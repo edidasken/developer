@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- All relative URLs resolved one level up (app.embeds/ → church root) -->
+  <base href="../">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
   <title>GROW with FlockOS</title>
@@ -180,9 +182,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
   <!--
-    grow_public.js and all dynamic imports resolved via <base href> one level up from app.embeds/
+    grow_public.js and all dynamic imports resolved via <base href> set in head
   -->
-  <base href="../">
   <script type="module" src="Scripts/grow_public.js"></script>
 </body>
 </html>

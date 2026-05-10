@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- All relative URLs resolved one level up (app.embeds/ → church root) -->
+  <base href="../">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
   <title>FlockOS</title>
@@ -118,8 +120,7 @@
   <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
 
-  <!-- Legacy backend scripts — all resolved via <base href> one level up from app.embeds/ -->
-  <base href="../">
+  <!-- Legacy backend scripts — all resolved via <base href> in head -->
   <script defer src="Scripts/firm_foundation.js"></script>
   <script defer src="Scripts/the_upper_room.js"></script>
   <script defer src="Scripts/fine_linen.js"></script>
