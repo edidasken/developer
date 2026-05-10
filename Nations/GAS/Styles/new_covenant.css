@@ -5051,3 +5051,36 @@ flock-tabs [role="tablist"], .tabs-bar {
   .grow-quiz-q-text { font-size:15px; }
   .grow-quiz-q-card { padding:18px 14px; }
 }
+
+/* ── The Pentecost — Special Services & Milestones ─────────────────────────── */
+.pent-list { display: flex; flex-direction: column; gap: 10px; }
+
+.pent-card {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--bg-card, #fff); border: 1px solid var(--line, #e5e7ef);
+  border-radius: 14px; padding: 14px 16px;
+  transition: box-shadow 150ms, border-color 150ms;
+}
+.pent-card:hover { box-shadow: 0 2px 12px rgba(27,38,79,.08); border-color: var(--gold, #e8a838); }
+.pent-card--past { background: var(--bg-soft, #f5f6fa); opacity: 0.82; }
+.pent-card--past:hover { opacity: 1; }
+
+.pent-card-icon {
+  flex-shrink: 0; width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.35rem; line-height: 1;
+}
+.pent-card-body { flex: 1; min-width: 0; }
+.pent-card-title { font: 600 0.97rem var(--font-ui); color: var(--ink, #1b264f); margin-bottom: 4px; }
+.pent-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 4px; }
+
+.pent-type-badge {
+  font: 600 0.75rem var(--font-ui); padding: 2px 9px; border-radius: 20px;
+}
+.pent-date { font: 0.82rem var(--font-ui); color: var(--ink-muted, #7a7f96); }
+.pent-candidates { font: 0.82rem var(--font-ui); color: var(--ink-muted, #7a7f96); }
+.pent-past-badge {
+  font: 600 0.72rem var(--font-ui); padding: 2px 8px; border-radius: 20px;
+  background: rgba(107,114,128,0.12); color: #6b7280;
+}
+.pent-notes { font: 0.85rem/1.5 var(--font-ui); color: var(--ink-muted, #7a7f96); margin-top: 2px; }
