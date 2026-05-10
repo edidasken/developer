@@ -1281,6 +1281,17 @@ function _openSheet(c, memberDir, onSave) {
             ${STATUSES.map(s => `<button class="life-status-pill${s === currentStatus ? ' is-active' : ''}" data-status="${_e(s)}">${_e(s)}</button>`).join('')}
           </div>
         </div>
+        <!-- Priority -->
+        <div class="life-sheet-field">
+          <div class="life-sheet-label">Priority</div>
+          <div class="life-priority-row">
+            ${['urgent','high','normal','low'].map(p => {
+              const pr = PRIORITY[p] || {};
+              const isActive = (c.priority || 'normal').toLowerCase() === p;
+              return `<button class="life-priority-pill${isActive ? ' is-active' : ''}" data-priority="${p}" style="${isActive ? `background:${pr.bg};color:${pr.color};border-color:${pr.color}` : ''}">${_e(pr.label || p)}</button>`;
+            }).join('')}
+          </div>
+        </div>
         <!-- Primary Caregiver -->
         <div class="life-sheet-field">
           <div class="life-sheet-label">Assigned To</div>
@@ -1410,6 +1421,22 @@ function _openSheet(c, memberDir, onSave) {
     btn.addEventListener('click', () => {
       sheet.querySelectorAll('.life-status-pill').forEach(b => b.classList.remove('is-active'));
       btn.classList.add('is-active');
+    });
+  });
+
+  // Priority pill wiring
+  sheet.querySelectorAll('.life-priority-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sheet.querySelectorAll('.life-priority-pill').forEach(b => {
+        b.classList.remove('is-active');
+        b.style.cssText = '';
+      });
+      btn.classList.add('is-active');
+      const p  = btn.dataset.priority;
+      const pr = PRIORITY[p] || {};
+      btn.style.background   = pr.bg    || '';
+      btn.style.color        = pr.color || '';
+      btn.style.borderColor  = pr.color || '';
     });
   });
 
@@ -1545,12 +1572,14 @@ function _openSheet(c, memberDir, onSave) {
     btn.disabled = true;
     btn.textContent = 'Saving…';
     const activeStatus  = sheet.querySelector('.life-status-pill.is-active')?.dataset.status || currentStatus;
+    const newPriority   = sheet.querySelector('.life-priority-pill.is-active')?.dataset.priority || (c.priority || 'normal').toLowerCase();
+    const oldPriority   = (c.priority || 'normal').toLowerCase();
     const assigneeVal   = sheet.querySelector('[data-field="assignee"]')?.value?.trim() || '';
     const secondaryVal  = sheet.querySelector('[data-field="secondary"]')?.value?.trim() || '';
     const summaryVal    = sheet.querySelector('[data-field="summary"]').value.trim();
     const pastoralVal   = isPastoral ? (sheet.querySelector('[data-field="pastoralNotes"]')?.value ?? null) : undefined;
     try {
-      const patch = { id: cid, status: activeStatus };
+      const patch = { id: cid, status: activeStatus, priority: newPriority };
       if (assigneeVal)  patch.primaryCaregiverId   = assigneeVal;
       if (secondaryVal) patch.secondaryCaregiverId = secondaryVal;
       if (summaryVal)   patch.summary              = summaryVal;
@@ -1558,6 +1587,27 @@ function _openSheet(c, memberDir, onSave) {
         patch.pastoralNotes = pastoralVal;
       }
       await MXC.update(patch);
+      // Log a priority-change interaction if the priority actually changed
+      if (newPriority !== oldPriority) {
+        const session   = window.TheVine?.session?.();
+        const fromLabel = PRIORITY[oldPriority]?.label || oldPriority;
+        const toLabel   = PRIORITY[newPriority]?.label || newPriority;
+        const ixPayload = {
+          caseId: cid,
+          notes: `Priority changed from ${fromLabel} → ${toLabel}`,
+          interactionType: 'Priority Change',
+          createdBy: session?.email || '',
+          author:    session?.email || '',
+        };
+        try {
+          const UR2 = window.UpperRoom;
+          if (UR2 && typeof UR2.createCareInteraction === 'function') {
+            await UR2.createCareInteraction(ixPayload);
+          } else {
+            await MXCI.create(ixPayload);
+          }
+        } catch (e) { console.error('[TheLife] priority log error:', e); }
+      }
       _closeSheet();
       if (onSave) onSave();
     } catch (err) {

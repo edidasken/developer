@@ -2499,6 +2499,18 @@ flock-tabs [role="tablist"], .tabs-bar {
   color: #9a6100;
 }
 
+/* Priority pills (case detail sheet) */
+.life-priority-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.life-priority-pill {
+  padding: 6px 14px; border: 1.5px solid var(--line, #e5e7ef);
+  border-radius: 20px; background: var(--bg-soft, #f5f6fa);
+  color: var(--ink, #1b264f); font: 600 0.82rem var(--font-ui);
+  cursor: pointer; transition: border-color 140ms, background 140ms, color 140ms;
+}
+.life-priority-pill.is-active {
+  font-weight: 700;
+}
+
 /* Interactions */
 .life-ix-list { display: flex; flex-direction: column; gap: 10px; }
 .life-ix-item { background: var(--bg-soft, #f5f6fa); border-radius: 10px; padding: 10px 12px; }
