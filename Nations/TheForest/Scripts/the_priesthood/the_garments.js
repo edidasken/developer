@@ -48,7 +48,7 @@ export async function renderGarments(/* { mode } */) {
         <p class="garments-request-access">
           Not set up yet? <button type="button" class="garments-request-link" data-act="request-access">Request access</button>
           <span class="garments-request-sep">·</span>
-          or <a href="grow-public.html" class="garments-request-link">continue learning in GROW</a>
+          or <a href="index.html" class="garments-request-link">Return to Home</a>
         </p>
       </form>
     `;
