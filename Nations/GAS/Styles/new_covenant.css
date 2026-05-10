@@ -218,6 +218,7 @@ html, body {
   display: flex; align-items: center; gap: 10px;
   text-decoration: none; padding: 5px 8px; border-radius: 10px; flex-shrink: 0;
   transition: background 180ms var(--ease);
+  border: 0; background: transparent; cursor: pointer;
 }
 .veil-brand:hover { background: rgba(255,255,255,0.08); }
 .veil-brand img {
@@ -5084,3 +5085,25 @@ flock-tabs [role="tablist"], .tabs-bar {
   background: rgba(107,114,128,0.12); color: #6b7280;
 }
 .pent-notes { font: 0.85rem/1.5 var(--font-ui); color: var(--ink-muted, #7a7f96); margin-top: 2px; }
+
+/* ── DM Pane (Fellowship > Direct) ─────────────────────────────────────────── */
+.dm-pane { display:flex; flex-direction:column; gap:10px; min-height:60vh; }
+.dm-pane-hd { display:flex; align-items:center; gap:8px; }
+.dm-pane-title { flex:1; font:600 0.95rem var(--font-ui,'Noto Sans',sans-serif); color:var(--ink,#1b264f); }
+.dm-body { display:grid; grid-template-columns:240px 1fr; gap:16px; flex:1; min-height:0; }
+.dm-list-col { border-right:1px solid var(--line,#e5e7ef); padding-right:10px; overflow-y:auto; }
+.dm-thread-col { min-width:0; }
+.dm-col--hidden { display:none !important; }
+.dm-list-empty,.dm-thread-empty { color:var(--ink-muted,#7a7f96); padding:16px 8px; font:0.9rem var(--font-ui); }
+.dm-thread-empty { padding:24px 8px; }
+.dm-row { display:flex; gap:8px; align-items:center; width:100%; padding:8px 10px; border:0; background:transparent; cursor:pointer; border-radius:8px; color:var(--ink,#1b264f); text-align:left; font:500 0.92rem var(--font-ui,'Noto Sans',sans-serif); }
+.dm-row:hover { background:var(--bg-soft,#f5f6fa); }
+.dm-row-at { color:var(--ink-muted,#7a7f96); }
+.dm-row-name { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+@media (max-width:600px) {
+  .dm-body { display:flex; flex-direction:column; grid-template-columns:none; }
+  .dm-list-col { border-right:none; padding-right:0; }
+}
+
+/* ── Fold DM Button ─────────────────────────────────────────────────────────── */
+.fold-dm-btn { font:600 0.78rem var(--font-ui,'Noto Sans',sans-serif); padding:3px 10px; border-radius:20px; }

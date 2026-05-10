@@ -21,9 +21,9 @@ export function mountCrown(host) {
   host.classList.add('veil-top');
   host.innerHTML = `
     <button class="veil-action veil-menu" data-act="toggle-side" aria-label="Open navigation">${ICON.menu}</button>
-    <a class="veil-brand" href="?covenant=new&view=the_good_shepherd" aria-label="FlockOS home">
+    <button class="veil-brand" data-act="home" aria-label="FlockOS home">
       <span class="veil-brand-text">FlockOS</span>
-    </a>
+    </button>
     <div class="veil-spacer"></div>
     <button class="veil-search" data-act="open-herald" aria-label="Open command palette (⌘K)">
       ${ICON.search}<span>Search anything…</span><kbd>⌘K</kbd>
@@ -39,7 +39,8 @@ export function mountCrown(host) {
     const btn = e.target.closest('[data-act]');
     if (!btn) return;
     const act = btn.dataset.act;
-    if (act === 'open-herald')        { import('../the_scribes/the_herald.js').then(m => m.toggle && m.toggle()); }
+    if (act === 'home')               { import('../the_scribes/index.js').then(m => m.go && m.go('the_good_shepherd')).catch(() => {}); }
+    else if (act === 'open-herald')   { import('../the_scribes/the_herald.js').then(m => m.toggle && m.toggle()); }
     else if (act === 'toggle-side')   { document.body.classList.toggle('veil-side-open'); }
     else if (act === 'open-account')  { import('../the_priesthood/index.js').then(m => m.openAccountSheet()); }
     else if (act === 'open-notifications') {

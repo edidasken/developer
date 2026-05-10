@@ -81,9 +81,9 @@ topbar.innerHTML = /* html */`
       <line x1="3" y1="18" x2="21" y2="18"/>
     </svg>
   </button>
-  <a class="veil-brand" href="#" aria-label="GROW home">
+  <button class="veil-brand" id="gp-home-btn" aria-label="GROW home">
     <span class="veil-brand-text">GROW</span>
-  </a>
+  </button>
   <span class="veil-spacer"></span>
   <div class="gp-avatar-wrap" style="position:relative;">
     <button class="veil-avatar" id="gp-signin-btn" aria-label="Sign in to FlockOS" aria-haspopup="true" aria-expanded="false">
@@ -108,6 +108,12 @@ topbar.innerHTML = /* html */`
     </div>
   </div>
 `;
+
+/* ─── Brand home button ─────────────────────────────────────────────────── */
+(function() {
+  const homeBtn = document.getElementById('gp-home-btn');
+  if (homeBtn) homeBtn.addEventListener('click', () => go(''));
+})();
 
 /* ─── Sign-in dropdown toggle ─────────────────────────────────────────────── */
 function _initSigninDropdown() {

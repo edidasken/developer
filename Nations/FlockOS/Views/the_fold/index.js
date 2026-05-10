@@ -6,6 +6,8 @@
 import { pageHero } from '../_frame.js';
 import { openContactComposer } from '../the_life/index.js';
 import { buildAdapter } from '../../Scripts/the_living_water_adapter.js';
+import { go } from '../../Scripts/the_scribes/index.js';
+import { dms } from '../../Scripts/the_upper_room/index.js';
 
 export const name  = 'the_fold';
 export const title = 'The Fold';
@@ -165,6 +167,22 @@ function _wireCards(grid, root) {
         if (kind === 'email') openContactComposer({ channel: 'email', name, recipient: value, target: value });
       });
     });
+
+    const dmBtn = card.querySelector('[data-fold-dm]');
+    if (dmBtn) {
+      dmBtn.addEventListener('click', async (ev) => {
+        ev.stopPropagation();
+        const email = dmBtn.dataset.foldDm;
+        if (!email) return;
+        try {
+          await dms.openWith(email);
+          go('the_fellowship', { tab: 'dms' });
+        } catch (err) {
+          console.error('[TheFold] DM error:', err);
+          alert(err?.message || 'Could not start a DM with that user.');
+        }
+      });
+    }
     const open = () => {
       const person = _personMap[card.dataset.id];
       if (person) _openMemberSheet(person, V, () => _loadMembers(root));
@@ -261,7 +279,8 @@ function _liveCard(p) {
         ${email ? `
           <button type="button" class="flock-icon-btn flock-icon-btn--sm fold-contact-btn" data-contact="email" data-name="${_e(name)}" data-value="${_e(email)}" title="Email ${_e(name)}" aria-label="Email ${_e(name)}">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
-          </button>` : ''}
+          </button>
+          <button type="button" class="flock-btn flock-btn--sm fold-dm-btn" data-fold-dm="${_e(email)}" title="DM ${_e(name)}" aria-label="DM ${_e(name)}">DM</button>` : ''}
       </div>` : ''}
       <svg class="fold-card-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
     </article>`;

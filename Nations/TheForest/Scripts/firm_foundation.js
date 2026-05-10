@@ -543,9 +543,9 @@ const Nehemiah = (() => {
       } catch (_) {}
     })();
 
-    // Always honour the full 25 s so the card is readable, then go to public portal
+    // Always honour the full 25 s so the card is readable, then go to launcher
     await new Promise(function(resolve) { setTimeout(resolve, 25000); });
-    window.location.replace(PUBLIC_PORTAL);
+    window.location.replace(LAUNCHER_PAGE);
   }
 
 
