@@ -338,6 +338,113 @@ const _ROLES_FIELDS = [
   { key: 'roles_visitor', label: 'Visitor Role', type: 'text', placeholder: 'e.g. Unapproved accounts' },
 ];
 
+// Permission matrix — [visitor, member, leader, admin] defaults (1 = on, 0 = off)
+const _PERMISSION_CATEGORIES = [
+  {
+    category: 'Membership',
+    perms: [
+      { key: 'perm_view_directory',     label: 'View Member Directory',       defaults: [0,1,1,1] },
+      { key: 'perm_edit_profiles',      label: 'Edit Member Profiles',        defaults: [0,0,1,1] },
+      { key: 'perm_invite_members',     label: 'Invite New Members',          defaults: [0,1,1,1] },
+      { key: 'perm_approve_membership', label: 'Approve Membership Requests', defaults: [0,0,0,1] },
+    ],
+  },
+  {
+    category: 'Pastoral Care',
+    perms: [
+      { key: 'perm_view_care',       label: 'View Care Cases',       defaults: [0,0,1,1] },
+      { key: 'perm_manage_care',     label: 'Manage Care Cases',     defaults: [0,0,1,1] },
+      { key: 'perm_prayer_chain',    label: 'Prayer Chain Access',   defaults: [0,1,1,1] },
+      { key: 'perm_compassion',      label: 'Submit Compassion Requests', defaults: [0,1,1,1] },
+    ],
+  },
+  {
+    category: 'Content & Announcements',
+    perms: [
+      { key: 'perm_view_announcements', label: 'View Announcements',           defaults: [1,1,1,1] },
+      { key: 'perm_post_announcements', label: 'Post Announcements',           defaults: [0,0,1,1] },
+      { key: 'perm_manage_content',     label: 'Manage Devotionals & Content', defaults: [0,0,0,1] },
+      { key: 'perm_view_calendar',      label: 'View Church Calendar',         defaults: [1,1,1,1] },
+    ],
+  },
+  {
+    category: 'Giving & Stewardship',
+    perms: [
+      { key: 'perm_view_own_giving', label: 'View Own Giving History',  defaults: [0,1,1,1] },
+      { key: 'perm_view_all_giving', label: 'View All Giving Records',  defaults: [0,0,0,1] },
+      { key: 'perm_manage_giving',   label: 'Manage Giving Records',    defaults: [0,0,0,1] },
+      { key: 'perm_pledge_manage',   label: 'Pledge Management',        defaults: [0,0,1,1] },
+    ],
+  },
+  {
+    category: 'Communications',
+    perms: [
+      { key: 'perm_send_dm',         label: 'Send Direct Messages',    defaults: [0,1,1,1] },
+      { key: 'perm_group_messaging', label: 'Group Messaging',         defaults: [0,0,1,1] },
+      { key: 'perm_mass_messaging',  label: 'Mass Church Messaging',   defaults: [0,0,0,1] },
+    ],
+  },
+  {
+    category: 'Analytics & Admin',
+    perms: [
+      { key: 'perm_view_analytics',      label: 'View Analytics',             defaults: [0,0,1,1] },
+      { key: 'perm_access_admin',        label: 'Access Admin Panel',         defaults: [0,0,0,1] },
+      { key: 'perm_manage_roles',        label: 'Manage Roles & Permissions', defaults: [0,0,0,1] },
+      { key: 'perm_manage_integrations', label: 'Manage Integrations',        defaults: [0,0,0,1] },
+    ],
+  },
+];
+
+const _ROLE_COLS = [
+  { key: 'visitor', label: 'Visitor' },
+  { key: 'member',  label: 'Member'  },
+  { key: 'leader',  label: 'Leader'  },
+  { key: 'admin',   label: 'Admin'   },
+];
+
+function _permMatrixMarkup() {
+  let html = `
+    <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border)">
+      <h3 style="font:600 .95rem var(--font-ui);margin:0 0 4px;color:var(--ink)">Permission Matrix</h3>
+      <p style="font:.78rem var(--font-ui);color:var(--ink-muted);margin:0 0 14px">
+        Check which capabilities each role can access. Changes apply immediately on save.
+      </p>
+      <div class="perm-matrix-wrap">
+        <table class="perm-matrix">
+          <thead>
+            <tr>
+              <th class="perm-matrix-label-col"></th>
+              ${_ROLE_COLS.map(c => `<th class="perm-matrix-col-head">${_e(c.label)}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>`;
+
+  for (const cat of _PERMISSION_CATEGORIES) {
+    html += `<tr class="perm-matrix-cat"><td colspan="5">${_e(cat.category)}</td></tr>`;
+    for (const p of cat.perms) {
+      html += `<tr class="perm-matrix-row">
+        <td class="perm-matrix-label">${_e(p.label)}</td>`;
+      _ROLE_COLS.forEach((col, ri) => {
+        const checked = p.defaults[ri] ? ' checked' : '';
+        html += `<td class="perm-matrix-cell">
+          <input type="checkbox" class="perm-cb" data-perm="${_e(p.key)}" data-role="${_e(col.key)}"${checked}>
+        </td>`;
+      });
+      html += `</tr>`;
+    }
+  }
+
+  html += `</tbody>
+        </table>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+        <button class="flock-btn flock-btn--primary" data-act="perms-save">Save Permissions</button>
+        <span data-bind="perms-saved" style="display:none;color:var(--success,#16a34a);font-size:.85rem">✓ Saved</span>
+      </div>
+    </div>`;
+  return html;
+}
+
 const _PASTORAL_SLOT_LABELS = [
   'Slot 1 — Lead Pastor',
   'Slot 2 — Timothy',
@@ -370,12 +477,57 @@ function _rolesPanelMarkup() {
       </div>
     </div>`;
 
-  return _genericAppConfigPanel('roles', _ROLES_FIELDS) + pastoralSection;
+  return _genericAppConfigPanel('roles', _ROLES_FIELDS) + _permMatrixMarkup() + pastoralSection;
 }
 
 function _wireRolesPanel(root) {
   _wireAppConfigPanel(root, 'roles', _ROLES_FIELDS);
+  _wirePermMatrix(root);
   _wirePastoralSlots(root);
+}
+
+async function _wirePermMatrix(root) {
+  const panel = root.querySelector('[data-wall-panel="roles"]');
+  if (!panel) return;
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR) return;
+
+  // Load saved permissions — override defaults if a saved value exists
+  try {
+    const cfg = await UR.getAppConfig({ key: 'role_permissions' });
+    if (cfg?.value) {
+      const saved = JSON.parse(cfg.value);
+      panel.querySelectorAll('.perm-cb').forEach(cb => {
+        const key = `${cb.dataset.perm}::${cb.dataset.role}`;
+        if (key in saved) cb.checked = !!saved[key];
+      });
+    }
+  } catch (_) {}
+
+  // Save
+  panel.addEventListener('click', async (e) => {
+    if (!e.target.closest('[data-act="perms-save"]')) return;
+    const btn = e.target.closest('[data-act="perms-save"]');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    const perms = {};
+    panel.querySelectorAll('.perm-cb').forEach(cb => {
+      perms[`${cb.dataset.perm}::${cb.dataset.role}`] = cb.checked ? 1 : 0;
+    });
+    try {
+      await UR.setAppConfig({
+        key: 'role_permissions',
+        value: JSON.stringify(perms),
+        category: 'roles',
+        description: 'Role Permission Matrix',
+      });
+      const savedEl = panel.querySelector('[data-bind="perms-saved"]');
+      if (savedEl) { savedEl.style.display = ''; setTimeout(() => { savedEl.style.display = 'none'; }, 3000); }
+    } catch (err) {
+      alert('Could not save: ' + (err?.message || String(err)));
+    } finally {
+      btn.disabled = false; btn.textContent = 'Save Permissions';
+    }
+  });
 }
 
 async function _wirePastoralSlots(root) {
