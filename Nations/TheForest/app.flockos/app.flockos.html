@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- base: resolves all relative resource paths from the parent New_Covenant/ folder -->
+  <base href="../">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
-  <title>FlockOS</title>
+  <title>The Forest</title>
 
-  <!-- PWA manifest -->
-  <link rel="manifest" href="manifest.json">
+  <!-- PWA manifest — path relative to base (New_Covenant/) -->
+  <link rel="manifest" href="app.flockos/manifest.json">
 
   <!-- Icons -->
   <link rel="icon" type="image/png" href="Images/NewCovenant.png">
@@ -17,7 +19,7 @@
   <meta name="theme-color" content="#e8a838">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="FlockOS">
+  <meta name="apple-mobile-web-app-title" content="The Forest">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <!-- SEO -->
@@ -181,14 +183,14 @@
 
   <!-- ── Firebase config — flockos-notify project ──────────────────────── -->
   <script>
-    window.FLOCK_FIREBASE_CONFIG = {
-      apiKey:            'AIzaSyBA-fkxjABbwIHn0i6MPiXbGwahfJmuJeo',
-      authDomain:        'flockos-notify.firebaseapp.com',
-      projectId:         'flockos-notify',
-      storageBucket:     'flockos-notify.firebasestorage.app',
-      messagingSenderId: '321766738616',
-      appId:             '1:321766738616:web:d2c1c53ad7493fcde4c24d',
-      measurementId:     'G-EFMSZE581W'
+        window.FLOCK_FIREBASE_CONFIG = {
+      apiKey:  'AIzaSyCnIbShg2ra1t4EiP3CffsivwvIK-bNu8M',
+      authDomain:  'flockos-theforest.firebaseapp.com',
+      projectId:  'flockos-theforest',
+      storageBucket:  'flockos-theforest.firebasestorage.app',
+      messagingSenderId:  '476522944133',
+      appId:  '1:476522944133:web:29ad5d19cf5a84c11b7bec',
+      measurementId:  'G-WMGPRHXP0Q',
     };
   </script>
 

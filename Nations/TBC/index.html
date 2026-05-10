@@ -9,9 +9,9 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="FlockOS">
+  <meta name="apple-mobile-web-app-title" content="Trinity Baptist Church">
   <meta name="theme-color" content="#0c1445">
-  <meta name="description" content="Trinity Baptist Church — complete church management and GROW discipleship tools. Free forever. 210 countries. Built to be shared.">
+  <meta name="description" content="Trinity Baptist Church — FlockOS church management and GROW discipleship tools. Free forever. 210 countries.">
 
   <!-- Open Graph -->
   <meta property="og:title" content="Trinity Baptist Church">
@@ -27,229 +27,155 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:          #09102e;
-      --bg-raised:   #111b44;
-      --bg-card:     #141f4e;
-      --ink:         #eef1fb;
-      --ink-muted:   #9ba8d0;
-      --ink-faint:   #5a6894;
-      --gold:        #e8a838;
-      --gold-soft:   rgba(232,168,56,0.14);
-      --accent:      #5b8dee;
-      --accent-soft: rgba(91,141,238,0.14);
-      --line:        rgba(255,255,255,0.08);
-      --line-strong: rgba(255,255,255,0.14);
-      --shadow-md:   0 6px 24px rgba(0,0,0,0.32);
-      --shadow-lg:   0 12px 40px rgba(0,0,0,0.44);
-      --font:        'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      --font-serif:  'Merriweather', Georgia, serif;
-      --radius:      20px;
+      --bg:       #09102e;
+      --card:     #111b44;
+      --ink:      #eef1fb;
+      --muted:    #9ba8d0;
+      --faint:    #3d4f7c;
+      --gold:     #e8a838;
+      --blue:     #5b8dee;
+      --line:     rgba(255,255,255,0.10);
+      --font:     'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --serif:    'Merriweather', Georgia, serif;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bot: env(safe-area-inset-bottom, 0px);
     }
 
     html, body {
       height: 100%;
       font-family: var(--font);
-      font-size: 16px;
-      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       background: var(--bg);
       color: var(--ink);
       overflow-x: hidden;
     }
 
+    /* Subtle radial glow behind everything */
     body::before {
       content: '';
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
       background:
-        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(91,141,238,0.18) 0%, transparent 70%),
-        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(232,168,56,0.10) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
+        radial-gradient(ellipse 90% 55% at 50% -5%,  rgba(91,141,238,0.16) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 40% at 85% 95%,  rgba(232,168,56,0.09) 0%, transparent 55%);
     }
 
-    /* ── Top header ─────────────────────────────────────────────────── */
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      width: 100%;
-      background: rgba(9,16,46,0.82);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--line-strong);
-      padding: env(safe-area-inset-top, 0px) 1.5rem 0;
-      height: calc(60px + env(safe-area-inset-top, 0px));
-      display: flex;
-      align-items: flex-end;
-    }
-    .site-header-inner {
-      max-width: 1080px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-    }
-    .site-header img { width: 36px; height: 36px; border-radius: 10px; }
-    .site-header-name {
-      font-size: 1.1rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--gold);
-    }
-
-    /* ── Page ───────────────────────────────────────────────────────── */
-    .page {
-      position: relative;
-      z-index: 1;
+    /* ── Launcher shell ────────────────────────────────────────────── */
+    .launcher {
+      position: relative; z-index: 1;
+      min-height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: calc(100vh - 60px);
-      padding: 3rem 1.25rem 4rem;
-      gap: 3rem;
-    }
-
-    /* ── Hero ───────────────────────────────────────────────────────── */
-    .hero {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 1rem;
-      max-width: 640px;
-    }
-    .hero h1 {
-      font-size: clamp(1.75rem, 5vw, 2.6rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.2;
-      color: var(--ink);
-    }
-    .hero h1 em { font-style: normal; color: var(--gold); }
-    .hero p {
-      font-size: 1.05rem;
-      color: var(--ink-muted);
-      max-width: 48ch;
-      line-height: 1.7;
-    }
-    .hero-badges {
-      display: flex;
-      flex-wrap: wrap;
       justify-content: center;
-      gap: 0.5rem;
-      margin-top: 0.25rem;
-    }
-    .badge {
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 0.3rem 0.75rem;
-      border-radius: 999px;
-      border: 1px solid var(--line-strong);
-      color: var(--ink-muted);
-      background: rgba(255,255,255,0.04);
+      padding: calc(var(--safe-top) + 2.5rem) 1.25rem calc(var(--safe-bot) + 2rem);
+      gap: 2.5rem;
     }
 
-    /* ── Product cards ──────────────────────────────────────────────── */
-    .products {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      width: 100%;
-      max-width: 740px;
-    }
-    .product-card {
+    /* ── Church identity ───────────────────────────────────────────── */
+    .church-id {
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 0.75rem;
       text-align: center;
-      gap: 1.1rem;
-      padding: 2.2rem 1.75rem 2rem;
-      background: var(--bg-card);
-      border: 1px solid var(--line-strong);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-md);
+    }
+    .church-id img {
+      width: 72px; height: 72px;
+      border-radius: 18px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.40);
+    }
+    .church-id h1 {
+      font-size: clamp(1.4rem, 5vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--gold);
+      line-height: 1.2;
+    }
+
+    /* ── App buttons ───────────────────────────────────────────────── */
+    .apps {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .app-btn {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.15rem 1.4rem;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
       text-decoration: none;
-      color: inherit;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      color: var(--ink);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.28);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
       position: relative;
       overflow: hidden;
-      min-height: 340px;
     }
-    .product-card::before {
+    .app-btn::before {
       content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 70% 50% at 50% 0%, var(--card-glow, rgba(91,141,238,0.10)), transparent 70%);
-      pointer-events: none;
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 80% 70% at 20% 50%, var(--btn-glow, transparent), transparent 70%);
     }
-    .product-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--card-accent, var(--accent));
-    }
-    .product-card--flockos { --card-glow: rgba(91,141,238,0.12); --card-accent: var(--accent); }
-    .product-card--grow    { --card-glow: rgba(232,168,56,0.12);  --card-accent: var(--gold); }
+    .app-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.40); }
+    .app-btn:active { transform: scale(0.98); }
 
-    .product-logo {
-      width: 96px;
-      height: 96px;
-      border-radius: 24px;
+    .app-btn--grow  { --btn-glow: rgba(232,168,56,0.10); border-color: rgba(232,168,56,0.18); }
+    .app-btn--flock { --btn-glow: rgba(91,141,238,0.10); border-color: rgba(91,141,238,0.18); }
+    .app-btn:hover.app-btn--grow  { border-color: rgba(232,168,56,0.40); }
+    .app-btn:hover.app-btn--flock { border-color: rgba(91,141,238,0.40); }
+
+    .app-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
       object-fit: contain;
-      box-shadow: var(--shadow-md);
-      position: relative;
-      z-index: 1;
+      flex-shrink: 0;
+      position: relative; z-index: 1;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.30);
     }
-    .product-name {
-      font-size: 1.5rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      position: relative;
-      z-index: 1;
-    }
-    .product-card--flockos .product-name { color: #a0beff; }
-    .product-card--grow    .product-name { color: var(--gold); }
-
-    .product-desc {
-      font-size: 0.97rem;
-      color: var(--ink-muted);
-      line-height: 1.6;
-      max-width: 30ch;
-      position: relative;
-      z-index: 1;
+    .app-label {
       flex: 1;
+      position: relative; z-index: 1;
     }
-    .product-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.88rem;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      padding: 0.55rem 1.3rem;
-      border-radius: 999px;
-      border: 1px solid var(--card-accent, var(--accent));
-      color: var(--card-accent, var(--accent));
-      background: transparent;
-      transition: background 0.15s, color 0.15s;
-      position: relative;
-      z-index: 1;
+    .app-label strong {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
     }
-    .product-card:hover .product-cta {
-      background: var(--card-accent, var(--accent));
-      color: #fff;
+    .app-btn--grow  .app-label strong { color: var(--gold); }
+    .app-btn--flock .app-label strong { color: #a0beff; }
+    .app-label span {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+    .app-arrow {
+      font-size: 1.2rem;
+      color: var(--faint);
+      position: relative; z-index: 1;
+      transition: color 0.15s, transform 0.15s;
+    }
+    .app-btn:hover .app-arrow {
+      color: var(--ink);
+      transform: translateX(3px);
     }
 
-    /* ── Footer verse ───────────────────────────────────────────────── */
-    .verse { text-align: center; max-width: 52ch; }
+    /* ── Scripture footer ──────────────────────────────────────────── */
+    .verse {
+      text-align: center;
+      max-width: 38ch;
+    }
     .verse p {
-      font-family: var(--font-serif);
+      font-family: var(--serif);
       font-style: italic;
-      font-size: 1rem;
-      color: var(--ink-faint);
+      font-size: 0.9rem;
+      color: var(--muted);
       line-height: 1.7;
     }
     .verse cite {
@@ -257,30 +183,20 @@
       margin-top: 0.4rem;
       font-family: var(--font);
       font-style: normal;
-      font-size: 0.82rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--gold);
     }
-    .verse small {
-      display: block;
-      margin-top: 0.9rem;
-      font-size: 0.8rem;
-      color: var(--ink-faint);
-    }
 
-    @media (max-width: 600px) {
-      .page { padding: 2rem 1rem 3rem; gap: 2.25rem; }
-      .product-logo { width: 80px; height: 80px; }
-    }
-
-    /* ── Pull-to-Refresh ─────────────────────────────────────────────── */
+    /* ── Pull-to-Refresh ───────────────────────────────────────────── */
     @media (max-width: 860px) {
       .ptr-indicator {
-        display: none; position: fixed; top: 58px; left: 50%; transform: translateX(-50%);
-        z-index: 9998; background: var(--bg-raised,#1e2030); border: 1px solid var(--line,rgba(255,255,255,0.08));
-        border-radius: 20px; padding: 6px 14px; font-size: 0.75rem; color: var(--ink-muted,#9ca3af);
+        display: none; position: fixed; top: calc(var(--safe-top) + 8px);
+        left: 50%; transform: translateX(-50%);
+        z-index: 9998; background: var(--card); border: 1px solid var(--line);
+        border-radius: 20px; padding: 6px 14px; font-size: 0.75rem; color: var(--muted);
         box-shadow: 0 4px 12px rgba(0,0,0,0.28); white-space: nowrap;
       }
       .ptr-indicator.visible { display: block; }
@@ -289,48 +205,38 @@
 </head>
 <body>
 
-  <nav class="site-header" role="banner">
-    <div class="site-header-inner">
-      <img src="Images/NewCovenant.png" alt="FlockOS">
-      <span class="site-header-name">Trinity Baptist Church</span>
+  <div class="launcher">
+
+    <div class="church-id">
+      <img src="Images/NewCovenant.png" alt="Trinity Baptist Church">
+      <h1>Trinity Baptist Church</h1>
     </div>
-  </nav>
 
-  <div class="page">
+    <nav class="apps" aria-label="Apps">
 
-    <header class="hero">
-      <h1>Welcome to <em>Trinity Baptist Church.</em></h1>
-      <p>Choose an app to get started.</p>
-      <div class="hero-badges">
-        <span class="badge">210 Countries</span>
-        <span class="badge">256-bit Encrypted</span>
-        <span class="badge">Offline-Capable</span>
-        <span class="badge">Free Forever</span>
-      </div>
-    </header>
-
-    <section class="products" aria-label="Products">
-
-      <a class="product-card product-card--grow" href="grow-public.html">
-        <img class="product-logo" src="Images/GrowIcon.png" alt="GROW">
-        <div class="product-name">GROW</div>
-        <p class="product-desc">Daily devotionals, reading plans, and discipleship content. Open to everyone.</p>
-        <span class="product-cta">Open GROW &#8594;</span>
+      <a class="app-btn app-btn--grow" href="app.grow/app.grow.html">
+        <img class="app-icon" src="Images/GrowIcon.png" alt="GROW">
+        <div class="app-label">
+          <strong>GROW</strong>
+          <span>Discipleship &amp; Bible study</span>
+        </div>
+        <span class="app-arrow" aria-hidden="true">&#8594;</span>
       </a>
 
-      <a class="product-card product-card--flockos" href="flockos.html">
-        <img class="product-logo" src="Images/NewCovenant.png" alt="FlockOS">
-        <div class="product-name">FlockOS</div>
-        <p class="product-desc">Church management, member care, discipleship, and pastoral tools — all in one.</p>
-        <span class="product-cta">Open FlockOS &#8594;</span>
+      <a class="app-btn app-btn--flock" href="app.flockos/app.flockos.html">
+        <img class="app-icon" src="Images/NewCovenant.png" alt="FlockOS">
+        <div class="app-label">
+          <strong>FlockOS</strong>
+          <span>Church management &amp; pastoral care</span>
+        </div>
+        <span class="app-arrow" aria-hidden="true">&#8594;</span>
       </a>
 
-    </section>
+    </nav>
 
     <footer class="verse">
       <p>"Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit."</p>
       <cite>Matthew 28:19</cite>
-      <small>Soli Deo Gloria &mdash; FlockOS &mdash; Built to Be Shared</small>
     </footer>
 
   </div>
@@ -338,41 +244,27 @@
   <!-- Pull-to-Refresh indicator -->
   <div class="ptr-indicator" id="ptrIndicator">&#8635; Release to refresh</div>
   <script>
-  // ── Pull-to-Refresh ────────────────────────────────────────────────────────
   (function () {
-    if (window.innerWidth > 860) return; // desktop — skip
+    if (window.innerWidth > 860) return;
     var ptr = document.getElementById('ptrIndicator');
     if (!ptr) return;
     var startY = 0, pulling = false, triggered = false;
 
     document.addEventListener('touchstart', function (e) {
-      var scrollY = window.scrollY || document.documentElement.scrollTop;
-      if (scrollY > 5) return;
-      startY    = e.touches[0].clientY;
-      pulling   = true;
-      triggered = false;
+      if ((window.scrollY || document.documentElement.scrollTop) > 5) return;
+      startY = e.touches[0].clientY; pulling = true; triggered = false;
     }, { passive: true });
 
     document.addEventListener('touchmove', function (e) {
       if (!pulling) return;
-      var dy = e.touches[0].clientY - startY;
-      if (dy > 60) {
-        triggered = true;
-        ptr.classList.add('visible');
-      } else if (!triggered) {
-        ptr.classList.remove('visible');
-      }
+      if (e.touches[0].clientY - startY > 60) { triggered = true; ptr.classList.add('visible'); }
+      else if (!triggered) { ptr.classList.remove('visible'); }
     }, { passive: true });
 
     document.addEventListener('touchend', function () {
-      if (triggered) {
-        ptr.textContent = 'Refreshing\u2026';
-        setTimeout(function () { location.reload(); }, 300);
-      } else {
-        ptr.classList.remove('visible');
-      }
-      pulling   = false;
-      triggered = false;
+      if (triggered) { ptr.textContent = 'Refreshing\u2026'; setTimeout(function () { location.reload(); }, 300); }
+      else { ptr.classList.remove('visible'); }
+      pulling = triggered = false;
     }, { passive: true });
   })();
   </script>

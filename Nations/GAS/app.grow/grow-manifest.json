@@ -2,7 +2,7 @@
   "name": "GROW by FlockOS",
   "short_name": "GROW",
   "description": "Free discipleship tools in 210 countries — Bible reading plans, devotionals, Strongs lexicons, apologetics, theology, missions, and more. No account required. Offline-capable.",
-  "start_url": "./grow-public.html",
+  "start_url": "./app.grow.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
@@ -13,13 +13,13 @@
   "categories": ["education", "productivity"],
   "icons": [
     {
-      "src": "Images/GrowIcon.png",
+      "src": "../Images/GrowIcon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "Images/NewCovenant.png",
+      "src": "../Images/NewCovenant.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
@@ -30,22 +30,22 @@
       "name": "Reading Plans",
       "short_name": "Reading",
       "description": "Open the one-year Bible reading plan",
-      "url": "./grow-public.html#the_gospel_reading",
-      "icons": [{ "src": "Images/GrowIcon.png", "sizes": "512x512" }]
+      "url": "./app.grow.html#the_gospel_reading",
+      "icons": [{ "src": "../Images/GrowIcon.png", "sizes": "512x512" }]
     },
     {
       "name": "Devotionals",
       "short_name": "Devotionals",
       "description": "Open daily devotionals",
-      "url": "./grow-public.html#the_gospel_devotionals",
-      "icons": [{ "src": "Images/GrowIcon.png", "sizes": "512x512" }]
+      "url": "./app.grow.html#the_gospel_devotionals",
+      "icons": [{ "src": "../Images/GrowIcon.png", "sizes": "512x512" }]
     },
     {
       "name": "Lexicon",
       "short_name": "Lexicon",
       "description": "Open Strongs Hebrew & Greek lexicon",
-      "url": "./grow-public.html#the_gospel_lexicon",
-      "icons": [{ "src": "Images/GrowIcon.png", "sizes": "512x512" }]
+      "url": "./app.grow.html#the_gospel_lexicon",
+      "icons": [{ "src": "../Images/GrowIcon.png", "sizes": "512x512" }]
     }
   ],
   "prefer_related_applications": false

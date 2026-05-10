@@ -1,8 +1,8 @@
 {
-  "name": "The Forest",
-  "short_name": "TheForest",
+  "name": "Trinity Baptist Church",
+  "short_name": "TBC",
   "description": "Complete church management and pastoral care platform. Google Sheets, Firebase, or fully offline via The Wellspring. 30+ modules. 210 countries. 256-bit encrypted. Free forever.",
-  "start_url": "./",
+  "start_url": "./app.flockos.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
@@ -16,13 +16,13 @@
   ],
   "icons": [
     {
-      "src": "Images/NewCovenant.png",
+      "src": "../Images/NewCovenant.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "Images/flockos-icon.svg",
+      "src": "../Images/flockos-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
@@ -33,10 +33,10 @@
       "name": "Home",
       "short_name": "Home",
       "description": "Go to the Good Shepherd dashboard",
-      "url": "./index.html?view=the_good_shepherd",
+      "url": "./app.flockos.html?view=the_good_shepherd",
       "icons": [
         {
-          "src": "Images/NewCovenant.png",
+          "src": "../Images/NewCovenant.png",
           "sizes": "512x512"
         }
       ]
@@ -45,10 +45,10 @@
       "name": "Fellowship",
       "short_name": "Fellowship",
       "description": "Open messaging and channels",
-      "url": "./index.html?view=the_fellowship",
+      "url": "./app.flockos.html?view=the_fellowship",
       "icons": [
         {
-          "src": "Images/flockos-icon.svg",
+          "src": "../Images/flockos-icon.svg",
           "sizes": "any"
         }
       ]
@@ -57,10 +57,10 @@
       "name": "Pastoral Care",
       "short_name": "Care",
       "description": "Open pastoral care follow-ups",
-      "url": "./index.html?view=the_life",
+      "url": "./app.flockos.html?view=the_life",
       "icons": [
         {
-          "src": "Images/flockos-icon.svg",
+          "src": "../Images/flockos-icon.svg",
           "sizes": "any"
         }
       ]

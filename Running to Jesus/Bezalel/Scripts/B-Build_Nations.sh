@@ -60,7 +60,10 @@ PREFLIGHT_OK=true
 
 [ -d "$NEW_COVENANT" ] || { echo "  ✗ MISSING: New_Covenant/"; PREFLIGHT_OK=false; }
 [ -f "$NEW_COVENANT/index.html" ] || { echo "  ✗ MISSING: New_Covenant/index.html (selector)"; PREFLIGHT_OK=false; }
-[ -f "$NEW_COVENANT/flockos.html" ] || { echo "  ✗ MISSING: New_Covenant/flockos.html (app)"; PREFLIGHT_OK=false; }
+[ -f "$NEW_COVENANT/app.flockos/app.flockos.html" ] || { echo "  ✗ MISSING: New_Covenant/app.flockos/app.flockos.html (app)"; PREFLIGHT_OK=false; }
+[ -f "$NEW_COVENANT/app.flockos/manifest.json" ] || { echo "  ✗ MISSING: New_Covenant/app.flockos/manifest.json"; PREFLIGHT_OK=false; }
+[ -f "$NEW_COVENANT/app.grow/app.grow.html" ] || { echo "  ✗ MISSING: New_Covenant/app.grow/app.grow.html"; PREFLIGHT_OK=false; }
+[ -f "$NEW_COVENANT/app.grow/grow-manifest.json" ] || { echo "  ✗ MISSING: New_Covenant/app.grow/grow-manifest.json"; PREFLIGHT_OK=false; }
 [ -f "$NEW_COVENANT/the_living_water.js" ] || { echo "  ✗ MISSING: New_Covenant/the_living_water.js"; PREFLIGHT_OK=false; }
 [ -f "$NEW_COVENANT/Scripts/the_true_vine.js" ] || { echo "  ✗ MISSING: New_Covenant/Scripts/the_true_vine.js"; PREFLIGHT_OK=false; }
 
@@ -138,7 +141,7 @@ PYEOF
     "$TARGET/the_living_water.js"
   echo "  ✓ the_living_water.js CACHE_NAME → $CACHE_NAME"
 
-  # ── 4. Patch manifest.json — name / branding ──────────────────────
+  # ── 4. Patch app.flockos/manifest.json — name / branding ─────────
   export _NC_CHURCH_NAME="$CHURCH_NAME"
   export _NC_SHORT_NAME="$SHORT_NAME"
   export _NC_THEME_COLOR="$THEME_COLOR"
@@ -147,7 +150,7 @@ PYEOF
 import os, json
 
 t = os.environ['_NC_TARGET']
-path = t + '/manifest.json'
+path = t + '/app.flockos/manifest.json'
 
 with open(path, 'r') as f:
     m = json.load(f)
@@ -160,10 +163,10 @@ m['background_color'] = os.environ['_NC_BG_COLOR']
 with open(path, 'w') as f:
     json.dump(m, f, indent=2)
     f.write('\n')
-print('  ✓ manifest.json patched')
+print('  ✓ app.flockos/manifest.json patched')
 PYEOF
 
-  # ── 5. Patch flockos.html — <title>, apple title, Firebase config ──
+  # ── 5. Patch app.flockos/app.flockos.html — <title>, apple title, Firebase config ──
   FB_CONFIG_JSON=$(jq -r '.firebaseConfig // "null"' "$CFG")
   export _NC_FB_CONFIG="$FB_CONFIG_JSON"
   GAS_ONLY=$(jq -r '.gasOnly // false' "$CFG")
@@ -174,7 +177,7 @@ import os, json, re
 t          = os.environ['_NC_TARGET']
 name       = os.environ['_NC_CHURCH_NAME']
 fb_raw     = os.environ['_NC_FB_CONFIG']
-path       = t + '/flockos.html'
+path       = t + '/app.flockos/app.flockos.html'
 
 with open(path, 'r') as f:
     content = f.read()
@@ -198,7 +201,7 @@ except Exception:
     fb_obj = None
 
 if gas_only:
-    # GAS-only build — strip ALL Firebase references from flockos.html
+    # GAS-only build — strip ALL Firebase references from app.flockos.html
     # Remove firestore preconnect / dns-prefetch lines
     content = re.sub(r'[ \t]*<link[^>]+firestore\.googleapis\.com[^>]*>\n?', '', content)
     # Remove firebase_config modulepreload
@@ -212,7 +215,7 @@ if gas_only:
     )
     # Remove Firebase SDK <script> tags
     content = re.sub(r'[ \t]*<script[^>]+gstatic\.com/firebasejs[^>]*></script>\n?', '', content)
-    print('  ✓ flockos.html Firebase stripped (GAS-only build)')
+    print('  ✓ app.flockos.html Firebase stripped (GAS-only build)')
 elif isinstance(fb_obj, dict) and 'projectId' in fb_obj:
     # Church has its own Firebase project — patch the config block
     cfg_lines = ['    window.FLOCK_FIREBASE_CONFIG = {']
@@ -226,13 +229,13 @@ elif isinstance(fb_obj, dict) and 'projectId' in fb_obj:
         content,
         flags=re.DOTALL
     )
-    print('  ✓ flockos.html Firebase config replaced with church config')
+    print('  ✓ app.flockos.html Firebase config replaced with church config')
 else:
-    print('  ✓ flockos.html Firebase config kept as default (shared)')
+    print('  ✓ app.flockos.html Firebase config kept as default (shared)')
 
 with open(path, 'w') as f:
     f.write(content)
-print(f'  ✓ flockos.html title → {name}')
+print(f'  ✓ app.flockos.html title → {name}')
 PYEOF
 
   # ── 6. Patch index.html selector — replace {{CHURCH_NAME}} ────────
