@@ -338,12 +338,118 @@ const _ROLES_FIELDS = [
   { key: 'roles_visitor', label: 'Visitor Role', type: 'text', placeholder: 'e.g. Unapproved accounts' },
 ];
 
+const _PASTORAL_SLOT_LABELS = [
+  'Slot 1 — Lead Pastor',
+  'Slot 2 — Timothy',
+  'Slot 3 — Pastor / Elder',
+  'Slot 4 — Pastor / Elder',
+  'Slot 5 — Pastor / Elder',
+  'Slot 6 — Pastor / Elder',
+  'Slot 7 — Pastor / Elder',
+  'Slot 8 — Pastor / Elder',
+  'Slot 9 — Pastor / Elder',
+  'Slot 10 — Pastor / Elder',
+];
+
 function _rolesPanelMarkup() {
-  return _genericAppConfigPanel('roles', _ROLES_FIELDS);
+  const slotsRows = _PASTORAL_SLOT_LABELS.map((label, i) => `
+    <div class="wall-setting-row" style="align-items:center">
+      <label class="wall-setting-label">${_e(label)}</label>
+      <select class="wall-church-input" data-pastoral-slot="${i}" style="min-width:200px;max-width:280px">
+        <option value="">— Unassigned —</option>
+      </select>
+    </div>`).join('');
+
+  const pastoralSection = `
+    <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border)">
+      <h3 style="font:600 .95rem var(--font-ui);margin:0 0 14px;color:var(--ink)">Pastoral Hierarchy</h3>
+      <div class="wall-settings-list">${slotsRows}</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+        <button class="flock-btn flock-btn--primary" data-act="pastoral-save">Save Pastoral Slots</button>
+        <span data-bind="pastoral-saved" style="display:none;color:var(--success,#16a34a);font-size:.85rem">✓ Saved</span>
+      </div>
+    </div>`;
+
+  return _genericAppConfigPanel('roles', _ROLES_FIELDS) + pastoralSection;
 }
 
 function _wireRolesPanel(root) {
   _wireAppConfigPanel(root, 'roles', _ROLES_FIELDS);
+  _wirePastoralSlots(root);
+}
+
+async function _wirePastoralSlots(root) {
+  const panel = root.querySelector('[data-wall-panel="roles"]');
+  if (!panel) return;
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR) return;
+
+  // Load member list
+  let members = [];
+  try {
+    if (typeof UR.listMembers === 'function') {
+      members = (await UR.listMembers({ limit: 500 })) || [];
+    }
+  } catch (_) {}
+
+  const getName = m => (
+    m.preferredName ||
+    (((m.firstName || '') + ' ' + (m.lastName || '')).trim()) ||
+    m.displayName || m.email || ''
+  );
+  members = members.slice().sort((a, b) => getName(a).localeCompare(getName(b)));
+
+  // Load saved pastoral slot assignments
+  let savedSlots = {};
+  try {
+    const cfg = await UR.getAppConfig({ key: 'pastoral_slots' });
+    if (cfg?.value) savedSlots = JSON.parse(cfg.value);
+  } catch (_) {}
+
+  // Populate dropdowns
+  panel.querySelectorAll('[data-pastoral-slot]').forEach(sel => {
+    const idx = parseInt(sel.dataset.pastoralSlot, 10);
+    const savedId = savedSlots[idx]?.memberId || '';
+    for (const m of members) {
+      const id = m.id || m.uid || m.email || '';
+      if (!id) continue;
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = getName(m);
+      if (id === savedId) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  });
+
+  // Wire save button
+  panel.addEventListener('click', async (e) => {
+    if (!e.target.closest('[data-act="pastoral-save"]')) return;
+    const btn = e.target.closest('[data-act="pastoral-save"]');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    const slots = {};
+    panel.querySelectorAll('[data-pastoral-slot]').forEach(sel => {
+      const idx = parseInt(sel.dataset.pastoralSlot, 10);
+      const memberId = sel.value;
+      const memberName = memberId ? (sel.options[sel.selectedIndex]?.textContent || '') : '';
+      slots[idx] = { memberId, memberName };
+    });
+    try {
+      await UR.setAppConfig({
+        key: 'pastoral_slots',
+        value: JSON.stringify(slots),
+        category: 'roles',
+        description: 'Pastoral Hierarchy Slots',
+      });
+      const savedEl = panel.querySelector('[data-bind="pastoral-saved"]');
+      if (savedEl) { savedEl.style.display = ''; setTimeout(() => { savedEl.style.display = 'none'; }, 3000); }
+    } catch (err) {
+      alert('Could not save: ' + (err?.message || String(err)));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Save Pastoral Slots';
+    }
+  });
 }
 
 /* ── Notifications settings panel ───────────────────────────────────────── */
