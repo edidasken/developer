@@ -673,26 +673,35 @@ function _bzUpdateOutput(root) {
 }
 
 /* ── Deployments tab ──────────────────────────────────────────────────────── */
-function _deploymentsTab() {
-  const rows = CHURCHES.map(c => {
+function _deploymentsTab(churches) {
+  const list = churches || CHURCHES;
+  const rows = list.map((c, i) => {
     const dot = c.status === 'live'
       ? '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;"></span>'
       : '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;"></span>';
     return `
-    <tr style="border-bottom:1px solid var(--line);">
+    <tr style="border-bottom:1px solid var(--line);" data-row="${i}">
       <td style="padding:10px 8px;">${dot}</td>
       <td style="padding:10px 8px;font-weight:600;color:var(--ink);">${_e(c.name)}</td>
       <td style="padding:10px 8px;font-size:0.8rem;color:var(--ink-muted);">
         <a href="https://${_e(c.url)}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;text-decoration-style:dotted;">${_e(c.url)}</a>
       </td>
-      <td style="padding:10px 8px;font-size:0.78rem;color:var(--ink-muted);font-family:monospace;">${_e(c.firebaseProject)}</td>
+      <td style="padding:10px 8px;font-size:0.78rem;color:var(--ink-muted);font-family:monospace;">${_e(c.firebaseProject ?? 'null')}</td>
       <td style="padding:10px 8px;"><span style="font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:99px;background:${c.status === 'live' ? 'rgba(34,197,94,0.12)' : 'rgba(245,158,11,0.12)'};color:${c.status === 'live' ? '#16a34a' : '#d97706'};border:1px solid ${c.status === 'live' ? 'rgba(34,197,94,0.3)' : 'rgba(245,158,11,0.3)'};">${_e(c.status)}</span></td>
       <td style="padding:10px 8px;font-size:0.78rem;color:var(--ink-muted);">v${_e(c.version)}</td>
+      <td style="padding:10px 8px;white-space:nowrap;">
+        <button class="bz-edit-church" data-idx="${i}" style="font-size:0.74rem;padding:4px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer;font-family:inherit;margin-right:4px;">✏ Edit</button>
+        <button class="bz-del-church" data-idx="${i}" style="font-size:0.74rem;padding:4px 10px;border:1px solid rgba(185,28,28,0.3);border-radius:6px;background:transparent;color:#b91c1c;cursor:pointer;font-family:inherit;">✕</button>
+      </td>
     </tr>`;
   }).join('');
 
   return `
-<div class="bz-card" style="background:var(--bg-raised);border:1px solid var(--line);border-radius:12px;overflow:hidden;">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+  <div style="font-size:0.82rem;color:var(--ink-muted);" id="bz-deploy-status">Loading…</div>
+  <button id="bz-add-church" style="font-size:0.82rem;padding:8px 16px;border:none;border-radius:8px;background:var(--accent);color:var(--ink-inverse);cursor:pointer;font-family:inherit;font-weight:700;">+ Add Church</button>
+</div>
+<div class="bz-card" style="background:var(--bg-raised);border:1px solid var(--line);border-radius:12px;overflow:hidden;" id="bz-church-table-wrap">
   <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
     <thead>
       <tr style="border-bottom:2px solid var(--line);background:var(--bg-sunken);">
@@ -702,14 +711,11 @@ function _deploymentsTab() {
         <th style="padding:10px 8px;text-align:left;font-size:0.7rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;">Firebase Project</th>
         <th style="padding:10px 8px;text-align:left;font-size:0.7rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;">Status</th>
         <th style="padding:10px 8px;text-align:left;font-size:0.7rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;">Version</th>
+        <th style="padding:10px 8px;text-align:left;font-size:0.7rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;">Actions</th>
       </tr>
     </thead>
-    <tbody>${rows}</tbody>
+    <tbody id="bz-church-tbody">${rows}</tbody>
   </table>
-</div>
-<div style="margin-top:12px;padding:10px 14px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:8px;font-size:0.8rem;color:var(--ink-muted);">
-  To add a new church, update <strong>CHURCHES</strong> in <code style="font-family:monospace;background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:3px;">New_Covenant/Views/bezalel/index.js</code>
-  and run a full BCP: <code style="font-family:monospace;background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:3px;">bash "Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh" --deploy-comms</code>
 </div>
 
 <div class="bz-card" style="background:var(--bg-raised);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:14px;">
@@ -717,20 +723,70 @@ function _deploymentsTab() {
   <p style="font-size:0.82rem;color:var(--ink-muted);line-height:1.55;margin:0 0 12px;">
     Indexes auto-deploy on every BCP (<code style="font-family:monospace;background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:3px;">--deploy-comms</code>).
     To deploy indexes manually to a single project, copy the command below.
-    GAS has no Firestore — no index needed.
   </p>
-  <div style="display:grid;gap:8px;">
-    ${CHURCHES.filter(c => c.firebaseProject).map(c => `
+  <div style="display:grid;gap:8px;" id="bz-idx-list">
+    ${list.filter(c => c.firebaseProject).map(c => `
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
       <span style="font-size:0.78rem;font-weight:600;color:var(--ink);min-width:140px;">${_e(c.name)}</span>
       <code id="bz-idx-cmd-${_e(c.id)}" style="flex:1;background:var(--bg-sunken);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:0.75rem;font-family:monospace;color:var(--ink);white-space:nowrap;overflow-x:auto;">firebase deploy --only firestore:indexes --project ${_e(c.firebaseProject)}</code>
       <button class="bz-idx-copy btn btn-outline" data-target="bz-idx-cmd-${_e(c.id)}" style="font-size:0.75rem;padding:5px 10px;white-space:nowrap;">📋 Copy</button>
     </div>`).join('')}
   </div>
+</div>
+
+<!-- Inline edit sheet (hidden by default) -->
+<div id="bz-church-sheet" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(10,14,33,0.55);backdrop-filter:blur(6px);align-items:flex-start;justify-content:center;padding:40px 12px 80px;overflow-y:auto;">
+  <div style="background:var(--bg-raised);border:1px solid var(--line);border-radius:16px;padding:24px;max-width:520px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,0.45);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <h3 id="bz-sheet-title" style="margin:0;font-size:1rem;color:var(--ink);">Add Church</h3>
+      <button id="bz-sheet-close" style="background:none;border:none;cursor:pointer;color:var(--ink-muted);font-size:1.3rem;line-height:1;padding:4px;">✕</button>
+    </div>
+    <div style="display:grid;gap:12px;">
+      <div>
+        <label style="font-size:0.74rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-muted);display:block;margin-bottom:4px;">Church Name *</label>
+        <input id="bz-sf-name" type="text" placeholder="e.g. Grace Community Church" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:0.88rem;font-family:inherit;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:0.74rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-muted);display:block;margin-bottom:4px;">URL (domain only) *</label>
+        <input id="bz-sf-url" type="text" placeholder="e.g. mychurch.flockos.app" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:0.88rem;font-family:inherit;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:0.74rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-muted);display:block;margin-bottom:4px;">Firebase Project ID</label>
+        <input id="bz-sf-firebase" type="text" placeholder="e.g. flockos-mychurch (leave blank for GAS-only)" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:0.88rem;font-family:inherit;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:0.74rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-muted);display:block;margin-bottom:4px;">GAS Endpoint URL</label>
+        <input id="bz-sf-gas" type="url" placeholder="https://script.google.com/macros/s/…/exec" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:0.88rem;font-family:inherit;box-sizing:border-box;">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:0.74rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-muted);display:block;margin-bottom:4px;">Status</label>
+          <select id="bz-sf-status" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:0.88rem;font-family:inherit;">
+            <option value="live">live</option>
+            <option value="building">building</option>
+            <option value="offline">offline</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:0.74rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-muted);display:block;margin-bottom:4px;">Version</label>
+          <input id="bz-sf-version" type="text" placeholder="e.g. 2.0.0" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:0.88rem;font-family:inherit;box-sizing:border-box;">
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;">
+      <button id="bz-sheet-cancel" style="padding:9px 18px;border:1px solid var(--line);border-radius:8px;background:none;color:var(--ink);cursor:pointer;font-family:inherit;font-size:0.88rem;">Cancel</button>
+      <button id="bz-sheet-save" style="padding:9px 20px;border:none;border-radius:8px;background:var(--accent);color:var(--ink-inverse);cursor:pointer;font-family:inherit;font-size:0.88rem;font-weight:700;">Save Church</button>
+    </div>
+  </div>
 </div>`;
 }
 
 function _wireDeployments(root) {
+  const UR = window.UpperRoom;
+  const STORE_KEY = 'bezalel_churches';
+  let _churches = null; // loaded list
+
+  /* ── Copy index commands ─────────────────────────────────────────────── */
   root.querySelectorAll('.bz-idx-copy').forEach(btn => {
     btn.addEventListener('click', async () => {
       const el = root.querySelector(`#${btn.dataset.target}`);
@@ -739,9 +795,188 @@ function _wireDeployments(root) {
         await navigator.clipboard.writeText(text);
         btn.textContent = '✓ Copied!';
         setTimeout(() => { btn.textContent = '📋 Copy'; }, 2500);
-      } catch (_) {
-        btn.textContent = 'Select & copy';
-      }
+      } catch (_) { btn.textContent = 'Select & copy'; }
     });
   });
+
+  /* ── Load from Firestore, fall back to hardcoded ─────────────────────── */
+  async function _load() {
+    if (UR && typeof UR.getAppConfig === 'function') {
+      try {
+        const res = await UR.getAppConfig({ key: STORE_KEY });
+        if (res?.value) {
+          const parsed = JSON.parse(res.value);
+          if (Array.isArray(parsed) && parsed.length) return parsed;
+        }
+      } catch (_) {}
+    }
+    return JSON.parse(JSON.stringify(CHURCHES)); // deep clone default
+  }
+
+  /* ── Persist to Firestore ─────────────────────────────────────────────── */
+  async function _save(list) {
+    if (UR && typeof UR.setAppConfig === 'function') {
+      await UR.setAppConfig({ key: STORE_KEY, value: JSON.stringify(list) });
+    }
+  }
+
+  /* ── Re-render table body + index list ──────────────────────────────────  */
+  function _refreshTable() {
+    const tbody = root.querySelector('#bz-church-tbody');
+    const idxList = root.querySelector('#bz-idx-list');
+    const statusEl = root.querySelector('#bz-deploy-status');
+    if (!tbody) return;
+
+    tbody.innerHTML = _churches.map((c, i) => {
+      const dot = c.status === 'live'
+        ? '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;"></span>'
+        : '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;"></span>';
+      return `
+      <tr style="border-bottom:1px solid var(--line);" data-row="${i}">
+        <td style="padding:10px 8px;">${dot}</td>
+        <td style="padding:10px 8px;font-weight:600;color:var(--ink);">${_e(c.name)}</td>
+        <td style="padding:10px 8px;font-size:0.8rem;color:var(--ink-muted);">
+          <a href="https://${_e(c.url)}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;text-decoration-style:dotted;">${_e(c.url)}</a>
+        </td>
+        <td style="padding:10px 8px;font-size:0.78rem;color:var(--ink-muted);font-family:monospace;">${_e(c.firebaseProject ?? 'null')}</td>
+        <td style="padding:10px 8px;"><span style="font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:99px;background:${c.status === 'live' ? 'rgba(34,197,94,0.12)' : 'rgba(245,158,11,0.12)'};color:${c.status === 'live' ? '#16a34a' : '#d97706'};border:1px solid ${c.status === 'live' ? 'rgba(34,197,94,0.3)' : 'rgba(245,158,11,0.3)'};">${_e(c.status)}</span></td>
+        <td style="padding:10px 8px;font-size:0.78rem;color:var(--ink-muted);">v${_e(c.version)}</td>
+        <td style="padding:10px 8px;white-space:nowrap;">
+          <button class="bz-edit-church" data-idx="${i}" style="font-size:0.74rem;padding:4px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer;font-family:inherit;margin-right:4px;">✏ Edit</button>
+          <button class="bz-del-church" data-idx="${i}" style="font-size:0.74rem;padding:4px 10px;border:1px solid rgba(185,28,28,0.3);border-radius:6px;background:transparent;color:#b91c1c;cursor:pointer;font-family:inherit;">✕</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    if (idxList) {
+      idxList.innerHTML = _churches.filter(c => c.firebaseProject).map(c => `
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:0.78rem;font-weight:600;color:var(--ink);min-width:140px;">${_e(c.name)}</span>
+          <code id="bz-idx-cmd-${_e(c.id)}" style="flex:1;background:var(--bg-sunken);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:0.75rem;font-family:monospace;color:var(--ink);white-space:nowrap;overflow-x:auto;">firebase deploy --only firestore:indexes --project ${_e(c.firebaseProject)}</code>
+          <button class="bz-idx-copy btn btn-outline" data-target="bz-idx-cmd-${_e(c.id)}" style="font-size:0.75rem;padding:5px 10px;white-space:nowrap;">📋 Copy</button>
+        </div>`).join('');
+      // Re-wire copy buttons
+      idxList.querySelectorAll('.bz-idx-copy').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const el = root.querySelector(`#${btn.dataset.target}`);
+          const text = el?.textContent?.trim() || '';
+          try {
+            await navigator.clipboard.writeText(text);
+            btn.textContent = '✓ Copied!';
+            setTimeout(() => { btn.textContent = '📋 Copy'; }, 2500);
+          } catch (_) { btn.textContent = 'Select & copy'; }
+        });
+      });
+    }
+
+    if (statusEl) statusEl.textContent = `${_churches.length} church${_churches.length !== 1 ? 'es' : ''} — changes saved to Firestore`;
+
+    // Re-wire edit/delete
+    _wireRowActions();
+  }
+
+  /* ── Sheet open/close ────────────────────────────────────────────────── */
+  const sheet   = root.querySelector('#bz-church-sheet');
+  const sheetTitle = root.querySelector('#bz-sheet-title');
+  const saveBtn = root.querySelector('#bz-sheet-save');
+  let _editIdx  = -1; // -1 = add new
+
+  function _openSheet(idx) {
+    _editIdx = idx;
+    const c = idx >= 0 ? _churches[idx] : null;
+    if (sheetTitle) sheetTitle.textContent = idx >= 0 ? 'Edit Church' : 'Add Church';
+    root.querySelector('#bz-sf-name').value    = c?.name            || '';
+    root.querySelector('#bz-sf-url').value     = c?.url             || '';
+    root.querySelector('#bz-sf-firebase').value= c?.firebaseProject || '';
+    root.querySelector('#bz-sf-gas').value     = c?.gasUrl          || '';
+    root.querySelector('#bz-sf-status').value  = c?.status          || 'live';
+    root.querySelector('#bz-sf-version').value = c?.version         || '2.0.0';
+    sheet.style.display = 'flex';
+    setTimeout(() => root.querySelector('#bz-sf-name').focus(), 80);
+  }
+
+  function _closeSheet() {
+    sheet.style.display = 'none';
+    _editIdx = -1;
+  }
+
+  root.querySelector('#bz-sheet-close')?.addEventListener('click', _closeSheet);
+  root.querySelector('#bz-sheet-cancel')?.addEventListener('click', _closeSheet);
+  sheet?.addEventListener('click', e => { if (e.target === sheet) _closeSheet(); });
+
+  /* ── Save (add or update) ────────────────────────────────────────────── */
+  saveBtn?.addEventListener('click', async () => {
+    const name    = root.querySelector('#bz-sf-name').value.trim();
+    const url     = root.querySelector('#bz-sf-url').value.trim().replace(/^https?:\/\//, '');
+    const fbProj  = root.querySelector('#bz-sf-firebase').value.trim() || null;
+    const gasUrl  = root.querySelector('#bz-sf-gas').value.trim();
+    const status  = root.querySelector('#bz-sf-status').value;
+    const version = root.querySelector('#bz-sf-version').value.trim() || '2.0.0';
+
+    if (!name || !url) {
+      root.querySelector('#bz-sf-name').style.borderColor = name ? 'var(--line)' : '#b91c1c';
+      root.querySelector('#bz-sf-url').style.borderColor  = url  ? 'var(--line)' : '#b91c1c';
+      return;
+    }
+
+    const entry = {
+      id:              _editIdx >= 0 ? (_churches[_editIdx].id || url.split('.')[0]) : url.split('.')[0],
+      name, url, firebaseProject: fbProj, gasUrl, status, version,
+    };
+
+    if (_editIdx >= 0) {
+      _churches[_editIdx] = entry;
+    } else {
+      _churches.push(entry);
+    }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = '⏳ Saving…';
+    try {
+      await _save(_churches);
+      saveBtn.textContent = '✓ Saved';
+    } catch (_) {
+      saveBtn.textContent = 'Save Church';
+    }
+    saveBtn.disabled = false;
+
+    _closeSheet();
+    _refreshTable();
+  });
+
+  /* ── Wire edit / delete row buttons ─────────────────────────────────── */
+  function _wireRowActions() {
+    root.querySelectorAll('.bz-edit-church').forEach(btn => {
+      btn.addEventListener('click', () => _openSheet(Number(btn.dataset.idx)));
+    });
+    root.querySelectorAll('.bz-del-church').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const idx = Number(btn.dataset.idx);
+        const name = _churches[idx]?.name || 'this church';
+        if (!confirm(`Remove "${name}" from the deployments list?`)) return;
+        _churches.splice(idx, 1);
+        await _save(_churches);
+        _refreshTable();
+      });
+    });
+  }
+
+  /* ── Add Church button ───────────────────────────────────────────────── */
+  root.querySelector('#bz-add-church')?.addEventListener('click', () => _openSheet(-1));
+
+  /* ── Bootstrap: load data, then wire ────────────────────────────────── */
+  const statusEl = root.querySelector('#bz-deploy-status');
+  if (statusEl) statusEl.textContent = 'Loading…';
+
+  _load().then(list => {
+    _churches = list;
+    _refreshTable();
+    // Initial row wiring (table was already rendered with default CHURCHES)
+    _wireRowActions();
+  }).catch(() => {
+    _churches = JSON.parse(JSON.stringify(CHURCHES));
+    _refreshTable();
+    _wireRowActions();
+  });
 }
+
