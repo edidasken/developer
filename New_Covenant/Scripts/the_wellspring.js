@@ -28,7 +28,7 @@ const TheWellspring = (() => {
 
   // ── Constants ────────────────────────────────────────────────────────────
   const DB_NAME    = 'FlockOS_Wellspring';
-  const DB_VERSION = 3; // v3 adds vault store in main upgrade handler
+  const DB_VERSION = 101; // 101 = New Covenant v1.01 — all three stores (sheets, meta, vault)
   const STORE_NAME = 'sheets';
   const META_STORE = 'meta';
   const META_KEY   = 'database';
