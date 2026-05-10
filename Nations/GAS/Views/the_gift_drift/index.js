@@ -7,7 +7,7 @@ import { pageHero } from '../_frame.js';
 import { buildAdapter } from '../../Scripts/the_living_water_adapter.js';
 
 export const name  = 'the_gift_drift';
-export const title = 'The Gift Drift';
+export const title = 'Generosity';
 
 const _e = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
@@ -33,7 +33,7 @@ export function render() {
   return `
 <section class="gift-view">
   ${pageHero({
-    title: 'The Gift Drift',
+    title: 'Generosity',
     subtitle: 'Giving, stewardship, and generosity.',
     scripture: 'Every man according as he purposeth in his heart, so let him give. — 2 Corinthians 9:7',
   })}
@@ -128,7 +128,8 @@ async function _loadGiving(root) {
   const txEl    = root.querySelector('[data-bind="transactions"]');
   const barEl   = root.querySelector('.gift-bar-chart');
   const fundsEl = root.querySelector('.gift-funds');
-  if (!V) {
+  const UR = window.UpperRoom;
+  if (!V && (!UR || !UR.isReady || !UR.isReady())) {
     if (txEl)    txEl.innerHTML    = '<div class="life-empty">Giving backend not loaded.</div>';
     if (barEl)   barEl.innerHTML   = '<div class="life-empty">Giving backend not loaded.</div>';
     if (fundsEl) fundsEl.innerHTML = '<div class="life-empty">Giving backend not loaded.</div>';
@@ -574,10 +575,7 @@ function _openPledgeSheet(item, onReload) {
       if (isNew) {
         await UR.createPledge(payload);
       } else {
-        // UpperRoom has no updatePledge — write directly via createPledge pattern (replace)
-        // Most church apps just create new pledge records; we archive + create for edits
-        const oldStatus = payload.status;
-        await UR.createPledge(Object.assign({}, payload, { replacesId: item.id }));
+        await UR.updatePledge(Object.assign({}, payload, { id: item.id }));
       }
       _closePledgeSheet();
       onReload?.();

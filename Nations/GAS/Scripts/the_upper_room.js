@@ -3066,16 +3066,43 @@
 
   function givingSummary() {
     return listGiving({ limit: 2000 }).then(function(rows) {
-      var total = 0, byFund = {}, byMonth = {}, count = rows.length;
+      var now = new Date();
+      var thisMonthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      var total = 0, monthlyTotal = 0, byFund = {}, byMonth = {}, givers = {}, count = rows.length;
       rows.forEach(function(r) {
         var amt = Number(r.amount || 0);
         total += amt;
+        var dateKey = (r.date || r.giftDate || '').substring(0, 7);
+        if (dateKey === thisMonthKey) monthlyTotal += amt;
         var f = r.fund || r.category || 'General';
         byFund[f] = (byFund[f] || 0) + amt;
-        var m = (r.date || '').substring(0, 7);
-        if (m) byMonth[m] = (byMonth[m] || 0) + amt;
+        if (dateKey) byMonth[dateKey] = (byMonth[dateKey] || 0) + amt;
+        var n = r.name || r.giverName || '';
+        if (n && n !== 'Anonymous') givers[n] = true;
       });
-      return { total: total, count: count, byFund: byFund, byMonth: byMonth };
+      // Convert byMonth → sorted array for bar chart
+      var monthArr = Object.keys(byMonth).sort().map(function(m) {
+        var d = new Date(m + '-02'); // day=2 avoids TZ shift
+        var lbl = d.toLocaleDateString(undefined, { month: 'short' });
+        return { month: m, label: lbl, amount: byMonth[m] };
+      });
+      // Last 12 months only
+      if (monthArr.length > 12) monthArr = monthArr.slice(monthArr.length - 12);
+      // Convert byFund → array sorted by amount desc
+      var fundArr = Object.keys(byFund)
+        .sort(function(a, b) { return byFund[b] - byFund[a]; })
+        .map(function(f) { return { name: f, amount: byFund[f] }; });
+      return {
+        total:        total,
+        monthlyTotal: monthlyTotal,
+        thisMonth:    monthlyTotal,
+        ytdTotal:     total,
+        count:        count,
+        averageGift:  count > 0 ? total / count : 0,
+        activeGivers: Object.keys(givers).length,
+        monthly:      monthArr,
+        funds:        fundArr,
+      };
     });
   }
 
@@ -3118,6 +3145,17 @@
     data.createdBy = _userEmail;
     return _pledgesRef().add(data).then(function(ref) {
       return { id: ref.id, success: true };
+    });
+  }
+
+  function updatePledge(data) {
+    var id = data.id; if (!id) throw new Error('id required');
+    var doc = Object.assign({}, data);
+    delete doc.id;
+    doc.updatedAt = _now();
+    doc.updatedBy = _userEmail;
+    return _pledgesRef().doc(id).update(doc).then(function() {
+      return { id: id, success: true };
     });
   }
 
@@ -4994,6 +5032,7 @@
     // Pledges
     listPledges:  listPledges,
     createPledge: createPledge,
+    updatePledge: updatePledge,
 
     // Journal
     listJournal:   listJournal,
