@@ -4615,6 +4615,68 @@
     });
   }
 
+  /* ── Strategic Plan (Goals / Initiatives / Key Dates) ─────────── */
+  function _stratGoalsRef()  { return _churchRef().collection('strategicGoals'); }
+  function _stratInitsRef()  { return _churchRef().collection('strategicInitiatives'); }
+  function _stratDatesRef()  { return _churchRef().collection('strategicKeyDates'); }
+
+  function listStrategicGoals(opts) {
+    return _paginatedGet(_stratGoalsRef().orderBy('createdAt', 'desc'), opts || { limit: 200 });
+  }
+  function createStrategicGoal(data) {
+    var id = _uid();
+    var doc = Object.assign({}, data, { createdBy: _userEmail, createdAt: _now(), updatedAt: _now() });
+    delete doc.id;
+    return _stratGoalsRef().doc(id).set(doc).then(function() { return Object.assign({ id: id }, doc); });
+  }
+  function updateStrategicGoal(data) {
+    var id = String(data.id);
+    var doc = Object.assign({}, data, { updatedAt: _now() });
+    delete doc.id;
+    return _stratGoalsRef().doc(id).update(doc).then(function() { return Object.assign({ id: id }, doc); });
+  }
+  function deleteStrategicGoal(opts) {
+    return _stratGoalsRef().doc(String(opts.id)).delete();
+  }
+
+  function listStrategicInitiatives(opts) {
+    return _paginatedGet(_stratInitsRef().orderBy('createdAt', 'desc'), opts || { limit: 200 });
+  }
+  function createStrategicInitiative(data) {
+    var id = _uid();
+    var doc = Object.assign({}, data, { createdBy: _userEmail, createdAt: _now(), updatedAt: _now() });
+    delete doc.id;
+    return _stratInitsRef().doc(id).set(doc).then(function() { return Object.assign({ id: id }, doc); });
+  }
+  function updateStrategicInitiative(data) {
+    var id = String(data.id);
+    var doc = Object.assign({}, data, { updatedAt: _now() });
+    delete doc.id;
+    return _stratInitsRef().doc(id).update(doc).then(function() { return Object.assign({ id: id }, doc); });
+  }
+  function deleteStrategicInitiative(opts) {
+    return _stratInitsRef().doc(String(opts.id)).delete();
+  }
+
+  function listStrategicKeyDates(opts) {
+    return _paginatedGet(_stratDatesRef().orderBy('createdAt', 'desc'), opts || { limit: 200 });
+  }
+  function createStrategicKeyDate(data) {
+    var id = _uid();
+    var doc = Object.assign({}, data, { createdBy: _userEmail, createdAt: _now(), updatedAt: _now() });
+    delete doc.id;
+    return _stratDatesRef().doc(id).set(doc).then(function() { return Object.assign({ id: id }, doc); });
+  }
+  function updateStrategicKeyDate(data) {
+    var id = String(data.id);
+    var doc = Object.assign({}, data, { updatedAt: _now() });
+    delete doc.id;
+    return _stratDatesRef().doc(id).update(doc).then(function() { return Object.assign({ id: id }, doc); });
+  }
+  function deleteStrategicKeyDate(opts) {
+    return _stratDatesRef().doc(String(opts.id)).delete();
+  }
+
   /* ── Error Telemetry (disabled — manual debugging only) ──────────── */
   function logError() {
     // Firestore error logging disabled to reduce writes.
@@ -5111,6 +5173,20 @@
     updateMissionsTeams:      updateMissionsTeams,
     deleteMissionsTeams:      deleteMissionsTeams,
     missionsBulkCreate:       missionsBulkCreate,
+
+    // Strategic Plan
+    listStrategicGoals:       listStrategicGoals,
+    createStrategicGoal:      createStrategicGoal,
+    updateStrategicGoal:      updateStrategicGoal,
+    deleteStrategicGoal:      deleteStrategicGoal,
+    listStrategicInitiatives:  listStrategicInitiatives,
+    createStrategicInitiative: createStrategicInitiative,
+    updateStrategicInitiative: updateStrategicInitiative,
+    deleteStrategicInitiative: deleteStrategicInitiative,
+    listStrategicKeyDates:     listStrategicKeyDates,
+    createStrategicKeyDate:    createStrategicKeyDate,
+    updateStrategicKeyDate:    updateStrategicKeyDate,
+    deleteStrategicKeyDate:    deleteStrategicKeyDate,
 
     // App Config
     listAppConfig:         listAppConfig,
