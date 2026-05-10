@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <title>FlockOS</title>
+
+  <!-- Icons -->
+  <link rel="icon" type="image/png" href="Images/NewCovenant.png">
+  <link rel="apple-touch-icon" href="Images/NewCovenant.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+  <link rel="preconnect" href="https://securetoken.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+Hebrew:wght@400;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Styles — loaded from GitHub Pages -->
+  <link rel="stylesheet" href="Styles/american_garments.css">
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <!-- Module preloads — resolves the ES module waterfall -->
+  <link rel="modulepreload" href="Scripts/the_ark.js">
+  <link rel="modulepreload" href="Scripts/the_adornment.js">
+  <link rel="modulepreload" href="Scripts/the_lampstand.js">
+  <link rel="modulepreload" href="Scripts/the_oil.js">
+  <link rel="modulepreload" href="Scripts/the_watchmen.js">
+  <link rel="modulepreload" href="Scripts/the_living_water_register.js">
+  <link rel="modulepreload" href="Scripts/the_legacy_bridge.js">
+  <link rel="modulepreload" href="Scripts/the_manna.js">
+  <link rel="modulepreload" href="Scripts/the_cistern.js">
+  <link rel="modulepreload" href="Scripts/the_scribes/index.js">
+  <link rel="modulepreload" href="Scripts/the_scribes/the_path.js">
+  <link rel="modulepreload" href="Scripts/the_scribes/the_chronicle.js">
+  <link rel="modulepreload" href="Scripts/the_scribes/the_herald.js">
+  <link rel="modulepreload" href="Scripts/the_veil/index.js">
+  <link rel="modulepreload" href="Scripts/the_veil/the_crown.js">
+  <link rel="modulepreload" href="Scripts/the_veil/the_pillars.js">
+  <link rel="modulepreload" href="Scripts/the_veil/the_courtyard.js">
+  <link rel="modulepreload" href="Scripts/the_veil/the_hem.js">
+  <link rel="modulepreload" href="Scripts/the_priesthood/index.js">
+  <link rel="modulepreload" href="Scripts/the_priesthood/the_garments.js">
+  <link rel="modulepreload" href="Scripts/the_priesthood/the_anointing.js">
+  <link rel="modulepreload" href="Scripts/the_priesthood/the_breastplate.js">
+  <link rel="modulepreload" href="Scripts/the_upper_room/index.js">
+  <link rel="modulepreload" href="Scripts/the_upper_room/the_firebase_config.js">
+  <link rel="modulepreload" href="Scripts/the_upper_room/the_tenant.js">
+  <link rel="modulepreload" href="Views/_frame.js">
+  <link rel="modulepreload" href="Views/the_good_shepherd/index.js">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    :root { --bg: #f7f8fb; --bg-raised: #ffffff; --ink: #1b264f; --line: #e5e7ef; }
+
+    html { height: 100%; overflow: hidden; background: var(--bg); }
+    body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); height: 100%; overflow: hidden; }
+
+    .veil-wrap {
+      display: grid;
+      grid-template-areas: "top top" "side main";
+      grid-template-columns: 256px 1fr;
+      grid-template-rows: 60px 1fr;
+      height: 100%;
+      min-height: 100vh;
+      position: relative;
+    }
+    #the-veil-top   { grid-area: top; }
+    #the-veil-side  { grid-area: side; overflow-y: auto; overflow-x: hidden; }
+    #the-holy-place { grid-area: main; min-width: 0; overflow-y: auto; }
+    #the-veil-foot  { grid-area: foot; }
+
+    @media (max-width: 860px) {
+      .veil-wrap {
+        grid-template-columns: 1fr;
+        grid-template-areas: "top" "main" "foot";
+      }
+      #the-veil-side { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="veil-wrap">
+    <header id="the-veil-top"   class="veil-top"   role="banner"></header>
+    <nav    id="the-veil-side"  class="veil-side"  role="navigation" aria-label="Primary"></nav>
+    <main   id="the-holy-place" class="veil-main"  role="main"></main>
+    <footer id="the-veil-foot"  class="veil-foot"  role="contentinfo"></footer>
+    <div    id="the-staff-host" class="staff-host" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <!-- Ensure the ?covenant=new param is set so the_ark.js boots the new shell -->
+  <script>
+    if (!new URLSearchParams(location.search).has('covenant')) {
+      var u = new URL(location.href);
+      u.searchParams.set('covenant', 'new');
+      history.replaceState(null, '', u);
+    }
+  </script>
+
+  <!-- Firebase config -->
+
+  <!-- Firebase SDKs -->
+
+  <!-- Legacy backend scripts — all resolved via <base href> one level up from app.embeds/ -->
+  <base href="../">
+  <script defer src="Scripts/firm_foundation.js"></script>
+  <script defer src="Scripts/the_upper_room.js"></script>
+  <script defer src="Scripts/fine_linen.js"></script>
+  <script defer src="Scripts/the_true_vine.js"></script>
+  <script defer src="Scripts/the_wellspring.js"></script>
+  <script defer src="Scripts/the_well.js"></script>
+  <script defer src="Scripts/the_tabernacle.js"></script>
+  <script defer src="Scripts/the_truth.js"></script>
+  <script defer src="Scripts/the_seasons.js"></script>
+  <script defer src="Scripts/the_way.js"></script>
+  <script defer src="Scripts/the_harvest.js"></script>
+  <script defer src="Scripts/the_life.js"></script>
+  <script defer src="Scripts/the_shepherd.js"></script>
+  <script defer src="Scripts/the_fold.js"></script>
+  <script defer src="Scripts/the_scrolls.js"></script>
+  <script defer src="Scripts/the_window_bridge.js"></script>
+
+  <!-- ES module boot — all dynamic imports resolve against the <base> href -->
+  <script type="module" src="Scripts/the_ark.js"></script>
+</body>
+</html>
