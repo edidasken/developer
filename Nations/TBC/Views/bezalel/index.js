@@ -113,7 +113,7 @@ export function mount(root) {
 
 /* ── Internal renderer ────────────────────────────────────────────────────── */
 function _render(root, tab) {
-  const activeTab = tab || 'gas-files';
+  const activeTab = (tab === 'gas-files' ? 'church-setup' : tab) || 'church-setup';
 
   if (!_isPastorPlus()) {
     root.innerHTML = `
@@ -127,7 +127,6 @@ function _render(root, tab) {
   }
 
   const tabs = [
-    { id: 'gas-files',    label: '📄 GAS Files'    },
     { id: 'church-setup', label: '⚙ Church Setup'  },
     { id: 'deployments',  label: '🚀 Deployments'  },
   ];
@@ -142,8 +141,7 @@ function _render(root, tab) {
   </div>`;
 
   let body = '';
-  if (activeTab === 'gas-files')         body = _gasFilesTab();
-  else if (activeTab === 'church-setup') body = _churchSetupTab();
+  if (activeTab === 'church-setup') body = _churchSetupTab();
   else if (activeTab === 'deployments')  body = _deploymentsTab();
 
   root.innerHTML = `
@@ -156,16 +154,12 @@ function _render(root, tab) {
     btn.addEventListener('click', () => _render(root, btn.dataset.tab));
   });
 
-  /* Wire copy buttons in GAS files tab */
-  if (activeTab === 'gas-files') {
+  /* Wire church setup generator + embedded GAS Files fetch buttons */
+  if (activeTab === 'church-setup') {
+    _wireChurchSetup(root);
     root.querySelectorAll('.bz-fetch-btn').forEach(btn => {
       btn.addEventListener('click', () => _fetchAndShow(root, btn.dataset.docId));
     });
-  }
-
-  /* Wire church setup generator */
-  if (activeTab === 'church-setup') {
-    _wireChurchSetup(root);
   }
 
   /* Wire index copy buttons */
@@ -488,6 +482,36 @@ function _churchSetupTab() {
       → deploy as Web App → paste URL into <code style="font-family:monospace;background:rgba(0,0,0,0.08);padding:1px 4px;border-radius:3px;">CHURCH_APP_URL</code> above and re-generate → run <code style="font-family:monospace;background:rgba(0,0,0,0.08);padding:1px 4px;border-radius:3px;">registerChurchUrl()</code>
       → <strong style="color:#b45309;">delete ADMIN_PASSWORD from Script Properties.</strong>
     </div>
+  </div>
+
+  <!-- GAS Files section -->
+  <div style="font-size:0.9rem;font-weight:700;color:var(--ink);margin-top:6px;">📄 GAS Files</div>
+  <div style="font-size:0.82rem;color:var(--ink-muted);margin-bottom:4px;">Load and copy Apps Script source files to deploy or update a church node.</div>
+  <div style="display:grid;gap:14px;">
+    ${GAS_DOCS.map(doc => `
+    <div class="bz-card" style="background:var(--bg-raised);border:1px solid var(--line);border-radius:12px;padding:16px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+        <div>
+          <div style="font-size:1rem;font-weight:700;color:var(--ink);">\${_e(doc.label)}</div>
+          <div style="font-size:0.76rem;color:var(--ink-muted);margin-top:3px;">\${_e(doc.filename)}</div>
+        </div>
+        <button class="bz-fetch-btn btn btn-primary" data-doc-id="\${_e(doc.id)}" style="font-size:0.8rem;padding:7px 14px;white-space:nowrap;">
+          📋 Load &amp; Copy
+        </button>
+      </div>
+      <p style="font-size:0.82rem;color:var(--ink-muted);line-height:1.55;margin:0 0 10px;">\${_e(doc.description)}</p>
+      <div id="bz-doc-\${_e(doc.id)}" style="display:none;">
+        <pre id="bz-pre-\${_e(doc.id)}" style="background:var(--bg-sunken);border:1px solid var(--line);border-radius:8px;
+          padding:14px;font-size:0.76rem;line-height:1.55;overflow-x:auto;white-space:pre-wrap;word-break:break-word;
+          max-height:420px;overflow-y:auto;color:var(--ink);font-family:monospace;"></pre>
+      </div>
+    </div>`).join('')}
+  </div>
+  <div style="margin-top:4px;padding:12px 14px;background:rgba(232,168,56,0.08);border:1px solid rgba(232,168,56,0.25);border-radius:8px;font-size:0.8rem;color:var(--ink-muted);line-height:1.5;">
+    <strong style="color:var(--ink);">How to deploy a new church:</strong>
+    Open the church's Google Sheet → Extensions → Apps Script → paste <strong>Code.gs</strong> →
+    Set Script Properties using the Church Setup form above (FIREBASE_SERVICE_ACCOUNT, TRUTH_SERVICE_ACCOUNT required) →
+    Run <code style="background:rgba(0,0,0,0.1);padding:1px 5px;border-radius:3px;font-family:monospace;">setupFlockOS()</code> once. FirestoreSync, SyncHandler, and camelCase normalization are all included in Code.gs.
   </div>
 
 </div>`;
