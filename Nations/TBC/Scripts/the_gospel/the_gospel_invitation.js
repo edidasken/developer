@@ -784,9 +784,12 @@ function _wireShare(root) {
   if (!btn) return;
 
   btn.addEventListener('click', () => {
-    // Always target the public GROW page — the recipient won't have an account
-    const base     = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
-    const shareUrl = base + 'grow-public.html#the_gospel_invitation';
+    // Always target the public GROW page — the recipient won't have an account.
+    // We're running inside app.flockos/ so we need to go up one level to the
+    // church root, then into app.grow/app.grow.html.
+    const appRoot  = window.location.origin +
+                     window.location.pathname.replace(/\/app\.[^/]+\/[^/]*$/, '/');
+    const shareUrl = appRoot + 'app.grow/app.grow.html#the_gospel_invitation';
     const shareMsg = 'I thought you\u2019d appreciate this \u2014 a hope-filled look at Jesus Christ:';
 
     // Use the native Web Share sheet when available (iOS/Android opens SMS, AirDrop, etc.)
