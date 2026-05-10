@@ -238,7 +238,57 @@ with open(path, 'w') as f:
 print(f'  ✓ app.flockos.html title → {name}')
 PYEOF
 
-  # ── 6. Patch index.html selector — replace {{CHURCH_NAME}} ────────
+  # ── 6. Patch app.grow/app.grow.html — Firebase config for public church info ──
+  python3 << 'PYEOF'
+import os, json, re
+
+t          = os.environ['_NC_TARGET']
+fb_raw     = os.environ['_NC_FB_CONFIG']
+gas_only   = os.environ.get('_NC_GAS_ONLY', 'false').strip().lower() == 'true'
+path       = t + '/app.grow/app.grow.html'
+
+if not os.path.exists(path):
+    print('  ✓ app.grow/app.grow.html not present — skip Firebase patch')
+else:
+    with open(path, 'r') as f:
+        content = f.read()
+
+    if gas_only:
+        # GAS-only: strip the FLOCK_FIREBASE_CONFIG block entirely
+        content = re.sub(
+            r'[ \t]*<script>\s*window\.FLOCK_FIREBASE_CONFIG\s*=\s*\{[^}]+\};\s*</script>\n?',
+            '',
+            content,
+            flags=re.DOTALL
+        )
+        print('  ✓ app.grow/app.grow.html Firebase stripped (GAS-only build)')
+    else:
+        try:
+            fb_obj = json.loads(fb_raw)
+        except Exception:
+            fb_obj = None
+
+        if isinstance(fb_obj, dict) and 'projectId' in fb_obj:
+            cfg_lines = ['    window.FLOCK_FIREBASE_CONFIG = {']
+            for k, v in fb_obj.items():
+                cfg_lines.append(f"      {k}:  '{v}',")
+            cfg_lines.append('    };')
+            new_block = '\n'.join(cfg_lines)
+            content = re.sub(
+                r'window\.FLOCK_FIREBASE_CONFIG\s*=\s*\{[^}]+\};',
+                new_block,
+                content,
+                flags=re.DOTALL
+            )
+            print('  ✓ app.grow/app.grow.html Firebase config replaced with church config')
+        else:
+            print('  ✓ app.grow/app.grow.html Firebase config kept as default (shared)')
+
+    with open(path, 'w') as f:
+        f.write(content)
+PYEOF
+
+  # ── 7. Patch index.html selector — replace {{CHURCH_NAME}} ────────
   python3 << 'PYEOF'
 import os
 
