@@ -72,11 +72,42 @@ export function render() {
       @keyframes gi-fadein { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
       .gi-fadein { animation:gi-fadein .3s ease both; }
 
+      /* ═══ Page hero overrides — invitation-specific ════════════ */
+      [data-grow="the_gospel_invitation"] .grow-hero {
+        background:linear-gradient(150deg,#0c1445 0%,#1a2260 55%,#2d1a6e 100%);
+        border:none; border-radius:0; padding:40px 28px 36px;
+        margin:-0px; position:relative;
+      }
+      [data-grow="the_gospel_invitation"] .grow-hero::before {
+        content:''; position:absolute; inset:0; pointer-events:none;
+        background:
+          radial-gradient(ellipse at 85% 30%,rgba(232,168,56,.22),transparent 52%),
+          radial-gradient(ellipse at 5% 90%,rgba(126,170,204,.15),transparent 48%);
+      }
+      [data-grow="the_gospel_invitation"] .grow-hero::after { display:none; }
+      [data-grow="the_gospel_invitation"] .grow-hero-icon {
+        width:72px; height:72px; border-radius:18px;
+        background:rgba(232,168,56,.18); border:2px solid rgba(232,168,56,.4);
+        box-shadow:0 6px 20px rgba(232,168,56,.2);
+      }
+      [data-grow="the_gospel_invitation"] .grow-hero-icon svg { width:36px; height:36px; }
+      [data-grow="the_gospel_invitation"] .grow-hero-title {
+        font-size:2rem; font-weight:800; color:#fff;
+        letter-spacing:-.02em; line-height:1.1;
+      }
+      @media(min-width:560px){
+        [data-grow="the_gospel_invitation"] .grow-hero-title { font-size:2.4rem; }
+      }
+      [data-grow="the_gospel_invitation"] .grow-hero-sub {
+        font-size:1.05rem; color:rgba(255,255,255,.75); opacity:1; line-height:1.7;
+        margin-top:8px;
+      }
+
       /* ═══ Section chrome ════════════════════════════════════════ */
-      .gi-section { margin-top:44px; }
+      .gi-section { margin-top:52px; }
       .gi-section-head {
-        display:flex; align-items:center; gap:14px; margin-bottom:20px;
-        padding-bottom:14px; border-bottom:2px solid var(--line,#e7e5e4);
+        display:flex; align-items:center; gap:16px; margin-bottom:24px;
+        padding-bottom:16px; border-bottom:2px solid var(--line,#e7e5e4);
       }
       .gi-section-num {
         flex:none; width:44px; height:44px; border-radius:50%;
@@ -339,136 +370,158 @@ export function render() {
 
       /* ═══ Church map ═════════════════════════════════════════════ */
       .gi-map-section {
-        margin-top:48px;
-        border-radius:18px; overflow:hidden;
+        margin-top:56px;
+        border-radius:22px; overflow:hidden;
         border:1.5px solid var(--line,#e7e5e4);
-        box-shadow:0 4px 20px rgba(0,0,0,.07);
+        box-shadow:0 6px 28px rgba(0,0,0,.10);
       }
       .gi-map-header {
-        background:linear-gradient(135deg,#0c1445,#1a2260);
-        padding:22px 24px 20px; position:relative; overflow:hidden;
+        background:linear-gradient(135deg,#0c1445 0%,#1a2260 60%,#0f1f5c 100%);
+        padding:28px 28px 26px; position:relative; overflow:hidden;
       }
       .gi-map-header::before {
         content:''; position:absolute; inset:0;
-        background:radial-gradient(ellipse at 80% 50%,rgba(232,168,56,.18),transparent 60%);
+        background:
+          radial-gradient(ellipse at 85% 40%,rgba(232,168,56,.22),transparent 55%),
+          radial-gradient(ellipse at 10% 80%,rgba(56,189,248,.12),transparent 50%);
       }
-      .gi-map-header-inner { position:relative; display:flex; align-items:flex-start; gap:14px; }
+      .gi-map-header-inner { position:relative; display:flex; align-items:center; gap:18px; }
       .gi-map-header-icon {
-        width:44px; height:44px; flex:none; border-radius:12px;
-        background:rgba(232,168,56,.2); border:1.5px solid rgba(232,168,56,.4);
-        display:flex; align-items:center; justify-content:center; font-size:1.3rem;
+        width:60px; height:60px; flex:none; border-radius:16px;
+        background:rgba(232,168,56,.18); border:2px solid rgba(232,168,56,.45);
+        display:flex; align-items:center; justify-content:center; font-size:1.7rem;
+        box-shadow:0 4px 14px rgba(232,168,56,.2);
       }
-      .gi-map-header h3 { font-size:1.1rem; font-weight:800; color:#fff; margin:0 0 4px; }
-      @media(min-width:560px){ .gi-map-header h3{ font-size:1.25rem; } }
-      .gi-map-header p  { font-size:.8rem; color:rgba(255,255,255,.65); margin:0; line-height:1.5; }
+      .gi-map-header h3 { font-size:1.45rem; font-weight:800; color:#fff; margin:0 0 5px; letter-spacing:-.01em; }
+      @media(min-width:560px){ .gi-map-header h3{ font-size:1.65rem; } }
+      .gi-map-header p  { font-size:.95rem; color:rgba(255,255,255,.7); margin:0; line-height:1.5; }
 
-      .gi-map-body { padding:20px 20px 4px; background:var(--bg-raised,#fff); }
+      .gi-map-body { padding:26px 24px 8px; background:var(--bg-raised,#fff); }
 
       .gi-map-pin-banner {
-        width:100%; border-radius:12px; overflow:hidden; margin-bottom:18px;
-        background:linear-gradient(135deg,#0c1445 0%,#1a2260 100%);
-        display:flex; align-items:center; justify-content:center;
-        padding:24px 20px; gap:16px; cursor:pointer; text-decoration:none;
-        transition:opacity .2s;
-        border:1.5px solid rgba(56,189,248,.18);
+        width:100%; border-radius:16px; overflow:hidden; margin-bottom:24px;
+        background:linear-gradient(135deg,#0c1445 0%,#1e2d7a 100%);
+        display:flex; align-items:center;
+        padding:22px 20px; gap:16px; cursor:pointer; text-decoration:none;
+        transition:transform .2s, box-shadow .2s;
+        border:1.5px solid rgba(56,189,248,.22);
+        box-shadow:0 3px 14px rgba(12,20,69,.22);
       }
-      .gi-map-pin-banner:hover { opacity:.88; }
+      .gi-map-pin-banner:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(12,20,69,.3); }
       .gi-map-pin-icon {
-        width:48px; height:48px; flex:none; border-radius:50%;
-        background:rgba(232,168,56,.2); border:2px solid rgba(232,168,56,.45);
-        display:flex; align-items:center; justify-content:center; font-size:1.5rem;
+        width:56px; height:56px; flex:none; border-radius:50%;
+        background:rgba(232,168,56,.2); border:2px solid rgba(232,168,56,.5);
+        display:flex; align-items:center; justify-content:center; font-size:1.6rem;
       }
-      .gi-map-pin-text { color:#fff; }
-      .gi-map-pin-text strong { display:block; font-size:.95rem; font-weight:700; margin-bottom:2px; }
-      .gi-map-pin-text span { font-size:.78rem; color:rgba(255,255,255,.6); }
+      .gi-map-pin-text { color:#fff; flex:1; min-width:0; }
+      .gi-map-pin-text strong { display:block; font-size:1.15rem; font-weight:800; margin-bottom:4px; letter-spacing:-.01em; }
+      .gi-map-pin-text span { font-size:.92rem; color:rgba(255,255,255,.65); line-height:1.4; }
       .gi-map-pin-arrow {
         margin-left:auto; flex:none;
-        width:32px; height:32px; border-radius:50%;
-        background:rgba(56,189,248,.15); border:1px solid rgba(56,189,248,.3);
+        width:40px; height:40px; border-radius:50%;
+        background:rgba(56,189,248,.18); border:1.5px solid rgba(56,189,248,.4);
         display:flex; align-items:center; justify-content:center;
         color:#38bdf8;
       }
 
       .gi-map-info {
-        display:flex; flex-direction:column; gap:14px;
+        display:flex; flex-direction:column; gap:20px;
       }
       @media(min-width:540px){
-        .gi-map-info{ display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; }
+        .gi-map-info{ display:grid; grid-template-columns:1fr 1fr; gap:18px 32px; }
       }
-      .gi-map-row { display:flex; align-items:flex-start; gap:12px; }
+      .gi-map-row { display:flex; align-items:flex-start; gap:14px; }
       .gi-map-row-icon {
-        width:32px; height:32px; flex:none; border-radius:8px;
+        width:42px; height:42px; flex:none; border-radius:12px;
         display:flex; align-items:center; justify-content:center;
-        font-size:.9rem;
+        font-size:1.1rem;
       }
-      .gi-map-row-icon--addr { background:rgba(56,189,248,.13); }
-      .gi-map-row-icon--time { background:rgba(232,168,56,.13); }
-      .gi-map-row-icon--phone{ background:rgba(52,211,153,.13); }
-      .gi-map-row-icon--web  { background:rgba(167,139,250,.13); }
+      .gi-map-row-icon--addr { background:rgba(56,189,248,.12); }
+      .gi-map-row-icon--time { background:rgba(232,168,56,.12); }
+      .gi-map-row-icon--phone{ background:rgba(52,211,153,.12); }
+      .gi-map-row-icon--web  { background:rgba(167,139,250,.12); }
       .gi-map-row-body { flex:1; min-width:0; }
-      .gi-map-row-label { font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--ink-faint,#a8a29e); margin-bottom:3px; }
-      .gi-map-row-value { font-size:.875rem; color:var(--ink,#1c1917); font-weight:500; line-height:1.45; word-break:break-word; }
-      .gi-map-row-value a { color:var(--c-sky,#38bdf8); text-decoration:none; }
+      .gi-map-row-label { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.12em; color:var(--ink-faint,#a8a29e); margin-bottom:5px; }
+      .gi-map-row-value { font-size:1.05rem; color:var(--ink,#1c1917); font-weight:600; line-height:1.45; word-break:break-word; }
+      .gi-map-row-value a { color:#7c3aed; text-decoration:none; font-weight:700; }
       .gi-map-row-value a:hover { text-decoration:underline; }
 
       .gi-map-directions {
-        display:flex; align-items:center; gap:8px; justify-content:center;
-        margin:4px 20px 20px; padding:12px;
-        background:linear-gradient(135deg,rgba(56,189,248,.10),rgba(56,189,248,.05));
-        border:1.5px solid rgba(56,189,248,.25); border-radius:10px;
-        font:.75rem var(--font-ui,sans-serif); font-weight:700;
+        display:flex; align-items:center; gap:10px; justify-content:center;
+        margin:20px 24px 24px; padding:16px;
+        background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(56,189,248,.06));
+        border:2px solid rgba(56,189,248,.3); border-radius:14px;
+        font:700 1rem var(--font-ui,sans-serif);
         color:var(--c-sky,#38bdf8); text-decoration:none; cursor:pointer;
-        transition:background .2s;
+        transition:background .2s, transform .15s;
+        letter-spacing:.01em;
       }
-      .gi-map-directions:hover { background:rgba(56,189,248,.18); }
+      .gi-map-directions:hover { background:rgba(56,189,248,.2); transform:translateY(-1px); }
 
       .gi-map-skeleton {
-        padding:32px 20px; text-align:center;
-        color:var(--ink-muted,#78716c); font-size:.875rem; line-height:1.6;
+        padding:40px 24px; text-align:center;
+        color:var(--ink-muted,#78716c); font-size:1rem; line-height:1.65;
       }
-      .gi-map-skeleton svg { opacity:.35; margin-bottom:10px; }
+      .gi-map-skeleton svg { opacity:.35; margin-bottom:12px; }
 
       /* ═══ Share banner ══════════════════════════════════════════ */
       .gi-share-banner {
-        margin-top:48px; margin-bottom:16px;
-        background:linear-gradient(135deg,#0c1445 0%,#1a2260 50%,#0c1445 100%);
-        border-radius:18px; padding:32px 24px; text-align:center;
-        box-shadow:0 4px 24px rgba(12,20,69,.25);
+        margin-top:56px; margin-bottom:24px;
+        background:linear-gradient(150deg,#0c1445 0%,#1a2260 45%,#2d1a6e 100%);
+        border-radius:26px; padding:48px 28px 44px; text-align:center;
+        box-shadow:0 8px 40px rgba(12,20,69,.32);
         position:relative; overflow:hidden;
       }
       .gi-share-banner::before {
         content:''; position:absolute; inset:0;
-        background:radial-gradient(ellipse at 70% 30%,rgba(232,168,56,.18),transparent 65%),
-                   radial-gradient(ellipse at 20% 80%,rgba(126,170,204,.15),transparent 60%);
+        background:
+          radial-gradient(ellipse at 75% 20%,rgba(232,168,56,.24),transparent 55%),
+          radial-gradient(ellipse at 15% 85%,rgba(126,170,204,.18),transparent 50%),
+          radial-gradient(ellipse at 50% 110%,rgba(167,139,250,.15),transparent 45%);
+      }
+      /* subtle star-dust texture */
+      .gi-share-banner::after {
+        content:''; position:absolute; inset:0; pointer-events:none;
+        background-image:radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1px);
+        background-size:28px 28px;
       }
       .gi-share-banner-inner { position:relative; }
       .gi-share-icon {
-        width:48px; height:48px; border-radius:50%;
-        background:rgba(232,168,56,.2); border:2px solid rgba(232,168,56,.4);
+        width:72px; height:72px; border-radius:50%;
+        background:rgba(232,168,56,.18); border:2px solid rgba(232,168,56,.45);
         display:flex; align-items:center; justify-content:center;
-        margin:0 auto 14px; font-size:1.4rem;
+        margin:0 auto 20px; font-size:2rem;
+        box-shadow:0 0 0 10px rgba(232,168,56,.07), 0 6px 22px rgba(232,168,56,.22);
+      }
+      .gi-share-tagline {
+        display:inline-block;
+        font-size:.72rem; font-weight:800; letter-spacing:.22em;
+        text-transform:uppercase; color:rgba(232,168,56,.9);
+        margin-bottom:14px;
       }
       .gi-share-banner h3 {
-        font-size:1.15rem; font-weight:800; color:#fff; margin:0 0 8px;
+        font-size:1.7rem; font-weight:800; color:#fff; margin:0 0 14px;
+        line-height:1.2; letter-spacing:-.02em;
       }
-      @media(min-width:560px){ .gi-share-banner h3{ font-size:1.35rem; } }
+      @media(min-width:560px){ .gi-share-banner h3{ font-size:2.1rem; } }
       .gi-share-banner p {
-        font-size:.875rem; color:rgba(255,255,255,.72); margin:0 auto 20px;
-        line-height:1.65; max-width:380px;
+        font-size:1.05rem; color:rgba(255,255,255,.75); margin:0 auto 28px;
+        line-height:1.75; max-width:360px;
       }
       .gi-share-btn {
-        display:inline-flex; align-items:center; gap:9px;
+        display:inline-flex; align-items:center; gap:10px;
         background:var(--gold,#e8a838); color:#0c1445; border:none;
-        border-radius:50px; padding:13px 28px;
-        font:700 .9rem var(--font-ui,sans-serif); cursor:pointer;
-        box-shadow:0 4px 16px rgba(232,168,56,.4);
-        transition:background .2s, transform .15s, box-shadow .2s;
+        border-radius:999px; padding:16px 36px;
+        font:800 1.05rem var(--font-ui,sans-serif); cursor:pointer;
+        box-shadow:0 6px 24px rgba(232,168,56,.45);
+        transition:background .2s, transform .18s, box-shadow .2s;
+        letter-spacing:.01em;
       }
       .gi-share-btn:hover {
         background:#fbbf24;
-        box-shadow:0 6px 22px rgba(232,168,56,.55); transform:translateY(-1px);
+        box-shadow:0 10px 36px rgba(232,168,56,.6); transform:translateY(-2px);
       }
-      .gi-share-btn:active { transform:scale(.96); }
+      .gi-share-btn:active { transform:scale(.95); }
     </style>
 
     <section class="grow-page" data-grow="the_gospel_invitation">
@@ -550,8 +603,9 @@ export function render() {
       <div class="gi-share-banner">
         <div class="gi-share-banner-inner">
           <div class="gi-share-icon">✉️</div>
-          <h3>Share This with a Friend</h3>
-          <p>Know someone carrying a heavy load? Send them a hope-filled look at Jesus Christ.</p>
+          <span class="gi-share-tagline">Pass It On</span>
+          <h3>Know Someone Who Needs This?</h3>
+          <p>Send them a hope-filled look at Jesus Christ — His invitations, His identity, and what He accomplished for them.</p>
           <button class="gi-share-btn" data-act="share-sms">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91A16 16 0 0 0 16 17l.96-.96a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
