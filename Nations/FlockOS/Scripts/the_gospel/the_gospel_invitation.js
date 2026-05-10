@@ -79,76 +79,105 @@ export function render() {
         padding-bottom:14px; border-bottom:2px solid var(--line,#e7e5e4);
       }
       .gi-section-num {
-        flex:none; width:36px; height:36px; border-radius:50%;
+        flex:none; width:44px; height:44px; border-radius:50%;
         display:flex; align-items:center; justify-content:center;
-        font-weight:800; font-size:.9rem; color:#fff;
+        font-weight:800; font-size:1.05rem; color:#fff;
+        box-shadow:0 3px 10px rgba(0,0,0,.18);
       }
       .gi-section-num--1 { background:linear-gradient(135deg,#7eaacc,#38bdf8); }
       .gi-section-num--2 { background:linear-gradient(135deg,#a78bfa,#7c3aed); }
       .gi-section-num--3 { background:linear-gradient(135deg,#fbbf24,#e8a838); }
       .gi-section-title  { flex:1; }
       .gi-section-title h2 {
-        font-size:1.1rem; font-weight:700; color:var(--ink,#1c1917);
-        margin:0 0 3px;
+        font-size:1.35rem; font-weight:800; color:var(--ink,#1c1917);
+        margin:0 0 5px; letter-spacing:-.01em;
       }
-      @media(min-width:600px){ .gi-section-title h2{ font-size:1.25rem; } }
+      @media(min-width:600px){ .gi-section-title h2{ font-size:1.6rem; } }
       .gi-section-title p {
-        font-size:.82rem; color:var(--ink-muted,#57534e); line-height:1.55; margin:0;
+        font-size:.9rem; color:var(--ink-muted,#57534e); line-height:1.55; margin:0;
       }
 
-      /* ═══ Invitation cards ══════════════════════════════════════ */
-      .gi-grid { display:grid; grid-template-columns:1fr; gap:14px; }
-      @media(min-width:560px){ .gi-grid{ grid-template-columns:repeat(3,1fr); } }
+      /* ═══ Invitation cards — bold hero treatment ══════════════ */
+      .gi-grid { display:grid; grid-template-columns:1fr; gap:22px; }
+      @media(min-width:560px){ .gi-grid{ grid-template-columns:repeat(3,1fr); gap:18px; } }
 
       .gi-card {
         position:relative; overflow:hidden;
-        border-radius:14px; padding:22px 20px 16px;
-        border:1.5px solid transparent;
-        cursor:pointer; transition:box-shadow .25s, transform .2s;
+        border-radius:22px;
+        box-shadow:0 4px 22px rgba(0,0,0,.10);
+        cursor:pointer; transition:box-shadow .3s, transform .25s;
         text-align:left; display:flex; flex-direction:column;
+        border:1.5px solid rgba(0,0,0,.06);
       }
-      .gi-card::before {
-        content:''; position:absolute; inset:0; opacity:.08;
-        background:var(--gi-c); transition:opacity .25s;
-      }
-      .gi-card:hover::before { opacity:.16; }
-      .gi-card:hover { box-shadow:0 6px 22px rgba(0,0,0,.10); transform:translateY(-2px); }
+      .gi-card:hover { box-shadow:0 14px 44px rgba(0,0,0,.17); transform:translateY(-5px); }
 
-      .gi-card-accent {
-        position:absolute; top:0; left:0; right:0; height:4px;
+      /* Colored hero zone at top of card */
+      .gi-card-hero {
         background:var(--gi-c);
+        padding:30px 26px 24px;
+        position:relative; overflow:hidden; flex:none;
       }
-      .gi-card-icon  { font-size:2.2rem; margin-bottom:10px; }
-      .gi-card h3    {
-        font-size:.95rem; font-weight:700;
-        color:var(--gi-c); margin-bottom:8px; line-height:1.3;
+      .gi-card-hero::before {
+        content:''; position:absolute; inset:0;
+        background:
+          radial-gradient(ellipse at -10% 120%, rgba(0,0,0,.28), transparent 65%),
+          radial-gradient(ellipse at 115% -10%, rgba(255,255,255,.22), transparent 55%);
       }
+      .gi-card-hero-inner { position:relative; }
+
+      .gi-card-icon { font-size:3rem; margin-bottom:16px; display:block; line-height:1; }
+      .gi-card h3 {
+        font-size:1.3rem; font-weight:800;
+        color:#fff; margin:0; line-height:1.2;
+        text-shadow:0 1px 8px rgba(0,0,0,.22);
+        letter-spacing:-.01em;
+      }
+      /* Slightly tighter on tablet columns where space is limited */
+      @media(min-width:560px) and (max-width:759px){ .gi-card h3 { font-size:1.05rem; } }
+      @media(min-width:760px){ .gi-card h3 { font-size:1.2rem; } }
+
+      /* White body zone below hero */
+      .gi-card-body {
+        background:var(--bg-raised, #fff);
+        padding:24px 24px 18px;
+        flex:1; display:flex; flex-direction:column;
+      }
+
       .gi-card-quote {
         color:var(--ink,#1c1917); font-style:italic;
-        font-size:.88rem; margin-bottom:6px; line-height:1.7;
-        flex:1;
+        font-size:1.1rem; margin:0 0 18px; line-height:1.85;
+        flex:1; font-family:'Noto Serif', Georgia, serif;
       }
+      @media(min-width:560px){ .gi-card-quote{ font-size:.95rem; } }
+      @media(min-width:760px){ .gi-card-quote{ font-size:1.05rem; } }
+
       .gi-card-ref {
-        display:inline-block; padding:2px 10px;
+        display:inline-block; padding:7px 18px;
         background:var(--gi-c); border-radius:999px;
-        font-size:.68rem; font-weight:700; color:#fff;
-        letter-spacing:.04em; margin-bottom:14px;
+        font-size:.82rem; font-weight:700; color:#fff;
+        letter-spacing:.05em; margin-bottom:16px; align-self:flex-start;
+        box-shadow:0 2px 8px rgba(0,0,0,.12);
       }
+
       .gi-card-insight {
         display:none; padding:14px 0 4px;
         border-top:1px solid rgba(0,0,0,.08);
-        font-size:.875rem; line-height:1.7; color:var(--ink-muted,#57534e);
+        font-size:.975rem; line-height:1.78; color:var(--ink-muted,#57534e);
       }
       .gi-card-insight.open { display:block; animation:gi-fadein .25s ease; }
       .gi-insight-label {
         display:block; color:var(--gi-c); font-weight:700;
-        font-size:.65rem; text-transform:uppercase; letter-spacing:.14em; margin-bottom:6px;
+        font-size:.68rem; text-transform:uppercase; letter-spacing:.14em; margin-bottom:8px;
       }
+
       .gi-toggle {
-        text-align:center; font-size:1.1rem; margin-top:8px;
-        color:var(--gi-c); opacity:.6; transition:opacity .2s; user-select:none;
+        text-align:center; font-size:1.5rem; margin-top:6px;
+        color:var(--gi-c); opacity:.4;
+        transition:opacity .2s, transform .3s cubic-bezier(.34,1.56,.64,1);
+        user-select:none; line-height:1;
       }
-      .gi-card:hover .gi-toggle { opacity:1; }
+      .gi-card:hover .gi-toggle { opacity:.85; }
+      .gi-toggle.open { transform:rotate(45deg); opacity:1; }
 
       /* ═══ I AM section ══════════════════════════════════════════ */
       .gi-iam-wrap {
@@ -676,15 +705,20 @@ function _esc(s) {
 function _invCard(c, color) {
   return /* html */`
     <div class="gi-card" style="--gi-c:${color}">
-      <div class="gi-card-accent"></div>
-      <div class="gi-card-icon">${c.icon}</div>
-      <h3>${_esc(c.title)}</h3>
-      <p class="gi-card-quote">&ldquo;${_esc(c.quote)}&rdquo;</p>
-      <p class="gi-card-ref">${_esc(c.ref)}</p>
-      <div class="gi-card-insight">
-        <span class="gi-insight-label">The Hope</span>${_esc(c.insight)}
+      <div class="gi-card-hero">
+        <div class="gi-card-hero-inner">
+          <span class="gi-card-icon">${c.icon}</span>
+          <h3>${_esc(c.title)}</h3>
+        </div>
       </div>
-      <div class="gi-toggle">+</div>
+      <div class="gi-card-body">
+        <p class="gi-card-quote">&ldquo;${_esc(c.quote)}&rdquo;</p>
+        <p class="gi-card-ref">${_esc(c.ref)}</p>
+        <div class="gi-card-insight">
+          <span class="gi-insight-label">The Hope</span>${_esc(c.insight)}
+        </div>
+        <div class="gi-toggle">+</div>
+      </div>
     </div>
   `;
 }
@@ -697,8 +731,8 @@ function _wireCards(root) {
       const wasOpen = insight.classList.contains('open');
       // collapse all
       root.querySelectorAll('.gi-card-insight').forEach(el => el.classList.remove('open'));
-      root.querySelectorAll('.gi-toggle').forEach(el => { el.textContent = '+'; });
-      if (!wasOpen) { insight.classList.add('open'); toggle.textContent = '−'; }
+      root.querySelectorAll('.gi-toggle').forEach(el => el.classList.remove('open'));
+      if (!wasOpen) { insight.classList.add('open'); toggle.classList.add('open'); }
     });
   });
 }
