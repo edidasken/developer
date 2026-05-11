@@ -27,19 +27,22 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg:     #e7eaee;
-      --bg-card:#ffffff;
-      --border: rgba(0,0,0,.09);
-      --ink:    #111827;
-      --muted:  #6b7280;
-      --gold:   #c97d10;
-      --danger: #dc2626;
-      --radius: 14px;
+      --bg-page:  #0e1320;
+      --bg-card:  #181b29;
+      --border:   rgba(255,255,255,.09);
+      --ink:      #f0f2f8;
+      --muted:    rgba(240,242,248,.55);
+      --gold:     #e8a838;
+      --gold-dark:#c97d10;
+      --danger:   #f87171;
+      --radius:   18px;
     }
+
     html, body {
       height: 100%;
-      background: var(--bg);
+      background: var(--bg-page);
       color: var(--ink);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -49,121 +52,129 @@
       padding: 24px 16px;
     }
 
-    /* ── Subtle light background glow ─────────────────────── */
-    .stars {
-      position: fixed; inset: 0; z-index: 0;
-      background: radial-gradient(ellipse at 60% 30%, rgba(201,125,16,.06) 0%, transparent 60%),
-                  radial-gradient(ellipse at 20% 80%, rgba(37,99,235,.04) 0%, transparent 50%);
-      pointer-events: none;
+    /* ── Background glow ──────────────────────────────────── */
+    .bg-glow {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 15% 10%,  rgba(232,168,56,.13)  0%, transparent 55%),
+        radial-gradient(ellipse 60% 50% at 85% 85%,  rgba(108,63,168,.12)  0%, transparent 55%),
+        radial-gradient(ellipse 100% 60% at 50% 50%, rgba(30,41,90,.6)     0%, transparent 80%);
     }
 
-    /* ── Card ────────────────────────────────────────────── */
+    /* ── Card ─────────────────────────────────────────────── */
     .card {
       position: relative; z-index: 1;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 40px 36px 36px;
+      padding: 44px 40px 40px;
       width: 100%;
-      max-width: 400px;
-      box-shadow: 0 8px 32px rgba(0,0,0,.10);
+      max-width: 420px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.04),
+        0 24px 64px rgba(0,0,0,.55),
+        0 4px 16px rgba(0,0,0,.3);
     }
 
-    /* ── Brand ───────────────────────────────────────────── */
+    /* ── Brand ────────────────────────────────────────────── */
     .brand {
-      display: flex; align-items: center; gap: 12px;
-      margin-bottom: 32px;
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 36px;
     }
     .brand-icon {
-      width: 48px; height: 48px;
-      background: rgba(201,125,16,.10);
-      border: 1px solid rgba(201,125,16,.25);
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem;
+      width: 54px; height: 54px;
+      border-radius: 14px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,.4);
     }
+    .brand-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .brand-name {
-      font-size: 1.25rem;
-      font-weight: 700;
-      letter-spacing: -.01em;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--ink);
     }
     .brand-sub {
       font-size: .75rem;
       color: var(--muted);
-      margin-top: 2px;
+      margin-top: 3px;
+      letter-spacing: .01em;
     }
 
-    /* ── Form ────────────────────────────────────────────── */
+    /* ── Section label ───────────────────────────────────── */
     .form-title {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: var(--muted);
-      letter-spacing: .02em;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .1em;
       text-transform: uppercase;
-      font-size: .72rem;
+      color: var(--gold);
+      margin-bottom: 22px;
     }
 
+    /* ── Fields ──────────────────────────────────────────── */
+    .field-group { margin-bottom: 18px; }
     label {
       display: block;
-      font-size: .8rem;
+      font-size: .78rem;
       font-weight: 600;
       color: var(--muted);
-      margin-bottom: 6px;
+      margin-bottom: 7px;
       letter-spacing: .02em;
     }
     input[type="email"],
     input[type="password"] {
       width: 100%;
-      background: #f9fafb;
-      border: 1px solid rgba(0,0,0,.12);
-      border-radius: 8px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
       color: var(--ink);
       font-family: inherit;
       font-size: .9rem;
-      padding: 11px 14px;
-      margin-bottom: 16px;
+      padding: 12px 15px;
       outline: none;
-      transition: border-color .15s;
+      transition: border-color .15s, box-shadow .15s;
       -webkit-appearance: none;
     }
     input[type="email"]:focus,
     input[type="password"]:focus {
       border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(201,125,16,.12);
+      box-shadow: 0 0 0 3px rgba(232,168,56,.18);
     }
-    input::placeholder { color: #9ca3af; }
+    input::placeholder { color: rgba(240,242,248,.3); }
 
+    /* ── Button ──────────────────────────────────────────── */
     .btn-signin {
       width: 100%;
-      background: var(--gold);
-      color: #ffffff;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+      color: #1a0f00;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-family: inherit;
       font-size: .9rem;
-      font-weight: 700;
-      padding: 13px;
+      font-weight: 800;
+      padding: 14px;
       cursor: pointer;
-      margin-top: 4px;
-      transition: opacity .15s, transform .1s;
-      letter-spacing: .01em;
+      margin-top: 8px;
+      letter-spacing: .02em;
+      transition: opacity .15s, transform .1s, box-shadow .15s;
+      box-shadow: 0 4px 20px rgba(232,168,56,.35);
     }
-    .btn-signin:hover { opacity: .9; }
+    .btn-signin:hover  { opacity: .92; box-shadow: 0 6px 24px rgba(232,168,56,.45); }
     .btn-signin:active { transform: scale(.98); }
-    .btn-signin:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-signin:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
 
     /* ── Error ───────────────────────────────────────────── */
     .error-msg {
       display: none;
-      background: rgba(220,38,38,.07);
-      border: 1px solid rgba(220,38,38,.25);
+      background: rgba(248,113,113,.08);
+      border: 1px solid rgba(248,113,113,.25);
       border-radius: 8px;
-      color: #b91c1c;
+      color: var(--danger);
       font-size: .82rem;
       padding: 10px 14px;
-      margin-top: 14px;
-      line-height: 1.4;
+      margin-top: 16px;
+      line-height: 1.5;
     }
     .error-msg.visible { display: block; }
 
@@ -171,31 +182,33 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner {
       display: inline-block;
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,.4);
-      border-top-color: #ffffff;
+      width: 15px; height: 15px;
+      border: 2px solid rgba(26,15,0,.3);
+      border-top-color: #1a0f00;
       border-radius: 50%;
       animation: spin .6s linear infinite;
       vertical-align: middle;
       margin-right: 6px;
     }
 
-    /* ── Footer note ─────────────────────────────────────── */
+    /* ── Footer ──────────────────────────────────────────── */
     .foot-note {
       text-align: center;
       color: var(--muted);
-      font-size: .75rem;
+      font-size: .73rem;
       margin-top: 24px;
     }
   </style>
 </head>
 <body>
 
-  <div class="stars"></div>
+  <div class="bg-glow"></div>
 
   <div class="card">
     <div class="brand">
-      <div class="brand-icon">🎵</div>
+      <div class="brand-icon">
+        <img src="Images/stand.png" alt="Music Stand">
+      </div>
       <div>
         <div class="brand-name">Music Stand</div>
         <div class="brand-sub">FlockOS Worship Tools</div>
@@ -205,11 +218,15 @@
     <div class="form-title">Sign in to continue</div>
 
     <form id="signin-form" autocomplete="on" novalidate>
-      <label for="ms-email">Email</label>
-      <input type="email" id="ms-email" name="email" placeholder="you@church.com" autocomplete="email" required>
+      <div class="field-group">
+        <label for="ms-email">Email</label>
+        <input type="email" id="ms-email" name="email" placeholder="you@church.com" autocomplete="email" required>
+      </div>
 
-      <label for="ms-pass">Passcode</label>
-      <input type="password" id="ms-pass" name="password" placeholder="••••••••" autocomplete="current-password" required>
+      <div class="field-group">
+        <label for="ms-pass">Passcode</label>
+        <input type="password" id="ms-pass" name="password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
 
       <button type="submit" class="btn-signin" id="ms-submit">Sign In</button>
     </form>
