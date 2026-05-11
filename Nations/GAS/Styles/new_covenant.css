@@ -3266,13 +3266,13 @@ flock-tabs [role="tablist"], .tabs-bar {
 .gen-stat-label { font: 0.74rem var(--font-ui); color: var(--ink-muted, #7a7f96); }
 .gen-timeline   { display: flex; flex-direction: column; gap: 0; }
 .gen-milestone  {
-  display: grid; grid-template-columns: 56px 16px 1fr; align-items: flex-start;
+  display: grid; grid-template-columns: 84px 16px 1fr; align-items: flex-start;
   gap: 0 12px; position: relative; padding-bottom: 20px;
 }
 .gen-milestone:last-child { padding-bottom: 0; }
 .gen-milestone-year {
   font: 700 0.80rem var(--font-ui); color: var(--ink-muted, #7a7f96);
-  padding-top: 4px; text-align: right; min-width: 82px; white-space: nowrap;
+  padding-top: 4px; text-align: right; white-space: nowrap;
 }
 .gen-milestone-dot {
   width: 12px; height: 12px; border-radius: 50%; margin-top: 6px; flex-shrink: 0;
