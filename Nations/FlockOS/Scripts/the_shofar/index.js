@@ -1122,6 +1122,13 @@ function msOpenArrEditor(arr) {
 
             '<div class="ms-form-group">' +
                 '<label class="ms-label" for="ms-af-chords">Lyrics with Chords (ChordPro format)</label>' +
+                '<div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">' +
+                    '<label class="ms-btn ms-btn-secondary ms-btn-sm" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;">' +
+                        '&#128194; Import ChordPro file' +
+                        '<input type="file" id="ms-af-chordpro-file" accept=".txt,.chopro,.cho,.pro" style="display:none;">' +
+                    '</label>' +
+                    '<span id="ms-af-file-status" style="color:#64748b; font-size:0.82rem;">Supports .txt / .chopro from SongSelect</span>' +
+                '</div>' +
                 '<textarea class="ms-input ms-textarea" id="ms-af-chords" rows="12" placeholder="[G]Amazing [C]grace how [G]sweet the sound&#10;That [G]saved a [Em]wretch like [D]me">' + msEscapeHtml(a.lyricsWithChords || '') + '</textarea>' +
                 '<p style="color:#64748b; font-size:0.8rem; margin:4px 0 0 0;">Use [Chord] before the syllable, e.g. [Am]Hello [G]world. <strong style="color:#22d3ee;">Leave blank</strong> to auto-derive from the song\'s original-key chord sheet, transposed to this arrangement\'s key.</p>' +
             '</div>' +
@@ -1147,6 +1154,61 @@ function msOpenArrEditor(arr) {
 
     document.getElementById('ms-arr-editor-close').addEventListener('click', function() { msCloseArrEditor(); });
     document.getElementById('ms-arr-cancel').addEventListener('click', function() { msCloseArrEditor(); });
+
+    // ── ChordPro file import ──────────────────────────────────────────────────
+    document.getElementById('ms-af-chordpro-file').addEventListener('change', function(e) {
+        var file = e.target.files && e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+            var text = ev.target.result || '';
+            var meta = msParseChordProDirectives(text);
+
+            // Populate chord textarea with full file content
+            document.getElementById('ms-af-chords').value = text;
+
+            // Key
+            if (meta.key) {
+                var keySelect = document.getElementById('ms-af-key');
+                for (var i = 0; i < keySelect.options.length; i++) {
+                    if (keySelect.options[i].value === meta.key) {
+                        keySelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            // Arrangement name: default to "Key of X" if field is empty
+            var nameInput = document.getElementById('ms-af-name');
+            if (!nameInput.value.trim() && meta.key) {
+                nameInput.value = 'Key of ' + meta.key;
+            }
+
+            // Notes: append tempo, time, CCLI if present
+            var noteParts = [];
+            if (meta.tempo)  noteParts.push('Tempo: ' + meta.tempo + ' BPM');
+            if (meta.time)   noteParts.push('Time: ' + meta.time);
+            if (meta.ccli)   noteParts.push('CCLI: ' + meta.ccli);
+            if (meta.artist) noteParts.push('Artist: ' + meta.artist);
+            if (noteParts.length) {
+                var notesEl = document.getElementById('ms-af-notes');
+                notesEl.value = (notesEl.value ? notesEl.value.trim() + '\n' : '') + noteParts.join(' | ');
+            }
+
+            // Status feedback
+            var statusEl = document.getElementById('ms-af-file-status');
+            if (statusEl) {
+                var parts = [];
+                if (meta.title)  parts.push(meta.title);
+                if (meta.key)    parts.push('Key: ' + meta.key);
+                if (meta.tempo)  parts.push(meta.tempo + ' BPM');
+                statusEl.textContent = parts.length ? '\u2713 Loaded: ' + parts.join(' \u2022 ') : '\u2713 File loaded';
+                statusEl.style.color = '#34d399';
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = ''; // allow re-selecting same file
+    });
 
     document.getElementById('ms-arr-form').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -1656,6 +1718,31 @@ function msBindTransposeControls(originalKey, currentSemitones, capoFret, idPref
 // ══════════════════════════════════════════════════════════════════════════════
 // Converts ChordPro notation: "[G]Amazing [C]grace" into two-line
 // display with chords above lyrics, using HTML spans.
+
+// ── Parse ChordPro directive headers from a file ─────────────────────────────
+// Returns: { title, artist, key, tempo, time, ccli, copyright }
+function msParseChordProDirectives(text) {
+    var result = {};
+    var directiveRe = /^\{(\w+):\s*(.+?)\s*\}/;
+    String(text).split('\n').forEach(function(line) {
+        var m = line.trim().match(directiveRe);
+        if (!m) return;
+        var tag = m[1].toLowerCase();
+        var val = m[2];
+        switch (tag) {
+            case 'title':  case 't':                result.title     = val; break;
+            case 'artist': case 'a':                result.artist    = val; break;
+            case 'subtitle': case 'st':             result.subtitle  = val; break;
+            case 'key':                             result.key       = val; break;
+            case 'tempo':                           result.tempo     = val; break;
+            case 'time':                            result.time      = val.trim(); break;
+            case 'capo':                            result.capo      = val; break;
+            case 'ccli':    case 'ccli_song':       result.ccli      = val; break;
+            case 'copyright':                       result.copyright = val; break;
+        }
+    });
+    return result;
+}
 
 function msRenderChordPro(text) {
     if (!text) return '';
