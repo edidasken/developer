@@ -219,11 +219,13 @@ async function boot() {
   try {
     _loadPrefs();
 
-    // Auth temporarily bypassed — skip Nehemiah wait
     const N = window.Nehemiah || {};
 
-    // Auth gate temporarily disabled — re-enable when ready
-    // if (!N.isAuthenticated()) { _renderAuthGate(N); return; }
+    // If not authenticated, send back to login page
+    if (typeof N.isAuthenticated === 'function' && !N.isAuthenticated()) {
+      window.location.replace('app.stand/index.html');
+      return;
+    }
 
     // Build user profile
     const sess = (N.getSession ? N.getSession() : null) || {};
