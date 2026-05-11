@@ -1908,8 +1908,13 @@
 
   function listOutreachContacts(opts) {
     opts = opts || {};
-    var q = _outreachContactsRef().orderBy('createdAt', 'desc');
+    var q = _outreachContactsRef();
+    // byEmail: filter to a specific submitter email (equality only — no composite index needed)
+    if (opts.byEmail) q = q.where('email', '==', opts.byEmail);
     if (opts.status) q = q.where('status', '==', opts.status);
+    // Skip orderBy when filtering by email to avoid requiring a composite index.
+    // Results are sorted client-side in the view layer.
+    if (!opts.byEmail) q = q.orderBy('createdAt', 'desc');
     return _paginatedGet(q, opts, function(d) { return Object.assign({ id: d.id }, d.data()); });
   }
 
