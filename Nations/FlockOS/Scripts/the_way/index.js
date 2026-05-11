@@ -2546,7 +2546,32 @@
       } catch (_) {}
 
       if (!rows.length) {
-        // Fallback: static chapter-link grid when no API data available
+        // Fallback: load from static books-of-the-bible.js bundle
+        try {
+          var bmod = await import('../Data/books-of-the-bible.js');
+          var bdata = bmod.default || [];
+          if (bdata.length) {
+            rows = bdata.map(function(b) {
+              return {
+                id:                    b.bookName,
+                'Book Name':           b.bookName,
+                'Testament':           b.testament,
+                'Genre':               b.genre,
+                'Summary':             b.summary,
+                'Core Theology':       b.christInBook,
+                'Practical Application': b.application,
+                'Key Verse':           b.keyVerse,
+                'Themes':              b.themes,
+                'Time Period':         b.timePeriod,
+                booknum:               b.order,
+              };
+            });
+          }
+        } catch (_) {}
+      }
+
+      if (!rows.length) {
+        // Last resort: static chapter-link grid (no rich data)
         var html = '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">';
         html += '<input type="text" placeholder="Search books\u2026" '
               + 'oninput="TheWay._filterPanel(\'lib\',this.value)" '
@@ -2696,31 +2721,48 @@
     var summary   = book['Summary'] || '';
     var theology  = book['Core Theology'] || '';
     var practical = book['Practical Application'] || '';
+    var keyVerse  = book['Key Verse'] || '';
+    var themes    = book['Themes'] || '';
+    var timePeriod= book['Time Period'] || '';
 
     var b = '<div style="max-width:700px;">';
 
     // Header
     b += '<div style="margin-bottom:20px;">';
     b += '<h2 style="font-size:1.5rem;font-weight:800;margin:0 0 4px;">' + _e(name) + '</h2>';
-    b += '<div style="font-size:0.8rem;color:var(--ink-muted);display:flex;gap:12px;">';
-    if (test)  b += '<span>' + _e(test) + ' Testament</span>';
-    if (genre) b += '<span style="color:var(--accent);">' + _e(genre) + '</span>';
-    b += '</div></div>';
+    b += '<div style="font-size:0.8rem;color:var(--ink-muted);display:flex;gap:12px;flex-wrap:wrap;">';
+    if (test)       b += '<span>' + _e(test) + ' Testament</span>';
+    if (genre)      b += '<span style="color:var(--accent);">' + _e(genre) + '</span>';
+    if (timePeriod) b += '<span>&#128336; ' + _e(timePeriod) + '</span>';
+    b += '</div>';
+    if (keyVerse) {
+      b += '<blockquote style="margin:12px 0 0;padding:10px 14px;border-left:3px solid var(--accent);'
+         + 'background:var(--bg-raised);border-radius:0 6px 6px 0;font-size:0.85rem;color:var(--ink-muted);font-style:italic;">'
+         + _e(keyVerse) + '</blockquote>';
+    }
+    b += '</div>';
 
     // Tab bar (only show tabs that have content)
     var firstTab = summary ? 'summary' : (theology ? 'theology' : 'practical');
-    if (summary || theology || practical) {
+    var tabs = [];
+    if (summary)  tabs.push({id:'summary',   label:'Summary'});
+    if (themes)   tabs.push({id:'themes',    label:'Themes'});
+    if (theology) tabs.push({id:'theology',  label:'Christ in This Book'});
+    if (practical)tabs.push({id:'practical', label:'Application'});
+    if (tabs.length) {
       b += '<div class="tw-lib-tab-bar">';
-      if (summary)  b += '<button class="tw-lib-tab' + (firstTab === 'summary'  ? ' active' : '') + '" id="lib-tab-summary"   onclick="TheWay._libTab(\'' + _e(id) + '\',\'summary\')">Summary</button>';
-      if (theology) b += '<button class="tw-lib-tab' + (firstTab === 'theology' ? ' active' : '') + '" id="lib-tab-theology"  onclick="TheWay._libTab(\'' + _e(id) + '\',\'theology\')">Core Theology</button>';
-      if (practical)b += '<button class="tw-lib-tab' + (firstTab === 'practical'? ' active' : '') + '" id="lib-tab-practical" onclick="TheWay._libTab(\'' + _e(id) + '\',\'practical\')">Application</button>';
+      tabs.forEach(function(tab, i) {
+        b += '<button class="tw-lib-tab' + (i === 0 ? ' active' : '') + '" id="lib-tab-' + tab.id + '" '
+           + 'onclick="TheWay._libTab(\'' + _e(id) + '\',\'' + tab.id + '\')">' + tab.label + '</button>';
+      });
       b += '</div>';
 
       // Content panels
       var prose = 'font-size:0.9rem;line-height:1.75;color:var(--ink);white-space:pre-wrap;';
-      if (summary)  b += '<div id="lib-panel-summary"   style="' + prose + (firstTab !== 'summary'   ? 'display:none;' : '') + '">' + _e(summary)   + '</div>';
-      if (theology) b += '<div id="lib-panel-theology"  style="' + prose + (firstTab !== 'theology'  ? 'display:none;' : '') + '">' + _e(theology)  + '</div>';
-      if (practical)b += '<div id="lib-panel-practical" style="' + prose + (firstTab !== 'practical' ? 'display:none;' : '') + '">' + _e(practical) + '</div>';
+      if (summary)  b += '<div id="lib-panel-summary"   style="' + prose + '">' + _e(summary)   + '</div>';
+      if (themes)   b += '<div id="lib-panel-themes"    style="' + prose + 'display:none;">' + _e(themes) + '</div>';
+      if (theology) b += '<div id="lib-panel-theology"  style="' + prose + 'display:none;">' + _e(theology)  + '</div>';
+      if (practical)b += '<div id="lib-panel-practical" style="' + prose + 'display:none;">' + _e(practical) + '</div>';
     } else {
       b += '<div style="color:var(--ink-muted);font-size:0.9rem;">No additional content available for this book.</div>';
     }
@@ -2730,7 +2772,7 @@
   }
 
   export function _libTab(id, tab) {
-    ['summary', 'theology', 'practical'].forEach(function(t) {
+    ['summary', 'themes', 'theology', 'practical'].forEach(function(t) {
       var panel = document.getElementById('lib-panel-' + t);
       var btn   = document.getElementById('lib-tab-' + t);
       if (panel) panel.style.display = t === tab ? '' : 'none';
