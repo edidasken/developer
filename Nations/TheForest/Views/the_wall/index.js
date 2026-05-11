@@ -3147,6 +3147,27 @@ const _DEP_MAP = {
         { file: 'index.js',  role: 'Calling, SMS, clipboard, share, contacts & device sensor facade' },
       ],
     },
+    {
+      name: 'Utility Modules (dynamic imports)',
+      type: 'module',
+      role: 'Helper modules loaded on demand by the shell and views',
+      scripts: [
+        { file: 'the_comms.js',                role: 'Unified comms façade across FlockChat, channels, and push surfaces' },
+        { file: 'the_living_water_adapter.js',  role: 'Shared Firestore-first / GAS-fallback data factory' },
+        { file: 'the_stones.js',               role: 'Input validators & form sanitizers' },
+        { file: 'the_witness.js',              role: 'Runtime self-checks (dev only — activate with ?witness=1)' },
+      ],
+    },
+    {
+      name: 'UI Components — vessels/',
+      type: 'module',
+      role: 'Custom web components (<flock-input>, <flock-card>, etc.) — imported by views on demand',
+      scripts: [
+        'the_basin.js', 'the_censer.js', 'the_chalice.js', 'the_cup.js',
+        'the_mantle.js', 'the_menorah.js', 'the_rod.js', 'the_seal.js',
+        'the_signet.js', 'the_staff.js',
+      ],
+    },
   ],
   views: {
     Home:         ['the_good_shepherd'],
