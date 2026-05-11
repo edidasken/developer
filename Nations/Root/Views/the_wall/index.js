@@ -3099,6 +3099,7 @@ const _DEP_MAP = {
         { file: 'the_pillars.js',    role: 'Sidebar navigation (SECTIONS data + badge mounts)' },
         { file: 'the_courtyard.js',  role: 'Main content area (view mount / unmount)' },
         { file: 'the_hem.js',        role: 'Mobile footer tab bar' },
+        { file: 'the_refresh.js',    role: 'Pull-to-refresh gesture handler for the courtyard scroll container' },
       ],
     },
     {
