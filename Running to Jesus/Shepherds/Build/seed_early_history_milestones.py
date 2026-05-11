@@ -42,58 +42,52 @@ def post_doc(token, fields):
         print(f'  ✗ HTTP {e.code}: {e.read().decode()}')
 
 MILESTONES = [
-    # ── 2023 ──────────────────────────────────────────────────────────────────
+    # ── January 2026 (phase 1) ───────────────────────────────────────────────
     {
-        'date': '2023-01-01',
-        'year': 2023,
+        'date': '2026-01-01',
+        'year': 2026,
         'title': 'FlockOS concept begins',
         'category': 'founding',
         'description': 'Vision formed for a free, full-featured church management platform built entirely on Google infrastructure — zero licensing fees, accessible to churches worldwide.',
     },
-    # ── Early 2024 ────────────────────────────────────────────────────────────
     {
-        'date': '2024-03-01',
-        'year': 2024,
+        'date': '2026-01-07',
+        'year': 2026,
         'title': 'Core architecture established',
         'category': 'building',
         'description': 'GAS backend, Google Sheets as database, and GitHub Pages hosting defined. Four-API architecture (Matthew / Mark / Luke / John) established for App content, Missions, Statistics, and CRM.',
     },
-    # ── Mid 2024 ──────────────────────────────────────────────────────────────
     {
-        'date': '2024-06-01',
-        'year': 2024,
+        'date': '2026-01-14',
+        'year': 2026,
         'title': 'Shepherd, Scrolls & Fold modules built',
         'category': 'building',
         'description': 'The Shepherd (member management), The Scrolls (interaction ledger), and The Fold (groups) — the first three major ministry modules — launched.',
     },
-    # ── Late 2024 ─────────────────────────────────────────────────────────────
     {
-        'date': '2024-10-01',
-        'year': 2024,
+        'date': '2026-01-21',
+        'year': 2026,
         'title': 'Multi-church deployment system launched',
         'category': 'tech',
         'description': 'build_churches.sh, JSON church config system, and the Nations/ output structure built — enabling one codebase to power many churches with unique branding and endpoints.',
     },
-    # ── Early 2025 ────────────────────────────────────────────────────────────
     {
-        'date': '2025-02-01',
-        'year': 2025,
+        'date': '2026-01-28',
+        'year': 2026,
         'title': 'Firestore integration added',
         'category': 'tech',
         'description': 'Firebase Firestore becomes the live primary data store. GAS shifts to hourly sync backup role. Real-time data layer now powers member presence, chat, and care.',
     },
-    # ── Mid 2025 ──────────────────────────────────────────────────────────────
     {
-        'date': '2025-06-01',
-        'year': 2025,
+        'date': '2026-02-07',
+        'year': 2026,
         'title': 'The Wellspring (offline engine) added',
         'category': 'tech',
         'description': 'Full .xlsx-based IndexedDB data layer built for rural and offline deployments. FlockOS can now run with zero internet connectivity.',
     },
-    # ── Late 2025 ─────────────────────────────────────────────────────────────
     {
-        'date': '2025-10-01',
-        'year': 2025,
+        'date': '2026-02-15',
+        'year': 2026,
         'title': 'v3.0 — Major architecture refactor',
         'category': 'tech',
         'description': 'Bezalel provisioning tool, Truth content seeding, full permission system redesign — version 3.0 establishes the permission group architecture and content pipeline.',
