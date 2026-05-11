@@ -87,7 +87,10 @@ export function render() {
             <div class="ctf-scripture-ref">${_e(s.ref)}</div>
             <div class="ctf-scripture-text">"${_e(s.text)}"</div>
           </div>`).join('')}
-          <button class="flock-btn flock-btn--ghost" style="width:100%;margin-top:12px">Forgiveness Prayer Guide</button>
+          <button class="flock-btn flock-btn--ghost" data-act="prayer-guide" style="width:100%;margin-top:12px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 1 5 5c0 3-5 7-5 7S7 10 7 7a5 5 0 0 1 5-5z"/><path d="M12 22v-8"/></svg>
+            Forgiveness Prayer Guide
+          </button>
         </aside>
 
       </div>
@@ -100,7 +103,8 @@ export function mount(root) {
   reload();
   _loadMembers();  // preload member list for party dropdowns
   root.querySelector('[data-act="open-case"]')?.addEventListener('click', () => _openCaseSheet(null, reload));
-  return () => { _closeCtfSheet(); };
+  root.querySelector('[data-act="prayer-guide"]')?.addEventListener('click', () => _openPrayerGuide());
+  return () => { _closeCtfSheet(); _closePrayerGuide(); };
 }
 
 function _rows(res) {
@@ -368,5 +372,161 @@ async function _openCaseSheet(c, onReload) {
       btn.disabled = false; btn.textContent = 'Delete Case';
     }
   });
+}
+
+// ── Prayer Guide ──────────────────────────────────────────────────────────────
+
+const PRAYER_STEPS = [
+  {
+    title:     'Acknowledge the Wound',
+    scripture: { ref: 'Psalm 34:18', text: 'The Lord is close to the brokenhearted and saves those who are crushed in spirit.' },
+    guide:     'Before we can forgive, we must be honest about what happened. Minimising the hurt does not honour the pain — God sees it all.',
+    prayer:    (name) => `Lord, I come before you with a wounded heart. I acknowledge honestly that ${name ? _e(name) : 'the person who hurt me'} wounded me. I do not minimise it. You see the full weight of this pain, and you care about every detail. I bring it to you now. Amen.`,
+  },
+  {
+    title:     'Choose to Forgive',
+    scripture: { ref: 'Colossians 3:13', text: 'Bearing with one another and, if one has a complaint against another, forgiving each other; as the Lord has forgiven you, so you also must forgive.' },
+    guide:     'Forgiveness is not a feeling — it is a decision of the will. You may not feel ready, but you can choose to begin. God\'s grace meets you in the choosing.',
+    prayer:    (name) => `Father, in my own strength I cannot fully forgive. But I choose — right now, as an act of my will — to forgive ${name ? _e(name) : 'this person'}. I do not do this because the hurt was small, but because you have forgiven me of so much more. Fill me with the grace to mean it more each day. Amen.`,
+  },
+  {
+    title:     'Speak the Release',
+    scripture: { ref: 'Matthew 6:14', text: 'For if you forgive men their trespasses, your heavenly Father will also forgive you.' },
+    guide:     'There is power in speaking forgiveness aloud. As you say these words, you are releasing the debt — not because it was fair, but because Christ released yours.',
+    prayer:    (name) => `Lord, I speak these words before you: ${name ? `I forgive ${_e(name)}.` : 'I forgive the one who wronged me.'} They no longer owe me. I release the debt. I place them in your hands and trust you for justice, healing, and whatever comes next. I will not hold this over them. Amen.`,
+  },
+  {
+    title:     'Seek Reconciliation',
+    scripture: { ref: 'Romans 12:18', text: 'If it is possible, as far as it depends on you, live at peace with everyone.' },
+    guide:     'Where it is safe and wise, God calls us toward restored relationship. This does not mean pretending nothing happened — it means trusting God to lead the next step.',
+    prayer:    (name) => `Father, where it is safe and right, I ask you to open the door to restored relationship with ${name ? _e(name) : 'this person'}. Give me wisdom to know when and how to reach out. If full reconciliation is not possible, guard my heart from bitterness and help me trust you. Your ways are higher than mine. Amen.`,
+  },
+  {
+    title:     'Walk in the Healing',
+    scripture: { ref: 'Isaiah 43:18–19', text: 'Forget the former things; do not dwell on the past. See, I am doing a new thing!' },
+    guide:     'Forgiveness is a journey, not a single moment. The feelings may return. When they do, return to this prayer. God\'s healing is real and it is for you.',
+    prayer:    (_name) => `Lord, I know this is a process. When the old pain resurfaces, I will return to this altar and choose again. Thank you that you are not done with me — or with ${_name ? _e(_name) : 'the one I have forgiven'}. I receive your healing. I step forward in freedom today. In Jesus' name, Amen.`,
+  },
+];
+
+let _activePrayerGuide = null;
+
+function _closePrayerGuide() {
+  if (!_activePrayerGuide) return;
+  const el = _activePrayerGuide;
+  el.querySelector('.ctf-pg-overlay')?.classList.remove('is-open');
+  el.querySelector('.ctf-pg-panel')?.classList.remove('is-open');
+  setTimeout(() => { el.remove(); if (_activePrayerGuide === el) _activePrayerGuide = null; }, 320);
+}
+
+function _openPrayerGuide() {
+  _closePrayerGuide();
+
+  let step = 0;  // 0 = intro / name entry, 1–5 = prayer steps
+  let personName = '';
+
+  const el = document.createElement('div');
+  el.className = 'ctf-pg';
+  document.body.appendChild(el);
+  _activePrayerGuide = el;
+
+  function _render() {
+    const isIntro  = step === 0;
+    const isDone   = step > PRAYER_STEPS.length;
+    const ps       = !isIntro && !isDone ? PRAYER_STEPS[step - 1] : null;
+    const progress = isIntro ? 0 : Math.min(step / PRAYER_STEPS.length, 1);
+
+    el.innerHTML = /* html */`
+      <div class="ctf-pg-overlay"></div>
+      <div class="ctf-pg-panel" role="dialog" aria-label="Forgiveness Prayer Guide">
+
+        <div class="ctf-pg-header">
+          <div class="ctf-pg-title-row">
+            <span class="ctf-pg-eyebrow">Forgiveness Prayer Guide</span>
+            <button class="ctf-pg-close" aria-label="Close">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="ctf-pg-progress-bar"><div class="ctf-pg-progress-fill" style="width:${Math.round(progress * 100)}%"></div></div>
+          ${!isIntro && !isDone ? `<div class="ctf-pg-steps-row">${PRAYER_STEPS.map((s, i) => `<span class="ctf-pg-dot${i < step ? ' is-done' : (i === step - 1 ? ' is-active' : '')}"></span>`).join('')}</div>` : ''}
+        </div>
+
+        <div class="ctf-pg-body">
+          ${isIntro ? /* html */`
+            <div class="ctf-pg-intro">
+              <div class="ctf-pg-intro-icon">🕊️</div>
+              <h2 class="ctf-pg-intro-title">The Pathway to Forgiveness</h2>
+              <p class="ctf-pg-intro-sub">This five-step prayer guide will walk you through the ministry of forgiveness — from honest acknowledgment to walking in healing. Take your time with each step.</p>
+              <label class="ctf-pg-name-label">
+                Who are you forgiving? <span style="font-weight:400;color:var(--ink-muted)">(optional)</span>
+                <input class="fold-search ctf-pg-name-input" type="text" placeholder="Their first name…" value="${_e(personName)}" />
+              </label>
+            </div>
+          ` : isDone ? /* html */`
+            <div class="ctf-pg-complete">
+              <div class="ctf-pg-complete-icon">✝️</div>
+              <h2 class="ctf-pg-complete-title">Prayer Complete</h2>
+              <p class="ctf-pg-complete-sub">You have walked through all five steps of forgiveness. This is holy work. God honours it — and he will complete the healing he has begun in you.</p>
+              <div class="ctf-pg-complete-verse">
+                <div class="ctf-pg-sv-ref">Philippians 1:6</div>
+                <div class="ctf-pg-sv-text">"He who began a good work in you will carry it on to completion until the day of Christ Jesus."</div>
+              </div>
+            </div>
+          ` : /* html */`
+            <div class="ctf-pg-step">
+              <div class="ctf-pg-step-num">Step ${step} of ${PRAYER_STEPS.length}</div>
+              <h2 class="ctf-pg-step-title">${_e(ps.title)}</h2>
+              <p class="ctf-pg-step-guide">${_e(ps.guide)}</p>
+              <div class="ctf-pg-scripture">
+                <div class="ctf-pg-sv-ref">${_e(ps.scripture.ref)}</div>
+                <div class="ctf-pg-sv-text">"${_e(ps.scripture.text)}"</div>
+              </div>
+              <div class="ctf-pg-prayer-label">Pray aloud or silently:</div>
+              <div class="ctf-pg-prayer-text">${ps.prayer(personName)}</div>
+            </div>
+          `}
+        </div>
+
+        <div class="ctf-pg-footer">
+          ${step > 0 && !isDone ? `<button class="flock-btn flock-btn--ghost ctf-pg-back">← Back</button>` : `<span></span>`}
+          ${isIntro
+            ? `<button class="flock-btn flock-btn--primary ctf-pg-next">Begin Guide →</button>`
+            : isDone
+              ? `<button class="flock-btn flock-btn--ghost ctf-pg-restart">Start Over</button><button class="flock-btn flock-btn--primary ctf-pg-close-btn">Done</button>`
+              : step < PRAYER_STEPS.length
+                ? `<button class="flock-btn flock-btn--primary ctf-pg-next">Next Step →</button>`
+                : `<button class="flock-btn flock-btn--primary ctf-pg-next">Finish</button>`
+          }
+        </div>
+      </div>`;
+
+    requestAnimationFrame(() => {
+      el.querySelector('.ctf-pg-overlay')?.classList.add('is-open');
+      el.querySelector('.ctf-pg-panel')?.classList.add('is-open');
+    });
+
+    el.querySelector('.ctf-pg-close')?.addEventListener('click', _closePrayerGuide);
+    el.querySelector('.ctf-pg-overlay')?.addEventListener('click', _closePrayerGuide);
+
+    el.querySelector('.ctf-pg-next')?.addEventListener('click', () => {
+      if (isIntro) {
+        personName = (el.querySelector('.ctf-pg-name-input')?.value || '').trim();
+      }
+      step++;
+      _render();
+    });
+    el.querySelector('.ctf-pg-back')?.addEventListener('click', () => {
+      step = Math.max(0, step - 1);
+      _render();
+    });
+    el.querySelector('.ctf-pg-restart')?.addEventListener('click', () => {
+      step = 0;
+      personName = '';
+      _render();
+    });
+    el.querySelector('.ctf-pg-close-btn')?.addEventListener('click', _closePrayerGuide);
+  }
+
+  _render();
 }
 
