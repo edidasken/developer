@@ -38,8 +38,7 @@ const PRECACHE_URLS = [
   'app.invite/manifest.json',
 
   /* ── Styles ───────────────────────────────────────────────────────────── */
-  'Styles/new_covenant.css',
-  'Styles/american_garments.css',
+  'Styles/new_covenant.css', /* american_garments merged in — one CSS file */
 
   /* ── Images ───────────────────────────────────────────────────────────── */
   'Images/NewCovenant.png',

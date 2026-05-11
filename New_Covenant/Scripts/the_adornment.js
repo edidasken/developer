@@ -2,11 +2,13 @@
    THE ADORNMENT — Theme controller (New Covenant redesign)
    "Strength and honour are her clothing." — Proverbs 31:25
 
-   Owns theme selection for the new shell. Themes are CSS variable sets
-   already defined in SharedVessels/styles/american_garments.css and
-   selected via attribute on <html>:
+   Owns theme selection for the new shell. New Covenant has ONE theme — its own
+   fixed design palette defined in new_covenant.css. The theme selector here
+   controls the legacy AG component token set (for FlockChat, ATOG, etc.),
+   which live inside new_covenant.css (merged from american_garments.css).
+   Themes are applied via attribute on <html>:
 
-       <html data-theme="light">     (default — ocean palette)
+       <html data-theme="light">     (default)
        <html data-theme="dark">
        <html data-theme="garden">    (light green)
        <html data-theme="garden-dark">

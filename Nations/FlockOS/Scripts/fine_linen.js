@@ -37,12 +37,12 @@ const Adornment = (() => {
 
   const DEFAULT_THEME = 'america';
   const STORAGE_KEY   = 'flock_theme';
-  // CSS is now loaded via american_garments.css; embedded CSS and STYLE_ID removed.
+  // CSS is now loaded via new_covenant.css (merged single file); embedded CSS and STYLE_ID removed.
 
 
   /* ─── INTERNAL HELPERS ────────────────────────────────────────────────────── */
 
-  // _inject() removed; CSS is loaded via <link> to american_garments.css
+  // _inject() removed; CSS is loaded via <link> to new_covenant.css (merged single file)
 
   function _apply(name) {
     document.documentElement.setAttribute('data-theme', name);
@@ -79,7 +79,7 @@ const Adornment = (() => {
    * Call once on page load, before anything renders.
    */
   function init() {
-    // _inject() removed; CSS is loaded via <link> to american_garments.css
+    // _inject() removed; CSS is loaded via <link> to new_covenant.css (merged single file)
     loadOverrides(); // Apply Interface Studio overrides immediately
 
     // Custom themes disabled — always apply the default America theme.
