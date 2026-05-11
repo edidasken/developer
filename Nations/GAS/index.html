@@ -127,9 +127,11 @@
     .app-btn--grow   { --btn-glow: rgba(232,168,56,0.10); border-color: rgba(232,168,56,0.18); }
     .app-btn--flock  { --btn-glow: rgba(91,141,238,0.10); border-color: rgba(91,141,238,0.18); }
     .app-btn--invite { --btn-glow: rgba(61,139,79,0.12);  border-color: rgba(61,139,79,0.22); }
+    .app-btn--stand  { --btn-glow: rgba(168,85,247,0.10); border-color: rgba(168,85,247,0.22); }
     .app-btn:hover.app-btn--grow   { border-color: rgba(232,168,56,0.40); }
     .app-btn:hover.app-btn--flock  { border-color: rgba(91,141,238,0.40); }
     .app-btn:hover.app-btn--invite { border-color: rgba(61,139,79,0.50); }
+    .app-btn:hover.app-btn--stand  { border-color: rgba(168,85,247,0.50); }
 
     .app-icon {
       width: 52px; height: 52px;
@@ -152,6 +154,7 @@
     .app-btn--grow  .app-label strong { color: var(--gold); }
     .app-btn--flock .app-label strong { color: #a0beff; }
     .app-btn--invite .app-label strong { color: #6ee7b7; }
+    .app-btn--stand .app-label strong { color: #d8b4fe; }
     .app-label span {
       display: block;
       font-size: 0.82rem;
@@ -240,6 +243,15 @@
         <div class="app-label">
           <strong>FlockOS</strong>
           <span>Church management &amp; pastoral care</span>
+        </div>
+        <span class="app-arrow" aria-hidden="true">&#8594;</span>
+      </a>
+
+      <a class="app-btn app-btn--stand" href="app.stand/">
+        <img class="app-icon" src="Images/stand.png" alt="Music Stand">
+        <div class="app-label">
+          <strong>Music Stand</strong>
+          <span>Songs, setlists &amp; live presenter</span>
         </div>
         <span class="app-arrow" aria-hidden="true">&#8594;</span>
       </a>
