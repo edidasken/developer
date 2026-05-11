@@ -3130,6 +3130,23 @@ const _DEP_MAP = {
       role: 'Pastoral care badge subscription and warm-up',
       scripts: ['index.js'],
     },
+    {
+      name: 'Scripture — the_scrolls/',
+      type: 'module',
+      role: 'Interaction ledger + auto-linkified scripture references',
+      scripts: [
+        { file: 'index.js',           role: 'Unified interaction ledger (touches, calls, texts, notes)' },
+        { file: 'the_bible_link.js',  role: 'Auto-linkify scripture references → bible.com (ESV)' },
+      ],
+    },
+    {
+      name: 'Device APIs — the_trumpet/',
+      type: 'module',
+      role: 'Phone & device integration — browser-native, no external dependencies',
+      scripts: [
+        { file: 'index.js',  role: 'Calling, SMS, clipboard, share, contacts & device sensor facade' },
+      ],
+    },
   ],
   views: {
     Home:         ['the_good_shepherd'],
