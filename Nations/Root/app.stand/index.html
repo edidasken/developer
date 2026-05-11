@@ -11,7 +11,7 @@
   <link rel="manifest" href="app.stand/manifest.json">
   <link rel="icon" type="image/png" href="Images/stand.png">
   <link rel="apple-touch-icon" href="Images/stand.png">
-  <meta name="theme-color" content="#e8a838">
+  <meta name="theme-color" content="#c97d10">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Music Stand">
@@ -30,13 +30,13 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:     #0c1118;
-      --bg-card:#131b26;
-      --border: rgba(255,255,255,.08);
-      --ink:    #e8eaf0;
-      --muted:  #8b92a0;
-      --gold:   #e8a838;
-      --danger: #ef4444;
+      --bg:     #f4f4f5;
+      --bg-card:#ffffff;
+      --border: rgba(0,0,0,.09);
+      --ink:    #111827;
+      --muted:  #6b7280;
+      --gold:   #c97d10;
+      --danger: #dc2626;
       --radius: 14px;
     }
     html, body {
@@ -51,11 +51,11 @@
       padding: 24px 16px;
     }
 
-    /* ── Stars background ─────────────────────────────────── */
+    /* ── Subtle light background glow ─────────────────────── */
     .stars {
       position: fixed; inset: 0; z-index: 0;
-      background: radial-gradient(ellipse at 60% 40%, rgba(232,168,56,.06) 0%, transparent 60%),
-                  radial-gradient(ellipse at 20% 80%, rgba(99,102,241,.05) 0%, transparent 50%);
+      background: radial-gradient(ellipse at 60% 30%, rgba(201,125,16,.06) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(37,99,235,.04) 0%, transparent 50%);
       pointer-events: none;
     }
 
@@ -68,7 +68,7 @@
       padding: 40px 36px 36px;
       width: 100%;
       max-width: 400px;
-      box-shadow: 0 24px 64px rgba(0,0,0,.5);
+      box-shadow: 0 8px 32px rgba(0,0,0,.10);
     }
 
     /* ── Brand ───────────────────────────────────────────── */
@@ -78,8 +78,8 @@
     }
     .brand-icon {
       width: 48px; height: 48px;
-      background: rgba(232,168,56,.12);
-      border: 1px solid rgba(232,168,56,.25);
+      background: rgba(201,125,16,.10);
+      border: 1px solid rgba(201,125,16,.25);
       border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.4rem;
@@ -117,8 +117,8 @@
     input[type="email"],
     input[type="password"] {
       width: 100%;
-      background: rgba(255,255,255,.05);
-      border: 1px solid var(--border);
+      background: #f9fafb;
+      border: 1px solid rgba(0,0,0,.12);
       border-radius: 8px;
       color: var(--ink);
       font-family: inherit;
@@ -132,13 +132,14 @@
     input[type="email"]:focus,
     input[type="password"]:focus {
       border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201,125,16,.12);
     }
-    input::placeholder { color: rgba(255,255,255,.25); }
+    input::placeholder { color: #9ca3af; }
 
     .btn-signin {
       width: 100%;
       background: var(--gold);
-      color: #0c1118;
+      color: #ffffff;
       border: none;
       border-radius: 8px;
       font-family: inherit;
@@ -157,10 +158,10 @@
     /* ── Error ───────────────────────────────────────────── */
     .error-msg {
       display: none;
-      background: rgba(239,68,68,.1);
-      border: 1px solid rgba(239,68,68,.3);
+      background: rgba(220,38,38,.07);
+      border: 1px solid rgba(220,38,38,.25);
       border-radius: 8px;
-      color: #fca5a5;
+      color: #b91c1c;
       font-size: .82rem;
       padding: 10px 14px;
       margin-top: 14px;
@@ -173,8 +174,8 @@
     .spinner {
       display: inline-block;
       width: 16px; height: 16px;
-      border: 2px solid rgba(12,17,24,.4);
-      border-top-color: #0c1118;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #ffffff;
       border-radius: 50%;
       animation: spin .6s linear infinite;
       vertical-align: middle;
