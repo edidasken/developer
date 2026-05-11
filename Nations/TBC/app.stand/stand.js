@@ -331,9 +331,7 @@ function _wireHeader() {
   const acctBtn = document.getElementById('ms-account-btn');
   if (acctBtn) {
     acctBtn.addEventListener('click', () => {
-      const N = window.Nehemiah;
-      if (N && typeof N.logout === 'function') N.logout();
-      else location.reload();
+      _signOutAndRedirect();
     });
   }
 
@@ -1242,10 +1240,30 @@ function _renderSettings(main) {
   });
 
   main.querySelector('#set-signout')?.addEventListener('click', () => {
-    const N = window.Nehemiah;
-    if (N && typeof N.logout === 'function') N.logout();
-    else location.reload();
+    _signOutAndRedirect();
   });
+}
+
+/**
+ * Sign out from this PWA and return to the church root index.html.
+ * Calls Nehemiah.logout() for full session cleanup but overrides its
+ * launcher redirect (which assumes the caller lives in /Pages/, not
+ * /app.stand/, and otherwise lands on a 404).
+ */
+function _signOutAndRedirect() {
+  // The correct destination relative to <base href="../"> is the church root.
+  const target = new URL('./', document.baseURI).toString();
+
+  const N = window.Nehemiah;
+  if (N && typeof N.logout === 'function') {
+    // Hijack the redirect Nehemiah.logout() will attempt at the end of its
+    // 25-second farewell card so it lands on the correct page.
+    const _origReplace = window.location.replace.bind(window.location);
+    window.location.replace = function () { _origReplace(target); };
+    try { N.logout(); } catch (_) { _origReplace(target); }
+  } else {
+    window.location.replace(target);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
