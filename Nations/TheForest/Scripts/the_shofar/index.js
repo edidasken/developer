@@ -222,7 +222,7 @@ function msEnsureStyles() {
         '.ms-stand-song-title { font-family:Merriweather,serif; font-size:1.8rem; color:#fff; margin:0; }',
         '.ms-stand-meta { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; }',
         /* slim badge — used inside the compact toolbar */
-        '.ms-stand-badge { display:inline-flex; align-items:center; background:rgba(0,0,0,0.07); color:#374151; padding:3px 9px; border-radius:20px; font-size:0.78rem; font-weight:600; border:1px solid rgba(0,0,0,0.08); white-space:nowrap; line-height:1.4; }',
+        '.ms-stand-badge { display:inline-flex; align-items:center; background:#f1f5f9; color:#1e293b; padding:3px 10px; border-radius:20px; font-size:0.78rem; font-weight:700; border:1px solid #cbd5e1; white-space:nowrap; line-height:1.4; }',
         /* toolbar row containing badges + transpose */
         '.ms-av-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:5px; padding:6px 0 8px 0; border-bottom:1px solid rgba(0,0,0,0.07); margin-bottom:10px; }',
         '.ms-av-divider { width:1px; height:18px; background:rgba(0,0,0,0.15); margin:0 3px; flex-shrink:0; }',
@@ -263,15 +263,15 @@ function msEnsureStyles() {
         /* cards hidden by default; shown on mobile via media query */
         '.ms-song-cards { display:none; max-width:100%; overflow-x:hidden; }',
 
-        /* Song card (mobile) */
-        '.ms-song-card { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:12px 0; border-bottom:1px solid rgba(0,0,0,0.07); max-width:100%; box-sizing:border-box; }',
-        '.ms-song-card:last-child { border-bottom:none; }',
+        /* Song card (mobile) — each one is its own pill on the page background */
+        '.ms-song-card { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; margin-bottom:12px; background:#ffffff; border:1px solid #e2e5ea; border-radius:14px; box-shadow:0 1px 3px rgba(15,23,42,0.05), 0 1px 2px rgba(15,23,42,0.04); max-width:100%; box-sizing:border-box; }',
+        '.ms-song-card:last-child { margin-bottom:0; }',
         '.ms-song-card-info { flex:1; min-width:0; }',
-        '.ms-song-card-title { font-weight:700; color:#111827; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:3px; }',
-        '.ms-song-card-meta { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }',
-        '.ms-song-card-meta span:not(.ms-stand-badge) { font-size:0.78rem; color:#6b7280; }',
+        '.ms-song-card-title { font-weight:800; color:#0f172a; font-size:0.98rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:5px; letter-spacing:-0.005em; }',
+        '.ms-song-card-meta { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }',
+        '.ms-song-card-meta span:not(.ms-stand-badge) { font-size:0.8rem; color:#475569; }',
         '.ms-song-card-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }',
-        '.ms-song-card-play { padding:8px 14px !important; font-size:0.88rem !important; }',
+        '.ms-song-card-play { padding:8px 14px !important; font-size:0.88rem !important; box-shadow:0 1px 2px rgba(180,108,10,0.2); }',
 
         /* Arrangement card */
         '.ms-arr-card { background:#f9fafb; border:1px solid rgba(0,0,0,0.09); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; }',
