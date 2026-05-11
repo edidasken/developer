@@ -1979,17 +1979,32 @@ function msLoadJsPDF() {
             resolve(window.jspdf.jsPDF);
             return;
         }
-        var script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js';
-        script.onload = function() {
-            if (window.jspdf && window.jspdf.jsPDF) {
-                resolve(window.jspdf.jsPDF);
-            } else {
-                reject(new Error('jsPDF failed to load.'));
+        var sources = [
+            'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js',
+            'https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js'
+        ];
+        var i = 0;
+        function tryNext() {
+            if (i >= sources.length) {
+                reject(new Error('Could not load jsPDF library.'));
+                return;
             }
-        };
-        script.onerror = function() { reject(new Error('Could not load jsPDF library.')); };
-        document.head.appendChild(script);
+            var script = document.createElement('script');
+            script.src = sources[i++];
+            script.crossOrigin = 'anonymous';
+            script.referrerPolicy = 'no-referrer';
+            script.onload = function() {
+                if (window.jspdf && window.jspdf.jsPDF) {
+                    resolve(window.jspdf.jsPDF);
+                } else {
+                    tryNext();
+                }
+            };
+            script.onerror = function() { tryNext(); };
+            document.head.appendChild(script);
+        }
+        tryNext();
     });
 }
 
