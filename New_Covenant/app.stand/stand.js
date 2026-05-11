@@ -211,24 +211,33 @@ function _waitFor(predicate, timeout = 5000) {
    BOOT
    ══════════════════════════════════════════════════════════════════════════════ */
 
+let _booted = false;
 async function boot() {
-  _loadPrefs();
+  if (_booted) return;
+  _booted = true;
 
-  // Auth temporarily bypassed — skip Nehemiah wait
-  const N = window.Nehemiah || {};
+  try {
+    _loadPrefs();
 
-  // Auth gate temporarily disabled — re-enable when ready
-  // if (!N.isAuthenticated()) { _renderAuthGate(N); return; }
+    // Auth temporarily bypassed — skip Nehemiah wait
+    const N = window.Nehemiah || {};
 
-  // Build user profile
-  const sess = (N.getSession ? N.getSession() : null) || {};
-  S.user = {
-    displayName: sess.displayName || sess.email || 'Worship Team',
-    email:       sess.email || '',
-    role:        sess.role || 'member',
-  };
+    // Auth gate temporarily disabled — re-enable when ready
+    // if (!N.isAuthenticated()) { _renderAuthGate(N); return; }
 
-  _launchApp();
+    // Build user profile
+    const sess = (N.getSession ? N.getSession() : null) || {};
+    S.user = {
+      displayName: sess.displayName || sess.email || 'Worship Team',
+      email:       sess.email || '',
+      role:        sess.role || 'member',
+    };
+
+    _launchApp();
+  } catch (err) {
+    console.error('[MusicStand] boot() error:', err);
+    _showBootError('Failed to load: ' + err.message);
+  }
 }
 
 /* ── Auth gate ────────────────────────────────────────────────────────────── */
@@ -1473,6 +1482,9 @@ function _stopMetronome() {
    INIT
    ══════════════════════════════════════════════════════════════════════════════ */
 
-window.addEventListener('DOMContentLoaded', boot);
-// Also try immediately (module may load after DOMContentLoaded)
-if (document.readyState !== 'loading') boot();
+// Modules are deferred — run after DOM is parsed
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
