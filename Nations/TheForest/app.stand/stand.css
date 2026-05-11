@@ -774,15 +774,15 @@ html, body {
 .ms-toast {
   padding: 10px 18px; border-radius: var(--ms-r-md);
   font-size: .85rem; font-weight: 600; color: #fff;
-  background: #2a3552; border: 1px solid var(--ms-line);
-  box-shadow: 0 4px 20px rgba(0,0,0,.5);
+  background: #374151; border: 1px solid rgba(0,0,0,0.12);
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
   opacity: 0; transform: translateY(8px) scale(.97);
   transition: all .3s var(--ms-spring); pointer-events: none;
 }
 .ms-toast.is-visible { opacity: 1; transform: none; }
-.ms-toast--success { background: #0f3b22; border-color: rgba(52,211,153,.3); }
-.ms-toast--error   { background: #3b0f0f; border-color: rgba(251,113,133,.3); }
-.ms-toast--info    { background: #1a2336; border-color: var(--ms-line); }
+.ms-toast--success { background: #166534; border-color: rgba(134,239,172,.25); }
+.ms-toast--error   { background: #991b1b; border-color: rgba(252,165,165,.25); }
+.ms-toast--info    { background: #374151; border-color: rgba(0,0,0,.12); }
 
 /* ── Utility ──────────────────────────────────────────────────────────────── */
 .ms-empty-state {
@@ -841,8 +841,9 @@ html, body {
   /* Main view padding */
   .ms-view { padding: 12px 10px; }
 
-  /* Header — tighter */
+  /* Header — hide account name text, keep icon; tighter padding */
   .ms-header { padding-left: 10px; padding-right: 10px; }
+  #ms-account-name { display: none; }
 
   /* Song search + add row */
   .ms-song-controls { flex-wrap: wrap; }

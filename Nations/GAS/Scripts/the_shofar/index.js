@@ -203,7 +203,7 @@ function msEnsureStyles() {
 
         /* Search */
         '.ms-search-bar { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }',
-        '.ms-search-input { flex:1; min-width:200px; }',
+        '.ms-search-input { flex:1; min-width:160px; }',
 
         /* Overlay / Modal */
         '.ms-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); z-index:9999; display:none; align-items:center; justify-content:center; padding:16px; }',
@@ -258,9 +258,10 @@ function msEnsureStyles() {
         '.ms-stand-nav { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-top:1px solid rgba(0,0,0,0.08); }',
         '.ms-stand-counter { color:#6b7280; font-size:0.9rem; }',
 
-        /* Song library — desktop table */
+        /* Song library — desktop table / mobile cards */
         '.ms-song-table-wrap { overflow-x:auto; }',
-        '.ms-song-cards { display:none; }',
+        /* cards hidden by default; shown on mobile via media query */
+        '.ms-song-cards { display:none; max-width:100%; overflow-x:hidden; }',
 
         /* Song card (mobile) — column layout so nothing overflows viewport */
         '.ms-song-card { display:flex; flex-direction:column; gap:8px; padding:12px 0; border-bottom:1px solid rgba(0,0,0,0.07); max-width:100%; box-sizing:border-box; }',
@@ -271,7 +272,6 @@ function msEnsureStyles() {
         '.ms-song-card-meta span:not(.ms-stand-badge) { font-size:0.78rem; color:#6b7280; }',
         '.ms-song-card-actions { display:flex; align-items:center; gap:6px; }',
         '.ms-song-card-play { flex:1; text-align:center; padding:8px 14px !important; font-size:0.88rem !important; }',
-        '.ms-song-cards { max-width:100%; overflow-x:hidden; }',
 
         /* Arrangement card */
         '.ms-arr-card { background:#f9fafb; border:1px solid rgba(0,0,0,0.09); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; }',
