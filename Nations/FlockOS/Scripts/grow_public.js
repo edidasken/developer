@@ -4,6 +4,8 @@
    "But grow in the grace and knowledge of our Lord." — 2 Peter 3:18
    ══════════════════════════════════════════════════════════════════════════════ */
 
+import { installScriptureLinks } from './the_scrolls/the_bible_link.js';
+
 /* ─── Module registry ────────────────────────────────────────────────────────
    Only public-safe modules. Excluded: Journal, Analytics, Certificates,
    Fellowship, Announcements, Prayer Chain, The Fold, The Life.
@@ -240,6 +242,7 @@ function _renderHome() {
   main.querySelectorAll('[data-go]').forEach(btn => {
     btn.addEventListener('click', () => go(btn.dataset.go));
   });
+  installScriptureLinks(main);
 }
 
 /* ─── Module loader ──────────────────────────────────────────────────────── */
@@ -256,6 +259,7 @@ async function _loadModule(name) {
     main.innerHTML = mod.render();
     const unmount = mod.mount(main, { go });
     _currentUnmount = typeof unmount === 'function' ? unmount : null;
+    installScriptureLinks(main);
     // Wire any "Send to Pastor" buttons inside this module
     const modTitle = ALL_MODULES.find(m => m.name === name)?.title || name.replace(/_/g,' ');
     _installPrayerHook(main, { name, title: modTitle });

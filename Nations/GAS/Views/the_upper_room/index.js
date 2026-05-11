@@ -24,6 +24,7 @@ import { pageHero }        from '../_frame.js';
 import { mountDevotional } from './the_devotional.js';
 import { mountReading }    from './the_reading.js';
 import { mountJournal }    from './the_journal.js';
+import { mountPrayer }     from './the_prayer.js';
 
 export const name  = 'the_upper_room';
 export const title = 'The Upper Room';
@@ -65,13 +66,7 @@ export function render(params = {}) {
         <flock-skeleton rows="4"></flock-skeleton>
       </div>
       <div class="ur-panel" data-ur-panel="prayer" ${initial !== 'prayer' ? 'hidden' : ''}>
-        <div class="ur-prayer-cta">
-          <h3>Pray with the flock</h3>
-          <p>Standing requests, the prayer chain, and live updates from your church family.</p>
-          <button type="button" class="flock-btn flock-btn--primary" data-ur-jump="the_prayer_chain">
-            Open the Prayer Chain
-          </button>
-        </div>
+        <flock-skeleton rows="4"></flock-skeleton>
       </div>
     </section>
   `;
@@ -79,7 +74,7 @@ export function render(params = {}) {
 
 export function mount(root, ctx) {
   const stops = [];
-  const mounted = { devotional: false, reading: false, journal: false };
+  const mounted = { devotional: false, reading: false, journal: false, prayer: false };
 
   const activate = (tabId) => {
     root.querySelectorAll('[data-ur-tab]').forEach((el) => {
@@ -103,15 +98,15 @@ export function mount(root, ctx) {
       stops.push(mountJournal(root.querySelector('[data-ur-panel="journal"]'), ctx));
       mounted.journal = true;
     }
+    if (tabId === 'prayer' && !mounted.prayer) {
+      mountPrayer(root.querySelector('[data-ur-panel="prayer"]'), ctx);
+      mounted.prayer = true;
+    }
   };
 
   // Wire tab buttons.
   root.querySelectorAll('[data-ur-tab]').forEach((btn) => {
     btn.addEventListener('click', () => activate(btn.dataset.urTab));
-  });
-  // Wire prayer jump.
-  root.querySelectorAll('[data-ur-jump]').forEach((btn) => {
-    btn.addEventListener('click', () => ctx && ctx.go && ctx.go(btn.dataset.urJump));
   });
 
   // Mount whichever tab is initially visible.

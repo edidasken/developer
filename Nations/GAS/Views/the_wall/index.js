@@ -40,13 +40,19 @@ const SECTIONS = [
   {
     key: 'integrations', label: 'Integrations',
     icon: '<rect x="2" y="2" width="6" height="6" rx="1"/><rect x="16" y="2" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M5 8v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/>',
-    settings: [
-      { label: 'Firebase Project',  value: 'flockos-comms',              type: 'text'  },
-      { label: 'GAS Endpoint',      value: 'Connected (TheScrolls)',      type: 'badge', status: 'ok'   },
-      { label: 'Push Notifications',value: 'VAPID key set',              type: 'badge', status: 'ok'   },
-      { label: 'Joshua Project API', type: 'jp-api' },
-      { label: 'api.bible',           type: 'bible-api' },
-    ],
+    get settings() {
+      const projId = (window.FLOCK_FIREBASE_CONFIG && window.FLOCK_FIREBASE_CONFIG.projectId)
+        || (window.UpperRoom && window.UpperRoom.isReady && window.UpperRoom.isReady() && window.firebase && window.firebase.apps.length && window.firebase.app().options.projectId)
+        || (window.firebase && window.firebase.apps.length && window.firebase.app().options.projectId)
+        || 'flockos-notify';
+      return [
+        { label: 'Firebase Project',  value: projId,                       type: 'text'  },
+        { label: 'GAS Endpoint',      value: 'Connected (TheScrolls)',      type: 'badge', status: 'ok'   },
+        { label: 'Push Notifications',value: 'VAPID key set',              type: 'badge', status: 'ok'   },
+        { label: 'Joshua Project API', type: 'jp-api' },
+        { label: 'api.bible',           type: 'bible-api' },
+      ];
+    },
   },
   {
     key: 'notifications', label: 'Notifications',
@@ -2130,50 +2136,112 @@ async function _importFirestoreJson(root, file) {
    One-shot utilities for after-the-fact data fixes (e.g. lead pastor
    handoff, lost assignments). Each action operates over the live
    Firestore collections via UpperRoom — no GAS bridge needed.          */
+/* ── Maintenance: shared helpers ────────────────────────────────────────── */
+// Canonical member PIN — used as the memberId in all assignment records.
+// Preference: memberPin → memberNumber → Firestore doc id.
+function _memberPinId(m) {
+  return String(
+    (m.memberPin && String(m.memberPin).trim()) ||
+    (m.memberNumber && String(m.memberNumber).trim()) ||
+    m.id || ''
+  ).trim();
+}
+
+function _isGarbage(v) {
+  if (v === undefined || v === null) return true;
+  const s = String(v).trim().toLowerCase();
+  return !s || s === 'undefined' || s === 'null';
+}
+
+function _maintRow({ title, desc, bindKey, actKey, btnLabel = 'Run now', danger = false }) {
+  const pad  = danger ? '16px' : '14px';
+  const bord = danger ? '2px solid #b45309' : '1px solid var(--line,#e5e7ef)';
+  const bg   = danger ? 'linear-gradient(180deg,#fff7ed,#fffbf3)' : 'var(--bg-raised,#fff)';
+  const clr  = danger ? '#7c2d12' : 'var(--ink,#1b264f)';
+  const muted= danger ? '#7c2d12' : 'var(--ink-muted,#7a7f96)';
+  const bang = danger
+    ? '<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#b45309;color:#fff;font-size:.75rem;font-weight:700">!</span>'
+    : '';
+  const btnStyle = danger ? 'flex-shrink:0;background:#b45309;border-color:#b45309' : 'flex-shrink:0';
+  return `<div class="wall-setting-row" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:${pad};border:${bord};border-radius:10px;margin-bottom:10px;background:${bg};flex-wrap:wrap">
+    <div style="flex:1;min-width:240px">
+      <div style="font-weight:${danger?700:600};color:${clr};margin-bottom:2px;display:flex;align-items:center;gap:8px">${bang}${title}</div>
+      <div style="font-size:.82rem;color:${muted};line-height:1.5">${desc}</div>
+      <div class="wall-maint-status" data-bind="${bindKey}" style="margin-top:8px;font-size:.82rem;color:${muted}"></div>
+    </div>
+    <button class="flock-btn flock-btn--primary" data-act="${actKey}" type="button" style="${btnStyle}">${btnLabel}</button>
+  </div>`;
+}
+
+function _maintSection(label) {
+  return `<div style="font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-muted,#7a7f96);padding:12px 0 6px">${label}</div>`;
+}
+
 function _maintenancePanelMarkup() {
   return /* html */`
     <p class="wall-audit-intro" style="margin:0 0 14px;color:var(--ink-muted,#7a7f96);font-size:.9rem">
-      Utilities for one-time data fixes. Use these when the lead pastor changes,
-      after a data import, or if care assignments need to be reset.
+      Utilities for one-time data fixes. Use when the lead pastor changes, after a data import,
+      or if care records need to be reset. <strong style="color:var(--ink,#1b264f)">Member PIN</strong>
+      is used as the identifier in all assignment records — not the Firestore doc ID.
     </p>
-    <div class="wall-setting-row" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px;border:2px solid #b45309;border-radius:10px;margin-bottom:14px;background:linear-gradient(180deg,#fff7ed,#fffbf3);flex-wrap:wrap">
-      <div style="flex:1;min-width:240px">
-        <div style="font-weight:700;color:#7c2d12;margin-bottom:2px;display:flex;align-items:center;gap:8px">
-          <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#b45309;color:#fff;font-size:.75rem;font-weight:700">!</span>
-          Reset Care to Lead Pastor (master override)
-        </div>
-        <div style="font-size:.82rem;color:#7c2d12;line-height:1.5;margin-top:4px">
-          Performs the full reset in one step:
-          <strong>(1)</strong> reassigns every open care case and active prayer to the LP,
-          <strong>(2)</strong> reassigns every active outreach contact to the LP,
-          <strong>(3)</strong> reassigns every existing Active care assignment to the LP, and
-          <strong>(4)</strong> creates an Active assignment (role: Shepherd) for any member who still has none.
-          Use this whenever spiritual oversight changes — secondary caregivers can be re-added afterward.
-        </div>
-        <div class="wall-maint-status" data-bind="reset-status" style="margin-top:8px;font-size:.82rem;color:#7c2d12"></div>
-      </div>
-      <button class="flock-btn flock-btn--primary" data-act="reset-care-to-lp" type="button" style="flex-shrink:0;background:#b45309;border-color:#b45309">Reset now</button>
-    </div>
-    <div class="wall-setting-row" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--line,#e5e7ef);border-radius:10px;margin-bottom:10px;background:var(--bg-raised,#fff);flex-wrap:wrap">
-      <div style="flex:1;min-width:240px">
-        <div style="font-weight:600;color:var(--ink,#1b264f);margin-bottom:2px">Reassign all to Lead Pastor</div>
-        <div style="font-size:.82rem;color:var(--ink-muted,#7a7f96);line-height:1.5">
-          Sets the primary caregiver on every <strong>open</strong> care case and the assignee on every <strong>active</strong> prayer request to the Lead Pastor (configured under Church Settings). Resolved cases and answered prayers are skipped.
-        </div>
-        <div class="wall-maint-status" data-bind="reassign-status" style="margin-top:8px;font-size:.82rem;color:var(--ink-muted,#7a7f96)"></div>
-      </div>
-      <button class="flock-btn flock-btn--primary" data-act="reassign-to-lp" type="button" style="flex-shrink:0">Reassign now</button>
-    </div>
-    <div class="wall-setting-row" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px;border:1px solid var(--line,#e5e7ef);border-radius:10px;margin-bottom:10px;background:var(--bg-raised,#fff);flex-wrap:wrap">
-      <div style="flex:1;min-width:240px">
-        <div style="font-weight:600;color:var(--ink,#1b264f);margin-bottom:2px">Assign Lead Pastor as caregiver for all members</div>
-        <div style="font-size:.82rem;color:var(--ink-muted,#7a7f96);line-height:1.5">
-          Creates an <strong>Active</strong> care assignment (role: Shepherd) linking every member to the Lead Pastor. Members who already have an active assignment to the LP are skipped. Existing assignments to other shepherds are left intact.
-        </div>
-        <div class="wall-maint-status" data-bind="assign-all-status" style="margin-top:8px;font-size:.82rem;color:var(--ink-muted,#7a7f96)"></div>
-      </div>
-      <button class="flock-btn flock-btn--primary" data-act="assign-all-to-lp" type="button" style="flex-shrink:0">Assign now</button>
-    </div>
+
+    ${_maintSection('Lead Pastor Assignment')}
+
+    ${_maintRow({
+      title: 'Reset Care to Lead Pastor (master override)', danger: true,
+      desc: 'Full reset: <strong>(1)</strong> reassigns every open care case, prayer, outreach contact &amp; compassion request to the LP, <strong>(2)</strong> sets every existing Active assignment\'s caregiverId to the LP PIN, <strong>(3)</strong> creates an Active Shepherd assignment (by PIN) for any member still without one.',
+      bindKey: 'reset-status', actKey: 'reset-care-to-lp', btnLabel: 'Reset now',
+    })}
+
+    ${_maintRow({
+      title: 'Assign Lead Pastor as caregiver for all members',
+      desc: 'Creates an Active <strong>Shepherd</strong> assignment (by member PIN) to the LP for every member not yet covered. Any other existing Active assignment is demoted to <strong>Timothy</strong> role. Members already assigned to the LP are skipped.',
+      bindKey: 'assign-all-status', actKey: 'assign-all-to-lp', btnLabel: 'Assign now',
+    })}
+
+    ${_maintRow({
+      title: 'Reassign open care cases &amp; prayers to Lead Pastor',
+      desc: 'Sets <code>primaryCaregiverId</code> on every open care case and <code>assignedTo</code> on every active prayer to the LP PIN. Terminal records (resolved, answered, closed) are skipped.',
+      bindKey: 'reassign-status', actKey: 'reassign-to-lp', btnLabel: 'Reassign now',
+    })}
+
+    ${_maintRow({
+      title: 'Reassign open compassion requests to Lead Pastor',
+      desc: 'Sets <code>assignedTo</code> to the LP PIN on every compassion request that is not yet closed, resolved, or denied.',
+      bindKey: 'compassion-reassign-status', actKey: 'reassign-compassion-to-lp', btnLabel: 'Reassign now',
+    })}
+
+    ${_maintRow({
+      title: 'Reassign open outreach contacts to Lead Pastor',
+      desc: 'Sets <code>assignedTo</code> to the LP PIN on every outreach contact that is not in a terminal status (converted, closed, archived, rejected, dropped).',
+      bindKey: 'outreach-reassign-status', actKey: 'reassign-outreach-to-lp', btnLabel: 'Reassign now',
+    })}
+
+    ${_maintSection('Record Hygiene')}
+
+    ${_maintRow({
+      title: 'Fill blank assignments across all record types',
+      desc: 'Finds care cases, prayers, outreach contacts, and compassion requests where the assignee field is blank, null, or the literal string "undefined" — and sets it to the LP PIN.',
+      bindKey: 'fill-blank-status', actKey: 'fill-blank-assignments', btnLabel: 'Fix now',
+    })}
+
+    ${_maintRow({
+      title: 'Deduplicate care assignments',
+      desc: 'For each member, if more than one Active assignment exists for the same caregiverId, all duplicates are ended (status → Ended) — keeping only the oldest Active row per caregiver per member.',
+      bindKey: 'dedup-status', actKey: 'dedup-care-assignments', btnLabel: 'Deduplicate now',
+    })}
+
+    ${_maintRow({
+      title: 'Generate missing member PINs',
+      desc: 'Finds every member record with a blank or missing <code>memberPin</code> field and generates a unique 9-digit PIN (xxx-xx-xxxx) for each. Does not overwrite existing PINs.',
+      bindKey: 'pins-status', actKey: 'gen-member-pins', btnLabel: 'Generate now',
+    })}
+
+    ${_maintRow({
+      title: 'End all non-Active care assignments',
+      desc: 'Marks every care assignment whose status is not <strong>Active</strong> as <strong>Ended</strong> — cleaning up legacy "Inactive", "Paused", blank, or unknown-status rows.',
+      bindKey: 'end-inactive-status', actKey: 'end-inactive-assignments', btnLabel: 'Clean up now',
+    })}
   `;
 }
 
@@ -2193,8 +2261,38 @@ function _wireMaintenancePanel(root) {
     }
     const assignAllBtn = e.target.closest('[data-act="assign-all-to-lp"]');
     if (assignAllBtn) {
-      if (!confirm('Create an Active care assignment to the Lead Pastor for every member who does not already have one?\n\nThis cannot be undone automatically.')) return;
+      if (!confirm('Assign Lead Pastor as Shepherd for every member?\n\nExisting non-LP assignments will be demoted to Timothy role.\nThis cannot be undone automatically.')) return;
       return _assignAllMembersToLeadPastor(root, assignAllBtn);
+    }
+    const compassionBtn = e.target.closest('[data-act="reassign-compassion-to-lp"]');
+    if (compassionBtn) {
+      if (!confirm('Reassign all open compassion requests to the Lead Pastor?\n\nThis cannot be undone automatically.')) return;
+      return _reassignCompassionToLP(root, compassionBtn);
+    }
+    const outreachBtn = e.target.closest('[data-act="reassign-outreach-to-lp"]');
+    if (outreachBtn) {
+      if (!confirm('Reassign all open outreach contacts to the Lead Pastor?\n\nThis cannot be undone automatically.')) return;
+      return _reassignOutreachToLP(root, outreachBtn);
+    }
+    const fillBtn = e.target.closest('[data-act="fill-blank-assignments"]');
+    if (fillBtn) {
+      if (!confirm('Fill all blank/null assignments across care cases, prayers, outreach, and compassion with the Lead Pastor PIN?\n\nThis cannot be undone automatically.')) return;
+      return _fillBlankAssignments(root, fillBtn);
+    }
+    const dedupBtn = e.target.closest('[data-act="dedup-care-assignments"]');
+    if (dedupBtn) {
+      if (!confirm('Deduplicate care assignments?\n\nDuplicate Active assignments for the same caregiver+member pair will be ended (oldest kept).\n\nThis cannot be undone automatically.')) return;
+      return _dedupCareAssignments(root, dedupBtn);
+    }
+    const pinsBtn = e.target.closest('[data-act="gen-member-pins"]');
+    if (pinsBtn) {
+      if (!confirm('Generate member PINs for any member missing one?\n\nExisting PINs will not be overwritten.')) return;
+      return _genMissingMemberPins(root, pinsBtn);
+    }
+    const endInactiveBtn = e.target.closest('[data-act="end-inactive-assignments"]');
+    if (endInactiveBtn) {
+      if (!confirm('End all non-Active care assignments (Inactive, Paused, blank status, etc.)?\n\nThis cannot be undone automatically.')) return;
+      return _endInactiveAssignments(root, endInactiveBtn);
     }
   });
 }
@@ -2320,7 +2418,7 @@ async function _assignAllMembersToLeadPastor(root, btn) {
   setStatus('Looking up Lead Pastor…');
 
   const UR = await _waitForUpperRoom(10000);
-  if (!UR || !UR.getAppConfig || !UR.listMembers || !UR.listCareAssignments || !UR.createCareAssignment) {
+  if (!UR || !UR.getAppConfig || !UR.listMembers || !UR.listCareAssignments || !UR.createCareAssignment || !UR.updateCareAssignment) {
     setStatus('Backend not ready (or care-assignment APIs missing).', '#b91c1c');
     btn.disabled = false; btn.textContent = origLabel;
     return;
@@ -2345,41 +2443,76 @@ async function _assignAllMembersToLeadPastor(root, btn) {
     const assignRows = Array.isArray(existing) ? existing : (existing?.results || []);
     console.log('[wall/assign-all] members=' + memberRows.length + ', existing assignments=' + assignRows.length);
 
-    // Index existing Active assignments by memberId where caregiverId === lpId
-    const alreadyAssigned = new Set();
+    // Group Active assignments by memberId
+    const byMember = {}; // memberId → [assignment, ...]
     for (const a of assignRows) {
       const st = String(a.status || '').toLowerCase();
       if (st && st !== 'active') continue;
-      if (String(a.caregiverId || '') === lpId && a.memberId) {
-        alreadyAssigned.add(String(a.memberId));
-      }
+      if (!a.memberId) continue;
+      const mid = String(a.memberId);
+      (byMember[mid] = byMember[mid] || []).push(a);
     }
 
-    setStatus(`Assigning Lead Pastor as caregiver for ${memberRows.length} members…`);
+    setStatus(`Processing ${memberRows.length} members…`);
 
-    let checked = 0, created = 0, skipped = 0, failed = 0;
+    let checked = 0, created = 0, demoted = 0, skipped = 0, failed = 0;
     for (const m of memberRows) {
       checked++;
-      const memberId = m.id || m.docId || m.uid || m.memberPin || m.memberNumber || '';
+      const memberId = _memberPinId(m);
       if (!memberId) { skipped++; continue; }
-      // Don't re-assign the lead pastor to themselves
-      if (String(memberId) === lpId
-          || String(m.memberPin || '') === lpId
-          || String(m.memberNumber || '') === lpId) {
-        skipped++;
+      // Skip the LP themselves
+      if (memberId === lpId) {
+        skipped++; continue;
+      }
+
+      const activeAssignments = byMember[memberId] || [];
+      const hasLP = activeAssignments.some((a) => String(a.caregiverId || '').trim() === lpId);
+
+      if (hasLP) {
+        // LP already assigned as primary — demote any non-LP assignments to Timothy
+        for (const a of activeAssignments) {
+          if (String(a.caregiverId || '').trim() === lpId) continue; // leave LP alone
+          if (String(a.role || '').toLowerCase() === 'timothy') continue; // already secondary
+          try {
+            await UR.updateCareAssignment({
+              id: a.id,
+              role: 'Timothy',
+              notes: (a.notes ? a.notes + '\n' : '') + 'Demoted to secondary (Timothy) via Assign-All-to-LP',
+            });
+            demoted++;
+          } catch (err) {
+            failed++;
+            console.error('[wall/assign-all] demote failed for assignment', a.id, err);
+          }
+        }
+        skipped++; // LP was already there; counted as skipped for creation
         continue;
       }
-      if (alreadyAssigned.has(String(memberId))) {
-        skipped++;
-        continue;
+
+      // No LP assignment yet — demote any existing non-LP assignments to Timothy first
+      for (const a of activeAssignments) {
+        if (String(a.role || '').toLowerCase() === 'timothy') continue;
+        try {
+          await UR.updateCareAssignment({
+            id: a.id,
+            role: 'Timothy',
+            notes: (a.notes ? a.notes + '\n' : '') + 'Demoted to secondary (Timothy) via Assign-All-to-LP',
+          });
+          demoted++;
+        } catch (err) {
+          failed++;
+          console.error('[wall/assign-all] demote failed for assignment', a.id, err);
+        }
       }
+
+      // Create LP as primary Shepherd
       try {
         await UR.createCareAssignment({
-          memberId: String(memberId),
+          memberId,
           caregiverId: lpId,
           role: 'Shepherd',
           status: 'Active',
-          notes: 'Bulk-assigned via Admin → Maintenance',
+          notes: 'Assigned via Admin → Maintenance (Assign All to LP)',
         });
         created++;
       } catch (err) {
@@ -2390,7 +2523,7 @@ async function _assignAllMembersToLeadPastor(root, btn) {
 
     const failMsg = failed ? ` · ${failed} failed (see console)` : '';
     setStatus(
-      `Done. ${created} created, ${skipped} skipped (already LP / no id / is the LP), of ${checked} members.${failMsg}`,
+      `Done. LP assigned to ${created} members · ${demoted} other assignments demoted to Timothy · ${skipped} already had LP.${failMsg}`,
       failed ? '#b45309' : '#16a34a'
     );
   } catch (err) {
@@ -2421,12 +2554,6 @@ async function _resetCareToLeadPastor(root, btn) {
     return;
   }
 
-  const isGarbage = (v) => {
-    if (v === undefined || v === null) return true;
-    const s = String(v).trim().toLowerCase();
-    return !s || s === 'undefined' || s === 'null';
-  };
-
   try {
     const cfg = await UR.getAppConfig({ key: 'LEAD_PASTOR_MEMBER_ID' });
     const lpId = String((cfg && cfg.value) || '').trim();
@@ -2438,7 +2565,7 @@ async function _resetCareToLeadPastor(root, btn) {
     console.log('[wall/reset] lpId =', JSON.stringify(lpId));
 
     // ── Step 1: Care cases ───────────────────────────────────────
-    setStatus('Step 1/5: Reassigning open care cases…');
+    setStatus('Step 1/6: Reassigning open care cases…');
     const TERMINAL_C = new Set(['resolved','closed','archived','cancelled','completed','denied']);
     let caseChecked = 0, caseUpdated = 0, caseSkipped = 0, caseFailed = 0;
     if (UR.listCareCases && UR.updateCareCase) {
@@ -2449,7 +2576,7 @@ async function _resetCareToLeadPastor(root, btn) {
         const st = String(c.status || '').toLowerCase();
         if (TERMINAL_C.has(st)) { caseSkipped++; continue; }
         const cur = c.primaryCaregiverId;
-        if (!isGarbage(cur) && String(cur).trim() === lpId) { caseSkipped++; continue; }
+        if (!_isGarbage(cur) && String(cur).trim() === lpId) { caseSkipped++; continue; }
         try {
           await UR.updateCareCase({ id: c.id, primaryCaregiverId: lpId });
           caseUpdated++;
@@ -2458,7 +2585,7 @@ async function _resetCareToLeadPastor(root, btn) {
     }
 
     // ── Step 2: Prayers ──────────────────────────────────────────
-    setStatus(`Step 2/5: Reassigning active prayers… (${caseUpdated} cases done)`);
+    setStatus(`Step 2/6: Reassigning active prayers… (${caseUpdated} cases done)`);
     const TERMINAL_P = new Set(['answered','closed','archived','resolved']);
     let prayerChecked = 0, prayerUpdated = 0, prayerSkipped = 0, prayerFailed = 0;
     if (UR.listPrayers && UR.updatePrayer) {
@@ -2469,7 +2596,7 @@ async function _resetCareToLeadPastor(root, btn) {
         const st = String(p.status || '').toLowerCase();
         if (TERMINAL_P.has(st)) { prayerSkipped++; continue; }
         const cur = p.assignedTo;
-        if (!isGarbage(cur) && String(cur).trim() === lpId) { prayerSkipped++; continue; }
+        if (!_isGarbage(cur) && String(cur).trim() === lpId) { prayerSkipped++; continue; }
         try {
           await UR.updatePrayer(p.id, { assignedTo: lpId });
           prayerUpdated++;
@@ -2478,7 +2605,7 @@ async function _resetCareToLeadPastor(root, btn) {
     }
 
     // ── Step 3: Outreach contacts ────────────────────────────────
-    setStatus(`Step 3/5: Reassigning active outreach contacts…`);
+    setStatus(`Step 3/6: Reassigning active outreach contacts…`);
     const TERMINAL_O = new Set(['converted','closed','archived','rejected','dropped']);
     let outChecked = 0, outUpdated = 0, outSkipped = 0, outFailed = 0;
     if (UR.listOutreachContacts && UR.updateOutreachContact) {
@@ -2489,7 +2616,7 @@ async function _resetCareToLeadPastor(root, btn) {
         const st = String(o.status || '').toLowerCase();
         if (TERMINAL_O.has(st)) { outSkipped++; continue; }
         const cur = o.assignedTo;
-        if (!isGarbage(cur) && String(cur).trim() === lpId) { outSkipped++; continue; }
+        if (!_isGarbage(cur) && String(cur).trim() === lpId) { outSkipped++; continue; }
         try {
           await UR.updateOutreachContact({ id: o.id, assignedTo: lpId });
           outUpdated++;
@@ -2497,8 +2624,28 @@ async function _resetCareToLeadPastor(root, btn) {
       }
     }
 
-    // ── Step 4: Reassign existing Active careAssignments ─────────
-    setStatus(`Step 4/5: Reassigning existing care assignments to LP…`);
+    // ── Step 4: Compassion requests ──────────────────────────────
+    setStatus(`Step 4/6: Reassigning open compassion requests…`);
+    const TERMINAL_CP = new Set(['closed','resolved','denied','archived']);
+    let compChecked = 0, compUpdated = 0, compSkipped = 0, compFailed = 0;
+    if (UR.listCompassionRequests && UR.updateCompassionRequest) {
+      const all = await UR.listCompassionRequests({ limit: 5000 }).catch(() => []);
+      const reqs = Array.isArray(all) ? all : (all?.results || []);
+      for (const c of reqs) {
+        compChecked++;
+        const st = String(c.status || '').toLowerCase();
+        if (TERMINAL_CP.has(st)) { compSkipped++; continue; }
+        const cur = c.assignedTo;
+        if (!_isGarbage(cur) && String(cur).trim() === lpId) { compSkipped++; continue; }
+        try {
+          await UR.updateCompassionRequest({ id: c.id, assignedTo: lpId });
+          compUpdated++;
+        } catch (err) { compFailed++; console.error('[wall/reset] compassion', c.id, err); }
+      }
+    }
+
+    // ── Step 5: Reassign existing Active careAssignments ─────────
+    setStatus(`Step 5/6: Reassigning existing care assignments to LP…`);
     let asgChecked = 0, asgReassigned = 0, asgSkipped = 0, asgFailed = 0;
     let existingAssignments = [];
     if (UR.listCareAssignments && UR.reassignCareAssignment) {
@@ -2509,7 +2656,7 @@ async function _resetCareToLeadPastor(root, btn) {
         const st = String(a.status || '').toLowerCase();
         if (st && st !== 'active') { asgSkipped++; continue; }
         const cur = a.caregiverId;
-        if (!isGarbage(cur) && String(cur).trim() === lpId) { asgSkipped++; continue; }
+        if (!_isGarbage(cur) && String(cur).trim() === lpId) { asgSkipped++; continue; }
         try {
           await UR.reassignCareAssignment({
             id: a.id,
@@ -2521,8 +2668,8 @@ async function _resetCareToLeadPastor(root, btn) {
       }
     }
 
-    // ── Step 5: Create LP assignment for members without one ─────
-    setStatus(`Step 5/5: Creating LP assignments for members without one…`);
+    // ── Step 6: Create LP assignment for members without one ─────
+    setStatus(`Step 6/6: Creating LP assignments for members without one…`);
     let memChecked = 0, memCreated = 0, memSkipped = 0, memFailed = 0;
     if (UR.listMembers && UR.createCareAssignment) {
       // Build set of memberIds already covered by an Active LP assignment
@@ -2538,13 +2685,11 @@ async function _resetCareToLeadPastor(root, btn) {
       const members = Array.isArray(all) ? all : (all?.results || []);
       for (const m of members) {
         memChecked++;
-        const memberId = m.id || m.docId || m.uid || m.memberPin || m.memberNumber || '';
+        const memberId = _memberPinId(m);
         if (!memberId) { memSkipped++; continue; }
         // Skip the LP themselves
-        if (String(memberId) === lpId
-            || String(m.memberPin || '') === lpId
-            || String(m.memberNumber || '') === lpId) { memSkipped++; continue; }
-        if (covered.has(String(memberId))) { memSkipped++; continue; }
+        if (memberId === lpId) { memSkipped++; continue; }
+        if (covered.has(memberId)) { memSkipped++; continue; }
         try {
           await UR.createCareAssignment({
             memberId: String(memberId),
@@ -2558,15 +2703,16 @@ async function _resetCareToLeadPastor(root, btn) {
       }
     }
 
-    const totalFailed = caseFailed + prayerFailed + outFailed + asgFailed + memFailed;
+    const totalFailed = caseFailed + prayerFailed + outFailed + compFailed + asgFailed + memFailed;
     const failMsg = totalFailed ? ` · ${totalFailed} failed (see console)` : '';
     setStatus(
       `Reset complete. ` +
-      `Cases: ${caseUpdated}/${caseChecked} reassigned · ` +
-      `Prayers: ${prayerUpdated}/${prayerChecked} reassigned · ` +
-      `Outreach: ${outUpdated}/${outChecked} reassigned · ` +
-      `Assignments: ${asgReassigned}/${asgChecked} reassigned · ` +
-      `New LP assignments: ${memCreated} created (of ${memChecked} members).${failMsg}`,
+      `Cases: ${caseUpdated}/${caseChecked} · ` +
+      `Prayers: ${prayerUpdated}/${prayerChecked} · ` +
+      `Outreach: ${outUpdated}/${outChecked} · ` +
+      `Compassion: ${compUpdated}/${compChecked} · ` +
+      `Assignments: ${asgReassigned}/${asgChecked} · ` +
+      `New LP assignments: ${memCreated}/${memChecked}.${failMsg}`,
       totalFailed ? '#b45309' : '#16a34a'
     );
   } catch (err) {
@@ -2576,6 +2722,244 @@ async function _resetCareToLeadPastor(root, btn) {
     btn.disabled = false;
     btn.textContent = origLabel;
   }
+}
+
+/* ── New maintenance actions ─────────────────────────────────────────── */
+
+async function _reassignCompassionToLP(root, btn) {
+  const status = root.querySelector('[data-bind="compassion-reassign-status"]');
+  const setStatus = (msg, color) => { if (status) { status.textContent = msg; status.style.color = color || 'var(--ink-muted,#7a7f96)'; } };
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Working…';
+  setStatus('Looking up Lead Pastor…');
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR || !UR.getAppConfig || !UR.listCompassionRequests || !UR.updateCompassionRequest) {
+    setStatus('Backend not ready.', '#b91c1c'); btn.disabled = false; btn.textContent = orig; return;
+  }
+  try {
+    const cfg = await UR.getAppConfig({ key: 'LEAD_PASTOR_MEMBER_ID' });
+    const lpId = String((cfg && cfg.value) || '').trim();
+    if (!lpId) { setStatus('No Lead Pastor PIN configured.', '#b91c1c'); btn.disabled = false; btn.textContent = orig; return; }
+    const TERMINAL = new Set(['closed','resolved','denied','archived']);
+    const all = await UR.listCompassionRequests({ limit: 5000 }).catch(() => []);
+    const reqs = Array.isArray(all) ? all : (all?.results || []);
+    let updated = 0, skipped = 0, failed = 0;
+    for (const c of reqs) {
+      const st = String(c.status || '').toLowerCase();
+      if (TERMINAL.has(st)) { skipped++; continue; }
+      if (!_isGarbage(c.assignedTo) && String(c.assignedTo).trim() === lpId) { skipped++; continue; }
+      try { await UR.updateCompassionRequest({ id: c.id, assignedTo: lpId }); updated++; }
+      catch (err) { failed++; console.error('[wall/compassion] update failed', c.id, err); }
+    }
+    setStatus(`Done. ${updated} reassigned, ${skipped} skipped, of ${reqs.length} total.${failed ? ` · ${failed} failed` : ''}`,
+      failed ? '#b45309' : '#16a34a');
+  } catch (err) {
+    setStatus(`Failed: ${err?.message || String(err)}`, '#b91c1c');
+  } finally { btn.disabled = false; btn.textContent = orig; }
+}
+
+async function _reassignOutreachToLP(root, btn) {
+  const status = root.querySelector('[data-bind="outreach-reassign-status"]');
+  const setStatus = (msg, color) => { if (status) { status.textContent = msg; status.style.color = color || 'var(--ink-muted,#7a7f96)'; } };
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Working…';
+  setStatus('Looking up Lead Pastor…');
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR || !UR.getAppConfig || !UR.listOutreachContacts || !UR.updateOutreachContact) {
+    setStatus('Backend not ready.', '#b91c1c'); btn.disabled = false; btn.textContent = orig; return;
+  }
+  try {
+    const cfg = await UR.getAppConfig({ key: 'LEAD_PASTOR_MEMBER_ID' });
+    const lpId = String((cfg && cfg.value) || '').trim();
+    if (!lpId) { setStatus('No Lead Pastor PIN configured.', '#b91c1c'); btn.disabled = false; btn.textContent = orig; return; }
+    const TERMINAL = new Set(['converted','closed','archived','rejected','dropped']);
+    const all = await UR.listOutreachContacts({ limit: 5000 }).catch(() => []);
+    const contacts = Array.isArray(all) ? all : (all?.results || []);
+    let updated = 0, skipped = 0, failed = 0;
+    for (const o of contacts) {
+      const st = String(o.status || '').toLowerCase();
+      if (TERMINAL.has(st)) { skipped++; continue; }
+      if (!_isGarbage(o.assignedTo) && String(o.assignedTo).trim() === lpId) { skipped++; continue; }
+      try { await UR.updateOutreachContact({ id: o.id, assignedTo: lpId }); updated++; }
+      catch (err) { failed++; console.error('[wall/outreach] update failed', o.id, err); }
+    }
+    setStatus(`Done. ${updated} reassigned, ${skipped} skipped, of ${contacts.length} total.${failed ? ` · ${failed} failed` : ''}`,
+      failed ? '#b45309' : '#16a34a');
+  } catch (err) {
+    setStatus(`Failed: ${err?.message || String(err)}`, '#b91c1c');
+  } finally { btn.disabled = false; btn.textContent = orig; }
+}
+
+async function _fillBlankAssignments(root, btn) {
+  const status = root.querySelector('[data-bind="fill-blank-status"]');
+  const setStatus = (msg, color) => { if (status) { status.textContent = msg; status.style.color = color || 'var(--ink-muted,#7a7f96)'; } };
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Scanning…';
+  setStatus('Looking up Lead Pastor…');
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR || !UR.getAppConfig) { setStatus('Backend not ready.', '#b91c1c'); btn.disabled = false; btn.textContent = orig; return; }
+  try {
+    const cfg = await UR.getAppConfig({ key: 'LEAD_PASTOR_MEMBER_ID' });
+    const lpId = String((cfg && cfg.value) || '').trim();
+    if (!lpId) { setStatus('No Lead Pastor PIN configured.', '#b91c1c'); btn.disabled = false; btn.textContent = orig; return; }
+    let total = 0, fixed = 0, failed = 0;
+
+    // Care cases — primaryCaregiverId
+    if (UR.listCareCases && UR.updateCareCase) {
+      const TERMINAL = new Set(['resolved','closed','archived','cancelled','completed','denied']);
+      const all = await UR.listCareCases({ limit: 1000 }).catch(() => []);
+      const rows = Array.isArray(all) ? all : (all?.results || []);
+      for (const c of rows) {
+        if (TERMINAL.has(String(c.status || '').toLowerCase())) continue;
+        if (!_isGarbage(c.primaryCaregiverId)) continue;
+        total++;
+        try { await UR.updateCareCase({ id: c.id, primaryCaregiverId: lpId }); fixed++; }
+        catch (err) { failed++; console.error('[wall/fill] case', c.id, err); }
+      }
+    }
+    // Prayers — assignedTo
+    if (UR.listPrayers && UR.updatePrayer) {
+      const TERMINAL = new Set(['answered','closed','archived','resolved']);
+      const all = await UR.listPrayers({ allUsers: true, limit: 1000 }).catch(() => []);
+      const rows = Array.isArray(all) ? all : (all?.results || []);
+      for (const p of rows) {
+        if (TERMINAL.has(String(p.status || '').toLowerCase())) continue;
+        if (!_isGarbage(p.assignedTo)) continue;
+        total++;
+        try { await UR.updatePrayer(p.id, { assignedTo: lpId }); fixed++; }
+        catch (err) { failed++; console.error('[wall/fill] prayer', p.id, err); }
+      }
+    }
+    // Outreach — assignedTo
+    if (UR.listOutreachContacts && UR.updateOutreachContact) {
+      const TERMINAL = new Set(['converted','closed','archived','rejected','dropped']);
+      const all = await UR.listOutreachContacts({ limit: 5000 }).catch(() => []);
+      const rows = Array.isArray(all) ? all : (all?.results || []);
+      for (const o of rows) {
+        if (TERMINAL.has(String(o.status || '').toLowerCase())) continue;
+        if (!_isGarbage(o.assignedTo)) continue;
+        total++;
+        try { await UR.updateOutreachContact({ id: o.id, assignedTo: lpId }); fixed++; }
+        catch (err) { failed++; console.error('[wall/fill] outreach', o.id, err); }
+      }
+    }
+    // Compassion — assignedTo
+    if (UR.listCompassionRequests && UR.updateCompassionRequest) {
+      const TERMINAL = new Set(['closed','resolved','denied','archived']);
+      const all = await UR.listCompassionRequests({ limit: 5000 }).catch(() => []);
+      const rows = Array.isArray(all) ? all : (all?.results || []);
+      for (const c of rows) {
+        if (TERMINAL.has(String(c.status || '').toLowerCase())) continue;
+        if (!_isGarbage(c.assignedTo)) continue;
+        total++;
+        try { await UR.updateCompassionRequest({ id: c.id, assignedTo: lpId }); fixed++; }
+        catch (err) { failed++; console.error('[wall/fill] compassion', c.id, err); }
+      }
+    }
+    setStatus(`Done. ${fixed} blank assignments filled with LP PIN (${total} found).${failed ? ` · ${failed} failed` : ''}`,
+      failed ? '#b45309' : '#16a34a');
+  } catch (err) {
+    setStatus(`Failed: ${err?.message || String(err)}`, '#b91c1c');
+  } finally { btn.disabled = false; btn.textContent = orig; }
+}
+
+async function _dedupCareAssignments(root, btn) {
+  const status = root.querySelector('[data-bind="dedup-status"]');
+  const setStatus = (msg, color) => { if (status) { status.textContent = msg; status.style.color = color || 'var(--ink-muted,#7a7f96)'; } };
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Scanning…';
+  setStatus('Loading all care assignments…');
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR || !UR.listCareAssignments || !UR.endCareAssignment) {
+    setStatus('Backend not ready.', '#b91c1c'); btn.disabled = false; btn.textContent = orig; return;
+  }
+  try {
+    const all = await UR.listCareAssignments({ limit: 5000 }).catch(() => []);
+    const rows = Array.isArray(all) ? all : (all?.results || []);
+    // Group Active rows by memberId+caregiverId, keep first (oldest — Firestore returns desc, so last)
+    const seen = {}; // "memberId|caregiverId" → true
+    const toEnd = [];
+    // Reverse so we process oldest first (want to keep oldest)
+    const active = rows.filter((a) => String(a.status || '').toLowerCase() === 'active');
+    const byKey = {};
+    for (const a of active) {
+      const key = `${String(a.memberId||'unknown')}|${String(a.caregiverId||'unknown')}`;
+      (byKey[key] = byKey[key] || []).push(a);
+    }
+    for (const [, group] of Object.entries(byKey)) {
+      if (group.length <= 1) continue;
+      // Keep the first (oldest by createdAt); end the rest
+      group.sort((a, b) => {
+        const ta = a.createdAt?.toMillis?.() || a.createdAt || 0;
+        const tb = b.createdAt?.toMillis?.() || b.createdAt || 0;
+        return ta - tb;
+      });
+      for (const dup of group.slice(1)) toEnd.push(dup.id);
+    }
+    let ended = 0, failed = 0;
+    for (const id of toEnd) {
+      try { await UR.endCareAssignment(id); ended++; }
+      catch (err) { failed++; console.error('[wall/dedup] end failed', id, err); }
+    }
+    setStatus(
+      toEnd.length === 0
+        ? `No duplicates found across ${active.length} Active assignments.`
+        : `Done. ${ended} duplicate assignments ended.${failed ? ` · ${failed} failed` : ''}`,
+      failed ? '#b45309' : '#16a34a'
+    );
+  } catch (err) {
+    setStatus(`Failed: ${err?.message || String(err)}`, '#b91c1c');
+  } finally { btn.disabled = false; btn.textContent = orig; }
+}
+
+async function _genMissingMemberPins(root, btn) {
+  const status = root.querySelector('[data-bind="pins-status"]');
+  const setStatus = (msg, color) => { if (status) { status.textContent = msg; status.style.color = color || 'var(--ink-muted,#7a7f96)'; } };
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Working…';
+  setStatus('Loading members…');
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR || !UR.listMembers || !UR.updateMember) {
+    setStatus('Backend not ready.', '#b91c1c'); btn.disabled = false; btn.textContent = orig; return;
+  }
+  const genPin = () => { const n = String(Math.floor(Math.random() * 900000000) + 100000000); return n.slice(0,3)+'-'+n.slice(3,5)+'-'+n.slice(5); };
+  try {
+    const all = await UR.listMembers({ limit: 5000 }).catch(() => []);
+    const members = Array.isArray(all) ? all : (all?.results || []);
+    let generated = 0, skipped = 0, failed = 0;
+    for (const m of members) {
+      if (m.memberPin && String(m.memberPin).trim()) { skipped++; continue; }
+      const pin = genPin();
+      try { await UR.updateMember({ id: m.id, memberPin: pin }); generated++; }
+      catch (err) { failed++; console.error('[wall/pins] update failed', m.id, err); }
+    }
+    setStatus(`Done. ${generated} PINs generated, ${skipped} members already had PINs.${failed ? ` · ${failed} failed` : ''}`,
+      failed ? '#b45309' : '#16a34a');
+  } catch (err) {
+    setStatus(`Failed: ${err?.message || String(err)}`, '#b91c1c');
+  } finally { btn.disabled = false; btn.textContent = orig; }
+}
+
+async function _endInactiveAssignments(root, btn) {
+  const status = root.querySelector('[data-bind="end-inactive-status"]');
+  const setStatus = (msg, color) => { if (status) { status.textContent = msg; status.style.color = color || 'var(--ink-muted,#7a7f96)'; } };
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Working…';
+  setStatus('Loading care assignments…');
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR || !UR.listCareAssignments || !UR.endCareAssignment) {
+    setStatus('Backend not ready.', '#b91c1c'); btn.disabled = false; btn.textContent = orig; return;
+  }
+  try {
+    const all = await UR.listCareAssignments({ limit: 5000 }).catch(() => []);
+    const rows = Array.isArray(all) ? all : (all?.results || []);
+    let ended = 0, skipped = 0, failed = 0;
+    for (const a of rows) {
+      const st = String(a.status || '').toLowerCase();
+      if (st === 'active') { skipped++; continue; }
+      if (st === 'ended') { skipped++; continue; } // already clean
+      try { await UR.endCareAssignment(a.id); ended++; }
+      catch (err) { failed++; console.error('[wall/end-inactive] failed', a.id, err); }
+    }
+    setStatus(`Done. ${ended} assignments ended, ${skipped} skipped (Active or already Ended).${failed ? ` · ${failed} failed` : ''}`,
+      failed ? '#b45309' : '#16a34a');
+  } catch (err) {
+    setStatus(`Failed: ${err?.message || String(err)}`, '#b91c1c');
+  } finally { btn.disabled = false; btn.textContent = orig; }
 }
 
 function _settingRow(s) {

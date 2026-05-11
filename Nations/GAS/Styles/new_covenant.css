@@ -617,9 +617,9 @@ flock-card h3 {
 
 /* Button */
 flock-button button, .flock-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  padding: 10px 20px; border: 1.5px solid transparent; border-radius: var(--radius-sm);
-  font: 600 0.92rem var(--font-ui); cursor: pointer; user-select: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 7px 15px; border: 1.5px solid transparent; border-radius: var(--radius-sm);
+  font: 600 0.84rem var(--font-ui); cursor: pointer; user-select: none;
   transition: transform 100ms var(--spring), background 150ms var(--ease),
               box-shadow 150ms var(--ease), border-color 150ms var(--ease);
 }
@@ -642,15 +642,15 @@ flock-button[tone="ghost"] button {
 }
 flock-button[tone="ghost"] button:hover { background: var(--accent-soft, rgba(0,0,0,0.05)); }
 flock-button[tone="danger"] button { background: #dc2626; color: #fff; }
-flock-button[size="lg"] button { padding: 13px 26px; font-size: 1rem; border-radius: 11px; }
-flock-button[size="sm"] button { padding: 6px 12px; font-size: 0.82rem; }
+flock-button[size="lg"] button { padding: 10px 22px; font-size: 0.95rem; border-radius: 11px; }
+flock-button[size="sm"] button { padding: 5px 11px; font-size: 0.78rem; }
 flock-button button:active, .flock-btn:active { transform: scale(0.96); }
 .flock-btn--ghost  { background: transparent; color: var(--ink, #1b264f); border: 1.5px solid var(--line, #e5e7ef); }
 .flock-btn--ghost:hover  { background: var(--bg-base, #f4f6fb); }
 .flock-btn--danger { background: #dc2626; color: #fff; border-color: #b91c1c; }
 .flock-btn--danger:hover { background: #b91c1c; }
-.flock-btn--sm { padding: 6px 14px; font-size: 0.82rem; }
-.flock-btn--xs { padding: 3px 10px; font-size: 0.72rem; }
+.flock-btn--sm { padding: 5px 11px; font-size: 0.78rem; }
+.flock-btn--xs { padding: 3px 8px; font-size: 0.70rem; }
 
 /* ── Icon-only action buttons (archive / delete / etc.) ───────────────────── */
 .flock-icon-btn {
@@ -2602,7 +2602,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .life-resolve-btn:hover { background: rgba(220,38,38,0.06); }
 .life-resolve-btn:disabled { opacity: 0.5; }
 
-.flock-btn--sm { padding: 6px 14px !important; font-size: 0.82rem !important; }
+.flock-btn--sm { padding: 5px 11px !important; font-size: 0.78rem !important; }
 
 /* Loading / empty states */
 .life-loading {
