@@ -37,16 +37,26 @@
     :root {
       --gold:      #e8a838;
       --gold-text: #b45309;
+      /* Safe area insets — set via CSS env() so they work without JS */
+      --safe-top:    env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left:   env(safe-area-inset-left, 0px);
+      --safe-right:  env(safe-area-inset-right, 0px);
     }
 
     html, body {
       height: auto;
       margin: 0; padding: 0;
-      background: var(--bg, #f7f8fb);
+      background: #0c1445; /* matches topbar so iOS status bar band is dark */
       color: var(--ink, #1b264f);
       font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
       -webkit-font-smoothing: antialiased;
       overscroll-behavior-y: contain;
+    }
+
+    /* Body bg below the topbar should be the page bg, not topbar dark */
+    #inv-main {
+      background: var(--bg, #f7f8fb);
     }
 
     /* ── Grow page / hero styles (extracted from new_covenant.css) ── */
@@ -122,7 +132,7 @@
 
     /* ── Scroll area ────────────────────────────────────────────── */
     #inv-main {
-      padding: 0 0 env(safe-area-inset-bottom, 24px);
+      padding-bottom: max(env(safe-area-inset-bottom, 0px), 24px);
     }
     #inv-main > * {
       max-width: 860px;
