@@ -2112,17 +2112,13 @@ async function markAllNotifRead() {
 
 async function refreshNotifBadge() {
   try {
-    // Fetch badge count + full notification list in parallel
-    // so _notifData is always warm when user opens the panel
-    var results = await Promise.all([
-      TheVine.flock.comms.notifications.unreadCount().catch(function() { return {}; }),
-      TheVine.flock.comms.notifications.list({ limit: 30 }).catch(function() { return []; })
-    ]);
-    var res = results[0];
-    var listRes = results[1];
+    // Single GAS call — list includes all data needed to derive unread count.
+    // (Previously two parallel calls every 30s; collapsed to reduce GAS simultaneous executions.)
+    var listRes = await TheVine.flock.comms.notifications.list({ limit: 30 }).catch(function() { return []; });
+    var rows = Array.isArray(listRes) ? listRes : (listRes && listRes.data ? listRes.data : (listRes && listRes.rows ? listRes.rows : []));
 
-    // Update badge
-    var count = (res && res.unreadCount) ? res.unreadCount : (res && res.count) ? res.count : (typeof res === 'number' ? res : 0);
+    // Derive unread count from the list
+    var count = rows.filter(function(r) { return !r.read; }).length;
     var bell  = document.getElementById('notifBell');
     var dot   = document.getElementById('notifDot');
     var badge = document.getElementById('notifCount');
@@ -2137,8 +2133,7 @@ async function refreshNotifBadge() {
       badge.style.display = 'none';
     }
 
-    // Silently warm the notification list cache
-    var rows = Array.isArray(listRes) ? listRes : (listRes && listRes.data ? listRes.data : (listRes && listRes.rows ? listRes.rows : []));
+    // Update cached notification list
     if (rows.length || !_notifData.length) _notifData = rows;
 
     // If panel is currently open, refresh its display
@@ -2147,16 +2142,16 @@ async function refreshNotifBadge() {
   } catch (_) {}
 }
 
-// Poll for new notifications every 30s
+// Poll for new notifications every 3 minutes (was 30s — reduced to lower GAS simultaneous executions)
 refreshNotifBadge();
-_notifPollId = setInterval(refreshNotifBadge, 30000);
+_notifPollId = setInterval(refreshNotifBadge, 180000);
 // Pause poll when tab is hidden, resume when visible; clear on unload
 document.addEventListener('visibilitychange', function() {
   if (document.hidden) {
     clearInterval(_notifPollId); _notifPollId = null;
   } else if (!_notifPollId) {
     refreshNotifBadge();
-    _notifPollId = setInterval(refreshNotifBadge, 30000);
+    _notifPollId = setInterval(refreshNotifBadge, 180000);
   }
 });
 window.addEventListener('beforeunload', function() { clearInterval(_notifPollId); });
