@@ -220,7 +220,24 @@ function msEnsureStyles() {
         '.ms-stand-song-title { font-family:Merriweather,serif; font-size:1.8rem; color:#fff; margin:0; }',
         '.ms-stand-meta { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; }',
         '.ms-stand-badge { background:rgba(34,211,238,0.15); color:#22d3ee; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:700; }',
-        '.ms-chord-display { font-family:"Courier New",Courier,monospace; font-size:1.1rem; line-height:2; white-space:pre-wrap; color:#e5e7eb; background:rgba(0,0,0,0.3); border-radius:12px; padding:20px; margin-bottom:16px; }',
+
+        /* ── ChordPro rendered output ── */
+        '.ms-chord-display { background:rgba(0,0,0,0.25); border-radius:12px; padding:20px 24px; margin-bottom:16px; }',
+        '.ms-cp-song { font-family:"Plus Jakarta Sans",system-ui,sans-serif; font-size:1rem; line-height:1.4; color:#e2e8f0; }',
+        '.ms-cp-title { font-size:1.4rem; font-weight:800; color:#fff; margin:0 0 4px 0; }',
+        '.ms-cp-subtitle { font-size:0.95rem; color:#94a3b8; margin:0 0 20px 0; }',
+        '.ms-cp-section-label { font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; padding:2px 0 2px 10px; border-left:3px solid; margin:20px 0 10px 0; }',
+        '.ms-cp-section { margin-bottom:4px; }',
+        '.ms-cp-spacer { height:18px; }',
+        /* Each line = flex row of chord+lyric pairs */
+        '.ms-cp-row { display:flex; flex-wrap:wrap; align-items:flex-end; gap:0; margin-bottom:2px; }',
+        '.ms-cp-pair { display:inline-flex; flex-direction:column; align-items:flex-start; margin-right:2px; }',
+        '.ms-cp-chord { font-family:"JetBrains Mono","Courier New",monospace; font-size:0.82rem; font-weight:700; color:#38bdf8; line-height:1.2; min-height:1.2em; white-space:pre; padding-right:4px; }',
+        '.ms-cp-chord--empty { color:transparent; }',
+        '.ms-cp-word { font-size:1.05rem; color:#e2e8f0; white-space:pre; line-height:1.5; }',
+        '.ms-cp-word--space { color:transparent; }',
+        '.ms-cp-lyric-only { font-size:1.05rem; color:#e2e8f0; line-height:1.8; padding-left:2px; }',
+
         '.ms-chord-line { color:#22d3ee; font-weight:700; }',
         '.ms-lyric-line { color:#e5e7eb; }',
         '.ms-stand-nav { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-top:1px solid rgba(255,255,255,0.12); }',
@@ -1642,69 +1659,153 @@ function msBindTransposeControls(originalKey, currentSemitones, capoFret, idPref
 
 function msRenderChordPro(text) {
     if (!text) return '';
+
     var lines = String(text).split('\n');
-    var html = '';
+    var html = '<div class="ms-cp-song">';
+    var inSection = false;
+
+    // Section label colours
+    var sectionColors = {
+        verse:    '#60a5fa',
+        chorus:   '#f472b6',
+        bridge:   '#a78bfa',
+        intro:    '#34d399',
+        outro:    '#34d399',
+        tag:      '#fbbf24',
+        prechorus:'#fb923c',
+        interlude:'#94a3b8',
+    };
+
+    function sectionColor(name) {
+        var key = String(name || '').toLowerCase().replace(/[\s_\d]/g, '');
+        for (var k in sectionColors) {
+            if (key.indexOf(k) !== -1) return sectionColors[k];
+        }
+        return '#e2e8f0';
+    }
+
+    function closeSection() {
+        if (inSection) { html += '</div>'; inSection = false; }
+    }
+
+    function openSection() {
+        if (!inSection) {
+            html += '<div class="ms-cp-section">';
+            inSection = true;
+        }
+    }
+
+    // Handle a line that has [Chord]lyric interleaving — returns an HTML row
+    function parseLyricLine(line) {
+        // Check if line has any chord markers
+        if (!/\[/.test(line)) {
+            // Plain lyric / instruction line
+            var trimmed = line.trim();
+            if (!trimmed) return null; // blank — caller adds spacer
+            return '<div class="ms-cp-lyric-only">' + msEscapeHtml(trimmed) + '</div>';
+        }
+
+        // Build pairs: [{chord, lyric}, ...]
+        var pairs = [];
+        var pos = 0;
+        var regex = /\[([^\]]+)\]/g;
+        var match;
+        var lastChord = null;
+
+        while ((match = regex.exec(line)) !== null) {
+            var lyricBefore = line.substring(pos, match.index);
+            if (lastChord !== null) {
+                pairs.push({ chord: lastChord, lyric: lyricBefore });
+            } else if (lyricBefore) {
+                pairs.push({ chord: '', lyric: lyricBefore });
+            }
+            lastChord = match[1];
+            pos = match.index + match[0].length;
+        }
+        // Remaining lyric after last chord
+        pairs.push({ chord: lastChord || '', lyric: line.substring(pos) });
+
+        // Render as a flex row of chord+lyric pairs
+        var row = '<div class="ms-cp-row">';
+        for (var i = 0; i < pairs.length; i++) {
+            var p = pairs[i];
+            var chordHtml = p.chord
+                ? '<span class="ms-cp-chord">' + msEscapeHtml(p.chord) + '</span>'
+                : '<span class="ms-cp-chord ms-cp-chord--empty">&nbsp;</span>';
+            var lyricHtml = p.lyric
+                ? '<span class="ms-cp-word">' + msEscapeHtml(p.lyric) + '</span>'
+                : '<span class="ms-cp-word ms-cp-word--space">&nbsp;</span>';
+            row += '<span class="ms-cp-pair">' + chordHtml + lyricHtml + '</span>';
+        }
+        row += '</div>';
+        return row;
+    }
 
     for (var i = 0; i < lines.length; i++) {
         var line = lines[i];
 
-        // Detect section headers like {title:...} or {comment:...}
-        var headerMatch = line.match(/^\{(title|t|comment|c|subtitle|st):\s*(.+)\}$/i);
-        if (headerMatch) {
-            var tag = headerMatch[1].toLowerCase();
-            if (tag === 'c' || tag === 'comment') {
-                html += '<div style="color:#d946ef; font-style:italic; margin:8px 0;">' + msEscapeHtml(headerMatch[2]) + '</div>';
-            } else {
-                html += '<div style="color:#fff; font-weight:700; font-size:1.1em; margin:10px 0 4px 0;">' + msEscapeHtml(headerMatch[2]) + '</div>';
-            }
+        // ── Directives ───────────────────────────────────────────────
+        // Section start: {start_of_chorus}, {soc}, {verse:1}, {chorus}, etc.
+        var sectionStart = line.match(/^\{(?:start_of_(\w+)|sov|soc|sob|sos|sot|(?:(verse|chorus|bridge|intro|outro|tag|pre-?chorus|interlude))(?::\s*(.+?))?)\}$/i);
+        if (sectionStart) {
+            closeSection();
+            var sName = sectionStart[1] || sectionStart[2] || 'Section';
+            var sNum  = sectionStart[3] ? ' ' + sectionStart[3].trim() : '';
+            var sLabel = sName.charAt(0).toUpperCase() + sName.slice(1).toLowerCase() + sNum;
+            var sCol = sectionColor(sName);
+            html += '<div class="ms-cp-section-label" style="color:' + sCol + '; border-left-color:' + sCol + ';">' + msEscapeHtml(sLabel) + '</div>';
             continue;
         }
 
-        // Skip other directives
-        if (line.match(/^\{.*\}$/)) continue;
+        // Section end directives
+        if (/^\{end_of_\w+\}$/i.test(line)) { closeSection(); continue; }
 
-        // Empty line → spacing
+        // {title:}, {t:}
+        var titleMatch = line.match(/^\{(?:title|t):\s*(.+)\}$/i);
+        if (titleMatch) {
+            closeSection();
+            html += '<div class="ms-cp-title">' + msEscapeHtml(titleMatch[1]) + '</div>';
+            continue;
+        }
+
+        // {subtitle:}, {st:}, {artist:}
+        var subMatch = line.match(/^\{(?:subtitle|st|artist):\s*(.+)\}$/i);
+        if (subMatch) {
+            closeSection();
+            html += '<div class="ms-cp-subtitle">' + msEscapeHtml(subMatch[1]) + '</div>';
+            continue;
+        }
+
+        // {comment:}, {c:}, {ci:}  — section label style
+        var commentMatch = line.match(/^\{(?:comment|c|ci|cb):\s*(.+)\}$/i);
+        if (commentMatch) {
+            closeSection();
+            var cName = commentMatch[1].trim();
+            var cCol  = sectionColor(cName);
+            html += '<div class="ms-cp-section-label" style="color:' + cCol + '; border-left-color:' + cCol + ';">' + msEscapeHtml(cName) + '</div>';
+            continue;
+        }
+
+        // Skip any remaining directives
+        if (/^\{.*\}$/.test(line.trim())) continue;
+
+        // ── Content lines ─────────────────────────────────────────────
         if (!line.trim()) {
-            html += '<div style="height:12px;"></div>';
+            closeSection();
+            html += '<div class="ms-cp-spacer"></div>';
             continue;
         }
 
-        // Parse [Chord]lyrics segments
-        var chordLine = '';
-        var lyricLine = '';
-        var pos = 0;
-        var hasChords = false;
-        var regex = /\[([^\]]+)\]/g;
-        var match;
-
-        while ((match = regex.exec(line)) !== null) {
-            hasChords = true;
-            // Text before chord
-            var before = line.substring(pos, match.index);
-            lyricLine += msEscapeHtml(before);
-
-            // Pad chord line to align
-            while (chordLine.length < lyricLine.length) {
-                chordLine += ' ';
-            }
-            chordLine += msEscapeHtml(match[1]);
-
-            pos = match.index + match[0].length;
-        }
-
-        // Remaining text
-        lyricLine += msEscapeHtml(line.substring(pos));
-
-        if (hasChords) {
-            html += '<span class="ms-chord-line">' + chordLine + '</span>\n';
-            html += '<span class="ms-lyric-line">' + lyricLine + '</span>\n';
-        } else {
-            html += '<span class="ms-lyric-line">' + msEscapeHtml(line) + '</span>\n';
-        }
+        openSection();
+        var rowHtml = parseLyricLine(line);
+        if (rowHtml) html += rowHtml;
     }
 
+    closeSection();
+    html += '</div>';
     return html;
 }
+
 
 // ══════════════════════════════════════════════════════════════════════════════
 // PDF EXPORT (via jsPDF)
