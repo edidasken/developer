@@ -199,6 +199,8 @@ export function wireHelp(root, summaryFn, opts = {}) {
   const btn  = root.querySelector('[data-help-btn]');
   const stat = root.querySelector('[data-help-status]');
   if (!btn || !stat) return;
+  /* Store summaryFn so the public prayer hook in grow_public.js can read it */
+  btn._prayerSummaryFn = summaryFn;
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     stat.textContent = 'Sending…';

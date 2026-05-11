@@ -638,9 +638,8 @@ function _openOutreachModal(prefillSummary, ctx) {
  */
 function _gatherDiagnosticSummary(root, ctx) {
   const lines = [];
-  const heroTitle = root.querySelector('.grow-hero-title');
-  const label = ctx?.title || heroTitle?.textContent.trim() || '';
-  if (label) lines.push(`=== ${label} Results ===\n`);
+  const label = ctx?.title || root.querySelector('.grow-hero-title')?.textContent.trim() || '';
+  if (label) lines.push(`=== ${label} ===\n`);
   root.querySelectorAll('.grow-split-aside, [data-bind="scan"], [data-bind="plan"]').forEach(panel => {
     panel.querySelectorAll('[style*="border-left"]').forEach(card => {
       const cat  = card.querySelector('[style*="text-transform"]');
@@ -655,7 +654,10 @@ function _gatherDiagnosticSummary(root, ctx) {
     const pct = panel.querySelector('.grow-scan-pct');
     if (pct) lines.push(`\nCompletion: ${pct.textContent.trim()}`);
   });
-  return lines.join('\n').trim() || '';
+  const scraped = lines.join('\n').trim();
+  if (scraped) return scraped;
+  /* Fallback: generic context based on module title */
+  return label ? `I was exploring "${label}" in GROW and would love to connect with a pastor.` : '';
 }
 
 /**
@@ -670,7 +672,12 @@ function _installPrayerHook(root, ctx) {
     if (!btn) return;
     e.stopImmediatePropagation();
     e.preventDefault();
-    const summary = _gatherDiagnosticSummary(root, ctx);
+    /* Prefer the module's own summaryFn (stored by wireHelp) over DOM scraping */
+    let summary = '';
+    if (typeof btn._prayerSummaryFn === 'function') {
+      try { const r = btn._prayerSummaryFn(); summary = (r instanceof Promise) ? '' : (r || ''); } catch (_) {}
+    }
+    if (!summary) summary = _gatherDiagnosticSummary(root, ctx);
     _openOutreachModal(summary, ctx);
   }, true /* capture */);
 }

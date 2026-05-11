@@ -200,6 +200,22 @@ function _paint(view) {
 
   _renderGrid(view);
   _wireControls(view);
+
+  /* Attach prayer summary so the public prayer hook has meaningful context */
+  const prayerBtn = view.querySelector('[data-help-btn]');
+  if (prayerBtn) {
+    prayerBtn._prayerSummaryFn = () => {
+      const featured = _state.nations[0];
+      const region   = featured?.region  || '';
+      const name     = featured?.countryName || '';
+      const prayer   = (featured?.owPrayerChallenges || [])[0] || '';
+      const lines    = ['I\'m reading about World Missions and have a prayer request.'];
+      if (name)   lines.push(`Featured nation: ${name}${region ? ' (' + region + ')' : ''}.`);
+      if (prayer) lines.push(`Today\'s prayer point: ${prayer}`);
+      lines.push('\nI\'d love to connect with a pastor about missions, outreach, or prayer.');
+      return lines.join('\n');
+    };
+  }
 }
 
 /* _injectJpWidget removed — widget now uses a static <iframe> in _paint() HTML */
