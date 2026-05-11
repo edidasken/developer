@@ -9,8 +9,8 @@
 /* ── Design tokens ────────────────────────────────────────────────────────── */
 :root {
   /* Colors — light theme */
-  --ms-bg:          #f4f4f5;
-  --ms-bg-raised:   #ebebec;
+  --ms-bg:          #e7eaee;
+  --ms-bg-raised:   #d8dde3;
   --ms-bg-card:     #ffffff;
   --ms-bg-card-hi:  #f9f9fa;
   --ms-ink:         #111827;
