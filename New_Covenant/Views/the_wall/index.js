@@ -40,13 +40,19 @@ const SECTIONS = [
   {
     key: 'integrations', label: 'Integrations',
     icon: '<rect x="2" y="2" width="6" height="6" rx="1"/><rect x="16" y="2" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M5 8v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/>',
-    settings: [
-      { label: 'Firebase Project',  value: 'flockos-comms',              type: 'text'  },
-      { label: 'GAS Endpoint',      value: 'Connected (TheScrolls)',      type: 'badge', status: 'ok'   },
-      { label: 'Push Notifications',value: 'VAPID key set',              type: 'badge', status: 'ok'   },
-      { label: 'Joshua Project API', type: 'jp-api' },
-      { label: 'api.bible',           type: 'bible-api' },
-    ],
+    get settings() {
+      const projId = (window.FLOCK_FIREBASE_CONFIG && window.FLOCK_FIREBASE_CONFIG.projectId)
+        || (window.UpperRoom && window.UpperRoom.isReady && window.UpperRoom.isReady() && window.firebase && window.firebase.apps.length && window.firebase.app().options.projectId)
+        || (window.firebase && window.firebase.apps.length && window.firebase.app().options.projectId)
+        || 'flockos-notify';
+      return [
+        { label: 'Firebase Project',  value: projId,                       type: 'text'  },
+        { label: 'GAS Endpoint',      value: 'Connected (TheScrolls)',      type: 'badge', status: 'ok'   },
+        { label: 'Push Notifications',value: 'VAPID key set',              type: 'badge', status: 'ok'   },
+        { label: 'Joshua Project API', type: 'jp-api' },
+        { label: 'api.bible',           type: 'bible-api' },
+      ];
+    },
   },
   {
     key: 'notifications', label: 'Notifications',
