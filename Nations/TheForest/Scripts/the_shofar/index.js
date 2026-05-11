@@ -262,15 +262,16 @@ function msEnsureStyles() {
         '.ms-song-table-wrap { overflow-x:auto; }',
         '.ms-song-cards { display:none; }',
 
-        /* Song card (mobile) */
-        '.ms-song-card { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid rgba(0,0,0,0.07); }',
+        /* Song card (mobile) — column layout so nothing overflows viewport */
+        '.ms-song-card { display:flex; flex-direction:column; gap:8px; padding:12px 0; border-bottom:1px solid rgba(0,0,0,0.07); max-width:100%; box-sizing:border-box; }',
         '.ms-song-card:last-child { border-bottom:none; }',
-        '.ms-song-card-info { flex:1; min-width:0; }',
+        '.ms-song-card-info { width:100%; min-width:0; }',
         '.ms-song-card-title { font-weight:700; color:#111827; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:3px; }',
         '.ms-song-card-meta { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }',
         '.ms-song-card-meta span:not(.ms-stand-badge) { font-size:0.78rem; color:#6b7280; }',
-        '.ms-song-card-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }',
-        '.ms-song-card-play { padding:8px 14px !important; font-size:0.88rem !important; }',
+        '.ms-song-card-actions { display:flex; align-items:center; gap:6px; }',
+        '.ms-song-card-play { flex:1; text-align:center; padding:8px 14px !important; font-size:0.88rem !important; }',
+        '.ms-song-cards { max-width:100%; overflow-x:hidden; }',
 
         /* Arrangement card */
         '.ms-arr-card { background:#f9fafb; border:1px solid rgba(0,0,0,0.09); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; }',
