@@ -2174,7 +2174,7 @@ function _maintenancePanelMarkup() {
       <div style="flex:1;min-width:240px">
         <div style="font-weight:600;color:var(--ink,#1b264f);margin-bottom:2px">Assign Lead Pastor as caregiver for all members</div>
         <div style="font-size:.82rem;color:var(--ink-muted,#7a7f96);line-height:1.5">
-          Creates an <strong>Active</strong> care assignment (role: Shepherd) linking every member to the Lead Pastor. Members who already have an active assignment to the LP are skipped. Existing assignments to other shepherds are left intact.
+          Assigns the Lead Pastor as the <strong>primary caregiver (Shepherd)</strong> for every member. Any existing Active assignment to another shepherd is demoted to the <strong>Timothy</strong> role (kept as secondary). Members already assigned to the LP are skipped.
         </div>
         <div class="wall-maint-status" data-bind="assign-all-status" style="margin-top:8px;font-size:.82rem;color:var(--ink-muted,#7a7f96)"></div>
       </div>
@@ -2326,7 +2326,7 @@ async function _assignAllMembersToLeadPastor(root, btn) {
   setStatus('Looking up Lead Pastor…');
 
   const UR = await _waitForUpperRoom(10000);
-  if (!UR || !UR.getAppConfig || !UR.listMembers || !UR.listCareAssignments || !UR.createCareAssignment) {
+  if (!UR || !UR.getAppConfig || !UR.listMembers || !UR.listCareAssignments || !UR.createCareAssignment || !UR.updateCareAssignment) {
     setStatus('Backend not ready (or care-assignment APIs missing).', '#b91c1c');
     btn.disabled = false; btn.textContent = origLabel;
     return;
@@ -2351,41 +2351,80 @@ async function _assignAllMembersToLeadPastor(root, btn) {
     const assignRows = Array.isArray(existing) ? existing : (existing?.results || []);
     console.log('[wall/assign-all] members=' + memberRows.length + ', existing assignments=' + assignRows.length);
 
-    // Index existing Active assignments by memberId where caregiverId === lpId
-    const alreadyAssigned = new Set();
+    // Group Active assignments by memberId
+    const byMember = {}; // memberId → [assignment, ...]
     for (const a of assignRows) {
       const st = String(a.status || '').toLowerCase();
       if (st && st !== 'active') continue;
-      if (String(a.caregiverId || '') === lpId && a.memberId) {
-        alreadyAssigned.add(String(a.memberId));
-      }
+      if (!a.memberId) continue;
+      const mid = String(a.memberId);
+      (byMember[mid] = byMember[mid] || []).push(a);
     }
 
-    setStatus(`Assigning Lead Pastor as caregiver for ${memberRows.length} members…`);
+    setStatus(`Processing ${memberRows.length} members…`);
 
-    let checked = 0, created = 0, skipped = 0, failed = 0;
+    let checked = 0, created = 0, demoted = 0, skipped = 0, failed = 0;
     for (const m of memberRows) {
       checked++;
-      const memberId = m.id || m.docId || m.uid || m.memberPin || m.memberNumber || '';
+      const memberId = String(
+        m.id || m.docId || m.uid || m.memberPin || m.memberNumber || ''
+      ).trim();
       if (!memberId) { skipped++; continue; }
-      // Don't re-assign the lead pastor to themselves
-      if (String(memberId) === lpId
-          || String(m.memberPin || '') === lpId
-          || String(m.memberNumber || '') === lpId) {
-        skipped++;
+      // Skip the LP themselves
+      if (memberId === lpId
+          || String(m.memberPin || '').trim() === lpId
+          || String(m.memberNumber || '').trim() === lpId) {
+        skipped++; continue;
+      }
+
+      const activeAssignments = byMember[memberId] || [];
+      const hasLP = activeAssignments.some((a) => String(a.caregiverId || '').trim() === lpId);
+
+      if (hasLP) {
+        // LP already assigned as primary — demote any non-LP assignments to Timothy
+        for (const a of activeAssignments) {
+          if (String(a.caregiverId || '').trim() === lpId) continue; // leave LP alone
+          if (String(a.role || '').toLowerCase() === 'timothy') continue; // already secondary
+          try {
+            await UR.updateCareAssignment({
+              id: a.id,
+              role: 'Timothy',
+              notes: (a.notes ? a.notes + '\n' : '') + 'Demoted to secondary (Timothy) via Assign-All-to-LP',
+            });
+            demoted++;
+          } catch (err) {
+            failed++;
+            console.error('[wall/assign-all] demote failed for assignment', a.id, err);
+          }
+        }
+        skipped++; // LP was already there; counted as skipped for creation
         continue;
       }
-      if (alreadyAssigned.has(String(memberId))) {
-        skipped++;
-        continue;
+
+      // No LP assignment yet — demote any existing non-LP assignments to Timothy first
+      for (const a of activeAssignments) {
+        if (String(a.role || '').toLowerCase() === 'timothy') continue;
+        try {
+          await UR.updateCareAssignment({
+            id: a.id,
+            role: 'Timothy',
+            notes: (a.notes ? a.notes + '\n' : '') + 'Demoted to secondary (Timothy) via Assign-All-to-LP',
+          });
+          demoted++;
+        } catch (err) {
+          failed++;
+          console.error('[wall/assign-all] demote failed for assignment', a.id, err);
+        }
       }
+
+      // Create LP as primary Shepherd
       try {
         await UR.createCareAssignment({
-          memberId: String(memberId),
+          memberId,
           caregiverId: lpId,
           role: 'Shepherd',
           status: 'Active',
-          notes: 'Bulk-assigned via Admin → Maintenance',
+          notes: 'Assigned via Admin → Maintenance (Assign All to LP)',
         });
         created++;
       } catch (err) {
@@ -2396,7 +2435,7 @@ async function _assignAllMembersToLeadPastor(root, btn) {
 
     const failMsg = failed ? ` · ${failed} failed (see console)` : '';
     setStatus(
-      `Done. ${created} created, ${skipped} skipped (already LP / no id / is the LP), of ${checked} members.${failMsg}`,
+      `Done. LP assigned to ${created} members · ${demoted} other assignments demoted to Timothy · ${skipped} already had LP.${failMsg}`,
       failed ? '#b45309' : '#16a34a'
     );
   } catch (err) {

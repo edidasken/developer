@@ -1698,6 +1698,17 @@
     });
   }
 
+  function updateCareAssignment(data) {
+    var id = data.id;
+    if (!id) return Promise.reject('assignment id required');
+    var patch = { updatedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedBy: _userEmail };
+    if (data.role     !== undefined) patch.role     = data.role;
+    if (data.status   !== undefined) patch.status   = data.status;
+    if (data.notes    !== undefined) patch.notes    = data.notes;
+    if (data.caregiverId !== undefined) patch.caregiverId = data.caregiverId;
+    return _careAssignmentsRef().doc(id).update(patch);
+  }
+
   function endCareAssignment(id) {
     if (typeof id === 'object') id = id.id;
     return _careAssignmentsRef().doc(id).update({
@@ -4878,6 +4889,7 @@
     careAssignmentsMyFlock:    careAssignmentsMyFlock,
     createCareAssignment:      createCareAssignment,
     reassignCareAssignment:    reassignCareAssignment,
+    updateCareAssignment:      updateCareAssignment,
     endCareAssignment:         endCareAssignment,
     listCaregivers:            listCaregivers,
 
