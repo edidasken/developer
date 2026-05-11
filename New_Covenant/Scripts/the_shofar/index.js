@@ -209,6 +209,8 @@ function msEnsureStyles() {
         '.ms-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:9999; display:none; align-items:center; justify-content:center; padding:16px; }',
         '.ms-overlay.ms-visible { display:flex; }',
         '.ms-modal { background:#1e293b; border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:24px; width:100%; max-width:640px; max-height:85vh; overflow-y:auto; }',
+        '.ms-modal--fullscreen { max-width:100%; max-height:100%; width:100%; height:100%; border-radius:0; border:none; display:flex; flex-direction:column; padding:20px 24px 16px 24px; }',
+        '.ms-modal--fullscreen .ms-chord-display { flex:1; overflow-y:auto; margin-bottom:0; }',
         '.ms-modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }',
         '.ms-modal-title { margin:0; font-family:Merriweather,serif; font-size:1.3rem; color:#fff; }',
         '.ms-close-btn { background:none; border:none; color:#94a3b8; font-size:1.5rem; cursor:pointer; padding:4px 8px; }',
@@ -804,6 +806,8 @@ function msShowArrangementView(arr) {
     var overlay = document.getElementById('ms-arr-overlay');
     var modal = document.getElementById('ms-arr-modal');
     if (!overlay || !modal) return;
+    modal.classList.add('ms-modal--fullscreen');
+    overlay.style.padding = '0';
 
     var song = musicStandAppState.currentSong;
     var songTitle = song ? song.title : 'Song';
@@ -861,6 +865,8 @@ function msShowArrangementView(arr) {
     document.getElementById('ms-arr-view-close').addEventListener('click', function() {
         overlay.classList.remove('ms-visible');
         overlay.setAttribute('aria-hidden', 'true');
+        modal.classList.remove('ms-modal--fullscreen');
+        overlay.style.padding = '';
     });
 
     document.getElementById('ms-arr-pdf-btn').addEventListener('click', function() {
@@ -1222,10 +1228,13 @@ function msOpenArrEditor(arr) {
 
 function msCloseArrEditor() {
     var overlay = document.getElementById('ms-arr-overlay');
+    var modal = document.getElementById('ms-arr-modal');
     if (overlay) {
         overlay.classList.remove('ms-visible');
         overlay.setAttribute('aria-hidden', 'true');
+        overlay.style.padding = '';
     }
+    if (modal) modal.classList.remove('ms-modal--fullscreen');
 }
 
 async function msSaveArrangement(isEdit) {
