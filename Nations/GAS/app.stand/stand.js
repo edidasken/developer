@@ -17,7 +17,8 @@
    CRUD flows run through The Shofar.
    ══════════════════════════════════════════════════════════════════════════════ */
 
-import { openMusicStandApp } from '../Scripts/the_shofar/index.js';
+// The Shofar is loaded as a plain defer script in music_stand.html
+// and exposes window.openMusicStandApp — no ES module import needed.
 
 /* ── Constants ───────────────────────────────────────────────────────────── */
 const STORE_KEY_PREFS   = 'ms_prefs';
@@ -520,7 +521,7 @@ function _renderSongs(main) {
   main.innerHTML = `<div id="ms-app-container" style="padding:0;"></div>`;
   // Give the DOM a tick to settle, then let The Shofar take over
   requestAnimationFrame(() => {
-    try { openMusicStandApp(); } catch (err) {
+    try { window.openMusicStandApp(); } catch (err) {
       console.error('[MusicStand] The Shofar failed to open:', err);
       main.innerHTML = `
         <div class="ms-view">
