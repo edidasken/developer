@@ -586,6 +586,19 @@ const TheSeason = (() => {
     ];
   }
 
+  function _alertOpts() {
+    return [
+      { value: '',     label: 'No alert' },
+      { value: '5',    label: '5 minutes before' },
+      { value: '10',   label: '10 minutes before' },
+      { value: '15',   label: '15 minutes before' },
+      { value: '30',   label: '30 minutes before' },
+      { value: '60',   label: '1 hour before' },
+      { value: '120',  label: '2 hours before' },
+      { value: '1440', label: '1 day before' },
+    ];
+  }
+
   function _visBadge(vis) {
     var v = String(vis || 'public').toLowerCase();
     if (v === 'public')   return _badge('\uD83C\uDF10 Public',   'success');
@@ -707,6 +720,78 @@ const TheSeason = (() => {
 
     return instances.length > 0 ? instances : [];
   }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // BROWSER ALERT / NOTIFICATION SYSTEM
+  // ═══════════════════════════════════════════════════════════════════════
+
+  var _alertIntervalId = null;
+  var _ALERTS_FIRED_KEY = 'flock_alerts_fired_';
+
+  function _alertFiredKey() {
+    return _ALERTS_FIRED_KEY + new Date().toISOString().substring(0, 10);
+  }
+
+  function _alertGetFired() {
+    try { return JSON.parse(localStorage.getItem(_alertFiredKey()) || '[]'); } catch (_) { return []; }
+  }
+
+  function _alertMarkFired(key) {
+    var fired = _alertGetFired();
+    if (fired.indexOf(key) < 0) {
+      fired.push(key);
+      localStorage.setItem(_alertFiredKey(), JSON.stringify(fired));
+    }
+  }
+
+  function _alertFire(ev, mins) {
+    var minsLabel = mins >= 1440
+      ? '1 day'
+      : mins >= 60 ? (mins / 60) + ' hour' + (mins / 60 > 1 ? 's' : '')
+      : mins + ' min';
+    var body = 'In ' + minsLabel + ': ' + (ev.title || 'Event')
+      + (ev.time ? ' at ' + _fmtTime12(ev.time) : '')
+      + (ev.location ? ' · ' + ev.location : '');
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      try { new Notification('\uD83D\uDCC5 FlockOS Reminder', { body: body, icon: '/favicon.ico' }); } catch (_) {}
+    }
+    _toast('\u23F0 ' + body, 'info');
+  }
+
+  function _alertCheck() {
+    if (!_calEvents || !_calEvents.length) return;
+    var now = new Date();
+    var fired = _alertGetFired();
+    _calEvents.forEach(function(ev) {
+      if (!ev.alertMinutes || !ev.date || !ev.time) return;
+      var alertMins = parseInt(ev.alertMinutes, 10);
+      if (!alertMins) return;
+      var eventDt = _calParse(ev.date + 'T' + ev.time);
+      if (!eventDt) return;
+      var alertTime = new Date(eventDt.getTime() - alertMins * 60000);
+      var alertKey = String(ev.id || ev.title) + '_' + ev.date + '_' + ev.time + '_' + alertMins;
+      var diff = now.getTime() - alertTime.getTime();
+      // Fire if we're within the last 60 s of the alert time and haven't fired yet
+      if (diff >= 0 && diff < 60000 && fired.indexOf(alertKey) < 0) {
+        _alertMarkFired(alertKey);
+        _alertFire(ev, alertMins);
+      }
+    });
+  }
+
+  function _alertRequestPermission() {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission().catch(function() {});
+    }
+  }
+
+  function _alertStart() {
+    _alertRequestPermission();
+    if (_alertIntervalId) return;
+    _alertCheck(); // run once immediately
+    _alertIntervalId = setInterval(_alertCheck, 60000);
+  }
+
 
   function _nthWeekday(year, month, ordinal, dayTarget) {
     if (ordinal === 'Last') {
@@ -912,6 +997,8 @@ const TheSeason = (() => {
     // ── 3b. Personal calendar events ─────────────────────────────────────
     if (calRes) {
       _rows(calRes).forEach(function(r) {
+        var vis = r.Visibility || 'private'; // personal events default to private
+        if (!_canSeeVis(vis, r.CreatedBy)) return;
         var startDt = r.StartDateTime || '';
         var endDt = r.EndDateTime || '';
         var dPart = startDt.substring(0, 10);
@@ -925,11 +1012,12 @@ const TheSeason = (() => {
           endTime: ePart,
           location: r.Location || '',
           type: '_personal',
-          visibility: r.Visibility || 'public',
+          visibility: vis,
           status: '',
           description: r.Description || '',
           recurring: r.RecurrenceRule || 'None',
-          recurringUntil: '',
+          recurringUntil: r.RecurringUntil || '',
+          alertMinutes: r.AlertMinutes || '',
           createdBy: r.CreatedBy || '',
           color: r.Color || '',
           attendees: r.Attendees || '',
@@ -998,6 +1086,7 @@ const TheSeason = (() => {
 
     _calEvents = expanded;
     _calLoadedAt = Date.now();
+    _alertStart();
   }
 
 
@@ -1309,6 +1398,13 @@ const TheSeason = (() => {
     if (ev.visibility && ev.visibility !== 'public') html += _visBadge(ev.visibility);
     html += '</div>';
 
+    var alertLabel = '';
+    if (ev.alertMinutes) {
+      var _am = parseInt(ev.alertMinutes, 10);
+      alertLabel = _am >= 1440 ? '1 day before'
+        : _am >= 60 ? (_am / 60) + ' hour' + (_am / 60 > 1 ? 's' : '') + ' before'
+        : _am + ' min before';
+    }
     var detailRows = [
       ['\uD83D\uDCC5', 'Date', ev.date],
       ['\uD83D\uDD52', 'Time', ev.time ? _fmtTime12(ev.time) + (ev.endTime ? ' \u2013 ' + _fmtTime12(ev.endTime) : '') : 'All Day'],
@@ -1316,6 +1412,7 @@ const TheSeason = (() => {
       ['\uD83C\uDFF7\uFE0F', 'Type', ev.type === '_service' ? 'Service Plan' : ev.type === '_ical' ? 'External' : ev.type],
       ['\uD83D\uDCE1', 'Source', ev.source],
       ['\uD83D\uDCCB', 'Status', ev.status],
+      ['\u23F0', 'Alert', alertLabel],
     ];
     detailRows.forEach(function(r) {
       if (r[2]) {
@@ -1466,18 +1563,21 @@ const TheSeason = (() => {
 
   function calNewPersonal() {
     var prefill = _calFmt(_calDate);
+    var myEmail = (_session && _session.email) ? _session.email : '';
     _modal('New Personal Event', [
-      { name: 'Title',    label: 'Title',    required: true },
-      { name: 'startDate', label: 'Date',    type: 'date', required: true, value: prefill },
-      { name: 'startTime', label: 'Start Time', type: 'time' },
-      { name: 'endTime',   label: 'End Time',   type: 'time' },
-      { name: 'Location',  label: 'Location' },
-      { name: 'Description', label: 'Description', type: 'textarea' },
-      { name: 'Color',     label: 'Color', type: 'color', value: '#6366f1' },
-      { name: 'IsAllDay',  label: 'All Day', type: 'select',
+      { name: 'Title',         label: 'Title',        required: true },
+      { name: 'startDate',     label: 'Date',         type: 'date', required: true, value: prefill },
+      { name: 'startTime',     label: 'Start Time',   type: 'time' },
+      { name: 'endTime',       label: 'End Time',     type: 'time' },
+      { name: 'Location',      label: 'Location' },
+      { name: 'Description',   label: 'Description',  type: 'textarea' },
+      { name: 'Color',         label: 'Color',        type: 'color', value: '#6366f1' },
+      { name: 'IsAllDay',      label: 'All Day',      type: 'select',
         options: [{ value: 'false', label: 'No' }, { value: 'true', label: 'Yes' }] },
-      { name: 'RecurrenceRule', label: 'Recurring', type: 'select', options: _recurOpts() },
-      { name: 'Visibility',    label: 'Visibility', type: 'select', options: _visibilityOpts() },
+      { name: 'RecurrenceRule', label: 'Recurring',   type: 'select', options: _recurOpts() },
+      { name: 'RecurringUntil', label: 'Repeat Until', type: 'date' },
+      { name: 'AlertMinutes',  label: 'Alert',        type: 'select', options: _alertOpts() },
+      { name: 'Visibility',    label: 'Visibility',   type: 'select', options: _visibilityOpts(), value: 'private' },
     ], async function(data) {
       var start = data.startDate + (data.startTime ? 'T' + data.startTime : '');
       var end   = data.startDate + (data.endTime   ? 'T' + data.endTime   : '');
@@ -1485,7 +1585,11 @@ const TheSeason = (() => {
         Title: data.Title, StartDateTime: start, EndDateTime: end,
         Location: data.Location, Description: data.Description,
         Color: data.Color, IsAllDay: data.IsAllDay === 'true',
-        RecurrenceRule: data.RecurrenceRule, Visibility: data.Visibility,
+        RecurrenceRule: data.RecurrenceRule,
+        RecurringUntil: data.RecurringUntil || '',
+        AlertMinutes: data.AlertMinutes || '',
+        Visibility: data.Visibility || 'private',
+        CreatedBy: myEmail,
       };
       if (_isFB()) { await UpperRoom.createCalendarEvent(calData); }
       else { await TheVine.flock.call('calendar.create', calData); }
@@ -1511,19 +1615,22 @@ const TheSeason = (() => {
     var startDt = ev.StartDateTime || '';
     var endDt   = ev.EndDateTime   || '';
 
+    var myEmail = (_session && _session.email) ? _session.email : (ev.CreatedBy || '');
     _modal('Edit Personal Event', [
-      { name: 'Title',    label: 'Title',    required: true, value: ev.Title || '' },
-      { name: 'startDate', label: 'Date',    type: 'date', required: true, value: startDt.substring(0, 10) },
-      { name: 'startTime', label: 'Start Time', type: 'time', value: ev.IsAllDay ? '' : startDt.substring(11, 16) },
-      { name: 'endTime',   label: 'End Time',   type: 'time', value: ev.IsAllDay ? '' : endDt.substring(11, 16) },
-      { name: 'Location',  label: 'Location', value: ev.Location || '' },
-      { name: 'Description', label: 'Description', type: 'textarea', value: ev.Description || '' },
-      { name: 'Color',     label: 'Color', type: 'color', value: ev.Color || '#6366f1' },
-      { name: 'IsAllDay',  label: 'All Day', type: 'select',
+      { name: 'Title',         label: 'Title',        required: true, value: ev.Title || '' },
+      { name: 'startDate',     label: 'Date',         type: 'date', required: true, value: startDt.substring(0, 10) },
+      { name: 'startTime',     label: 'Start Time',   type: 'time', value: ev.IsAllDay ? '' : startDt.substring(11, 16) },
+      { name: 'endTime',       label: 'End Time',     type: 'time', value: ev.IsAllDay ? '' : endDt.substring(11, 16) },
+      { name: 'Location',      label: 'Location',     value: ev.Location || '' },
+      { name: 'Description',   label: 'Description',  type: 'textarea', value: ev.Description || '' },
+      { name: 'Color',         label: 'Color',        type: 'color', value: ev.Color || '#6366f1' },
+      { name: 'IsAllDay',      label: 'All Day',      type: 'select',
         options: [{ value: 'false', label: 'No' }, { value: 'true', label: 'Yes' }],
         value: ev.IsAllDay ? 'true' : 'false' },
-      { name: 'RecurrenceRule', label: 'Recurring', type: 'select', options: _recurOpts(), value: ev.RecurrenceRule || 'None' },
-      { name: 'Visibility',    label: 'Visibility', type: 'select', options: _visibilityOpts(), value: ev.Visibility || 'public' },
+      { name: 'RecurrenceRule', label: 'Recurring',   type: 'select', options: _recurOpts(), value: ev.RecurrenceRule || 'None' },
+      { name: 'RecurringUntil', label: 'Repeat Until', type: 'date', value: (ev.RecurringUntil || '').substring(0, 10) },
+      { name: 'AlertMinutes',  label: 'Alert',        type: 'select', options: _alertOpts(), value: ev.AlertMinutes || '' },
+      { name: 'Visibility',    label: 'Visibility',   type: 'select', options: _visibilityOpts(), value: ev.Visibility || 'private' },
     ], async function(data) {
       var start = data.startDate + (data.startTime ? 'T' + data.startTime : '');
       var end   = data.startDate + (data.endTime   ? 'T' + data.endTime   : '');
@@ -1532,7 +1639,11 @@ const TheSeason = (() => {
         Title: data.Title, StartDateTime: start, EndDateTime: end,
         Location: data.Location, Description: data.Description,
         Color: data.Color, IsAllDay: data.IsAllDay === 'true',
-        RecurrenceRule: data.RecurrenceRule, Visibility: data.Visibility,
+        RecurrenceRule: data.RecurrenceRule,
+        RecurringUntil: data.RecurringUntil || '',
+        AlertMinutes: data.AlertMinutes || '',
+        Visibility: data.Visibility || 'private',
+        CreatedBy: myEmail,
       };
       if (_isFB()) { await UpperRoom.updateCalendarEvent(calUpdate); }
       else { await TheVine.flock.call('calendar.update', calUpdate); }
@@ -2576,6 +2687,10 @@ const TheSeason = (() => {
     // Check-in
     openCheckinSession,
     closeCheckinSession,
+
+    // Alerts
+    _alertStart,
+    _alertRequestPermission,
   };
 
 })();
