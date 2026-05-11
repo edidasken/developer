@@ -290,7 +290,7 @@ function msResolveChordContent(song, arr, extraSemitones) {
     return null;
 }
 
-export function openMusicStandApp() {
+function openMusicStandApp() {
     msEnsureStyles();
 
     // If songs already warm, just re-render without refetching
