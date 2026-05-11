@@ -208,12 +208,12 @@ function msEnsureStyles() {
         /* Overlay / Modal */
         '.ms-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); z-index:9999; display:none; align-items:center; justify-content:center; padding:16px; }',
         '.ms-overlay.ms-visible { display:flex; }',
-        '.ms-modal { background:#ffffff; border:1px solid rgba(0,0,0,0.10); border-radius:18px; padding:24px; width:100%; max-width:640px; max-height:85vh; overflow-y:auto; color:#111827; }',
-        '.ms-modal--fullscreen { max-width:100%; max-height:100%; width:100%; height:100%; border-radius:0; border:none; display:flex; flex-direction:column; padding:20px 24px 16px 24px; }',
+        '.ms-modal { background:#ffffff; border:1px solid rgba(0,0,0,0.10); border-radius:18px; padding:18px 20px; width:100%; max-width:640px; max-height:85vh; overflow-y:auto; color:#111827; }',
+        '.ms-modal--fullscreen { max-width:100%; max-height:100%; width:100%; height:100%; border-radius:0; border:none; display:flex; flex-direction:column; padding:12px 18px 10px 18px; }',
         '.ms-modal--fullscreen .ms-chord-display { flex:1; overflow-y:auto; margin-bottom:0; }',
-        '.ms-modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }',
-        '.ms-modal-title { margin:0; font-family:Merriweather,serif; font-size:1.3rem; color:#111827; }',
-        '.ms-close-btn { background:none; border:none; color:#6b7280; font-size:1.5rem; cursor:pointer; padding:4px 8px; }',
+        '.ms-modal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; gap:8px; }',
+        '.ms-modal-title { margin:0; font-family:Merriweather,serif; font-size:1.05rem; color:#111827; }',
+        '.ms-close-btn { background:none; border:none; color:#6b7280; font-size:1.2rem; cursor:pointer; padding:0 4px; }',
         '.ms-close-btn:hover { color:#111827; }',
 
         /* Music Stand full-screen view */
@@ -221,7 +221,17 @@ function msEnsureStyles() {
         '.ms-stand-header { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.12); margin-bottom:16px; }',
         '.ms-stand-song-title { font-family:Merriweather,serif; font-size:1.8rem; color:#fff; margin:0; }',
         '.ms-stand-meta { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; }',
-        '.ms-stand-badge { background:rgba(0,0,0,0.07); color:#374151; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:700; border:1px solid rgba(0,0,0,0.10); }',
+        /* slim badge — used inside the compact toolbar */
+        '.ms-stand-badge { display:inline-flex; align-items:center; background:rgba(0,0,0,0.07); color:#374151; padding:3px 9px; border-radius:20px; font-size:0.78rem; font-weight:600; border:1px solid rgba(0,0,0,0.08); white-space:nowrap; line-height:1.4; }',
+        /* toolbar row containing badges + transpose */
+        '.ms-av-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:5px; padding:6px 0 8px 0; border-bottom:1px solid rgba(0,0,0,0.07); margin-bottom:10px; }',
+        '.ms-av-divider { width:1px; height:18px; background:rgba(0,0,0,0.15); margin:0 3px; flex-shrink:0; }',
+        /* compact transpose pill buttons */
+        '.ms-xp-btn { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:6px; border:1px solid rgba(0,0,0,0.15); background:#f3f4f6; color:#374151; font-size:1rem; font-weight:700; cursor:pointer; line-height:1; transition:background 0.12s; flex-shrink:0; padding:0; }',
+        '.ms-xp-btn:hover { background:#e5e7eb; }',
+        '.ms-xp-reset { font-size:0.9rem; }',
+        /* key select inside toolbar — override ms-input sizing */
+        '#ms-av-key,#ms-sv-key { height:28px !important; min-width:0 !important; width:auto !important; padding:0 6px !important; border-radius:6px !important; border:1px solid rgba(0,0,0,0.15) !important; background:#f3f4f6 !important; color:#374151 !important; font-size:0.85rem !important; font-weight:700 !important; cursor:pointer !important; }',
 
         /* ── ChordPro rendered output ── */
         '.ms-chord-display { background:rgba(0,0,0,0.2); border-radius:12px; padding:24px 28px; margin-bottom:0; overflow-y:auto; }',
@@ -842,24 +852,27 @@ function msShowArrangementView(arr) {
 
     // Build the modal once — only chord content and key badge are updated on transpose
     modal.innerHTML =
+        /* compact header */
         '<div class="ms-modal-header" style="flex-shrink:0;">' +
-            '<div>' +
-                '<h3 class="ms-modal-title">' + msEscapeHtml(songTitle) + '</h3>' +
-                (artistStr ? '<div style="color:#94a3b8;font-size:0.85rem;margin-top:2px;">' + msEscapeHtml(artistStr) + '</div>' : '') +
+            '<div style="min-width:0;">' +
+                '<h3 class="ms-modal-title" style="font-size:1.05rem;">' + msEscapeHtml(songTitle) + '</h3>' +
+                (artistStr ? '<div style="color:#6b7280;font-size:0.78rem;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + msEscapeHtml(artistStr) + '</div>' : '') +
             '</div>' +
-            '<button class="ms-close-btn" id="ms-arr-view-close">&times;</button>' +
+            '<button class="ms-close-btn" id="ms-arr-view-close" style="font-size:1.2rem;padding:0 4px;">&times;</button>' +
         '</div>' +
-        '<div class="ms-stand-meta" style="flex-shrink:0;">' +
-            '<span class="ms-stand-badge" id="ms-av-key-badge">&#127929; ' + msEscapeHtml(initKey) + '</span>' +
-            (capoFret ? '<span class="ms-stand-badge">Capo ' + capoFret + ' \u2192 ' + msEscapeHtml(initSounding) + '</span>' : '') +
-            (tempoVal  ? '<span class="ms-stand-badge">' + msEscapeHtml(tempoVal) + ' BPM</span>' : '') +
+        /* single slim toolbar: badges + transpose inline */
+        '<div class="ms-av-toolbar" style="flex-shrink:0;">' +
+            '<span class="ms-stand-badge" id="ms-av-key-badge">&#127929;&nbsp;' + msEscapeHtml(initKey) + '</span>' +
+            (capoFret ? '<span class="ms-stand-badge">Capo&nbsp;' + capoFret + '</span>' : '') +
+            (tempoVal  ? '<span class="ms-stand-badge">' + msEscapeHtml(tempoVal) + '&thinsp;BPM</span>' : '') +
             (timeVal   ? '<span class="ms-stand-badge">' + msEscapeHtml(timeVal) + '</span>' : '') +
             '<span class="ms-stand-badge">' + msEscapeHtml(arr.instrument || 'Guitar') + '</span>' +
+            '<span class="ms-av-divider"></span>' +
+            msTransposeControls(originalKey, initKey, capoFret, 'ms-av') +
         '</div>' +
-        '<div style="flex-shrink:0;">' + msTransposeControls(originalKey, initKey, capoFret, 'ms-av') + '</div>' +
         '<div class="ms-chord-display" id="ms-av-chord-content" style="flex:1;">' + buildChordHtml(0) + '</div>' +
-        '<div style="text-align:right; margin-top:10px; flex-shrink:0;">' +
-            '<button class="ms-btn ms-btn-secondary" id="ms-arr-pdf-btn">Export PDF</button>' +
+        '<div style="text-align:right;margin-top:8px;flex-shrink:0;">' +
+            '<button class="ms-btn ms-btn-secondary ms-btn-sm" id="ms-arr-pdf-btn">Export PDF</button>' +
         '</div>';
 
     // Transpose: only update chord content and key badge — no full rebuild
@@ -1682,17 +1695,13 @@ function msKeySelect(id, selected, label) {
 // Transpose controls UI — emits HTML string
 // targetKey: the currently-displayed key; originalKey: the stored arr.key
 function msTransposeControls(originalKey, targetKey, capoFret, idPrefix) {
-    var cap = Number(capoFret) || 0;
-    var soundingKey = cap ? msCapoSoundingKey(targetKey, cap) : targetKey;
     var prefix = idPrefix || 'ms-xp';
-    return '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:var(--accent-soft);border:1px solid var(--line-strong);border-radius:10px;">' +
-        '<span style="color:var(--ink-muted);font-size:0.82rem;font-weight:700;text-transform:uppercase;white-space:nowrap;">Transpose</span>' +
-        '<button class="ms-btn ms-btn-secondary ms-btn-sm" id="' + prefix + '-down">&#x2212; Semitone</button>' +
-        '<button class="ms-btn ms-btn-secondary ms-btn-sm" id="' + prefix + '-up">+ Semitone</button>' +
-        msKeySelect(prefix + '-key', targetKey, 'Jump to key') +
-        '<button class="ms-btn ms-btn-secondary ms-btn-sm" id="' + prefix + '-reset" title="Reset to original key (' + (originalKey||'') + ')">Reset</button>' +
-        (cap ? '<span style="color:var(--accent);font-size:0.85rem;white-space:nowrap;">Capo ' + cap + ' \u2192 sounds like <strong>' + soundingKey + '</strong></span>' : '') +
-    '</div>';
+    // Compact inline: − | key select | + | ↺  (no box, no label, no flex-wrap)
+    return '' +
+        '<button class="ms-xp-btn" id="' + prefix + '-down" title="Down a semitone">&#x2212;</button>' +
+        msKeySelect(prefix + '-key', targetKey, 'Key') +
+        '<button class="ms-xp-btn" id="' + prefix + '-up" title="Up a semitone">+</button>' +
+        '<button class="ms-xp-btn ms-xp-reset" id="' + prefix + '-reset" title="Reset to ' + (originalKey||'original') + '">&#x21ba;</button>';
 }
 
 // Wire up transposition controls after they're in the DOM.
