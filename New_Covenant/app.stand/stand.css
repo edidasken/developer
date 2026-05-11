@@ -827,6 +827,7 @@ html, body {
   .ms-page-hero-actions { width: 100%; }
   .ms-stats-grid { grid-template-columns: repeat(2, 1fr); }
   #ms-live-btn > span { display: none; }
+  #ms-live-btn { min-width: 38px; padding-left: 10px; padding-right: 10px; }
 }
 
 @media (max-width: 480px) {
@@ -834,6 +835,12 @@ html, body {
   .ms-import-source-grid { grid-template-columns: 1fr; }
   .ms-stats-grid { grid-template-columns: repeat(2, 1fr); }
   .ms-song-controls { gap: 8px; }
+  #ms-live-btn { display: none; }
+  .ms-header-logo { display: none; }
+  .ms-header-brand { gap: 8px; }
+  .ms-header-title { font-size: .94rem; }
+  .ms-header-right { gap: 4px; }
+  .ms-btn--account { padding-left: 10px; padding-right: 10px; }
 }
 
 /* ── iPhone / small phone (≤ 430px) ─────────────────────────────────────── */
@@ -848,6 +855,7 @@ html, body {
   /* Song search + add row */
   .ms-song-controls { flex-wrap: wrap; }
   .ms-search-input  { min-width: 0; width: 100%; }
+  .ms-page-hero { display: none; }
 
   /* Song library table → hidden, cards shown */
   .ms-song-table-wrap { display: none !important; }

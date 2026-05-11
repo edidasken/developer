@@ -167,15 +167,15 @@ function msEnsureStyles() {
     var style = document.createElement('style');
     style.id = 'ms-styles';
     style.textContent = [
-        '.ms-app { padding:10px 10px var(--scroll-tail-pad) 10px; color:#e5e7eb; font-family:Inter,sans-serif; }',
-        '.ms-card { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:18px; margin-bottom:14px; }',
-        '.ms-title { margin:0 0 10px 0; font-family:Merriweather,serif; font-size:1.6rem; color:#fff; text-align:center; }',
-        '.ms-subtitle { margin:0 0 6px 0; color:#cbd5e1; font-size:1rem; text-align:center; }',
+        '.ms-app { padding:0 0 var(--scroll-tail-pad) 0; color:#111827; font-family:Inter,sans-serif; }',
+        '.ms-card { background:#ffffff; border:1px solid rgba(0,0,0,0.08); border-radius:14px; padding:18px; margin-bottom:14px; box-shadow:0 10px 24px rgba(15,23,42,0.04); }',
+        '.ms-title { margin:0 0 8px 0; font-family:Merriweather,serif; font-size:1.55rem; color:#111827; text-align:center; }',
+        '.ms-subtitle { margin:0; color:#6b7280; font-size:0.96rem; text-align:center; }',
 
         /* Tabs */
-        '.ms-tabs { display:flex; gap:0; border-bottom:1px solid rgba(255,255,255,0.12); margin-bottom:16px; }',
+        '.ms-tabs { display:flex; gap:0; border-bottom:1px solid rgba(0,0,0,0.08); margin-bottom:18px; }',
         '.ms-tab-btn { flex:1; padding:14px 8px; background:transparent; color:#94a3b8; border:none; border-bottom:2px solid transparent; font-weight:700; font-size:1rem; cursor:pointer; transition:all 0.2s; font-family:Inter,sans-serif; }',
-        '.ms-tab-btn.ms-active { color:#22d3ee; border-bottom-color:#22d3ee; background:rgba(255,255,255,0.05); }',
+        '.ms-tab-btn.ms-active { color:#c97d10; border-bottom-color:#c97d10; background:rgba(201,125,16,0.05); }',
 
         /* Table */
         '.ms-table { width:100%; border-collapse:collapse; font-size:0.92rem; }',
@@ -282,6 +282,12 @@ function msEnsureStyles() {
         '@media (min-width:768px) { .ms-cp-song { column-count:2; } }',
         /* ── MOBILE (≤ 640px) ── */
         '@media (max-width:640px) {',
+        '  .ms-card { padding:14px 16px; }',
+        '  .ms-title { font-size:1.35rem; }',
+        '  .ms-subtitle { font-size:0.88rem; line-height:1.45; }',
+        '  .ms-search-bar { display:grid; grid-template-columns:1fr 1fr; gap:10px; }',
+        '  .ms-search-input { grid-column:1 / -1; min-width:0; }',
+        '  #ms-import-song-btn, #ms-add-song-btn { width:100%; justify-content:center; }',
         '  .ms-song-table-wrap { display:none; }',
         '  .ms-song-cards { display:block; }',
         '  .ms-cp-song { column-count:1; font-size:0.92rem; }',
@@ -293,6 +299,10 @@ function msEnsureStyles() {
         '  .ms-modal-title { font-size:0.95rem !important; }',
         '  .ms-xp-btn { width:32px; height:32px; }',
         '  .ms-stand-badge { font-size:0.72rem; padding:2px 7px; }',
+        '  .ms-song-card { gap:8px; }',
+        '  .ms-song-card-title { font-size:0.92rem; }',
+        '  .ms-song-card-actions { gap:5px; }',
+        '  .ms-song-card-play { padding:8px 12px !important; }',
         '}',
         /* Print / PDF */
         '@media print { .ms-cp-song { column-count:2; color:#000; } .ms-cp-chord { color:#cc0000; } .ms-cp-word { color:#000; } .ms-cp-section-label { color:#555; } }',
