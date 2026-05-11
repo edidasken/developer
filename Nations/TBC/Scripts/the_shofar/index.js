@@ -224,26 +224,33 @@ function msEnsureStyles() {
         '.ms-stand-badge { background:rgba(34,211,238,0.15); color:#22d3ee; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:700; }',
 
         /* ── ChordPro rendered output ── */
-        '.ms-chord-display { background:rgba(0,0,0,0.25); border-radius:12px; padding:20px 24px; margin-bottom:16px; }',
-        '.ms-cp-song { font-family:"Plus Jakarta Sans",system-ui,sans-serif; font-size:1rem; line-height:1.4; color:#e2e8f0; }',
-        '.ms-cp-title { font-size:1.4rem; font-weight:800; color:#fff; margin:0 0 4px 0; }',
-        '.ms-cp-subtitle { font-size:0.95rem; color:#94a3b8; margin:0 0 20px 0; }',
-        '.ms-cp-section-label { font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.1em; padding:2px 0 2px 10px; border-left:3px solid; margin:20px 0 10px 0; }',
-        '.ms-cp-section { margin-bottom:4px; }',
-        '.ms-cp-spacer { height:18px; }',
+        '.ms-chord-display { background:rgba(0,0,0,0.2); border-radius:12px; padding:24px 28px; margin-bottom:0; overflow-y:auto; }',
+        /* Two-column layout — sections flow left-to-right like Planning Center */
+        '.ms-cp-song { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.97rem; line-height:1.3; color:#e2e8f0; column-count:2; column-gap:48px; }',
+        '.ms-cp-title { font-size:1.2rem; font-weight:800; color:#fff; margin:0 0 2px 0; column-span:all; }',
+        '.ms-cp-subtitle { font-size:0.85rem; color:#94a3b8; margin:0 0 16px 0; column-span:all; }',
+        /* Clean section label — bold uppercase, no border gimmick */
+        '.ms-cp-section-label { font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8; margin:0 0 6px 0; padding:0; border:none; }',
+        /* Each section stays together — never split across columns */
+        '.ms-cp-section { break-inside:avoid; page-break-inside:avoid; margin-bottom:22px; }',
+        '.ms-cp-spacer { height:10px; }',
         /* Each line = flex row of chord+lyric pairs */
-        '.ms-cp-row { display:flex; flex-wrap:wrap; align-items:flex-end; gap:0; margin-bottom:2px; }',
-        '.ms-cp-pair { display:inline-flex; flex-direction:column; align-items:flex-start; margin-right:2px; }',
-        '.ms-cp-chord { font-family:"JetBrains Mono","Courier New",monospace; font-size:0.82rem; font-weight:700; color:#38bdf8; line-height:1.2; min-height:1.2em; white-space:pre; padding-right:4px; }',
+        '.ms-cp-row { display:flex; flex-wrap:wrap; align-items:flex-end; gap:0; margin-bottom:1px; }',
+        '.ms-cp-pair { display:inline-flex; flex-direction:column; align-items:flex-start; }',
+        '.ms-cp-chord { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.82rem; font-weight:800; color:#f87171; line-height:1.3; min-height:1.3em; white-space:pre; padding-right:6px; }',
         '.ms-cp-chord--empty { color:transparent; }',
-        '.ms-cp-word { font-size:1.05rem; color:#e2e8f0; white-space:pre; line-height:1.5; }',
+        '.ms-cp-word { font-size:0.97rem; color:#e2e8f0; white-space:pre; line-height:1.5; }',
         '.ms-cp-word--space { color:transparent; }',
-        '.ms-cp-lyric-only { font-size:1.05rem; color:#e2e8f0; line-height:1.8; padding-left:2px; }',
+        '.ms-cp-lyric-only { font-size:0.97rem; color:#e2e8f0; line-height:1.7; }',
 
-        '.ms-chord-line { color:#22d3ee; font-weight:700; }',
+        '.ms-chord-line { color:#f87171; font-weight:700; }',
         '.ms-lyric-line { color:#e5e7eb; }',
         '.ms-stand-nav { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-top:1px solid rgba(255,255,255,0.12); }',
         '.ms-stand-counter { color:#94a3b8; font-size:0.9rem; }',
+        /* Single column on small screens */
+        '@media (max-width:700px) { .ms-cp-song { column-count:1; } }',
+        /* Print / PDF */
+        '@media print { .ms-cp-song { column-count:2; color:#000; } .ms-cp-chord { color:#cc0000; } .ms-cp-word { color:#000; } .ms-cp-section-label { color:#555; } }',
 
         /* Arrangement card */
         '.ms-arr-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; }',
@@ -825,20 +832,33 @@ function msShowArrangementView(arr) {
     var initKey = originalKey;
     var initSounding = capoFret ? msCapoSoundingKey(initKey, capoFret) : initKey;
 
+    // Extract tempo/time/artist from notes or song fields if present
+    var notesStr = arr.notes || '';
+    var tempoMatch = notesStr.match(/Tempo:\s*(\d+)\s*BPM/i);
+    var timeMatch  = notesStr.match(/Time:\s*([\d\/]+)/i);
+    var artistStr  = (song && song.artist) || '';
+    var tempoVal   = tempoMatch ? tempoMatch[1] : (arr.tempo || '');
+    var timeVal    = timeMatch  ? timeMatch[1]  : (arr.time  || '');
+
     // Build the modal once — only chord content and key badge are updated on transpose
     modal.innerHTML =
-        '<div class="ms-modal-header">' +
-            '<h3 class="ms-modal-title">' + msEscapeHtml(songTitle) + ' \u2014 ' + msEscapeHtml(arr.name) + '</h3>' +
+        '<div class="ms-modal-header" style="flex-shrink:0;">' +
+            '<div>' +
+                '<h3 class="ms-modal-title">' + msEscapeHtml(songTitle) + '</h3>' +
+                (artistStr ? '<div style="color:#94a3b8;font-size:0.85rem;margin-top:2px;">' + msEscapeHtml(artistStr) + '</div>' : '') +
+            '</div>' +
             '<button class="ms-close-btn" id="ms-arr-view-close">&times;</button>' +
         '</div>' +
-        '<div class="ms-stand-meta">' +
-            '<span class="ms-stand-badge" id="ms-av-key-badge">Key: ' + msEscapeHtml(initKey) + '</span>' +
-            (capoFret ? '<span class="ms-stand-badge">Capo ' + capoFret + ' \u2192 sounds: <span id="ms-av-sounding-key">' + msEscapeHtml(initSounding) + '</span></span>' : '') +
+        '<div class="ms-stand-meta" style="flex-shrink:0;">' +
+            '<span class="ms-stand-badge" id="ms-av-key-badge">&#127929; ' + msEscapeHtml(initKey) + '</span>' +
+            (capoFret ? '<span class="ms-stand-badge">Capo ' + capoFret + ' \u2192 ' + msEscapeHtml(initSounding) + '</span>' : '') +
+            (tempoVal  ? '<span class="ms-stand-badge">' + msEscapeHtml(tempoVal) + ' BPM</span>' : '') +
+            (timeVal   ? '<span class="ms-stand-badge">' + msEscapeHtml(timeVal) + '</span>' : '') +
             '<span class="ms-stand-badge">' + msEscapeHtml(arr.instrument || 'Guitar') + '</span>' +
         '</div>' +
-        msTransposeControls(originalKey, initKey, capoFret, 'ms-av') +
-        '<div class="ms-chord-display" id="ms-av-chord-content">' + buildChordHtml(0) + '</div>' +
-        '<div style="text-align:right; margin-top:12px;">' +
+        '<div style="flex-shrink:0;">' + msTransposeControls(originalKey, initKey, capoFret, 'ms-av') + '</div>' +
+        '<div class="ms-chord-display" id="ms-av-chord-content" style="flex:1;">' + buildChordHtml(0) + '</div>' +
+        '<div style="text-align:right; margin-top:10px; flex-shrink:0;">' +
             '<button class="ms-btn ms-btn-secondary" id="ms-arr-pdf-btn">Export PDF</button>' +
         '</div>';
 
@@ -852,13 +872,8 @@ function msShowArrangementView(arr) {
 
         var keyBadge = document.getElementById('ms-av-key-badge');
         if (keyBadge) {
-            keyBadge.innerHTML = 'Key: ' + msEscapeHtml(newKey) +
+            keyBadge.innerHTML = '&#127929; ' + msEscapeHtml(newKey) +
                 (newSemitones !== 0 ? ' <span style="color:#94a3b8;font-size:0.8em;">(orig: ' + msEscapeHtml(originalKey) + ')</span>' : '');
-        }
-
-        if (capoFret) {
-            var soundingSpan = document.getElementById('ms-av-sounding-key');
-            if (soundingSpan) soundingSpan.textContent = msCapoSoundingKey(newKey, capoFret);
         }
     });
 
@@ -1848,37 +1863,26 @@ function msRenderChordPro(text) {
             var sName = sectionStart[1] || sectionStart[2] || 'Section';
             var sNum  = sectionStart[3] ? ' ' + sectionStart[3].trim() : '';
             var sLabel = sName.charAt(0).toUpperCase() + sName.slice(1).toLowerCase() + sNum;
-            var sCol = sectionColor(sName);
-            html += '<div class="ms-cp-section-label" style="color:' + sCol + '; border-left-color:' + sCol + ';">' + msEscapeHtml(sLabel) + '</div>';
+            html += '<div class="ms-cp-section-label">' + msEscapeHtml(sLabel) + '</div>';
             continue;
         }
 
         // Section end directives
         if (/^\{end_of_\w+\}$/i.test(line)) { closeSection(); continue; }
 
-        // {title:}, {t:}
+        // {title:}, {t:} — skip, shown in modal header
         var titleMatch = line.match(/^\{(?:title|t):\s*(.+)\}$/i);
-        if (titleMatch) {
-            closeSection();
-            html += '<div class="ms-cp-title">' + msEscapeHtml(titleMatch[1]) + '</div>';
-            continue;
-        }
+        if (titleMatch) { continue; }
 
-        // {subtitle:}, {st:}, {artist:}
+        // {subtitle:}, {st:}, {artist:} — skip, shown in modal header
         var subMatch = line.match(/^\{(?:subtitle|st|artist):\s*(.+)\}$/i);
-        if (subMatch) {
-            closeSection();
-            html += '<div class="ms-cp-subtitle">' + msEscapeHtml(subMatch[1]) + '</div>';
-            continue;
-        }
+        if (subMatch) { continue; }
 
-        // {comment:}, {c:}, {ci:}  — section label style
+        // {comment:}, {c:}, {ci:}  — plain section label
         var commentMatch = line.match(/^\{(?:comment|c|ci|cb):\s*(.+)\}$/i);
         if (commentMatch) {
             closeSection();
-            var cName = commentMatch[1].trim();
-            var cCol  = sectionColor(cName);
-            html += '<div class="ms-cp-section-label" style="color:' + cCol + '; border-left-color:' + cCol + ';">' + msEscapeHtml(cName) + '</div>';
+            html += '<div class="ms-cp-section-label">' + msEscapeHtml(commentMatch[1].trim()) + '</div>';
             continue;
         }
 
