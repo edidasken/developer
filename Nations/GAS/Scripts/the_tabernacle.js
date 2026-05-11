@@ -4703,6 +4703,16 @@ const Modules = (() => {
       + label + '</button>';
   }
 
+  _def('psalms', async el => {
+    if (typeof TheWay !== 'undefined' && TheWay.renderHub) {
+      await TheWay.renderHub(el, typeof Nehemiah !== 'undefined' && Nehemiah.getSession ? Nehemiah.getSession() : {});
+      if (TheWay.switchTab) TheWay.switchTab('psalms');
+      return;
+    }
+    _shell(el, 'Psalms', 'Browse all 150 psalms by theme or number.', '');
+    _body(el, _empty('\uD83C\uDFB5', 'Psalms unavailable', 'The Learning Hub module could not be loaded.'));
+  });
+
   _def('learning', async el => {
     if (typeof TheWay !== 'undefined' && TheWay.renderHub) {
       if (TheWay.resetHome) TheWay.resetHome();
