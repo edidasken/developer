@@ -838,11 +838,11 @@ html, body {
 
 /* ── iPhone / small phone (≤ 430px) ─────────────────────────────────────── */
 @media (max-width: 430px) {
-  /* Main view padding */
-  .ms-view { padding: 12px 10px; }
+  /* Main view padding — 16px sides so content breathes away from screen edge */
+  .ms-view { padding: 16px; }
 
   /* Header — hide account name text, keep icon; tighter padding */
-  .ms-header { padding-left: 10px; padding-right: 10px; }
+  .ms-header { padding-left: 14px; padding-right: 14px; }
   #ms-account-name { display: none; }
 
   /* Song search + add row */
