@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Resolve all relative paths from the parent New_Covenant/ directory -->
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <title>Music Stand — FlockOS</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="app.stand/manifest.json">
+  <link rel="icon" type="image/png" href="Images/stand.png">
+  <link rel="apple-touch-icon" href="Images/stand.png">
+  <meta name="theme-color" content="#e8a838">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Music Stand">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- SEO -->
+  <meta name="description" content="FlockOS Music Stand — the worship team's complete digital music stand. Song library, service plans, live presenter, key transposition, Nashville Number System, chord diagrams, and imports from CCLI SongSelect and Planning Center.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Firebase preconnect -->
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+  <link rel="preconnect" href="https://securetoken.googleapis.com">
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com">
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="app.stand/stand.css">
+
+  <!-- Flash prevention + base vars -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ms-bg:     #0c1118;
+      --ms-ink:    #e8eaf0;
+      --ms-gold:   #e8a838;
+    }
+    html, body {
+      height: 100%;
+      background: var(--ms-bg);
+      color: var(--ms-ink);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+    /* Boot splash */
+    #ms-boot {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+      background: #0c1118;
+    }
+    .ms-boot-icon { font-size: 3rem; animation: ms-pulse 1.2s ease-in-out infinite; }
+    .ms-boot-label { color: #e8a838; font-size: .9rem; letter-spacing: .08em; }
+    @keyframes ms-pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+  </style>
+</head>
+<body>
+
+  <!-- Boot splash (hidden once app mounts) -->
+  <div id="ms-boot">
+    <div class="ms-boot-icon">🎵</div>
+    <div class="ms-boot-label">MUSIC STAND</div>
+  </div>
+
+  <!-- Auth overlay (populated by stand.js when user is not signed in) -->
+  <div id="ms-auth-overlay" hidden></div>
+
+  <!-- App root -->
+  <div id="ms-app" hidden>
+    <!-- Header -->
+    <header class="ms-header" id="ms-header">
+      <div class="ms-header-brand">
+        <button class="ms-menu-toggle" id="ms-menu-toggle" aria-label="Toggle menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M3 6h18M3 12h18M3 18h18"/>
+          </svg>
+        </button>
+        <span class="ms-header-logo">🎵</span>
+        <span class="ms-header-title">Music Stand</span>
+      </div>
+      <div class="ms-header-tools" id="ms-header-tools">
+        <!-- populated by stand.js per-view -->
+      </div>
+      <div class="ms-header-right">
+        <button class="ms-btn ms-btn--ghost ms-btn--sm" id="ms-live-btn" title="Enter live presenter mode">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+          <span>Live</span>
+        </button>
+        <button class="ms-btn ms-btn--ghost ms-btn--icon" id="ms-settings-btn" title="Settings">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <button class="ms-btn ms-btn--ghost ms-btn--sm ms-btn--account" id="ms-account-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="ms-account-name">Account</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Body: sidebar + main -->
+    <div class="ms-body">
+      <!-- Sidebar nav -->
+      <nav class="ms-sidebar" id="ms-sidebar" aria-label="Music Stand navigation">
+        <div class="ms-nav-section">
+          <button class="ms-nav-item" data-view="dashboard">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Dashboard
+          </button>
+        </div>
+        <div class="ms-nav-section">
+          <div class="ms-nav-label">Library</div>
+          <button class="ms-nav-item" data-view="songs">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            Songs
+          </button>
+          <button class="ms-nav-item" data-view="import">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Import
+          </button>
+        </div>
+        <div class="ms-nav-section">
+          <div class="ms-nav-label">Planning</div>
+          <button class="ms-nav-item" data-view="services">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+            Service Plans
+          </button>
+        </div>
+        <div class="ms-nav-section ms-nav-section--bottom">
+          <button class="ms-nav-item ms-nav-item--live" data-action="live">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+            Live Mode
+          </button>
+          <button class="ms-nav-item" data-view="settings">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Settings
+          </button>
+        </div>
+      </nav>
+
+      <!-- Main content -->
+      <main class="ms-main" id="ms-main" role="main"></main>
+    </div>
+
+    <!-- Mobile bottom nav -->
+    <nav class="ms-bottom-nav" id="ms-bottom-nav" aria-label="Mobile navigation">
+      <button class="ms-bnav-item" data-view="dashboard">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="ms-bnav-item" data-view="songs">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <span>Songs</span>
+      </button>
+      <button class="ms-bnav-item ms-bnav-item--live" data-action="live">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+        <span>Live</span>
+      </button>
+      <button class="ms-bnav-item" data-view="services">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+        <span>Services</span>
+      </button>
+      <button class="ms-bnav-item" data-view="import">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Import</span>
+      </button>
+    </nav>
+
+    <!-- Toast container -->
+    <div id="ms-toasts" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- Sheet/modal host -->
+    <div id="ms-sheet-host"></div>
+  </div>
+
+  <!-- Live presenter overlay (full-screen) -->
+  <div id="ms-live-overlay" hidden></div>
+
+  <!-- Firebase (used for cloud sync when FLOCK_FIREBASE_CONFIG is set) -->
+  <script>
+    // Inherit the church Firebase config from the parent FlockOS deployment
+    // (injected by A-Build_Churches.sh per-church). Falls back gracefully.
+    window.FLOCK_FIREBASE_CONFIG = window.FLOCK_FIREBASE_CONFIG || null;
+  </script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+  <!-- FlockOS auth (Nehemiah — firm_foundation.js) -->
+  <script defer src="Scripts/firm_foundation.js"></script>
+  <!-- Firebase wrapper (window.UpperRoom) -->
+  <script defer src="Scripts/the_upper_room.js"></script>
+  <!-- GAS backend adapter (window.TheVine) -->
+  <script defer src="Scripts/the_true_vine.js"></script>
+
+  <!-- Music Stand main module -->
+  <script type="module" src="app.stand/stand.js"></script>
+
+</body>
+</html>
