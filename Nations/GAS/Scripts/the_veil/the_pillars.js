@@ -89,6 +89,7 @@ const SECTIONS = [
       { name: 'the_anatomy_of_worship', label: 'Service Order',     icon: ICON.clipboard },
       { name: 'quarterly_worship',       label: 'Worship Plan',      icon: ICON.music },
       { name: 'the_pentecost',           label: 'Special Services',  icon: ICON.flame },
+      { name: 'music_stand',             label: 'Music Stand',       icon: ICON.music, href: 'app.stand/' },
     ],
   },
   /* ── Mission ─────────────────────────────────────────────────────────── */
@@ -142,6 +143,10 @@ export function mountPillars(host) {
   const items = Array.from(host.querySelectorAll('.pillars-item'));
   items.forEach((btn) => {
     btn.addEventListener('click', () => {
+      if (btn.dataset.href) {
+        window.location.href = btn.dataset.href;
+        return;
+      }
       go(btn.dataset.view).catch((err) => console.warn('[pillars]', err));
       document.body.classList.remove('veil-side-open');
     });
@@ -192,7 +197,7 @@ function _section(s) {
   const head = s.title ? `<div class="pillars-section">${s.title}</div>` : '';
   const slug = (s.title || 'home').toLowerCase().replace(/\s+/g, '-');
   const items = s.items.map((it) => `
-    <button class="pillars-item" type="button" data-view="${it.name}" data-section="${slug}">
+    <button class="pillars-item" type="button" data-view="${it.name}" data-section="${slug}"${it.href ? ` data-href="${it.href}"` : ''}>
       <span class="pillars-icon" aria-hidden="true">${it.icon}</span>
       <span class="pillars-label">${it.label}</span>
       ${it.badge ? `<span class="pillars-badge" data-badge="${it.badge}" hidden></span>` : ''}
