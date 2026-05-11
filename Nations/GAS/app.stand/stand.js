@@ -235,6 +235,18 @@ async function boot() {
       role:        sess.role || 'member',
     };
 
+    // Authenticate with Firebase so UpperRoom.isReady() → true
+    // and the Shofar can use Firestore instead of falling back to GAS.
+    try {
+      const UR = window.UpperRoom;
+      if (UR && typeof UR.init === 'function') {
+        await UR.init();
+        await UR.authenticate();
+      }
+    } catch (fbErr) {
+      console.warn('[MusicStand] Firebase auth best-effort failed:', fbErr.message);
+    }
+
     _launchApp();
   } catch (err) {
     console.error('[MusicStand] boot() error:', err);
