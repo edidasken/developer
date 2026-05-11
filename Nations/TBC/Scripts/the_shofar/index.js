@@ -234,45 +234,67 @@ function msEnsureStyles() {
         '#ms-av-key,#ms-sv-key { height:28px !important; min-width:0 !important; width:auto !important; padding:0 6px !important; border-radius:6px !important; border:1px solid rgba(0,0,0,0.15) !important; background:#f3f4f6 !important; color:#374151 !important; font-size:0.85rem !important; font-weight:700 !important; cursor:pointer !important; }',
 
         /* ── ChordPro rendered output ── */
-        '.ms-chord-display { background:rgba(0,0,0,0.2); border-radius:12px; padding:24px 28px; margin-bottom:0; overflow-y:auto; }',
-        /* Two-column layout — sections flow left-to-right like Planning Center */
-        '.ms-cp-song { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.97rem; line-height:1.3; color:#e2e8f0; column-count:2; column-gap:48px; }',
-        '.ms-cp-title { font-size:1.2rem; font-weight:800; color:#fff; margin:0 0 2px 0; column-span:all; }',
-        '.ms-cp-subtitle { font-size:0.85rem; color:#94a3b8; margin:0 0 16px 0; column-span:all; }',
-        /* Clean section label — bold uppercase, no border gimmick */
-        '.ms-cp-section-label { font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#94a3b8; margin:0 0 6px 0; padding:0; border:none; }',
-        /* Each section stays together — never split across columns */
-        '.ms-cp-section { break-inside:avoid; page-break-inside:avoid; margin-bottom:22px; }',
+        '.ms-chord-display { background:#ffffff; border:1px solid rgba(0,0,0,0.08); border-radius:12px; padding:20px 24px; margin-bottom:0; overflow-y:auto; }',
+        /* Two-column layout on tablet/desktop */
+        '.ms-cp-song { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.97rem; line-height:1.3; color:#111827; column-count:2; column-gap:48px; }',
+        '.ms-cp-title { font-size:1.2rem; font-weight:800; color:#111827; margin:0 0 2px 0; column-span:all; }',
+        '.ms-cp-subtitle { font-size:0.85rem; color:#6b7280; margin:0 0 16px 0; column-span:all; }',
+        /* Section label */
+        '.ms-cp-section-label { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#6b7280; margin:0 0 5px 0; padding:0; border:none; }',
+        /* Each section stays together */
+        '.ms-cp-section { break-inside:avoid; page-break-inside:avoid; margin-bottom:20px; }',
         '.ms-cp-spacer { height:10px; }',
-        /* Each line = flex row of chord+lyric pairs */
-        '.ms-cp-row { display:flex; flex-wrap:wrap; align-items:flex-end; gap:0; margin-bottom:1px; }',
+        /* Each line = flex row of chord+lyric pairs, wraps as full pairs */
+        '.ms-cp-row { display:flex; flex-wrap:wrap; align-items:flex-end; gap:0; margin-bottom:2px; }',
         '.ms-cp-pair { display:inline-flex; flex-direction:column; align-items:flex-start; }',
-        '.ms-cp-chord { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.82rem; font-weight:800; color:#f87171; line-height:1.3; min-height:1.3em; white-space:pre; padding-right:6px; }',
+        '.ms-cp-chord { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.8rem; font-weight:800; color:#dc2626; line-height:1.3; min-height:1.3em; white-space:pre; padding-right:6px; }',
         '.ms-cp-chord--empty { color:transparent; }',
-        '.ms-cp-word { font-size:0.97rem; color:#e2e8f0; white-space:pre; line-height:1.5; }',
+        '.ms-cp-word { font-size:0.97rem; color:#111827; white-space:pre; line-height:1.5; }',
         '.ms-cp-word--space { color:transparent; }',
-        '.ms-cp-lyric-only { font-size:0.97rem; color:#e2e8f0; line-height:1.7; }',
+        '.ms-cp-lyric-only { font-size:0.97rem; color:#111827; line-height:1.7; }',
 
-        '.ms-chord-line { color:#f87171; font-weight:700; }',
-        '.ms-lyric-line { color:#e5e7eb; }',
-        '.ms-stand-nav { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-top:1px solid rgba(255,255,255,0.12); }',
-        '.ms-stand-counter { color:#94a3b8; font-size:0.9rem; }',
-        /* Single column on small screens */
-        '@media (max-width:700px) { .ms-cp-song { column-count:1; } }',
-        /* Print / PDF */
-        '@media print { .ms-cp-song { column-count:2; color:#000; } .ms-cp-chord { color:#cc0000; } .ms-cp-word { color:#000; } .ms-cp-section-label { color:#555; } }',
+        '.ms-chord-line { color:#dc2626; font-weight:700; }',
+        '.ms-lyric-line { color:#111827; }',
+        '.ms-stand-nav { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-top:1px solid rgba(0,0,0,0.08); }',
+        '.ms-stand-counter { color:#6b7280; font-size:0.9rem; }',
+
+        /* Song library — desktop table */
+        '.ms-song-table-wrap { overflow-x:auto; }',
+        '.ms-song-cards { display:none; }',
+
+        /* Song card (mobile) */
+        '.ms-song-card { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-bottom:1px solid rgba(0,0,0,0.07); }',
+        '.ms-song-card:last-child { border-bottom:none; }',
+        '.ms-song-card-info { flex:1; min-width:0; }',
+        '.ms-song-card-title { font-weight:700; color:#111827; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:3px; }',
+        '.ms-song-card-meta { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }',
+        '.ms-song-card-meta span:not(.ms-stand-badge) { font-size:0.78rem; color:#6b7280; }',
+        '.ms-song-card-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }',
+        '.ms-song-card-play { padding:8px 14px !important; font-size:0.88rem !important; }',
 
         /* Arrangement card */
         '.ms-arr-card { background:#f9fafb; border:1px solid rgba(0,0,0,0.09); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; }',
         '.ms-arr-info { flex:1; min-width:200px; }',
         '.ms-arr-key { font-weight:700; color:#c97d10; }',
 
-        /* Responsive */
+        /* ── TABLET (768px+): two-column chord layout ── */
+        '@media (min-width:768px) { .ms-cp-song { column-count:2; } }',
+        /* ── MOBILE (≤ 640px) ── */
         '@media (max-width:640px) {',
-        '  .ms-table th:nth-child(n+4), .ms-table td:nth-child(n+4) { display:none; }',
-        '  .ms-stand-song-title { font-size:1.3rem; }',
-        '  .ms-chord-display { font-size:0.95rem; padding:14px; }',
-        '}'
+        '  .ms-song-table-wrap { display:none; }',
+        '  .ms-song-cards { display:block; }',
+        '  .ms-cp-song { column-count:1; font-size:0.92rem; }',
+        '  .ms-cp-chord { font-size:0.75rem; padding-right:4px; }',
+        '  .ms-cp-word { font-size:0.92rem; }',
+        '  .ms-chord-display { padding:14px 16px; border-radius:8px; }',
+        '  .ms-modal--fullscreen { padding:10px 12px 8px 12px !important; }',
+        '  .ms-av-toolbar { gap:4px; padding:4px 0 6px 0; }',
+        '  .ms-modal-title { font-size:0.95rem !important; }',
+        '  .ms-xp-btn { width:32px; height:32px; }',
+        '  .ms-stand-badge { font-size:0.72rem; padding:2px 7px; }',
+        '}',
+        /* Print / PDF */
+        '@media print { .ms-cp-song { column-count:2; color:#000; } .ms-cp-chord { color:#cc0000; } .ms-cp-word { color:#000; } .ms-cp-section-label { color:#555; } }',
     ].join('\n');
     document.head.appendChild(style);
 }
@@ -486,14 +508,14 @@ function msRenderSongsTab() {
                     '</p>' +
                 '</div>';
     } else {
-        html += '<div style="overflow-x:auto;">' +
+        /* ── Desktop table ── (hidden on mobile via CSS) */
+        html += '<div class="ms-song-table-wrap">' +
                 '<table class="ms-table">' +
                     '<thead><tr>' +
                         '<th>Title</th>' +
                         '<th>Artist</th>' +
                         '<th>Key</th>' +
                         '<th>BPM</th>' +
-                        '<th>Active</th>' +
                         '<th></th>' +
                     '</tr></thead>' +
                     '<tbody>';
@@ -501,20 +523,40 @@ function msRenderSongsTab() {
         for (var i = 0; i < filtered.length; i++) {
             var s = filtered[i];
             html += '<tr>' +
-                '<td><a href="#" class="ms-song-link" data-song-idx="' + i + '" style="color:#22d3ee; text-decoration:none; font-weight:600;">' + msEscapeHtml(s.title) + '</a></td>' +
-                '<td>' + msEscapeHtml(s.artist) + '</td>' +
+                '<td><a href="#" class="ms-song-link" data-song-idx="' + i + '" style="color:#c97d10;text-decoration:none;font-weight:600;">' + msEscapeHtml(s.title) + '</a></td>' +
+                '<td style="color:#6b7280;">' + msEscapeHtml(s.artist) + '</td>' +
                 '<td><span class="ms-stand-badge">' + msEscapeHtml(s.defaultKey || '—') + '</span></td>' +
-                '<td>' + (s.tempoBpm || '—') + '</td>' +
-                '<td>' + (s.active === 'TRUE' ? '<span style="color:#22c55e;">Yes</span>' : '<span style="color:#94a3b8;">No</span>') + '</td>' +
-                '<td>' +
-                    '<button class="ms-btn ms-btn-primary ms-btn-sm ms-play-song" data-song-idx="' + i + '" title="Open chord chart">♪ Play</button> ' +
+                '<td style="color:#6b7280;">' + (s.tempoBpm || '—') + '</td>' +
+                '<td style="white-space:nowrap;">' +
+                    '<button class="ms-btn ms-btn-primary ms-btn-sm ms-play-song" data-song-idx="' + i + '">&#9654; Play</button> ' +
                     '<button class="ms-btn ms-btn-secondary ms-btn-sm ms-edit-song" data-row-index="' + s.index + '" data-song-idx="' + i + '">Edit</button> ' +
-                    '<button class="ms-btn ms-btn-danger ms-btn-sm ms-delete-song" data-row-index="' + s.index + '" data-song-id="' + msEscapeHtml(s.id || '') + '" data-title="' + msEscapeHtml(s.title) + '">Delete</button>' +
+                    '<button class="ms-btn ms-btn-danger ms-btn-sm ms-delete-song" data-row-index="' + s.index + '" data-song-id="' + msEscapeHtml(s.id || '') + '" data-title="' + msEscapeHtml(s.title) + '">&#x2715;</button>' +
                 '</td>' +
             '</tr>';
         }
-
         html += '</tbody></table></div>';
+
+        /* ── Mobile card list ── (hidden on desktop via CSS) */
+        html += '<div class="ms-song-cards">';
+        for (var j = 0; j < filtered.length; j++) {
+            var sc = filtered[j];
+            html += '<div class="ms-song-card">' +
+                '<div class="ms-song-card-info">' +
+                    '<div class="ms-song-card-title">' + msEscapeHtml(sc.title) + '</div>' +
+                    '<div class="ms-song-card-meta">' +
+                        (sc.artist ? '<span>' + msEscapeHtml(sc.artist) + '</span>' : '') +
+                        (sc.defaultKey ? '<span class="ms-stand-badge">' + msEscapeHtml(sc.defaultKey) + '</span>' : '') +
+                        (sc.tempoBpm ? '<span class="ms-stand-badge">' + sc.tempoBpm + ' BPM</span>' : '') +
+                    '</div>' +
+                '</div>' +
+                '<div class="ms-song-card-actions">' +
+                    '<button class="ms-btn ms-btn-primary ms-play-song ms-song-card-play" data-song-idx="' + j + '">&#9654; Play</button>' +
+                    '<button class="ms-btn ms-btn-secondary ms-btn-sm ms-edit-song" data-row-index="' + sc.index + '" data-song-idx="' + j + '">Edit</button>' +
+                    '<button class="ms-btn ms-btn-danger ms-btn-sm ms-delete-song" data-row-index="' + sc.index + '" data-song-id="' + msEscapeHtml(sc.id || '') + '" data-title="' + msEscapeHtml(sc.title) + '">&#x2715;</button>' +
+                '</div>' +
+            '</div>';
+        }
+        html += '</div>';
     }
 
     html += '<p style="color:#64748b; font-size:0.8rem; margin-top:12px;">' +
