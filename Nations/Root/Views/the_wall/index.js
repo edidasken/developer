@@ -3173,7 +3173,7 @@ const _DEP_MAP = {
     Home:         ['the_good_shepherd'],
     Worship:      ['the_anatomy_of_worship', 'quarterly_worship', 'the_pentecost'],
     Mission:      ['the_great_commission', 'the_gospel_invitation', 'the_harvest', 'the_way', 'the_truth', 'fishing_for_men', 'fishing_for_data'],
-    Comms:        ['the_fellowship', 'the_announcements', 'the_prayer_chain'],
+    Comms:        ['the_fellowship', 'the_announcements', 'the_prayer_chain', 'the_upper_room'],
     Care:         ['the_fold', 'the_life', 'the_seasons', 'the_call_to_forgive', 'prayerful_action'],
     Discipleship: [
       'the_growth', 'the_gospel_courses', 'the_gospel_quizzes', 'the_gospel_reading',
