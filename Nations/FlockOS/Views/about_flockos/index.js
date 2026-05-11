@@ -11,8 +11,9 @@ export const title = 'The Why';
 
 const _SRC = (() => {
   // Resolve embed-about.html relative to New_Covenant/ regardless of deploy path.
+  // embed-about.html lives inside app.embeds/ subfolder.
   const base = new URL('../..', import.meta.url).href.replace(/\/$/, '');
-  return `${base}/embed-about.html`;
+  return `${base}/app.embeds/embed-about.html`;
 })();
 
 export function render() {
