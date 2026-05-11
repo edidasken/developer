@@ -543,8 +543,9 @@ async function _loadDashboardData(main) {
    ══════════════════════════════════════════════════════════════════════════════ */
 
 function _renderSongs(main) {
-  // The Shofar expects a container with id="ms-app-container"
-  main.innerHTML = `<div id="ms-app-container" style="padding:0;"></div>`;
+  // The Shofar expects a container with id="ms-app-container".
+  // Wrap it in .ms-view so it inherits the same side padding as every other view.
+  main.innerHTML = `<div class="ms-view"><div id="ms-app-container"></div></div>`;
   // Give the DOM a tick to settle, then let The Shofar take over
   requestAnimationFrame(() => {
     try { window.openMusicStandApp(); } catch (err) {
