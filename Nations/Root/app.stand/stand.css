@@ -72,6 +72,9 @@
 /* ── Reset & Base ─────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Ensure hidden attribute always wins regardless of display rules */
+[hidden] { display: none !important; }
+
 html, body {
   height: 100%;
   font-family: var(--ms-font);

@@ -243,10 +243,10 @@ async function boot() {
 /* ── Auth gate ────────────────────────────────────────────────────────────── */
 function _renderAuthGate(N) {
   const bootEl = document.getElementById('ms-boot');
-  if (bootEl) bootEl.hidden = true;
+  if (bootEl) bootEl.style.display = 'none';
 
   const overlay = document.getElementById('ms-auth-overlay');
-  overlay.hidden = false;
+  overlay.removeAttribute('hidden'); overlay.style.display = ''
   overlay.innerHTML = `
     <div class="ms-auth-card">
       <img src="Images/stand.png" alt="Music Stand">
@@ -274,20 +274,23 @@ function _renderAuthGate(N) {
 function _showBootError(msg) {
   const bootEl = document.getElementById('ms-boot');
   if (bootEl) {
-    bootEl.querySelector('.ms-boot-label').textContent = msg;
-    bootEl.querySelector('.ms-boot-icon').textContent = '⚠️';
+    bootEl.style.display = 'flex';
+    const lbl = bootEl.querySelector('.ms-boot-label');
+    const ico = bootEl.querySelector('.ms-boot-icon');
+    if (lbl) lbl.textContent = msg;
+    if (ico) ico.textContent = '⚠️';
   }
 }
 
 /* ── Launch app after auth ────────────────────────────────────────────────── */
 function _launchApp() {
-  // Hide boot
+  // Hide boot (use style.display — CSS display:flex overrides the hidden attribute)
   const bootEl = document.getElementById('ms-boot');
-  if (bootEl) bootEl.hidden = true;
+  if (bootEl) bootEl.style.display = 'none';
 
   // Show app
   const appEl = document.getElementById('ms-app');
-  appEl.hidden = false;
+  if (appEl) { appEl.removeAttribute('hidden'); appEl.style.display = ''; }
 
   // Restore last plan id
   try { S.activePlanId = localStorage.getItem(STORE_KEY_PLAN_ID) || null; } catch (_) {}
