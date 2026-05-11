@@ -471,6 +471,7 @@ function msRenderSongsTab() {
                 '<td>' + (s.tempoBpm || '—') + '</td>' +
                 '<td>' + (s.active === 'TRUE' ? '<span style="color:#22c55e;">Yes</span>' : '<span style="color:#94a3b8;">No</span>') + '</td>' +
                 '<td>' +
+                    '<button class="ms-btn ms-btn-primary ms-btn-sm ms-play-song" data-song-idx="' + i + '" title="Open chord chart">♪ Play</button> ' +
                     '<button class="ms-btn ms-btn-secondary ms-btn-sm ms-edit-song" data-row-index="' + s.index + '" data-song-idx="' + i + '">Edit</button> ' +
                     '<button class="ms-btn ms-btn-danger ms-btn-sm ms-delete-song" data-row-index="' + s.index + '" data-song-id="' + msEscapeHtml(s.id || '') + '" data-title="' + msEscapeHtml(s.title) + '">Delete</button>' +
                 '</td>' +
@@ -509,6 +510,21 @@ function msRenderSongsTab() {
     if (importBtn) {
         importBtn.addEventListener('click', function() { msOpenSongSelectImport(); });
     }
+
+    // Play buttons → open chord chart directly
+    panel.querySelectorAll('.ms-play-song').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var idx = Number(btn.getAttribute('data-song-idx'));
+            var filteredP = musicStandAppState.songs.filter(function(s2) {
+                var f = musicStandAppState.filter.toLowerCase();
+                if (!f) return true;
+                return (s2.title || '').toLowerCase().indexOf(f) !== -1 ||
+                       (s2.artist || '').toLowerCase().indexOf(f) !== -1;
+            });
+            if (filteredP[idx]) msQuickPlaySong(filteredP[idx]);
+        });
+    });
 
     // Song title links → detail view
     panel.querySelectorAll('.ms-song-link').forEach(function(link) {
@@ -708,6 +724,61 @@ function msRenderSongDetail() {
             msDeleteArrangement(rowIndex, name, arrId);
         });
     });
+}
+
+// ── Quick-play: open chord chart directly from song library ──────────────────
+// Loads arrangements, picks the best one, and opens the chord view immediately.
+// Falls back to song-level chordSheet or lyrics if no arrangements exist.
+
+async function msQuickPlaySong(song) {
+    // Fetch full song + arrangements if not cached
+    var cached = _msSongDetailCache[song.id];
+    if (!cached || (Date.now() - cached._ts) >= _MS_SONG_TTL) {
+        try {
+            if (_msFB() && song.id) {
+                var full = await UpperRoom.getSongWithArrangements(song.id);
+                full._ts = Date.now();
+                _msSongDetailCache[song.id] = full;
+                musicStandAppState.currentSong = full;
+                musicStandAppState.arrangements = full.arrangements || [];
+            } else {
+                var data = await msApiCall('songs.get', { songId: song.id });
+                if (data) {
+                    data.row._ts = Date.now();
+                    _msSongDetailCache[song.id] = data.row;
+                    musicStandAppState.currentSong = data.row;
+                    musicStandAppState.arrangements = data.row.arrangements || [];
+                }
+            }
+        } catch (err) {
+            console.warn('MusicStand: msQuickPlaySong fetch error', err);
+            musicStandAppState.currentSong = song;
+            musicStandAppState.arrangements = [];
+        }
+    } else {
+        musicStandAppState.currentSong = cached;
+        musicStandAppState.arrangements = cached.arrangements || [];
+    }
+
+    var arr = (musicStandAppState.arrangements && musicStandAppState.arrangements[0]) || null;
+
+    // If there's an arrangement, use the full chord-chart overlay
+    if (arr) {
+        msShowArrangementView(arr);
+        return;
+    }
+
+    // No arrangements — build a synthetic arrangement from song-level data
+    var synth = {
+        name: 'Default',
+        key: musicStandAppState.currentSong.defaultKey || 'C',
+        capo: 0,
+        instrument: 'Guitar',
+        lyricsWithChords: musicStandAppState.currentSong.chordSheet || null,
+        chordChart: musicStandAppState.currentSong.chordChart || null,
+    };
+    // Patch song so msResolveChordContent can fall back to song.chordSheet
+    msShowArrangementView(synth);
 }
 
 // ── Arrangement chord-chart view ─────────────────────────────
