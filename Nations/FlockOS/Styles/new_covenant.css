@@ -3465,9 +3465,27 @@ flock-tabs [role="tablist"], .tabs-bar {
 }
 .inv-pending-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .inv-invite-card {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap;
   background: var(--bg-card, #fff); border: 1px solid var(--stroke, #e5e7f0);
   border-radius: 12px; padding: 16px;
+}
+.inv-form-row {
+  display: flex; gap: 10px; flex-wrap: wrap; width: 100%;
+}
+.inv-form-row--2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.inv-label {
+  display: flex; flex-direction: column; gap: 5px;
+  font: 600 0.76rem var(--font-ui); color: var(--ink-muted, #7a7f96); flex: 1; min-width: 0;
+}
+.inv-label .fold-search, .inv-label .inv-select { margin-top: 0; }
+.inv-req { color: #dc2626; }
+.inv-textarea { resize: vertical; min-height: 54px; padding: 8px 12px; }
+.inv-form-actions {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; width: 100%; margin-top: 4px;
+}
+.inv-sms-label {
+  display: flex; align-items: center; gap: 6px;
+  font: 0.82rem var(--font-ui); color: var(--ink, #1b264f); cursor: pointer;
 }
 .inv-select {
   padding: 8px 12px; border: 1px solid var(--stroke, #e5e7f0); border-radius: 8px;
@@ -3534,6 +3552,7 @@ flock-tabs [role="tablist"], .tabs-bar {
   .gen-stats, .inv-stats      { grid-template-columns: repeat(2, 1fr); }
   .ctf-layout, .qw-layout, .sdr-layout { grid-template-columns: 1fr; }
   .lm-features                { grid-template-columns: repeat(2, 1fr); }
+  .inv-form-row--2            { grid-template-columns: 1fr; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
