@@ -465,4 +465,27 @@ for entry in "${CHURCHES[@]}"; do
   echo "  Nations/$FOLDER/"
 done
 echo ""
+
+# ── Seed build event → flockos-notify Firestore /milestones ──────────
+# Records this build in The Generations (church build log).
+# Non-fatal: if gcloud isn't authenticated the build still succeeds.
+if ! $DRY_RUN; then
+  SEED_SCRIPT="$SCRIPT_DIR/../../Shepherds/Build/seed_build_event.py"
+  if [ -f "$SEED_SCRIPT" ]; then
+    # Capture last git commit subject + hash for the log entry
+    GIT_SUBJECT=$(git -C "$WORKSPACE" log -1 --pretty=format:'%s' 2>/dev/null || echo "B-Build")
+    GIT_HASH=$(git -C "$WORKSPACE" log -1 --pretty=format:'%h' 2>/dev/null || echo "")
+    BUILD_DATE=$(date +%Y-%m-%d)
+    BUILD_TITLE="Build: ${GIT_SUBJECT}"
+    BUILD_DESC="B-Build completed on ${BUILD_DATE}. Nations synced: Root, FlockOS, TBC, TheForest, GAS. Commit: ${GIT_HASH}. ${GIT_SUBJECT}"
+
+    python3 "$SEED_SCRIPT" \
+      --title "$BUILD_TITLE" \
+      --description "$BUILD_DESC" \
+      --category "build" \
+      --date "$BUILD_DATE" \
+      || true  # never fail the build
+  fi
+fi
+
 echo "Next: commit + push to deploy via GitHub Pages / Firebase."
