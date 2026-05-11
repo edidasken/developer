@@ -708,3 +708,6 @@ const Nehemiah = (() => {
   });
 
 })();
+
+// Expose globally so ES modules and standalone apps can access it
+if (typeof window !== 'undefined') window.Nehemiah = Nehemiah;

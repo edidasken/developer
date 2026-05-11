@@ -213,30 +213,19 @@ function _waitFor(predicate, timeout = 5000) {
 async function boot() {
   _loadPrefs();
 
-  // Wait for Nehemiah (firm_foundation.js deferred script)
-  try {
-    await _waitFor(() => typeof window.Nehemiah !== 'undefined');
-  } catch (_) {
-    // Nehemiah not available — show error
-    _showBootError('Could not load authentication. Please refresh.');
-    return;
-  }
+  // Auth temporarily bypassed — skip Nehemiah wait
+  const N = window.Nehemiah || {};
 
-  const N = window.Nehemiah;
-
-  // Check auth
-  if (!N.isAuthenticated()) {
-    _renderAuthGate(N);
-    return;
-  }
+  // Auth gate temporarily disabled — re-enable when ready
+  // if (!N.isAuthenticated()) { _renderAuthGate(N); return; }
 
   // Build user profile
-  const sess = N.getSession ? N.getSession() : null;
-  S.user = sess ? {
-    displayName: sess.displayName || sess.email,
-    email:       sess.email,
+  const sess = (N.getSession ? N.getSession() : null) || {};
+  S.user = {
+    displayName: sess.displayName || sess.email || 'Worship Team',
+    email:       sess.email || '',
     role:        sess.role || 'member',
-  } : { displayName: 'Worship Team', email: '', role: 'member' };
+  };
 
   _launchApp();
 }
