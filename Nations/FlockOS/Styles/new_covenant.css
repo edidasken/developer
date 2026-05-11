@@ -3272,7 +3272,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .gen-milestone:last-child { padding-bottom: 0; }
 .gen-milestone-year {
   font: 700 0.80rem var(--font-ui); color: var(--ink-muted, #7a7f96);
-  padding-top: 4px; text-align: right;
+  padding-top: 4px; text-align: right; min-width: 82px; white-space: nowrap;
 }
 .gen-milestone-dot {
   width: 12px; height: 12px; border-radius: 50%; margin-top: 6px; flex-shrink: 0;

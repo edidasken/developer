@@ -100,16 +100,22 @@ async function _loadGenerations(root) {
       return;
     }
 
-    const sorted = [...rows].sort((a, b) => {
-      const ya = a.year || (a.date ? new Date(a.date).getFullYear() : 0);
-      const yb = b.year || (b.date ? new Date(b.date).getFullYear() : 0);
-      return yb - ya;
-    });
+    const _msDate = m => {
+      if (m.date) return new Date(m.date);
+      if (m.year) return new Date(`${m.year}-01-01`);
+      return new Date(0);
+    };
+    const sorted = [...rows].sort((a, b) => _msDate(b) - _msDate(a));
 
     _updateGenStats(root, sorted);
 
     tlEl.innerHTML = sorted.map(m => {
-      const year  = m.year || (m.date ? new Date(m.date).getFullYear() : '');
+      const d = _msDate(m);
+      const label = d.getTime() > 0
+        ? (m.date
+            ? `${String(d.getUTCMonth()+1).padStart(2,'0')}/${String(d.getUTCDate()).padStart(2,'0')}/${d.getUTCFullYear()}`
+            : String(m.year))
+        : '';
       const title = m.title || m.name || 'Milestone';
       const cat   = (m.category || m.type || 'growth').toLowerCase();
       const desc  = m.description || m.notes || m.desc || '';
@@ -117,7 +123,7 @@ async function _loadGenerations(root) {
       const mid   = m.id ? ` data-id="${_e(String(m.id))}"` : '';
       return /* html */`
         <div class="gen-milestone"${mid}>
-          <div class="gen-milestone-year">${year}</div>
+          <div class="gen-milestone-year">${label}</div>
           <div class="gen-milestone-dot" style="background:${meta.color}"></div>
           <div class="gen-milestone-body">
             <div class="gen-milestone-head">
@@ -192,8 +198,8 @@ function _openMilestoneSheet(m, onReload) {
       </div>
       <div class="life-sheet-body">
         <div class="life-sheet-field">
-          <div class="life-sheet-label">Year <span style="color:#dc2626">*</span></div>
-          <input class="life-sheet-input" data-field="year" type="number" min="1800" max="2100" value="${m?.year || new Date().getFullYear()}" placeholder="${new Date().getFullYear()}">
+          <div class="life-sheet-label">Date <span style="color:#dc2626">*</span></div>
+          <input class="life-sheet-input" data-field="date" type="date" value="${m?.date || (m?.year ? m.year + '-01-01' : new Date().toISOString().slice(0,10))}">
         </div>
         <div class="life-sheet-field">
           <div class="life-sheet-label">Title <span style="color:#dc2626">*</span></div>
@@ -232,15 +238,16 @@ function _openMilestoneSheet(m, onReload) {
 
   sheet.querySelector('[data-save]').addEventListener('click', async () => {
     const errEl = sheet.querySelector('[data-error]');
-    const yr    = parseInt(sheet.querySelector('[data-field="year"]').value, 10);
+    const dt    = sheet.querySelector('[data-field="date"]').value;
     const ttl   = sheet.querySelector('[data-field="title"]').value.trim();
-    if (!ttl)          { errEl.textContent = 'Title is required.';       errEl.style.display = ''; return; }
-    if (!yr || isNaN(yr)) { errEl.textContent = 'A valid year is required.'; errEl.style.display = ''; return; }
+    if (!ttl) { errEl.textContent = 'Title is required.'; errEl.style.display = ''; return; }
+    if (!dt)  { errEl.textContent = 'A date is required.'; errEl.style.display = ''; return; }
     errEl.style.display = 'none';
     const btn = sheet.querySelector('[data-save]');
     btn.disabled = true; btn.textContent = 'Saving…';
     const payload = {
-      year:        yr,
+      date:        sheet.querySelector('[data-field="date"]').value,
+      year:        new Date(sheet.querySelector('[data-field="date"]').value).getUTCFullYear() || undefined,
       title:       ttl,
       category:    sheet.querySelector('[data-field="category"]').value,
       description: sheet.querySelector('[data-field="description"]').value.trim() || undefined,
