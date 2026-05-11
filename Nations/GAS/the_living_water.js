@@ -27,12 +27,15 @@ const PRECACHE_URLS = [
   /* ── Entry points ─────────────────────────────────────────────────────── */
   '',
   'index.html',
-  'manifest.json',
 
   /* ── GROW public PWA ─────────────────────────────────────────────────── */
-  'grow-public.html',
-  'grow-manifest.json',
+  'app.grow/app.grow.html',
+  'app.grow/manifest.json',
   'Scripts/grow_public.js',
+
+  /* ── Invite standalone PWA ───────────────────────────────────────────── */
+  'app.invite/app.invite.html',
+  'app.invite/manifest.json',
 
   /* ── Styles ───────────────────────────────────────────────────────────── */
   'Styles/new_covenant.css',
@@ -41,6 +44,7 @@ const PRECACHE_URLS = [
   /* ── Images ───────────────────────────────────────────────────────────── */
   'Images/NewCovenant.png',
   'Images/GrowIcon.png',
+  'Images/Invite.png',
 
   /* ── Boot scripts ─────────────────────────────────────────────────────── */
   'Scripts/the_ark.js',
