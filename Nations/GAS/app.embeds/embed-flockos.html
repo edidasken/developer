@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- All relative URLs resolved one level up (app.embeds/ → church root) -->
-  <base href="../">
+  <!-- Absolute base so all relative URLs resolve to GitHub Pages regardless of embed host -->
+  <base href="https://flock-os.github.io/FlockOS/New_Covenant/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
   <title>FlockOS</title>
@@ -105,7 +105,7 @@
 
   <!-- Firebase SDKs -->
 
-  <!-- Legacy backend scripts — all resolved via <base href> in head -->
+  <!-- Legacy backend scripts — all resolved via absolute <base href> set in head -->
   <script defer src="Scripts/firm_foundation.js"></script>
   <script defer src="Scripts/the_upper_room.js"></script>
   <script defer src="Scripts/fine_linen.js"></script>
