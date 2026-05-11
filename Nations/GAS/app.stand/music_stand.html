@@ -32,36 +32,16 @@
   <link rel="preconnect" href="https://securetoken.googleapis.com">
   <link rel="dns-prefetch" href="https://firestore.googleapis.com">
 
-  <!-- App CSS -->
+  <!-- App CSS — one source of truth: new_covenant.css contains all Music Stand styles -->
   <link rel="stylesheet" href="Styles/american_garments.css">
   <link rel="stylesheet" href="Styles/new_covenant.css">
-  <link rel="stylesheet" href="app.stand/stand.css">
 
   <!-- Flash prevention + base vars -->
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --ms-bg:     #e7eaee;
-      --ms-ink:    #111827;
-      --ms-gold:   #c97d10;
-    }
-    html, body {
-      height: 100%;
-      background: var(--ms-bg);
-      color: var(--ms-ink);
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      overflow: hidden;
-    }
-    /* Boot splash */
-    #ms-boot {
-      position: fixed; inset: 0; z-index: 9999;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
-      background: #e7eaee;
-    }
-    .ms-boot-icon { font-size: 3rem; animation: ms-pulse 1.2s ease-in-out infinite; }
-    .ms-boot-label { color: #c97d10; font-size: .9rem; letter-spacing: .08em; }
-    @keyframes ms-pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+    /* Flash prevention — minimal overrides only; full styling in new_covenant.css */
+    html, body { height: 100%; overflow: hidden; }
+    /* Boot splash — styled in new_covenant.css */
   </style>
 </head>
 <body>
