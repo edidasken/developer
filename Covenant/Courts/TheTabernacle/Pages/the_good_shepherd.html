@@ -2142,16 +2142,16 @@ async function refreshNotifBadge() {
   } catch (_) {}
 }
 
-// Poll for new notifications every 3 minutes (was 30s — reduced to lower GAS simultaneous executions)
+// Poll for new notifications every 10 minutes (was 30s — reduced to lower GAS simultaneous executions)
 refreshNotifBadge();
-_notifPollId = setInterval(refreshNotifBadge, 180000);
+_notifPollId = setInterval(refreshNotifBadge, 600000);
 // Pause poll when tab is hidden, resume when visible; clear on unload
 document.addEventListener('visibilitychange', function() {
   if (document.hidden) {
     clearInterval(_notifPollId); _notifPollId = null;
   } else if (!_notifPollId) {
     refreshNotifBadge();
-    _notifPollId = setInterval(refreshNotifBadge, 180000);
+    _notifPollId = setInterval(refreshNotifBadge, 600000);
   }
 });
 window.addEventListener('beforeunload', function() { clearInterval(_notifPollId); });
