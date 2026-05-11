@@ -118,7 +118,7 @@ async function msApiCall(action, extraParams) {
     var endpoint = msGetEndpoint();
     var auth = getMusicStandAuth();
     if (!endpoint || !auth) {
-        msRedirectToSecure('Not authenticated.');
+        console.warn('[MusicStand] msApiCall: no auth/endpoint — skipping redirect (auth bypass active).');
         return null;
     }
 
