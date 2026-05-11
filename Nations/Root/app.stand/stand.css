@@ -8,39 +8,39 @@
 
 /* ── Design tokens ────────────────────────────────────────────────────────── */
 :root {
-  /* Colors */
-  --ms-bg:          #0c1118;
-  --ms-bg-raised:   #141c27;
-  --ms-bg-card:     #1a2336;
-  --ms-bg-card-hi:  #1e2a3e;
-  --ms-ink:         #e8eaf0;
-  --ms-ink-muted:   #7a8baa;
-  --ms-ink-faint:   #3d4f6e;
-  --ms-line:        rgba(255,255,255,0.08);
-  --ms-gold:        #e8a838;
-  --ms-gold-soft:   rgba(232,168,56,0.15);
-  --ms-gold-glow:   rgba(232,168,56,0.30);
-  --ms-blue:        #5b8dee;
-  --ms-blue-soft:   rgba(91,141,238,0.14);
-  --ms-violet:      #a78bfa;
-  --ms-violet-soft: rgba(167,139,250,0.14);
-  --ms-emerald:     #34d399;
-  --ms-emerald-soft:rgba(52,211,153,0.14);
-  --ms-rose:        #fb7185;
-  --ms-rose-soft:   rgba(251,113,133,0.14);
-  --ms-amber:       #fbbf24;
-  --ms-amber-soft:  rgba(251,191,36,0.14);
-  --ms-red:         #ef4444;
+  /* Colors — light theme */
+  --ms-bg:          #f4f4f5;
+  --ms-bg-raised:   #ebebec;
+  --ms-bg-card:     #ffffff;
+  --ms-bg-card-hi:  #f9f9fa;
+  --ms-ink:         #111827;
+  --ms-ink-muted:   #6b7280;
+  --ms-ink-faint:   #9ca3af;
+  --ms-line:        rgba(0,0,0,0.09);
+  --ms-gold:        #c97d10;
+  --ms-gold-soft:   rgba(201,125,16,0.10);
+  --ms-gold-glow:   rgba(201,125,16,0.35);
+  --ms-blue:        #2563eb;
+  --ms-blue-soft:   rgba(37,99,235,0.10);
+  --ms-violet:      #7c3aed;
+  --ms-violet-soft: rgba(124,58,237,0.10);
+  --ms-emerald:     #059669;
+  --ms-emerald-soft:rgba(5,150,105,0.10);
+  --ms-rose:        #e11d48;
+  --ms-rose-soft:   rgba(225,29,72,0.10);
+  --ms-amber:       #d97706;
+  --ms-amber-soft:  rgba(217,119,6,0.10);
+  --ms-red:         #dc2626;
 
-  /* Section label colors (chorus, verse, bridge…) */
-  --sc-chorus:      #e8a838;
-  --sc-verse:       #5b8dee;
-  --sc-bridge:      #a78bfa;
-  --sc-intro:       #34d399;
-  --sc-outro:       #fb7185;
-  --sc-pre-chorus:  #38bdf8;
-  --sc-tag:         #fbbf24;
-  --sc-default:     #7a8baa;
+  /* Section label colors */
+  --sc-chorus:      #c97d10;
+  --sc-verse:       #2563eb;
+  --sc-bridge:      #7c3aed;
+  --sc-intro:       #059669;
+  --sc-outro:       #e11d48;
+  --sc-pre-chorus:  #0284c7;
+  --sc-tag:         #d97706;
+  --sc-default:     #6b7280;
 
   /* Layout */
   --ms-header-h:    58px;
@@ -61,8 +61,8 @@
   --ms-r-xl:  24px;
 
   /* Shadows */
-  --ms-shadow-card: 0 2px 12px rgba(0,0,0,0.35);
-  --ms-shadow-sheet:0 -8px 40px rgba(0,0,0,0.60);
+  --ms-shadow-card: 0 1px 6px rgba(0,0,0,0.10);
+  --ms-shadow-sheet:0 -4px 24px rgba(0,0,0,0.12);
 
   /* Motion */
   --ms-ease:   cubic-bezier(.2,.8,.2,1);
@@ -105,7 +105,7 @@ html, body {
   top: 0; left: 0; right: 0;
   height: calc(var(--ms-header-h) + var(--ms-safe-top));
   padding-top: var(--ms-safe-top);
-  background: rgba(12,17,24,0.92);
+  background: rgba(255,255,255,0.95);
   backdrop-filter: blur(16px) saturate(150%);
   -webkit-backdrop-filter: blur(16px) saturate(150%);
   border-bottom: 1px solid var(--ms-line);
@@ -141,7 +141,7 @@ html, body {
 .ms-sidebar {
   width: var(--ms-sidebar-w);
   flex-shrink: 0;
-  background: #0a0f1a;
+  background: #ffffff;
   border-right: 1px solid var(--ms-line);
   overflow-y: auto;
   overflow-x: hidden;
@@ -189,7 +189,7 @@ html, body {
   bottom: 0; left: 0; right: 0;
   height: calc(var(--ms-bnav-h) + var(--ms-safe-bot));
   padding-bottom: var(--ms-safe-bot);
-  background: rgba(10,15,26,0.96);
+  background: rgba(255,255,255,0.97);
   backdrop-filter: blur(12px);
   border-top: 1px solid var(--ms-line);
   flex-direction: row;
@@ -216,7 +216,7 @@ html, body {
   transition: all .15s var(--ms-ease); white-space: nowrap;
 }
 .ms-btn--primary {
-  background: var(--ms-gold); color: #0c1118;
+  background: var(--ms-gold); color: #ffffff;
 }
 .ms-btn--primary:hover { background: #f0b845; }
 .ms-btn--ghost {
@@ -515,7 +515,7 @@ html, body {
 .ms-textarea { resize: vertical; min-height: 100px; }
 .ms-content-editor {
   font-family: var(--ms-mono); font-size: .87rem; min-height: 400px; tab-size: 2;
-  line-height: 1.7; resize: vertical; background: #080d14;
+  line-height: 1.7; resize: vertical; background: #f8f8f8;
 }
 .ms-content-preview {
   min-height: 300px; padding: 18px;

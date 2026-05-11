@@ -179,25 +179,25 @@ function msEnsureStyles() {
 
         /* Table */
         '.ms-table { width:100%; border-collapse:collapse; font-size:0.92rem; }',
-        '.ms-table th { padding:10px 8px; text-align:left; color:#94a3b8; font-weight:600; font-size:0.8rem; text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.12); }',
-        '.ms-table td { padding:10px 8px; border-bottom:1px solid rgba(255,255,255,0.06); color:#e5e7eb; }',
-        '.ms-table tr:hover td { background:rgba(255,255,255,0.04); }',
+        '.ms-table th { padding:10px 8px; text-align:left; color:#6b7280; font-weight:600; font-size:0.8rem; text-transform:uppercase; border-bottom:1px solid rgba(0,0,0,0.10); }',
+        '.ms-table td { padding:10px 8px; border-bottom:1px solid rgba(0,0,0,0.06); color:#111827; }',
+        '.ms-table tr:hover td { background:rgba(0,0,0,0.03); }',
 
         /* Buttons */
         '.ms-btn { display:inline-flex; align-items:center; gap:6px; padding:10px 18px; border-radius:10px; border:none; font-weight:700; font-size:0.95rem; cursor:pointer; transition:all 0.15s; font-family:Inter,sans-serif; }',
-        '.ms-btn-primary { background:linear-gradient(135deg,#06b6d4,#3b82f6); color:#fff; }',
-        '.ms-btn-primary:hover { filter:brightness(1.15); }',
-        '.ms-btn-secondary { background:rgba(255,255,255,0.08); color:#e5e7eb; border:1px solid rgba(255,255,255,0.15); }',
-        '.ms-btn-secondary:hover { background:rgba(255,255,255,0.14); }',
-        '.ms-btn-danger { background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); }',
-        '.ms-btn-danger:hover { background:rgba(239,68,68,0.25); }',
+        '.ms-btn-primary { background:linear-gradient(135deg,#c97d10,#b56c0a); color:#fff; }',
+        '.ms-btn-primary:hover { filter:brightness(1.1); }',
+        '.ms-btn-secondary { background:#f3f4f6; color:#374151; border:1px solid rgba(0,0,0,0.12); }',
+        '.ms-btn-secondary:hover { background:#e5e7eb; }',
+        '.ms-btn-danger { background:rgba(220,38,38,0.08); color:#dc2626; border:1px solid rgba(220,38,38,0.25); }',
+        '.ms-btn-danger:hover { background:rgba(220,38,38,0.15); }',
         '.ms-btn-sm { padding:6px 12px; font-size:0.85rem; border-radius:8px; }',
 
         /* Form */
         '.ms-form-group { margin-bottom:14px; }',
-        '.ms-label { display:block; margin-bottom:4px; color:#94a3b8; font-size:0.85rem; font-weight:600; text-transform:uppercase; }',
-        '.ms-input { width:100%; padding:10px 12px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#e5e7eb; font-size:0.95rem; font-family:Inter,sans-serif; box-sizing:border-box; }',
-        '.ms-input:focus { outline:none; border-color:#22d3ee; box-shadow:0 0 0 2px rgba(34,211,238,0.15); }',
+        '.ms-label { display:block; margin-bottom:4px; color:#6b7280; font-size:0.85rem; font-weight:600; text-transform:uppercase; }',
+        '.ms-input { width:100%; padding:10px 12px; background:#f9fafb; border:1px solid rgba(0,0,0,0.15); border-radius:10px; color:#111827; font-size:0.95rem; font-family:Inter,sans-serif; box-sizing:border-box; }',
+        '.ms-input:focus { outline:none; border-color:#c97d10; box-shadow:0 0 0 2px rgba(201,125,16,0.15); }',
         '.ms-textarea { resize:vertical; min-height:100px; }',
         '.ms-select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'8\' viewBox=\'0 0 12 8\'%3E%3Cpath d=\'M1 1l5 5 5-5\' stroke=\'%2394a3b8\' stroke-width=\'2\' fill=\'none\'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:36px; }',
 
@@ -206,22 +206,22 @@ function msEnsureStyles() {
         '.ms-search-input { flex:1; min-width:200px; }',
 
         /* Overlay / Modal */
-        '.ms-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:9999; display:none; align-items:center; justify-content:center; padding:16px; }',
+        '.ms-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); z-index:9999; display:none; align-items:center; justify-content:center; padding:16px; }',
         '.ms-overlay.ms-visible { display:flex; }',
-        '.ms-modal { background:#1e293b; border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:24px; width:100%; max-width:640px; max-height:85vh; overflow-y:auto; }',
+        '.ms-modal { background:#ffffff; border:1px solid rgba(0,0,0,0.10); border-radius:18px; padding:24px; width:100%; max-width:640px; max-height:85vh; overflow-y:auto; color:#111827; }',
         '.ms-modal--fullscreen { max-width:100%; max-height:100%; width:100%; height:100%; border-radius:0; border:none; display:flex; flex-direction:column; padding:20px 24px 16px 24px; }',
         '.ms-modal--fullscreen .ms-chord-display { flex:1; overflow-y:auto; margin-bottom:0; }',
         '.ms-modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }',
-        '.ms-modal-title { margin:0; font-family:Merriweather,serif; font-size:1.3rem; color:#fff; }',
-        '.ms-close-btn { background:none; border:none; color:#94a3b8; font-size:1.5rem; cursor:pointer; padding:4px 8px; }',
-        '.ms-close-btn:hover { color:#fff; }',
+        '.ms-modal-title { margin:0; font-family:Merriweather,serif; font-size:1.3rem; color:#111827; }',
+        '.ms-close-btn { background:none; border:none; color:#6b7280; font-size:1.5rem; cursor:pointer; padding:4px 8px; }',
+        '.ms-close-btn:hover { color:#111827; }',
 
         /* Music Stand full-screen view */
         '.ms-stand-view { min-height:60vh; }',
         '.ms-stand-header { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.12); margin-bottom:16px; }',
         '.ms-stand-song-title { font-family:Merriweather,serif; font-size:1.8rem; color:#fff; margin:0; }',
         '.ms-stand-meta { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; }',
-        '.ms-stand-badge { background:rgba(34,211,238,0.15); color:#22d3ee; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:700; }',
+        '.ms-stand-badge { background:rgba(0,0,0,0.07); color:#374151; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:700; border:1px solid rgba(0,0,0,0.10); }',
 
         /* ── ChordPro rendered output ── */
         '.ms-chord-display { background:rgba(0,0,0,0.2); border-radius:12px; padding:24px 28px; margin-bottom:0; overflow-y:auto; }',
@@ -253,9 +253,9 @@ function msEnsureStyles() {
         '@media print { .ms-cp-song { column-count:2; color:#000; } .ms-cp-chord { color:#cc0000; } .ms-cp-word { color:#000; } .ms-cp-section-label { color:#555; } }',
 
         /* Arrangement card */
-        '.ms-arr-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; }',
+        '.ms-arr-card { background:#f9fafb; border:1px solid rgba(0,0,0,0.09); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; }',
         '.ms-arr-info { flex:1; min-width:200px; }',
-        '.ms-arr-key { font-weight:700; color:#22d3ee; }',
+        '.ms-arr-key { font-weight:700; color:#c97d10; }',
 
         /* Responsive */
         '@media (max-width:640px) {',
