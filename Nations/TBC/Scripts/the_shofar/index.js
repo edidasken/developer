@@ -27,7 +27,8 @@ const musicStandAppState = {
     editorMode: 'create',   // 'create' | 'edit'
     activeTab: 'songs',     // 'songs' | 'stand'
     standIndex: 0,          // current song index in Music Stand view
-    standSemitones: {}      // keyed by setlist item index → semitone offset
+    standSemitones: {},     // keyed by setlist item index → semitone offset
+    sectionVisibility: {}   // keyed by setlist item index → { secId: bool }
 };
 
 let _msActiveEditRow = null;
@@ -210,7 +211,15 @@ function msEnsureStyles() {
         '.ms-overlay.ms-visible { display:flex; }',
         '.ms-modal { background:#ffffff; border:1px solid rgba(0,0,0,0.10); border-radius:18px; padding:18px 20px; width:100%; max-width:640px; max-height:85vh; overflow-y:auto; color:#111827; }',
         '.ms-modal--fullscreen { max-width:100%; max-height:100%; width:100%; height:100%; border-radius:0; border:none; display:flex; flex-direction:column; padding:12px 18px 10px 18px; }',
-        '.ms-modal--fullscreen .ms-chord-display { flex:1; overflow-y:auto; margin-bottom:0; }',
+        /* in play view: strip inner card chrome and let CSS columns fill the height */
+        '.ms-modal--fullscreen .ms-chord-display { flex:1; min-height:0; overflow:hidden; margin-bottom:0; padding:6px 0; border:none; border-radius:0; background:transparent; box-shadow:none; }',
+        '.ms-modal--fullscreen .ms-cp-song { height:100%; column-fill:auto; column-count:2; column-gap:20px; font-size:0.95rem; line-height:1.25; }',
+        '.ms-modal--fullscreen .ms-cp-chord { font-size:0.78rem; line-height:1.2; min-height:1.2em; }',
+        '.ms-modal--fullscreen .ms-cp-word { font-size:0.95rem; line-height:1.4; }',
+        '.ms-modal--fullscreen .ms-cp-lyric-only { font-size:0.95rem; line-height:1.5; }',
+        '.ms-modal--fullscreen .ms-cp-sec-group { margin-bottom:14px; }',
+        '.ms-modal--fullscreen .ms-cp-section-label { font-size:0.72rem; margin-bottom:4px; }',
+        '.ms-modal--fullscreen .ms-cp-spacer { height:8px; }',
         '.ms-modal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; gap:8px; }',
         '.ms-modal-title { margin:0; font-family:Merriweather,serif; font-size:1.05rem; color:#111827; }',
         '.ms-close-btn { background:none; border:none; color:#6b7280; font-size:1.2rem; cursor:pointer; padding:0 4px; }',
@@ -234,24 +243,24 @@ function msEnsureStyles() {
         '#ms-av-key,#ms-sv-key { height:28px !important; min-width:0 !important; width:auto !important; padding:0 6px !important; border-radius:6px !important; border:1px solid rgba(0,0,0,0.15) !important; background:#f3f4f6 !important; color:#374151 !important; font-size:0.85rem !important; font-weight:700 !important; cursor:pointer !important; }',
 
         /* ── ChordPro rendered output ── */
-        '.ms-chord-display { background:#ffffff; border:1px solid rgba(0,0,0,0.08); border-radius:12px; padding:20px 24px; margin-bottom:0; overflow-y:auto; }',
-        /* Two-column layout on tablet/desktop */
-        '.ms-cp-song { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.97rem; line-height:1.3; color:#111827; column-count:2; column-gap:48px; }',
-        '.ms-cp-title { font-size:1.2rem; font-weight:800; color:#111827; margin:0 0 2px 0; column-span:all; }',
-        '.ms-cp-subtitle { font-size:0.85rem; color:#6b7280; margin:0 0 16px 0; column-span:all; }',
+        '.ms-chord-display { background:#ffffff; border:1px solid rgba(0,0,0,0.08); border-radius:12px; padding:12px 16px; margin-bottom:0; overflow-y:auto; }',
+        /* Two-column layout — tuned for iPad portrait */
+        '.ms-cp-song { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.86rem; line-height:1.22; color:#111827; column-count:2; column-gap:22px; }',
+        '.ms-cp-title { font-size:1.05rem; font-weight:800; color:#111827; margin:0 0 2px 0; column-span:all; }',
+        '.ms-cp-subtitle { font-size:0.8rem; color:#6b7280; margin:0 0 10px 0; column-span:all; }',
         /* Section label */
-        '.ms-cp-section-label { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#6b7280; margin:0 0 5px 0; padding:0; border:none; }',
-        /* Each section stays together */
-        '.ms-cp-section { break-inside:avoid; page-break-inside:avoid; margin-bottom:20px; }',
-        '.ms-cp-spacer { height:10px; }',
+        '.ms-cp-section-label { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#6b7280; margin:0 0 3px 0; padding:0; border:none; }',
+        /* Each section stays together — now nested inside .ms-cp-sec-group */
+        '.ms-cp-section { break-inside:avoid; page-break-inside:avoid; }',
+        '.ms-cp-spacer { height:6px; }',
         /* Each line = flex row of chord+lyric pairs, wraps as full pairs */
-        '.ms-cp-row { display:flex; flex-wrap:wrap; align-items:flex-end; gap:0; margin-bottom:2px; }',
+        '.ms-cp-row { display:flex; flex-wrap:wrap; align-items:flex-end; gap:0; margin-bottom:1px; }',
         '.ms-cp-pair { display:inline-flex; flex-direction:column; align-items:flex-start; }',
-        '.ms-cp-chord { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.8rem; font-weight:800; color:#dc2626; line-height:1.3; min-height:1.3em; white-space:pre; padding-right:6px; }',
+        '.ms-cp-chord { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.72rem; font-weight:800; color:#dc2626; line-height:1.2; min-height:1.2em; white-space:pre; padding-right:5px; }',
         '.ms-cp-chord--empty { color:transparent; }',
-        '.ms-cp-word { font-size:0.97rem; color:#111827; white-space:pre; line-height:1.5; }',
+        '.ms-cp-word { font-size:0.86rem; color:#111827; white-space:pre; line-height:1.4; }',
         '.ms-cp-word--space { color:transparent; }',
-        '.ms-cp-lyric-only { font-size:0.97rem; color:#111827; line-height:1.7; }',
+        '.ms-cp-lyric-only { font-size:0.86rem; color:#111827; line-height:1.5; }',
 
         '.ms-chord-line { color:#dc2626; font-weight:700; }',
         '.ms-lyric-line { color:#111827; }',
@@ -278,8 +287,20 @@ function msEnsureStyles() {
         '.ms-arr-info { flex:1; min-width:200px; }',
         '.ms-arr-key { font-weight:700; color:#c97d10; }',
 
+        /* ── Section visibility strip ── */
+        '.ms-sec-strip { display:flex; gap:5px; flex-wrap:wrap; padding:4px 0 6px; flex-shrink:0; }',
+        '.ms-sec-chip { display:inline-flex; align-items:center; gap:3px; height:24px; padding:0 9px; border-radius:12px; border:1px solid; font-size:0.66rem; font-weight:700; letter-spacing:.05em; cursor:pointer; transition:opacity 0.15s; text-transform:uppercase; white-space:nowrap; background:transparent; }',
+        '.ms-sec-chip.sec-on { opacity:1; }',
+        '.ms-sec-chip.sec-off { opacity:0.3; text-decoration:line-through; }',
+        /* Section group — wraps label + content, keeps them together in columns */
+        '.ms-cp-sec-group { break-inside:avoid; page-break-inside:avoid; margin-bottom:12px; }',
+        '.ms-cp-sec-group--hidden > .ms-cp-section-label { opacity:0.28 !important; font-style:italic; }',
+        '.ms-cp-sec-group--hidden > .ms-cp-section-content { display:none; }',
+
         /* ── TABLET (768px+): two-column chord layout ── */
-        '@media (min-width:768px) { .ms-cp-song { column-count:2; } }',
+        '@media (min-width:768px) { .ms-cp-song { column-count:2; column-gap:22px; } }',
+        /* ── LARGE DESKTOP (1100px+): loosen gap slightly ── */
+        '@media (min-width:1100px) { .ms-cp-song { column-gap:32px; } }',
         /* ── MOBILE (≤ 640px) ── */
         '@media (max-width:640px) {',
         '  .ms-card { padding:14px 16px; }',
@@ -290,10 +311,10 @@ function msEnsureStyles() {
         '  #ms-import-song-btn, #ms-add-song-btn { width:100%; justify-content:center; }',
         '  .ms-song-table-wrap { display:none; }',
         '  .ms-song-cards { display:block; }',
-        '  .ms-cp-song { column-count:1; font-size:0.92rem; }',
-        '  .ms-cp-chord { font-size:0.75rem; padding-right:4px; }',
-        '  .ms-cp-word { font-size:0.92rem; }',
-        '  .ms-chord-display { padding:14px 16px; border-radius:8px; }',
+        '  .ms-cp-song { column-count:1; font-size:0.88rem; }',
+        '  .ms-cp-chord { font-size:0.72rem; padding-right:4px; }',
+        '  .ms-cp-word { font-size:0.88rem; }',
+        '  .ms-chord-display { padding:10px 12px; border-radius:8px; }',
         '  .ms-modal--fullscreen { padding:10px 12px 8px 12px !important; }',
         '  .ms-av-toolbar { gap:4px; padding:4px 0 6px 0; }',
         '  .ms-modal-title { font-size:0.95rem !important; }',
@@ -885,9 +906,14 @@ function msShowArrangementView(arr) {
     var capoFret = Number(arr.capo) || 0;
     var currentSemitones = 0;
 
+    // Parse sections for strip + visibility-aware rendering
+    var _arrSections = msParseSections(msResolveChordContent(song, arr, 0) || '');
+    var _arrVisMap = {};
+    _arrSections.forEach(function(s) { _arrVisMap[s.id] = s.visible; });
+
     function buildChordHtml(semitones) {
         var text = msResolveChordContent(song, arr, semitones);
-        if (text) return msRenderChordPro(text);
+        if (text) return msRenderChordPro(text, _arrVisMap);
         if (arr.chordChart) return '<span class="ms-lyric-line">' + msEscapeHtml(arr.chordChart) + '</span>';
         return '<p style="color:#94a3b8; text-align:center;">No chord chart available.</p>';
     }
@@ -923,10 +949,14 @@ function msShowArrangementView(arr) {
             '<span class="ms-av-divider"></span>' +
             msTransposeControls(originalKey, initKey, capoFret, 'ms-av') +
         '</div>' +
+        (_arrSections.length ? msBuildSectionStrip(_arrSections) : '') +
         '<div class="ms-chord-display" id="ms-av-chord-content" style="flex:1;">' + buildChordHtml(0) + '</div>' +
         '<div style="text-align:right;margin-top:8px;flex-shrink:0;">' +
             '<button class="ms-btn ms-btn-secondary ms-btn-sm" id="ms-arr-pdf-btn">Export PDF</button>' +
         '</div>';
+
+    // Bind section strip (must be after modal.innerHTML is set)
+    if (_arrSections.length) msBindSectionStrip(_arrVisMap);
 
     // Transpose: only update chord content and key badge — no full rebuild
     msBindTransposeControls(originalKey, 0, capoFret, 'ms-av', function(newSemitones) {
@@ -1515,10 +1545,22 @@ function msRenderStandView() {
         // Transposition controls
         html += msTransposeControls(originalKey, displayKey, capoFret, 'ms-sv');
 
-        // Show chord chart — priority: ChordPro (arr or auto-transposed from song.chordSheet) / arr plain chart / lyrics
+        // Section visibility — init once per song, persists across transposes and navigation returns
+        var _svSections = [];
+        var _svVis = null;
         var resolvedChords = msResolveChordContent(song, arr, semitones);
         if (resolvedChords) {
-            html += '<div class="ms-chord-display" id="ms-sv-chord-content">' + msRenderChordPro(resolvedChords) + '</div>';
+            _svSections = msParseSections(resolvedChords);
+            if (!musicStandAppState.sectionVisibility[idx]) {
+                var _initVis = {};
+                _svSections.forEach(function(s) { _initVis[s.id] = s.visible; });
+                musicStandAppState.sectionVisibility[idx] = _initVis;
+            }
+            _svVis = musicStandAppState.sectionVisibility[idx];
+            // Sync visible flag on sections for strip rendering
+            _svSections.forEach(function(s) { s.visible = _svVis[s.id] !== false; });
+            if (_svSections.length) html += msBuildSectionStrip(_svSections);
+            html += '<div class="ms-chord-display" id="ms-sv-chord-content">' + msRenderChordPro(resolvedChords, _svVis) + '</div>';
         } else if (arr && arr.chordChart) {
             html += '<div class="ms-chord-display" id="ms-sv-chord-content">' + msEscapeHtml(arr.chordChart) + '</div>';
         } else if (song.lyrics) {
@@ -1621,9 +1663,10 @@ function msRenderStandView() {
             var chordDiv = document.getElementById('ms-sv-chord-content');
             if (chordDiv && ci) {
                 var newResolved = msResolveChordContent(ci.song, ci.arrangement, newSemitones);
+                var _svVisNow = musicStandAppState.sectionVisibility[idx] || {};
                 if (newResolved) {
                     chordDiv.className = 'ms-chord-display';
-                    chordDiv.innerHTML = msRenderChordPro(newResolved);
+                    chordDiv.innerHTML = msRenderChordPro(newResolved, _svVisNow);
                 } else if (ci.arrangement && ci.arrangement.chordChart) {
                     chordDiv.className = 'ms-chord-display';
                     chordDiv.innerHTML = msEscapeHtml(ci.arrangement.chordChart);
@@ -1646,6 +1689,9 @@ function msRenderStandView() {
                 if (soundingSpan) soundingSpan.textContent = msCapoSoundingKey(newKey, svCapo);
             }
         });
+
+        // Bind section strip (must be after panel.innerHTML)
+        if (_svVis) msBindSectionStrip(_svVis);
     }
 
     // Keyboard navigation
@@ -1830,12 +1876,73 @@ function msParseChordProDirectives(text) {
     return result;
 }
 
-function msRenderChordPro(text) {
+// ── Section parser — returns ordered list of sections detected in ChordPro text ──
+function msParseSections(text) {
+    var sections = [];
+    var labelCounts = {};
+    var secRe = /^\{(?:start_of_(\w+)|sov|soc|sob|sos|sot|(?:(verse|chorus|bridge|intro|outro|tag|pre-?chorus|interlude))(?::\s*(.+?))?)\}$/i;
+    var comRe = /^\{(?:comment|c|ci|cb):\s*(.+)\}$/i;
+    String(text || '').split('\n').forEach(function(line) {
+        var sm = line.trim().match(secRe), label, type;
+        if (sm) {
+            var sName = sm[1] || sm[2] || 'Section';
+            label = sName.charAt(0).toUpperCase() + sName.slice(1).toLowerCase() + (sm[3] ? ' ' + sm[3].trim() : '');
+            type  = sName.toLowerCase().replace(/[^a-z]/g, '');
+        } else {
+            var cm = line.trim().match(comRe);
+            if (!cm) return;
+            label = cm[1].trim();
+            type  = label.toLowerCase().replace(/[^a-z]/g, '');
+        }
+        labelCounts[label] = (labelCounts[label] || 0) + 1;
+        sections.push({ id: 'sec-' + sections.length, label: label, type: type, isRepeat: labelCounts[label] > 1, visible: labelCounts[label] === 1 });
+    });
+    return sections;
+}
+
+// ── Section strip HTML builder ─────────────────────────────────
+function msBuildSectionStrip(sections) {
+    if (!sections || !sections.length) return '';
+    var cols = { verse:'#60a5fa', chorus:'#f472b6', bridge:'#a78bfa', intro:'#34d399', outro:'#34d399', tag:'#fbbf24', prechorus:'#fb923c', interlude:'#94a3b8' };
+    function col(type) { for (var k in cols) { if (type && type.indexOf(k) !== -1) return cols[k]; } return '#94a3b8'; }
+    var h = '<div class="ms-sec-strip" id="ms-sec-strip">';
+    sections.forEach(function(s) {
+        var c = col(s.type);
+        var short = s.label.replace(/verse\s*/i,'V').replace(/chorus\s*/i,'Ch').replace(/bridge\s*/i,'Br')
+            .replace(/intro\s*/i,'In').replace(/outro\s*/i,'Out').replace(/pre.?chorus\s*/i,'PCh')
+            .replace(/tag\s*/i,'Tag').replace(/interlude\s*/i,'Int');
+        h += '<button class="ms-sec-chip ' + (s.visible ? 'sec-on' : 'sec-off') + '" data-sec-id="' + msEscapeHtml(s.id) + '" style="border-color:' + c + ';color:' + c + ';">' +
+            msEscapeHtml(short) + (s.isRepeat ? ' <span style="font-size:0.8em;opacity:0.65;">↻</span>' : '') + '</button>';
+    });
+    h += '</div>';
+    return h;
+}
+
+// ── Section strip event binding (pass visMap to keep state in sync for transposes) ──
+function msBindSectionStrip(visMap) {
+    var strip = document.getElementById('ms-sec-strip');
+    if (!strip) return;
+    strip.addEventListener('click', function(e) {
+        var chip = e.target.closest ? e.target.closest('.ms-sec-chip') : e.target;
+        if (!chip || !chip.classList.contains('ms-sec-chip')) return;
+        var secId = chip.getAttribute('data-sec-id');
+        var wasOn = chip.classList.contains('sec-on');
+        chip.classList.toggle('sec-on', !wasOn);
+        chip.classList.toggle('sec-off', wasOn);
+        var group = document.querySelector('.ms-cp-sec-group[data-sec-id="' + secId + '"]');
+        if (group) group.classList.toggle('ms-cp-sec-group--hidden', wasOn);
+        if (visMap) visMap[secId] = !wasOn;
+    });
+}
+
+function msRenderChordPro(text, visMap) {
     if (!text) return '';
 
     var lines = String(text).split('\n');
     var html = '<div class="ms-cp-song">';
-    var inSection = false;
+    var inSecGroup = false;   // inside a .ms-cp-sec-group wrapper
+    var inSection  = false;   // inside a .ms-cp-section (break-inside row group)
+    var secCounter = 0;       // increments per section label — must match msParseSections order
 
     // Section label colours
     var sectionColors = {
@@ -1859,6 +1966,19 @@ function msRenderChordPro(text) {
 
     function closeSection() {
         if (inSection) { html += '</div>'; inSection = false; }
+    }
+
+    function closeSecGroup() {
+        closeSection();
+        if (inSecGroup) { html += '</div></div>'; inSecGroup = false; } // close .ms-cp-section-content + .ms-cp-sec-group
+    }
+
+    function openSecGroup(label, secId, hidden) {
+        closeSecGroup();
+        html += '<div class="ms-cp-sec-group' + (hidden ? ' ms-cp-sec-group--hidden' : '') + '" data-sec-id="' + msEscapeHtml(secId) + '">';
+        html += '<div class="ms-cp-section-label">' + msEscapeHtml(label) + '</div>';
+        html += '<div class="ms-cp-section-content">';
+        inSecGroup = true;
     }
 
     function openSection() {
@@ -1921,11 +2041,12 @@ function msRenderChordPro(text) {
         // Section start: {start_of_chorus}, {soc}, {verse:1}, {chorus}, etc.
         var sectionStart = line.match(/^\{(?:start_of_(\w+)|sov|soc|sob|sos|sot|(?:(verse|chorus|bridge|intro|outro|tag|pre-?chorus|interlude))(?::\s*(.+?))?)\}$/i);
         if (sectionStart) {
-            closeSection();
             var sName = sectionStart[1] || sectionStart[2] || 'Section';
             var sNum  = sectionStart[3] ? ' ' + sectionStart[3].trim() : '';
             var sLabel = sName.charAt(0).toUpperCase() + sName.slice(1).toLowerCase() + sNum;
-            html += '<div class="ms-cp-section-label">' + msEscapeHtml(sLabel) + '</div>';
+            var secId = 'sec-' + secCounter++;
+            var hidden = visMap ? (visMap[secId] === false) : false;
+            openSecGroup(sLabel, secId, hidden);
             continue;
         }
 
@@ -1933,18 +2054,18 @@ function msRenderChordPro(text) {
         if (/^\{end_of_\w+\}$/i.test(line)) { closeSection(); continue; }
 
         // {title:}, {t:} — skip, shown in modal header
-        var titleMatch = line.match(/^\{(?:title|t):\s*(.+)\}$/i);
-        if (titleMatch) { continue; }
+        if (/^\{(?:title|t):\s*(.+)\}$/i.test(line)) continue;
 
         // {subtitle:}, {st:}, {artist:} — skip, shown in modal header
-        var subMatch = line.match(/^\{(?:subtitle|st|artist):\s*(.+)\}$/i);
-        if (subMatch) { continue; }
+        if (/^\{(?:subtitle|st|artist):\s*(.+)\}$/i.test(line)) continue;
 
-        // {comment:}, {c:}, {ci:}  — plain section label
+        // {comment:}, {c:}, {ci:}  — plain section label (treated as a named section group)
         var commentMatch = line.match(/^\{(?:comment|c|ci|cb):\s*(.+)\}$/i);
         if (commentMatch) {
-            closeSection();
-            html += '<div class="ms-cp-section-label">' + msEscapeHtml(commentMatch[1].trim()) + '</div>';
+            var cLabel = commentMatch[1].trim();
+            var secId = 'sec-' + secCounter++;
+            var hidden = visMap ? (visMap[secId] === false) : false;
+            openSecGroup(cLabel, secId, hidden);
             continue;
         }
 
@@ -1963,7 +2084,7 @@ function msRenderChordPro(text) {
         if (rowHtml) html += rowHtml;
     }
 
-    closeSection();
+    closeSecGroup();
     html += '</div>';
     return html;
 }
