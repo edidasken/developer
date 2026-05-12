@@ -2555,6 +2555,7 @@
               return {
                 id:                    b.bookName,
                 'Book Name':           b.bookName,
+                'Author':              b.author,
                 'Testament':           b.testament,
                 'Genre':               b.genre,
                 'Summary':             b.summary,
@@ -2663,7 +2664,7 @@
               + 'data-search="' + _e(name.toLowerCase()) + '" '
               + 'onclick="TheWay._openBook(this,\'' + _e(id) + '\')">';
         html += '<span>' + _e(name) + '</span>';
-        if (genre) html += '<span class="tw-lib-tag">' + _e(genre) + '</span>';
+        if (genre) html += '<span class="tw-lib-tag">' + _e(_shortGenre(genre)) + '</span>';
         html += '</div>';
       });
       html += '</div></div>'; // end sidebar
@@ -2681,6 +2682,13 @@
     } catch (e) {
       _panel(_errHtml(e.message));
     }
+  }
+
+  function _shortGenre(g) {
+    if (!g) return g;
+    var m = g.match(/\(([^)]+)\)/);
+    var s = m ? m[1] : g;
+    return s.replace(/^The /, '');
   }
 
   export function _libFilter(testament, btn) {
@@ -2716,6 +2724,7 @@
     }
 
     var name      = book['Book Name'] || id;
+    var author    = book['Author'] || '';
     var test      = book['Testament'] || '';
     var genre     = book['Genre'] || '';
     var summary   = book['Summary'] || '';
@@ -2731,8 +2740,9 @@
     b += '<div style="margin-bottom:20px;">';
     b += '<h2 style="font-size:1.5rem;font-weight:800;margin:0 0 4px;">' + _e(name) + '</h2>';
     b += '<div style="font-size:0.8rem;color:var(--ink-muted);display:flex;gap:12px;flex-wrap:wrap;">';
+    if (author)     b += '<span>&#9997; ' + _e(author) + '</span>';
     if (test)       b += '<span>' + _e(test) + ' Testament</span>';
-    if (genre)      b += '<span style="color:var(--accent);">' + _e(genre) + '</span>';
+    if (genre)      b += '<span style="color:var(--accent);">' + _e(_shortGenre(genre)) + '</span>';
     if (timePeriod) b += '<span>&#128336; ' + _e(timePeriod) + '</span>';
     b += '</div>';
     if (keyVerse) {
