@@ -751,18 +751,23 @@ function _sortTabsAlphabetically_(ss) {
 
 // Maps Firestore collection name → destination Sheet tab name
 var TRUTH_COLLECTION_MAP_ = {
-  'apologetics': 'Apologetics',
-  'books':       'Books',
-  'config':      'Config',
-  'counseling':  'Counseling',
-  'devotionals': 'Devotionals',
-  'genealogy':   'Genealogy',
-  'heart':       'Heart',
-  'mirror':      'Mirror',
-  'quiz':        'Quiz',
-  'reading':     'Reading',
-  'theology':    'Theology',
-  'words':       'Words'
+  'apologetics':        'Apologetics',
+  'books':              'Books',
+  'config':             'Config',
+  'counseling':         'Counseling',
+  'devotionals':        'Devotionals',
+  'genealogy':          'Genealogy',
+  'heart':              'Heart',
+  'library':            'Library',
+  'mirror':             'Mirror',
+  'psalms':             'Psalms',
+  'psalmThemes':        'PsalmThemes',
+  'quiz':               'Quiz',
+  'reading':            'Reading',
+  'teachingPlans':      'TeachingPlans',
+  'theology':           'Theology',
+  'theologyCategories': 'TheologyCategories',
+  'words':              'Words'
 };
 
 /**
@@ -933,6 +938,13 @@ function setupTruthSheet() {
     }
     // Put _id first as 'id' column
     var headers = ['id'].concat(fieldSet);
+
+    // Sort books by canonical order (1–66) before writing to sheet
+    if (collName === 'books') {
+      docs.sort(function(a, b) {
+        return (Number(a.order) || Number(a.booknum) || 999) - (Number(b.order) || Number(b.booknum) || 999);
+      });
+    }
 
     // Build row data
     var rows = [headers];
@@ -31099,18 +31111,21 @@ var TRUTH_FIRESTORE_MAP = {
       'Question ID': 'questionId', 'Question Title': 'questionTitle',
       'Short Title': 'shortTitle', 'Answer Content': 'answerContent',
       'Quote Text': 'quoteText', 'Reference Text': 'referenceText',
-      'Reference URL': 'referenceUrl'
+      'Reference URL': 'referenceUrl', 'Sort Order': 'sortOrder'
     }
   },
 
   'Books': {
     collection: 'books',
-    docIdHeader: 'ID / Book Number',
+    docIdHeader: 'Book Name',
+    docIdSlugify: true,
     headerMap: {
       'Book Name': 'bookName', 'Testament': 'testament', 'Genre': 'genre',
-      'Summary': 'summary', 'Core Theology': 'coreTheology',
-      'Practical Application': 'practicalApplication',
-      'ID / Book Number': 'bookId'
+      'Order': 'order', 'Book Number': 'booknum', 'Book ID': 'bookId',
+      'Author': 'author', 'Key Verse': 'keyVerse', 'Summary': 'summary',
+      'Themes': 'themes', 'Christ In Book': 'christInBook',
+      'Time Period': 'timePeriod', 'Application': 'application',
+      'Core Theology': 'coreTheology', 'Practical Application': 'practicalApplication'
     }
   },
 
@@ -31148,9 +31163,9 @@ var TRUTH_FIRESTORE_MAP = {
     collection: 'heart',
     docIdHeader: 'Question ID',
     headerMap: {
-      'Question ID': 'questionId', 'Category': 'category',
-      'Chart Axis': 'chartAxis', 'Question': 'question',
-      'Prescription': 'prescription', 'Verse Reference': 'verseReference'
+      'Question ID': 'Question ID', 'Category': 'Category',
+      'Question': 'Question', 'Prescription': 'Prescription',
+      'Verse Reference': 'Verse Reference'
     }
   },
 
@@ -31180,11 +31195,10 @@ var TRUTH_FIRESTORE_MAP = {
 
   'Reading': {
     collection: 'reading',
-    docIdHeader: null,
-    docIdPrefix: 'day',
+    docIdHeader: 'Date',
     headerMap: {
-      'Old Testament': 'oldTestament', 'New Testament': 'newTestament',
-      'Psalms': 'psalms', 'Proverbs': 'proverbs'
+      'Date': 'date', 'Day': 'day',
+      'OT': 'ot', 'NT': 'nt', 'PS': 'ps', 'PR': 'pr'
     }
   },
 
@@ -31194,8 +31208,9 @@ var TRUTH_FIRESTORE_MAP = {
     docIdPrefix: 'theo',
     headerMap: {
       'Category ID': 'categoryId', 'Category Title': 'categoryTitle',
-      'Category Intro': 'categoryIntro', 'Section ID': 'sectionId',
-      'Section Title': 'sectionTitle', 'Content': 'content'
+      'Category Intro': 'categoryIntro', 'Category Subtitle': 'categorySubtitle',
+      'Category Color': 'categoryColor', 'Category Icon': 'categoryIcon',
+      'Section ID': 'sectionId', 'Section Title': 'sectionTitle', 'Content': 'content'
     }
   },
 
@@ -31203,11 +31218,10 @@ var TRUTH_FIRESTORE_MAP = {
     collection: 'theologyCategories',
     docIdHeader: 'ID',
     headerMap: {
-      'ID': 'id', 'Category ID': 'categoryId', 'Title': 'title',
-      'Subtitle': 'subtitle', 'Intro': 'intro', 'Icon': 'icon',
+      'ID': 'id', 'Title': 'title', 'Subtitle': 'subtitle',
+      'Description': 'description', 'Icon': 'icon',
       'Color Var': 'colorVar', 'Sort Order': 'sortOrder',
-      'Visible': 'visible', 'Status': 'status',
-      'Created At': 'createdAt', 'Updated At': 'updatedAt'
+      'Created At': 'createdAt'
     }
   },
 
@@ -31215,11 +31229,10 @@ var TRUTH_FIRESTORE_MAP = {
     collection: 'words',
     docIdHeader: "Strong's",
     headerMap: {
-      'English': 'english', "Strong's": 'strongs',
-      'Original': 'original', 'Transliteration': 'transliteration',
-      'Definition': 'definition', 'Nuance': 'nuance',
-      'Testament': 'testament', 'Theme': 'theme',
-      'Usage Count': 'usageCount', 'Verses': 'verses'
+      "Strong's": 'strongs', 'Testament': 'testament',
+      'Lemma': 'lemma', 'Transliteration': 'xlit',
+      'Pronunciation': 'pron', 'Derivation': 'derivation',
+      "Strong's Definition": 'strongs_def', 'KJV Rendering': 'kjv_def'
     }
   },
 
@@ -31855,9 +31868,13 @@ function populateTruthMaster() {
 
       var docId;
       if (idColIdx >= 0 && row[idColIdx] !== null && String(row[idColIdx]).trim() !== '') {
-        docId = String(row[idColIdx] instanceof Date
+        var rawId = String(row[idColIdx] instanceof Date
           ? Utilities.formatDate(row[idColIdx], 'UTC', 'yyyy-MM-dd')
-          : row[idColIdx]).trim().replace(/[\/\\]/g, '_');
+          : row[idColIdx]).trim();
+        // docIdSlugify: true → lowercase slug (used for collections like books where IDs are name-based slugs)
+        docId = config.docIdSlugify
+          ? rawId.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')
+          : rawId.replace(/[\/\\]/g, '_');
       } else {
         docId = (config.docIdPrefix || tabName.toLowerCase().substring(0, 4)) + '_' + ('000' + rowCount).slice(-3);
       }
