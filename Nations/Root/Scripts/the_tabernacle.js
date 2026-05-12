@@ -1069,13 +1069,15 @@ const Modules = (() => {
     var strongs  = word["Strong's"] || '';
     var original = word['Original'] || '';
     var translit = word['Transliteration'] || '';
+    var pronunc  = word['Pronunciation'] || '';
     var def      = word['Definition'] || '';
-    var nuance   = word['Nuance'] || '';
-    var testament= word['Testament'] || '';
+    var etymology= word['Etymology'] || word['Nuance'] || '';
+    var kjvAll   = word['KJV Renderings'] || '';
+    var testament= word['Testament'] || (word['language'] === 'greek' ? 'New' : word['language'] === 'hebrew' ? 'Old' : '');
     var theme    = word['Theme'] || '';
     var usage    = parseInt(word['Usage Count'] || '0', 10) || 0;
     var verses   = word['Verses'] || '';
-    var isNT     = testament === 'New';
+    var isNT     = testament.toLowerCase().includes('new') || testament.toLowerCase().includes('greek') || (word['language'] || '') === 'greek';
     var langDir  = isNT ? 'ltr' : 'rtl';
     var langClass= isNT ? 'lex-greek' : 'lex-hebrew';
 
@@ -1085,7 +1087,8 @@ const Modules = (() => {
     html += '<div class="gene-hero">';
     if (original) {
       html += '<div class="lex-original ' + langClass + '" dir="' + langDir + '" style="font-size:2.4rem;margin-bottom:4px;">' + _e(original) + '</div>';
-      if (translit) html += '<p style="font-style:italic;color:var(--ink-muted);font-size:0.9rem;margin:0 0 6px;">' + _e(translit) + '</p>';
+      if (translit) html += '<p style="font-style:italic;color:var(--ink-muted);font-size:0.9rem;margin:0 0 2px;">' + _e(translit) + '</p>';
+      if (pronunc)  html += '<p style="color:var(--ink-muted);font-size:0.8rem;margin:0 0 6px;">Pronounced: <em>' + _e(pronunc) + '</em></p>';
     }
     html += '<h2 class="gene-hero-name">' + _e(eng) + '</h2>';
     html += '<div class="gene-hero-badges">';
@@ -1105,11 +1108,23 @@ const Modules = (() => {
       html += '<p style="line-height:1.7;">' + _e(def) + '</p></div>';
     }
 
-    // Nuance
-    if (nuance) {
+    // Nuance/Etymology
+    if (etymology) {
       html += '<div class="gene-section gene-section-lilac">';
-      html += '<div class="gene-section-label">Nuance</div>';
-      html += '<p style="font-style:italic;line-height:1.6;">' + _e(nuance) + '</p></div>';
+      html += '<div class="gene-section-label">Etymology</div>';
+      html += '<p style="font-style:italic;line-height:1.6;">' + _e(etymology) + '</p></div>';
+    }
+
+    // KJV Renderings
+    if (kjvAll) {
+      var chips = kjvAll.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+      if (chips.length) {
+        html += '<div class="gene-section">';
+        html += '<div class="gene-section-label">KJV Renderings</div>';
+        html += '<div class="grow-lex-kjv-chips">' + chips.map(function(c) {
+          return '<span class="grow-lex-kjv-chip">' + _e(c) + '</span>';
+        }).join('') + '</div></div>';
+      }
     }
 
     // Usage stats with visual bar
@@ -1607,6 +1622,9 @@ const Modules = (() => {
     english: 'English', strongs: "Strong's", original: 'Original',
     transliteration: 'Transliteration', nuance: 'Nuance',
     usageCount: 'Usage Count', verses: 'Verses',
+    // Firestore lexicon raw fields (from seed_lexicon_to_firestore.py)
+    lemma: 'Original', xlit: 'Transliteration', pron: 'Pronunciation',
+    derivation: 'Etymology', strongs_def: 'Definition', kjv_def: 'KJV Renderings',
     category: 'Category', chartAxis: 'Chart Axis', questionId: 'Question ID',
     prescription: 'Prescription', verseReference: 'Verse Reference',
     categoryId: 'Category ID', categoryTitle: 'Category Title',
@@ -1630,6 +1648,18 @@ const Modules = (() => {
         if (r[k] !== undefined && r[_fieldAliases[k]] === undefined) {
           r[_fieldAliases[k]] = r[k];
         }
+      }
+      // Lexicon: derive English from first KJV rendering if not set
+      if (!r['English'] && r['KJV Renderings']) {
+        r['English'] = (r['KJV Renderings'] + '').split(',')[0].trim();
+      }
+      // Lexicon: derive English from kjv_def if still not set
+      if (!r['English'] && r['kjv_def']) {
+        r['English'] = (r['kjv_def'] + '').split(',')[0].trim();
+      }
+      // Lexicon: Testament from language field if not set
+      if (!r['Testament'] && r['language']) {
+        r['Testament'] = r['language'] === 'greek' ? 'New' : 'Old';
       }
     }
     return rows;
@@ -6011,8 +6041,9 @@ const Modules = (() => {
       const rows = Array.isArray(raw) ? raw : _rows(raw);
       if (!rows.length) { _body(el, _empty('&#10017;', 'No lexicon data yet', 'Add word entries in the Matthew spreadsheet.')); return; }
 
-      const ntWords = rows.filter(r => (r['Testament'] || '') === 'New');
-      const otWords = rows.filter(r => (r['Testament'] || '') !== 'New');
+      const _isNT = r => { const t = r['Testament'] || ''; const lang = r['language'] || ''; return t === 'New' || t.toLowerCase().includes('new') || lang === 'greek'; };
+      const ntWords = rows.filter(_isNT);
+      const otWords = rows.filter(r => !_isNT(r));
       const maxUsage = Math.max(...rows.map(r => parseInt(r['Usage Count'] || '0', 10) || 0), 1);
 
       // Sort alphabetically by English
@@ -6067,7 +6098,7 @@ const Modules = (() => {
           const eng = r['English'] || '';
           const original = r['Original'] || '';
           const strongs = r["Strong's"] || '';
-          const isNT = (r['Testament'] || '') === 'New';
+          const isNT = (r['Testament'] || '') === 'New' || (r['language'] || '') === 'greek';
           const searchText = (eng + ' ' + strongs + ' ' + original + ' ' + (r['Transliteration'] || '') + ' ' + (r['Definition'] || '')).toLowerCase();
           html += '<div class="gene-item" data-search="' + _e(searchText) + '" data-testament="' + (isNT ? 'nt' : 'ot') + '" data-letter="' + letter + '" data-idx="' + _e(eng) + '">';
           html += '<div class="gene-item-name">' + _e(eng) + '</div>';

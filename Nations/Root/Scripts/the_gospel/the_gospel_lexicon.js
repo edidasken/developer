@@ -67,11 +67,13 @@ function _load(root) {
       id,
       'Strong\'s': id,
       English:        (e.kjv_def   || '').split(',')[0].trim(),
+      KJVRenderings:  e.kjv_def   || '',
       Original:       e.lemma      || '',
       Transliteration: e.translit  || '',
+      Pronunciation:  '',
       Testament:      'New Testament',
       Definition:     e.strongs_def ? e.strongs_def.trim() : '',
-      Nuance:         e.derivation  || '',
+      Etymology:      e.derivation  || '',
       Verses: '', Theme: ''
     });
   }
@@ -80,11 +82,13 @@ function _load(root) {
       id,
       'Strong\'s': id,
       English:        (e.kjv_def   || '').split(',')[0].trim(),
+      KJVRenderings:  e.kjv_def   || '',
       Original:       e.lemma      || '',
-      Transliteration: e.xlit || e.translit || '',
+      Transliteration: e.xlit     || '',
+      Pronunciation:  e.pron      || '',
       Testament:      'Old Testament',
       Definition:     e.strongs_def ? e.strongs_def.trim() : '',
-      Nuance:         e.derivation  || '',
+      Etymology:      e.derivation  || '',
       Verses: '', Theme: ''
     });
   }
@@ -123,12 +127,20 @@ function _paintDetail(root) {
   const isGreek  = testament.toLowerCase().includes('new') || testament.toLowerCase().includes('greek');
   const lang     = isGreek ? 'Greek' : 'Hebrew';
   const langColor = isGreek ? '#0891b2' : '#7c3aed';
+  const kjvChips = (w.KJVRenderings || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((r) => `<span class="grow-lex-kjv-chip">${esc(r)}</span>`)
+    .join('');
+
   det.innerHTML = /* html */`
     <div class="grow-lex-hero" style="--lex-color:${langColor}">
-      ${w.Original ? `<div class="grow-lex-big-word">${esc(w.Original || w.original || '')}</div>` : ''}
+      ${w.Original ? `<div class="grow-lex-big-word">${esc(w.Original)}</div>` : ''}
       <div class="grow-lex-hero-text">
         <h2 class="grow-lex-english">${esc(w.English || w.english || '')}</h2>
         ${w.Transliteration ? `<p class="grow-lex-transliteration">/${esc(w.Transliteration)}/</p>` : ''}
+        ${w.Pronunciation   ? `<p class="grow-lex-pronunciation">Pronounced: <em>${esc(w.Pronunciation)}</em></p>` : ''}
       </div>
     </div>
     <div class="grow-lex-meta">
@@ -136,10 +148,12 @@ function _paintDetail(root) {
       ${w.Testament   ? chip(lang, 'level') : ''}
       ${w.Theme       ? chip(w.Theme, 'topic') : ''}
     </div>
-    ${w.Definition ? `<h4 class="grow-detail-h4">Definition</h4><p class="grow-detail-body">${esc(snip(w.Definition, 600))}</p>` : ''}
-    ${w.Nuance     ? `<h4 class="grow-detail-h4">Nuance</h4><p class="grow-detail-body">${esc(snip(w.Nuance, 400))}</p>` : ''}
+    ${w.Definition ? `<h4 class="grow-detail-h4">Definition</h4><p class="grow-detail-body">${esc(w.Definition)}</p>` : ''}
+    ${w.Etymology  ? `<h4 class="grow-detail-h4">Etymology</h4><p class="grow-detail-body grow-detail-body--muted">${esc(w.Etymology)}</p>` : ''}
+    ${kjvChips     ? `<h4 class="grow-detail-h4">KJV Renderings</h4><div class="grow-lex-kjv-chips">${kjvChips}</div>` : ''}
     ${w.Verses     ? `<h4 class="grow-detail-h4">Verse appearances</h4><p class="grow-detail-body">${esc(w.Verses)}</p>` : ''}
   `;
+
 }
 
 function _filtered() {
