@@ -25,13 +25,17 @@ const DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 const EVENT_TYPES = ['service','prayer','ministry','outreach','admin','special','training','other'];
 
 const RECURRENCE_RULES = [
-  { value: 'None',      label: 'Does not repeat' },
-  { value: 'Daily',     label: 'Daily' },
-  { value: 'Weekly',    label: 'Weekly' },
-  { value: 'Biweekly',  label: 'Every 2 weeks' },
-  { value: 'Monthly',   label: 'Monthly (same date)' },
-  { value: 'Yearly',    label: 'Yearly' },
+  { value: 'None',       label: 'Does not repeat' },
+  { value: 'Daily',      label: 'Daily' },
+  { value: 'Weekly',     label: 'Weekly' },
+  { value: 'Biweekly',   label: 'Every 2 weeks' },
+  { value: 'Monthly',    label: 'Monthly (same date)' },
+  { value: 'MonthlyDow', label: 'Monthly (day of week)' },
+  { value: 'Yearly',     label: 'Yearly' },
 ];
+
+const DOW_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const ORD_NAMES = ['1st','2nd','3rd','4th','Last'];
 
 const ALERT_OPTIONS = [
   { value: '',     label: 'No alert' },
@@ -784,9 +788,10 @@ function _personalEventCard(ev) {
   const vis     = (ev.Visibility || ev.visibility || 'private').toLowerCase();
   const time    = ev.StartDateTime ? ev.StartDateTime.substring(11, 16) : (ev.startTime || ev.time || '');
   const loc     = ev.Location || ev.location || '';
-  const recur   = ev.RecurrenceRule || ev.recurring || '';
-  const alert   = ev.AlertMinutes || ev.alertMinutes || '';
-  const id      = String(ev.EventID || ev.id || '');
+  const recur      = ev.RecurrenceRule || ev.recurring || '';
+  const recurDay   = ev.RecurringDay || '';
+  const alert      = ev.AlertMinutes || ev.alertMinutes || '';
+  const id         = String(ev.EventID || ev.id || '');
 
   const visLabel = { private: '🔒 Private', members: '👥 Members', leaders: '🛡️ Leaders', public: '🌐 Public' }[vis] || vis;
   const visColor = vis === 'private' ? '#6366f1' : vis === 'public' ? '#059669' : '#e8a838';
@@ -796,6 +801,9 @@ function _personalEventCard(ev) {
     const am = parseInt(alert, 10);
     alertLabel = am >= 1440 ? '⏰ 1 day' : am >= 60 ? `⏰ ${am/60}h` : `⏰ ${am}m`;
   }
+  const recurLabel = recur === 'MonthlyDow'
+    ? `Monthly · ${recurDay || 'day of week'}`
+    : recur;
 
   const isValid = d && !isNaN(d.getTime());
   return /* html */`
@@ -812,7 +820,7 @@ function _personalEventCard(ev) {
           <span style="color:${visColor};font-weight:600;">${visLabel}</span>
           ${time ? `<span>🕐 ${_e(time)}</span>` : ''}
           ${loc  ? `<span>📍 ${_e(loc)}</span>`  : ''}
-          ${recur && recur !== 'None' ? `<span>🔁 ${_e(recur)}</span>` : ''}
+          ${recurLabel && recurLabel !== 'None' ? `<span>🔁 ${_e(recurLabel)}</span>` : ''}
           ${alertLabel ? `<span>${alertLabel} alert</span>` : ''}
         </div>
       </div>
@@ -832,14 +840,22 @@ function _openPersonalSheet(ev, onReload) {
   const loc   = ev?.Location || ev?.location || '';
   const desc  = ev?.Description || ev?.description || '';
   const color = ev?.Color || '#6366f1';
-  const recurVal = ev?.RecurrenceRule || ev?.recurring || 'None';
-  const recurUntil = ev?.RecurringUntil ? ev.RecurringUntil.substring(0, 10) : '';
+  const recurVal    = ev?.RecurrenceRule || ev?.recurring || 'None';
+  const recurUntil  = ev?.RecurringUntil ? ev.RecurringUntil.substring(0, 10) : '';
+  const recurDayVal = ev?.RecurringDay || '';
+  const [recurOrdinal = '1st', recurDayName = 'Sunday'] = recurDayVal ? recurDayVal.split(' ') : [];
   const alertVal = ev?.AlertMinutes || ev?.alertMinutes || '';
   const visVal   = ev?.Visibility || ev?.visibility || 'private';
   const isAllDay = ev?.IsAllDay || false;
 
   const recurOptions = RECURRENCE_RULES.map(r =>
     `<option value="${_e(r.value)}"${r.value === recurVal ? ' selected' : ''}>${_e(r.label)}</option>`
+  ).join('');
+  const ordinalOptions = ORD_NAMES.map(o =>
+    `<option value="${o}"${o === recurOrdinal ? ' selected' : ''}>${o}</option>`
+  ).join('');
+  const dowOptions = DOW_NAMES.map(d =>
+    `<option value="${d}"${d === recurDayName ? ' selected' : ''}>${d}</option>`
   ).join('');
   const alertOptions = ALERT_OPTIONS.map(a =>
     `<option value="${_e(a.value)}"${a.value === String(alertVal) ? ' selected' : ''}>${_e(a.label)}</option>`
@@ -909,6 +925,16 @@ function _openPersonalSheet(ev, onReload) {
             <input class="life-sheet-input" data-field="RecurringUntil" type="date" value="${_e(recurUntil)}">
           </div>
         </div>
+        <div class="fold-form-row" data-dow-row style="display:${recurVal === 'MonthlyDow' ? '' : 'none'}">
+          <div class="life-sheet-field">
+            <div class="life-sheet-label">Occurrence</div>
+            <select class="life-sheet-input" data-field="recurOrdinal">${ordinalOptions}</select>
+          </div>
+          <div class="life-sheet-field">
+            <div class="life-sheet-label">Day of Week</div>
+            <select class="life-sheet-input" data-field="recurDay">${dowOptions}</select>
+          </div>
+        </div>
         <div class="fold-form-row">
           <div class="life-sheet-field">
             <div class="life-sheet-label">Alert</div>
@@ -947,6 +973,27 @@ function _openPersonalSheet(ev, onReload) {
   sheet.querySelector('[data-cancel]').addEventListener('click', close);
   sheet.querySelector('.life-sheet-close').addEventListener('click', close);
 
+  // Show/hide day-of-week sub-row + auto-suggest from start date
+  const _recurSel = sheet.querySelector('[data-field="RecurrenceRule"]');
+  const _dowRow   = sheet.querySelector('[data-dow-row]');
+  const _dateSel  = sheet.querySelector('[data-field="startDate"]');
+  const _autoSuggestDow = () => {
+    if (_recurSel.value !== 'MonthlyDow') return;
+    const raw = _dateSel.value;
+    if (!raw) return;
+    const d = new Date(raw + 'T12:00:00');
+    const dayName = DOW_NAMES[d.getDay()];
+    const weekNum = Math.ceil(d.getDate() / 7);
+    const ordName = weekNum <= 4 ? ORD_NAMES[weekNum - 1] : 'Last';
+    sheet.querySelector('[data-field="recurOrdinal"]').value = ordName;
+    sheet.querySelector('[data-field="recurDay"]').value = dayName;
+  };
+  _recurSel.addEventListener('change', () => {
+    _dowRow.style.display = _recurSel.value === 'MonthlyDow' ? '' : 'none';
+    _autoSuggestDow();
+  });
+  _dateSel.addEventListener('change', _autoSuggestDow);
+
   const _myEmail = () => window.Nehemiah?.getSession?.()?.email || window.TheVine?.session?.()?.email || '';
 
   sheet.querySelector('[data-save]').addEventListener('click', async () => {
@@ -961,6 +1008,7 @@ function _openPersonalSheet(ev, onReload) {
 
     const startTimeV = sheet.querySelector('[data-field="startTime"]').value;
     const endTimeV   = sheet.querySelector('[data-field="endTime"]').value;
+    const recurRuleV = sheet.querySelector('[data-field="RecurrenceRule"]').value;
     const payload = {
       Title:          titleV,
       StartDateTime:  dateV + (startTimeV ? 'T' + startTimeV : ''),
@@ -969,7 +1017,10 @@ function _openPersonalSheet(ev, onReload) {
       Description:    sheet.querySelector('[data-field="Description"]').value.trim() || '',
       Color:          sheet.querySelector('[data-field="Color"]').value,
       IsAllDay:       sheet.querySelector('[data-field="IsAllDay"]').value === 'true',
-      RecurrenceRule: sheet.querySelector('[data-field="RecurrenceRule"]').value,
+      RecurrenceRule: recurRuleV,
+      RecurringDay:   recurRuleV === 'MonthlyDow'
+        ? `${sheet.querySelector('[data-field="recurOrdinal"]').value} ${sheet.querySelector('[data-field="recurDay"]').value}`
+        : '',
       RecurringUntil: sheet.querySelector('[data-field="RecurringUntil"]').value || '',
       AlertMinutes:   sheet.querySelector('[data-field="AlertMinutes"]').value || '',
       Visibility:     sheet.querySelector('[data-field="Visibility"]').value || 'private',
