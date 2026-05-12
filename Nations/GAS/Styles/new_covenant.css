@@ -13608,12 +13608,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .grow-quote { margin:10px 0; padding:10px 14px; border-left:3px solid var(--grow-accent, #2563eb); background:var(--bg-base, #f7f8fb); font-style:italic; color:var(--ink, #1b264f); }
 .grow-prayer { color:var(--muted, #aaa); }
 
-/* apologetics */
-.grow-apo-group { border:1px solid var(--border, rgba(255,255,255,.08)); border-radius:12px; padding:6px 12px; }
-.grow-apo-cat { cursor:pointer; padding:8px 4px; font-weight:600; }
-.grow-apo-count { float:right; font-size:12px; color:var(--muted, #888); }
-.grow-card--apo { padding:14px 16px; cursor:default; }
-.grow-card--apo:hover { transform:none; }
+/* apologetics — old stubs removed, see GROW · APOLOGETICS REDESIGN below */
 
 /* counseling */
 .grow-grid--counseling { grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); }
@@ -13921,33 +13916,60 @@ flock-tabs [role="tablist"], .tabs-bar {
 /* ══════════════════════════════════════════════════════════════════════════════
    GROW · APOLOGETICS REDESIGN
    ══════════════════════════════════════════════════════════════════════════════ */
-.grow-apo-list { display:flex; flex-direction:column; border:1px solid var(--border,rgba(255,255,255,.08)); border-radius:14px; overflow:hidden; }
-.grow-apo-item { border-bottom:1px solid var(--border,rgba(255,255,255,.06)); }
-.grow-apo-item:last-child { border-bottom:none; }
+.grow-apo-list  { display:flex; flex-direction:column; gap:28px; }
+.grow-apo-section { --apo-color:#475569; }
+.grow-apo-section-head {
+  display:flex; flex-direction:column; gap:4px;
+  padding-bottom:12px;
+  border-bottom:2px solid var(--apo-color);
+  margin-bottom:10px;
+}
+.grow-apo-section-title  { margin:0; font-size:15px; font-weight:700; color:var(--apo-color); }
+.grow-apo-section-intro  { margin:4px 0 0; font-size:13px; color:var(--muted,#aaa); line-height:1.5; }
+.grow-apo-section-count  { font-size:11px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--muted,#888); }
+.grow-apo-cards { display:flex; flex-direction:column; gap:6px; }
+.grow-apo-card {
+  border:1px solid var(--border,rgba(255,255,255,.08));
+  border-left:3px solid var(--apo-color);
+  border-radius:10px; overflow:hidden;
+  background:var(--surface,rgba(255,255,255,.03));
+  transition:border-color .15s, box-shadow .15s;
+}
+.grow-apo-card.is-open {
+  border-color:color-mix(in srgb, var(--apo-color) 40%, transparent);
+  border-left-color:var(--apo-color);
+  box-shadow:0 2px 14px color-mix(in srgb, var(--apo-color) 12%, transparent);
+}
 .grow-apo-q {
-  display:flex; align-items:center; gap:12px; width:100%; padding:14px 16px;
+  display:flex; align-items:center; gap:12px; width:100%; padding:13px 16px;
   background:none; border:none; cursor:pointer; font:inherit; text-align:left;
   color:var(--text,#f5f5f7); transition:background .12s;
 }
-.grow-apo-q:hover { background:var(--surface,rgba(255,255,255,.03)); }
-.grow-apo-item.is-open .grow-apo-q { background:color-mix(in srgb, #475569 10%, var(--surface,rgba(255,255,255,.03))); }
+.grow-apo-q:hover { background:color-mix(in srgb, var(--apo-color) 6%, transparent); }
+.grow-apo-card.is-open .grow-apo-q { background:color-mix(in srgb, var(--apo-color) 10%, transparent); }
 .grow-apo-num {
   flex-shrink:0; min-width:28px; height:28px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
   font-size:11px; font-weight:700;
-  background:color-mix(in srgb, #475569 22%, transparent); color:#94a3b8;
+  background:color-mix(in srgb, var(--apo-color) 20%, transparent); color:var(--apo-color);
 }
-.grow-apo-qtext { flex:1; font-size:14px; font-weight:500; line-height:1.4; }
-.grow-apo-chevron { flex-shrink:0; color:var(--muted,#888); transition:transform .2s; }
-.grow-apo-item.is-open .grow-apo-chevron { transform:rotate(180deg); }
-.grow-apo-body { padding:4px 16px 18px 56px; line-height:1.65; }
+.grow-apo-qtext   { flex:1; font-size:14px; font-weight:500; line-height:1.4; }
+.grow-apo-chevron { flex-shrink:0; color:var(--muted,#888); transition:transform .25s; }
+.grow-apo-card.is-open .grow-apo-chevron { transform:rotate(180deg); }
+.grow-apo-body  { padding:4px 16px 18px 56px; }
 @media (max-width:600px) { .grow-apo-body { padding:4px 14px 16px 14px; } }
-.grow-apo-catbadge {
-  display:inline-block; font-size:11px; font-weight:600; letter-spacing:.05em;
-  text-transform:uppercase; padding:2px 10px; border-radius:20px; margin-bottom:10px;
-  background:color-mix(in srgb, #475569 18%, transparent); color:#94a3b8;
+.grow-apo-answer { font-size:14px; line-height:1.65; color:var(--text,#d8d8d8); margin:0 0 14px; }
+.grow-apo-quote {
+  margin:0; padding:12px 16px;
+  border-left:3px solid var(--apo-color);
+  background:color-mix(in srgb, var(--apo-color) 8%, transparent);
+  border-radius:0 8px 8px 0;
 }
-.grow-apo-answer { font-size:14px; color:var(--text,#d8d8d8); margin:0 0 12px; }
+.grow-apo-quote p    { margin:0 0 8px; font-style:italic; font-size:14px; line-height:1.6; color:var(--text,#d8d8d8); }
+.grow-apo-quote p:last-child { margin-bottom:0; }
+.grow-apo-quote cite { display:block; font-size:12px; font-style:normal; margin-top:6px; color:var(--muted,#aaa); }
+.grow-apo-quote cite a { color:var(--apo-color); text-decoration:none; }
+.grow-apo-quote cite a:hover { text-decoration:underline; }
 
 /* ══════════════════════════════════════════════════════════════════════════════
    GROW · GENEALOGY REDESIGN

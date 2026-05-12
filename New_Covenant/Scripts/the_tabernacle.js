@@ -7162,18 +7162,31 @@ const Modules = (() => {
       const rows = Array.isArray(raw) ? raw : _rows(raw);
       if (!rows.length) { _body(el, _empty('&#9878;', 'No apologetics data yet', 'Add entries in the Matthew spreadsheet.')); return; }
 
-      // Build category map for pill colors + intros; preserve insertion order
-      const catMeta = {};
-      rows.forEach(r => {
-        const cat = r['Category Title'] || 'General';
-        if (!catMeta[cat]) catMeta[cat] = { color: r['Category Color'] || 'var(--accent)', intro: r['Category Intro'] || '' };
-      });
-      const catKeys = Object.keys(catMeta);
+      // Normalize field names (camelCase from Firestore export or bracket-space from Sheets)
+      const norm = rows.map(r => ({
+        questionTitle:  r.questionTitle  || r['Question Title']  || r['Short Title'] || '',
+        answerContent:  r.answerContent  || r['Answer Content']  || '',
+        quoteText:      r.quoteText      || r['Quote Text']      || '',
+        referenceText:  r.referenceText  || r['Reference Text']  || '',
+        referenceUrl:   r.referenceUrl   || r['Reference URL']   || '',
+        categoryTitle:  r.categoryTitle  || r['Category Title']  || 'General',
+        categoryColor:  r.categoryColor  || r['Category Color']  || 'var(--accent)',
+        categoryIntro:  r.categoryIntro  || r['Category Intro']  || '',
+        sortOrder:      r.sortOrder      || 0,
+      }));
 
-      // Stats
+      // Group by category
+      const catMap = new Map();
+      norm.forEach(r => {
+        const cat = r.categoryTitle;
+        if (!catMap.has(cat)) catMap.set(cat, { color: r.categoryColor, intro: r.categoryIntro, items: [] });
+        catMap.get(cat).items.push(r);
+      });
+
+      // Stats bar
       let html = '<div class="settings-stat-row">';
-      html += '<div class="settings-stat-card"><div class="settings-stat-value">' + catKeys.length + '</div><div class="settings-stat-label">Topics</div></div>';
-      html += '<div class="settings-stat-card"><div class="settings-stat-value" style="color:var(--accent);">' + rows.length + '</div><div class="settings-stat-label">Questions</div></div>';
+      html += '<div class="settings-stat-card"><div class="settings-stat-value">' + catMap.size + '</div><div class="settings-stat-label">Topics</div></div>';
+      html += '<div class="settings-stat-card"><div class="settings-stat-value" style="color:var(--accent);">' + norm.length + '</div><div class="settings-stat-label">Questions</div></div>';
       html += '</div>';
 
       // Search
@@ -7182,62 +7195,44 @@ const Modules = (() => {
       html += '<input type="text" class="browse-search-input" placeholder="Search questions\u2026" oninput="Modules._filterBrowse(\'apol\',this.value)">';
       html += '</div>';
 
-      // Each QUESTION is its own accordion
-      html += '<div class="browse-grid" id="apol-grid">';
-      rows.forEach(r => {
-        const question  = r['Question Title'] || r['Short Title'] || 'Question';
-        const cat       = r['Category Title'] || 'General';
-        const color     = catMeta[cat] ? catMeta[cat].color : 'var(--accent)';
-        const answer    = r['Answer Content'] || '';
-        const quote     = r['Quote Text'] || '';
-        const refText   = r['Reference Text'] || '';
-        const refUrl    = r['Reference URL'] || '';
-        const searchText = (question + ' ' + cat + ' ' + answer + ' ' + quote + ' ' + refText).toLowerCase();
-
-        // Pill: use category color from sheet as inline style
-        const pillStyle = 'font-size:0.68rem;background:' + _e(color) + '1a;color:' + _e(color) + ';border:1px solid ' + _e(color) + '44;border-radius:20px;padding:2px 8px;white-space:nowrap;flex-shrink:0;';
-
-        html += '<details class="browse-item" data-search="' + _e(searchText) + '">';
-        html += '<summary class="browse-item-trigger">';
-        html += '<span class="browse-item-icon" style="color:' + _e(color) + ';">&#9878;</span>';
-        html += '<div style="flex:1;min-width:0;">';
-        html += '<span class="browse-item-title">' + _e(question) + '</span>';
+      // Grouped accordion
+      html += '<div class="grow-apo-list" id="apol-grid">';
+      catMap.forEach(function({ color, intro, items }, cat) {
+        const safeColor = _e(color);
+        html += '<div class="grow-apo-section" style="--apo-color:' + safeColor + '">';
+        html += '<div class="grow-apo-section-head">';
+        html += '<h3 class="grow-apo-section-title">' + _e(cat) + '</h3>';
+        if (intro) html += '<p class="grow-apo-section-intro">' + _e(intro) + '</p>';
+        html += '<span class="grow-apo-section-count">' + items.length + ' question' + (items.length !== 1 ? 's' : '') + '</span>';
         html += '</div>';
-        html += '<span style="' + pillStyle + '">' + _e(cat) + '</span>';
-        html += '<span class="browse-item-chevron">&#9654;</span>';
-        html += '</summary>';
-
-        html += '<div class="browse-item-body">';
-
-        // Answer card
-        if (answer) {
-          html += '<div class="browse-detail-card browse-card-accent">';
-          html += '<div class="browse-detail-head"><span class="browse-detail-icon">&#128214;</span><span class="browse-detail-label">Biblical Answer</span></div>';
-          html += '<div class="browse-detail-body">' + _paras(answer) + '</div>';
-          html += '</div>';
-        }
-
-        // Scripture card — quote text + reference pills + external source link
-        if (quote || refText || refUrl) {
-          html += '<div class="browse-detail-card browse-card-gold">';
-          html += '<div class="browse-detail-head"><span class="browse-detail-icon">&#128220;</span><span class="browse-detail-label">Scripture</span></div>';
-          if (quote) html += '<div class="browse-detail-body">' + _paras(quote) + '</div>';
-          if (refText) {
-            html += '<div style="display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px 14px;">';
-            refText.split(/[;,]+/).map(r => r.trim()).filter(Boolean).forEach(ref => {
-              html += _biblePill(ref, 'pill-accent');
-            });
-            html += '</div>';
+        html += '<div class="grow-apo-cards">';
+        items.forEach(function(r, idx) {
+          const num     = r.sortOrder || (idx + 1);
+          const qtitle  = _e(r.questionTitle.replace(/^\d+\.\s*/, ''));
+          const answer  = r.answerContent;
+          const quote   = r.quoteText;
+          const ref     = r.referenceText;
+          const refUrl  = r.referenceUrl;
+          const searchTxt = (r.questionTitle + ' ' + r.answerContent + ' ' + cat).toLowerCase();
+          html += '<div class="grow-apo-card browse-item" data-search="' + _e(searchTxt) + '">';
+          html += '<button class="grow-apo-q" type="button" onclick="(function(btn){var card=btn.closest(\'.grow-apo-card\');var body=card.querySelector(\'.grow-apo-body\');var open=card.classList.toggle(\'is-open\');body.hidden=!open;})(this)">';
+          html += '<span class="grow-apo-num">' + num + '</span>';
+          html += '<span class="grow-apo-qtext">' + qtitle + '</span>';
+          html += '<svg class="grow-apo-chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>';
+          html += '</button>';
+          html += '<div class="grow-apo-body" hidden>';
+          if (answer) html += '<p class="grow-apo-answer">' + _paras(answer) + '</p>';
+          if (quote || ref) {
+            html += '<blockquote class="grow-apo-quote">';
+            if (quote) html += '<p>' + _e(quote) + '</p>';
+            if (ref) {
+              html += '<cite>' + (refUrl ? '<a href="' + _e(refUrl) + '" target="_blank" rel="noopener noreferrer">' + _e(ref) + '</a>' : _e(ref)) + '</cite>';
+            }
+            html += '</blockquote>';
           }
-          if (refUrl) {
-            html += '<div style="padding:4px 14px 14px;font-size:0.78rem;">';
-            html += '<a href="' + _e(refUrl) + '" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:underline;">&#128279; Source Reference</a>';
-            html += '</div>';
-          }
-          html += '</div>';
-        }
-
-        html += '</div></details>';
+          html += '</div></div>';
+        });
+        html += '</div></div>';
       });
       html += '</div>';
       _body(el, html);

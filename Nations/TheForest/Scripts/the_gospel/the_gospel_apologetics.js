@@ -63,34 +63,53 @@ function _paint(root) {
     list.innerHTML = emptyState({ icon: '⚖️', title: q ? 'No matches' : 'No apologetics yet' });
     return;
   }
-  list.innerHTML = rows.map((q, idx) => _item(q, idx)).join('');
-  // Accordion: click to expand/collapse
-  list.querySelectorAll('.grow-apo-item').forEach((item) => {
-    item.querySelector('.grow-apo-q').addEventListener('click', () => {
-      const open = item.classList.toggle('is-open');
-      item.querySelector('.grow-apo-body').style.display = open ? '' : 'none';
+
+  // Group by category, preserving sort order
+  const catMap = new Map();
+  rows.forEach((r) => {
+    const cat = r.categoryTitle || 'General';
+    if (!catMap.has(cat)) catMap.set(cat, { color: r.categoryColor || '#475569', intro: r.categoryIntro || '', items: [] });
+    catMap.get(cat).items.push(r);
+  });
+
+  list.innerHTML = [...catMap.entries()].map(([cat, { color, intro, items }]) => /* html */`
+    <div class="grow-apo-section" style="--apo-color:${esc(color)}">
+      <div class="grow-apo-section-head">
+        <h3 class="grow-apo-section-title">${esc(cat)}</h3>
+        ${intro ? `<p class="grow-apo-section-intro">${esc(intro)}</p>` : ''}
+        <span class="grow-apo-section-count">${items.length} question${items.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="grow-apo-cards">
+        ${items.map((r, i) => _item(r, i)).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.grow-apo-card').forEach((card) => {
+    card.querySelector('.grow-apo-q').addEventListener('click', () => {
+      const open = card.classList.toggle('is-open');
+      card.querySelector('.grow-apo-body').hidden = !open;
     });
   });
 }
 
 function _item(q, idx) {
   const num    = q.sortOrder || (idx + 1);
-  const qtitle = q.questionTitle || q.question || '';
+  const qtitle = (q.questionTitle || q.question || '').replace(/^\d+\.\s*/, '');
   const answer = q.answerContent || '';
   const quote  = q.quoteText || '';
   const ref    = q.referenceText || '';
-  const cat    = (q.categoryTitle || '').replace(/^[^\w\s]+\s*/, ''); // strip leading emoji
+  const refUrl = q.referenceUrl || '';
   return /* html */`
-    <div class="grow-apo-item">
-      <button class="grow-apo-q" type="button" aria-expanded="false">
+    <div class="grow-apo-card">
+      <button class="grow-apo-q" type="button">
         <span class="grow-apo-num">${num}</span>
         <span class="grow-apo-qtext">${esc(qtitle)}</span>
         <svg class="grow-apo-chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
       </button>
-      <div class="grow-apo-body" style="display:none;">
-        ${cat ? `<div class="grow-apo-catbadge">${esc(cat)}</div>` : ''}
+      <div class="grow-apo-body" hidden>
         ${answer ? `<p class="grow-apo-answer">${esc(answer)}</p>` : ''}
-        ${quote  ? `<blockquote class="grow-quote">${esc(quote)}${ref ? `<cite>— ${esc(ref)}</cite>` : ''}</blockquote>` : ''}
+        ${quote ? `<blockquote class="grow-apo-quote"><p>${esc(quote)}</p>${ref ? `<cite>${refUrl ? `<a href="${esc(refUrl)}" target="_blank" rel="noopener">${esc(ref)}</a>` : esc(ref)}</cite>` : ''}</blockquote>` : ''}
       </div>
     </div>
   `;
