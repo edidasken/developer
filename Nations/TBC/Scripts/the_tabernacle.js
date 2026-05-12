@@ -7809,15 +7809,6 @@ const Modules = (() => {
     }, 'Start Thread');
   }
 
-  async function _threadArchive(id) {
-    _undoAction('Thread archived', async function() {
-      if (_isFirebaseComms()) { await UpperRoom.archiveConversation(id); }
-      else { await TheVine.flock.comms.threads.archive({ id: id }); }
-      _invalidateCache('comms-threads');
-      commsView('threads');
-    });
-  }
-
   async function _threadMuteToggle(id, isMuted) {
     if (_isFirebaseComms()) {
       await UpperRoom.updateConversation(id, { muted: !isMuted });
@@ -8050,6 +8041,26 @@ const Modules = (() => {
       await UpperRoom.deleteConversation(id);
       commsView(_commsTab || 'threads');
     });
+  }
+
+  // ── Archive a room ────────────────────────────────────────────────────
+  async function _roomArchive(id) {
+    if (!confirm('Archive this room? It will no longer appear in the rooms list.')) return;
+    try {
+      await UpperRoom.archiveConversation(id);
+      _toast('Room archived.');
+      commsView('rooms');
+    } catch (e) { _toast('Error: ' + e.message, 'danger'); }
+  }
+
+  // ── Delete a room (pastor/admin only) ─────────────────────────────────
+  async function _roomDelete(id) {
+    if (!confirm('Permanently delete this room and all its messages? This cannot be undone.')) return;
+    try {
+      await UpperRoom.deleteConversation(id);
+      _toast('Room deleted.');
+      commsView('rooms');
+    } catch (e) { _toast('Error: ' + e.message, 'danger'); }
   }
 
   async function commsView(tab) {
@@ -8343,6 +8354,10 @@ const Modules = (() => {
               return;
             }
 
+            var _rSess = (typeof Nehemiah !== 'undefined' && Nehemiah.getSession) ? Nehemiah.getSession() : {};
+            var _rMyEmail = UpperRoom.userEmail ? UpperRoom.userEmail() : (_rSess.email || '');
+            var _rCanDel = (_rSess.roleLevel >= 4) || /^(pastor|admin|seed)$/i.test(_rSess.role || '') || (typeof Nehemiah !== 'undefined' && (Nehemiah.hasGroup('Master') || Nehemiah.hasGroup('Seed Admin') || Nehemiah.hasGroup('Lead Pastor')));
+
             var listHtml = '';
             rooms.forEach(function(r) {
               var name = r.name || r.subject || '(Unnamed Room)';
@@ -8350,12 +8365,15 @@ const Modules = (() => {
               var memberCount = (r.participants) ? r.participants.length : 0;
               var lastMsg = r.lastMessage || '';
               var rid = r.id || '';
+              var isCreator = r.createdBy === _rMyEmail;
+              var showArchive = isCreator || _rCanDel;
+              var showDelete = _rCanDel;
               listHtml += '<div class="cr" data-search="' + _e((name + ' ' + desc).toLowerCase()) + '" '
-                + 'onclick="Modules.openRoom(\'' + _e(rid) + '\')" '
-                + 'style="display:flex;gap:12px;padding:14px 16px;cursor:pointer;'
+                + 'style="display:flex;gap:12px;padding:14px 16px;'
                 + 'border-bottom:1px solid var(--line);transition:background .12s;"'
                 + ' onmouseenter="this.style.background=\'rgba(255,255,255,0.06)\'"'
                 + ' onmouseleave="this.style.background=\'transparent\'">'
+                + '<div onclick="Modules.openRoom(\'' + _e(rid) + '\')" style="display:flex;gap:12px;flex:1;min-width:0;cursor:pointer;">'
                 + '<div style="width:38px;height:38px;border-radius:50%;background:var(--accent);'
                 + 'display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;'
                 + 'opacity:0.9;">&#128172;</div>'
@@ -8368,7 +8386,17 @@ const Modules = (() => {
                 + '<div style="font-size:0.78rem;color:var(--ink-muted);margin-top:3px;'
                 + 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'
                 + _e(desc || lastMsg || 'Tap to open room') + '</div>'
-                + '</div>'
+                + '</div></div>'
+                + ((showArchive || showDelete)
+                  ? '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;" onclick="event.stopPropagation();">'
+                    + (showArchive ? '<button onclick="Modules._roomArchive(\'' + _e(rid) + '\')" title="Archive room" '
+                      + 'style="background:none;border:1px solid var(--ink-muted);color:var(--ink-muted);border-radius:5px;'
+                      + 'padding:3px 8px;font-size:0.72rem;cursor:pointer;font-family:inherit;">Archive</button>' : '')
+                    + (showDelete ? '<button onclick="Modules._roomDelete(\'' + _e(rid) + '\')" title="Delete room" '
+                      + 'style="background:none;border:1px solid var(--danger);color:var(--danger);border-radius:5px;'
+                      + 'padding:3px 8px;font-size:0.72rem;cursor:pointer;font-family:inherit;">Delete</button>' : '')
+                    + '</div>'
+                  : '')
                 + '</div>';
             });
             container.innerHTML = listHtml;
@@ -21556,7 +21584,7 @@ const Modules = (() => {
     openThread, newThread, _sendThreadReply, _renderThreadConversation,
     _threadArchive, _threadMuteToggle, _threadAddParticipant,
     openRoom, newRoom, _sendRoomMessage, _renderRoomConversation, _renderRoomMessages,
-    _roomTypingStart, _roomAddParticipant, _deleteFirebaseThread, _deleteRoomMsg,
+    _roomTypingStart, _roomAddParticipant, _roomArchive, _roomDelete, _deleteFirebaseThread, _deleteRoomMsg,
     _toggleInlineReply, _sendInlineReply, _commsFilter,
     _commsSetMode, _isFirebaseComms,
     _notifMarkRead, _notifMarkAllRead, _notifDismiss, _notifBroadcastPanel, _sendBroadcastNotif, _saveNotifPrefs, _sendTestEmail,

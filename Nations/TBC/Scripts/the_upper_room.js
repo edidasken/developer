@@ -360,7 +360,7 @@
         snap.forEach(function(doc) {
           var d = doc.data();
           d.id = doc.id;
-          results.push(d);
+          if (d.status !== 'archived') results.push(d);
         });
         return results;
       });
@@ -382,7 +382,7 @@
         snap.forEach(function(doc) {
           var d = doc.data();
           d.id = doc.id;
-          results.push(d);
+          if (d.status !== 'archived') results.push(d);
         });
         callback(results);
       }, function(err) {
