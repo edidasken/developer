@@ -2243,6 +2243,25 @@ function _maintenancePanelMarkup() {
       bindKey: 'end-inactive-status', actKey: 'end-inactive-assignments', btnLabel: 'Clean up now',
     })}
 
+    ${_maintSection('Member De-duplication')}
+
+    <!-- Dedup scan -->
+    <div style="border:1px solid var(--line,#e5e7ef);border-radius:10px;margin-bottom:10px;overflow:hidden;background:var(--bg-raised,#fff)">
+      <div style="padding:14px;display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:240px">
+          <div style="font-weight:600;color:var(--ink,#1b264f);margin-bottom:2px">Find &amp; Merge Duplicate Members</div>
+          <div style="font-size:.82rem;color:var(--ink-muted,#7a7f96);line-height:1.5">Scans all member records for likely duplicates — matched by email address, full name, or phone number. Review each pair, choose which record to keep, and merge any missing fields from the duplicate before archiving it.</div>
+          <div data-bind="member-dedup-status" style="margin-top:6px;font-size:.82rem;color:var(--ink-muted)"></div>
+        </div>
+        <button class="flock-btn flock-btn--secondary" data-act="scan-member-dups" type="button" style="flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:-1px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Scan for Duplicates
+        </button>
+      </div>
+      <!-- Results populated by JS -->
+      <div data-bind="member-dedup-results" style="display:none"></div>
+    </div>
+
     ${_maintSection('Contact Import / Export')}
 
     <!-- VCF Export -->
@@ -2331,6 +2350,17 @@ function _wireMaintenancePanel(root) {
     // ── VCF Export ────────────────────────────────────────────────
     const vcfExportBtn = e.target.closest('[data-act="vcf-export"]');
     if (vcfExportBtn) return _vcfExport(root, vcfExportBtn);
+
+    // ── Member de-duplication scan ────────────────────────────────
+    const scanDupBtn = e.target.closest('[data-act="scan-member-dups"]');
+    if (scanDupBtn) return _scanMemberDuplicates(root, scanDupBtn);
+
+    // ── Member dedup: keep-A / keep-B radio (re-render summary) ──
+    if (e.target.matches('input[data-dedup-radio]')) return; // no-op: radios are just checked
+
+    // ── Member dedup: merge pair ──────────────────────────────────
+    const mergeBtn = e.target.closest('[data-act="merge-member-pair"]');
+    if (mergeBtn) return _mergeMemberPair(root, mergeBtn);
 
     // ── VCF Import: select all / deselect all ─────────────────────
     if (e.target.closest('[data-act="vcf-select-all"]')) {
@@ -3760,6 +3790,311 @@ async function _vcfImportSelected(root, btn) {
   // Uncheck all if no failures
   if (!failed) {
     checkboxes.forEach(cb => { cb.checked = false; });
+  }
+}
+
+  btn.disabled = false; btn.innerHTML = orig;
+
+  // Uncheck all if no failures
+  if (!failed) {
+    checkboxes.forEach(cb => { cb.checked = false; });
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MEMBER DE-DUPLICATION
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Scan all members for duplicates by email, name, or phone.
+ * Groups them into pairs/sets and renders a review UI.
+ */
+async function _scanMemberDuplicates(root, btn) {
+  const statusEl  = root.querySelector('[data-bind="member-dedup-status"]');
+  const resultsEl = root.querySelector('[data-bind="member-dedup-results"]');
+  const setS = (msg, col) => { if (statusEl) { statusEl.textContent = msg; statusEl.style.color = col || 'var(--ink-muted)'; } };
+
+  btn.disabled = true;
+  const orig = btn.innerHTML;
+  btn.textContent = 'Scanning…';
+  setS('Loading members…');
+  if (resultsEl) { resultsEl.style.display = 'none'; resultsEl.innerHTML = ''; }
+
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR || !UR.listMembers) {
+    setS('Backend not available.', '#b91c1c');
+    btn.disabled = false; btn.innerHTML = orig; return;
+  }
+
+  try {
+    const raw  = await UR.listMembers({ limit: 5000 }).catch(() => []);
+    const all  = (Array.isArray(raw) ? raw : (raw?.results || []))
+      // Skip already-archived records from scan
+      .filter(m => String(m.membershipStatus || '').toLowerCase() !== 'archived');
+
+    // Build duplicate groups — each group is an array of member records
+    const grouped = new Map(); // groupKey → Set of member ids
+    const memberById = {};
+    for (const m of all) memberById[m.id] = m;
+
+    const _norm = s => String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const _normPhone = s => String(s || '').replace(/\D/g, '');
+
+    // email → ids
+    const byEmail  = {};
+    // name → ids
+    const byName   = {};
+    // phone → ids
+    const byPhone  = {};
+
+    for (const m of all) {
+      const emails = [m.primaryEmail, m.secondaryEmail].map(_norm).filter(Boolean);
+      for (const e of emails) {
+        (byEmail[e] = byEmail[e] || []).push(m.id);
+      }
+      const name = _norm([m.firstName, m.lastName].filter(Boolean).join(' '));
+      if (name) (byName[name] = byName[name] || []).push(m.id);
+
+      const phones = [m.cellPhone, m.homePhone, m.workPhone].map(_normPhone).filter(p => p.length >= 7);
+      for (const p of phones) {
+        (byPhone[p] = byPhone[p] || []).push(m.id);
+      }
+    }
+
+    // Collect pair groups (deduplicate pairs regardless of match source)
+    const pairKey = (a, b) => [a, b].sort().join('||');
+    const seenPairs = new Set();
+    const groups = []; // [{ids: [id1, id2], reason: 'email'|'name'|'phone'}]
+
+    const _addPairs = (idLists, reason) => {
+      for (const ids of Object.values(idLists)) {
+        if (ids.length < 2) continue;
+        // Create all pairs from this group
+        for (let i = 0; i < ids.length; i++) {
+          for (let j = i + 1; j < ids.length; j++) {
+            const key = pairKey(ids[i], ids[j]);
+            if (seenPairs.has(key)) continue;
+            seenPairs.add(key);
+            groups.push({ ids: [ids[i], ids[j]], reason });
+          }
+        }
+      }
+    };
+
+    _addPairs(byEmail, 'Same email');
+    _addPairs(byName,  'Same name');
+    _addPairs(byPhone, 'Same phone');
+
+    if (!groups.length) {
+      setS(`✓ No duplicates found across ${all.length} active members.`, '#16a34a');
+      btn.disabled = false; btn.innerHTML = orig; return;
+    }
+
+    setS(`Found ${groups.length} likely duplicate pair${groups.length !== 1 ? 's' : ''} — review below.`, '#d97706');
+    _renderDupResults(root, groups, memberById);
+  } catch (err) {
+    console.error('[wall/dedup-members] scan error', err);
+    setS(`Scan failed: ${err?.message || err}`, '#b91c1c');
+  }
+  btn.disabled = false; btn.innerHTML = orig;
+}
+
+/** Render the duplicate review cards. */
+function _renderDupResults(root, groups, memberById) {
+  const resultsEl = root.querySelector('[data-bind="member-dedup-results"]');
+  if (!resultsEl) return;
+
+  const FIELDS = [
+    { key: 'primaryEmail',   label: 'Email (primary)' },
+    { key: 'secondaryEmail', label: 'Email (secondary)' },
+    { key: 'cellPhone',      label: 'Cell phone' },
+    { key: 'homePhone',      label: 'Home phone' },
+    { key: 'workPhone',      label: 'Work phone' },
+    { key: 'streetAddress1', label: 'Address' },
+    { key: 'city',           label: 'City' },
+    { key: 'state',          label: 'State' },
+    { key: 'zipCode',        label: 'ZIP' },
+    { key: 'dateOfBirth',    label: 'Birthday' },
+    { key: 'gender',         label: 'Gender' },
+    { key: 'membershipStatus', label: 'Status' },
+    { key: 'memberPin',      label: 'Member PIN' },
+    { key: 'notes',          label: 'Notes' },
+  ];
+
+  const _fieldVal = (m, key) => String(m[key] || '').trim();
+  const _countFields = (m) => FIELDS.filter(f => _fieldVal(m, f.key)).length;
+
+  const cards = groups.map((g, gi) => {
+    const [mA, mB] = g.ids.map(id => memberById[id]).filter(Boolean);
+    if (!mA || !mB) return '';
+
+    const nameA = _e([mA.firstName, mA.lastName].filter(Boolean).join(' ') || mA.displayName || '(No name)');
+    const nameB = _e([mB.firstName, mB.lastName].filter(Boolean).join(' ') || mB.displayName || '(No name)');
+
+    // Auto-suggest keeping the one with more data
+    const keepDefault = _countFields(mA) >= _countFields(mB) ? 'A' : 'B';
+
+    const fieldRows = FIELDS.map(f => {
+      const vA = _fieldVal(mA, f.key);
+      const vB = _fieldVal(mB, f.key);
+      if (!vA && !vB) return '';
+      const match = vA && vB && vA.toLowerCase() === vB.toLowerCase();
+      const cellStyle = 'padding:4px 8px;font-size:.8rem;vertical-align:top;';
+      const aStyle = cellStyle + (!vA ? 'color:var(--ink-muted);font-style:italic;' : match ? '' : 'color:#1b264f;font-weight:600;');
+      const bStyle = cellStyle + (!vB ? 'color:var(--ink-muted);font-style:italic;' : match ? '' : 'color:#1b264f;font-weight:600;');
+      return `<tr style="border-bottom:1px solid var(--line,#e5e7ef)">
+        <td style="${cellStyle}color:var(--ink-muted);white-space:nowrap">${_e(f.label)}</td>
+        <td style="${aStyle}">${vA ? _e(vA) : '—'}</td>
+        <td style="${bStyle}">${vB ? _e(vB) : '—'}</td>
+      </tr>`;
+    }).filter(Boolean).join('');
+
+    return `<div data-dedup-group="${gi}" style="border-top:1px solid var(--line,#e5e7ef);padding:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <div>
+          <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);margin-right:8px">${_e(g.reason)}</span>
+          <span style="font-weight:700;font-size:.92rem;color:var(--ink)">${nameA}</span>
+          <span style="color:var(--ink-muted);margin:0 6px">vs</span>
+          <span style="font-weight:700;font-size:.92rem;color:var(--ink)">${nameB}</span>
+        </div>
+      </div>
+
+      <!-- Side-by-side field comparison table -->
+      <div style="overflow-x:auto;margin-bottom:10px">
+        <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+          <thead>
+            <tr style="background:var(--bg-sunken,#f3f4f8)">
+              <th style="padding:5px 8px;text-align:left;font-size:.75rem;color:var(--ink-muted);font-weight:700;width:110px">Field</th>
+              <th style="padding:5px 8px;text-align:left;font-size:.75rem;color:var(--ink-muted);font-weight:700">
+                <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+                  <input type="radio" name="dedup-keep-${gi}" value="A" ${keepDefault === 'A' ? 'checked' : ''} data-dedup-radio>
+                  Keep: <strong style="color:var(--ink)">${nameA}</strong>
+                </label>
+              </th>
+              <th style="padding:5px 8px;text-align:left;font-size:.75rem;color:var(--ink-muted);font-weight:700">
+                <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+                  <input type="radio" name="dedup-keep-${gi}" value="B" ${keepDefault === 'B' ? 'checked' : ''} data-dedup-radio>
+                  Keep: <strong style="color:var(--ink)">${nameB}</strong>
+                </label>
+              </th>
+            </tr>
+          </thead>
+          <tbody>${fieldRows || '<tr><td colspan="3" style="padding:8px;color:var(--ink-muted);font-size:.8rem">No differing fields found.</td></tr>'}</tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div style="flex:1;font-size:.78rem;color:var(--ink-muted)">
+          The selected record is kept. Any blank fields will be filled from the other record. The duplicate is then archived.
+        </div>
+        <span data-bind="dedup-merge-status-${gi}" style="font-size:.8rem"></span>
+        <button class="flock-btn flock-btn--danger" style="font-size:.8rem;padding:6px 14px"
+          data-act="merge-member-pair"
+          data-dedup-group="${gi}"
+          data-id-a="${_e(mA.id)}"
+          data-id-b="${_e(mB.id)}"
+          type="button">
+          Merge &amp; Archive Duplicate
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  resultsEl.innerHTML = `
+    <div style="padding:10px 14px;background:var(--bg-sunken,#f3f4f8);border-top:1px solid var(--line,#e5e7ef);font-size:.82rem;color:var(--ink-muted)">
+      ${groups.length} duplicate pair${groups.length !== 1 ? 's' : ''} found — review each and choose which record to keep.
+      <strong style="color:var(--ink)">Bold fields differ between records.</strong>
+      The radio button selects the primary (kept) record.
+    </div>
+    ${cards}
+  `;
+  resultsEl.style.display = '';
+}
+
+/** Merge one pair: fill blank fields on keeper, archive the duplicate. */
+async function _mergeMemberPair(root, btn) {
+  const gi    = btn.dataset.dedupGroup;
+  const idA   = btn.dataset.idA;
+  const idB   = btn.dataset.idB;
+  const panel = root.querySelector('[data-wall-panel="maintenance"]');
+  const statusEl = root.querySelector(`[data-bind="dedup-merge-status-${gi}"]`);
+  const setS = (msg, col) => { if (statusEl) { statusEl.textContent = msg; statusEl.style.color = col || 'var(--ink-muted)'; } };
+
+  // Which to keep?
+  const radios  = panel ? [...panel.querySelectorAll(`input[name="dedup-keep-${gi}"]`)] : [];
+  const keepVal = (radios.find(r => r.checked) || radios[0])?.value || 'A';
+  const keepId  = keepVal === 'A' ? idA : idB;
+  const removeId = keepVal === 'A' ? idB : idA;
+
+  if (!confirm(`Merge & archive the duplicate?\n\n• Blank fields on the keeper will be filled from the duplicate.\n• The duplicate will be archived (not permanently deleted).\n\nThis cannot be automatically undone.`)) return;
+
+  btn.disabled = true;
+  const orig = btn.innerHTML;
+  btn.textContent = 'Merging…';
+  setS('Working…');
+
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR || !UR.listMembers || !UR.updateMember) {
+    setS('Backend not available.', '#b91c1c');
+    btn.disabled = false; btn.innerHTML = orig; return;
+  }
+
+  try {
+    // Fetch fresh copies (stale memberById may be missing recent updates)
+    const all  = await UR.listMembers({ limit: 5000 }).catch(() => []);
+    const list = Array.isArray(all) ? all : (all?.results || []);
+    const keeper  = list.find(m => m.id === keepId);
+    const removed = list.find(m => m.id === removeId);
+
+    if (!keeper || !removed) {
+      setS('Could not find one or both members — re-scan to refresh.', '#b91c1c');
+      btn.disabled = false; btn.innerHTML = orig; return;
+    }
+
+    const MERGE_FIELDS = [
+      'firstName','lastName','middleName','prefix','suffix',
+      'primaryEmail','secondaryEmail',
+      'cellPhone','homePhone','workPhone',
+      'streetAddress1','streetAddress2','city','state','zipCode','country',
+      'dateOfBirth','gender','notes','organization','jobTitle',
+    ];
+
+    const patch = { id: keepId };
+    let filledCount = 0;
+    for (const key of MERGE_FIELDS) {
+      const cur = String(keeper[key] || '').trim();
+      const src = String(removed[key] || '').trim();
+      if (!cur && src) { patch[key] = src; filledCount++; }
+    }
+
+    // Update keeper with merged fields (if any)
+    if (filledCount > 0) await UR.updateMember(patch);
+
+    // Archive the duplicate
+    await UR.updateMember({
+      id: removeId,
+      membershipStatus: 'Archived',
+      mergedIntoMemberId: keepId,
+      mergedAt: new Date().toISOString(),
+    });
+
+    const groupCard = root.querySelector(`[data-dedup-group="${gi}"]`);
+    if (groupCard) {
+      groupCard.style.opacity = '0.4';
+      groupCard.style.pointerEvents = 'none';
+    }
+
+    setS(
+      filledCount > 0
+        ? `✓ Merged — ${filledCount} field${filledCount !== 1 ? 's' : ''} filled in, duplicate archived.`
+        : `✓ Done — no new fields to fill, duplicate archived.`,
+      '#16a34a'
+    );
+    console.log(`[wall/dedup] merged ${removeId} → ${keepId}, ${filledCount} fields filled`);
+  } catch (err) {
+    console.error('[wall/dedup] merge error', err);
+    setS(`Failed: ${err?.message || err}`, '#b91c1c');
+    btn.disabled = false; btn.innerHTML = orig;
   }
 }
 
