@@ -2364,18 +2364,18 @@ function _wireMaintenancePanel(root) {
       const contacts = _parseVcf(ev.target.result || '');
       // Load existing members to detect duplicates
       if (preview) preview.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-muted);font-size:.85rem">Checking against existing members…</div>';
-      const existingEmails = new Set();
-      const existingNames  = new Set();
+      const existingEmails = new Map(); // email.lower → member record
+      const existingNames  = new Map(); // "first last".lower → member record
       try {
         const UR = await _waitForUpperRoom(5000);
         if (UR && UR.listMembers) {
           const rows = await UR.listMembers({ limit: 5000 }).catch(() => []);
           const list = Array.isArray(rows) ? rows : [];
           for (const m of list) {
-            if (m.primaryEmail)   existingEmails.add(m.primaryEmail.toLowerCase().trim());
-            if (m.secondaryEmail) existingEmails.add(m.secondaryEmail.toLowerCase().trim());
+            if (m.primaryEmail)   existingEmails.set(m.primaryEmail.toLowerCase().trim(), m);
+            if (m.secondaryEmail) existingEmails.set(m.secondaryEmail.toLowerCase().trim(), m);
             const n = [m.firstName, m.lastName].filter(Boolean).join(' ').toLowerCase().trim();
-            if (n) existingNames.add(n);
+            if (n) existingNames.set(n, m);
           }
         }
       } catch (_) {}
@@ -3504,8 +3504,8 @@ function _membersToVcfText(members) {
 
 /** Render the parsed-contacts preview list inside the import section. */
 function _renderVcfPreview(root, contacts, existingEmails, existingNames) {
-  existingEmails = existingEmails || new Set();
-  existingNames  = existingNames  || new Set();
+  existingEmails = existingEmails || new Map();
+  existingNames  = existingNames  || new Map();
   const preview = root.querySelector('[data-bind="vcf-preview"]');
   if (!preview) return;
   preview.style.display = '';
@@ -3519,12 +3519,13 @@ function _renderVcfPreview(root, contacts, existingEmails, existingNames) {
   const people    = contacts.filter(c => !c.isCompany);
   const companies = contacts.filter(c =>  c.isCompany);
 
-  // Mark duplicates within people
+  // Mark duplicates within people — store matched member for later merge
   people.forEach(c => {
-    const emailMatch = c.primaryEmail && existingEmails.has(c.primaryEmail.toLowerCase().trim());
+    const emailKey   = (c.primaryEmail || '').toLowerCase().trim();
     const nameStr    = [c.firstName, c.lastName].filter(Boolean).join(' ').toLowerCase().trim();
-    const nameMatch  = nameStr && existingNames.has(nameStr);
-    c._isDuplicate   = !!(emailMatch || nameMatch);
+    const matched    = (emailKey && existingEmails.get(emailKey)) || (nameStr && existingNames.get(nameStr)) || null;
+    c._isDuplicate   = !!matched;
+    c._existingMember = matched; // full Firestore member record
   });
 
   const newPeople  = people.filter(c => !c._isDuplicate);
@@ -3543,7 +3544,7 @@ function _renderVcfPreview(root, contacts, existingEmails, existingNames) {
       c.organization && !c.isCompany ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)">🏢 ' + _e(c.organization) + '</span>' : '',
     ].filter(Boolean).join('');
     const dupBadge = c._isDuplicate
-      ? '<span style="display:inline-flex;align-items:center;padding:2px 9px;border-radius:99px;background:#fef9c3;border:1px solid #fbbf24;font-size:.72rem;font-weight:700;color:#92400e">Already in system</span>'
+      ? '<span style="display:inline-flex;align-items:center;padding:2px 9px;border-radius:99px;background:#fef9c3;border:1px solid #fbbf24;font-size:.72rem;font-weight:700;color:#92400e">✏️ Will fill blank fields</span>'
       : '';
     const rowBg = dimmed ? 'background:var(--bg-sunken,#f9fafb);' : '';
     return '<label style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line,#e5e7ef);cursor:pointer;' + rowBg + '" data-vcf-row="' + globalIdx + '">'
@@ -3568,7 +3569,7 @@ function _renderVcfPreview(root, contacts, existingEmails, existingNames) {
     peopleHtml += newPeople.map(c => _contactRow(c, contacts.indexOf(c), true, false)).join('');
   }
   if (dupPeople.length) {
-    peopleHtml += _sectionHead('Already in system', dupPeople.length, '#fffbeb', 'Unchecked — matched by email or name');
+    peopleHtml += _sectionHead('Already in system', dupPeople.length, '#fffbeb', 'Check to fill in any blank fields — existing data is never overwritten');
     peopleHtml += dupPeople.map(c => _contactRow(c, contacts.indexOf(c), false, true)).join('');
   }
   if (!people.length) {
@@ -3661,14 +3662,17 @@ async function _vcfExport(root, btn) {
   btn.disabled = false; btn.innerHTML = orig;
 }
 
-/** Import the checked contacts from the parsed VCF preview list. */
+/** Import the checked contacts from the parsed VCF preview list.
+ *  - New contacts → UR.createMember
+ *  - Existing contacts → UR.updateMember with only BLANK fields filled in
+ */
 async function _vcfImportSelected(root, btn) {
   const preview  = root.querySelector('[data-bind="vcf-preview"]');
   const statusEl = root.querySelector('[data-bind="vcf-import-status"]');
   const contacts = preview?._vcfContacts || [];
   const setS = (msg, col) => { if (statusEl) { statusEl.textContent = msg; statusEl.style.color = col || 'var(--ink-muted)'; } };
 
-  // Gather selected indices
+  // Gather selected contacts
   const checkboxes = preview ? [...preview.querySelectorAll('input[type="checkbox"]')] : [];
   const selected   = checkboxes
     .filter(cb => cb.checked)
@@ -3685,47 +3689,75 @@ async function _vcfImportSelected(root, btn) {
 
   btn.disabled = true;
   const orig = btn.innerHTML;
-  btn.textContent = `Importing 0 / ${selected.length}…`;
-  setS(`Importing ${selected.length} contact${selected.length !== 1 ? 's' : ''}…`);
+  btn.textContent = `Working 0 / ${selected.length}…`;
+  setS(`Processing ${selected.length} contact${selected.length !== 1 ? 's' : ''}…`);
 
-  let done = 0, failed = 0;
+  // Helper: build a full field map from a parsed VCF contact
+  const _vcfFields = (c) => ({
+    firstName:      c.firstName      || (c.fn ? c.fn.split(' ')[0] : ''),
+    lastName:       c.lastName       || (c.fn ? c.fn.split(' ').slice(1).join(' ') : ''),
+    middleName:     c.middleName     || '',
+    prefix:         c.prefix         || '',
+    suffix:         c.suffix         || '',
+    primaryEmail:   c.primaryEmail   || '',
+    secondaryEmail: c.secondaryEmail || '',
+    cellPhone:      c.cellPhone      || '',
+    homePhone:      c.homePhone      || '',
+    workPhone:      c.workPhone      || '',
+    streetAddress1: c.streetAddress1 || '',
+    city:           c.city           || '',
+    state:          c.state          || '',
+    zipCode:        c.zipCode        || '',
+    country:        c.country        || '',
+    dateOfBirth:    c.dateOfBirth    || '',
+    gender:         c.gender         || '',
+    notes:          c.notes          || '',
+  });
+
+  let created = 0, merged = 0, mergedFields = 0, failed = 0;
   for (const c of selected) {
     try {
-      await UR.createMember({
-        firstName:      c.firstName  || (c.fn ? c.fn.split(' ')[0] : ''),
-        lastName:       c.lastName   || (c.fn ? c.fn.split(' ').slice(1).join(' ') : ''),
-        middleName:     c.middleName  || '',
-        prefix:         c.prefix      || '',
-        suffix:         c.suffix      || '',
-        primaryEmail:   c.primaryEmail   || '',
-        secondaryEmail: c.secondaryEmail || '',
-        cellPhone:      c.cellPhone   || '',
-        homePhone:      c.homePhone   || '',
-        workPhone:      c.workPhone   || '',
-        streetAddress1: c.streetAddress1 || '',
-        city:           c.city        || '',
-        state:          c.state       || '',
-        zipCode:        c.zipCode     || '',
-        country:        c.country     || '',
-        dateOfBirth:    c.dateOfBirth || '',
-        gender:         c.gender      || '',
-        notes:          c.notes       || '',
-        membershipStatus: 'Visitor',
-        importedFromVcf:  true,
-      });
-      done++;
-      btn.textContent = `Importing ${done} / ${selected.length}…`;
+      if (c._isDuplicate && c._existingMember) {
+        // Merge: only write fields that are blank in Firestore
+        const existing = c._existingMember;
+        const incoming = _vcfFields(c);
+        const patch = {};
+        for (const [key, val] of Object.entries(incoming)) {
+          if (!val) continue; // nothing to contribute
+          const cur = String(existing[key] || '').trim();
+          if (!cur) patch[key] = val; // blank in Firestore → fill it in
+        }
+        if (Object.keys(patch).length > 0) {
+          patch.id = existing.id;
+          await UR.updateMember(patch);
+          mergedFields += Object.keys(patch).length - 1; // subtract the id key
+        }
+        merged++;
+      } else {
+        // New contact → create
+        await UR.createMember({
+          ..._vcfFields(c),
+          membershipStatus: 'Visitor',
+          importedFromVcf:  true,
+        });
+        created++;
+      }
+      const total = created + merged;
+      btn.textContent = `Working ${total} / ${selected.length}…`;
     } catch (err) {
       failed++;
       console.error('[wall/vcf-import] failed for', c.fn || c.primaryEmail, err);
     }
   }
 
-  const failMsg = failed ? ` · ${failed} failed (see console)` : '';
-  setS(`✓ Imported ${done} contact${done !== 1 ? 's' : ''}${failMsg}.`, failed ? '#b45309' : '#16a34a');
+  const parts = [];
+  if (created)      parts.push(`${created} new contact${created !== 1 ? 's' : ''} added`);
+  if (merged)       parts.push(`${merged} existing contact${merged !== 1 ? 's' : ''} updated (${mergedFields} field${mergedFields !== 1 ? 's' : ''} filled in)`);
+  if (failed)       parts.push(`${failed} failed (see console)`);
+  setS('✓ ' + (parts.join(' · ') || 'Nothing to do.'), failed ? '#b45309' : '#16a34a');
   btn.disabled = false; btn.innerHTML = orig;
 
-  // Uncheck imported rows (keep failed ones checked for retry)
+  // Uncheck all if no failures
   if (!failed) {
     checkboxes.forEach(cb => { cb.checked = false; });
   }
