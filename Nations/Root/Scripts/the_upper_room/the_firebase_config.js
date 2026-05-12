@@ -15,10 +15,22 @@
 
 const SHARED_FALLBACK_PROJECT = 'flockos-notify';
 
+// Shared flockos-notify config used as fallback for churches that haven't
+// migrated to their own Firebase project yet.
+// Firebase API keys are public identifiers — security is enforced by rules.
+const _SHARED_FALLBACK_CONFIG = {
+  apiKey:            'AIzaSyBA-fkxjABbwIHn0i6MPiXbGwahfJmuJeo',
+  authDomain:        'flockos-notify.firebaseapp.com',
+  projectId:         'flockos-notify',
+  storageBucket:     'flockos-notify.firebasestorage.app',
+  messagingSenderId: '321766738616',
+  appId:             '1:321766738616:web:d2c1c53ad7493fcde4c24d'
+};
+
 export function getConfig() {
   const inj = (typeof window !== 'undefined') ? window.FLOCK_FIREBASE_CONFIG : null;
   if (inj && inj.projectId) return inj;
-  return null; // No fallback config baked in — caller should detect and degrade.
+  return _SHARED_FALLBACK_CONFIG;
 }
 
 export function getVapidKey() {
