@@ -1423,7 +1423,7 @@ h4 { font-size: 1.1rem; }
   padding: 0.4rem 0.85rem;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--ink-muted);
+  color: var(--ink);
   border-radius: var(--radius-pill);
   transition: background 0.15s ease, color 0.15s ease;
 }
