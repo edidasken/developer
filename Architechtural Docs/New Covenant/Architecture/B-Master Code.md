@@ -29550,7 +29550,8 @@ function syncFirestoreToSheet() {
       rows.push(row);
     }
 
-    // Clear and write
+    // Clear validations + content, then write (validations block setValues)
+    sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns()).clearDataValidations();
     sheet.clearContents();
     if (rows.length > 0 && rows[0].length > 0) {
       // Ensure sheet has enough rows/cols
