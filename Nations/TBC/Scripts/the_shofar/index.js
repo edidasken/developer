@@ -241,6 +241,15 @@ function msEnsureStyles() {
         '.ms-xp-reset { font-size:0.9rem; }',
         /* key select inside toolbar — override ms-input sizing */
         '#ms-av-key,#ms-sv-key { height:28px !important; min-width:0 !important; width:auto !important; padding:0 6px !important; border-radius:6px !important; border:1px solid rgba(0,0,0,0.15) !important; background:#f3f4f6 !important; color:#374151 !important; font-size:0.85rem !important; font-weight:700 !important; cursor:pointer !important; }',
+        /* capo picker inline in toolbar */
+        '.ms-capo-select { height:28px !important; padding:0 4px !important; border-radius:6px !important; border:1px solid rgba(0,0,0,0.15) !important; background:#f3f4f6 !important; color:#374151 !important; font-size:0.78rem !important; font-weight:700 !important; cursor:pointer !important; }',
+        /* sounding key badge — green accent */
+        '.ms-sounding-badge { display:inline-flex; align-items:center; background:#dcfce7; color:#166534; padding:3px 10px; border-radius:20px; font-size:0.78rem; font-weight:700; border:1px solid #86efac; white-space:nowrap; line-height:1.4; }',
+        /* arrangement selector strip */
+        '.ms-arr-selector { display:flex; gap:5px; flex-wrap:wrap; padding:4px 0 6px; flex-shrink:0; border-bottom:1px solid rgba(0,0,0,0.07); margin-bottom:6px; }',
+        '.ms-arr-chip { display:inline-flex; align-items:center; height:24px; padding:0 10px; border-radius:12px; border:1px solid rgba(0,0,0,0.18); background:#f3f4f6; color:#374151; font-size:0.7rem; font-weight:700; cursor:pointer; white-space:nowrap; transition:background 0.12s; }',
+        '.ms-arr-chip:hover { background:#e5e7eb; }',
+        '.ms-arr-chip--active { background:#0f172a; color:#fff; border-color:#0f172a; }',
 
         /* ── ChordPro rendered output ── */
         '.ms-chord-display { background:#ffffff; border:1px solid rgba(0,0,0,0.08); border-radius:12px; padding:12px 16px; margin-bottom:0; overflow-y:auto; }',
@@ -901,9 +910,10 @@ function msShowArrangementView(arr) {
     overlay.style.padding = '0';
 
     var song = musicStandAppState.currentSong;
+    var allArrs = musicStandAppState.arrangements || [];
     var songTitle = song ? song.title : 'Song';
     var originalKey = arr.key || 'C';
-    var capoFret = Number(arr.capo) || 0;
+    var capoFret = Number(arr.capo) || 0;  // live — user can change on the fly
     var currentSemitones = 0;
 
     // Parse sections for strip + visibility-aware rendering
@@ -918,8 +928,32 @@ function msShowArrangementView(arr) {
         return '<p style="color:#94a3b8; text-align:center;">No chord chart available.</p>';
     }
 
+    // Sounding key badge — green, shown only when capo > 0
+    function soundingBadgeHtml(frettedKey, capo) {
+        if (!capo) return '';
+        var sounding = msCapoSoundingKey(frettedKey, capo);
+        return '<span class="ms-sounding-badge" id="ms-av-sounding-badge">&rarr;&nbsp;Sounds:&nbsp;' + msEscapeHtml(sounding) + '</span>';
+    }
+
+    // Capo picker select (0–7)
+    function capoSelectHtml(current) {
+        var h = '<select class="ms-capo-select" id="ms-av-capo" title="Capo fret">';
+        for (var f = 0; f <= 7; f++) {
+            h += '<option value="' + f + '"' + (f === current ? ' selected' : '') + '>' + (f === 0 ? 'No capo' : 'Capo ' + f) + '</option>';
+        }
+        h += '</select>';
+        return h;
+    }
+
+    // Label for each arrangement chip
+    function arrChipLabel(a) {
+        var label = msEscapeHtml(a.instrument || 'Guitar');
+        if (a.key) label += ' &middot; ' + msEscapeHtml(a.key);
+        if (Number(a.capo)) label += ' &middot; Capo ' + a.capo;
+        return label;
+    }
+
     var initKey = originalKey;
-    var initSounding = capoFret ? msCapoSoundingKey(initKey, capoFret) : initKey;
 
     // Extract tempo/time/artist from notes or song fields if present
     var notesStr = arr.notes || '';
@@ -929,7 +963,7 @@ function msShowArrangementView(arr) {
     var tempoVal   = tempoMatch ? tempoMatch[1] : (arr.tempo || '');
     var timeVal    = timeMatch  ? timeMatch[1]  : (arr.time  || '');
 
-    // Build the modal once — only chord content and key badge are updated on transpose
+    // Build modal HTML
     modal.innerHTML =
         /* compact header */
         '<div class="ms-modal-header" style="flex-shrink:0;">' +
@@ -939,10 +973,20 @@ function msShowArrangementView(arr) {
             '</div>' +
             '<button class="ms-close-btn" id="ms-arr-view-close" style="font-size:1.2rem;padding:0 4px;">&times;</button>' +
         '</div>' +
-        /* single slim toolbar: badges + transpose inline */
+        /* arrangement selector — only shown when there are multiple arrangements */
+        (allArrs.length > 1
+            ? '<div class="ms-arr-selector" style="flex-shrink:0;">' +
+                allArrs.map(function(a) {
+                    var isActive = a.id ? (a.id === arr.id) : (a === arr);
+                    return '<button class="ms-arr-chip' + (isActive ? ' ms-arr-chip--active' : '') + '" data-arr-idx="' + allArrs.indexOf(a) + '">' + arrChipLabel(a) + '</button>';
+                }).join('') +
+              '</div>'
+            : '') +
+        /* toolbar: key badge + capo picker + sounding key + tempo/time/instrument + transpose */
         '<div class="ms-av-toolbar" style="flex-shrink:0;">' +
             '<span class="ms-stand-badge" id="ms-av-key-badge">&#127929;&nbsp;' + msEscapeHtml(initKey) + '</span>' +
-            (capoFret ? '<span class="ms-stand-badge">Capo&nbsp;' + capoFret + '</span>' : '') +
+            capoSelectHtml(capoFret) +
+            '<span id="ms-av-sounding-wrap">' + soundingBadgeHtml(initKey, capoFret) + '</span>' +
             (tempoVal  ? '<span class="ms-stand-badge">' + msEscapeHtml(tempoVal) + '&thinsp;BPM</span>' : '') +
             (timeVal   ? '<span class="ms-stand-badge">' + msEscapeHtml(timeVal) + '</span>' : '') +
             '<span class="ms-stand-badge">' + msEscapeHtml(arr.instrument || 'Guitar') + '</span>' +
@@ -958,7 +1002,30 @@ function msShowArrangementView(arr) {
     // Bind section strip (must be after modal.innerHTML is set)
     if (_arrSections.length) msBindSectionStrip(_arrVisMap);
 
-    // Transpose: only update chord content and key badge — no full rebuild
+    // Arrangement selector — tap a chip to switch arrangements
+    var arrSelector = modal.querySelector('.ms-arr-selector');
+    if (arrSelector) {
+        arrSelector.addEventListener('click', function(e) {
+            var chip = e.target.closest ? e.target.closest('.ms-arr-chip') : null;
+            if (!chip) return;
+            var idx = Number(chip.getAttribute('data-arr-idx'));
+            var newArr = allArrs[idx];
+            if (newArr && newArr !== arr) msShowArrangementView(newArr);
+        });
+    }
+
+    // Capo picker — update sounding key badge in real time (no chord change)
+    var capoPicker = document.getElementById('ms-av-capo');
+    if (capoPicker) {
+        capoPicker.addEventListener('change', function() {
+            capoFret = Number(capoPicker.value);
+            var currentKey = msTransposeChord(originalKey, currentSemitones) || originalKey;
+            var soundingWrap = document.getElementById('ms-av-sounding-wrap');
+            if (soundingWrap) soundingWrap.innerHTML = soundingBadgeHtml(currentKey, capoFret);
+        });
+    }
+
+    // Transpose: update chord content, key badge, and sounding key
     msBindTransposeControls(originalKey, 0, capoFret, 'ms-av', function(newSemitones) {
         currentSemitones = newSemitones;
         var newKey = msTransposeChord(originalKey, newSemitones) || originalKey;
@@ -968,9 +1035,12 @@ function msShowArrangementView(arr) {
 
         var keyBadge = document.getElementById('ms-av-key-badge');
         if (keyBadge) {
-            keyBadge.innerHTML = '&#127929; ' + msEscapeHtml(newKey) +
-                (newSemitones !== 0 ? ' <span style="color:#94a3b8;font-size:0.8em;">(orig: ' + msEscapeHtml(originalKey) + ')</span>' : '');
+            keyBadge.innerHTML = '&#127929;&nbsp;' + msEscapeHtml(newKey) +
+                (newSemitones !== 0 ? '&nbsp;<span style="color:#94a3b8;font-size:0.8em;">(orig: ' + msEscapeHtml(originalKey) + ')</span>' : '');
         }
+
+        var soundingWrap = document.getElementById('ms-av-sounding-wrap');
+        if (soundingWrap) soundingWrap.innerHTML = soundingBadgeHtml(newKey, capoFret);
     });
 
     document.getElementById('ms-arr-view-close').addEventListener('click', function() {
