@@ -2242,6 +2242,39 @@ function _maintenancePanelMarkup() {
       desc: 'Marks every care assignment whose status is not <strong>Active</strong> as <strong>Ended</strong> — cleaning up legacy "Inactive", "Paused", blank, or unknown-status rows.',
       bindKey: 'end-inactive-status', actKey: 'end-inactive-assignments', btnLabel: 'Clean up now',
     })}
+
+    ${_maintSection('Contact Import / Export')}
+
+    <!-- VCF Export -->
+    <div class="wall-setting-row" style="display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid var(--line,#e5e7ef);border-radius:10px 10px 0 0;margin-bottom:0;background:var(--bg-raised,#fff);flex-wrap:wrap">
+      <div style="flex:1;min-width:240px">
+        <div style="font-weight:600;color:var(--ink,#1b264f);margin-bottom:2px">Export Members as .vcf</div>
+        <div style="font-size:.82rem;color:var(--ink-muted,#7a7f96);line-height:1.5">Download all member records as a standard vCard file — importable into Apple Contacts, Google Contacts, Outlook, and more. Use this to seed a new church deployment with existing contacts.</div>
+        <div data-bind="vcf-export-status" style="margin-top:6px;font-size:.82rem;color:var(--ink-muted)"></div>
+      </div>
+      <button class="flock-btn flock-btn--primary" data-act="vcf-export" type="button" style="flex-shrink:0">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:-1px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export All (.vcf)
+      </button>
+    </div>
+
+    <!-- VCF Import -->
+    <div style="border:1px solid var(--line,#e5e7ef);border-top:none;border-radius:0 0 10px 10px;margin-bottom:10px;overflow:hidden;background:var(--bg-raised,#fff)">
+      <div style="padding:14px;border-bottom:1px solid var(--line,#e5e7ef)">
+        <div style="font-weight:600;color:var(--ink,#1b264f);margin-bottom:2px">Import Contacts from .vcf</div>
+        <div style="font-size:.82rem;color:var(--ink-muted,#7a7f96);line-height:1.5;margin-bottom:12px">Upload a .vcf file to preview contacts, then choose all, some, or just one to import as new member records. Existing members are never overwritten — imports only create new records.</div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <label style="display:inline-flex;align-items:center;gap:7px;cursor:pointer;padding:8px 16px;border:1.5px dashed var(--line-strong,#c5c8d6);border-radius:8px;background:var(--bg,#f7f8fb);color:var(--ink,#1b264f);font-size:.85rem;font-weight:600;transition:border-color .18s" data-bind="vcf-file-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Choose .vcf File
+            <input type="file" accept=".vcf,text/vcard,text/x-vcard" data-bind="vcf-file-input" style="display:none">
+          </label>
+          <span data-bind="vcf-file-name" style="font-size:.82rem;color:var(--ink-muted)">No file chosen</span>
+        </div>
+      </div>
+      <!-- Preview list — populated by JS after file parse -->
+      <div data-bind="vcf-preview" style="display:none"></div>
+    </div>
   `;
 }
 
@@ -2294,6 +2327,41 @@ function _wireMaintenancePanel(root) {
       if (!confirm('End all non-Active care assignments (Inactive, Paused, blank status, etc.)?\n\nThis cannot be undone automatically.')) return;
       return _endInactiveAssignments(root, endInactiveBtn);
     }
+
+    // ── VCF Export ────────────────────────────────────────────────
+    const vcfExportBtn = e.target.closest('[data-act="vcf-export"]');
+    if (vcfExportBtn) return _vcfExport(root, vcfExportBtn);
+
+    // ── VCF Import: select all / deselect all ─────────────────────
+    if (e.target.closest('[data-act="vcf-select-all"]')) {
+      panel.querySelectorAll('[data-bind="vcf-preview"] input[type="checkbox"]').forEach(cb => { cb.checked = true; });
+      return;
+    }
+    if (e.target.closest('[data-act="vcf-deselect-all"]')) {
+      panel.querySelectorAll('[data-bind="vcf-preview"] input[type="checkbox"]').forEach(cb => { cb.checked = false; });
+      return;
+    }
+
+    // ── VCF Import: import selected ───────────────────────────────
+    const vcfImportBtn = e.target.closest('[data-act="vcf-import-selected"]');
+    if (vcfImportBtn) return _vcfImportSelected(root, vcfImportBtn);
+  });
+
+  // File-input change handler — parse VCF and render preview
+  const fileInput = panel.querySelector('[data-bind="vcf-file-input"]');
+  fileInput?.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    const nameEl = panel.querySelector('[data-bind="vcf-file-name"]');
+    const preview = panel.querySelector('[data-bind="vcf-preview"]');
+    if (!file) { if (nameEl) nameEl.textContent = 'No file chosen'; return; }
+    if (nameEl) nameEl.textContent = file.name;
+    if (preview) { preview.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-muted);font-size:.85rem">Parsing…</div>'; preview.style.display = ''; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const contacts = _parseVcf(ev.target.result || '');
+      _renderVcfPreview(root, contacts);
+    };
+    reader.readAsText(file, 'UTF-8');
   });
 }
 
@@ -3270,6 +3338,310 @@ ${viewBlocks}`;
   padding:16px;font-size:.74rem;line-height:1.7;overflow-x:auto;white-space:pre-wrap;word-break:break-word;
   max-height:640px;overflow-y:auto;color:var(--ink);font-family:monospace;margin:0;">${tree}</pre>
 `;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   VCF IMPORT / EXPORT HELPERS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Parse a vCard (.vcf) text blob into an array of plain contact objects.
+ * Handles multiple vCards per file, folded lines, and common property params.
+ */
+function _parseVcf(text) {
+  // Unfold lines (RFC 2425: continuation lines begin with SPACE or TAB)
+  const unfolded = text.replace(/\r\n([ \t])/g, '$1').replace(/\n([ \t])/g, '$1');
+  const lines = unfolded.split(/\r\n|\r|\n/);
+
+  const cards = [];
+  let cur = null;
+
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+    if (!line) continue;
+    const upper = line.toUpperCase();
+
+    if (upper === 'BEGIN:VCARD') { cur = {}; continue; }
+    if (upper === 'END:VCARD')   { if (cur) cards.push(cur); cur = null; continue; }
+    if (!cur) continue;
+
+    const colon = line.indexOf(':');
+    if (colon < 0) continue;
+
+    const propFull = line.slice(0, colon).toUpperCase();
+    const value    = line.slice(colon + 1).trim();
+    const parts    = propFull.split(';');
+    const prop     = parts[0];
+    const params   = parts.slice(1).join(';');
+
+    switch (prop) {
+      case 'FN':
+        cur.fn = value;
+        break;
+      case 'N': {
+        // N:Last;First;Middle;Prefix;Suffix
+        const n = value.split(';');
+        cur.lastName   = (n[0] || '').replace(/\\/g, '').trim();
+        cur.firstName  = (n[1] || '').replace(/\\/g, '').trim();
+        cur.middleName = (n[2] || '').replace(/\\/g, '').trim();
+        cur.prefix     = (n[3] || '').replace(/\\/g, '').trim();
+        cur.suffix     = (n[4] || '').replace(/\\/g, '').trim();
+        break;
+      }
+      case 'EMAIL':
+        if (!cur.primaryEmail)   cur.primaryEmail   = value.toLowerCase();
+        else if (!cur.secondaryEmail) cur.secondaryEmail = value.toLowerCase();
+        break;
+      case 'TEL': {
+        const clean = value.replace(/[^\d+\-()\s.ext]/gi, '').trim();
+        const isCell = params.includes('CELL') || params.includes('MOBILE') || params.includes('IPHONE');
+        const isWork = params.includes('WORK');
+        const isHome = params.includes('HOME');
+        if (isCell && !cur.cellPhone)       cur.cellPhone = clean;
+        else if (isWork && !cur.workPhone)  cur.workPhone = clean;
+        else if (isHome && !cur.homePhone)  cur.homePhone = clean;
+        else if (!cur.cellPhone)            cur.cellPhone = clean; // first unlabelled → cell
+        break;
+      }
+      case 'ADR': {
+        // ADR:POBox;Extended;Street;City;State;ZIP;Country
+        const a = value.split(';');
+        if (!cur.streetAddress1) {
+          cur.streetAddress1 = (a[2] || '').replace(/\\n/g, ' ').trim();
+          cur.city           = (a[3] || '').trim();
+          cur.state          = (a[4] || '').trim();
+          cur.zipCode        = (a[5] || '').trim();
+          cur.country        = (a[6] || '').trim();
+        }
+        break;
+      }
+      case 'BDAY': {
+        // Accept YYYY-MM-DD or YYYYMMDD
+        const bd = value.replace(/[^0-9]/g, '');
+        if (bd.length === 8)
+          cur.dateOfBirth = `${bd.slice(0,4)}-${bd.slice(4,6)}-${bd.slice(6,8)}`;
+        else
+          cur.dateOfBirth = value;
+        break;
+      }
+      case 'GENDER':
+        if (value === 'M') cur.gender = 'Male';
+        else if (value === 'F') cur.gender = 'Female';
+        break;
+      case 'NOTE':
+        cur.notes = value.replace(/\\n/g, '\n').replace(/\\,/g, ',').replace(/\\;/g, ';');
+        break;
+      case 'ORG':
+        cur.organization = value.split(';')[0].trim();
+        break;
+      case 'TITLE':
+        cur.jobTitle = value;
+        break;
+    }
+  }
+
+  // Filter out empty/unparseable cards
+  return cards.filter(c => c.fn || c.firstName || c.lastName || c.primaryEmail);
+}
+
+/**
+ * Convert an array of member records (from UpperRoom) to a multi-vCard VCF string.
+ */
+function _membersToVcfText(members) {
+  function _vcfEsc(s) { return String(s || '').replace(/,/g, '\\,').replace(/;/g, '\\;'); }
+  return members.map(m => {
+    const lines = ['BEGIN:VCARD', 'VERSION:3.0'];
+    const first = m.firstName  || '';
+    const last  = m.lastName   || '';
+    const full  = [first, last].filter(Boolean).join(' ') || m.displayName || m.name || '(Member)';
+    lines.push(`FN:${_vcfEsc(full)}`);
+    lines.push(`N:${_vcfEsc(last)};${_vcfEsc(first)};${_vcfEsc(m.middleName||'')};${_vcfEsc(m.prefix||'')};${_vcfEsc(m.suffix||'')}`);
+    if (m.primaryEmail)   lines.push(`EMAIL;TYPE=INTERNET,PREF:${m.primaryEmail}`);
+    if (m.secondaryEmail) lines.push(`EMAIL;TYPE=INTERNET:${m.secondaryEmail}`);
+    if (m.cellPhone)  lines.push(`TEL;TYPE=CELL,VOICE:${m.cellPhone}`);
+    if (m.homePhone)  lines.push(`TEL;TYPE=HOME,VOICE:${m.homePhone}`);
+    if (m.workPhone)  lines.push(`TEL;TYPE=WORK,VOICE:${m.workPhone}`);
+    const addrParts = [m.streetAddress1, m.city, m.state, m.zipCode, m.country];
+    if (addrParts.some(Boolean))
+      lines.push(`ADR:;;${addrParts.map(_vcfEsc).join(';')}`);
+    if (m.dateOfBirth) lines.push(`BDAY:${m.dateOfBirth}`);
+    if (m.gender === 'Male')   lines.push('GENDER:M');
+    if (m.gender === 'Female') lines.push('GENDER:F');
+    if (m.notes) lines.push(`NOTE:${_vcfEsc(m.notes)}`);
+    lines.push('END:VCARD');
+    return lines.join('\r\n');
+  }).join('\r\n');
+}
+
+/** Render the parsed-contacts preview list inside the import section. */
+function _renderVcfPreview(root, contacts) {
+  const preview = root.querySelector('[data-bind="vcf-preview"]');
+  if (!preview) return;
+  preview.style.display = '';
+
+  if (!contacts.length) {
+    preview.innerHTML = `<div style="padding:20px;text-align:center;color:var(--ink-muted);font-size:.85rem">
+      No valid contacts found in this file. Make sure it is a valid .vcf (vCard) file.
+    </div>`;
+    return;
+  }
+
+  const rows = contacts.map((c, i) => {
+    const name = _e(c.fn || [c.firstName, c.lastName].filter(Boolean).join(' ') || '(No Name)');
+    const chips = [
+      c.primaryEmail   ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>${_e(c.primaryEmail)}</span>` : '',
+      c.cellPhone  ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>${_e(c.cellPhone)}</span>` : '',
+      c.homePhone  ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>${_e(c.homePhone)}</span>` : '',
+      c.workPhone  ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>${_e(c.workPhone)}</span>` : '',
+      (c.city || c.state) ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${_e([c.city,c.state].filter(Boolean).join(', '))}</span>` : '',
+      c.dateOfBirth ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${_e(c.dateOfBirth)}</span>` : '',
+    ].filter(Boolean).join('');
+
+    return `<label style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line,#e5e7ef);cursor:pointer;" data-vcf-row="${i}">
+      <input type="checkbox" data-vcf-idx="${i}" checked style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:var(--accent,#3d8b4f)">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:.9rem;color:var(--ink,#1b264f);margin-bottom:5px">${name}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px">${chips || '<span style="font-size:.78rem;color:var(--ink-muted)">No contact details</span>'}</div>
+      </div>
+    </label>`;
+  }).join('');
+
+  preview.innerHTML = `
+    <div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;background:var(--bg-sunken,#f3f4f8);border-bottom:1px solid var(--line,#e5e7ef)">
+      <div style="font-size:.88rem;font-weight:700;color:var(--ink,#1b264f)">${contacts.length} contact${contacts.length !== 1 ? 's' : ''} found</div>
+      <div style="display:flex;gap:8px">
+        <button class="flock-btn flock-btn--ghost" style="font-size:.78rem;padding:5px 12px" data-act="vcf-select-all" type="button">Select All</button>
+        <button class="flock-btn flock-btn--ghost" style="font-size:.78rem;padding:5px 12px" data-act="vcf-deselect-all" type="button">Deselect All</button>
+      </div>
+    </div>
+    <div style="max-height:440px;overflow-y:auto" data-bind="vcf-contact-list">${rows}</div>
+    <div style="padding:12px 14px;display:flex;align-items:center;gap:12px;justify-content:flex-end;flex-wrap:wrap;border-top:1px solid var(--line,#e5e7ef)">
+      <span data-bind="vcf-import-status" style="flex:1;font-size:.82rem;color:var(--ink-muted)"></span>
+      <button class="flock-btn flock-btn--primary" data-act="vcf-import-selected" type="button">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:-1px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Import Selected
+      </button>
+    </div>
+  `;
+
+  // Stash parsed contacts on the element so the import handler can read them
+  preview._vcfContacts = contacts;
+}
+
+/** Export all members as a .vcf download. */
+async function _vcfExport(root, btn) {
+  const status = root.querySelector('[data-bind="vcf-export-status"]');
+  const setS = (msg, col) => { if (status) { status.textContent = msg; status.style.color = col || 'var(--ink-muted)'; } };
+
+  btn.disabled = true;
+  const orig = btn.innerHTML;
+  btn.textContent = 'Loading…';
+  setS('Fetching members…');
+
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR || !UR.listMembers) {
+    setS('Backend not available.', '#b91c1c');
+    btn.disabled = false; btn.innerHTML = orig;
+    return;
+  }
+
+  try {
+    const members = await UR.listMembers({ limit: 5000 });
+    if (!members.length) {
+      setS('No members found.', '#b45309');
+      btn.disabled = false; btn.innerHTML = orig;
+      return;
+    }
+
+    const vcfText = _membersToVcfText(members);
+    const blob = new Blob([vcfText], { type: 'text/vcard;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const date = new Date().toISOString().slice(0, 10);
+    a.href     = url;
+    a.download = `FlockOS_Members_${date}.vcf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+    setS(`✓ Exported ${members.length} member${members.length !== 1 ? 's' : ''}.`, '#16a34a');
+  } catch (err) {
+    console.error('[wall/vcf-export]', err);
+    setS('Export failed — see console.', '#b91c1c');
+  }
+
+  btn.disabled = false; btn.innerHTML = orig;
+}
+
+/** Import the checked contacts from the parsed VCF preview list. */
+async function _vcfImportSelected(root, btn) {
+  const preview  = root.querySelector('[data-bind="vcf-preview"]');
+  const statusEl = root.querySelector('[data-bind="vcf-import-status"]');
+  const contacts = preview?._vcfContacts || [];
+  const setS = (msg, col) => { if (statusEl) { statusEl.textContent = msg; statusEl.style.color = col || 'var(--ink-muted)'; } };
+
+  // Gather selected indices
+  const checkboxes = preview ? [...preview.querySelectorAll('input[type="checkbox"]')] : [];
+  const selected   = checkboxes
+    .filter(cb => cb.checked)
+    .map(cb => contacts[parseInt(cb.dataset.vcfIdx, 10)])
+    .filter(Boolean);
+
+  if (!selected.length) { setS('No contacts selected.', '#b45309'); return; }
+
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR || !UR.createMember) {
+    setS('Backend not available.', '#b91c1c');
+    return;
+  }
+
+  btn.disabled = true;
+  const orig = btn.innerHTML;
+  btn.textContent = `Importing 0 / ${selected.length}…`;
+  setS(`Importing ${selected.length} contact${selected.length !== 1 ? 's' : ''}…`);
+
+  let done = 0, failed = 0;
+  for (const c of selected) {
+    try {
+      await UR.createMember({
+        firstName:      c.firstName  || (c.fn ? c.fn.split(' ')[0] : ''),
+        lastName:       c.lastName   || (c.fn ? c.fn.split(' ').slice(1).join(' ') : ''),
+        middleName:     c.middleName  || '',
+        prefix:         c.prefix      || '',
+        suffix:         c.suffix      || '',
+        primaryEmail:   c.primaryEmail   || '',
+        secondaryEmail: c.secondaryEmail || '',
+        cellPhone:      c.cellPhone   || '',
+        homePhone:      c.homePhone   || '',
+        workPhone:      c.workPhone   || '',
+        streetAddress1: c.streetAddress1 || '',
+        city:           c.city        || '',
+        state:          c.state       || '',
+        zipCode:        c.zipCode     || '',
+        country:        c.country     || '',
+        dateOfBirth:    c.dateOfBirth || '',
+        gender:         c.gender      || '',
+        notes:          c.notes       || '',
+        membershipStatus: 'Visitor',
+        importedFromVcf:  true,
+      });
+      done++;
+      btn.textContent = `Importing ${done} / ${selected.length}…`;
+    } catch (err) {
+      failed++;
+      console.error('[wall/vcf-import] failed for', c.fn || c.primaryEmail, err);
+    }
+  }
+
+  const failMsg = failed ? ` · ${failed} failed (see console)` : '';
+  setS(`✓ Imported ${done} contact${done !== 1 ? 's' : ''}${failMsg}.`, failed ? '#b45309' : '#16a34a');
+  btn.disabled = false; btn.innerHTML = orig;
+
+  // Uncheck imported rows (keep failed ones checked for retry)
+  if (!failed) {
+    checkboxes.forEach(cb => { cb.checked = false; });
+  }
 }
 
 function _wireDepMapPanel(root) {
