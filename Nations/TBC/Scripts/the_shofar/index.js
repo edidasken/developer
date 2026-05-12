@@ -1293,7 +1293,7 @@ function msOpenArrEditor(arr) {
                 statusEl.style.color = '#34d399';
             }
         };
-        reader.readAsText(file);
+        reader.readAsText(file, 'UTF-8');
         e.target.value = ''; // allow re-selecting same file
     });
 
