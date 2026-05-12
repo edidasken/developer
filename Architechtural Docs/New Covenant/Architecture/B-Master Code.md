@@ -981,6 +981,1126 @@ function doPost(e) { return expansionDoPost(e); }
  */
 var _ssCache = null;
 var _sheetCache = {};
+// ══════════════════════════════════════════════════════════════════════════════
+// SCHEMA REGISTRY — single source of truth for every GAS sheet tab.
+// Both getTab() (lazy auto-create) and _buildCoreTabs_() (full setup) drive
+// from this object. To add a new tab: add it here once — done everywhere.
+// Format: tabName: { headers: [...], dropdowns: { col: [options] } }
+// ══════════════════════════════════════════════════════════════════════════════
+var _TAB_HEADERS_ = {
+
+  // ── PASTORAL CORE ──────────────────────────────────────────────────────────
+  Members: {
+    headers: [
+      'id', 'firstName', 'lastName', 'preferredName', 'suffix', 'dateOfBirth',
+      'gender', 'photoUrl', 'primaryEmail', 'secondaryEmail', 'cellPhone',
+      'homePhone', 'workPhone', 'preferredContact', 'address1', 'address2',
+      'city', 'state', 'zip', 'country', 'membershipStatus', 'memberSince',
+      'howTheyFoundUs', 'baptismDate', 'salvationDate', 'dateOfDeath',
+      'householdId', 'familyRole', 'maritalStatus', 'spouseName',
+      'emergencyContact', 'emergencyPhone', 'ministryTeams', 'volunteerRoles',
+      'spiritualGifts', 'smallGroup', 'pastoralNotes', 'lastContactDate',
+      'nextFollowUp', 'followUpPriority', 'assignedTo', 'tags', 'archived',
+      'archiveReason', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt',
+      'website', 'colorScheme', 'bgScheme'
+    ],
+    dropdowns: {
+      'G': ['Male', 'Female', '—'],
+      'N': ['Email', 'Text', 'Call'],
+      'U': ['Active', 'Inactive', 'Non-Member', 'Member in Glory', 'Resigned Member'],
+      'W': ['Referral', 'Walk-In', 'Online', 'Event', 'Other'],
+      'AB': ['Head of Household', 'Spouse', 'Child', 'Other'],
+      'AC': ['Single', 'Married', 'Widowed', 'Divorced', 'Separated'],
+      'AN': ['Low', 'Medium', 'High', 'Urgent'],
+      'AQ': ['TRUE', 'FALSE']
+    }
+  },
+
+  PrayerRequests: {
+    headers: [
+      'id', 'memberId', 'submitterName', 'submitterEmail', 'submitterPhone',
+      'prayerText', 'category', 'isConfidential', 'followUpRequested', 'status',
+      'adminNotes', 'assignedTo', 'submittedAt', 'lastUpdated', 'updatedBy',
+      'archived', 'autoLog', 'groupId'
+    ],
+    dropdowns: {
+      'G': ['Health', 'Family', 'Financial', 'Spiritual', 'Grief', 'Praise', 'Other'],
+      'H': ['TRUE', 'FALSE'],
+      'I': ['TRUE', 'FALSE'],
+      'J': ['New', 'In Progress', 'Answered', 'Closed'],
+      'P': ['TRUE', 'FALSE']
+    }
+  },
+
+  JournalEntries: {
+    headers: [
+      'id', 'userEmail', 'title', 'entry', 'category', 'scriptureRef', 'mood',
+      'private', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'E': ['Prayer', 'Devotional', 'Study', 'Reflection', 'Gratitude', 'Other'],
+      'G': ['Grateful', 'Joyful', 'Peaceful', 'Struggling', 'Seeking', 'Hopeful'],
+      'H': ['TRUE', 'FALSE']
+    }
+  },
+
+  ContactLog: {
+    headers: [
+      'id', 'memberId', 'contactDate', 'contactType', 'direction', 'subject',
+      'details', 'followUpNeeded', 'followUpDate', 'followUpCompleted',
+      'contactedBy', 'createdAt'
+    ],
+    dropdowns: {
+      'D': ['Phone Call', 'Text', 'Email', 'Home Visit', 'Office Visit', 'Video Call', 'Other'],
+      'E': ['Outbound', 'Inbound'],
+      'H': ['TRUE', 'FALSE'],
+      'J': ['TRUE', 'FALSE']
+    }
+  },
+
+  PastoralNotes: {
+    headers: [
+      'id', 'memberId', 'noteDate', 'category', 'noteText', 'createdBy',
+      'createdAt', 'groupId'
+    ],
+    dropdowns: {
+      'D': ['General', 'Counseling', 'Concern', 'Praise', 'Confidential']
+    }
+  },
+
+  Milestones: {
+    headers: [
+      'id', 'memberId', 'milestoneType', 'milestoneDate', 'description',
+      'recordedBy', 'createdAt'
+    ],
+    dropdowns: {
+      'C': ['Salvation', 'Baptism', 'Membership', 'Wedding', 'Baby', 'Graduation', 'Ordination', 'Death', 'Other']
+    }
+  },
+
+  Households: {
+    headers: [
+      'householdId', 'householdName', 'address1', 'address2', 'city', 'state',
+      'zip', 'country', 'primaryContactId', 'notes', 'createdAt'
+    ]
+  },
+
+  ToDo: {
+    headers: [
+      'id', 'title', 'description', 'assignedTo', 'assignedMemberId', 'dueDate',
+      'priority', 'status', 'category', 'entityType', 'entityId', 'recurring',
+      'recurrenceRule', 'notes', 'autoLog', 'createdBy', 'createdAt', 'updatedBy',
+      'updatedAt'
+    ],
+    dropdowns: {
+      'G': ['Low', 'Medium', 'High', 'Urgent'],
+      'H': ['Not Started', 'In Progress', 'Done', 'Archived'],
+      'I': ['Follow-Up', 'Visit', 'Phone Call', 'Admin', 'Event', 'Other'],
+      'J': ['Members', 'PrayerRequests', 'PastoralNotes', 'Events', 'SmallGroups',
+             'SpiritualCareCases', 'OutreachContacts', 'OutreachCampaigns',
+             'CompassionRequests', 'Ministries', 'Sermons', 'DiscipleshipEnrollments',
+             'DiscipleshipMentoring', 'Giving', 'Attendance', 'VolunteerSchedule',
+             'ServicePlans', 'LearningPlaylists', 'MissionsRegistry', 'Households',
+             'Milestones', 'Other'],
+      'L': ['TRUE', 'FALSE'],
+      'M': ['Daily', 'Weekly', 'Biweekly', 'Monthly', 'Quarterly', 'Yearly']
+    }
+  },
+
+  // ── STRATEGIC PLANNING ────────────────────────────────────────────────────
+  StrategicGoals: {
+    headers: [
+      'id', 'area', 'goal', 'progress', 'status', 'owner', 'notes',
+      'createdAt', 'createdBy', 'updatedAt'
+    ]
+  },
+
+  StrategicInitiatives: {
+    headers: [
+      'id', 'title', 'ministry', 'owner', 'due', 'dueIso', 'progress',
+      'status', 'description', 'createdAt', 'createdBy', 'updatedAt'
+    ]
+  },
+
+  StrategicKeyDates: {
+    headers: [
+      'id', 'label', 'date', 'done', 'notes', 'createdAt', 'createdBy', 'updatedAt'
+    ],
+    dropdowns: {
+      'D': ['TRUE', 'FALSE']
+    }
+  },
+
+  // ── ATTENDANCE & EVENTS ───────────────────────────────────────────────────
+  Attendance: {
+    headers: [
+      'id', 'date', 'serviceType', 'adults', 'children', 'total', 'notes',
+      'recordedBy', 'createdAt'
+    ],
+    dropdowns: {
+      'C': ['Sunday AM', 'Sunday PM', 'Wednesday', 'Special', 'Small Group', 'Other']
+    }
+  },
+
+  Events: {
+    headers: [
+      'id', 'title', 'description', 'eventType', 'location', 'startDate',
+      'endDate', 'startTime', 'endTime', 'recurring', 'recurringUntil',
+      'capacity', 'rsvpRequired', 'ministryTeam', 'contactPerson', 'status',
+      'visibility', 'notes', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt'
+    ],
+    dropdowns: {
+      'D': ['Service', 'Bible Study', 'Fellowship', 'Outreach', 'Meeting', 'Conference', 'Other'],
+      'J': ['None', 'Weekly', 'Biweekly', 'Monthly', 'Yearly'],
+      'M': ['TRUE', 'FALSE'],
+      'P': ['Planned', 'Active', 'Completed', 'Cancelled']
+    }
+  },
+
+  EventRSVPs: {
+    headers: [
+      'id', 'eventId', 'memberId', 'response', 'guestCount', 'notes',
+      'respondedAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'D': ['Yes', 'No', 'Maybe']
+    }
+  },
+
+  // ── SMALL GROUPS ──────────────────────────────────────────────────────────
+  SmallGroups: {
+    headers: [
+      'id', 'groupName', 'description', 'groupType', 'leaderId', 'coLeaderId',
+      'meetingDay', 'meetingTime', 'location', 'capacity', 'status', 'semester',
+      'notes', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'D': ['Bible Study', 'Prayer', 'Fellowship', 'Youth', 'Women', 'Men', 'Couples', 'Other'],
+      'G': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Varies'],
+      'K': ['Active', 'On Hold', 'Closed']
+    }
+  },
+
+  SmallGroupMembers: {
+    headers: [
+      'id', 'groupId', 'memberId', 'role', 'joinedDate', 'leftDate', 'status',
+      'notes', 'createdAt'
+    ],
+    dropdowns: {
+      'D': ['Member', 'Leader', 'Co-Leader', 'Host'],
+      'G': ['Active', 'Inactive']
+    }
+  },
+
+  // ── GIVING ────────────────────────────────────────────────────────────────
+  Giving: {
+    headers: [
+      'id', 'memberId', 'donorName', 'amount', 'currency', 'date', 'fund',
+      'method', 'checkNumber', 'transactionRef', 'isTaxDeductible', 'notes',
+      'recordedBy', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'G': ['General', 'Missions', 'Building', 'Benevolence', 'Youth', 'Special', 'Other'],
+      'H': ['Cash', 'Check', 'Online', 'Zelle', 'Venmo', 'Card', 'Other'],
+      'K': ['TRUE', 'FALSE']
+    }
+  },
+
+  GivingPledges: {
+    headers: [
+      'id', 'memberId', 'fund', 'pledgeAmount', 'frequency', 'startDate',
+      'endDate', 'totalPledged', 'totalGiven', 'status', 'notes', 'createdBy',
+      'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'C': ['General', 'Missions', 'Building', 'Benevolence', 'Youth', 'Special', 'Other'],
+      'E': ['Weekly', 'Biweekly', 'Monthly', 'Quarterly', 'Yearly', 'One-Time'],
+      'J': ['Active', 'Completed', 'Cancelled']
+    }
+  },
+
+  // ── VOLUNTEER ─────────────────────────────────────────────────────────────
+  VolunteerSchedule: {
+    headers: [
+      'id', 'memberId', 'ministryTeam', 'role', 'scheduledDate', 'serviceType',
+      'status', 'swapRequested', 'swapWith', 'notes', 'scheduledBy', 'createdAt',
+      'updatedAt'
+    ],
+    dropdowns: {
+      'C': ['Worship', 'Greeting', 'Sound', 'Children', 'Youth', 'Outreach', 'Other'],
+      'F': ['Sunday AM', 'Sunday PM', 'Wednesday', 'Special', 'Other'],
+      'G': ['Scheduled', 'Confirmed', 'Declined', 'No-Show', 'Completed'],
+      'H': ['TRUE', 'FALSE']
+    }
+  },
+
+  // ── COMMUNICATIONS ────────────────────────────────────────────────────────
+  Communications: {
+    headers: [
+      'id', 'type', 'subject', 'body', 'audience', 'audienceFilter', 'sentAt',
+      'sentBy', 'recipientCount', 'status', 'scheduledFor', 'notes', 'createdAt'
+    ],
+    dropdowns: {
+      'B': ['Email', 'SMS', 'Push', 'Announcement'],
+      'E': ['All', 'Active Members', 'Small Group', 'Ministry Team', 'Custom'],
+      'J': ['Draft', 'Sent', 'Failed', 'Scheduled']
+    }
+  },
+
+  CommsMessages: {
+    headers: [
+      'id', 'threadId', 'senderId', 'senderName', 'senderEmail', 'recipientType',
+      'recipientId', 'recipientName', 'messageType', 'subject', 'body', 'priority',
+      'attachmentUrl', 'attachmentName', 'replyToId', 'status', 'sentAt',
+      'editedAt', 'readCount', 'flagged', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'F': ['Member', 'Group', 'Ministry', 'Channel'],
+      'I': ['Text', 'Announcement', 'Prayer', 'System', 'Template'],
+      'L': ['Low', 'Normal', 'High', 'Urgent'],
+      'P': ['Sent', 'Draft', 'Deleted', 'Failed'],
+      'T': ['TRUE', 'FALSE']
+    }
+  },
+
+  CommsThreads: {
+    headers: [
+      'id', 'subject', 'threadType', 'creatorId', 'creatorName', 'participantIds',
+      'participantNames', 'participantCount', 'messageCount', 'lastMessageAt',
+      'lastMessageBy', 'lastSnippet', 'status', 'pinned', 'mutedBy', 'channelId',
+      'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'C': ['Direct', 'Group', 'Channel'],
+      'M': ['Active', 'Archived', 'Deleted'],
+      'N': ['TRUE', 'FALSE']
+    }
+  },
+
+  CommsNotifications: {
+    headers: [
+      'id', 'recipientId', 'recipientName', 'recipientEmail', 'title', 'body',
+      'notifType', 'priority', 'entityType', 'entityId', 'actionUrl', 'icon',
+      'status', 'readAt', 'dismissedAt', 'sentVia', 'senderEmail', 'expiresAt',
+      'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'G': ['Message', 'Event', 'Prayer', 'Care', 'System', 'Broadcast', 'Approval', 'Custom'],
+      'H': ['Low', 'Normal', 'High', 'Urgent'],
+      'M': ['Unread', 'Read', 'Dismissed', 'Expired'],
+      'P': ['In-App', 'Email', 'Both']
+    }
+  },
+
+  CommsNotificationPrefs: {
+    headers: [
+      'id', 'memberId', 'memberEmail', 'emailEnabled', 'emailDigest', 'inAppEnabled',
+      'quietHoursStart', 'quietHoursEnd', 'notifMessages', 'notifAnnouncements',
+      'notifEvents', 'notifPrayer', 'notifCare', 'notifSystem', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'D': ['TRUE', 'FALSE'],
+      'E': ['Instant', 'Hourly', 'Daily', 'Weekly'],
+      'F': ['TRUE', 'FALSE'],
+      'I': ['TRUE', 'FALSE'],
+      'J': ['TRUE', 'FALSE'],
+      'K': ['TRUE', 'FALSE'],
+      'L': ['TRUE', 'FALSE'],
+      'M': ['TRUE', 'FALSE'],
+      'N': ['TRUE', 'FALSE']
+    }
+  },
+
+  CommsChannels: {
+    headers: [
+      'id', 'channelName', 'slug', 'description', 'channelType', 'icon',
+      'colorHex', 'creatorId', 'creatorName', 'subscriberCount', 'messageCount',
+      'visibility', 'postPermission', 'pinnedMessageId', 'status', 'sortOrder',
+      'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'E': ['Announcement', 'Discussion', 'Prayer Chain', 'Ministry', 'Staff', 'Custom'],
+      'L': ['Public', 'Leaders Only', 'Members Only'],
+      'M': ['Anyone', 'Leaders', 'Pastors', 'Admins'],
+      'O': ['Active', 'Paused', 'Deleted']
+    }
+  },
+
+  CommsTemplates: {
+    headers: [
+      'id', 'templateName', 'templateType', 'subject', 'body', 'bodyHtml',
+      'category', 'variables', 'useCount', 'lastUsedAt', 'visibility', 'status',
+      'createdBy', 'createdByName', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'C': ['Email', 'SMS', 'In-App', 'Announcement'],
+      'G': ['General', 'Welcome', 'Follow-Up', 'Event', 'Prayer', 'Care', 'Giving', 'Custom'],
+      'K': ['Shared', 'Personal'],
+      'L': ['Active', 'Draft', 'Archived']
+    }
+  },
+
+  CommsReadReceipts: {
+    headers: [
+      'id', 'messageId', 'threadId', 'readerId', 'readerName', 'readerEmail',
+      'readAt', 'device', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'H': ['Web', 'Mobile', 'Desktop']
+    }
+  },
+
+  CommsBroadcastLog: {
+    headers: [
+      'id', 'type', 'subject', 'body', 'bodyHtml', 'audience', 'audienceFilter',
+      'templateId', 'channelId', 'sentAt', 'sentBy', 'sentByName', 'recipientCount',
+      'deliveredCount', 'failedCount', 'status', 'scheduledFor', 'createdAt'
+    ],
+    dropdowns: {
+      'B': ['Email', 'SMS', 'Push', 'Multi-Channel'],
+      'F': ['All', 'Active Members', 'Small Group', 'Ministry Team', 'Custom', 'Channel'],
+      'P': ['Draft', 'Sent', 'Failed', 'Scheduled', 'Cancelled']
+    }
+  },
+
+  // ── FLOCKCHAT ─────────────────────────────────────────────────────────────
+  FCRooms: {
+    headers: [
+      'id', 'name', 'type', 'members', 'description', 'groupId', 'createdBy',
+      'createdByName', 'createdAt', 'lastMsgText', 'lastMsgSender', 'lastMsgAt'
+    ],
+    dropdowns: {
+      'C': ['room', 'dm', 'pastoral', 'prayer', 'announcement']
+    }
+  },
+
+  FCMessages: {
+    headers: [
+      'id', 'roomId', 'sender', 'senderName', 'text', 'type', 'timestamp',
+      'deleted', 'deletedAt', 'deletedBy'
+    ],
+    dropdowns: {
+      'F': ['message', 'prayer', 'image', 'system']
+    }
+  },
+
+  FCPresence: {
+    headers: ['userEmail', 'userName', 'status', 'lastSeen', 'activeRoom'],
+    dropdowns: {
+      'C': ['online', 'away', 'offline']
+    }
+  },
+
+  FCAnnouncements: {
+    headers: [
+      'id', 'sender', 'senderName', 'title', 'body', 'audience', 'timestamp', 'readBy'
+    ],
+    dropdowns: {
+      'F': ['all', 'leaders', 'ministry', 'custom']
+    }
+  },
+
+  FCReadReceipts: {
+    headers: ['id', 'roomId', 'userEmail', 'lastReadAt']
+  },
+
+  // ── CHECK-IN & MINISTRIES ─────────────────────────────────────────────────
+  CheckInSessions: {
+    headers: [
+      'id', 'eventId', 'sessionName', 'date', 'openedAt', 'closedAt',
+      'totalCheckIns', 'openedBy', 'notes', 'createdAt'
+    ]
+  },
+
+  Ministries: {
+    headers: [
+      'id', 'ministryName', 'category', 'description', 'leadId', 'coLeadId',
+      'contactEmail', 'meetingDay', 'meetingTime', 'meetingLocation',
+      'budgetAllocated', 'status', 'reportingTo', 'notes', 'createdBy',
+      'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'C': ['Pastoral', 'Worship', 'Children & Youth', 'Life Stage', 'Outreach', 'Missions', 'Education', 'Operations', 'Community', 'Prayer', 'Counseling', 'Recovery', 'Other'],
+      'H': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Varies', 'As Needed'],
+      'L': ['Active', 'On Hold', 'Archived']
+    }
+  },
+
+  MinistryMembers: {
+    headers: [
+      'id', 'ministryId', 'memberId', 'role', 'startDate', 'endDate', 'status',
+      'hoursPerMonth', 'notes', 'createdAt'
+    ],
+    dropdowns: {
+      'D': ['Member', 'Team Lead', 'Coordinator', 'Trainer', 'Volunteer', 'Intern', 'Advisor'],
+      'G': ['Active', 'Inactive', 'On Leave', 'Sabbatical']
+    }
+  },
+
+  // ── SERVICE PLANNING ──────────────────────────────────────────────────────
+  ServicePlans: {
+    headers: [
+      'id', 'serviceDate', 'serviceType', 'theme', 'scriptureFocus', 'sermonTitle',
+      'preacherId', 'worshipLeaderId', 'status', 'notes', 'createdBy', 'createdAt',
+      'updatedBy', 'updatedAt'
+    ],
+    dropdowns: {
+      'C': ['Sunday AM', 'Sunday PM', 'Wednesday', 'Special', 'Good Friday', 'Easter', 'Christmas', 'Other'],
+      'I': ['Draft', 'Confirmed', 'In Progress', 'Completed']
+    }
+  },
+
+  ServicePlanItems: {
+    headers: [
+      'id', 'planId', 'order', 'itemType', 'title', 'description', 'durationMinutes',
+      'assignedToId', 'notes', 'createdAt'
+    ],
+    dropdowns: {
+      'D': ['Song', 'Scripture Reading', 'Prayer', 'Sermon', 'Offering', 'Announcement', 'Special Music', 'Video', 'Communion', 'Benediction', 'Transition', 'Other']
+    }
+  },
+
+  ServiceOrders: {
+    headers: ['id', 'itemsJson', 'updatedAt', 'updatedBy']
+  },
+
+  // ── MUSIC ─────────────────────────────────────────────────────────────────
+  Songs: {
+    headers: [
+      'id', 'title', 'artist', 'ccliNumber', 'defaultKey', 'tempoBpm',
+      'timeSignature', 'durationMinutes', 'genre', 'tags', 'lyrics', 'notes',
+      'active', 'driveFileId', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt'
+    ],
+    dropdowns: {
+      'E': ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B',
+            'Cm', 'C#m', 'Dm', 'D#m', 'Ebm', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bbm', 'Bm'],
+      'G': ['4/4', '3/4', '6/8', '2/4', '12/8', '2/2', 'Other'],
+      'I': ['Hymn', 'Contemporary', 'Gospel', 'Chorus', 'Christmas', 'Easter', 'Other'],
+      'M': ['TRUE', 'FALSE']
+    }
+  },
+
+  SongArrangements: {
+    headers: [
+      'id', 'songId', 'name', 'key', 'capo', 'chordChart', 'lyricsWithChords',
+      'instrument', 'vocalRange', 'driveFileId', 'notes', 'createdBy', 'createdAt',
+      'updatedAt'
+    ],
+    dropdowns: {
+      'D': ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B',
+            'Cm', 'C#m', 'Dm', 'D#m', 'Ebm', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bbm', 'Bm'],
+      'H': ['Guitar', 'Piano', 'Bass', 'Drums', 'Vocals', 'Other']
+    }
+  },
+
+  SetlistSongs: {
+    headers: [
+      'id', 'planId', 'planItemId', 'songId', 'arrangementId', 'keyOverride',
+      'notes', 'createdBy', 'createdAt', 'updatedAt'
+    ]
+  },
+
+  // ── SPIRITUAL CARE ────────────────────────────────────────────────────────
+  SpiritualCareCases: {
+    headers: [
+      'id', 'memberId', 'careType', 'priority', 'status', 'summary',
+      'assignedTeamId', 'primaryCaregiverId', 'secondaryCaregiverId', 'openedDate',
+      'targetResolveDate', 'resolvedDate', 'referralInfo', 'confidential', 'notes',
+      'riskLevel', 'supportPresence', 'spiritualState', 'trend', 'linkedCaseId',
+      'nextReviewDate', 'createdBy', 'createdAt', 'updatedBy', 'updatedAt'
+    ],
+    dropdowns: {
+      'C': ['Shepherding', 'Elder Care', 'Crisis', 'Abuse / Domestic Violence', 'Immigration / Deportation', 'Incarceration & Re-Entry', 'Grief', 'Pregnancy & Infant Loss', 'Marriage', 'Pre-Marriage', 'Addiction', 'Pornography / Sexual Addiction', 'Hospital Visit', 'Medical', 'Terminal Illness / End of Life', 'New Believer', 'New Member Integration', 'Restoration', 'Counseling', 'Mental Health', 'Gender Identity / Sexuality', 'Discipleship', 'Family', 'Financial', 'Other'],
+      'D': ['Low', 'Normal', 'High', 'Urgent'],
+      'E': ['Open', 'In Progress', 'Follow-Up', 'Resolved', 'Referred', 'Closed'],
+      'N': ['TRUE', 'FALSE'],
+      'P': ['Low', 'Medium', 'High', 'Critical'],
+      'Q': ['None', 'Minimal', 'Moderate', 'Strong'],
+      'R': ['Unknown', 'Struggling', 'Seeking', 'Stable', 'Growing'],
+      'S': ['Declining', 'Stable', 'Improving']
+    }
+  },
+
+  SpiritualCareInteractions: {
+    headers: [
+      'id', 'caseId', 'interactionDate', 'type', 'caregiverId', 'durationMinutes',
+      'summary', 'followUpNeeded', 'followUpDate', 'followUpDone', 'confidential',
+      'createdAt'
+    ],
+    dropdowns: {
+      'D': ['Visit', 'Phone', 'Text', 'Email', 'Prayer', 'Meal', 'Hospital', 'Group Session', 'Other'],
+      'H': ['TRUE', 'FALSE'],
+      'J': ['TRUE', 'FALSE'],
+      'K': ['TRUE', 'FALSE']
+    }
+  },
+
+  SpiritualCareAssignments: {
+    headers: [
+      'id', 'caregiverId', 'memberId', 'ministryId', 'role', 'startDate', 'endDate',
+      'status', 'notes', 'createdBy', 'createdAt'
+    ],
+    dropdowns: {
+      'E': ['Shepherd', 'Prayer Partner', 'Mentor', 'Accountability Partner', 'Deacon', 'Elder', 'Lay Counselor'],
+      'H': ['Active', 'Inactive', 'Reassigned']
+    }
+  },
+
+  // ── OUTREACH ──────────────────────────────────────────────────────────────
+  OutreachContacts: {
+    headers: [
+      'id', 'firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state',
+      'zip', 'source', 'campaignId', 'status', 'interestLevel', 'notes', 'memberId',
+      'assignedTo', 'lastContactDate', 'nextFollowUpDate', 'tags', 'createdBy',
+      'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'J': ['Walk-In', 'Door-to-Door', 'Event', 'Referral', 'Online', 'Social Media', 'Flyer', 'Community Service', 'Other'],
+      'L': ['New', 'Contacted', 'Engaged', 'Visiting', 'Regular Visitor', 'Converted', 'Inactive', 'Declined'],
+      'M': ['Unknown', 'Low', 'Medium', 'High', 'Very High']
+    }
+  },
+
+  OutreachCampaigns: {
+    headers: [
+      'id', 'campaignName', 'type', 'description', 'startDate', 'endDate', 'location',
+      'ministryId', 'leadId', 'budget', 'goalReached', 'actualReached', 'decisions',
+      'status', 'notes', 'tags', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'C': ['Door-to-Door', 'Community Event', 'Service Project', 'Media Campaign', 'Mission Trip', 'Revival', 'VBS', 'Sports Camp', 'Food Drive', 'Health Fair', 'Concert', 'Other'],
+      'N': ['Planned', 'Active', 'Completed', 'Cancelled']
+    }
+  },
+
+  OutreachFollowUps: {
+    headers: [
+      'id', 'contactId', 'date', 'type', 'byId', 'summary', 'response',
+      'followUpNeeded', 'nextDate', 'followUpDone', 'notes', 'createdAt'
+    ],
+    dropdowns: {
+      'D': ['Phone', 'Text', 'Email', 'Visit', 'Event Invite', 'Meal', 'Door-Knock', 'Other'],
+      'H': ['TRUE', 'FALSE'],
+      'J': ['TRUE', 'FALSE']
+    }
+  },
+
+  // ── SERMONS ───────────────────────────────────────────────────────────────
+  Sermons: {
+    headers: [
+      'id', 'title', 'preacherId', 'preacherName', 'date', 'serviceType', 'seriesId',
+      'seriesOrder', 'scriptureRefs', 'topicTags', 'summary', 'driveFileId', 'fileUrl',
+      'filename', 'fileType', 'audioDriveId', 'videoDriveId', 'status', 'visibility',
+      'createdBy', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'F': ['Sunday AM', 'Sunday PM', 'Wednesday', 'Special', 'Other'],
+      'R': ['Draft', 'Under Review', 'Approved', 'Revision Requested', 'Delivered'],
+      'S': ['Public', 'Members Only', 'Leaders Only']
+    }
+  },
+
+  SermonSeries: {
+    headers: [
+      'id', 'seriesName', 'description', 'themeScripture', 'startDate', 'endDate',
+      'preacherId', 'status', 'coverImageUrl', 'sermonCount', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'H': ['Planning', 'Active', 'Completed', 'Archived']
+    }
+  },
+
+  SermonReviews: {
+    headers: [
+      'id', 'sermonId', 'reviewerId', 'reviewerName', 'decision', 'feedback',
+      'reviewedAt', 'privateNotes', 'createdAt'
+    ],
+    dropdowns: {
+      'E': ['Approved', 'Revision Requested', 'Noted']
+    }
+  },
+
+  // ── COMPASSION ────────────────────────────────────────────────────────────
+  CompassionRequests: {
+    headers: [
+      'id', 'requesterName', 'phone', 'email', 'isMember', 'memberId', 'requestType',
+      'description', 'urgency', 'amountRequested', 'amountApproved', 'status',
+      'assignedTeam', 'assignedTo', 'followUpDate', 'resolutionNotes', 'confidential',
+      'submittedBy', 'approvedBy', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'E': ['TRUE', 'FALSE'],
+      'G': ['Financial', 'Food', 'Clothing', 'Housing', 'Medical', 'Transportation', 'Utility', 'Other'],
+      'I': ['Low', 'Normal', 'High', 'Urgent'],
+      'L': ['Submitted', 'Under Review', 'Approved', 'Denied', 'In Progress', 'Resolved', 'Closed'],
+      'Q': ['TRUE', 'FALSE']
+    }
+  },
+
+  CompassionResources: {
+    headers: [
+      'id', 'resourceName', 'category', 'description', 'quantityOnHand', 'unit',
+      'reorderLevel', 'location', 'donatedBy', 'status', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'C': ['Food', 'Clothing', 'Financial', 'Household', 'Medical', 'Gift Cards', 'Other'],
+      'J': ['Available', 'Low', 'Out of Stock', 'Discontinued']
+    }
+  },
+
+  CompassionTeamLog: {
+    headers: [
+      'id', 'requestId', 'date', 'activityType', 'teamMemberId', 'teamMemberName',
+      'description', 'resourcesUsed', 'amountDisbursed', 'followUpNeeded', 'notes',
+      'createdAt'
+    ],
+    dropdowns: {
+      'D': ['Visit', 'Delivery', 'Phone Call', 'Meeting', 'Resource Pickup', 'Other'],
+      'J': ['TRUE', 'FALSE']
+    }
+  },
+
+  // ── DISCIPLESHIP ──────────────────────────────────────────────────────────
+  DiscipleshipPaths: {
+    headers: [
+      'id', 'name', 'description', 'category', 'targetAudience', 'difficultyLevel',
+      'estimatedWeeks', 'totalSteps', 'prerequisitePathId', 'requiredForLeadership',
+      'facilitatorGuideUrl', 'studentGuideUrl', 'status', 'visibility', 'createdBy',
+      'approvedBy', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'D': ['Foundations', 'Baptism', 'Membership', 'Leadership', 'Bible Study', 'Theology', 'Marriage', 'Parenting', 'Recovery', 'Missions', 'Youth', 'Custom'],
+      'E': ['All', 'New Believers', 'Youth', 'Men', 'Women', 'Couples', 'Leaders', 'Seniors'],
+      'F': ['Beginner', 'Intermediate', 'Advanced'],
+      'J': ['TRUE', 'FALSE'],
+      'M': ['Draft', 'Active', 'Archived'],
+      'N': ['Public', 'Members Only', 'Leaders Only']
+    }
+  },
+
+  DiscipleshipSteps: {
+    headers: [
+      'id', 'pathId', 'stepOrder', 'title', 'description', 'stepType',
+      'durationMinutes', 'scriptureRefs', 'learningObjectives', 'contentUrl',
+      'videoUrl', 'homeworkDescription', 'assessmentRequired', 'passingScore',
+      'facilitatorNotes', 'resourceIds', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'F': ['Lesson', 'Workshop', 'Activity', 'Quiz', 'Discussion', 'Project', 'Reading', 'Video', 'Field Trip', 'Mentoring Session', 'Other'],
+      'M': ['TRUE', 'FALSE']
+    }
+  },
+
+  DiscipleshipEnrollments: {
+    headers: [
+      'id', 'memberId', 'memberName', 'pathId', 'pathName', 'enrolledDate',
+      'targetCompletion', 'actualCompletion', 'currentStepId', 'stepsCompleted',
+      'totalSteps', 'percentComplete', 'status', 'facilitatorId', 'facilitatorName',
+      'groupCohort', 'meetingDay', 'meetingTime', 'notes', 'enrolledBy', 'createdAt',
+      'updatedAt'
+    ],
+    dropdowns: {
+      'M': ['Enrolled', 'In Progress', 'Completed', 'Paused', 'Dropped', 'Transferred'],
+      'Q': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    }
+  },
+
+  DiscipleshipMentoring: {
+    headers: [
+      'id', 'mentorId', 'mentorName', 'menteeId', 'menteeName', 'relationshipType',
+      'focusArea', 'startDate', 'endDate', 'meetingFrequency', 'meetingDay',
+      'meetingLocation', 'status', 'goals', 'notes', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'F': ['Discipleship', 'Accountability', 'Coaching', 'Pastoral', 'Peer', 'Other'],
+      'G': ['General Spiritual Growth', 'Bible Study', 'Prayer Life', 'Ministry Skills', 'Leadership', 'Marriage', 'Recovery', 'Other'],
+      'J': ['Weekly', 'Biweekly', 'Monthly', 'As Needed'],
+      'K': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      'M': ['Active', 'Paused', 'Completed', 'Cancelled']
+    }
+  },
+
+  DiscipleshipMeetings: {
+    headers: [
+      'id', 'mentoringId', 'meetingDate', 'meetingTime', 'durationMinutes', 'location',
+      'meetingType', 'topicsCovered', 'scriptureDiscussed', 'homeworkAssigned',
+      'homeworkCompleted', 'prayerRequests', 'actionItems', 'notes', 'createdAt',
+      'updatedAt'
+    ],
+    dropdowns: {
+      'G': ['In Person', 'Video Call', 'Phone Call', 'Group Session', 'Other'],
+      'K': ['TRUE', 'FALSE']
+    }
+  },
+
+  DiscipleshipAssessments: {
+    headers: [
+      'id', 'memberId', 'memberName', 'assessmentType', 'assessmentName', 'description',
+      'dateTaken', 'assessedBy', 'scoreTotal', 'scoreMax', 'scorePercent', 'resultsJson',
+      'topGifts', 'topStrengths', 'growthAreas', 'recommendations', 'enrollmentId',
+      'pathId', 'status', 'notes', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'D': ['Spiritual Gifts', 'Maturity', 'Bible Knowledge', 'Personality', 'Leadership', 'Calling', 'Custom'],
+      'S': ['Completed', 'In Progress', 'Pending Review']
+    }
+  },
+
+  DiscipleshipResources: {
+    headers: [
+      'id', 'title', 'description', 'resourceType', 'author', 'url', 'driveFileId',
+      'category', 'topicTags', 'difficultyLevel', 'estimatedTime', 'pathIds', 'stepIds',
+      'visibility', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'D': ['Book', 'Video', 'Article', 'Podcast', 'Worksheet', 'Study Guide', 'Devotional', 'Course', 'Website', 'Other'],
+      'H': ['General', 'Foundations', 'Bible Study', 'Prayer', 'Theology', 'Leadership', 'Marriage', 'Parenting', 'Recovery', 'Youth', 'Other'],
+      'J': ['Beginner', 'Intermediate', 'Advanced'],
+      'N': ['Public', 'Members Only', 'Leaders Only']
+    }
+  },
+
+  DiscipleshipMilestones: {
+    headers: [
+      'id', 'memberId', 'memberName', 'milestoneType', 'milestoneName', 'description',
+      'dateAchieved', 'verifiedBy', 'enrollmentId', 'pathId', 'certificateId',
+      'ceremonyDate', 'witness', 'notes', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'D': ['Salvation', 'Baptism', 'Membership', 'First Serve', 'Leadership', 'Graduation', 'Testimony', 'Ordination', 'Mission Trip', 'Teaching', 'Mentoring', 'Custom']
+    }
+  },
+
+  DiscipleshipGoals: {
+    headers: [
+      'id', 'memberId', 'memberName', 'goalCategory', 'goalTitle', 'description',
+      'targetDate', 'completionDate', 'status', 'progressPercent', 'measurementType',
+      'targetValue', 'currentValue', 'accountabilityPartnerId', 'accountabilityPartnerName',
+      'reviewFrequency', 'lastReviewed', 'notes', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'D': ['Spiritual Discipline', 'Bible Reading', 'Prayer', 'Evangelism', 'Serving', 'Giving', 'Character', 'Relationship', 'Knowledge', 'Leadership', 'Health', 'Custom'],
+      'I': ['Active', 'In Progress', 'Completed', 'Paused', 'Abandoned'],
+      'K': ['Subjective', 'Numeric', 'Frequency', 'Milestone'],
+      'P': ['Daily', 'Weekly', 'Biweekly', 'Monthly']
+    }
+  },
+
+  DiscipleshipCertificates: {
+    headers: [
+      'id', 'memberId', 'memberName', 'pathId', 'pathName', 'enrollmentId',
+      'certificateNumber', 'issueDate', 'issuedBy', 'expiryDate', 'status', 'notes',
+      'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'K': ['Issued', 'Revoked', 'Expired']
+    }
+  },
+
+  // ── LEARNING ──────────────────────────────────────────────────────────────
+  LearningTopics: {
+    headers: [
+      'id', 'topicName', 'slug', 'description', 'parentTopicId', 'level', 'sortOrder',
+      'iconUrl', 'colorHex', 'featured', 'sermonCount', 'subscriberCount', 'status',
+      'createdBy', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'J': ['TRUE', 'FALSE'],
+      'M': ['Active', 'Archived', 'Draft']
+    }
+  },
+
+  LearningPlaylists: {
+    headers: [
+      'id', 'title', 'description', 'coverImageUrl', 'curatorId', 'curatorName',
+      'topicIds', 'topicNames', 'preacherFilter', 'scriptureFilter', 'difficultyLevel',
+      'estimatedHours', 'itemCount', 'subscriberCount', 'visibility', 'featured',
+      'sortOrder', 'tags', 'status', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'K': ['Beginner', 'Intermediate', 'Advanced', 'All Levels'],
+      'O': ['Public', 'Private', 'Members Only'],
+      'P': ['TRUE', 'FALSE'],
+      'S': ['Active', 'Archived', 'Draft']
+    }
+  },
+
+  LearningPlaylistItems: {
+    headers: [
+      'id', 'playlistId', 'sermonId', 'sermonTitle', 'preacherName', 'scriptureRefs',
+      'sortOrder', 'sectionLabel', 'notesForLearner', 'durationMins', 'required',
+      'bonus', 'discussionQuestions', 'addedBy', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'K': ['TRUE', 'FALSE'],
+      'L': ['TRUE', 'FALSE']
+    }
+  },
+
+  LearningProgress: {
+    headers: [
+      'id', 'memberId', 'memberName', 'sermonId', 'sermonTitle', 'playlistId',
+      'playlistTitle', 'status', 'progressPercent', 'lastPositionSecs', 'totalDurationSecs',
+      'startedAt', 'completedAt', 'listenCount', 'lastListenedAt', 'rating', 'device',
+      'notes', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'H': ['Not Started', 'In Progress', 'Completed'],
+      'Q': ['Web', 'Mobile', 'Tablet']
+    }
+  },
+
+  LearningNotes: {
+    headers: [
+      'id', 'memberId', 'memberName', 'sermonId', 'sermonTitle', 'playlistId',
+      'noteType', 'title', 'content', 'timestampSecs', 'scriptureRef', 'highlightText',
+      'shared', 'pinned', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'G': ['General', 'Key Point', 'Question', 'Application', 'Quote', 'Reflection'],
+      'M': ['TRUE', 'FALSE'],
+      'N': ['TRUE', 'FALSE']
+    }
+  },
+
+  LearningBookmarks: {
+    headers: [
+      'id', 'memberId', 'memberName', 'sermonId', 'sermonTitle', 'preacherName',
+      'collection', 'tags', 'notes', 'positionSecs', 'priority', 'reminderDate',
+      'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'G': ['Watch Later', 'Favourites', 'Study', 'Share', 'Custom'],
+      'K': ['High', 'Normal', 'Low']
+    }
+  },
+
+  LearningRecommendations: {
+    headers: [
+      'id', 'memberId', 'memberName', 'sermonId', 'sermonTitle', 'preacherName',
+      'reasonType', 'reasonText', 'topicMatch', 'scriptureMatch', 'score', 'priority',
+      'status', 'dismissedAt', 'recommendedBy', 'recommendedByName', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'G': ['Manual', 'Auto-Generated', 'Topic Match', 'Preacher Match', 'Series Continuation'],
+      'L': ['High', 'Normal', 'Low'],
+      'M': ['Active', 'Accepted', 'Dismissed', 'Expired']
+    }
+  },
+
+  LearningQuizzes: {
+    headers: [
+      'id', 'sermonId', 'sermonTitle', 'playlistId', 'title', 'description',
+      'difficulty', 'passPercent', 'questionsJson', 'questionCount', 'timeLimitMins',
+      'attemptsAllowed', 'topicTags', 'scriptureRefs', 'status', 'createdBy',
+      'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'G': ['Beginner', 'Intermediate', 'Advanced'],
+      'O': ['Draft', 'Published', 'Archived']
+    }
+  },
+
+  LearningQuizResults: {
+    headers: [
+      'id', 'quizId', 'quizTitle', 'memberId', 'memberName', 'sermonId',
+      'attemptNumber', 'startedAt', 'completedAt', 'timeTakenSecs', 'answersJson',
+      'correctCount', 'totalQuestions', 'scorePercent', 'passed', 'feedback',
+      'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'O': ['TRUE', 'FALSE']
+    }
+  },
+
+  LearningCertificates: {
+    headers: [
+      'id', 'memberId', 'memberName', 'certificateType', 'playlistId', 'playlistTitle',
+      'quizId', 'quizTitle', 'certificateNumber', 'issueDate', 'issuedBy', 'expiryDate',
+      'status', 'notes', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'D': ['Playlist Completion', 'Quiz Mastery', 'Topic Mastery', 'Custom'],
+      'M': ['Issued', 'Revoked', 'Expired']
+    }
+  },
+
+  // ── THEOLOGY ──────────────────────────────────────────────────────────────
+  TheologyCategories: {
+    headers: [
+      'id', 'categoryId', 'title', 'subtitle', 'intro', 'icon', 'colorVar',
+      'sortOrder', 'visible', 'status', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'I': ['TRUE', 'FALSE'],
+      'J': ['Active', 'Archived']
+    }
+  },
+
+  TheologySections: {
+    headers: [
+      'id', 'categoryRowId', 'sectionId', 'title', 'content', 'summary',
+      'scriptureRefs', 'keywords', 'sortOrder', 'visible', 'approvedBy', 'approvedAt',
+      'version', 'status', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'J': ['TRUE', 'FALSE'],
+      'N': ['Draft', 'Approved', 'Under Review', 'Archived']
+    }
+  },
+
+  TheologyScriptures: {
+    headers: [
+      'id', 'sectionRowId', 'reference', 'text', 'translation', 'contextNote',
+      'sortOrder', 'isPrimary', 'status', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'E': ['ESV', 'NIV', 'KJV', 'NKJV', 'NASB', 'NLT', 'CSB', 'Other'],
+      'H': ['TRUE', 'FALSE'],
+      'I': ['Active', 'Archived']
+    }
+  },
+
+  TheologyRevisions: {
+    headers: [
+      'id', 'sectionRowId', 'version', 'previousTitle', 'previousContent',
+      'changedBy', 'changeReason', 'approvedBy', 'status', 'createdAt'
+    ],
+    dropdowns: {
+      'I': ['Recorded', 'Reviewed']
+    }
+  },
+
+  // ── MEMBER CARDS ──────────────────────────────────────────────────────────
+  MemberCards: {
+    headers: [
+      'id', 'memberNumber', 'email', 'firstName', 'lastName', 'preferredName',
+      'suffix', 'photoUrl', 'cardTitle', 'cardBio', 'ministry', 'smallGroup',
+      'phone', 'phoneVisible', 'emailVisible', 'websiteUrl', 'scheduleUrl',
+      'colorScheme', 'bgScheme', 'cardIcon', 'showDailyBread', 'showPrayerTicker',
+      'cardFooter', 'visibility', 'viewCount', 'active', 'status', 'createdBy',
+      'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'N': ['TRUE', 'FALSE'],
+      'O': ['TRUE', 'FALSE'],
+      'R': ['gold', 'cyan', 'magenta', 'emerald', 'rose', 'slate', 'custom'],
+      'U': ['TRUE', 'FALSE'],
+      'V': ['TRUE', 'FALSE'],
+      'X': ['public', 'authenticated', 'private'],
+      'Z': ['TRUE', 'FALSE'],
+      'AA': ['Active', 'Suspended', 'Archived']
+    }
+  },
+
+  MemberCardLinks: {
+    headers: [
+      'id', 'cardRowId', 'linkType', 'label', 'icon', 'url', 'sortOrder', 'visible',
+      'platform', 'status', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'C': ['phone', 'sms', 'email', 'website', 'schedule', 'social', 'custom'],
+      'H': ['TRUE', 'FALSE'],
+      'I': ['', 'instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'tiktok', 'threads', 'other'],
+      'J': ['Active', 'Archived']
+    }
+  },
+
+  MemberCardViews: {
+    headers: [
+      'id', 'cardRowId', 'memberNumber', 'viewerEmail', 'viewSource', 'userAgent',
+      'ipHash', 'viewedAt'
+    ],
+    dropdowns: {
+      'E': ['direct', 'qr', 'directory', 'share']
+    }
+  },
+
+  // ── AUTH & CONFIG ─────────────────────────────────────────────────────────
+  AuthUsers: {
+    headers: [
+      'email', 'passcode', 'passcodeHash', 'salt', 'firstName', 'lastName', 'role',
+      'status', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'G': ['admin', 'pastor', 'leader', 'volunteer', 'readonly'],
+      'H': ['active', 'inactive', 'suspended', 'pending']
+    }
+  },
+
+  UserProfiles: {
+    headers: [
+      'email', 'displayName', 'photoUrl', 'phone', 'bio', 'timezone', 'language',
+      'notifications', 'theme', 'updatedAt'
+    ],
+    dropdowns: {
+      'H': ['TRUE', 'FALSE'],
+      'I': ['Light', 'Dark', 'Auto']
+    }
+  },
+
+  AccessControl: {
+    headers: [
+      'email', 'role', 'displayName', 'groups', 'active', 'notes', 'createdAt', 'updatedAt'
+    ],
+    dropdowns: {
+      'B': ['admin', 'pastor', 'leader', 'volunteer', 'readonly'],
+      'E': ['TRUE', 'FALSE']
+    }
+  },
+
+  Permissions: {
+    headers: ['Email', 'Module', 'Access', 'GrantedBy', 'GrantedAt', 'Notes'],
+    dropdowns: {
+      'C': ['grant', 'deny']
+    }
+  },
+
+  CalendarEvents: {
+    headers: [
+      'eventId', 'email', 'title', 'description', 'startDateTime', 'endDateTime',
+      'location', 'attendees', 'color', 'isAllDay', 'recurrenceRule', 'visibility',
+      'sharedWith', 'delegatedTo', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy'
+    ],
+    dropdowns: {
+      'J': ['TRUE', 'FALSE'],
+      'L': ['public', 'authenticated', 'private']
+    }
+  },
+
+  AuthAudit: {
+    headers: ['timestamp', 'event', 'email', 'details']
+  },
+
+  AuditLog: {
+    headers: ['timestamp', 'email', 'role', 'action', 'tab', 'rowRef', 'details']
+  },
+
+  AppConfig: {
+    headers: ['key', 'value', 'description', 'category', 'updatedBy', 'updatedAt'],
+    dropdowns: {
+      'D': ['Auth', 'Care', 'Display', 'Failover', 'General', 'Modules', 'Notifications', 'Pastoral', 'Roles', 'Security']
+    }
+  },
+
+  ChurchRegistry: {
+    headers: [
+      'churchId', 'sheetId', 'name', 'plan', 'status', 'createdAt', 'shortName',
+      'brandName', 'tagline', 'themeColor', 'backgroundColor', 'databaseUrl',
+      'photosUrl', 'adminEmail', 'analyticsId', 'favicon', 'portrait', 'version',
+      'firebaseConfig'
+    ],
+    dropdowns: {
+      'D': ['Standard', 'Premium'],
+      'E': ['Active', 'Inactive']
+    }
+  }
+
+};
+
+// ── getTab() — returns the named sheet, auto-creating it from _TAB_HEADERS_
+//   on first access for any deployment that predates a new tab.
+//   Unknown tab names still throw so typos are caught immediately.
 function getTab(name) {
   if (!_ssCache) {
     var id = PropertiesService.getScriptProperties().getProperty('SHEET_ID');
@@ -988,7 +2108,16 @@ function getTab(name) {
   }
   if (!_sheetCache[name]) {
     var sheet = _ssCache.getSheetByName(name);
-    if (!sheet) throw new Error('Tab not found: ' + name);
+    if (!sheet) {
+      var def = _TAB_HEADERS_[name];
+      if (def) {
+        sheet = ensureTab(_ssCache, name, def.headers);
+        if (def.dropdowns) addDropdowns(_ssCache, name, def.dropdowns);
+        Logger.log('Auto-created tab on first access: ' + name);
+      } else {
+        throw new Error('Tab not found: ' + name);
+      }
+    }
     _sheetCache[name] = sheet;
   }
   return _sheetCache[name];
@@ -8444,6 +9573,8 @@ function routeExpansionAction(action, params, auth) {
   if (action === 'serviceItems.update')      return handleServiceItemsUpdate(params, auth);
   if (action === 'serviceItems.delete')      return handleServiceItemsDelete(params, auth);
   if (action === 'serviceItems.reorder')     return handleServiceItemsReorder(params, auth);
+  if (action === 'serviceOrders.get')         return handleServiceOrdersGet(params, auth);
+  if (action === 'serviceOrders.save')        return handleServiceOrdersSave(params, auth);
 
   // ── Songs & Music Stand ─────────────────────────────────────────────────
   if (action === 'songs.list')                return handleSongsList(params, auth);
@@ -9033,2170 +10164,19 @@ function _buildCoreTabs_() {
     PropertiesService.getScriptProperties().getProperty('SHEET_ID')
   );
 
-
-  // ══════════════════════════════════════════════════════════════════════════
-  // PASTORAL CORE — Members, Prayer, Contacts, Notes, Milestones, Households, ToDo
-  // ══════════════════════════════════════════════════════════════════════════
-
-  // ── Members (51 columns — master member roster) ────────────────────────────
-  ensureTab(ss, 'Members', [
-    'id',                   // A  — auto-generated UUID
-    'firstName',            // B
-    'lastName',             // C
-    'preferredName',        // D  — nickname / what they go by
-    'suffix',               // E  — Jr, Sr, III, etc.
-    'dateOfBirth',          // F
-    'gender',               // G  — Male / Female / —
-    'photoUrl',             // H  — optional link to a profile picture
-    'primaryEmail',         // I
-    'secondaryEmail',       // J
-    'cellPhone',            // K
-    'homePhone',            // L
-    'workPhone',            // M
-    'preferredContact',     // N  — Email / Text / Call
-    'address1',             // O
-    'address2',             // P
-    'city',                 // Q
-    'state',                // R
-    'zip',                  // S
-    'country',              // T
-    'membershipStatus',     // U  — Active / Inactive / Non-Member / Member in Glory / Resigned Member
-    'memberSince',          // V  — date
-    'howTheyFoundUs',       // W  — Referral / Walk-In / Online / Event / Other
-    'baptismDate',          // X
-    'salvationDate',        // Y
-    'dateOfDeath',          // Z  — for "Member in Glory"
-    'householdId',          // AA — links family members together
-    'familyRole',           // AB — Head of Household / Spouse / Child / Other
-    'maritalStatus',        // AC — Single / Married / Widowed / Divorced / Separated
-    'spouseName',           // AD — quick-reference
-    'emergencyContact',     // AE — name
-    'emergencyPhone',       // AF
-    'ministryTeams',        // AG — comma-separated (Worship, Youth, Outreach…)
-    'volunteerRoles',       // AH — comma-separated
-    'spiritualGifts',       // AI — comma-separated
-    'smallGroup',           // AJ — group name
-    'pastoralNotes',        // AK — private admin notes
-    'lastContactDate',      // AL
-    'nextFollowUp',         // AM — date
-    'followUpPriority',     // AN — Low / Medium / High / Urgent
-    'assignedTo',           // AO — pastor / elder / deacon name or email
-    'tags',                 // AP — freeform comma-separated labels
-    'archived',             // AQ — TRUE / FALSE
-    'archiveReason',        // AR
-    'createdBy',            // AS
-    'createdAt',            // AT
-    'updatedBy',            // AU
-    'updatedAt',            // AV
-    'website',              // AW
-    'colorScheme',          // AX
-    'bgScheme'              // AY
-  ]);
-
-  addDropdowns(ss, 'Members', {
-    'G': ['Male', 'Female', '—'],
-    'N': ['Email', 'Text', 'Call'],
-    'U': ['Active', 'Inactive', 'Non-Member', 'Member in Glory', 'Resigned Member'],
-    'W': ['Referral', 'Walk-In', 'Online', 'Event', 'Other'],
-    'AB': ['Head of Household', 'Spouse', 'Child', 'Other'],
-    'AC': ['Single', 'Married', 'Widowed', 'Divorced', 'Separated'],
-    'AN': ['Low', 'Medium', 'High', 'Urgent'],
-    'AQ': ['TRUE', 'FALSE']
-  });
-
-  // ── Prayer Requests (17 columns) ──────────────────────────────────────────
-  ensureTab(ss, 'PrayerRequests', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID (blank if anonymous)
-    'submitterName',        // C
-    'submitterEmail',       // D
-    'submitterPhone',       // E
-    'prayerText',           // F
-    'category',             // G  — Health / Family / Financial / Spiritual / Grief / Praise / Other
-    'isConfidential',       // H  — TRUE / FALSE
-    'followUpRequested',    // I  — TRUE / FALSE
-    'status',               // J  — New / In Progress / Answered / Closed
-    'adminNotes',           // K
-    'assignedTo',           // L  — who is handling
-    'submittedAt',          // M
-    'lastUpdated',          // N
-    'updatedBy',            // O
-    'archived',             // P  — TRUE / FALSE
-    'autoLog',              // Q
-    'groupId'               // R  — FK to SmallGroups.ID (links request to a small group for leader visibility)
-  ]);
-
-  addDropdowns(ss, 'PrayerRequests', {
-    'G': ['Health', 'Family', 'Financial', 'Spiritual', 'Grief', 'Praise', 'Other'],
-    'H': ['TRUE', 'FALSE'],
-    'I': ['TRUE', 'FALSE'],
-    'J': ['New', 'In Progress', 'Answered', 'Closed'],
-    'P': ['TRUE', 'FALSE']
-  });
-
-  // ── Journal Entries (10 columns) ──────────────────────────────────────────
-  ensureTab(ss, 'JournalEntries', [
-    'id',                   // A  — auto-generated UUID
-    'userEmail',            // B  — who wrote it
-    'title',                // C  — optional subject
-    'entry',                // D  — journal body text
-    'category',             // E  — Prayer / Devotional / Study / Reflection / Gratitude / Other
-    'scriptureRef',         // F  — optional scripture reference
-    'mood',                 // G  — Grateful / Joyful / Peaceful / Struggling / Seeking / Hopeful
-    'private',              // H  — TRUE (default) / FALSE
-    'createdAt',            // I
-    'updatedAt'             // J
-  ]);
-
-  addDropdowns(ss, 'JournalEntries', {
-    'E': ['Prayer', 'Devotional', 'Study', 'Reflection', 'Gratitude', 'Other'],
-    'G': ['Grateful', 'Joyful', 'Peaceful', 'Struggling', 'Seeking', 'Hopeful'],
-    'H': ['TRUE', 'FALSE']
-  });
-
-  // ── Contact Log (12 columns) ──────────────────────────────────────────────
-  ensureTab(ss, 'ContactLog', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'contactDate',          // C
-    'contactType',          // D  — Phone Call / Text / Email / Home Visit / Office Visit / Video Call / Other
-    'direction',            // E  — Outbound / Inbound
-    'subject',              // F
-    'details',              // G
-    'followUpNeeded',       // H  — TRUE / FALSE
-    'followUpDate',         // I
-    'followUpCompleted',    // J  — TRUE / FALSE
-    'contactedBy',          // K  — admin email
-    'createdAt'             // L
-  ]);
-
-  addDropdowns(ss, 'ContactLog', {
-    'D': ['Phone Call', 'Text', 'Email', 'Home Visit', 'Office Visit', 'Video Call', 'Other'],
-    'E': ['Outbound', 'Inbound'],
-    'H': ['TRUE', 'FALSE'],
-    'J': ['TRUE', 'FALSE']
-  });
-
-  // ── Pastoral Notes (7 columns) ────────────────────────────────────────────
-  ensureTab(ss, 'PastoralNotes', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'noteDate',             // C
-    'category',             // D  — General / Counseling / Concern / Praise / Confidential
-    'noteText',             // E
-    'createdBy',            // F
-    'createdAt',            // G
-    'groupId'               // H  — FK to SmallGroups.ID (links note to a small group for leader visibility)
-  ]);
-
-  addDropdowns(ss, 'PastoralNotes', {
-    'D': ['General', 'Counseling', 'Concern', 'Praise', 'Confidential']
-  });
-
-  // ── Milestones (7 columns) ────────────────────────────────────────────────
-  ensureTab(ss, 'Milestones', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'milestoneType',        // C  — Salvation / Baptism / Membership / etc.
-    'milestoneDate',        // D
-    'description',          // E
-    'recordedBy',           // F
-    'createdAt'             // G
-  ]);
-
-  addDropdowns(ss, 'Milestones', {
-    'C': ['Salvation', 'Baptism', 'Membership', 'Wedding', 'Baby', 'Graduation', 'Ordination', 'Death', 'Other']
-  });
-
-  // ── Households (11 columns) ───────────────────────────────────────────────
-  ensureTab(ss, 'Households', [
-    'householdId',          // A  — shared across family members
-    'householdName',        // B  — e.g. "The Smith Family"
-    'address1',             // C
-    'address2',             // D
-    'city',                 // E
-    'state',                // F
-    'zip',                  // G
-    'country',              // H
-    'primaryContactId',     // I  — FK to Members.ID
-    'notes',                // J
-    'createdAt'             // K
-  ]);
-
-  // ── ToDo (15 columns) ─────────────────────────────────────────────────────
-  ensureTab(ss, 'ToDo', [
-    'id',                   // A
-    'title',                // B
-    'description',          // C
-    'assignedTo',           // D  — email of assignee
-    'assignedMemberId',     // E  — FK to Members.ID (the member this task is about)
-    'dueDate',              // F
-    'priority',             // G  — Low / Medium / High / Urgent
-    'status',               // H  — Not Started / In Progress / Done / Archived
-    'category',             // I  — Follow-Up / Visit / Phone Call / Admin / Event / Other
-    'entityType',           // J  — links task to any entity (tab name)
-    'entityId',             // K  — FK to the row ID in the linked entity's tab
-    'recurring',            // L  — TRUE / FALSE
-    'recurrenceRule',       // M  — Daily / Weekly / Biweekly / Monthly / Quarterly / Yearly
-    'notes',                // N
-    'autoLog',              // O
-    'createdBy',            // P
-    'createdAt',            // Q
-    'updatedBy',            // R
-    'updatedAt'             // S
-  ]);
-
-  addDropdowns(ss, 'ToDo', {
-    'G': ['Low', 'Medium', 'High', 'Urgent'],
-    'H': ['Not Started', 'In Progress', 'Done', 'Archived'],
-    'I': ['Follow-Up', 'Visit', 'Phone Call', 'Admin', 'Event', 'Other'],
-    'J': ['Members', 'PrayerRequests', 'PastoralNotes', 'Events', 'SmallGroups',
-           'SpiritualCareCases', 'OutreachContacts', 'OutreachCampaigns',
-           'CompassionRequests', 'Ministries', 'Sermons', 'DiscipleshipEnrollments',
-           'DiscipleshipMentoring', 'Giving', 'Attendance', 'VolunteerSchedule',
-           'ServicePlans', 'LearningPlaylists', 'MissionsRegistry', 'Households',
-           'Milestones', 'Other'],
-    'L': ['TRUE', 'FALSE'],
-    'M': ['Daily', 'Weekly', 'Biweekly', 'Monthly', 'Quarterly', 'Yearly']
-  });
-
-  // ── Strategic Planning (New_Covenant extension) ─────────────────────────
-  ensureTab(ss, 'StrategicGoals', [
-    'id',           // A
-    'area',         // B
-    'goal',         // C
-    'progress',     // D
-    'status',       // E
-    'owner',        // F
-    'notes',        // G
-    'createdAt',    // H
-    'createdBy',    // I
-    'updatedAt'     // J
-  ]);
-
-  ensureTab(ss, 'StrategicInitiatives', [
-    'id',           // A
-    'title',        // B
-    'ministry',     // C
-    'owner',        // D
-    'due',          // E
-    'dueIso',       // F
-    'progress',     // G
-    'status',       // H
-    'description',  // I
-    'createdAt',    // J
-    'createdBy',    // K
-    'updatedAt'     // L
-  ]);
-
-  ensureTab(ss, 'StrategicKeyDates', [
-    'id',           // A
-    'label',        // B
-    'date',         // C
-    'done',         // D
-    'notes',        // E
-    'createdAt',    // F
-    'createdBy',    // G
-    'updatedAt'     // H
-  ]);
-
-  addDropdowns(ss, 'StrategicKeyDates', {
-    'D': ['TRUE', 'FALSE']
-  });
-
-
-  // ══════════════════════════════════════════════════════════════════════════
-  // NOTE: Content & Reference tabs (Books, Genealogy, Counseling,
-  // Devotionals, Reading, Words, Heart, Mirror) live in the MASTER_API
-  // sheet — a separate Google Sheet + deployment. Do NOT create them here.
-  //
-  // Country data lives in MissionsRegistry rows — no per-country tabs.
-  // ══════════════════════════════════════════════════════════════════════════
-
-
-  // ══════════════════════════════════════════════════════════════════════════
-  // EXPANSION MODULES — Attendance through Statistics
-  // ══════════════════════════════════════════════════════════════════════════
-
-  // ── Attendance (aggregate per-service model) ────────────────────────────────
-  ensureTab(ss, 'Attendance', [
-    'id',                   // A  — auto-generated UUID
-    'date',                 // B  — service date (YYYY-MM-DD)
-    'serviceType',          // C  — Sunday AM / Sunday PM / Wednesday / Special / Small Group / Other
-    'adults',               // D  — adult headcount
-    'children',             // E  — children headcount
-    'total',                // F  — computed total (adults + children)
-    'notes',                // G
-    'recordedBy',           // H  — admin email
-    'createdAt'             // I
-  ]);
-
-  addDropdowns(ss, 'Attendance', {
-    'C': ['Sunday AM', 'Sunday PM', 'Wednesday', 'Special', 'Small Group', 'Other']
-  });
-
-  // ── Events ─────────────────────────────────────────────────────────────────
-  ensureTab(ss, 'Events', [
-    'id',                   // A
-    'title',                // B
-    'description',          // C
-    'eventType',            // D  — Service / Bible Study / Fellowship / Outreach / Meeting / Conference / Other
-    'location',             // E
-    'startDate',            // F
-    'endDate',              // G
-    'startTime',            // H
-    'endTime',              // I
-    'recurring',            // J  — None / Weekly / Biweekly / Monthly / Yearly
-    'recurringUntil',       // K  — end date for recurrence
-    'capacity',             // L  — max attendees (0 = unlimited)
-    'rsvpRequired',         // M  — TRUE / FALSE
-    'ministryTeam',         // N  — which team is responsible
-    'contactPerson',        // O  — organizer email
-    'status',               // P  — Planned / Active / Completed / Cancelled
-    'visibility',           // Q  — public / members / leaders / deacons / pastors / admins / private
-    'notes',                // R
-    'createdBy',            // S
-    'createdAt',            // T
-    'updatedBy',            // U
-    'updatedAt'             // V
-  ]);
-
-  addDropdowns(ss, 'Events', {
-    'D': ['Service', 'Bible Study', 'Fellowship', 'Outreach', 'Meeting', 'Conference', 'Other'],
-    'J': ['None', 'Weekly', 'Biweekly', 'Monthly', 'Yearly'],
-    'M': ['TRUE', 'FALSE'],
-    'P': ['Planned', 'Active', 'Completed', 'Cancelled']
-  });
-
-  // ── Event RSVPs ────────────────────────────────────────────────────────────
-  ensureTab(ss, 'EventRSVPs', [
-    'id',                   // A
-    'eventId',              // B  — FK to Events.ID
-    'memberId',             // C  — FK to Members.ID
-    'response',             // D  — Yes / No / Maybe
-    'guestCount',           // E  — number of additional guests
-    'notes',                // F
-    'respondedAt',          // G
-    'updatedAt'             // H
-  ]);
-
-  addDropdowns(ss, 'EventRSVPs', {
-    'D': ['Yes', 'No', 'Maybe']
-  });
-
-  // ── Small Groups ───────────────────────────────────────────────────────────
-  ensureTab(ss, 'SmallGroups', [
-    'id',                   // A
-    'groupName',            // B
-    'description',          // C
-    'groupType',            // D  — Bible Study / Prayer / Fellowship / Youth / Women / Men / Couples / Other
-    'leaderId',             // E  — FK to Members.ID
-    'coLeaderId',           // F  — FK to Members.ID
-    'meetingDay',           // G  — Monday / Tuesday / ... / Sunday / Varies
-    'meetingTime',          // H
-    'location',             // I
-    'capacity',             // J
-    'status',               // K  — Active / On Hold / Closed
-    'semester',             // L  — e.g. "Spring 2026"
-    'notes',                // M
-    'createdBy',            // N
-    'createdAt',            // O
-    'updatedAt'             // P
-  ]);
-
-  addDropdowns(ss, 'SmallGroups', {
-    'D': ['Bible Study', 'Prayer', 'Fellowship', 'Youth', 'Women', 'Men', 'Couples', 'Other'],
-    'G': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Varies'],
-    'K': ['Active', 'On Hold', 'Closed']
-  });
-
-  // ── Small Group Members (junction) ─────────────────────────────────────────
-  ensureTab(ss, 'SmallGroupMembers', [
-    'id',                   // A
-    'groupId',              // B  — FK to SmallGroups.ID
-    'memberId',             // C  — FK to Members.ID
-    'role',                 // D  — Member / Leader / Co-Leader / Host
-    'joinedDate',           // E
-    'leftDate',             // F  — blank if still active
-    'status',               // G  — Active / Inactive
-    'notes',                // H
-    'createdAt'             // I
-  ]);
-
-  addDropdowns(ss, 'SmallGroupMembers', {
-    'D': ['Member', 'Leader', 'Co-Leader', 'Host'],
-    'G': ['Active', 'Inactive']
-  });
-
-  // ── Giving / Contributions ─────────────────────────────────────────────────
-  ensureTab(ss, 'Giving', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID (blank for anonymous)
-    'donorName',            // C  — for non-members or anonymous
-    'amount',               // D  — decimal
-    'currency',             // E  — USD / etc.
-    'date',                 // F
-    'fund',                 // G  — General / Missions / Building / Benevolence / Youth / Special / Other
-    'method',               // H  — Cash / Check / Online / Zelle / Venmo / Card / Other
-    'checkNumber',          // I
-    'transactionRef',       // J  — external reference
-    'isTaxDeductible',      // K  — TRUE / FALSE
-    'notes',                // L
-    'recordedBy',           // M
-    'createdAt',            // N
-    'updatedAt'             // O
-  ]);
-
-  addDropdowns(ss, 'Giving', {
-    'G': ['General', 'Missions', 'Building', 'Benevolence', 'Youth', 'Special', 'Other'],
-    'H': ['Cash', 'Check', 'Online', 'Zelle', 'Venmo', 'Card', 'Other'],
-    'K': ['TRUE', 'FALSE']
-  });
-
-  // ── Giving Pledges ─────────────────────────────────────────────────────────
-  ensureTab(ss, 'GivingPledges', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'fund',                 // C  — General / Missions / Building / etc.
-    'pledgeAmount',         // D  — per period
-    'frequency',            // E  — Weekly / Biweekly / Monthly / Quarterly / Yearly / One-Time
-    'startDate',            // F
-    'endDate',              // G
-    'totalPledged',         // H  — computed or manual
-    'totalGiven',           // I  — computed or manual
-    'status',               // J  — Active / Completed / Cancelled
-    'notes',                // K
-    'createdBy',            // L
-    'createdAt',            // M
-    'updatedAt'             // N
-  ]);
-
-  addDropdowns(ss, 'GivingPledges', {
-    'C': ['General', 'Missions', 'Building', 'Benevolence', 'Youth', 'Special', 'Other'],
-    'E': ['Weekly', 'Biweekly', 'Monthly', 'Quarterly', 'Yearly', 'One-Time'],
-    'J': ['Active', 'Completed', 'Cancelled']
-  });
-
-  // ── Volunteer Schedule ─────────────────────────────────────────────────────
-  ensureTab(ss, 'VolunteerSchedule', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'ministryTeam',         // C  — Worship / Greeting / Sound / Children / Youth / Outreach / Other
-    'role',                 // D  — specific role within the team
-    'scheduledDate',        // E
-    'serviceType',          // F  — Sunday AM / Sunday PM / Wednesday / Special / Other
-    'status',               // G  — Scheduled / Confirmed / Declined / No-Show / Completed
-    'swapRequested',        // H  — TRUE / FALSE
-    'swapWith',             // I  — Member ID of swap partner
-    'notes',                // J
-    'scheduledBy',          // K
-    'createdAt',            // L
-    'updatedAt'             // M
-  ]);
-
-  addDropdowns(ss, 'VolunteerSchedule', {
-    'C': ['Worship', 'Greeting', 'Sound', 'Children', 'Youth', 'Outreach', 'Other'],
-    'F': ['Sunday AM', 'Sunday PM', 'Wednesday', 'Special', 'Other'],
-    'G': ['Scheduled', 'Confirmed', 'Declined', 'No-Show', 'Completed'],
-    'H': ['TRUE', 'FALSE']
-  });
-
-  // ── Communications Log ─────────────────────────────────────────────────────
-  ensureTab(ss, 'Communications', [
-    'id',                   // A
-    'type',                 // B  — Email / SMS / Push / Announcement
-    'subject',              // C
-    'body',                 // D
-    'audience',             // E  — All / Active Members / Small Group / Ministry Team / Custom
-    'audienceFilter',       // F  — specific group/team name if applicable
-    'sentAt',               // G
-    'sentBy',               // H
-    'recipientCount',       // I
-    'status',               // J  — Draft / Sent / Failed / Scheduled
-    'scheduledFor',         // K  — if Status = Scheduled
-    'notes',                // L
-    'createdAt'             // M
-  ]);
-
-  addDropdowns(ss, 'Communications', {
-    'B': ['Email', 'SMS', 'Push', 'Announcement'],
-    'E': ['All', 'Active Members', 'Small Group', 'Ministry Team', 'Custom'],
-    'J': ['Draft', 'Sent', 'Failed', 'Scheduled']
-  });
-
-  // ── Comms Messages (internal direct & group messaging) ─────────────────────
-  ensureTab(ss, 'CommsMessages', [
-    'id',                   // A
-    'threadId',             // B  — FK to CommsThreads.ID
-    'senderId',             // C  — FK to Members.ID
-    'senderName',           // D
-    'senderEmail',          // E
-    'recipientType',        // F  — Member / Group / Ministry / Channel
-    'recipientId',          // G  — FK dependent on type
-    'recipientName',        // H
-    'messageType',          // I  — Text / Announcement / Prayer / System / Template
-    'subject',              // J
-    'body',                 // K
-    'priority',             // L  — Low / Normal / High / Urgent
-    'attachmentUrl',        // M
-    'attachmentName',       // N
-    'replyToId',            // O  — FK to CommsMessages.ID (for threading)
-    'status',               // P  — Sent / Draft / Deleted / Failed
-    'sentAt',               // Q
-    'editedAt',             // R
-    'readCount',            // S
-    'flagged',              // T  — TRUE / FALSE
-    'createdAt',            // U
-    'updatedAt'             // V
-  ]);
-
-  addDropdowns(ss, 'CommsMessages', {
-    'F': ['Member', 'Group', 'Ministry', 'Channel'],
-    'I': ['Text', 'Announcement', 'Prayer', 'System', 'Template'],
-    'L': ['Low', 'Normal', 'High', 'Urgent'],
-    'P': ['Sent', 'Draft', 'Deleted', 'Failed'],
-    'T': ['TRUE', 'FALSE']
-  });
-
-  // ── Comms Threads (conversation containers) ────────────────────────────────
-  ensureTab(ss, 'CommsThreads', [
-    'id',                   // A
-    'subject',              // B
-    'threadType',           // C  — Direct / Group / Channel
-    'creatorId',            // D  — FK to Members.ID
-    'creatorName',          // E
-    'participantIds',       // F  — comma-separated list
-    'participantNames',     // G  — comma-separated list
-    'participantCount',     // H
-    'messageCount',         // I
-    'lastMessageAt',        // J
-    'lastMessageBy',        // K
-    'lastSnippet',          // L  — first 100 chars of last message
-    'status',               // M  — Active / Archived / Deleted
-    'pinned',               // N  — TRUE / FALSE
-    'mutedBy',              // O  — comma-separated member IDs who muted
-    'channelId',            // P  — FK to CommsChannels.ID (if channel thread)
-    'createdAt',            // Q
-    'updatedAt'             // R
-  ]);
-
-  addDropdowns(ss, 'CommsThreads', {
-    'C': ['Direct', 'Group', 'Channel'],
-    'M': ['Active', 'Archived', 'Deleted'],
-    'N': ['TRUE', 'FALSE']
-  });
-
-  // ── Comms Notifications (system + custom notifications per user) ───────────
-  ensureTab(ss, 'CommsNotifications', [
-    'id',                   // A
-    'recipientId',          // B  — FK to Members.ID
-    'recipientName',        // C
-    'recipientEmail',       // D
-    'title',                // E
-    'body',                 // F
-    'notifType',            // G  — Message / Event / Prayer / Care / System / Broadcast / Approval / Custom
-    'priority',             // H  — Low / Normal / High / Urgent
-    'entityType',           // I  — source tab (CommsMessages, Events, PrayerRequests, etc.)
-    'entityId',             // J  — FK to the source entity
-    'actionUrl',            // K  — deep link within the app
-    'icon',                 // L
-    'status',               // M  — Unread / Read / Dismissed / Expired
-    'readAt',               // N
-    'dismissedAt',          // O
-    'sentVia',              // P  — In-App / Email / Both
-    'senderEmail',          // Q
-    'expiresAt',            // R
-    'createdAt',            // S
-    'updatedAt'             // T
-  ]);
-
-  addDropdowns(ss, 'CommsNotifications', {
-    'G': ['Message', 'Event', 'Prayer', 'Care', 'System', 'Broadcast', 'Approval', 'Custom'],
-    'H': ['Low', 'Normal', 'High', 'Urgent'],
-    'M': ['Unread', 'Read', 'Dismissed', 'Expired'],
-    'P': ['In-App', 'Email', 'Both']
-  });
-
-  // ── Comms Notification Preferences (per-user notification settings) ────────
-  ensureTab(ss, 'CommsNotificationPrefs', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'memberEmail',          // C
-    'emailEnabled',         // D  — TRUE / FALSE
-    'emailDigest',          // E  — Instant / Hourly / Daily / Weekly
-    'inAppEnabled',         // F  — TRUE / FALSE
-    'quietHoursStart',      // G  — e.g. 22:00
-    'quietHoursEnd',        // H  — e.g. 07:00
-    'notifMessages',        // I  — TRUE / FALSE
-    'notifAnnouncements',   // J  — TRUE / FALSE
-    'notifEvents',          // K  — TRUE / FALSE
-    'notifPrayer',          // L  — TRUE / FALSE
-    'notifCare',            // M  — TRUE / FALSE
-    'notifSystem',          // N  — TRUE / FALSE
-    'createdAt',            // O
-    'updatedAt'             // P
-  ]);
-
-  addDropdowns(ss, 'CommsNotificationPrefs', {
-    'D': ['TRUE', 'FALSE'],
-    'E': ['Instant', 'Hourly', 'Daily', 'Weekly'],
-    'F': ['TRUE', 'FALSE'],
-    'I': ['TRUE', 'FALSE'],
-    'J': ['TRUE', 'FALSE'],
-    'K': ['TRUE', 'FALSE'],
-    'L': ['TRUE', 'FALSE'],
-    'M': ['TRUE', 'FALSE'],
-    'N': ['TRUE', 'FALSE']
-  });
-
-  // ── Comms Channels (announcement & topic channels) ─────────────────────────
-  ensureTab(ss, 'CommsChannels', [
-    'id',                   // A
-    'channelName',          // B
-    'slug',                 // C  — URL-friendly name
-    'description',          // D
-    'channelType',          // E  — Announcement / Discussion / Prayer Chain / Ministry / Staff / Custom
-    'icon',                 // F
-    'colorHex',             // G  — branding color (e.g. #FF6B35)
-    'creatorId',            // H  — FK to Members.ID
-    'creatorName',          // I
-    'subscriberCount',      // J
-    'messageCount',         // K
-    'visibility',           // L  — Public / Leaders Only / Members Only
-    'postPermission',       // M  — Anyone / Leaders / Pastors / Admins
-    'pinnedMessageId',      // N  — FK to CommsMessages.ID
-    'status',               // O  — Active / Paused / Deleted
-    'sortOrder',            // P
-    'createdAt',            // Q
-    'updatedAt'             // R
-  ]);
-
-  addDropdowns(ss, 'CommsChannels', {
-    'E': ['Announcement', 'Discussion', 'Prayer Chain', 'Ministry', 'Staff', 'Custom'],
-    'L': ['Public', 'Leaders Only', 'Members Only'],
-    'M': ['Anyone', 'Leaders', 'Pastors', 'Admins'],
-    'O': ['Active', 'Paused', 'Deleted']
-  });
-
-  // ── Comms Templates (reusable message / email templates) ───────────────────
-  ensureTab(ss, 'CommsTemplates', [
-    'id',                   // A
-    'templateName',         // B
-    'templateType',         // C  — Email / SMS / In-App / Announcement
-    'subject',              // D
-    'body',                 // E  — plain text (with {{variable}} placeholders)
-    'bodyHtml',             // F  — rich HTML version
-    'category',             // G  — General / Welcome / Follow-Up / Event / Prayer / Care / Giving / Custom
-    'variables',            // H  — comma-separated list of available {{placeholders}}
-    'useCount',             // I
-    'lastUsedAt',           // J
-    'visibility',           // K  — Shared / Personal
-    'status',               // L  — Active / Draft / Archived
-    'createdBy',            // M
-    'createdByName',        // N
-    'createdAt',            // O
-    'updatedAt'             // P
-  ]);
-
-  addDropdowns(ss, 'CommsTemplates', {
-    'C': ['Email', 'SMS', 'In-App', 'Announcement'],
-    'G': ['General', 'Welcome', 'Follow-Up', 'Event', 'Prayer', 'Care', 'Giving', 'Custom'],
-    'K': ['Shared', 'Personal'],
-    'L': ['Active', 'Draft', 'Archived']
-  });
-
-  // ── Comms Read Receipts (who read which messages) ──────────────────────────
-  ensureTab(ss, 'CommsReadReceipts', [
-    'id',                   // A
-    'messageId',            // B  — FK to CommsMessages.ID
-    'threadId',             // C  — FK to CommsThreads.ID
-    'readerId',             // D  — FK to Members.ID
-    'readerName',           // E
-    'readerEmail',          // F
-    'readAt',               // G
-    'device',               // H  — Web / Mobile / Desktop
-    'createdAt',            // I
-    'updatedAt'             // J
-  ]);
-
-  addDropdowns(ss, 'CommsReadReceipts', {
-    'H': ['Web', 'Mobile', 'Desktop']
-  });
-
-  // ── Comms Broadcast Log (enhanced broadcast tracking) ──────────────────────
-  ensureTab(ss, 'CommsBroadcastLog', [
-    'id',                   // A
-    'type',                 // B  — Email / SMS / Push / Multi-Channel
-    'subject',              // C
-    'body',                 // D
-    'bodyHtml',             // E
-    'audience',             // F  — All / Active Members / Small Group / Ministry Team / Custom / Channel
-    'audienceFilter',       // G
-    'templateId',           // H  — FK to CommsTemplates.ID (if template was used)
-    'channelId',            // I  — FK to CommsChannels.ID
-    'sentAt',               // J
-    'sentBy',               // K
-    'sentByName',           // L
-    'recipientCount',       // M
-    'deliveredCount',       // N
-    'failedCount',          // O
-    'status',               // P  — Draft / Sent / Failed / Scheduled / Cancelled
-    'scheduledFor',         // Q
-    'createdAt'             // R
-  ]);
-
-  addDropdowns(ss, 'CommsBroadcastLog', {
-    'B': ['Email', 'SMS', 'Push', 'Multi-Channel'],
-    'F': ['All', 'Active Members', 'Small Group', 'Ministry Team', 'Custom', 'Channel'],
-    'P': ['Draft', 'Sent', 'Failed', 'Scheduled', 'Cancelled']
-  });
-
-  // ── FlockChat — Real-Time Messaging (Phase 3) ─────────────────────────────
-  ensureTab(ss, 'FCRooms', [
-    'id',                   // A
-    'name',                 // B
-    'type',                 // C  — room / dm / pastoral / prayer / announcement
-    'members',              // D  — comma-separated emails
-    'description',          // E
-    'groupId',              // F  — FK to SmallGroups.ID (for auto-created rooms)
-    'createdBy',            // G
-    'createdByName',        // H
-    'createdAt',            // I
-    'lastMsgText',          // J  — preview (100 chars)
-    'lastMsgSender',        // K
-    'lastMsgAt'             // L
-  ]);
-
-  addDropdowns(ss, 'FCRooms', {
-    'C': ['room', 'dm', 'pastoral', 'prayer', 'announcement']
-  });
-
-  ensureTab(ss, 'FCMessages', [
-    'id',                   // A
-    'roomId',               // B  — FK to FCRooms.ID
-    'sender',               // C  — email
-    'senderName',           // D
-    'text',                 // E
-    'type',                 // F  — message / prayer / image / system
-    'timestamp',            // G
-    'deleted',              // H  — true / (blank)
-    'deletedAt',            // I
-    'deletedBy'             // J
-  ]);
-
-  addDropdowns(ss, 'FCMessages', {
-    'F': ['message', 'prayer', 'image', 'system']
-  });
-
-  ensureTab(ss, 'FCPresence', [
-    'userEmail',            // A
-    'userName',             // B
-    'status',               // C  — online / away / offline
-    'lastSeen',             // D
-    'activeRoom'            // E  — current room ID or blank
-  ]);
-
-  addDropdowns(ss, 'FCPresence', {
-    'C': ['online', 'away', 'offline']
-  });
-
-  ensureTab(ss, 'FCAnnouncements', [
-    'id',                   // A
-    'sender',               // B
-    'senderName',           // C
-    'title',                // D
-    'body',                 // E
-    'audience',             // F  — all / leaders / ministry / custom
-    'timestamp',            // G
-    'readBy'                // H  — comma-separated emails
-  ]);
-
-  addDropdowns(ss, 'FCAnnouncements', {
-    'F': ['all', 'leaders', 'ministry', 'custom']
-  });
-
-  ensureTab(ss, 'FCReadReceipts', [
-    'id',                   // A
-    'roomId',               // B  — FK to FCRooms.ID
-    'userEmail',            // C
-    'lastReadAt'            // D
-  ]);
-
-  // ── Check-In Sessions (for Sunday services, events) ────────────────────────
-  ensureTab(ss, 'CheckInSessions', [
-    'id',                   // A
-    'eventId',              // B  — FK to Events.ID (or blank for ad-hoc)
-    'sessionName',          // C  — e.g. "Sunday AM — March 23, 2026"
-    'date',                 // D
-    'openedAt',             // E
-    'closedAt',             // F
-    'totalCheckIns',        // G  — computed
-    'openedBy',             // H
-    'notes',                // I
-    'createdAt'             // J
-  ]);
-
-  // ── Ministries ────────────────────────────────────────────────────────────
-  ensureTab(ss, 'Ministries', [
-    'id',                   // A  — auto-generated UUID
-    'ministryName',         // B  — e.g. Spiritual Care, Worship, Children, Youth …
-    'category',             // C  — Pastoral / Worship / Children & Youth / Life Stage / Outreach / Missions / Education / Operations / Community / Prayer / Counseling / Recovery / Other
-    'description',          // D
-    'leadId',               // E  — FK to Members.ID
-    'coLeadId',             // F  — FK to Members.ID
-    'contactEmail',         // G
-    'meetingDay',           // H  — Monday–Sunday / Varies / As Needed
-    'meetingTime',          // I
-    'meetingLocation',      // J
-    'budgetAllocated',      // K  — annual budget
-    'status',               // L  — Active / On Hold / Archived
-    'reportingTo',          // M  — parent ministry ID (for sub-ministries) or blank
-    'notes',                // N
-    'createdBy',            // O
-    'createdAt',            // P
-    'updatedAt'             // Q
-  ]);
-
-  addDropdowns(ss, 'Ministries', {
-    'C': ['Pastoral', 'Worship', 'Children & Youth', 'Life Stage', 'Outreach', 'Missions', 'Education', 'Operations', 'Community', 'Prayer', 'Counseling', 'Recovery', 'Other'],
-    'H': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Varies', 'As Needed'],
-    'L': ['Active', 'On Hold', 'Archived']
-  });
-
-  // ── Ministry Members (junction — who serves in which ministry) ─────────────
-  ensureTab(ss, 'MinistryMembers', [
-    'id',                   // A
-    'ministryId',           // B  — FK to Ministries.ID
-    'memberId',             // C  — FK to Members.ID
-    'role',                 // D  — Member / Team Lead / Coordinator / Trainer / Volunteer / Intern / Advisor
-    'startDate',            // E
-    'endDate',              // F  — blank if still active
-    'status',               // G  — Active / Inactive / On Leave / Sabbatical
-    'hoursPerMonth',        // H  — estimated service hours
-    'notes',                // I
-    'createdAt'             // J
-  ]);
-
-  addDropdowns(ss, 'MinistryMembers', {
-    'D': ['Member', 'Team Lead', 'Coordinator', 'Trainer', 'Volunteer', 'Intern', 'Advisor'],
-    'G': ['Active', 'Inactive', 'On Leave', 'Sabbatical']
-  });
-
-  // ── Service Plans (weekly worship / service order) ─────────────────────────
-  ensureTab(ss, 'ServicePlans', [
-    'id',                   // A
-    'serviceDate',          // B
-    'serviceType',          // C  — Sunday AM / Sunday PM / Wednesday / Special / Good Friday / Easter / Christmas / Other
-    'theme',                // D
-    'scriptureFocus',       // E  — primary passage(s)
-    'sermonTitle',          // F
-    'preacherId',           // G  — FK to Members.ID
-    'worshipLeaderId',      // H  — FK to Members.ID
-    'status',               // I  — Draft / Confirmed / In Progress / Completed
-    'notes',                // J
-    'createdBy',            // K
-    'createdAt',            // L
-    'updatedBy',            // M
-    'updatedAt'             // N
-  ]);
-
-  addDropdowns(ss, 'ServicePlans', {
-    'C': ['Sunday AM', 'Sunday PM', 'Wednesday', 'Special', 'Good Friday', 'Easter', 'Christmas', 'Other'],
-    'I': ['Draft', 'Confirmed', 'In Progress', 'Completed']
-  });
-
-  // ── Service Plan Items (individual elements within a service) ──────────────
-  ensureTab(ss, 'ServicePlanItems', [
-    'id',                   // A
-    'planId',               // B  — FK to ServicePlans.ID
-    'order',                // C  — sequence number (10, 20, 30 …)
-    'itemType',             // D  — Song / Scripture Reading / Prayer / Sermon / Offering / Announcement / Special Music / Video / Communion / Benediction / Transition / Other
-    'title',                // E  — e.g. song title, reading passage
-    'description',          // F  — details, key/tempo, instructions
-    'durationMinutes',      // G  — estimated duration
-    'assignedToId',         // H  — FK to Members.ID (who leads this item)
-    'notes',                // I
-    'createdAt'             // J
-  ]);
-
-  addDropdowns(ss, 'ServicePlanItems', {
-    'D': ['Song', 'Scripture Reading', 'Prayer', 'Sermon', 'Offering', 'Announcement', 'Special Music', 'Video', 'Communion', 'Benediction', 'Transition', 'Other']
-  });
-
-  // ── Songs (master catalog) ──────────────────────────────────────────────────
-  ensureTab(ss, 'Songs', [
-    'id',                   // A  — auto-generated UUID
-    'title',                // B  — song title
-    'artist',               // C  — original artist or author
-    'ccliNumber',           // D  — CCLI license number
-    'defaultKey',           // E  — default musical key
-    'tempoBpm',             // F  — beats per minute
-    'timeSignature',        // G  — 4/4, 3/4, 6/8, etc.
-    'durationMinutes',      // H  — typical performance length
-    'genre',                // I  — Hymn / Contemporary / Gospel / Chorus / Christmas / Easter / Other
-    'tags',                 // J  — comma-separated (Worship, Praise, Communion, Opening, Closing …)
-    'lyrics',               // K  — full lyrics (plain text)
-    'notes',                // L  — internal notes
-    'active',               // M  — TRUE / FALSE
-    'driveFileId',          // N  — Google Drive ID for lead sheet PDF/image
-    'createdBy',            // O
-    'createdAt',            // P
-    'updatedBy',            // Q
-    'updatedAt'             // R
-  ]);
-
-  addDropdowns(ss, 'Songs', {
-    'E': ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B',
-          'Cm', 'C#m', 'Dm', 'D#m', 'Ebm', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bbm', 'Bm'],
-    'G': ['4/4', '3/4', '6/8', '2/4', '12/8', '2/2', 'Other'],
-    'I': ['Hymn', 'Contemporary', 'Gospel', 'Chorus', 'Christmas', 'Easter', 'Other'],
-    'M': ['TRUE', 'FALSE']
-  });
-
-  // ── Song Arrangements (key-specific chord charts / lead sheets) ─────────────
-  ensureTab(ss, 'SongArrangements', [
-    'id',                   // A  — auto-generated UUID
-    'songId',               // B  — FK to Songs.ID
-    'name',                 // C  — arrangement label (e.g. "Default", "Acoustic", "Simplified")
-    'key',                  // D  — musical key for this arrangement
-    'capo',                 // E  — capo fret position (0 = none)
-    'chordChart',           // F  — chord progression text (e.g. "C  G  Am  F")
-    'lyricsWithChords',     // G  — ChordPro-style text: "[C]Amazing [G]grace"
-    'instrument',           // H  — Guitar / Piano / Bass / Drums / Vocals / Other
-    'vocalRange',           // I  — e.g. "Bb3–E5"
-    'driveFileId',          // J  — Google Drive ID for arrangement PDF/image
-    'notes',                // K
-    'createdBy',            // L
-    'createdAt',            // M
-    'updatedAt'             // N
-  ]);
-
-  addDropdowns(ss, 'SongArrangements', {
-    'D': ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B',
-          'Cm', 'C#m', 'Dm', 'D#m', 'Ebm', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'A#m', 'Bbm', 'Bm'],
-    'H': ['Guitar', 'Piano', 'Bass', 'Drums', 'Vocals', 'Other']
-  });
-
-  // ── Setlist Songs (links ServicePlanItems → Songs → Arrangements) ──────────
-  ensureTab(ss, 'SetlistSongs', [
-    'id',                   // A  — auto-generated UUID
-    'planId',               // B  — FK to ServicePlans.ID
-    'planItemId',           // C  — FK to ServicePlanItems.ID
-    'songId',               // D  — FK to Songs.ID
-    'arrangementId',        // E  — FK to SongArrangements.ID (optional)
-    'keyOverride',          // F  — override the arrangement key for this service
-    'notes',                // G
-    'createdBy',            // H
-    'createdAt',            // I
-    'updatedAt'             // J
-  ]);
-
-  // ── Spiritual Care Cases ───────────────────────────────────────────────────
-  ensureTab(ss, 'SpiritualCareCases', [
-    'id',                     // A  (SCC.ID)
-    'memberId',               // B  (SCC.MEMBER_ID) — FK to Members.ID
-    'careType',               // C  (SCC.CARE_TYPE)
-    'priority',               // D  (SCC.PRIORITY)
-    'status',                 // E  (SCC.STATUS)
-    'summary',                // F  (SCC.SUMMARY)
-    'assignedTeamId',         // G  (SCC.TEAM_ID) — FK to Ministries.ID
-    'primaryCaregiverId',     // H  (SCC.PRIMARY_CG) — FK to Members.ID
-    'secondaryCaregiverId',   // I  (SCC.SECONDARY_CG) — FK to Members.ID
-    'openedDate',             // J  (SCC.OPENED)
-    'targetResolveDate',      // K  (SCC.TARGET_DATE)
-    'resolvedDate',           // L  (SCC.RESOLVED)
-    'referralInfo',           // M  (SCC.REFERRAL)
-    'confidential',           // N  (SCC.CONFIDENTIAL) — TRUE / FALSE
-    'notes',                  // O  (SCC.NOTES)
-    'riskLevel',              // P  (SCC.RISK_LEVEL)
-    'supportPresence',        // Q  (SCC.SUPPORT_PRESENCE)
-    'spiritualState',         // R  (SCC.SPIRITUAL_STATE)
-    'trend',                  // S  (SCC.TREND)
-    'linkedCaseId',           // T  (SCC.LINKED_CASE)
-    'nextReviewDate',         // U  (SCC.NEXT_REVIEW)
-    'createdBy',              // V  (SCC.CREATED_BY)
-    'createdAt',              // W  (SCC.CREATED_AT)
-    'updatedBy',              // X  (SCC.UPDATED_BY)
-    'updatedAt'               // Y  (SCC.UPDATED_AT)
-  ]);
-
-  addDropdowns(ss, 'SpiritualCareCases', {
-    'C': ['Shepherding', 'Elder Care', 'Crisis', 'Abuse / Domestic Violence', 'Immigration / Deportation', 'Incarceration & Re-Entry', 'Grief', 'Pregnancy & Infant Loss', 'Marriage', 'Pre-Marriage', 'Addiction', 'Pornography / Sexual Addiction', 'Hospital Visit', 'Medical', 'Terminal Illness / End of Life', 'New Believer', 'New Member Integration', 'Restoration', 'Counseling', 'Mental Health', 'Gender Identity / Sexuality', 'Discipleship', 'Family', 'Financial', 'Other'],
-    'D': ['Low', 'Normal', 'High', 'Urgent'],
-    'E': ['Open', 'In Progress', 'Follow-Up', 'Resolved', 'Referred', 'Closed'],
-    'N': ['TRUE', 'FALSE'],
-    'P': ['Low', 'Medium', 'High', 'Critical'],
-    'Q': ['None', 'Minimal', 'Moderate', 'Strong'],
-    'R': ['Unknown', 'Struggling', 'Seeking', 'Stable', 'Growing'],
-    'S': ['Declining', 'Stable', 'Improving']
-  });
-
-  // ── Spiritual Care Interactions (follow-up log for each case) ──────────────
-  ensureTab(ss, 'SpiritualCareInteractions', [
-    'id',                   // A
-    'caseId',               // B  — FK to SpiritualCareCases.ID
-    'interactionDate',      // C
-    'type',                 // D  — Visit / Phone / Text / Email / Prayer / Meal / Hospital / Group Session / Other
-    'caregiverId',          // E  — FK to Members.ID (who made contact)
-    'durationMinutes',      // F
-    'summary',              // G
-    'followUpNeeded',       // H  — TRUE / FALSE
-    'followUpDate',         // I
-    'followUpDone',         // J  — TRUE / FALSE
-    'confidential',         // K  — TRUE / FALSE
-    'createdAt'             // L
-  ]);
-
-  addDropdowns(ss, 'SpiritualCareInteractions', {
-    'D': ['Visit', 'Phone', 'Text', 'Email', 'Prayer', 'Meal', 'Hospital', 'Group Session', 'Other'],
-    'H': ['TRUE', 'FALSE'],
-    'J': ['TRUE', 'FALSE'],
-    'K': ['TRUE', 'FALSE']
-  });
-
-  // ── Spiritual Care Assignments (who is shepherding whom) ───────────────────
-  ensureTab(ss, 'SpiritualCareAssignments', [
-    'id',                   // A
-    'caregiverId',          // B  — FK to Members.ID (the shepherd)
-    'memberId',             // C  — FK to Members.ID (the sheep)
-    'ministryId',           // D  — FK to Ministries.ID (e.g. Spiritual Care team)
-    'role',                 // E  — Shepherd / Prayer Partner / Mentor / Accountability Partner / Deacon / Elder / Lay Counselor
-    'startDate',            // F
-    'endDate',              // G
-    'status',               // H  — Active / Inactive / Reassigned
-    'notes',                // I
-    'createdBy',            // J
-    'createdAt'             // K
-  ]);
-
-  addDropdowns(ss, 'SpiritualCareAssignments', {
-    'E': ['Shepherd', 'Prayer Partner', 'Mentor', 'Accountability Partner', 'Deacon', 'Elder', 'Lay Counselor'],
-    'H': ['Active', 'Inactive', 'Reassigned']
-  });
-
-  // ── Outreach Contacts (visitors, community members, prospects) ─────────────
-  ensureTab(ss, 'OutreachContacts', [
-    'id',                   // A  — auto-generated UUID
-    'firstName',            // B
-    'lastName',             // C
-    'email',                // D
-    'phone',                // E
-    'address',              // F
-    'city',                 // G
-    'state',                // H
-    'zip',                  // I
-    'source',               // J  — Walk-In / Door-to-Door / Event / Referral / Online / Social Media / Flyer / Community Service / Other
-    'campaignId',           // K  — FK to OutreachCampaigns.ID
-    'status',               // L  — New / Contacted / Engaged / Visiting / Regular Visitor / Converted / Inactive / Declined
-    'interestLevel',        // M  — Unknown / Low / Medium / High / Very High
-    'notes',                // N
-    'memberId',             // O  — FK to Members.ID (populated when converted)
-    'assignedTo',           // P  — member/volunteer email who follows up
-    'lastContactDate',      // Q
-    'nextFollowUpDate',     // R
-    'tags',                 // S
-    'createdBy',            // T
-    'createdAt',            // U
-    'updatedAt'             // V
-  ]);
-
-  addDropdowns(ss, 'OutreachContacts', {
-    'J': ['Walk-In', 'Door-to-Door', 'Event', 'Referral', 'Online', 'Social Media', 'Flyer', 'Community Service', 'Other'],
-    'L': ['New', 'Contacted', 'Engaged', 'Visiting', 'Regular Visitor', 'Converted', 'Inactive', 'Declined'],
-    'M': ['Unknown', 'Low', 'Medium', 'High', 'Very High']
-  });
-
-  // ── Outreach Campaigns (organized efforts) ─────────────────────────────────
-  ensureTab(ss, 'OutreachCampaigns', [
-    'id',                   // A
-    'campaignName',         // B
-    'type',                 // C  — Door-to-Door / Community Event / Service Project / Media Campaign / Mission Trip / Revival / VBS / Sports Camp / Food Drive / Health Fair / Concert / Other
-    'description',          // D
-    'startDate',            // E
-    'endDate',              // F
-    'location',             // G
-    'ministryId',           // H  — FK to Ministries.ID (owning ministry)
-    'leadId',               // I  — FK to Members.ID (campaign leader)
-    'budget',               // J
-    'goalReached',          // K  — target number of people to reach
-    'actualReached',        // L  — actual count
-    'decisions',            // M  — number of salvation / recommitment decisions
-    'status',               // N  — Planned / Active / Completed / Cancelled
-    'notes',                // O
-    'tags',                 // P
-    'createdBy',            // Q
-    'createdAt',            // R
-    'updatedAt'             // S
-  ]);
-
-  addDropdowns(ss, 'OutreachCampaigns', {
-    'C': ['Door-to-Door', 'Community Event', 'Service Project', 'Media Campaign', 'Mission Trip', 'Revival', 'VBS', 'Sports Camp', 'Food Drive', 'Health Fair', 'Concert', 'Other'],
-    'N': ['Planned', 'Active', 'Completed', 'Cancelled']
-  });
-
-  // ── Outreach Follow-Ups (interaction log per contact) ──────────────────────
-  ensureTab(ss, 'OutreachFollowUps', [
-    'id',                   // A
-    'contactId',            // B  — FK to OutreachContacts.ID
-    'date',                 // C
-    'type',                 // D  — Phone / Text / Email / Visit / Event Invite / Meal / Door-Knock / Other
-    'byId',                 // E  — FK to Members.ID or email of person who made contact
-    'summary',              // F
-    'response',             // G  — how the contact responded
-    'followUpNeeded',       // H  — TRUE / FALSE
-    'nextDate',             // I  — next follow-up date
-    'followUpDone',         // J  — TRUE / FALSE
-    'notes',                // K
-    'createdAt'             // L
-  ]);
-
-  addDropdowns(ss, 'OutreachFollowUps', {
-    'D': ['Phone', 'Text', 'Email', 'Visit', 'Event Invite', 'Meal', 'Door-Knock', 'Other'],
-    'H': ['TRUE', 'FALSE'],
-    'J': ['TRUE', 'FALSE']
-  });
-
-  // ── Sermons (metadata — manuscripts stored in Google Drive) ────────────────
-  ensureTab(ss, 'Sermons', [
-    'id',                   // A  — auto-generated UUID
-    'title',                // B
-    'preacherId',           // C  — FK to Members.ID or AuthUsers.Email
-    'preacherName',         // D
-    'date',                 // E  — sermon delivery date
-    'serviceType',          // F  — Sunday AM / Sunday PM / Wednesday / Special / Other
-    'seriesId',             // G  — FK to SermonSeries.ID
-    'seriesOrder',          // H  — position within series
-    'scriptureRefs',        // I  — comma-separated references
-    'topicTags',            // J  — comma-separated tags
-    'summary',              // K
-    'driveFileId',          // L  — Google Drive file ID (manuscript)
-    'fileUrl',              // M  — direct link
-    'filename',             // N
-    'fileType',             // O  — PDF / DOCX / PPTX / TXT / RTF
-    'audioDriveId',         // P  — audio recording Drive ID
-    'videoDriveId',         // Q  — video recording Drive ID
-    'status',               // R  — Draft / Under Review / Approved / Revision Requested / Delivered
-    'visibility',           // S  — Public / Members Only / Leaders Only
-    'createdBy',            // T
-    'createdAt',            // U
-    'updatedAt'             // V
-  ]);
-
-  addDropdowns(ss, 'Sermons', {
-    'F': ['Sunday AM', 'Sunday PM', 'Wednesday', 'Special', 'Other'],
-    'R': ['Draft', 'Under Review', 'Approved', 'Revision Requested', 'Delivered'],
-    'S': ['Public', 'Members Only', 'Leaders Only']
-  });
-
-  // ── Sermon Series (multi-week teaching themes) ─────────────────────────────
-  ensureTab(ss, 'SermonSeries', [
-    'id',                   // A
-    'seriesName',           // B
-    'description',          // C
-    'themeScripture',       // D
-    'startDate',            // E
-    'endDate',              // F
-    'preacherId',           // G
-    'status',               // H  — Planning / Active / Completed / Archived
-    'coverImageUrl',        // I
-    'sermonCount',          // J
-    'createdAt',            // K
-    'updatedAt'             // L
-  ]);
-
-  addDropdowns(ss, 'SermonSeries', {
-    'H': ['Planning', 'Active', 'Completed', 'Archived']
-  });
-
-  // ── Sermon Reviews (feedback / approval workflow) ──────────────────────────
-  ensureTab(ss, 'SermonReviews', [
-    'id',                   // A
-    'sermonId',             // B  — FK to Sermons.ID
-    'reviewerId',           // C  — FK to AuthUsers.Email
-    'reviewerName',         // D
-    'decision',             // E  — Approved / Needs Revision / Feedback Only
-    'feedback',             // F
-    'reviewedAt',           // G
-    'privateNotes',         // H  — pastor-only notes (not shown to reviewee)
-    'createdAt'             // I
-  ]);
-
-  addDropdowns(ss, 'SermonReviews', {
-    'E': ['Approved', 'Revision Requested', 'Noted']
-  });
-
-  // ── Compassion Requests (benevolence needs) ────────────────────────────────
-  ensureTab(ss, 'CompassionRequests', [
-    'id',                   // A
-    'requesterName',        // B
-    'phone',                // C
-    'email',                // D
-    'isMember',             // E  — TRUE / FALSE
-    'memberId',             // F  — FK to Members.ID
-    'requestType',          // G  — Financial / Food / Clothing / Housing / Medical / Transportation / Utility / Other
-    'description',          // H
-    'urgency',              // I  — Low / Normal / High / Urgent
-    'amountRequested',      // J
-    'amountApproved',       // K
-    'status',               // L  — Submitted / Under Review / Approved / Denied / In Progress / Resolved / Closed
-    'assignedTeam',         // M
-    'assignedTo',           // N
-    'followUpDate',         // O
-    'resolutionNotes',      // P
-    'confidential',         // Q  — TRUE / FALSE
-    'submittedBy',          // R
-    'approvedBy',           // S
-    'createdAt',            // T
-    'updatedAt'             // U
-  ]);
-
-  addDropdowns(ss, 'CompassionRequests', {
-    'E': ['TRUE', 'FALSE'],
-    'G': ['Financial', 'Food', 'Clothing', 'Housing', 'Medical', 'Transportation', 'Utility', 'Other'],
-    'I': ['Low', 'Normal', 'High', 'Urgent'],
-    'L': ['Submitted', 'Under Review', 'Approved', 'Denied', 'In Progress', 'Resolved', 'Closed'],
-    'Q': ['TRUE', 'FALSE']
-  });
-
-  // ── Compassion Resources (inventory) ───────────────────────────────────────
-  ensureTab(ss, 'CompassionResources', [
-    'id',                   // A
-    'resourceName',         // B
-    'category',             // C  — Food / Clothing / Financial / Household / Medical / Gift Cards / Other
-    'description',          // D
-    'quantityOnHand',       // E
-    'unit',                 // F
-    'reorderLevel',         // G
-    'location',             // H
-    'donatedBy',            // I
-    'status',               // J  — Available / Low / Out of Stock / Discontinued
-    'createdAt',            // K
-    'updatedAt'             // L
-  ]);
-
-  addDropdowns(ss, 'CompassionResources', {
-    'C': ['Food', 'Clothing', 'Financial', 'Household', 'Medical', 'Gift Cards', 'Other'],
-    'J': ['Available', 'Low', 'Out of Stock', 'Discontinued']
-  });
-
-  // ── Compassion Team Log (activity history) ─────────────────────────────────
-  ensureTab(ss, 'CompassionTeamLog', [
-    'id',                   // A
-    'requestId',            // B  — FK to CompassionRequests.ID
-    'date',                 // C
-    'activityType',         // D  — Visit / Delivery / Phone Call / Meeting / Resource Pickup / Other
-    'teamMemberId',         // E
-    'teamMemberName',       // F
-    'description',          // G
-    'resourcesUsed',        // H  — comma-separated resource names
-    'amountDisbursed',      // I
-    'followUpNeeded',       // J  — TRUE / FALSE
-    'notes',                // K
-    'createdAt'             // L
-  ]);
-
-  addDropdowns(ss, 'CompassionTeamLog', {
-    'D': ['Visit', 'Delivery', 'Phone Call', 'Meeting', 'Resource Pickup', 'Other'],
-    'J': ['TRUE', 'FALSE']
-  });
-
-  // ── Discipleship Paths (curriculum / pathway definitions) ──────────────────
-  ensureTab(ss, 'DiscipleshipPaths', [
-    'id',                      // A
-    'name',                    // B
-    'description',             // C
-    'category',                // D  — Foundations / Baptism / Membership / Leadership / Bible Study / Theology / Marriage / Parenting / Recovery / Missions / Youth / Custom
-    'targetAudience',          // E  — All / New Believers / Youth / Men / Women / Couples / Leaders / Seniors
-    'difficultyLevel',         // F  — Beginner / Intermediate / Advanced
-    'estimatedWeeks',          // G
-    'totalSteps',              // H
-    'prerequisitePathId',      // I  — FK to DiscipleshipPaths.ID
-    'requiredForLeadership',   // J  — TRUE / FALSE
-    'facilitatorGuideUrl',     // K
-    'studentGuideUrl',         // L
-    'status',                  // M  — Draft / Active / Archived
-    'visibility',              // N  — Public / Members Only / Leaders Only
-    'createdBy',               // O
-    'approvedBy',              // P
-    'createdAt',               // Q
-    'updatedAt'                // R
-  ]);
-
-  addDropdowns(ss, 'DiscipleshipPaths', {
-    'D': ['Foundations', 'Baptism', 'Membership', 'Leadership', 'Bible Study', 'Theology', 'Marriage', 'Parenting', 'Recovery', 'Missions', 'Youth', 'Custom'],
-    'E': ['All', 'New Believers', 'Youth', 'Men', 'Women', 'Couples', 'Leaders', 'Seniors'],
-    'F': ['Beginner', 'Intermediate', 'Advanced'],
-    'J': ['TRUE', 'FALSE'],
-    'M': ['Draft', 'Active', 'Archived'],
-    'N': ['Public', 'Members Only', 'Leaders Only']
-  });
-
-  // ── Discipleship Steps (lessons / milestones within a path) ────────────────
-  ensureTab(ss, 'DiscipleshipSteps', [
-    'id',                   // A
-    'pathId',               // B  — FK to DiscipleshipPaths.ID
-    'stepOrder',            // C
-    'title',                // D
-    'description',          // E
-    'stepType',             // F  — Lesson / Workshop / Activity / Quiz / Discussion / Project / Reading / Video / Field Trip / Mentoring Session / Other
-    'durationMinutes',      // G
-    'scriptureRefs',        // H
-    'learningObjectives',   // I
-    'contentUrl',           // J
-    'videoUrl',             // K
-    'homeworkDescription',  // L
-    'assessmentRequired',   // M  — TRUE / FALSE
-    'passingScore',         // N
-    'facilitatorNotes',     // O
-    'resourceIds',          // P  — comma-separated FK to DiscipleshipResources.ID
-    'createdAt',            // Q
-    'updatedAt'             // R
-  ]);
-
-  addDropdowns(ss, 'DiscipleshipSteps', {
-    'F': ['Lesson', 'Workshop', 'Activity', 'Quiz', 'Discussion', 'Project', 'Reading', 'Video', 'Field Trip', 'Mentoring Session', 'Other'],
-    'M': ['TRUE', 'FALSE']
-  });
-
-  // ── Discipleship Enrollments (participant tracking & progress) ─────────────
-  ensureTab(ss, 'DiscipleshipEnrollments', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'memberName',           // C
-    'pathId',               // D  — FK to DiscipleshipPaths.ID
-    'pathName',             // E
-    'enrolledDate',         // F
-    'targetCompletion',     // G
-    'actualCompletion',     // H
-    'currentStepId',        // I  — FK to DiscipleshipSteps.ID
-    'stepsCompleted',       // J
-    'totalSteps',           // K
-    'percentComplete',      // L
-    'status',               // M  — Enrolled / In Progress / Completed / Paused / Dropped / Transferred
-    'facilitatorId',        // N
-    'facilitatorName',      // O
-    'groupCohort',          // P  — cohort label (e.g. "Spring 2026 Class A")
-    'meetingDay',           // Q
-    'meetingTime',          // R
-    'notes',                // S
-    'enrolledBy',           // T
-    'createdAt',            // U
-    'updatedAt'             // V
-  ]);
-
-  addDropdowns(ss, 'DiscipleshipEnrollments', {
-    'M': ['Enrolled', 'In Progress', 'Completed', 'Paused', 'Dropped', 'Transferred'],
-    'Q': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-  });
-
-  // ── Discipleship Mentoring (mentor-mentee pairings) ────────────────────────
-  ensureTab(ss, 'DiscipleshipMentoring', [
-    'id',                   // A
-    'mentorId',             // B  — FK to Members.ID
-    'mentorName',           // C
-    'menteeId',             // D  — FK to Members.ID
-    'menteeName',           // E
-    'relationshipType',     // F  — Discipleship / Accountability / Coaching / Pastoral / Peer / Other
-    'focusArea',            // G  — General Spiritual Growth / Bible Study / Prayer Life / Ministry Skills / Leadership / Marriage / Recovery / Other
-    'startDate',            // H
-    'endDate',              // I
-    'meetingFrequency',     // J  — Weekly / Biweekly / Monthly / As Needed
-    'meetingDay',           // K
-    'meetingLocation',      // L
-    'status',               // M  — Active / Paused / Completed / Cancelled
-    'goals',                // N
-    'notes',                // O
-    'createdBy',            // P
-    'createdAt',            // Q
-    'updatedAt'             // R
-  ]);
-
-  addDropdowns(ss, 'DiscipleshipMentoring', {
-    'F': ['Discipleship', 'Accountability', 'Coaching', 'Pastoral', 'Peer', 'Other'],
-    'G': ['General Spiritual Growth', 'Bible Study', 'Prayer Life', 'Ministry Skills', 'Leadership', 'Marriage', 'Recovery', 'Other'],
-    'J': ['Weekly', 'Biweekly', 'Monthly', 'As Needed'],
-    'K': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-    'M': ['Active', 'Paused', 'Completed', 'Cancelled']
-  });
-
-  // ── Discipleship Meetings (session logs for mentoring pairs) ───────────────
-  ensureTab(ss, 'DiscipleshipMeetings', [
-    'id',                   // A
-    'mentoringId',          // B  — FK to DiscipleshipMentoring.ID
-    'meetingDate',          // C
-    'meetingTime',          // D
-    'durationMinutes',      // E
-    'location',             // F
-    'meetingType',          // G  — In Person / Video Call / Phone Call / Group Session / Other
-    'topicsCovered',        // H
-    'scriptureDiscussed',   // I
-    'homeworkAssigned',     // J
-    'homeworkCompleted',    // K  — TRUE / FALSE
-    'prayerRequests',       // L
-    'actionItems',          // M
-    'notes',                // N
-    'createdAt',            // O
-    'updatedAt'             // P
-  ]);
-
-  addDropdowns(ss, 'DiscipleshipMeetings', {
-    'G': ['In Person', 'Video Call', 'Phone Call', 'Group Session', 'Other'],
-    'K': ['TRUE', 'FALSE']
-  });
-
-  // ── Discipleship Assessments (spiritual gifts, evaluations, surveys) ───────
-  ensureTab(ss, 'DiscipleshipAssessments', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'memberName',           // C
-    'assessmentType',       // D  — Spiritual Gifts / Maturity / Bible Knowledge / Personality / Leadership / Calling / Custom
-    'assessmentName',       // E
-    'description',          // F
-    'dateTaken',            // G
-    'assessedBy',           // H
-    'scoreTotal',           // I
-    'scoreMax',             // J
-    'scorePercent',         // K
-    'resultsJson',          // L  — structured results (JSON string)
-    'topGifts',             // M  — comma-separated
-    'topStrengths',         // N  — comma-separated
-    'growthAreas',          // O  — comma-separated
-    'recommendations',      // P
-    'enrollmentId',         // Q  — FK to DiscipleshipEnrollments.ID
-    'pathId',               // R  — FK to DiscipleshipPaths.ID
-    'status',               // S  — Completed / In Progress / Pending Review
-    'notes',                // T
-    'createdAt',            // U
-    'updatedAt'             // V
-  ]);
-
-  addDropdowns(ss, 'DiscipleshipAssessments', {
-    'D': ['Spiritual Gifts', 'Maturity', 'Bible Knowledge', 'Personality', 'Leadership', 'Calling', 'Custom'],
-    'S': ['Completed', 'In Progress', 'Pending Review']
-  });
-
-  // ── Discipleship Resources (study materials, books, videos, links) ─────────
-  ensureTab(ss, 'DiscipleshipResources', [
-    'id',                   // A
-    'title',                // B
-    'description',          // C
-    'resourceType',         // D  — Book / Video / Article / Podcast / Worksheet / Study Guide / Devotional / Course / Website / Other
-    'author',               // E
-    'url',                  // F
-    'driveFileId',          // G  — Google Drive file ID
-    'category',             // H  — General / Foundations / Bible Study / Prayer / Theology / Leadership / Marriage / Parenting / Recovery / Youth / Other
-    'topicTags',            // I  — comma-separated
-    'difficultyLevel',      // J  — Beginner / Intermediate / Advanced
-    'estimatedTime',        // K  — e.g. "2 hours" or "6 weeks"
-    'pathIds',              // L  — comma-separated FK to DiscipleshipPaths.ID
-    'stepIds',              // M  — comma-separated FK to DiscipleshipSteps.ID
-    'visibility',           // N  — Public / Members Only / Leaders Only
-    'createdAt',            // O
-    'updatedAt'             // P
-  ]);
-
-  addDropdowns(ss, 'DiscipleshipResources', {
-    'D': ['Book', 'Video', 'Article', 'Podcast', 'Worksheet', 'Study Guide', 'Devotional', 'Course', 'Website', 'Other'],
-    'H': ['General', 'Foundations', 'Bible Study', 'Prayer', 'Theology', 'Leadership', 'Marriage', 'Parenting', 'Recovery', 'Youth', 'Other'],
-    'J': ['Beginner', 'Intermediate', 'Advanced'],
-    'N': ['Public', 'Members Only', 'Leaders Only']
-  });
-
-  // ── Discipleship Milestones (personal spiritual milestones per member) ─────
-  ensureTab(ss, 'DiscipleshipMilestones', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'memberName',           // C
-    'milestoneType',        // D  — Salvation / Baptism / Membership / First Serve / Leadership / Graduation / Testimony / Ordination / Mission Trip / Teaching / Mentoring / Custom
-    'milestoneName',        // E
-    'description',          // F
-    'dateAchieved',         // G
-    'verifiedBy',           // H
-    'enrollmentId',         // I  — FK to DiscipleshipEnrollments.ID
-    'pathId',               // J  — FK to DiscipleshipPaths.ID
-    'certificateId',        // K  — FK to DiscipleshipCertificates.ID
-    'ceremonyDate',         // L
-    'witness',              // M  — who was present / officiated
-    'notes',                // N
-    'createdAt',            // O
-    'updatedAt'             // P
-  ]);
-
-  addDropdowns(ss, 'DiscipleshipMilestones', {
-    'D': ['Salvation', 'Baptism', 'Membership', 'First Serve', 'Leadership', 'Graduation', 'Testimony', 'Ordination', 'Mission Trip', 'Teaching', 'Mentoring', 'Custom']
-  });
-
-  // ── Discipleship Goals (personal spiritual goals & accountability) ─────────
-  ensureTab(ss, 'DiscipleshipGoals', [
-    'id',                            // A
-    'memberId',                      // B  — FK to Members.ID
-    'memberName',                    // C
-    'goalCategory',                  // D  — Spiritual Discipline / Bible Reading / Prayer / Evangelism / Serving / Giving / Character / Relationship / Knowledge / Leadership / Health / Custom
-    'goalTitle',                     // E
-    'description',                   // F
-    'targetDate',                    // G
-    'completionDate',                // H
-    'status',                        // I  — Active / In Progress / Completed / Paused / Abandoned
-    'progressPercent',               // J
-    'measurementType',               // K  — Subjective / Numeric / Frequency / Milestone
-    'targetValue',                   // L
-    'currentValue',                  // M
-    'accountabilityPartnerId',       // N  — FK to Members.ID
-    'accountabilityPartnerName',     // O
-    'reviewFrequency',               // P  — Daily / Weekly / Biweekly / Monthly
-    'lastReviewed',                  // Q
-    'notes',                         // R
-    'createdAt',                     // S
-    'updatedAt'                      // T
-  ]);
-
-  addDropdowns(ss, 'DiscipleshipGoals', {
-    'D': ['Spiritual Discipline', 'Bible Reading', 'Prayer', 'Evangelism', 'Serving', 'Giving', 'Character', 'Relationship', 'Knowledge', 'Leadership', 'Health', 'Custom'],
-    'I': ['Active', 'In Progress', 'Completed', 'Paused', 'Abandoned'],
-    'K': ['Subjective', 'Numeric', 'Frequency', 'Milestone'],
-    'P': ['Daily', 'Weekly', 'Biweekly', 'Monthly']
-  });
-
-  // ── Discipleship Certificates (completion records for paths) ───────────────
-  ensureTab(ss, 'DiscipleshipCertificates', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'memberName',           // C
-    'pathId',               // D  — FK to DiscipleshipPaths.ID
-    'pathName',             // E
-    'enrollmentId',         // F  — FK to DiscipleshipEnrollments.ID
-    'certificateNumber',    // G  — auto-generated: CERT-YYYYMMDD-XXXX
-    'issueDate',            // H
-    'issuedBy',             // I
-    'expiryDate',           // J
-    'status',               // K  — Issued / Revoked / Expired
-    'notes',                // L
-    'createdAt',            // M
-    'updatedAt'             // N
-  ]);
-
-  addDropdowns(ss, 'DiscipleshipCertificates', {
-    'K': ['Issued', 'Revoked', 'Expired']
-  });
-
-  // ══════════════════════════════════════════════════════════════════════════
-  // LEARNING — Sermon-Based Learning Module (10 tabs)
-  // ══════════════════════════════════════════════════════════════════════════
-
-  // ── Learning Topics (hierarchical taxonomy for sermon categorisation) ──────
-  ensureTab(ss, 'LearningTopics', [
-    'id',                   // A
-    'topicName',            // B
-    'slug',                 // C  — URL-safe version of name
-    'description',          // D
-    'parentTopicId',        // E  — FK to LearningTopics.ID (for hierarchy)
-    'level',                // F  — 0 = root, 1 = child, 2 = grandchild
-    'sortOrder',            // G
-    'iconUrl',              // H
-    'colorHex',             // I  — e.g. #3B82F6
-    'featured',             // J  — TRUE / FALSE
-    'sermonCount',          // K  — cached count
-    'subscriberCount',      // L  — cached count
-    'status',               // M  — Active / Archived / Draft
-    'createdBy',            // N
-    'createdAt',            // O
-    'updatedAt'             // P
-  ]);
-
-  addDropdowns(ss, 'LearningTopics', {
-    'J': ['TRUE', 'FALSE'],
-    'M': ['Active', 'Archived', 'Draft']
-  });
-
-  // ── Learning Playlists (curated sermon collections) ────────────────────────
-  ensureTab(ss, 'LearningPlaylists', [
-    'id',                   // A
-    'title',                // B
-    'description',          // C
-    'coverImageUrl',        // D
-    'curatorId',            // E  — FK to Members.ID
-    'curatorName',          // F
-    'topicIds',             // G  — comma-separated FK to LearningTopics.ID
-    'topicNames',           // H  — comma-separated display names
-    'preacherFilter',       // I  — preacher name(s) this playlist focuses on
-    'scriptureFilter',      // J  — scripture range(s) this playlist covers
-    'difficultyLevel',      // K  — Beginner / Intermediate / Advanced / All Levels
-    'estimatedHours',       // L
-    'itemCount',            // M  — cached count
-    'subscriberCount',      // N  — cached count
-    'visibility',           // O  — Public / Private / Members Only
-    'featured',             // P  — TRUE / FALSE
-    'sortOrder',            // Q
-    'tags',                 // R  — comma-separated freeform tags
-    'status',               // S  — Active / Archived / Draft
-    'createdBy',            // T
-    'createdAt',            // U
-    'updatedAt'             // V
-  ]);
-
-  addDropdowns(ss, 'LearningPlaylists', {
-    'K': ['Beginner', 'Intermediate', 'Advanced', 'All Levels'],
-    'O': ['Public', 'Private', 'Members Only'],
-    'P': ['TRUE', 'FALSE'],
-    'S': ['Active', 'Archived', 'Draft']
-  });
-
-  // ── Learning Playlist Items (sermons within playlists, ordered) ────────────
-  ensureTab(ss, 'LearningPlaylistItems', [
-    'id',                   // A
-    'playlistId',           // B  — FK to LearningPlaylists.ID
-    'sermonId',             // C  — FK to Sermons.ID
-    'sermonTitle',          // D  — denormalised for display
-    'preacherName',         // E
-    'scriptureRefs',        // F
-    'sortOrder',            // G
-    'sectionLabel',         // H  — e.g. "Week 1", "Part A"
-    'notesForLearner',      // I  — curator instructions for this sermon
-    'durationMins',         // J
-    'required',             // K  — TRUE / FALSE
-    'bonus',                // L  — TRUE / FALSE
-    'discussionQuestions',  // M  — text block
-    'addedBy',              // N
-    'createdAt',            // O
-    'updatedAt'             // P
-  ]);
-
-  addDropdowns(ss, 'LearningPlaylistItems', {
-    'K': ['TRUE', 'FALSE'],
-    'L': ['TRUE', 'FALSE']
-  });
-
-  // ── Learning Progress (per-user sermon listening/viewing tracking) ─────────
-  ensureTab(ss, 'LearningProgress', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'memberName',           // C
-    'sermonId',             // D  — FK to Sermons.ID
-    'sermonTitle',          // E
-    'playlistId',           // F  — FK to LearningPlaylists.ID (optional context)
-    'playlistTitle',        // G
-    'status',               // H  — Not Started / In Progress / Completed
-    'progressPercent',      // I  — 0–100
-    'lastPositionSecs',     // J  — playback resume point
-    'totalDurationSecs',    // K
-    'startedAt',            // L
-    'completedAt',          // M
-    'listenCount',          // N  — number of plays
-    'lastListenedAt',       // O
-    'rating',               // P  — 1–5 stars
-    'device',               // Q  — Web / Mobile / Tablet
-    'notes',                // R
-    'createdAt',            // S
-    'updatedAt'             // T
-  ]);
-
-  addDropdowns(ss, 'LearningProgress', {
-    'H': ['Not Started', 'In Progress', 'Completed'],
-    'Q': ['Web', 'Mobile', 'Tablet']
-  });
-
-  // ── Learning Notes (personal notes on sermons) ────────────────────────────
-  ensureTab(ss, 'LearningNotes', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'memberName',           // C
-    'sermonId',             // D  — FK to Sermons.ID
-    'sermonTitle',          // E
-    'playlistId',           // F  — FK to LearningPlaylists.ID (optional context)
-    'noteType',             // G  — General / Key Point / Question / Application / Quote / Reflection
-    'title',                // H
-    'content',              // I  — note body
-    'timestampSecs',        // J  — position in sermon when note was taken
-    'scriptureRef',         // K  — referenced passage
-    'highlightText',        // L  — quoted sermon text
-    'shared',               // M  — TRUE / FALSE (share with group)
-    'pinned',               // N  — TRUE / FALSE
-    'createdAt',            // O
-    'updatedAt'             // P
-  ]);
-
-  addDropdowns(ss, 'LearningNotes', {
-    'G': ['General', 'Key Point', 'Question', 'Application', 'Quote', 'Reflection'],
-    'M': ['TRUE', 'FALSE'],
-    'N': ['TRUE', 'FALSE']
-  });
-
-  // ── Learning Bookmarks (save sermons for later) ───────────────────────────
-  ensureTab(ss, 'LearningBookmarks', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'memberName',           // C
-    'sermonId',             // D  — FK to Sermons.ID
-    'sermonTitle',          // E
-    'preacherName',         // F
-    'collection',           // G  — Watch Later / Favourites / Study / Share / Custom
-    'tags',                 // H  — comma-separated personal tags
-    'notes',                // I
-    'positionSecs',         // J  — bookmarked playback position
-    'priority',             // K  — High / Normal / Low
-    'reminderDate',         // L
-    'createdAt',            // M
-    'updatedAt'             // N
-  ]);
-
-  addDropdowns(ss, 'LearningBookmarks', {
-    'G': ['Watch Later', 'Favourites', 'Study', 'Share', 'Custom'],
-    'K': ['High', 'Normal', 'Low']
-  });
-
-  // ── Learning Recommendations (suggested sermons for members) ──────────────
-  ensureTab(ss, 'LearningRecommendations', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'memberName',           // C
-    'sermonId',             // D  — FK to Sermons.ID
-    'sermonTitle',          // E
-    'preacherName',         // F
-    'reasonType',           // G  — Manual / Auto-Generated / Topic Match / Preacher Match / Series Continuation
-    'reasonText',           // H  — human-readable explanation
-    'topicMatch',           // I  — matching topic(s)
-    'scriptureMatch',       // J  — matching reference(s)
-    'score',                // K  — relevance score (0–100)
-    'priority',             // L  — High / Normal / Low
-    'status',               // M  — Active / Accepted / Dismissed / Expired
-    'dismissedAt',          // N
-    'recommendedBy',        // O  — email (SYSTEM for auto)
-    'recommendedByName',    // P
-    'createdAt',            // Q
-    'updatedAt'             // R
-  ]);
-
-  addDropdowns(ss, 'LearningRecommendations', {
-    'G': ['Manual', 'Auto-Generated', 'Topic Match', 'Preacher Match', 'Series Continuation'],
-    'L': ['High', 'Normal', 'Low'],
-    'M': ['Active', 'Accepted', 'Dismissed', 'Expired']
-  });
-
-  // ── Learning Quizzes (comprehension checks on sermons) ────────────────────
-  ensureTab(ss, 'LearningQuizzes', [
-    'id',                   // A
-    'sermonId',             // B  — FK to Sermons.ID
-    'sermonTitle',          // C
-    'playlistId',           // D  — FK to LearningPlaylists.ID (optional)
-    'title',                // E
-    'description',          // F
-    'difficulty',           // G  — Beginner / Intermediate / Advanced
-    'passPercent',          // H  — minimum % to pass (e.g. 70)
-    'questionsJson',        // I  — JSON array [{question, options[], correctAnswer}]
-    'questionCount',        // J
-    'timeLimitMins',        // K  — 0 = no limit
-    'attemptsAllowed',      // L  — 0 = unlimited
-    'topicTags',            // M  — comma-separated
-    'scriptureRefs',        // N
-    'status',               // O  — Draft / Published / Archived
-    'createdBy',            // P
-    'createdAt',            // Q
-    'updatedAt'             // R
-  ]);
-
-  addDropdowns(ss, 'LearningQuizzes', {
-    'G': ['Beginner', 'Intermediate', 'Advanced'],
-    'O': ['Draft', 'Published', 'Archived']
-  });
-
-  // ── Learning Quiz Results (member quiz attempts & scores) ─────────────────
-  ensureTab(ss, 'LearningQuizResults', [
-    'id',                   // A
-    'quizId',               // B  — FK to LearningQuizzes.ID
-    'quizTitle',            // C
-    'memberId',             // D  — FK to Members.ID
-    'memberName',           // E
-    'sermonId',             // F  — FK to Sermons.ID
-    'attemptNumber',        // G
-    'startedAt',            // H
-    'completedAt',          // I
-    'timeTakenSecs',        // J
-    'answersJson',          // K  — JSON array of user answers
-    'correctCount',         // L
-    'totalQuestions',       // M
-    'scorePercent',         // N
-    'passed',               // O  — TRUE / FALSE
-    'feedback',             // P
-    'createdAt',            // Q
-    'updatedAt'             // R
-  ]);
-
-  addDropdowns(ss, 'LearningQuizResults', {
-    'O': ['TRUE', 'FALSE']
-  });
-
-  // ── Learning Certificates (issued on playlist / quiz completion) ──────────
-  ensureTab(ss, 'LearningCertificates', [
-    'id',                   // A
-    'memberId',             // B  — FK to Members.ID
-    'memberName',           // C
-    'certificateType',      // D  — Playlist Completion / Quiz Mastery / Topic Mastery / Custom
-    'playlistId',           // E  — FK to LearningPlaylists.ID
-    'playlistTitle',        // F
-    'quizId',               // G  — FK to LearningQuizzes.ID
-    'quizTitle',            // H
-    'certificateNumber',    // I  — auto-generated: LCERT-YYYYMMDD-XXXX
-    'issueDate',            // J
-    'issuedBy',             // K
-    'expiryDate',           // L
-    'status',               // M  — Issued / Revoked / Expired
-    'notes',                // N
-    'createdAt',            // O
-    'updatedAt'             // P
-  ]);
-
-  addDropdowns(ss, 'LearningCertificates', {
-    'D': ['Playlist Completion', 'Quiz Mastery', 'Topic Mastery', 'Custom'],
-    'M': ['Issued', 'Revoked', 'Expired']
-  });
-  // ══════════════════════════════════════════════════════════════════════════
-  // WORLD MISSIONS — Separate MISSIONS API (Mark/Gospel.gs)
-  // 8 tabs: MissionsRegistry, Regions, Cities, Partners,
-  //         PrayerFocus, Updates, Teams, Metrics
-  // ══════════════════════════════════════════════════════════════════════════
-
-  // ════════════════════════════════════════════════════════════════════════════
-  // THEOLOGY — Statement of Faith & Doctrine
-  // ════════════════════════════════════════════════════════════════════════════
-
-  // ── Theology Categories (groupings like Core Doctrine, Applied Theology) ──
-  ensureTab(ss, 'TheologyCategories', [
-    'id',                    // A
-    'categoryId',            // B  — slug (core, applied, marriage_cov, etc.)
-    'title',                 // C
-    'subtitle',              // D
-    'intro',                 // E  — category introduction text
-    'icon',                  // F  — emoji icon
-    'colorVar',              // G  — CSS variable for color coding
-    'sortOrder',             // H
-    'visible',               // I  — TRUE/FALSE
-    'status',                // J  — Active / Archived
-    'createdAt',             // K
-    'updatedAt'              // L
-  ]);
-
-  addDropdowns(ss, 'TheologyCategories', {
-    'I': ['TRUE', 'FALSE'],
-    'J': ['Active', 'Archived']
-  });
-
-  // ── Theology Sections (individual doctrinal statements per category) ───────
-  ensureTab(ss, 'TheologySections', [
-    'id',                    // A
-    'categoryRowId',         // B  — FK to TheologyCategories.ID
-    'sectionId',             // C  — slug identifier
-    'title',                 // D
-    'content',               // E  — the doctrinal statement body
-    'summary',               // F  — brief summary
-    'scriptureRefs',         // G  — comma-separated references
-    'keywords',              // H  — search tags
-    'sortOrder',             // I
-    'visible',               // J  — TRUE/FALSE
-    'approvedBy',            // K  — email of approver
-    'approvedAt',            // L
-    'version',               // M  — increments on content change
-    'status',                // N  — Draft / Approved / Under Review / Archived
-    'createdAt',             // O
-    'updatedAt'              // P
-  ]);
-
-  addDropdowns(ss, 'TheologySections', {
-    'J': ['TRUE', 'FALSE'],
-    'N': ['Draft', 'Approved', 'Under Review', 'Archived']
-  });
-
-  // ── Theology Scriptures (supporting references per section) ────────────────
-  ensureTab(ss, 'TheologyScriptures', [
-    'id',                    // A
-    'sectionRowId',          // B  — FK to TheologySections.ID
-    'reference',             // C  — e.g. "John 3:16"
-    'text',                  // D  — the quoted text
-    'translation',           // E  — ESV, NIV, KJV, etc.
-    'contextNote',           // F  — why this scripture supports the doctrine
-    'sortOrder',             // G
-    'isPrimary',             // H  — TRUE/FALSE (primary proof text)
-    'status',                // I  — Active / Archived
-    'createdBy',             // J
-    'createdAt',             // K
-    'updatedAt'              // L
-  ]);
-
-  addDropdowns(ss, 'TheologyScriptures', {
-    'E': ['ESV', 'NIV', 'KJV', 'NKJV', 'NASB', 'NLT', 'CSB', 'Other'],
-    'H': ['TRUE', 'FALSE'],
-    'I': ['Active', 'Archived']
-  });
-
-  // ── Theology Revisions (audit trail for doctrinal changes) ─────────────────
-  ensureTab(ss, 'TheologyRevisions', [
-    'id',                    // A
-    'sectionRowId',          // B  — FK to TheologySections.ID
-    'version',               // C  — version number being replaced
-    'previousTitle',         // D
-    'previousContent',       // E
-    'changedBy',             // F  — email
-    'changeReason',          // G
-    'approvedBy',            // H  — email of who approved the change
-    'status',                // I  — Recorded / Reviewed
-    'createdAt'              // J
-  ]);
-
-  addDropdowns(ss, 'TheologyRevisions', {
-    'I': ['Recorded', 'Reviewed']
-  });
-
-  // ── Seed Theology Categories ───────────────────────────────────────────────
+  // Drive entirely from _TAB_HEADERS_ — no schema duplicated here.
+  // To add a new tab: add it to _TAB_HEADERS_ above. Done.
+  var names = Object.keys(_TAB_HEADERS_);
+  for (var i = 0; i < names.length; i++) {
+    var name = names[i];
+    var def  = _TAB_HEADERS_[name];
+    ensureTab(ss, name, def.headers);
+    if (def.dropdowns) addDropdowns(ss, name, def.dropdowns);
+  }
+
+  // Post-build seed hooks (run after all tabs exist)
   seedTheologyCategories_(ss);
-
-
-  // ════════════════════════════════════════════════════════════════════════════
-  // MEMBER CARDS — Dynamic Contact Cards via Member Number
-  // ════════════════════════════════════════════════════════════════════════════
-
-  // ── Member Cards (public card profile per member) ──────────────────────────
-  ensureTab(ss, 'MemberCards', [
-    'id',                    // A
-    'memberNumber',          // B  — FlockOS-0001 (auto-assigned, sequential)
-    'email',                 // C  — links to auth/member profile
-    'firstName',             // D
-    'lastName',              // E
-    'preferredName',         // F
-    'suffix',                // G
-    'photoUrl',              // H
-    'cardTitle',             // I  — role/title shown on card
-    'cardBio',               // J  — short public bio
-    'ministry',              // K
-    'smallGroup',            // L
-    'phone',                 // M  — public-facing phone
-    'phoneVisible',          // N  — TRUE/FALSE
-    'emailVisible',          // O  — TRUE/FALSE
-    'websiteUrl',            // P
-    'scheduleUrl',           // Q  — booking/calendar link
-    'colorScheme',           // R  — gold / cyan / magenta / etc.
-    'bgScheme',              // S  — background variant
-    'cardIcon',              // T  — emoji for card seal
-    'showDailyBread',        // U  — TRUE/FALSE
-    'showPrayerTicker',      // V  — TRUE/FALSE
-    'cardFooter',            // W  — custom footer text
-    'visibility',            // X  — public / authenticated / private
-    'viewCount',             // Y  — auto-maintained
-    'active',                // Z  — TRUE/FALSE
-    'status',                // AA — Active / Suspended / Archived
-    'createdBy',             // AB
-    'createdAt',             // AC
-    'updatedAt'              // AD
-  ]);
-
-  addDropdowns(ss, 'MemberCards', {
-    'N': ['TRUE', 'FALSE'],
-    'O': ['TRUE', 'FALSE'],
-    'R': ['gold', 'cyan', 'magenta', 'emerald', 'rose', 'slate', 'custom'],
-    'U': ['TRUE', 'FALSE'],
-    'V': ['TRUE', 'FALSE'],
-    'X': ['public', 'authenticated', 'private'],
-    'Z': ['TRUE', 'FALSE'],
-    'AA': ['Active', 'Suspended', 'Archived']
-  });
-
-  // ── Member Card Links (action buttons & social links per card) ─────────────
-  ensureTab(ss, 'MemberCardLinks', [
-    'id',                    // A
-    'cardRowId',             // B  — FK to MemberCards.ID
-    'linkType',              // C  — phone / sms / email / website / schedule / social / custom
-    'label',                 // D  — display label
-    'icon',                  // E  — emoji icon
-    'url',                   // F  — the action URL or value
-    'sortOrder',             // G
-    'visible',               // H  — TRUE/FALSE
-    'platform',              // I  — instagram / twitter / facebook / linkedin / youtube / etc.
-    'status',                // J  — Active / Archived
-    'createdAt',             // K
-    'updatedAt'              // L
-  ]);
-
-  addDropdowns(ss, 'MemberCardLinks', {
-    'C': ['phone', 'sms', 'email', 'website', 'schedule', 'social', 'custom'],
-    'H': ['TRUE', 'FALSE'],
-    'I': ['', 'instagram', 'twitter', 'facebook', 'linkedin', 'youtube', 'tiktok', 'threads', 'other'],
-    'J': ['Active', 'Archived']
-  });
-
-  // ── Member Card Views (analytics tracking) ─────────────────────────────────
-  ensureTab(ss, 'MemberCardViews', [
-    'id',                    // A
-    'cardRowId',             // B  — FK to MemberCards.ID
-    'memberNumber',          // C  — denormalized for quick lookups
-    'viewerEmail',           // D  — who viewed (or 'anonymous')
-    'viewSource',            // E  — direct / qr / directory / share
-    'userAgent',             // F
-    'ipHash',                // G  — SHA-256 hashed for privacy
-    'viewedAt'               // H
-  ]);
-
-  addDropdowns(ss, 'MemberCardViews', {
-    'E': ['direct', 'qr', 'directory', 'share']
-  });
-
-
-  // ── Statistics — Moved to separate EXTRA API sheet ──────────────────────────
-  // (StatisticsConfig, StatisticsSnapshots, StatisticsCustomViews + 50 generic tabs)
-
-
-  // ── Auth / Config Tabs (self-contained auth system) ────────────────────────
-
-  ensureTab(ss, 'AuthUsers', [
-    'email',                // A  — login email (primary key)
-    'passcode',             // B  — plain-text passcode (or leave blank if using hash)
-    'passcodeHash',         // C  — SHA-256 hash (preferred over plain text)
-    'salt',                 // D  — optional salt for hashing
-    'firstName',            // E
-    'lastName',             // F
-    'role',                 // G  — admin / pastor / leader / volunteer / readonly
-    'status',               // H  — active / inactive / suspended
-    'createdAt',            // I
-    'updatedAt'             // J
-  ]);
-
-  addDropdowns(ss, 'AuthUsers', {
-    'G': ['admin', 'pastor', 'leader', 'volunteer', 'readonly'],
-    'H': ['active', 'inactive', 'suspended', 'pending']
-  });
-
-  ensureTab(ss, 'UserProfiles', [
-    'email',                // A  — matches AuthUsers.Email
-    'displayName',          // B
-    'photoUrl',             // C
-    'phone',                // D
-    'bio',                  // E
-    'timezone',             // F
-    'language',             // G  — en / es / fr / etc.
-    'notifications',        // H  — TRUE / FALSE
-    'theme',                // I  — Light / Dark / Auto
-    'updatedAt'             // J
-  ]);
-
-  addDropdowns(ss, 'UserProfiles', {
-    'H': ['TRUE', 'FALSE'],
-    'I': ['Light', 'Dark', 'Auto']
-  });
-
-  ensureTab(ss, 'AccessControl', [
-    'email',                // A  — user email
-    'role',                 // B  — admin / pastor / leader / volunteer / readonly
-    'displayName',          // C
-    'groups',               // D  — comma-separated group tags
-    'active',               // E  — TRUE / FALSE
-    'notes',                // F
-    'createdAt',            // G
-    'updatedAt'             // H
-  ]);
-
-  addDropdowns(ss, 'AccessControl', {
-    'B': ['admin', 'pastor', 'leader', 'volunteer', 'readonly'],
-    'E': ['TRUE', 'FALSE']
-  });
-
-  // ── Permissions (per-user module overrides) ──────────────────────────────
-  ensureTab(ss, 'Permissions', [
-    'Email',       // A — FK to AuthUsers.Email
-    'Module',      // B — module key from MODULE_PERMISSIONS
-    'Access',      // C — "grant" or "deny"
-    'GrantedBy',   // D — admin email who set this override
-    'GrantedAt',   // E — ISO timestamp
-    'Notes'        // F — optional reason for the override
-  ]);
-
-  addDropdowns(ss, 'Permissions', {
-    'C': ['grant', 'deny']
-  });
-
-  // ── Calendar Events ──────────────────────────────────────────────────────
-  ensureTab(ss, 'CalendarEvents', [
-    'eventId',        // A — UUID
-    'email',          // B — creator/organizer email
-    'title',          // C — event name
-    'description',    // D — event details
-    'startDateTime',  // E — ISO 8601
-    'endDateTime',    // F — ISO 8601
-    'location',       // G — place/address
-    'attendees',      // H — comma-separated emails
-    'color',          // I — hex color for calendar display
-    'isAllDay',       // J — TRUE/FALSE
-    'recurrenceRule', // K — iCal RRULE
-    'visibility',     // L — public / authenticated / private
-    'sharedWith',     // M — emails with access
-    'delegatedTo',    // N — email if delegated
-    'createdAt',      // O — timestamp
-    'createdBy',      // P — creator email
-    'updatedAt',      // Q — timestamp
-    'updatedBy'       // R — last editor email
-  ]);
-
-  addDropdowns(ss, 'CalendarEvents', {
-    'J': ['TRUE', 'FALSE'],
-    'L': ['public', 'authenticated', 'private']
-  });
-
-  ensureTab(ss, 'AuthAudit', [
-    'timestamp',            // A
-    'event',                // B  — login_ok / login_failed / logout / passcode_changed / etc.
-    'email',                // C
-    'details'               // D
-  ]);
-
-  ensureTab(ss, 'AuditLog', [
-    'timestamp',            // A
-    'email',                // B  — who performed the action
-    'role',                 // C
-    'action',               // D  — action name (e.g. members.create)
-    'tab',                  // E  — which sheet was affected
-    'rowRef',               // F  — row index or ID
-    'details'               // G
-  ]);
-
-  ensureTab(ss, 'AppConfig', [
-    'key',                  // A  — configuration key name
-    'value',                // B  — configuration value
-    'description',          // C  — what this setting controls
-    'category',             // D  — General / Auth / Modules / Notifications / Display
-    'updatedBy',            // E
-    'updatedAt'             // F
-  ]);
-
-  addDropdowns(ss, 'AppConfig', {
-    'D': ['Auth', 'Care', 'Display', 'Failover', 'General', 'Modules', 'Notifications', 'Pastoral', 'Roles', 'Security']
-  });
-
-  // ── Seed default AppConfig values ──────────────────────────────────────────
   seedAppConfigDefaults_(ss);
-
-  // ── ChurchRegistry (multi-church tenant registry) ─────────────────────────
-  ensureTab(ss, 'ChurchRegistry', [
-    'churchId',        // A  — unique church identifier (shortName-based slug)
-    'sheetId',         // B  — Google Sheet ID for this church's data
-    'name',            // C  — full church display name
-    'plan',            // D  — Standard / Premium
-    'status',          // E  — Active / Inactive
-    'createdAt',       // F  — ISO date created
-    'shortName',       // G  — URL slug / folder name (e.g. TBC)
-    'brandName',       // H  — app brand label (e.g. FlockOS or custom)
-    'tagline',         // I  — subtitle shown in app
-    'themeColor',      // J  — primary accent color hex
-    'backgroundColor', // K  — background color hex
-    'databaseUrl',     // L  — GAS Web App URL for this church
-    'photosUrl',       // M  — Google Photos album URL
-    'adminEmail',      // N  — notification sender / admin email
-    'analyticsId',     // O  — Google Analytics G-XXXXXXXX tag ID
-    'favicon',         // P  — favicon filename or URL
-    'portrait',        // Q  — portrait/logo filename or URL
-    'version',         // R  — deployment version string
-    'firebaseConfig'   // S  — JSON object with Firebase project config (optional)
-  ]);
-
-  addDropdowns(ss, 'ChurchRegistry', {
-    'D': ['Standard', 'Premium'],
-    'E': ['Active', 'Inactive']
-  });
 
   SpreadsheetApp.flush();
   Logger.log('✅ All GAS tabs built — setupFlockOSGAS() continues...');
@@ -25587,6 +24567,103 @@ function handleServiceItemsReorder(params, auth) {
 
   writeAudit(auth, 'serviceItems.reorder', SPI_TAB, '', 'Plan: ' + params.planId);
   return jsonOk({ items: getItemsForPlan_(params.planId) });
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+//  ServiceOrders.gs  (Anatomy of Worship — liturgical run-of-service)
+// ═══════════════════════════════════════════════════════════════
+
+// Sheet: ServiceOrders
+// Columns: ID | ITEMS_JSON | UPDATED_AT | UPDATED_BY
+// ID values: 'sunday' | 'evening' | 'midweek'
+
+var SO_TAB = 'ServiceOrders';
+var SO_NUM_COLS = 4;
+
+var SO = { ID: 0, ITEMS_JSON: 1, UPDATED_AT: 2, UPDATED_BY: 3 };
+
+// Returns the row index (1-based) where SO.ID matches serviceId, or -1
+function findServiceOrderRow_(sheet, serviceId) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return -1;
+  var ids = sheet.getRange(2, SO.ID + 1, lastRow - 1, 1).getValues();
+  for (var i = 0; i < ids.length; i++) {
+    if (String(ids[i][0]) === serviceId) return i + 2;
+  }
+  return -1;
+}
+
+// ── serviceOrders.get ──────────────────────────────────────────────────────
+// params.id  — required: 'sunday' | 'evening' | 'midweek'
+// Returns { id, items: [...], updatedAt, updatedBy } or { id, items: [] }
+function handleServiceOrdersGet(params, auth) {
+  requireRole(auth, 'volunteer');
+  var id = String(params.id || '').trim().toLowerCase();
+  if (!id) return jsonErr('id is required.');
+
+  var sheet = getTab(SO_TAB);
+  var rowIdx = findServiceOrderRow_(sheet, id);
+  if (rowIdx === -1) return jsonOk({ id: id, items: [], updatedAt: null, updatedBy: null });
+
+  var vals = sheet.getRange(rowIdx, 1, 1, SO_NUM_COLS).getValues()[0];
+  var items;
+  try { items = JSON.parse(String(vals[SO.ITEMS_JSON] || '[]')); }
+  catch (e) { items = []; }
+
+  return jsonOk({
+    id:        id,
+    items:     items,
+    updatedAt: isoDate(vals[SO.UPDATED_AT]),
+    updatedBy: String(vals[SO.UPDATED_BY] || '')
+  });
+}
+
+// ── serviceOrders.save ─────────────────────────────────────────────────────
+// params.id    — required: 'sunday' | 'evening' | 'midweek'
+// params.items — required: JSON string or array of segment objects
+// Upserts the row; returns the saved record.
+function handleServiceOrdersSave(params, auth) {
+  requireRole(auth, 'leader');
+  var id = String(params.id || '').trim().toLowerCase();
+  if (!id) return jsonErr('id is required.');
+  if (!params.items && params.items !== '') return jsonErr('items is required.');
+
+  var items;
+  try {
+    items = (typeof params.items === 'string') ? JSON.parse(params.items) : params.items;
+  } catch (e) {
+    return jsonErr('items must be a valid JSON array.');
+  }
+  if (!Array.isArray(items)) return jsonErr('items must be an array.');
+
+  var now = isoNow();
+  var itemsJson = JSON.stringify(items);
+  var sheet = getTab(SO_TAB);
+  var rowIdx = findServiceOrderRow_(sheet, id);
+
+  if (rowIdx === -1) {
+    // Insert new row
+    var newRow = new Array(SO_NUM_COLS);
+    newRow[SO.ID]         = id;
+    newRow[SO.ITEMS_JSON] = itemsJson;
+    newRow[SO.UPDATED_AT] = now;
+    newRow[SO.UPDATED_BY] = String(auth.userId || '');
+    sheet.appendRow(newRow);
+  } else {
+    // Update existing row
+    sheet.getRange(rowIdx, SO.ITEMS_JSON + 1).setValue(itemsJson);
+    sheet.getRange(rowIdx, SO.UPDATED_AT + 1).setValue(now);
+    sheet.getRange(rowIdx, SO.UPDATED_BY + 1).setValue(String(auth.userId || ''));
+  }
+
+  writeAudit(auth, 'serviceOrders.save', SO_TAB, id, 'segments: ' + items.length);
+  return jsonOk({
+    id:        id,
+    items:     items,
+    updatedAt: now,
+    updatedBy: String(auth.userId || '')
+  });
 }
 
 
