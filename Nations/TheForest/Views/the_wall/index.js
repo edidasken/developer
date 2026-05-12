@@ -2347,19 +2347,39 @@ function _wireMaintenancePanel(root) {
     if (vcfImportBtn) return _vcfImportSelected(root, vcfImportBtn);
   });
 
-  // File-input change handler — parse VCF and render preview
+  // File-input change handler — parse VCF, check for duplicates, then render preview
   const fileInput = panel.querySelector('[data-bind="vcf-file-input"]');
   fileInput?.addEventListener('change', () => {
     const file = fileInput.files[0];
-    const nameEl = panel.querySelector('[data-bind="vcf-file-name"]');
+    const nameEl  = panel.querySelector('[data-bind="vcf-file-name"]');
     const preview = panel.querySelector('[data-bind="vcf-preview"]');
     if (!file) { if (nameEl) nameEl.textContent = 'No file chosen'; return; }
     if (nameEl) nameEl.textContent = file.name;
-    if (preview) { preview.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-muted);font-size:.85rem">Parsing…</div>'; preview.style.display = ''; }
+    if (preview) {
+      preview.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-muted);font-size:.85rem">Parsing file…</div>';
+      preview.style.display = '';
+    }
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       const contacts = _parseVcf(ev.target.result || '');
-      _renderVcfPreview(root, contacts);
+      // Load existing members to detect duplicates
+      if (preview) preview.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-muted);font-size:.85rem">Checking against existing members…</div>';
+      const existingEmails = new Set();
+      const existingNames  = new Set();
+      try {
+        const UR = await _waitForUpperRoom(5000);
+        if (UR && UR.listMembers) {
+          const rows = await UR.listMembers({ limit: 5000 }).catch(() => []);
+          const list = Array.isArray(rows) ? rows : [];
+          for (const m of list) {
+            if (m.primaryEmail)   existingEmails.add(m.primaryEmail.toLowerCase().trim());
+            if (m.secondaryEmail) existingEmails.add(m.secondaryEmail.toLowerCase().trim());
+            const n = [m.firstName, m.lastName].filter(Boolean).join(' ').toLowerCase().trim();
+            if (n) existingNames.add(n);
+          }
+        }
+      } catch (_) {}
+      _renderVcfPreview(root, contacts, existingEmails, existingNames);
     };
     reader.readAsText(file, 'UTF-8');
   });
@@ -3440,8 +3460,17 @@ function _parseVcf(text) {
     }
   }
 
-  // Filter out empty/unparseable cards
-  return cards.filter(c => c.fn || c.firstName || c.lastName || c.primaryEmail);
+  // Filter out empty/unparseable cards, then classify companies
+  return cards
+    .filter(c => c.fn || c.firstName || c.lastName || c.primaryEmail)
+    .map(c => {
+      const noPersonName = !c.firstName && !c.lastName;
+      const fnMatchesOrg = c.organization && c.fn &&
+        c.fn.trim().toLowerCase() === c.organization.trim().toLowerCase();
+      // A company: has an org name but no individual name (or FN is just the org name)
+      c.isCompany = !!(c.organization && (noPersonName || fnMatchesOrg));
+      return c;
+    });
 }
 
 /**
@@ -3474,55 +3503,113 @@ function _membersToVcfText(members) {
 }
 
 /** Render the parsed-contacts preview list inside the import section. */
-function _renderVcfPreview(root, contacts) {
+function _renderVcfPreview(root, contacts, existingEmails, existingNames) {
+  existingEmails = existingEmails || new Set();
+  existingNames  = existingNames  || new Set();
   const preview = root.querySelector('[data-bind="vcf-preview"]');
   if (!preview) return;
   preview.style.display = '';
 
   if (!contacts.length) {
-    preview.innerHTML = `<div style="padding:20px;text-align:center;color:var(--ink-muted);font-size:.85rem">
-      No valid contacts found in this file. Make sure it is a valid .vcf (vCard) file.
-    </div>`;
+    preview.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-muted);font-size:.85rem">No valid contacts found in this file. Make sure it is a valid .vcf (vCard) file.</div>';
     return;
   }
 
-  const rows = contacts.map((c, i) => {
-    const name = _e(c.fn || [c.firstName, c.lastName].filter(Boolean).join(' ') || '(No Name)');
+  // Split into people and companies
+  const people    = contacts.filter(c => !c.isCompany);
+  const companies = contacts.filter(c =>  c.isCompany);
+
+  // Mark duplicates within people
+  people.forEach(c => {
+    const emailMatch = c.primaryEmail && existingEmails.has(c.primaryEmail.toLowerCase().trim());
+    const nameStr    = [c.firstName, c.lastName].filter(Boolean).join(' ').toLowerCase().trim();
+    const nameMatch  = nameStr && existingNames.has(nameStr);
+    c._isDuplicate   = !!(emailMatch || nameMatch);
+  });
+
+  const newPeople  = people.filter(c => !c._isDuplicate);
+  const dupPeople  = people.filter(c =>  c._isDuplicate);
+
+  // Build a contact row
+  const _contactRow = (c, globalIdx, checked, dimmed) => {
+    const name = _e(c.fn || [c.firstName, c.lastName].filter(Boolean).join(' ') || c.organization || '(No Name)');
     const chips = [
-      c.primaryEmail   ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>${_e(c.primaryEmail)}</span>` : '',
-      c.cellPhone  ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>${_e(c.cellPhone)}</span>` : '',
-      c.homePhone  ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>${_e(c.homePhone)}</span>` : '',
-      c.workPhone  ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>${_e(c.workPhone)}</span>` : '',
-      (c.city || c.state) ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${_e([c.city,c.state].filter(Boolean).join(', '))}</span>` : '',
-      c.dateOfBirth ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${_e(c.dateOfBirth)}</span>` : '',
+      c.primaryEmail   ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>' + _e(c.primaryEmail) + '</span>' : '',
+      c.cellPhone      ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>' + _e(c.cellPhone) + '</span>' : '',
+      c.homePhone      ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>' + _e(c.homePhone) + '</span>' : '',
+      c.workPhone      ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>' + _e(c.workPhone) + '</span>' : '',
+      (c.city || c.state) ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' + _e([c.city, c.state].filter(Boolean).join(', ')) + '</span>' : '',
+      c.dateOfBirth    ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' + _e(c.dateOfBirth) + '</span>' : '',
+      c.organization && !c.isCompany ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;background:var(--bg,#f3f4f8);font-size:.78rem;color:var(--ink-muted)">🏢 ' + _e(c.organization) + '</span>' : '',
     ].filter(Boolean).join('');
+    const dupBadge = c._isDuplicate
+      ? '<span style="display:inline-flex;align-items:center;padding:2px 9px;border-radius:99px;background:#fef9c3;border:1px solid #fbbf24;font-size:.72rem;font-weight:700;color:#92400e">Already in system</span>'
+      : '';
+    const rowBg = dimmed ? 'background:var(--bg-sunken,#f9fafb);' : '';
+    return '<label style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line,#e5e7ef);cursor:pointer;' + rowBg + '" data-vcf-row="' + globalIdx + '">'
+      + '<input type="checkbox" data-vcf-idx="' + globalIdx + '"' + (checked ? ' checked' : '') + ' style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:var(--accent,#3d8b4f)">'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-bottom:5px"><span style="font-weight:600;font-size:.9rem;color:var(--ink,#1b264f)">' + name + '</span>' + dupBadge + '</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:5px">' + (chips || '<span style="font-size:.78rem;color:var(--ink-muted)">No contact details</span>') + '</div>'
+      + '</div></label>';
+  };
 
-    return `<label style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line,#e5e7ef);cursor:pointer;" data-vcf-row="${i}">
-      <input type="checkbox" data-vcf-idx="${i}" checked style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:var(--accent,#3d8b4f)">
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:600;font-size:.9rem;color:var(--ink,#1b264f);margin-bottom:5px">${name}</div>
-        <div style="display:flex;flex-wrap:wrap;gap:5px">${chips || '<span style="font-size:.78rem;color:var(--ink-muted)">No contact details</span>'}</div>
-      </div>
-    </label>`;
-  }).join('');
+  // Section header helper
+  const _sectionHead = (label, count, color, note) =>
+    '<div style="padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:' + color + ';border-bottom:1px solid var(--line,#e5e7ef)">'
+    + '<div style="font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted)">' + _e(label) + ' <span style="font-weight:800;color:var(--ink)">' + count + '</span></div>'
+    + (note ? '<div style="font-size:.75rem;color:var(--ink-muted)">' + note + '</div>' : '')
+    + '</div>';
 
-  preview.innerHTML = `
-    <div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;background:var(--bg-sunken,#f3f4f8);border-bottom:1px solid var(--line,#e5e7ef)">
-      <div style="font-size:.88rem;font-weight:700;color:var(--ink,#1b264f)">${contacts.length} contact${contacts.length !== 1 ? 's' : ''} found</div>
-      <div style="display:flex;gap:8px">
-        <button class="flock-btn flock-btn--ghost" style="font-size:.78rem;padding:5px 12px" data-act="vcf-select-all" type="button">Select All</button>
-        <button class="flock-btn flock-btn--ghost" style="font-size:.78rem;padding:5px 12px" data-act="vcf-deselect-all" type="button">Deselect All</button>
-      </div>
-    </div>
-    <div style="max-height:440px;overflow-y:auto" data-bind="vcf-contact-list">${rows}</div>
-    <div style="padding:12px 14px;display:flex;align-items:center;gap:12px;justify-content:flex-end;flex-wrap:wrap;border-top:1px solid var(--line,#e5e7ef)">
-      <span data-bind="vcf-import-status" style="flex:1;font-size:.82rem;color:var(--ink-muted)"></span>
-      <button class="flock-btn flock-btn--primary" data-act="vcf-import-selected" type="button">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:-1px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Import Selected
-      </button>
-    </div>
-  `;
+  // Build people rows (new first, then duplicates)
+  let peopleHtml = '';
+  if (newPeople.length) {
+    peopleHtml += _sectionHead('New — ready to import', newPeople.length, 'var(--bg-sunken,#f3f4f8)', '');
+    peopleHtml += newPeople.map(c => _contactRow(c, contacts.indexOf(c), true, false)).join('');
+  }
+  if (dupPeople.length) {
+    peopleHtml += _sectionHead('Already in system', dupPeople.length, '#fffbeb', 'Unchecked — matched by email or name');
+    peopleHtml += dupPeople.map(c => _contactRow(c, contacts.indexOf(c), false, true)).join('');
+  }
+  if (!people.length) {
+    peopleHtml = '<div style="padding:16px 14px;font-size:.85rem;color:var(--ink-muted)">No individual contacts found.</div>';
+  }
+
+  // Build companies section (collapsed by default)
+  let companiesHtml = '';
+  if (companies.length) {
+    const compRows = companies.map(c => _contactRow(c, contacts.indexOf(c), false, true)).join('');
+    companiesHtml = '<details style="border-top:2px solid var(--line,#e5e7ef)">'
+      + '<summary style="padding:10px 14px;cursor:pointer;font-size:.82rem;font-weight:700;color:var(--ink-muted);list-style:none;display:flex;align-items:center;gap:8px;user-select:none">'
+      + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>'
+      + 'Companies / Organisations (' + companies.length + ') — unchecked by default — click to expand'
+      + '</summary>'
+      + '<div>' + compRows + '</div>'
+      + '</details>';
+  }
+
+  const totalNew = newPeople.length;
+  preview.innerHTML =
+    '<div style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;background:var(--bg-sunken,#f3f4f8);border-bottom:1px solid var(--line,#e5e7ef)">'
+    + '<div style="font-size:.88rem;font-weight:700;color:var(--ink,#1b264f)">'
+    + contacts.length + ' card' + (contacts.length !== 1 ? 's' : '') + ' parsed'
+    + ' &nbsp;·&nbsp; '
+    + '<span style="color:#16a34a">' + newPeople.length + ' new</span>'
+    + (dupPeople.length  ? ' &nbsp;·&nbsp; <span style="color:#d97706">' + dupPeople.length + ' already exist</span>' : '')
+    + (companies.length  ? ' &nbsp;·&nbsp; <span style="color:var(--ink-muted)">' + companies.length + ' companies</span>' : '')
+    + '</div>'
+    + '<div style="display:flex;gap:8px">'
+    + '<button class="flock-btn flock-btn--ghost" style="font-size:.78rem;padding:5px 12px" data-act="vcf-select-all" type="button">Select All</button>'
+    + '<button class="flock-btn flock-btn--ghost" style="font-size:.78rem;padding:5px 12px" data-act="vcf-deselect-all" type="button">Deselect All</button>'
+    + '</div></div>'
+    + '<div style="max-height:480px;overflow-y:auto" data-bind="vcf-contact-list">' + peopleHtml + companiesHtml + '</div>'
+    + '<div style="padding:12px 14px;display:flex;align-items:center;gap:12px;justify-content:flex-end;flex-wrap:wrap;border-top:1px solid var(--line,#e5e7ef)">'
+    + '<span data-bind="vcf-import-status" style="flex:1;font-size:.82rem;color:var(--ink-muted)">'
+    + (totalNew ? totalNew + ' new contact' + (totalNew !== 1 ? 's' : '') + ' pre-selected.' : 'All contacts already exist in the system.')
+    + '</span>'
+    + '<button class="flock-btn flock-btn--primary" data-act="vcf-import-selected" type="button">'
+    + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;vertical-align:-1px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'
+    + 'Import Selected</button></div>';
 
   // Stash parsed contacts on the element so the import handler can read them
   preview._vcfContacts = contacts;
