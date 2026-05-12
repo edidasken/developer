@@ -446,7 +446,7 @@ The redesign is judged on **experience**, not features. The backend stays — th
 
 No change to the pipeline:
 - Author everything under `/FlockOS/` (master).
-- `bash "Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh"` rsyncs to every Nation, regenerates codex, syncs SharedVessels CSS.
+- `bash "Iris/Bezalel/Scripts/A-Build_Churches.sh"` rsyncs to every Nation, regenerates codex, syncs SharedVessels CSS.
 - Deploy command unchanged: `--deploy-comms` flag for FlockChat.
 
 The redesign adds **no new build step**. Modules are served as-is (HTTP/2, no bundler). If perf demands later, add a single esbuild step that emits one `the_ark.bundle.js`.

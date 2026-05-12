@@ -17,7 +17,7 @@ Flow: New Covenant -> Old Covenant
 ## Notes
 - New Covenant is the authoring source for architecture artifacts.
 - Old Covenant is the mirrored continuity tree.
-- Build scripts live canonically in `Running to Jesus/Bezalel/Scripts/` (the `Covenant/Bezalel/` tree has been removed).
+- Build scripts live canonically in `Iris/Bezalel/Scripts/` (the `Covenant/Bezalel/` tree has been removed).
 
 ## Update source
 - Canonical source path: Architechtural Docs/New Covenant/

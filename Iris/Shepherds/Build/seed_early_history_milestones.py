@@ -5,7 +5,7 @@ Seeds the pre-March-19, 2026 FlockOS history milestones into flockos-notify Gene
 Source: K-Flock Docs.md — Appendix I: The FlockOS Timeline
 
 Run from repo root:
-  python3 "Running to Jesus/Shepherds/Build/seed_early_history_milestones.py"
+  python3 "Iris/Shepherds/Build/seed_early_history_milestones.py"
 """
 
 import subprocess, json, urllib.request, urllib.error, datetime

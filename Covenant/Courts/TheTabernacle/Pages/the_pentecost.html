@@ -1455,7 +1455,7 @@ Nehemiah.canAccess('missions');  // module access</code></pre>
   <div class="gospel">"Whatever you do, work at it with all your heart, as working for the Lord." &mdash; Colossians 3:23</div>
 
   <h3>A-Build_Churches.sh</h3>
-  <p>The build script at <code>Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh</code> generates all church deployments from the master source. It performs these steps for each church:</p>
+  <p>The build script at <code>Iris/Bezalel/Scripts/A-Build_Churches.sh</code> generates all church deployments from the master source. It performs these steps for each church:</p>
 
   <ol>
     <li><strong>rsync</strong> &mdash; Copy master FlockOS source into <code>Covenant/Nations/&lt;name&gt;/</code></li>
@@ -1474,9 +1474,9 @@ Nehemiah.canAccess('missions');  // module access</code></pre>
 
   <h3>Running the Build</h3>
   <pre><code>cd /path/to/Software
-bash "Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh"
+bash "Iris/Bezalel/Scripts/A-Build_Churches.sh"
 # With FlockChat comms deploy:
-bash "Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh" --deploy-comms</code></pre>
+bash "Iris/Bezalel/Scripts/A-Build_Churches.sh" --deploy-comms</code></pre>
   <p>Output: <code>Covenant/Nations/FlockOS/</code>, <code>Covenant/Nations/GAS/</code>, <code>Covenant/Nations/TBC/</code>, <code>Covenant/Nations/TheForest/</code></p>
 
   <h3>Other Build Scripts</h3>
@@ -1807,7 +1807,7 @@ Seed replication (during setupFlockOS):
   <h3>Phase 11 &mdash; Add to Build Script</h3>
   <ol>
     <li>Add the church&rsquo;s config block to <code>Covenant/Scrolls/ChurchRegistry/ChurchName.json</code></li>
-    <li>Run <code>bash Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh</code> to generate the deployment</li>
+    <li>Run <code>bash Iris/Bezalel/Scripts/A-Build_Churches.sh</code> to generate the deployment</li>
     <li>Commit and push to GitHub Pages</li>
   </ol>
 
@@ -1913,7 +1913,7 @@ Seed replication (during setupFlockOS):
   <h3>Update Frontend &amp; Rebuild Churches</h3>
   <ol>
     <li>Edit files in <code>Covenant/Courts/TheTabernacle/Scripts/</code> or <code>Covenant/Courts/TheTabernacle/Pages/</code> (master source only)</li>
-    <li>Run <code>bash "Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh"</code> from the repo root</li>
+    <li>Run <code>bash "Iris/Bezalel/Scripts/A-Build_Churches.sh"</code> from the repo root</li>
     <li>Commit and push to GitHub</li>
   </ol>
 

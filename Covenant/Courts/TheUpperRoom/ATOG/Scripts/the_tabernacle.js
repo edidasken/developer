@@ -20168,7 +20168,7 @@ const Modules = (() => {
     html += '<div ' + _bdy + '>'
       + '<ol style="padding-left:20px;">'
       + '<li>Add the church&rsquo;s config in <code>Covenant/Scrolls/ChurchRegistry/ChurchName.json</code></li>'
-      + '<li>Run <code>bash Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh</code> to generate the deployment</li>'
+      + '<li>Run <code>bash Iris/Bezalel/Scripts/A-Build_Churches.sh</code> to generate the deployment</li>'
       + '<li>Commit and push to GitHub Pages</li>'
       + '</ol></div></details>';
 
@@ -20224,7 +20224,7 @@ const Modules = (() => {
     html += '<details class="settings-accordion">';
     html += '<summary class="settings-accordion-trigger">Build System &amp; Automation</summary>';
     html += '<div ' + _bdy + '>'
-      + '<p style="margin:0 0 8px;">The build script at <code>Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh</code> generates all church deployments from the master source:</p>'
+      + '<p style="margin:0 0 8px;">The build script at <code>Iris/Bezalel/Scripts/A-Build_Churches.sh</code> generates all church deployments from the master source:</p>'
       + '<ol style="padding-left:20px;">'
       + '<li><strong>rsync</strong> &mdash; Copy master FlockOS source into <code>Covenant/Nations/&lt;name&gt;/</code></li>'
       + '<li><strong>Database URL</strong> &mdash; <code>sed</code> replaces the GAS endpoint URL in HTML/JS files</li>'
@@ -20241,7 +20241,7 @@ const Modules = (() => {
       + '</ol>'
       + '<h4 style="font-size:0.88rem;font-weight:600;margin:12px 0 6px;">Running the Build</h4>'
       + '<code style="display:block;background:var(--surface-alt,#f5f5f5);padding:8px 12px;border-radius:6px;font-size:0.82rem;">'
-      + 'cd "Running to Jesus/Bezalel/Scripts/"<br>bash A-Build_Churches.sh</code>'
+      + 'cd "Iris/Bezalel/Scripts/"<br>bash A-Build_Churches.sh</code>'
       + '<p style="margin:8px 0 0;font-size:0.82rem;">Output: <code>Covenant/Nations/FlockOS/</code>, <code>Covenant/Nations/GAS/</code>, <code>Covenant/Nations/TBC/</code>, <code>Covenant/Nations/TheForest/</code></p>'
       + '</div></details>';
 

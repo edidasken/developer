@@ -96,7 +96,7 @@ Registry files used by both old and new systems.
 
 ## Bezalel/Scripts/
 
-Legacy build utilities. These are **not** the primary build scripts (those live in `Running to Jesus/Bezalel/Scripts/`).
+Legacy build utilities. These are **not** the primary build scripts (those live in `Iris/Bezalel/Scripts/`).
 
 | Script | Purpose |
 |--------|---------|
@@ -107,7 +107,7 @@ Legacy build utilities. These are **not** the primary build scripts (those live 
 
 ## Shepherds/
 
-Legacy entry-point wrappers that delegate to the canonical Python scripts in `Running to Jesus/Shepherds/Build/`. **Do not add new scripts here.** New automation goes in `Running to Jesus/Shepherds/Build/`.
+Legacy entry-point wrappers that delegate to the canonical Python scripts in `Iris/Shepherds/Build/`. **Do not add new scripts here.** New automation goes in `Iris/Shepherds/Build/`.
 
 | Subfolder | Purpose |
 |-----------|---------|
@@ -133,7 +133,7 @@ These parts of `Covenant/` are still used by the live build pipeline:
 ## Rules
 
 - **Do not edit `Styles/american_garments.css` in Courts/ — always edit `Foundations/SharedVessels/styles/american_garments.css`.**
-- Do not add new Python scripts to `Shepherds/Build/`. Add them to `Running to Jesus/Shepherds/Build/`.
+- Do not add new Python scripts to `Shepherds/Build/`. Add them to `Iris/Shepherds/Build/`.
 - `Covenant/Nations/` is legacy — do not deploy from it. Use root `/Nations/` instead.
 
 ---

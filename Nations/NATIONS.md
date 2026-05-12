@@ -17,7 +17,7 @@ Each subfolder represents one deployed church instance — a fully branded, self
 The B-Build script reads from the master source at `New_Covenant/` (the canonical single source of truth), applies each church's branding and configuration, and rsyncs the result into the corresponding `Nations/<Church>/` folder. From there, Firebase Hosting serves each church's copy from its dedicated project.
 
 **Source:** `New_Covenant/`
-**Build script:** `Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh`
+**Build script:** `Iris/Bezalel/Scripts/A-Build_Churches.sh`
 **Deploy target:** Firebase Hosting (one project per church)
 
 ---

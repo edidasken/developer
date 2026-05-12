@@ -34,8 +34,8 @@ done
 if $DRY_RUN; then echo "🏗  DRY RUN — no files will be written"; echo ""; fi
 
 COVENANT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-# When invoked via canonical path (Running to Jesus/...), COVENANT_ROOT resolves
-# to "Running to Jesus" — but Covenant/ tree still holds the rsync targets and
+# When invoked via canonical path (Iris/...), COVENANT_ROOT resolves
+# to "Iris" — but Covenant/ tree still holds the rsync targets and
 # Tabernacle source. Detect and re-anchor to the real Covenant/ folder.
 if [ ! -d "$COVENANT_ROOT/Courts/TheTabernacle" ]; then
   WORKSPACE_ROOT="$(cd "$COVENANT_ROOT/.." && pwd)"
@@ -221,12 +221,12 @@ fi
 
 # ── Publish combined schema manifest to FlockOS-Truth backup store ─────────
 TRUTH_SCHEMA_MANIFEST="$WORKSPACE_ROOT/Architechtural Docs/New Covenant/Architecture/combined_schema_manifest.deployable.json"
-TRUTH_SCHEMA_PUBLISHER="$WORKSPACE_ROOT/Running to Jesus/Bezalel/Scripts/publish_truth_schema_backup.cjs"
+TRUTH_SCHEMA_PUBLISHER="$WORKSPACE_ROOT/Iris/Bezalel/Scripts/publish_truth_schema_backup.cjs"
 TRUTH_SCHEMA_SQL="$WORKSPACE_ROOT/Architechtural Docs/New Covenant/Architecture/New Covenant Schema.sql"
 if ! $SKIP_TRUTH_SCHEMA_PUBLISH; then
   echo "Publishing combined schema backup to FlockOS-Truth…"
   if $DRY_RUN; then
-    echo "  [dry-run] Would run: node 'Running to Jesus/Bezalel/Scripts/publish_truth_schema_backup.cjs'"
+    echo "  [dry-run] Would run: node 'Iris/Bezalel/Scripts/publish_truth_schema_backup.cjs'"
   else
     if [ ! -f "$TRUTH_SCHEMA_SQL" ]; then
       echo "  ✗ MISSING: $TRUTH_SCHEMA_SQL"

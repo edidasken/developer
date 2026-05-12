@@ -8,7 +8,7 @@ Called automatically by B-Build_Nations.sh after every successful build.
 Also usable manually to record significant engineering milestones.
 
 Usage:
-  python3 "Running to Jesus/Shepherds/Build/seed_build_event.py" \
+  python3 "Iris/Shepherds/Build/seed_build_event.py" \
     --title "My milestone title" \
     --description "What changed and why." \
     [--category tech]   # default: tech

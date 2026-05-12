@@ -9,8 +9,8 @@ Covers:
   - Music Stand login redesign — dark NC theme (May 11)
 
 Run from repo root:
-  python3 "Running to Jesus/Shepherds/Build/seed_may11_milestones.py"
-  python3 "Running to Jesus/Shepherds/Build/seed_may11_milestones.py" --dry-run
+  python3 "Iris/Shepherds/Build/seed_may11_milestones.py"
+  python3 "Iris/Shepherds/Build/seed_may11_milestones.py" --dry-run
 """
 import json, subprocess, sys, time, urllib.request, urllib.error
 from datetime import datetime, timezone

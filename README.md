@@ -207,13 +207,13 @@ Each church deployment is driven by a JSON config file in `Scrolls/ChurchRegistr
 ### Build command
 
 ```bash
-bash "Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh"
+bash "Iris/Bezalel/Scripts/A-Build_Churches.sh"
 ```
 
 ### Build + FlockChat deploy (BCP)
 
 ```bash
-bash "Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh" --deploy-comms
+bash "Iris/Bezalel/Scripts/A-Build_Churches.sh" --deploy-comms
 ```
 
 This runs the normal church build and then deploys FlockChat hosting to `https://flockos-comms.web.app` via Firebase predeploy packaging.

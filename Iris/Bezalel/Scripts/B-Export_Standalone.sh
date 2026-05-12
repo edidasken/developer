@@ -27,9 +27,9 @@
 #   • node_modules, .venv, snapshots, etc.
 #
 # Usage:
-#   bash "Running to Jesus/Bezalel/Scripts/B-Export_Standalone.sh" <ShortName>
-#   bash "Running to Jesus/Bezalel/Scripts/B-Export_Standalone.sh" TBC
-#   bash "Running to Jesus/Bezalel/Scripts/B-Export_Standalone.sh" TheForest --dry-run
+#   bash "Iris/Bezalel/Scripts/B-Export_Standalone.sh" <ShortName>
+#   bash "Iris/Bezalel/Scripts/B-Export_Standalone.sh" TBC
+#   bash "Iris/Bezalel/Scripts/B-Export_Standalone.sh" TheForest --dry-run
 # ======================================================================
 set -euo pipefail
 
@@ -60,7 +60,7 @@ fi
 # ── Paths ─────────────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 COVENANT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-# When invoked via canonical Running to Jesus path, COVENANT_ROOT is wrong.
+# When invoked via canonical Iris path, COVENANT_ROOT is wrong.
 # Re-anchor to actual Covenant/ folder (which holds Courts, Scrolls, etc.).
 if [ ! -d "$COVENANT_ROOT/Courts/TheTabernacle" ]; then
   _CANDIDATE_REPO="$(cd "$COVENANT_ROOT/.." && pwd)"
@@ -194,9 +194,9 @@ if [ -d "$REPO_ROOT/flockchat-public" ]; then
 fi
 
 # ── 2. Covenant/ — sub-tree by sub-tree ───────────────────────────────
-echo "[2/7] Copying Bezalel/ (build scripts) from Running to Jesus/…"
+echo "[2/7] Copying Bezalel/ (build scripts) from Iris/…"
 rsync "${RSYNC_FLAGS[@]}" "${COMMON_EXCLUDES[@]}" \
-  "$REPO_ROOT/Running to Jesus/Bezalel/" "$EXPORT_DEST/Covenant/Bezalel/"
+  "$REPO_ROOT/Iris/Bezalel/" "$EXPORT_DEST/Covenant/Bezalel/"
 
 echo "[3/7] Copying Covenant/Courts/ (FlockOS, FlockChat, ATOG sources)…"
 rsync "${RSYNC_FLAGS[@]}" "${COMMON_EXCLUDES[@]}" \
@@ -298,7 +298,7 @@ Source:    Master FlockOS repo @ $(git -C "$REPO_ROOT" rev-parse --short HEAD 2>
 git init && git add -A && git commit -m "Initial standalone export"
 
 # Rebuild the deployment after edits
-bash "Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh"
+bash "Iris/Bezalel/Scripts/A-Build_Churches.sh"
 \`\`\`
 
 ## Live URL

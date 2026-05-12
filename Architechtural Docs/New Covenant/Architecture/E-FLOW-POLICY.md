@@ -46,7 +46,7 @@ All architecture documentation and deployment configuration flows from **New Cov
 
 ## Build & Deploy
 
-- **Build (BCP):** `bash "Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh"` from workspace root
+- **Build (BCP):** `bash "Iris/Bezalel/Scripts/A-Build_Churches.sh"` from workspace root
   - With comms deploy: append `--deploy-comms` (or run `npm run bcp`)
   - Syncs SharedVessels CSS → Tabernacle, rsync to Nations, regenerates codex, deploys FlockChat hosting
 - **Firestore rules deploy:** firebase CLI using rules/indexes from `Architechtural Docs/New Covenant/Deployment/Firestore/`

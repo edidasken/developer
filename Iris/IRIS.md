@@ -1,4 +1,4 @@
-# Running to Jesus/
+# Iris/
 
 Created: 2026-05-11
 
@@ -6,7 +6,7 @@ Created: 2026-05-11
 
 ## What Is This Folder?
 
-`Running to Jesus/` is the **operational toolbox** for FlockOS — the home of all build scripts, deployment automation, Firestore seeders, runbooks, and maintenance utilities that keep the platform running.
+`Iris/` is the **operational toolbox** for FlockOS — the home of all build scripts, deployment automation, Firestore seeders, runbooks, and maintenance utilities that keep the platform running.
 
 It is not source code for the app itself. It is the machinery that builds, seeds, and maintains the app.
 
@@ -15,7 +15,7 @@ It is not source code for the app itself. It is the machinery that builds, seeds
 ## Folder Structure
 
 ```
-Running to Jesus/
+Iris/
   Bezalel/Scripts/    ← Core build scripts (A-Build, B-Build, schema tools)
   Shepherds/Build/    ← Python automation (Firestore seeding, data import, registry)
   Runbooks/           ← Operational runbooks and snapshot utilities
@@ -38,7 +38,7 @@ The build engine. Named after the craftsman appointed to build the Tabernacle (E
 
 **To run A-Build (BCP):**
 ```bash
-bash "Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh"
+bash "Iris/Bezalel/Scripts/A-Build_Churches.sh"
 ```
 
 ---
@@ -67,7 +67,7 @@ Python scripts for seeding and maintaining Firestore data. Each script is a one-
 **To run a Shepherd script:**
 ```bash
 source .venv/bin/activate
-python "Running to Jesus/Shepherds/Build/<script_name>.py" [--flags]
+python "Iris/Shepherds/Build/<script_name>.py" [--flags]
 ```
 
 ---
@@ -82,7 +82,7 @@ Operational procedures for maintenance and recovery.
 
 **To snapshot the repo:**
 ```bash
-bash "Running to Jesus/Runbooks/Snapshot.sh"
+bash "Iris/Runbooks/Snapshot.sh"
 ```
 
 ---
