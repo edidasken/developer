@@ -31666,8 +31666,12 @@ function replicateTruthFromMaster() {
 
   var totalDocs = 0;
   var collections = [
+    // Truth content (12 core collections)
     'apologetics', 'books', 'counseling', 'devotionals', 'genealogy',
-    'heart', 'mirror', 'quiz', 'reading', 'theology', 'theologyCategories', 'words'
+    'heart', 'mirror', 'quiz', 'reading', 'theology', 'theologyCategories', 'words',
+    // Missions (shared cross-church content, seeded into flockos-truth via seedSharedContentToTruth)
+    'missionsRegistry', 'missionsRegions', 'missionsCities', 'missionsPartners',
+    'missionsPrayerFocus', 'missionsUpdates', 'missionsTeams', 'missionsMetrics'
   ];
 
   var counselingDocs = null;
@@ -31865,6 +31869,155 @@ function populateTruthMaster() {
   Logger.log('[TruthMaster] ✅ Done — ' + totalDocs + ' total documents written to FlockOS-Truth.');
   Logger.log('[TruthMaster]    Future churches can now call replicateTruthFromMaster() instead of reading from the Sheet.');
   return totalDocs;
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MISSIONS → TRUTH MASTER REPLICATION
+//
+// populateMissionsToTruth()  — ONE-TIME / on-update: reads the 8 missions
+//   collections from FS_PROJECT_ID (flockos-notify) Firestore and pushes them
+//   to TRUTH_PROJECT_ID (flockos-truth) as top-level collections.
+//
+//   Run this from the flockos-notify GAS project whenever missions data changes
+//   and you want those changes available to all churches.
+//
+// seedSharedContentToTruth()  — convenience wrapper: calls populateTruthMaster()
+//   then populateMissionsToTruth(). Run from flockos-notify GAS to push ALL
+//   shared content (truth + missions) to flockos-truth in a single call.
+//   After this, churches call replicateTruthFromMaster() to receive it all.
+//
+//   Pipeline:
+//     flockos-notify → (seedSharedContentToTruth) → flockos-truth
+//     flockos-truth  → (replicateTruthFromMaster)  → flockos-theforest
+//     flockos-truth  → (replicateTruthFromMaster)  → flockos-trinity
+//
+//   Excluded by design: members, careCases, households, prayers, memberCards —
+//   all personally-identifiable / church-specific data stays in its own project.
+//
+// Requires:
+//   FIREBASE_SERVICE_ACCOUNT  — service account for FS_PROJECT_ID (notify)
+//   TRUTH_SERVICE_ACCOUNT     — service account for TRUTH_PROJECT_ID (flockos-truth)
+// ══════════════════════════════════════════════════════════════════════════════
+
+/** Collections shared from flockos-notify → flockos-truth (excluding personal data). */
+var MISSIONS_COLLECTIONS_ = [
+  'missionsRegistry', 'missionsRegions', 'missionsCities', 'missionsPartners',
+  'missionsPrayerFocus', 'missionsUpdates', 'missionsTeams', 'missionsMetrics'
+];
+
+
+/**
+ * Copies all 8 missions collections from FS_PROJECT_ID (flockos-notify) to
+ * TRUTH_PROJECT_ID (flockos-truth) as top-level collections.
+ *
+ * Run from flockos-notify GAS whenever missions data changes.
+ * Docs are overwritten (not duplicated) — safe to re-run.
+ *
+ * Requires FIREBASE_SERVICE_ACCOUNT and TRUTH_SERVICE_ACCOUNT in Script Properties.
+ */
+function populateMissionsToTruth() {
+  var props = PropertiesService.getScriptProperties();
+  if (!props.getProperty('FIREBASE_SERVICE_ACCOUNT')) {
+    Logger.log('[MissionsToTruth] Skipping — FIREBASE_SERVICE_ACCOUNT not set.');
+    return 0;
+  }
+  if (!props.getProperty('TRUTH_SERVICE_ACCOUNT')) {
+    Logger.log('[MissionsToTruth] Skipping — TRUTH_SERVICE_ACCOUNT not set. Add service account JSON for flockos-truth.');
+    return 0;
+  }
+
+  var notifyToken = _getFirestoreAccessToken();   // reads from FS_PROJECT_ID (flockos-notify)
+  var truthToken  = _getTruthAccessToken();        // writes to TRUTH_PROJECT_ID (flockos-truth)
+
+  Logger.log('[MissionsToTruth] Copying missions: ' + FS_PROJECT_ID + ' → ' + TRUTH_PROJECT_ID);
+
+  var totalDocs = 0;
+
+  for (var c = 0; c < MISSIONS_COLLECTIONS_.length; c++) {
+    var collectionName = MISSIONS_COLLECTIONS_[c];
+
+    // Read from flockos-notify Firestore (top-level collection)
+    var docs = _firestoreListFromProject(FS_PROJECT_ID, collectionName, notifyToken);
+
+    if (!docs.length) {
+      Logger.log('[MissionsToTruth]   ⚠️  ' + collectionName + ': 0 docs in notify — skipping');
+      continue;
+    }
+
+    // Write to flockos-truth as top-level collection (same path, no church prefix)
+    var writes = [];
+    for (var d = 0; d < docs.length; d++) {
+      var doc = docs[d];
+      writes.push({
+        update: {
+          name: 'projects/' + TRUTH_PROJECT_ID + '/databases/(default)/documents/' +
+                collectionName + '/' + doc.id,
+          fields: doc.fields
+        }
+      });
+    }
+
+    // Batch commit to flockos-truth (max 450 per batch)
+    var committed = 0;
+    for (var i = 0; i < writes.length; i += 450) {
+      var batch = writes.slice(i, Math.min(i + 450, writes.length));
+      var url   = 'https://firestore.googleapis.com/v1/projects/' + TRUTH_PROJECT_ID +
+                  '/databases/(default)/documents:commit';
+      var resp  = UrlFetchApp.fetch(url, {
+        method: 'post',
+        contentType: 'application/json',
+        headers: { 'Authorization': 'Bearer ' + truthToken },
+        payload: JSON.stringify({ writes: batch }),
+        muteHttpExceptions: true
+      });
+      if (resp.getResponseCode() !== 200) {
+        Logger.log('[MissionsToTruth] Batch error: HTTP ' + resp.getResponseCode());
+        Logger.log(resp.getContentText().substring(0, 500));
+        throw new Error('populateMissionsToTruth batch commit failed for ' + collectionName);
+      }
+      committed += batch.length;
+    }
+
+    totalDocs += committed;
+    Logger.log('[MissionsToTruth]   ✅ ' + collectionName + ': ' + committed + ' docs → ' + TRUTH_PROJECT_ID);
+  }
+
+  Logger.log('[MissionsToTruth] ✅ Done — ' + totalDocs + ' missions docs written to ' + TRUTH_PROJECT_ID);
+  return totalDocs;
+}
+
+
+/**
+ * Convenience wrapper — seeds ALL shared content (truth + missions) from this
+ * flockos-notify GAS project to flockos-truth in a single call.
+ *
+ * Step 1 of the full seeding pipeline:
+ *   Run this from flockos-notify GAS  →  flockos-truth is now fully populated.
+ *   Then run replicateTruthFromMaster() from each church's GAS project to pull it down.
+ *
+ * Requires FIREBASE_SERVICE_ACCOUNT and TRUTH_SERVICE_ACCOUNT in Script Properties.
+ */
+function seedSharedContentToTruth() {
+  Logger.log('╔══════════════════════════════════════════════════════╗');
+  Logger.log('║   FlockOS — Seed Shared Content to flockos-truth     ║');
+  Logger.log('╚══════════════════════════════════════════════════════╝');
+  Logger.log('  Step 1 of 3: Truth content (12 collections from Sheet)…');
+  var truthDocs = populateTruthMaster();
+
+  Logger.log('  Step 2 of 3: Missions (8 collections from Firestore)…');
+  var missionsDocs = populateMissionsToTruth();
+
+  var grand = truthDocs + missionsDocs;
+  Logger.log('╔══════════════════════════════════════════════════════╗');
+  Logger.log('║  ✅ seedSharedContentToTruth complete                ║');
+  Logger.log('║     Truth docs   : ' + String(truthDocs).padStart(6)  + '                              ║');
+  Logger.log('║     Missions docs: ' + String(missionsDocs).padStart(6) + '                              ║');
+  Logger.log('║     Grand total  : ' + String(grand).padStart(6) + ' → ' + TRUTH_PROJECT_ID + '          ║');
+  Logger.log('╚══════════════════════════════════════════════════════╝');
+  Logger.log('  Next: run replicateTruthFromMaster() from flockos-theforest GAS.');
+  Logger.log('  Then: run replicateTruthFromMaster() from flockos-trinity GAS.');
+  return grand;
 }
 
 
