@@ -8,12 +8,12 @@
 
 // Resolve embed-about.html relative to this module's location.
 // This module is at Scripts/the_gospel/the_gospel_why.js,
-// so ../../embed-about.html → New_Covenant/embed-about.html.
+// so ../../app.embeds/embed-about.html → New_Covenant/app.embeds/embed-about.html.
 const _SRC = (() => {
   try {
-    return new URL('../../embed-about.html', import.meta.url).href;
+    return new URL('../../app.embeds/embed-about.html', import.meta.url).href;
   } catch (_) {
-    return './embed-about.html';
+    return '../../app.embeds/embed-about.html';
   }
 })();
 
