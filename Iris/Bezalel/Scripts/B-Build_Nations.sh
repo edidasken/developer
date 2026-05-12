@@ -215,6 +215,9 @@ if gas_only:
     )
     # Remove Firebase SDK <script> tags
     content = re.sub(r'[ \t]*<script[^>]+gstatic\.com/firebasejs[^>]*></script>\n?', '', content)
+    # Inject FLOCK_NO_FIREBASE flag so the_firebase_config.js returns null
+    if '<head>' in content:
+        content = content.replace('<head>', '<head>\n  <script>window.FLOCK_NO_FIREBASE = true;</script>', 1)
     print('  ✓ app.flockos.html Firebase stripped (GAS-only build)')
 elif isinstance(fb_obj, dict) and 'projectId' in fb_obj:
     # Church has its own Firebase project — patch the config block
@@ -261,6 +264,8 @@ else:
             content,
             flags=re.DOTALL
         )
+        if '<head>' in content:
+            content = content.replace('<head>', '<head>\n  <script>window.FLOCK_NO_FIREBASE = true;</script>', 1)
         print('  ✓ app.grow/app.grow.html Firebase stripped (GAS-only build)')
     else:
         try:
@@ -308,6 +313,8 @@ else:
             r'[ \t]*<script>\s*window\.FLOCK_FIREBASE_CONFIG\s*=\s*\{[^}]+\};\s*</script>\n?',
             '', content, flags=re.DOTALL)
         content = re.sub(r'[ \t]*<script[^>]+gstatic\.com/firebasejs[^>]*></script>\n?', '', content)
+        if '<head>' in content:
+            content = content.replace('<head>', '<head>\n  <script>window.FLOCK_NO_FIREBASE = true;</script>', 1)
         print('  ✓ app.embeds/embed-flockos.html Firebase stripped (GAS-only build)')
     else:
         try:
@@ -351,6 +358,8 @@ else:
             r'[ \t]*<script>\s*window\.FLOCK_FIREBASE_CONFIG\s*=\s*\{[^}]+\};\s*</script>\n?',
             '', content, flags=re.DOTALL)
         content = re.sub(r'[ \t]*<script[^>]+gstatic\.com/firebasejs[^>]*></script>\n?', '', content)
+        if '<head>' in content:
+            content = content.replace('<head>', '<head>\n  <script>window.FLOCK_NO_FIREBASE = true;</script>', 1)
         print('  ✓ app.embeds/embed-grow.html Firebase stripped (GAS-only build)')
     else:
         try:
@@ -394,6 +403,8 @@ else:
             r'[ \t]*<script>\s*window\.FLOCK_FIREBASE_CONFIG\s*=\s*\{[^}]+\};\s*</script>\n?',
             '', content, flags=re.DOTALL)
         content = re.sub(r'[ \t]*<script[^>]+gstatic\.com/firebasejs[^>]*></script>\n?', '', content)
+        if '<head>' in content:
+            content = content.replace('<head>', '<head>\n  <script>window.FLOCK_NO_FIREBASE = true;</script>', 1)
         print('  ✓ app.embeds/embed-stand.html Firebase stripped (GAS-only build)')
     else:
         try:
@@ -437,6 +448,8 @@ else:
             r'[ \t]*<script>\s*window\.FLOCK_FIREBASE_CONFIG\s*=\s*\{[^}]+\};\s*</script>\n?',
             '', content, flags=re.DOTALL)
         content = re.sub(r'[ \t]*<script[^>]+gstatic\.com/firebasejs[^>]*></script>\n?', '', content)
+        if '<head>' in content:
+            content = content.replace('<head>', '<head>\n  <script>window.FLOCK_NO_FIREBASE = true;</script>', 1)
         print('  ✓ app.invite/app.invite.html Firebase stripped (GAS-only build)')
     else:
         try:

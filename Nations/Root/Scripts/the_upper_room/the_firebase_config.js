@@ -30,6 +30,8 @@ const _SHARED_FALLBACK_CONFIG = {
 export function getConfig() {
   const inj = (typeof window !== 'undefined') ? window.FLOCK_FIREBASE_CONFIG : null;
   if (inj && inj.projectId) return inj;
+  // Respect explicit opt-out (e.g. GAS-only churches that don't use Firestore).
+  if (typeof window !== 'undefined' && window.FLOCK_NO_FIREBASE === true) return null;
   return _SHARED_FALLBACK_CONFIG;
 }
 
