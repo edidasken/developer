@@ -102,20 +102,25 @@ function _paintDetail(root) {
   const p = list.find((x, i) => String(x.name || i) === String(_state.selected));
   if (!p) return;
   const nm = p.name || '';
+  const refs = (p.reference || '').split(/[,;]/).map((v) => v.trim()).filter(Boolean);
+  const children = (p.children || '').split(/[,;]/).map((c) => c.trim()).filter(Boolean);
   det.innerHTML = /* html */`
     <div class="grow-gen-detail-head">
       <div class="grow-gen-avatar grow-gen-avatar--lg" aria-hidden="true">${esc(_initial(nm))}</div>
       <div>
-        <h2 class="grow-detail-title" style="margin:0 0 6px;">${esc(nm)}</h2>
-        ${p.title ? `<p class="grow-muted" style="margin:0;">${esc(p.title)}</p>` : ''}
+        <h2 class="grow-gen-name grow-gen-name--hero">${esc(nm)}</h2>
+        ${p.title ? `<p class="grow-gen-role grow-gen-role--hero">${esc(p.title)}</p>` : ''}
       </div>
     </div>
-    <div class="grow-lex-meta" style="margin:14px 0;">
-      ${p.lifespan  ? chip(p.lifespan + ' yrs', 'neutral') : ''}
-      ${p.reference ? chip(p.reference, 'level') : ''}
-      ${p.meaning   ? chip('Means: ' + p.meaning, 'topic') : ''}
+    <div class="gene-hero-badges grow-gen-badges">
+      ${p.lifespan ? `<span class="gene-hero-badge gene-hero-badge-gold">${esc(p.lifespan)}</span>` : ''}
+      ${p.meaning  ? `<span class="gene-hero-badge gene-hero-badge-accent">\u201c${esc(p.meaning)}\u201d</span>` : ''}
+      ${refs.length ? `<span class="gene-hero-badge">${esc(refs[0])}</span>` : ''}
     </div>
-    ${p.bio     ? `<p class="grow-detail-body">${esc(snip(p.bio, 1200))}</p>` : ''}
-    ${p.children ? `<h4 class="grow-detail-h4" style="margin:14px 0 6px; font-size:13px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted,#888);">Children</h4><p class="grow-detail-body">${esc(p.children)}</p>` : ''}
+    <div class="gene-sections">
+      ${p.bio ? `<div class="gene-section gene-section-lilac"><div class="gene-section-label">Biography</div><p>${esc(snip(p.bio, 1200))}</p></div>` : ''}
+      ${refs.length > 0 ? `<div class="gene-section gene-section-peach"><div class="gene-section-label">Scripture</div><div class="gene-ref-pills">${refs.map((v) => `<span class="gene-ref-pill">${esc(v)}</span>`).join('')}</div></div>` : ''}
+      ${children.length ? `<div class="gene-section gene-section-mint"><div class="gene-section-label">Children</div><p>${esc(children.join(', '))}</p></div>` : ''}
+    </div>
   `;
 }

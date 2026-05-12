@@ -1243,15 +1243,24 @@ const Modules = (() => {
 
     var html = '<div class="gene-fade-in">';
 
+    // ── Compute initials ──
+    var _nameParts = name.trim().split(/\s+/);
+    var _initials = _nameParts.length > 1
+      ? (_nameParts[0][0] + _nameParts[_nameParts.length - 1][0]).toUpperCase()
+      : (_nameParts[0][0] || '?').toUpperCase();
+
     // ── Hero header ──
-    html += '<div class="gene-hero">';
+    html += '<div class="gene-hero gene-hero--with-avatar">';
+    html += '<div class="gene-avatar-xl" aria-hidden="true">' + _e(_initials) + '</div>';
+    html += '<div class="gene-hero-body">';
     html += '<h2 class="gene-hero-name">' + _e(name) + '</h2>';
     if (title) html += '<p class="gene-hero-title">' + _e(title) + '</p>';
     html += '<div class="gene-hero-badges">';
     if (lifespan) html += '<span class="gene-hero-badge gene-hero-badge-gold">' + _e(lifespan) + '</span>';
     if (meaning)  html += '<span class="gene-hero-badge gene-hero-badge-accent">\u201C' + _e(meaning) + '\u201D</span>';
     html += '</div>';
-    html += '</div>';
+    html += '</div>'; // close gene-hero-body
+    html += '</div>'; // close gene-hero;
 
     // ── Sections ──
     html += '<div class="gene-sections">';
@@ -6672,7 +6681,15 @@ const Modules = (() => {
       const catOrder = [];
       rows.forEach(r => {
         const cat = r.category_title || r.categoryTitle || r['Category Title'] || 'General';
-        if (!cats[cat]) { cats[cat] = { intro: r.category_intro || r.categoryIntro || r['Category Intro'] || '', sections: [] }; catOrder.push(cat); }
+        if (!cats[cat]) {
+          cats[cat] = {
+            intro: r.category_intro || r.categoryIntro || r['Category Intro'] || '',
+            color: r.category_color || r.categoryColor || r['Category Color'] || '',
+            icon:  r.category_icon  || r.categoryIcon  || r['Category Icon']  || '',
+            sections: []
+          };
+          catOrder.push(cat);
+        }
         if (r.section_title || r.sectionTitle || r['Section Title'] || r.content || r['Content']) {
           cats[cat].sections.push(r);
         }
@@ -6697,11 +6714,11 @@ const Modules = (() => {
           (s.section_title || s.sectionTitle || s['Section Title'] || '') + ' ' +
           (s.content || s['Content'] || '')).join(' ')).toLowerCase();
 
-        html += '<details class="browse-item" data-search="' + _e(searchText) + '">';
+        html += '<details class="browse-item" data-search="' + _e(searchText) + '"' + (grp.color ? ' style="--cat-color:' + _e(grp.color) + '"' : '') + '>';
         html += '<summary class="browse-item-trigger">';
-        html += '<span class="browse-item-icon">&#9768;</span>';
+        html += '<span class="browse-item-icon">' + (grp.icon || '&#9768;') + '</span>';
         html += '<div style="flex:1;min-width:0;">';
-        html += '<span class="browse-item-title">' + _e(cat) + '</span>';
+        html += '<span class="browse-item-title"' + (grp.color ? ' style="color:var(--cat-color)"' : '') + '>' + _e(cat) + '</span>';
         html += '<span class="browse-item-sub" style="margin-left:8px;">' + grp.sections.length + ' statement' + (grp.sections.length !== 1 ? 's' : '') + '</span>';
         html += '</div>';
         html += '<span class="browse-item-chevron">&#9654;</span>';
@@ -6709,7 +6726,7 @@ const Modules = (() => {
 
         html += '<div class="browse-item-body">';
         if (grp.intro) {
-          html += '<div class="browse-detail-card browse-card-accent">';
+          html += '<div class="browse-detail-card browse-card-accent"' + (grp.color ? ' style="border-left-color:' + _e(grp.color) + '"' : '') + '>';
           html += '<div class="browse-detail-head"><span class="browse-detail-icon">&#128214;</span><span class="browse-detail-label">Overview</span></div>';
           html += '<div class="browse-detail-body">' + _paras(grp.intro) + '</div>';
           html += '</div>';
@@ -6718,7 +6735,7 @@ const Modules = (() => {
           const title   = s.section_title || s.sectionTitle || s['Section Title'] || '';
           const content = s.content || s['Content'] || '';
           if (!title && !content) return;
-          html += '<div class="browse-detail-card browse-card-gold">';
+          html += '<div class="browse-detail-card browse-card-gold"' + (grp.color ? ' style="border-left-color:' + _e(grp.color) + '"' : '') + '>';
           html += '<div class="browse-detail-head"><span class="browse-detail-icon">&#128220;</span><span class="browse-detail-label">' + _e(title || 'Statement') + '</span></div>';
           if (content) html += '<div class="browse-detail-body">' + _paras(content) + '</div>';
           html += '</div>';
