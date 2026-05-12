@@ -94,8 +94,9 @@ function _paint(root) {
 }
 
 function _item(q, idx) {
-  const num    = q.sortOrder || (idx + 1);
-  const qtitle = (q.questionTitle || q.question || '').replace(/^\d+\.\s*/, '');
+  const num        = q.sortOrder || (idx + 1);
+  const qtitle     = (q.questionTitle || q.question || '').replace(/^\d+\.\s*/, '');
+  const shortLabel = (q.shortTitle || q['Short Title'] || '').replace(/^\d+\.\s*/, '');
   const answer = q.answerContent || '';
   const quote  = q.quoteText || '';
   const ref    = q.referenceText || '';
@@ -108,6 +109,7 @@ function _item(q, idx) {
         <svg class="grow-apo-chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
       </button>
       <div class="grow-apo-body" hidden>
+        ${shortLabel && shortLabel !== qtitle ? `<p class="grow-apo-topic">${esc(shortLabel)}</p>` : ''}
         ${answer ? `<p class="grow-apo-answer">${esc(answer)}</p>` : ''}
         ${quote ? `<blockquote class="grow-apo-quote"><p>${esc(quote)}</p>${ref ? `<cite>${refUrl ? `<a href="${esc(refUrl)}" target="_blank" rel="noopener">${esc(ref)}</a>` : esc(ref)}</cite>` : ''}</blockquote>` : ''}
       </div>

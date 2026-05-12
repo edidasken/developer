@@ -6714,9 +6714,10 @@ const Modules = (() => {
         const cat = r.category_title || r.categoryTitle || r['Category Title'] || 'General';
         if (!cats[cat]) {
           cats[cat] = {
-            intro: r.category_intro || r.categoryIntro || r['Category Intro'] || '',
-            color: r.category_color || r.categoryColor || r['Category Color'] || '',
-            icon:  r.category_icon  || r.categoryIcon  || r['Category Icon']  || '',
+            intro:    r.category_intro    || r.categoryIntro    || r['Category Intro']    || '',
+            subtitle: r.category_subtitle || r.categorySubtitle || r['Category Subtitle'] || '',
+            color:    r.category_color    || r.categoryColor    || r['Category Color']    || '',
+            icon:     r.category_icon     || r.categoryIcon     || r['Category Icon']     || '',
             sections: []
           };
           catOrder.push(cat);
@@ -6750,7 +6751,7 @@ const Modules = (() => {
         html += '<span class="browse-item-icon">' + (grp.icon || '&#9768;') + '</span>';
         html += '<div style="flex:1;min-width:0;">';
         html += '<span class="browse-item-title"' + (grp.color ? ' style="color:var(--cat-color)"' : '') + '>' + _e(cat) + '</span>';
-        html += '<span class="browse-item-sub" style="margin-left:8px;">' + grp.sections.length + ' statement' + (grp.sections.length !== 1 ? 's' : '') + '</span>';
+        html += '<span class="browse-item-sub" style="margin-left:8px;">' + (grp.subtitle || (grp.sections.length + ' statement' + (grp.sections.length !== 1 ? 's' : ''))) + '</span>';
         html += '</div>';
         html += '<span class="browse-item-chevron">&#9654;</span>';
         html += '</summary>';

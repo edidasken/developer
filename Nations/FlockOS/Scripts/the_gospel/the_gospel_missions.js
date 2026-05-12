@@ -33,6 +33,16 @@ function _pct(val) {
   return (+val).toFixed(1) + '%';
 }
 
+function _fmtPop(val) {
+  if (!val) return '';
+  const n = +val;
+  if (isNaN(n)) return String(val);
+  if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
+  if (n >= 1_000_000)     return (n / 1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000)         return (n / 1_000).toFixed(0) + 'K';
+  return String(n);
+}
+
 function _filtered() {
   const q = _state.query.toLowerCase().trim();
   return _state.nations.filter(n => {
@@ -56,9 +66,11 @@ export function render() {
         .ms-focus { background:var(--surface-raised,#fff); border-radius:16px; padding:20px 20px 16px; margin:0 0 24px; box-shadow:0 2px 14px rgba(0,0,0,0.08); border:1.5px solid rgba(5,150,105,.12); }
         .ms-focus-flag { font-size:3rem; line-height:1; display:block; margin-bottom:10px; }
         .ms-focus-name { font:700 1.25rem var(--font-ui); color:var(--ink,#1a1d2e); margin:0 0 2px; }
-        .ms-focus-region { font:0.8rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin:0 0 12px; }
-        .ms-focus-meta { display:flex; flex-wrap:wrap; gap:7px; margin:0 0 14px; }
+        .ms-focus-region { font:0.8rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin:0 0 4px; }
+        .ms-focus-detail { font:0.8rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin:0 0 4px; }
+        .ms-focus-meta { display:flex; flex-wrap:wrap; gap:7px; margin:12px 0 14px; }
         .ms-stat-pill { background:var(--surface,#f4f5f9); border-radius:20px; padding:4px 12px; font:0.78rem var(--font-ui); color:var(--ink-sub,#4a4f68); }
+        .ms-stat-pill--warn { background:rgba(234,88,12,.08); color:#c2410c; }
         .ms-prayer-box { background:linear-gradient(135deg,rgba(5,150,105,.07),rgba(5,150,105,.02)); border-left:3px solid #059669; border-radius:0 10px 10px 0; padding:12px 14px; font:0.87rem/1.65 var(--font-body,sans-serif); color:var(--ink,#1a1d2e); margin:0 0 16px; }
         .ms-prayer-label { font:600 0.7rem var(--font-ui); letter-spacing:.07em; text-transform:uppercase; color:#059669; margin:0 0 6px; }
         .ms-pray-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; background:#059669; color:#fff; border:none; border-radius:20px; font:600 0.83rem var(--font-ui); cursor:pointer; transition:background .15s; }
@@ -158,11 +170,15 @@ function _paint(view) {
       <span class="ms-focus-flag">${featured.icon || '🌍'}</span>
       <h2 class="ms-focus-name">${esc(featured.countryName)}</h2>
       <p class="ms-focus-region">${esc(featured.region || '')}</p>
+      ${featured.capital ? `<p class="ms-focus-detail">📍 ${esc(featured.capital)}</p>` : ''}
+      ${featured.population ? `<p class="ms-focus-detail">👥 Pop. ${_fmtPop(featured.population)}</p>` : ''}
       <div class="ms-focus-meta">
         ${featured.gospelAccess ? `<span class="ms-badge ${_accessClass(featured.gospelAccess)}">${esc(featured.gospelAccess)} Access</span>` : ''}
         ${evPct ? `<span class="ms-stat-pill">⛪ ${evPct} Evangelical</span>` : ''}
+        ${_pct(featured.christianPercent) ? `<span class="ms-stat-pill">✝️ ${_pct(featured.christianPercent)} Christian</span>` : ''}
         ${featured.unreachedGroups != null ? `<span class="ms-stat-pill">👥 ${featured.unreachedGroups} unreached groups</span>` : ''}
         ${featured.tenFortyWindow ? `<span class="ms-stat-pill">🕊 10/40 Window</span>` : ''}
+        ${featured.persecutionLabel ? `<span class="ms-stat-pill ms-stat-pill--warn">⚠️ ${esc(featured.persecutionLabel)}</span>` : ''}
       </div>
       ${prayer ? /* html */`
         <div class="ms-prayer-box">
@@ -266,6 +282,10 @@ function _cardHTML(n) {
         ${evPct ? `<span class="ms-stat-pill" style="font-size:.7rem;padding:2px 8px;">${evPct} Evangelical</span>` : ''}
       </div>
       <div class="ms-expand">
+        ${n.capital    ? `<p class="ms-expand-stat">📍 Capital: ${esc(n.capital)}</p>` : ''}
+        ${n.population ? `<p class="ms-expand-stat">👥 Pop. ${_fmtPop(n.population)}</p>` : ''}
+        ${_pct(n.christianPercent) ? `<p class="ms-expand-stat">✝️ ${_pct(n.christianPercent)} Christian</p>` : ''}
+        ${n.persecutionLabel ? `<p class="ms-expand-stat">⚠️ ${esc(n.persecutionLabel)}</p>` : ''}
         ${n.unreachedGroups != null ? `<p class="ms-expand-stat"><strong>${n.unreachedGroups}</strong> unreached people group${n.unreachedGroups !== 1 ? 's' : ''}${n.totalPeopleGroups ? ` of ${n.totalPeopleGroups} total` : ''}</p>` : ''}
         ${n.tenFortyWindow ? `<p class="ms-expand-stat" style="color:#059669;">🕊 In the 10/40 Window</p>` : ''}
         ${prayer ? /* html */`

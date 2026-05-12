@@ -14004,6 +14004,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .grow-apo-body  { padding:4px 16px 18px 56px; }
 @media (max-width:600px) { .grow-apo-body { padding:4px 14px 16px 14px; } }
 .grow-apo-answer { font-size:14px; line-height:1.65; color:var(--text,#d8d8d8); margin:0 0 14px; }
+.grow-apo-topic  { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--apo-color); margin:0 0 10px; opacity:.8; }
 .grow-apo-quote {
   margin:0; padding:12px 16px;
   border-left:3px solid var(--apo-color);
@@ -14798,6 +14799,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .grow-theology-hero { --cat-color:#c2410c; display:flex; align-items:flex-start; gap:16px; margin-bottom:20px; padding:16px 18px; border-radius:12px; background:color-mix(in srgb, var(--cat-color) 10%, transparent); border:1px solid color-mix(in srgb, var(--cat-color) 22%, transparent); }
 .grow-theology-icon { font-size:36px; line-height:1; flex-shrink:0; }
 .grow-theology-title { margin:0 0 4px; font-size:20px; font-weight:700; color:var(--cat-color); }
+.grow-theology-subtitle { margin:0 0 6px; font-size:13px; color:color-mix(in srgb, var(--cat-color) 70%, var(--muted,#aaa)); font-style:italic; line-height:1.4; }
 .grow-doctrine { --doctrine-color:var(--grow-accent,#c2410c); padding:14px 0 14px 12px; border-top:1px solid var(--border,rgba(255,255,255,.06)); border-left:3px solid color-mix(in srgb, var(--doctrine-color) 35%, transparent); margin-bottom:6px; }
 .grow-doctrine:first-of-type { border-left-color:var(--doctrine-color); }
 .grow-doctrine-title { margin:0 0 6px; font-size:16px; font-weight:600; color:var(--text,#f5f5f7); }

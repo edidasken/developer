@@ -166,6 +166,7 @@ function _paintDetail(root) {
       ${cat.icon ? `<span class="grow-theology-icon">${esc(cat.icon)}</span>` : ''}
       <div>
         <h2 class="grow-theology-title">${esc(_friendlyTitle(cat.title || cat.name || ''))}</h2>
+        ${cat.subtitle ? `<p class="grow-theology-subtitle">${esc(cat.subtitle)}</p>` : ''}
         ${cat.description ? `<div class="grow-detail-sub">${mdInline(cat.description)}</div>` : ''}
       </div>
     </div>
