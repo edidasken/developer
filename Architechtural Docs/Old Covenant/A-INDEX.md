@@ -21,37 +21,37 @@ Role: Documentation for the legacy FlockOS platform (Covenant/). Historical refe
 
 ## Architecture/
 
-Design and operational documents covering the full lifecycle of the legacy platform.
+Design and operational documents covering the full lifecycle of the legacy Covenant platform.
 
 | File | Purpose |
 |------|---------|
-| `A-Table of Contents.md` | Master table of contents |
-| `A-Plan for New Covenant.md` | Bridge document — the plan that initiated the New Covenant rewrite |
-| `AA-Project Support Pitch.md` | Project support pitch document |
-| `B-In Order to Send.md` | Sending and deployment prerequisites |
-| `C-Self-Hosting Guide.md` | Self-hosting setup guide |
-| `D-Deployment and Connection.md` | Deployment and Firebase connection guide |
-| `E-Bezalel Dependencies.md` | Bezalel script dependencies |
-| `F-Sync Secrets.md` | Secrets sync procedures |
-| `G-Verified Endpoints.md` | Verified API and Firebase endpoints |
-| `H-End to End Plan.md` | End-to-end architecture plan |
-| `I-Firestore Reduction.md` | Firestore data reduction strategy |
-| `J-Firestore Rules.md` | Firestore security rules documentation |
-| `K-Flock Docs.md` | Flock platform documentation |
-| `P-Master Cleanup FlockOS.md` | Master cleanup and refactor log |
-| `Q-The 150 Plan.md` | The 150-church growth plan |
-| `R-Permissions Plan.md` | Role and permissions plan |
-| `S-FlockChat.md` | FlockChat architecture notes |
-| `T-Permissions Audit.md` | Permissions audit results |
-| `U-Workflows.md` | Operational workflows |
-| `V-Bezalel.html` | Bezalel build dashboard (HTML) |
-| `V-Covenant-v1.0-Release.md` | Covenant v1.0 release notes |
-| `V-Covenant-v1.1-Release.md` | Covenant v1.1 release notes |
-| `W-Timeline.md` | Project timeline |
-| `X-Action Items.md` | Outstanding action items |
-| `Y-Debugging Issues.md` | Debugging history and known issues |
-| `Z-Project Documents.md` | Supporting project documents |
-| `Z-Variance.md` | Variance log (planned vs. actual) |
+| `A-Table of Contents.md` | Master table of contents and full file index for all Covenant architecture docs (updated April 2026 after archive cleanup) |
+| `A-Plan for New Covenant.md` | Scope document for the New Covenant rewrite — ES module architecture, entry point, contract registry, domain modules |
+| `AA-Project Support Pitch.md` | Missionary support pitch for FlockOS — the vision, the problem (fragmented church software), and the stewardship case |
+| `B-In Order to Send.md` | Succession document — everything that must be done technically, spiritually, and practically before FlockOS can live on without its builder |
+| `C-Self-Hosting Guide.md` | How to host FlockOS independently for your own church using GAS + Sheets + GitHub Pages + Firebase (cost: $0 for most churches) |
+| `D-Deployment and Connection.md` | As-built v1.0 deployment guide — build script, launcher layout, app links, CSS source of truth, church config requirements, root and church deployment paths |
+| `E-Bezalel Dependencies.md` | As-built v1.0 Bezalel build system — what Bezalel is, how it works, dependencies, codex files, and the A-Build_Churches.sh pipeline |
+| `F-Sync Secrets.md` | GAS `SYNC_SECRET` values and Sheet IDs for all church deployments (FlockOS, TBC, TheForest, GAS) — set in Script Properties |
+| `G-Verified Endpoints.md` | Live GAS web app URLs and Firebase configs for all church deployments (FlockOS, TBC, TheForest, GAS) |
+| `H-End to End Plan.md` | As-built v1.0 end-to-end architecture — single-source-of-truth model, canonical source locations, build pipeline, config requirements |
+| `I-Firestore Reduction.md` | Firestore read reduction plan — project mapping per church, analysis of `the_upper_room.js` (~154 `.get()` calls, 6 listeners), optimization strategy |
+| `J-Firestore Rules.md` | As-built v1.0 Firestore security rules — per-church project model (no `churches/{id}` nesting), deploy instructions, canonical rules source |
+| `K-Flock Docs.md` | FlockOS: The Complete Guide — full multi-chapter documentation of the platform vision, architecture, modules, deployment, security, and operational continuity |
+| `P-Master Cleanup FlockOS.md` | GAS Google Sheets cleanup scripts — `DeleteUnknownTabs.gs` with `CLEAN_GAS`, `STRIP_TO_FIRESTORE`, and migration modes |
+| `Q-The 150 Plan.md` | The 150/100 roadmap — scored improvement plan for FlockOS v3.17 (created April 12, 2026) |
+| `R-Permissions Plan.md` | As-built v3.5 AccessControl Groups reference — Column D values, granular `MODULE_PERMISSIONS` in GAS, all modules implemented |
+| `S-FlockChat.md` | FlockChat build plan — real-time team messaging for the church, HipChat-inspired, backed by flockos-comms Firebase project |
+| `T-Permissions Audit.md` | As-built permissions audit (April 13, 2026) — RBAC role definitions from `the_cornerstone.js`, `firm_foundation.js`, `the_tabernacle.js` |
+| `U-Workflows.md` | Church operational workflows — Elder Care workflow and others for coordinating sustained church support |
+| `V-Bezalel.html` | Bezalel build dashboard (HTML) — in-browser tool for viewing and deploying GAS source code |
+| `V-Covenant-v1.0-Release.md` | Covenant v1.0 release notes — as-built documentation update summary, links to all canonical architecture docs |
+| `V-Covenant-v1.1-Release.md` | Covenant v1.1 release notes — builds on v1.0 architecture foundation, updated canonical docs |
+| `W-Timeline.md` | Project timeline — detailed day-by-day build log (April 14–24, 2026) covering FlockChat integration, multi-church build system, UI/UX overhaul |
+| `X-Action Items.md` | Open backend/frontend gap items — prioritized implementation task list (last updated April 21, 2026, v3.17) |
+| `Y-Debugging Issues.md` | Debugging checklist for any church deployment — how to test, what to capture in `[FLOCK-DEBUG]` console output, how to report issues |
+| `Z-Project Documents.md` | Comprehensive file index of the entire FlockOS master project — use as checklist for site-wide updates (last audited April 21, 2026, v3.17) |
+| `Z-Variance.md` | Complete schema audit — variance between Covenant and New_Covenant runtime Firestore contracts, sync maps, camelCase field maps, and UI payload schemas |
 
 ---
 
