@@ -32,6 +32,13 @@ export function getConfig() {
   if (inj && inj.projectId) return inj;
   // Respect explicit opt-out (e.g. GAS-only churches that don't use Firestore).
   if (typeof window !== 'undefined' && window.FLOCK_NO_FIREBASE === true) return null;
+  // Only Root (id: 'flockos') is permitted to fall back to the shared flockos-notify project.
+  // Any other church without its own config gets null and a warning — never someone else's data.
+  const churchId = (typeof window !== 'undefined') ? (window.FLOCK_CHURCH_ID || '') : '';
+  if (churchId && churchId !== 'flockos') {
+    console.warn('[FlockOS] Firebase config not set for church "' + churchId + '". A Firebase project must be configured before Firestore will work.');
+    return null;
+  }
   return _SHARED_FALLBACK_CONFIG;
 }
 

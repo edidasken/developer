@@ -91,6 +91,7 @@ for entry in "${CHURCHES[@]}"; do
   # Read config values
   DB_URL=$(jq -r '.databaseUrl' "$CFG")
   CHURCH_NAME=$(jq -r '.name' "$CFG")
+  CHURCH_ID=$(jq -r '.id' "$CFG")
   SHORT_NAME=$(jq -r '.shortName' "$CFG")
   THEME_COLOR=$(jq -r '.themeColor // "#e8a838"' "$CFG")
   BG_COLOR=$(jq -r '.backgroundColor // "#0c1445"' "$CFG")
@@ -143,6 +144,7 @@ PYEOF
 
   # ── 4. Patch app.flockos/manifest.json — name / branding ─────────
   export _NC_CHURCH_NAME="$CHURCH_NAME"
+  export _NC_CHURCH_ID="$CHURCH_ID"
   export _NC_SHORT_NAME="$SHORT_NAME"
   export _NC_THEME_COLOR="$THEME_COLOR"
   export _NC_BG_COLOR="$BG_COLOR"
@@ -176,6 +178,7 @@ import os, json, re
 
 t          = os.environ['_NC_TARGET']
 name       = os.environ['_NC_CHURCH_NAME']
+church_id  = os.environ.get('_NC_CHURCH_ID', '')
 fb_raw     = os.environ['_NC_FB_CONFIG']
 path       = t + '/app.flockos/app.flockos.html'
 
@@ -191,6 +194,14 @@ content = re.sub(
     rf'\g<1>{name}\g<2>',
     content
 )
+
+# Inject FLOCK_CHURCH_ID so the_firebase_config.js can enforce project isolation
+if church_id and '<head>' in content:
+    content = content.replace(
+        '<head>',
+        f'<head>\n  <script>window.FLOCK_CHURCH_ID = "{church_id}";</script>',
+        1
+    )
 
 # Handle Firebase config / GAS-only stripping
 gas_only = os.environ.get('_NC_GAS_ONLY', 'false').strip().lower() == 'true'
