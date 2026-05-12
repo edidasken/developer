@@ -139,12 +139,15 @@ function _paint(root) {
     catEl.innerHTML = emptyState({ icon: '☩', title: 'No theology entries yet', body: 'Ask your shepherd to seed the doctrine map.' });
     return;
   }
-  catEl.innerHTML = _state.tree.map((c) => `
-    <button class="grow-cat ${_state.openId === c.id ? 'is-active' : ''}" data-cat="${esc(c.id)}">
+  catEl.innerHTML = _state.tree.map((c) => {
+    const color = c.colorVar || '';
+    return `
+    <button class="grow-cat ${_state.openId === c.id ? 'is-active' : ''}" data-cat="${esc(c.id)}"${color ? ` style="--cat-color:${esc(color)}"` : ''}>
+      ${c.icon ? `<span class="grow-cat-icon">${esc(c.icon)}</span>` : ''}
       <span class="grow-cat-title">${esc(_friendlyTitle(c.title || c.name || 'Untitled'))}</span>
       ${c.sections ? `<span class="grow-cat-count">${c.sections.length}</span>` : ''}
-    </button>
-  `).join('');
+    </button>`;
+  }).join('');
   catEl.querySelectorAll('[data-cat]').forEach((btn) => {
     btn.addEventListener('click', () => { _state.openId = btn.getAttribute('data-cat'); _paint(root); _paintDetail(root); });
   });
@@ -157,17 +160,24 @@ function _paintDetail(root) {
   const cat = _state.tree.find((c) => c.id === _state.openId);
   if (!cat) { detEl.innerHTML = `<p class="grow-muted">Category not found.</p>`; return; }
   const sections = cat.sections || [];
+  const color = cat.colorVar || accent;
   detEl.innerHTML = /* html */`
-    <h2 class="grow-detail-title">${esc(_friendlyTitle(cat.title || cat.name || ''))}</h2>
-    ${cat.description ? `<div class="grow-detail-sub">${mdInline(cat.description)}</div>` : ''}
-    ${sections.length ? sections.map(_section).join('') : `<p class="grow-muted">No sections in this category yet.</p>`}
+    <div class="grow-theology-hero" style="--cat-color:${esc(color)}">
+      ${cat.icon ? `<span class="grow-theology-icon">${esc(cat.icon)}</span>` : ''}
+      <div>
+        <h2 class="grow-theology-title">${esc(_friendlyTitle(cat.title || cat.name || ''))}</h2>
+        ${cat.description ? `<div class="grow-detail-sub">${mdInline(cat.description)}</div>` : ''}
+      </div>
+    </div>
+    ${sections.length ? sections.map((s) => _section(s, color)).join('') : `<p class="grow-muted">No sections in this category yet.</p>`}
   `;
 }
 
-function _section(s) {
-  const scriptures = (s.scriptures || []).map((r) => `<span class="grow-scripture">${esc(typeof r === 'string' ? r : (r.reference || r.ref || ''))}</span>`).join('');
+function _section(s, catColor) {
+  const color = catColor || accent;
+  const scriptures = (s.scriptures || []).map((r) => `<span class="grow-scripture" style="--doc-color:${esc(color)}">${esc(typeof r === 'string' ? r : (r.reference || r.ref || ''))}</span>`).join('');
   return /* html */`
-    <article class="grow-doctrine">
+    <article class="grow-doctrine" style="--doctrine-color:${esc(color)}">
       <h3 class="grow-doctrine-title">${esc(s.title || '')}</h3>
       ${s.description ? `<div class="grow-doctrine-body">${mdInline(snip(stripHtml(s.description), 600))}</div>` : ''}
       ${scriptures ? `<div class="grow-scriptures">${scriptures}</div>` : ''}

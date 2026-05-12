@@ -119,18 +119,26 @@ function _paintDetail(root) {
   const list = _filtered();
   const w = list.find((x, i) => String(x.id || i) === String(_state.selectedId));
   if (!w) return;
+  const testament = w.Testament || '';
+  const isGreek  = testament.toLowerCase().includes('new') || testament.toLowerCase().includes('greek');
+  const lang     = isGreek ? 'Greek' : 'Hebrew';
+  const langColor = isGreek ? '#0891b2' : '#7c3aed';
   det.innerHTML = /* html */`
-    <h2 class="grow-detail-title">${esc(w.English || w.english || '')}</h2>
-    <div class="grow-lex-meta">
-      ${w.Original    ? `<span class="grow-lex-original">${esc(w.Original)}</span>` : ''}
-      ${w.Transliteration ? chip(w.Transliteration, 'neutral') : ''}
-      ${w["Strong's"] ? chip("Strong's " + w["Strong's"], 'neutral') : ''}
-      ${w.Testament   ? chip(w.Testament, 'level') : ''}
+    <div class="grow-lex-hero" style="--lex-color:${langColor}">
+      ${w.Original ? `<div class="grow-lex-big-word">${esc(w.Original || w.original || '')}</div>` : ''}
+      <div class="grow-lex-hero-text">
+        <h2 class="grow-lex-english">${esc(w.English || w.english || '')}</h2>
+        ${w.Transliteration ? `<p class="grow-lex-transliteration">/${esc(w.Transliteration)}/</p>` : ''}
+      </div>
     </div>
-    ${w.Definition ? `<p class="grow-detail-body">${esc(snip(w.Definition, 600))}</p>` : ''}
+    <div class="grow-lex-meta">
+      ${w["Strong's"] ? chip("Strong's " + w["Strong's"], 'neutral') : ''}
+      ${w.Testament   ? chip(lang, 'level') : ''}
+      ${w.Theme       ? chip(w.Theme, 'topic') : ''}
+    </div>
+    ${w.Definition ? `<h4 class="grow-detail-h4">Definition</h4><p class="grow-detail-body">${esc(snip(w.Definition, 600))}</p>` : ''}
     ${w.Nuance     ? `<h4 class="grow-detail-h4">Nuance</h4><p class="grow-detail-body">${esc(snip(w.Nuance, 400))}</p>` : ''}
-    ${w.Verses     ? `<h4 class="grow-detail-h4">Where it appears</h4><p class="grow-detail-body">${esc(w.Verses)}</p>` : ''}
-    ${w.Theme      ? `<p class="grow-muted">Theme: ${esc(w.Theme)}</p>` : ''}
+    ${w.Verses     ? `<h4 class="grow-detail-h4">Verse appearances</h4><p class="grow-detail-body">${esc(w.Verses)}</p>` : ''}
   `;
 }
 

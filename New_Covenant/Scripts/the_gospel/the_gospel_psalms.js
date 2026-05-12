@@ -68,48 +68,42 @@ export function mount(root) {
         const searchText = (section.theme + ' ' + (section.intro || '') + ' ' +
           section.psalms.map(p => p.number + ' ' + p.title).join(' ')).toLowerCase();
         if (q && searchText.indexOf(q) === -1) return;
-        html += `<details style="margin-bottom:8px;border:1px solid var(--line);border-radius:8px;overflow:hidden;">`;
-        html += `<summary style="padding:12px 16px;background:var(--bg-raised);cursor:pointer;
-font-weight:700;font-size:0.88rem;border-left:4px solid ${color};display:flex;align-items:center;gap:8px;">
-${esc(section.theme)} <span style="font-size:0.75rem;color:var(--ink-muted);font-weight:400;">(&times;${section.psalms.length})</span></summary>`;
-        html += `<div style="padding:14px 16px;">`;
-        if (section.intro) {
-          html += `<div style="background:var(--bg-raised);border-radius:6px;padding:8px 12px;
-margin-bottom:12px;font-size:0.8rem;font-style:italic;color:var(--ink-muted);">${esc(section.intro)}</div>`;
-        }
-        html += `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">`;
+        html += `<div class="grow-psalm-section" style="--psalm-color:${color}">`;
+        html += `<button class="grow-psalm-head" type="button" onclick="(function(btn){var sec=btn.closest('.grow-psalm-section');var open=sec.classList.toggle('is-open');sec.querySelector('.grow-psalm-body').hidden=!open;})(this)">`;
+        html += `<span class="grow-psalm-label"><span class="grow-psalm-theme">${esc(section.theme)}</span><span class="grow-psalm-count">${section.psalms.length} psalm${section.psalms.length !== 1 ? 's' : ''}</span></span>`;
+        html += `<svg class="grow-psalm-chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>`;
+        html += `</button>`;
+        html += `<div class="grow-psalm-body" hidden>`;
+        if (section.intro) html += `<p class="grow-psalm-intro">${esc(section.intro)}</p>`;
+        html += `<div class="grow-psalm-chips">`;
         section.psalms.forEach(p => {
-          html += `<span style="display:inline-block;padding:3px 10px;border-radius:12px;
-background:${color}22;border:1px solid ${color}55;font-size:0.78rem;font-weight:600;color:var(--ink);"
-title="${esc(p.title)}">¶ ${esc(p.display)}</span>`;
+          html += `<span class="grow-psalm-chip" title="${esc(p.title)}">¶ ${esc(p.display)}</span>`;
         });
-        html += `</div>`;
+        html += `</div><div class="grow-psalm-rows">`;
         section.psalms.forEach(p => {
-          html += `<div style="padding:6px 0;border-top:1px solid var(--line);display:flex;gap:8px;align-items:baseline;">
-<span style="font-weight:700;font-size:0.8rem;min-width:40px;color:${color};">¶ ${esc(p.display)}</span>
-<span style="font-size:0.82rem;color:var(--ink-muted);">${esc(p.title)}</span></div>`;
+          html += `<div class="grow-psalm-row"><span class="grow-psalm-num">¶ ${esc(p.display)}</span><span class="grow-psalm-title">${esc(p.title)}</span></div>`;
         });
-        html += `</div></details>`;
+        html += `</div></div></div>`;
       });
     } else {
+      html += `<div class="grow-psalm-number-list">`;
       byNumber.forEach(p => {
         const searchText = (p.number + ' ' + p.display + ' ' + p.types.join(' ') + ' ' + p.title).toLowerCase();
         if (q && searchText.indexOf(q) === -1) return;
         const typeHtml = p.types.map(t => {
-          const c = _themeColor(t);
-          return `<span style="font-size:0.72rem;padding:2px 7px;border-radius:10px;
-background:${c}22;border:1px solid ${c}55;color:var(--ink);white-space:nowrap;">${esc(t)}</span>`;
+          return `<span class="grow-psalm-type" style="--type-color:${_themeColor(t)}">${esc(t)}</span>`;
         }).join('');
-        html += `<div style="padding:10px 14px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;">
-<span style="font-weight:700;font-size:0.85rem;min-width:70px;color:${accent};">Psalm ${esc(p.display)}</span>
-<span style="font-size:0.85rem;flex:1;">${esc(p.title)}</span>
-${typeHtml ? `<span style="display:flex;gap:4px;flex-wrap:wrap;">${typeHtml}</span>` : ''}
-</div>`;
+        html += `<div class="grow-psalm-row grow-psalm-row--num" style="--psalm-color:${_themeColor(p.types[0] || '')}">`;
+        html += `<span class="grow-psalm-num">Psalm ${esc(p.display)}</span>`;
+        html += `<span class="grow-psalm-title grow-psalm-title--num">${esc(p.title)}</span>`;
+        if (typeHtml) html += `<div class="grow-psalm-types">${typeHtml}</div>`;
+        html += `</div>`;
       });
+      html += `</div>`;
     }
 
-    if (!html) {
-      html = `<div style="padding:40px;text-align:center;color:var(--ink-muted);">No psalms matched your search.</div>`;
+    if (!html || html === '<div class="grow-psalm-number-list"></div>') {
+      html = `<p class="grow-muted" style="padding:30px;text-align:center;">No psalms matched your search.</p>`;
     }
     gridEl.innerHTML = html;
   }
@@ -132,7 +126,7 @@ ${typeHtml ? `<span style="display:flex;gap:4px;flex-wrap:wrap;">${typeHtml}</sp
     _data = mod.default || {};
     _paint();
   }).catch(() => {
-    gridEl.innerHTML = `<div style="padding:40px;text-align:center;color:var(--ink-muted);">Psalms data could not be loaded.</div>`;
+    gridEl.innerHTML = `<p class="grow-muted" style="padding:30px;text-align:center;">Psalms data could not be loaded.</p>`;
   });
 
   return () => {};

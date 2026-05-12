@@ -191,23 +191,23 @@ function _detailHtml(item) {
   const scrips  = _parseScriptures(item.Scriptures || item.scriptures || '');
   const steps   = _parseSteps(item.Steps || item.steps || '');
   let h = '';
-  if (def) h += `<p class="grow-detail-body" style="margin:8px 0 16px;font-size:15px;line-height:1.55;">${esc(def)}</p>`;
+  if (def) h += `<p class="grow-counsel-def">${esc(def)}</p>`;
   if (scrips.length) {
-    h += `<div class="grow-detail-h4" style="color:${esc(color)};font-size:14px;letter-spacing:.04em;">📖 Scripture Foundation</div>`;
+    h += `<div class="grow-counsel-section-head" style="--counsel-color:${esc(color)}"><span class="grow-counsel-section-icon">📖</span> Scripture Foundation</div>`;
     scrips.forEach((s) => {
-      h += `<div style="padding:8px 0; border-top:1px solid var(--line, #e5e7ef);">`;
-      if (s.ref)  h += `<div style="font-weight:600; color:${esc(color)}; font-size:15px;">${bibleLink(s.ref)}</div>`;
-      if (s.text) h += `<div style="font-style:italic; color:var(--ink, #1b264f); font-size:15px; line-height:1.5; margin-top:3px;">“${esc(s.text)}”</div>`;
+      h += `<div class="grow-counsel-scripture" style="--counsel-color:${esc(color)}">`;
+      if (s.ref)  h += `<div class="grow-counsel-ref">${bibleLink(s.ref)}</div>`;
+      if (s.text) h += `<div class="grow-counsel-verse">“${esc(s.text)}”</div>`;
       h += `</div>`;
     });
   }
   if (steps.length) {
-    h += `<div class="grow-detail-h4" style="color:${esc(color)}; margin-top:18px;font-size:14px;letter-spacing:.04em;">💡 Faith Response Steps</div>`;
-    h += `<ol style="padding-left:22px; margin:8px 0; color:var(--ink, #1b264f); font-size:15px; line-height:1.6;">`;
-    steps.forEach((s) => { h += `<li style="margin:6px 0;">${esc(s)}</li>`; });
+    h += `<div class="grow-counsel-section-head" style="--counsel-color:${esc(color)}"><span class="grow-counsel-section-icon">💡</span> Faith Response Steps</div>`;
+    h += `<ol class="grow-counsel-steps">`;
+    steps.forEach((s) => { h += `<li>${esc(s)}</li>`; });
     h += `</ol>`;
   }
-  if (!h) h = `<div class="grow-muted" style="padding:8px 0;font-size:15px;">No details available.</div>`;
+  if (!h) h = `<p class="grow-muted" style="padding:8px 0;">No details available.</p>`;
   return h;
 }
 
