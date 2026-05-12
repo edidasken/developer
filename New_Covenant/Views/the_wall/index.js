@@ -3793,14 +3793,6 @@ async function _vcfImportSelected(root, btn) {
   }
 }
 
-  btn.disabled = false; btn.innerHTML = orig;
-
-  // Uncheck all if no failures
-  if (!failed) {
-    checkboxes.forEach(cb => { cb.checked = false; });
-  }
-}
-
 /* ══════════════════════════════════════════════════════════════════════════
    MEMBER DE-DUPLICATION
    ══════════════════════════════════════════════════════════════════════════ */
