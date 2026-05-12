@@ -29372,11 +29372,15 @@ function _resolveFirestoreChurchId() {
  */
 var SYNC_COLLECTIONS = {
 
+  // ── PEOPLE ──────────────────────────────────────────────────────────────────
+
   members: {
     tab: 'Members',
     fields: [
-      'memberPin', 'firstName', 'lastName', 'preferredName', 'suffix',
-      'dateOfBirth', 'gender', 'photoUrl', 'primaryEmail', 'secondaryEmail',
+      'id', 'memberPin', 'memberNumber',
+      'firstName', 'lastName', 'preferredName', 'suffix',
+      'dateOfBirth', 'gender', 'photoUrl',
+      'primaryEmail', 'secondaryEmail',
       'cellPhone', 'homePhone', 'workPhone', 'preferredContact',
       'address1', 'address2', 'city', 'state', 'zip', 'country',
       'membershipStatus', 'memberSince', 'howTheyFoundUs',
@@ -29386,12 +29390,14 @@ var SYNC_COLLECTIONS = {
       'ministryTeams', 'volunteerRoles', 'spiritualGifts', 'smallGroup',
       'pastoralNotes', 'lastContactDate', 'nextFollowUp', 'followUpPriority',
       'assignedTo', 'tags', 'archived', 'archiveReason',
-      'createdBy', 'createdAt', 'updatedBy', 'updatedAt',
-      'website', 'colorScheme', 'bgScheme', 'id'
+      'website', 'colorScheme', 'bgScheme',
+      'createdBy', 'createdAt', 'updatedBy', 'updatedAt'
     ],
     headers: [
-      'ID', 'First Name', 'Last Name', 'Preferred Name', 'Suffix',
-      'Date of Birth', 'Gender', 'Photo URL', 'Primary Email', 'Secondary Email',
+      'ID', 'Member PIN', 'Member Number',
+      'First Name', 'Last Name', 'Preferred Name', 'Suffix',
+      'Date of Birth', 'Gender', 'Photo URL',
+      'Primary Email', 'Secondary Email',
       'Cell Phone', 'Home Phone', 'Work Phone', 'Preferred Contact',
       'Street Address 1', 'Street Address 2', 'City', 'State', 'ZIP Code', 'Country',
       'Membership Status', 'Member Since', 'How They Found Us',
@@ -29401,10 +29407,82 @@ var SYNC_COLLECTIONS = {
       'Ministry Teams', 'Volunteer Roles', 'Spiritual Gifts', 'Small Group',
       'Pastoral Notes', 'Last Contact Date', 'Next Follow-Up', 'Follow-Up Priority',
       'Assigned To', 'Tags', 'Archived', 'Archive Reason',
-      'Created By', 'Created At', 'Updated By', 'Updated At',
-      'Website Link', 'Color Scheme', 'BG Scheme', 'firestoreId'
+      'Website Link', 'Color Scheme', 'BG Scheme',
+      'Created By', 'Created At', 'Updated By', 'Updated At'
     ]
   },
+
+  touches: {
+    tab: 'Touches',
+    fields: [
+      'id', 'memberId', 'memberName', 'channel', 'note', 'loggedBy', 'loggedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Member Name', 'Channel', 'Note', 'Logged By', 'Logged At'
+    ]
+  },
+
+  households: {
+    tab: 'Households',
+    fields: [
+      'id', 'householdName', 'primaryContactId', 'address1', 'address2',
+      'city', 'state', 'zip', 'country', 'phone', 'email',
+      'memberIds', 'notes', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Household Name', 'Primary Contact ID', 'Street Address 1', 'Street Address 2',
+      'City', 'State', 'ZIP', 'Country', 'Phone', 'Email',
+      'Member IDs', 'Notes', 'Created At', 'Updated At'
+    ]
+  },
+
+  memberCards: {
+    tab: 'MemberCards',
+    fields: [
+      'id', 'memberNumber', 'email', 'firstName', 'lastName', 'preferredName', 'suffix',
+      'photoUrl', 'cardTitle', 'cardBio', 'ministry', 'smallGroup',
+      'phone', 'phoneVisible', 'emailVisible', 'websiteUrl', 'scheduleUrl',
+      'colorScheme', 'bgScheme', 'cardIcon',
+      'showDailyBread', 'showPrayerTicker', 'cardFooter',
+      'visibility', 'viewCount', 'active', 'status',
+      'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member Number', 'Email', 'First Name', 'Last Name', 'Preferred Name', 'Suffix',
+      'Photo URL', 'Card Title', 'Card Bio', 'Ministry', 'Small Group',
+      'Phone', 'Phone Visible', 'Email Visible', 'Website URL', 'Schedule URL',
+      'Color Scheme', 'BG Scheme', 'Card Icon',
+      'Show Daily Bread', 'Show Prayer Ticker', 'Card Footer',
+      'Visibility', 'View Count', 'Active', 'Status',
+      'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  cardLinks: {
+    tab: 'MemberCardLinks',
+    fields: [
+      'id', 'cardRowId', 'linkType', 'label', 'icon', 'url',
+      'sortOrder', 'visible', 'platform', 'status', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Card Row ID', 'Link Type', 'Label', 'Icon', 'URL',
+      'Sort Order', 'Visible', 'Platform', 'Status', 'Created At', 'Updated At'
+    ]
+  },
+
+  memberCardViews: {
+    tab: 'MemberCardViews',
+    fields: [
+      'id', 'cardRowId', 'memberNumber', 'viewerEmail',
+      'viewSource', 'userAgent', 'ipHash', 'viewedAt'
+    ],
+    headers: [
+      'ID', 'Card Row ID', 'Member Number', 'Viewer Email',
+      'View Source', 'User Agent', 'IP Hash', 'Viewed At'
+    ]
+  },
+
+  // ── PASTORAL CARE ────────────────────────────────────────────────────────────
 
   careCases: {
     tab: 'SpiritualCareCases',
@@ -29426,7 +29504,1084 @@ var SYNC_COLLECTIONS = {
       'Linked Case ID', 'Next Review Date',
       'Created By', 'Created At', 'Updated By', 'Updated At'
     ]
+  },
+
+  careInteractions: {
+    tab: 'SpiritualCareInteractions',
+    fields: [
+      'id', 'caseId', 'interactionDate', 'type', 'caregiverId',
+      'durationMinutes', 'summary', 'followUpNeeded', 'followUpDate',
+      'followUpDone', 'confidential', 'createdAt'
+    ],
+    headers: [
+      'ID', 'Case ID', 'Interaction Date', 'Type', 'Caregiver ID',
+      'Duration (mins)', 'Summary', 'Follow-Up Needed', 'Follow-Up Date',
+      'Follow-Up Done', 'Confidential', 'Created At'
+    ]
+  },
+
+  careAssignments: {
+    tab: 'SpiritualCareAssignments',
+    fields: [
+      'id', 'caregiverId', 'memberId', 'ministryId', 'role',
+      'startDate', 'endDate', 'status', 'notes', 'createdBy', 'createdAt'
+    ],
+    headers: [
+      'ID', 'Caregiver ID', 'Member ID', 'Ministry ID', 'Role',
+      'Start Date', 'End Date', 'Status', 'Notes', 'Created By', 'Created At'
+    ]
+  },
+
+  // ── PRAYER ──────────────────────────────────────────────────────────────────
+
+  prayers: {
+    tab: 'PrayerRequests',
+    fields: [
+      'id', 'requestId', 'memberId', 'name',
+      'submitterEmail', 'submitterPhone', 'text', 'category',
+      'confidential', 'followUp', 'status', 'adminNotes',
+      'assigned', 'submittedAt', 'lastUpdated', 'updatedBy', 'archived'
+    ],
+    headers: [
+      'ID', 'Request ID', 'Member ID', 'Name',
+      'Submitter Email', 'Submitter Phone', 'Prayer Text', 'Category',
+      'Confidential', 'Follow Up', 'Status', 'Admin Notes',
+      'Assigned', 'Submitted At', 'Last Updated', 'Updated By', 'Archived'
+    ]
+  },
+
+  // ── ATTENDANCE & EVENTS ──────────────────────────────────────────────────────
+
+  attendance: {
+    tab: 'Attendance',
+    fields: [
+      'id', 'date', 'serviceType', 'notes', 'recordedBy', 'createdAt'
+    ],
+    headers: [
+      'ID', 'Date', 'Service Type', 'Notes', 'Recorded By', 'Created At'
+    ]
+  },
+
+  events: {
+    tab: 'Events',
+    fields: [
+      'id', 'title', 'description', 'eventType', 'location',
+      'startDate', 'endDate', 'startTime', 'endTime',
+      'recurring', 'recurringUntil', 'capacity', 'rsvpRequired',
+      'ministryTeam', 'contactPerson', 'status', 'visibility', 'notes',
+      'createdBy', 'createdAt', 'updatedBy', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Title', 'Description', 'Event Type', 'Location',
+      'Start Date', 'End Date', 'Start Time', 'End Time',
+      'Recurring', 'Recurring Until', 'Capacity', 'RSVP Required',
+      'Ministry Team', 'Contact Person', 'Status', 'Visibility', 'Notes',
+      'Created By', 'Created At', 'Updated By', 'Updated At'
+    ]
+  },
+
+  rsvps: {
+    tab: 'EventRSVPs',
+    fields: [
+      'id', 'eventId', 'memberId', 'response',
+      'guestCount', 'notes', 'respondedAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Event ID', 'Member ID', 'Response',
+      'Guest Count', 'Notes', 'Responded At', 'Updated At'
+    ]
+  },
+
+  calendarEvents: {
+    tab: 'CalendarEvents',
+    fields: [
+      'id', 'EventID', 'StartDateTime', 'EndDateTime', 'IsAllDay',
+      'RecurrenceRule', 'SharedWith', 'DelegatedTo',
+      'CreatedAt', 'CreatedBy', 'UpdatedAt', 'UpdatedBy'
+    ],
+    headers: [
+      'ID', 'Event ID', 'Start Date Time', 'End Date Time', 'Is All Day',
+      'Recurrence Rule', 'Shared With', 'Delegated To',
+      'Created At', 'Created By', 'Updated At', 'Updated By'
+    ]
+  },
+
+  checkinSessions: {
+    tab: 'CheckInSessions',
+    fields: [
+      'id', 'eventId', 'sessionName', 'date', 'openedAt', 'closedAt',
+      'totalCheckIns', 'openedBy', 'notes', 'createdAt'
+    ],
+    headers: [
+      'ID', 'Event ID', 'Session Name', 'Date', 'Opened At', 'Closed At',
+      'Total Check-Ins', 'Opened By', 'Notes', 'Created At'
+    ]
+  },
+
+  // ── GROUPS & VOLUNTEERS ──────────────────────────────────────────────────────
+
+  groups: {
+    tab: 'SmallGroups',
+    fields: [
+      'id', 'groupName', 'description', 'groupType',
+      'leaderId', 'coLeaderId', 'meetingDay', 'meetingTime', 'location',
+      'capacity', 'status', 'semester', 'notes',
+      'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Group Name', 'Description', 'Group Type',
+      'Leader ID', 'Co-Leader ID', 'Meeting Day', 'Meeting Time', 'Location',
+      'Capacity', 'Status', 'Semester', 'Notes',
+      'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  groupMembers: {
+    tab: 'SmallGroupMembers',
+    fields: [
+      'id', 'groupId', 'memberId', 'role',
+      'joinedDate', 'leftDate', 'status', 'notes', 'createdAt'
+    ],
+    headers: [
+      'ID', 'Group ID', 'Member ID', 'Role',
+      'Joined Date', 'Left Date', 'Status', 'Notes', 'Created At'
+    ]
+  },
+
+  volunteers: {
+    tab: 'VolunteerSchedule',
+    fields: [
+      'id', 'memberId', 'ministryTeam', 'role', 'scheduledDate', 'serviceType',
+      'status', 'swapRequested', 'swapWith', 'notes',
+      'scheduledBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Ministry Team', 'Role', 'Scheduled Date', 'Service Type',
+      'Status', 'Swap Requested', 'Swap With', 'Notes',
+      'Scheduled By', 'Created At', 'Updated At'
+    ]
+  },
+
+  ministries: {
+    tab: 'Ministries',
+    fields: [
+      'id', 'ministryName', 'category', 'description',
+      'leadId', 'coLeadId', 'contactEmail',
+      'meetingDay', 'meetingTime', 'meetingLocation',
+      'budgetAllocated', 'status', 'reportingTo', 'notes',
+      'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Ministry Name', 'Category', 'Description',
+      'Lead ID', 'Co-Lead ID', 'Contact Email',
+      'Meeting Day', 'Meeting Time', 'Meeting Location',
+      'Budget Allocated', 'Status', 'Reporting To', 'Notes',
+      'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  // ── GIVING ───────────────────────────────────────────────────────────────────
+
+  giving: {
+    tab: 'Giving',
+    fields: [
+      'id', 'memberId', 'donorName', 'amount', 'currency', 'date', 'fund',
+      'method', 'checkNumber', 'transactionRef', 'isTaxDeductible',
+      'notes', 'recordedBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Donor Name', 'Amount', 'Currency', 'Date', 'Fund',
+      'Method', 'Check Number', 'Transaction Ref', 'Is Tax Deductible',
+      'Notes', 'Recorded By', 'Created At', 'Updated At'
+    ]
+  },
+
+  pledges: {
+    tab: 'GivingPledges',
+    fields: [
+      'id', 'memberId', 'fund', 'pledgeAmount', 'frequency',
+      'startDate', 'endDate', 'totalPledged', 'totalGiven', 'status',
+      'notes', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Fund', 'Pledge Amount', 'Frequency',
+      'Start Date', 'End Date', 'Total Pledged', 'Total Given', 'Status',
+      'Notes', 'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  // ── COMMUNICATIONS ───────────────────────────────────────────────────────────
+
+  conversations: {
+    tab: 'CommsThreads',
+    fields: [
+      'id', 'subject', 'threadType', 'creatorId', 'creatorName',
+      'participantIds', 'participantNames', 'participantCount',
+      'messageCount', 'lastMessageAt', 'lastMessageBy', 'lastSnippet',
+      'status', 'pinned', 'mutedBy', 'channelId', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Subject', 'Thread Type', 'Creator ID', 'Creator Name',
+      'Participant IDs', 'Participant Names', 'Participant Count',
+      'Message Count', 'Last Message At', 'Last Message By', 'Last Snippet',
+      'Status', 'Pinned', 'Muted By', 'Channel ID', 'Created At', 'Updated At'
+    ]
+  },
+
+  messages: {
+    tab: 'CommsMessages',
+    fields: [
+      'id', 'threadId', 'senderId', 'senderName', 'senderEmail',
+      'recipientType', 'recipientId', 'recipientName',
+      'messageType', 'subject', 'body', 'priority',
+      'attachmentUrl', 'attachmentName', 'replyToId',
+      'status', 'sentAt', 'editedAt', 'readCount', 'flagged',
+      'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Thread ID', 'Sender ID', 'Sender Name', 'Sender Email',
+      'Recipient Type', 'Recipient ID', 'Recipient Name',
+      'Message Type', 'Subject', 'Body', 'Priority',
+      'Attachment URL', 'Attachment Name', 'Reply To ID',
+      'Status', 'Sent At', 'Edited At', 'Read Count', 'Flagged',
+      'Created At', 'Updated At'
+    ]
+  },
+
+  notifications: {
+    tab: 'CommsNotifications',
+    fields: [
+      'id', 'recipientId', 'recipientName', 'recipientEmail',
+      'title', 'body', 'notifType', 'priority',
+      'entityType', 'entityId', 'actionUrl', 'icon',
+      'status', 'readAt', 'dismissedAt', 'sentVia', 'senderEmail',
+      'expiresAt', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Recipient ID', 'Recipient Name', 'Recipient Email',
+      'Title', 'Body', 'Notif Type', 'Priority',
+      'Entity Type', 'Entity ID', 'Action URL', 'Icon',
+      'Status', 'Read At', 'Dismissed At', 'Sent Via', 'Sender Email',
+      'Expires At', 'Created At', 'Updated At'
+    ]
+  },
+
+  templates: {
+    tab: 'CommsTemplates',
+    fields: [
+      'id', 'templateName', 'templateType', 'subject', 'body', 'bodyHtml',
+      'category', 'variables', 'useCount', 'lastUsedAt',
+      'visibility', 'status', 'createdBy', 'createdByName', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Template Name', 'Template Type', 'Subject', 'Body', 'Body HTML',
+      'Category', 'Variables', 'Use Count', 'Last Used At',
+      'Visibility', 'Status', 'Created By', 'Created By Name', 'Created At', 'Updated At'
+    ]
+  },
+
+  broadcasts: {
+    tab: 'CommsBroadcastLog',
+    fields: [
+      'id', 'type', 'subject', 'body', 'bodyHtml',
+      'audience', 'audienceFilter', 'templateId', 'channelId',
+      'sentAt', 'sentBy', 'sentByName',
+      'recipientCount', 'deliveredCount', 'failedCount',
+      'status', 'scheduledFor', 'createdAt'
+    ],
+    headers: [
+      'ID', 'Type', 'Subject', 'Body', 'Body HTML',
+      'Audience', 'Audience Filter', 'Template ID', 'Channel ID',
+      'Sent At', 'Sent By', 'Sent By Name',
+      'Recipient Count', 'Delivered Count', 'Failed Count',
+      'Status', 'Scheduled For', 'Created At'
+    ]
+  },
+
+  // ── JOURNAL ──────────────────────────────────────────────────────────────────
+
+  journal: {
+    tab: 'JournalEntries',
+    fields: [
+      'id', 'userEmail', 'title', 'entry', 'category',
+      'scriptureRef', 'mood', 'isPrivate', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'User Email', 'Title', 'Entry', 'Category',
+      'Scripture Ref', 'Mood', 'Is Private', 'Created At', 'Updated At'
+    ]
+  },
+
+  todos: {
+    tab: 'ToDo',
+    fields: [
+      'id', 'title', 'description', 'status', 'priority',
+      'dueDate', 'assignedTo', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Title', 'Description', 'Status', 'Priority',
+      'Due Date', 'Assigned To', 'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  // ── COMPASSION ───────────────────────────────────────────────────────────────
+
+  compassionRequests: {
+    tab: 'CompassionRequests',
+    fields: [
+      'id', 'requesterName', 'requesterPhone', 'requesterEmail',
+      'isMember', 'memberId', 'requestType', 'description', 'urgency',
+      'amountRequested', 'amountApproved', 'status',
+      'assignedTeam', 'assignedTo', 'followUpDate', 'resolutionNotes',
+      'confidential', 'submittedBy', 'approvedBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Requester Name', 'Phone', 'Email',
+      'Is Member', 'Member ID', 'Request Type', 'Description', 'Urgency',
+      'Amount Requested', 'Amount Approved', 'Status',
+      'Assigned Team', 'Assigned To', 'Follow-Up Date', 'Resolution Notes',
+      'Confidential', 'Submitted By', 'Approved By', 'Created At', 'Updated At'
+    ]
+  },
+
+  compassionResources: {
+    tab: 'CompassionResources',
+    fields: [
+      'id', 'resourceName', 'category', 'description',
+      'quantityOnHand', 'unit', 'reorderLevel', 'location',
+      'donatedBy', 'status', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Resource Name', 'Category', 'Description',
+      'Qty On Hand', 'Unit', 'Reorder Level', 'Location',
+      'Donated By', 'Status', 'Created At', 'Updated At'
+    ]
+  },
+
+  compassionLogs: {
+    tab: 'CompassionTeamLog',
+    fields: [
+      'id', 'requestId', 'date', 'activityType',
+      'teamMemberId', 'teamMemberName', 'description',
+      'resourcesUsed', 'amountDisbursed', 'followUpNeeded', 'notes', 'createdAt'
+    ],
+    headers: [
+      'ID', 'Request ID', 'Date', 'Activity Type',
+      'Team Member ID', 'Team Member Name', 'Description',
+      'Resources Used', 'Amount Disbursed', 'Follow-Up Needed', 'Notes', 'Created At'
+    ]
+  },
+
+  // ── OUTREACH ─────────────────────────────────────────────────────────────────
+
+  outreachContacts: {
+    tab: 'OutreachContacts',
+    fields: [
+      'id', 'firstName', 'lastName', 'email', 'phone',
+      'address', 'city', 'state', 'zip',
+      'source', 'campaignId', 'status', 'interestLevel',
+      'notes', 'memberId', 'assignedTo',
+      'lastContact', 'nextFollowUp', 'tags',
+      'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'First Name', 'Last Name', 'Email', 'Phone',
+      'Address', 'City', 'State', 'ZIP',
+      'Source', 'Campaign ID', 'Status', 'Interest Level',
+      'Notes', 'Member ID', 'Assigned To',
+      'Last Contact', 'Next Follow-Up', 'Tags',
+      'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  outreachCampaigns: {
+    tab: 'OutreachCampaigns',
+    fields: [
+      'id', 'campaignName', 'campaignType', 'description',
+      'startDate', 'endDate', 'location', 'ministryId', 'leadId',
+      'budget', 'goalReached', 'actualReached', 'decisions',
+      'status', 'notes', 'tags', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Campaign Name', 'Campaign Type', 'Description',
+      'Start Date', 'End Date', 'Location', 'Ministry ID', 'Lead ID',
+      'Budget', 'Goal Reached', 'Actual Reached', 'Decisions',
+      'Status', 'Notes', 'Tags', 'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  outreachFollowUps: {
+    tab: 'OutreachFollowUps',
+    fields: [
+      'id', 'contactId', 'date', 'type', 'byId', 'summary',
+      'response', 'followUpNeeded', 'nextDate', 'followUpDone',
+      'notes', 'createdAt'
+    ],
+    headers: [
+      'ID', 'Contact ID', 'Date', 'Type', 'By ID', 'Summary',
+      'Response', 'Follow-Up Needed', 'Next Date', 'Follow-Up Done',
+      'Notes', 'Created At'
+    ]
+  },
+
+  // ── DISCIPLESHIP ─────────────────────────────────────────────────────────────
+
+  discipleshipPaths: {
+    tab: 'DiscipleshipPaths',
+    fields: [
+      'id', 'name', 'description', 'category', 'targetAudience',
+      'difficultyLevel', 'estimatedWeeks', 'totalSteps',
+      'prerequisitePathId', 'requiredForLeadership',
+      'facilitatorGuideUrl', 'studentGuideUrl',
+      'status', 'visibility', 'createdBy', 'approvedBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Name', 'Description', 'Category', 'Target Audience',
+      'Difficulty Level', 'Estimated Weeks', 'Total Steps',
+      'Prerequisite Path ID', 'Required For Leadership',
+      'Facilitator Guide URL', 'Student Guide URL',
+      'Status', 'Visibility', 'Created By', 'Approved By', 'Created At', 'Updated At'
+    ]
+  },
+
+  discipleshipSteps: {
+    tab: 'DiscipleshipSteps',
+    fields: [
+      'id', 'pathId', 'stepOrder', 'title', 'description', 'stepType',
+      'durationMinutes', 'scriptureRefs', 'learningObjectives',
+      'contentUrl', 'videoUrl', 'homeworkDesc',
+      'assessmentRequired', 'passingScore', 'facilitatorNotes',
+      'resourceIds', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Path ID', 'Step Order', 'Title', 'Description', 'Step Type',
+      'Duration (mins)', 'Scripture Refs', 'Learning Objectives',
+      'Content URL', 'Video URL', 'Homework Desc',
+      'Assessment Required', 'Passing Score', 'Facilitator Notes',
+      'Resource IDs', 'Created At', 'Updated At'
+    ]
+  },
+
+  discipleshipEnrollments: {
+    tab: 'DiscipleshipEnrollments',
+    fields: [
+      'id', 'memberId', 'memberName', 'pathId', 'pathName',
+      'enrolledDate', 'targetCompletion', 'actualCompletion',
+      'currentStepId', 'stepsCompleted', 'totalSteps', 'percentComplete',
+      'status', 'facilitatorId', 'facilitatorName',
+      'groupCohort', 'meetingDay', 'meetingTime', 'notes',
+      'enrolledBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Member Name', 'Path ID', 'Path Name',
+      'Enrolled Date', 'Target Completion', 'Actual Completion',
+      'Current Step ID', 'Steps Completed', 'Total Steps', 'Percent Complete',
+      'Status', 'Facilitator ID', 'Facilitator Name',
+      'Group Cohort', 'Meeting Day', 'Meeting Time', 'Notes',
+      'Enrolled By', 'Created At', 'Updated At'
+    ]
+  },
+
+  discipleshipMentoring: {
+    tab: 'DiscipleshipMentoring',
+    fields: [
+      'id', 'mentorId', 'mentorName', 'menteeId', 'menteeName',
+      'relationshipType', 'focusArea', 'startDate', 'endDate',
+      'meetingFrequency', 'meetingDay', 'meetingLocation',
+      'status', 'goals', 'notes', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Mentor ID', 'Mentor Name', 'Mentee ID', 'Mentee Name',
+      'Relationship Type', 'Focus Area', 'Start Date', 'End Date',
+      'Meeting Frequency', 'Meeting Day', 'Meeting Location',
+      'Status', 'Goals', 'Notes', 'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  discipleshipMeetings: {
+    tab: 'DiscipleshipMeetings',
+    fields: [
+      'id', 'mentoringId', 'meetingDate', 'meetingTime', 'durationMinutes',
+      'location', 'meetingType', 'topicsCovered', 'scriptureDiscussed',
+      'homeworkAssigned', 'homeworkCompleted', 'prayerRequests',
+      'actionItems', 'notes', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Mentoring ID', 'Meeting Date', 'Meeting Time', 'Duration (mins)',
+      'Location', 'Meeting Type', 'Topics Covered', 'Scripture Discussed',
+      'Homework Assigned', 'Homework Completed', 'Prayer Requests',
+      'Action Items', 'Notes', 'Created At', 'Updated At'
+    ]
+  },
+
+  discipleshipAssessments: {
+    tab: 'DiscipleshipAssessments',
+    fields: [
+      'id', 'memberId', 'memberName', 'assessmentType', 'assessmentName',
+      'description', 'dateTaken', 'assessedBy',
+      'scoreTotal', 'scoreMax', 'scorePercent',
+      'resultsJson', 'topGifts', 'topStrengths', 'growthAreas', 'recommendations',
+      'enrollmentId', 'pathId', 'status', 'notes', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Member Name', 'Assessment Type', 'Assessment Name',
+      'Description', 'Date Taken', 'Assessed By',
+      'Score Total', 'Score Max', 'Score Percent',
+      'Results JSON', 'Top Gifts', 'Top Strengths', 'Growth Areas', 'Recommendations',
+      'Enrollment ID', 'Path ID', 'Status', 'Notes', 'Created At', 'Updated At'
+    ]
+  },
+
+  discipleshipMilestones: {
+    tab: 'DiscipleshipMilestones',
+    fields: [
+      'id', 'memberId', 'memberName', 'milestoneType', 'milestoneName',
+      'description', 'dateAchieved', 'verifiedBy',
+      'enrollmentId', 'pathId', 'certificateId',
+      'ceremonyDate', 'witness', 'notes', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Member Name', 'Milestone Type', 'Milestone Name',
+      'Description', 'Date Achieved', 'Verified By',
+      'Enrollment ID', 'Path ID', 'Certificate ID',
+      'Ceremony Date', 'Witness', 'Notes', 'Created At', 'Updated At'
+    ]
+  },
+
+  discipleshipGoals: {
+    tab: 'DiscipleshipGoals',
+    fields: [
+      'id', 'memberId', 'memberName', 'goalCategory', 'goalTitle',
+      'description', 'targetDate', 'completionDate', 'status', 'progressPercent',
+      'measurementType', 'targetValue', 'currentValue',
+      'accountabilityPartnerId', 'accountabilityPartnerName',
+      'reviewFrequency', 'lastReviewed', 'notes', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Member Name', 'Goal Category', 'Goal Title',
+      'Description', 'Target Date', 'Completion Date', 'Status', 'Progress %',
+      'Measurement Type', 'Target Value', 'Current Value',
+      'Accountability Partner ID', 'Accountability Partner Name',
+      'Review Frequency', 'Last Reviewed', 'Notes', 'Created At', 'Updated At'
+    ]
+  },
+
+  discipleshipCertificates: {
+    tab: 'DiscipleshipCertificates',
+    fields: [
+      'id', 'memberId', 'memberName', 'pathId', 'pathName',
+      'enrollmentId', 'certificateNumber', 'issueDate', 'issuedBy',
+      'expiryDate', 'status', 'notes', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Member Name', 'Path ID', 'Path Name',
+      'Enrollment ID', 'Certificate Number', 'Issue Date', 'Issued By',
+      'Expiry Date', 'Status', 'Notes', 'Created At', 'Updated At'
+    ]
+  },
+
+  // ── LEARNING ─────────────────────────────────────────────────────────────────
+
+  learningTopics: {
+    tab: 'LearningTopics',
+    fields: [
+      'id', 'topicName', 'slug', 'description', 'parentTopicId',
+      'level', 'sortOrder', 'iconUrl', 'colorHex', 'featured',
+      'sermonCount', 'subscriberCount', 'status',
+      'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Topic Name', 'Slug', 'Description', 'Parent Topic ID',
+      'Level', 'Sort Order', 'Icon URL', 'Color Hex', 'Featured',
+      'Sermon Count', 'Subscriber Count', 'Status',
+      'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  learningPlaylists: {
+    tab: 'LearningPlaylists',
+    fields: [
+      'id', 'title', 'description', 'coverImageUrl',
+      'curatorId', 'curatorName', 'topicIds', 'topicNames',
+      'preacherFilter', 'scriptureFilter', 'difficultyLevel',
+      'estimatedHours', 'itemCount', 'subscriberCount',
+      'visibility', 'featured', 'sortOrder', 'tags',
+      'status', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Title', 'Description', 'Cover Image URL',
+      'Curator ID', 'Curator Name', 'Topic IDs', 'Topic Names',
+      'Preacher Filter', 'Scripture Filter', 'Difficulty Level',
+      'Estimated Hours', 'Item Count', 'Subscriber Count',
+      'Visibility', 'Featured', 'Sort Order', 'Tags',
+      'Status', 'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  learningPlaylistItems: {
+    tab: 'LearningPlaylistItems',
+    fields: [
+      'id', 'playlistId', 'sermonId', 'sermonTitle', 'preacherName',
+      'scriptureRefs', 'sortOrder', 'sectionLabel', 'notesForLearner',
+      'durationMins', 'required', 'bonus', 'discussionQuestions',
+      'addedBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Playlist ID', 'Sermon ID', 'Sermon Title', 'Preacher Name',
+      'Scripture Refs', 'Sort Order', 'Section Label', 'Notes For Learner',
+      'Duration (mins)', 'Required', 'Bonus', 'Discussion Questions',
+      'Added By', 'Created At', 'Updated At'
+    ]
+  },
+
+  learningProgress: {
+    tab: 'LearningProgress',
+    fields: [
+      'id', 'memberId', 'memberName', 'sermonId', 'sermonTitle',
+      'playlistId', 'playlistTitle', 'status', 'progressPercent',
+      'lastPositionSecs', 'totalDurationSecs',
+      'startedAt', 'completedAt', 'listenCount', 'lastListenedAt',
+      'rating', 'device', 'notes', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Member Name', 'Sermon ID', 'Sermon Title',
+      'Playlist ID', 'Playlist Title', 'Status', 'Progress %',
+      'Last Position (secs)', 'Total Duration (secs)',
+      'Started At', 'Completed At', 'Listen Count', 'Last Listened At',
+      'Rating', 'Device', 'Notes', 'Created At', 'Updated At'
+    ]
+  },
+
+  learningNotes: {
+    tab: 'LearningNotes',
+    fields: [
+      'id', 'memberId', 'memberName', 'sermonId', 'sermonTitle',
+      'playlistId', 'noteType', 'title', 'content',
+      'timestampSecs', 'scriptureRef', 'highlightText',
+      'shared', 'pinned', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Member Name', 'Sermon ID', 'Sermon Title',
+      'Playlist ID', 'Note Type', 'Title', 'Content',
+      'Timestamp (secs)', 'Scripture Ref', 'Highlight Text',
+      'Shared', 'Pinned', 'Created At', 'Updated At'
+    ]
+  },
+
+  learningBookmarks: {
+    tab: 'LearningBookmarks',
+    fields: [
+      'id', 'memberId', 'memberName', 'sermonId', 'sermonTitle',
+      'preacherName', 'collection', 'tags', 'notes',
+      'positionSecs', 'priority', 'reminderDate', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Member Name', 'Sermon ID', 'Sermon Title',
+      'Preacher Name', 'Collection', 'Tags', 'Notes',
+      'Position (secs)', 'Priority', 'Reminder Date', 'Created At', 'Updated At'
+    ]
+  },
+
+  learningRecommendations: {
+    tab: 'LearningRecommendations',
+    fields: [
+      'id', 'memberId', 'memberName', 'sermonId', 'sermonTitle', 'preacherName',
+      'reasonType', 'reasonText', 'topicMatch', 'scriptureMatch',
+      'score', 'priority', 'status', 'dismissedAt',
+      'recommendedBy', 'recommendedByName', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Member Name', 'Sermon ID', 'Sermon Title', 'Preacher Name',
+      'Reason Type', 'Reason Text', 'Topic Match', 'Scripture Match',
+      'Score', 'Priority', 'Status', 'Dismissed At',
+      'Recommended By', 'Recommended By Name', 'Created At', 'Updated At'
+    ]
+  },
+
+  learningQuizzes: {
+    tab: 'LearningQuizzes',
+    fields: [
+      'id', 'sermonId', 'sermonTitle', 'playlistId', 'title', 'description',
+      'difficulty', 'passPercent', 'questionsJson', 'questionCount',
+      'timeLimitMins', 'attemptsAllowed', 'topicTags', 'scriptureRefs',
+      'status', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Sermon ID', 'Sermon Title', 'Playlist ID', 'Title', 'Description',
+      'Difficulty', 'Pass Percent', 'Questions JSON', 'Question Count',
+      'Time Limit (mins)', 'Attempts Allowed', 'Topic Tags', 'Scripture Refs',
+      'Status', 'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  learningQuizResults: {
+    tab: 'LearningQuizResults',
+    fields: [
+      'id', 'quizId', 'quizTitle', 'memberId', 'memberName', 'sermonId',
+      'attemptNumber', 'startedAt', 'completedAt', 'timeTakenSecs',
+      'answersJson', 'correctCount', 'totalQuestions', 'scorePercent',
+      'passed', 'feedback', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Quiz ID', 'Quiz Title', 'Member ID', 'Member Name', 'Sermon ID',
+      'Attempt Number', 'Started At', 'Completed At', 'Time Taken (secs)',
+      'Answers JSON', 'Correct Count', 'Total Questions', 'Score Percent',
+      'Passed', 'Feedback', 'Created At', 'Updated At'
+    ]
+  },
+
+  learningCertificates: {
+    tab: 'LearningCertificates',
+    fields: [
+      'id', 'memberId', 'memberName', 'certificateType',
+      'playlistId', 'playlistTitle', 'quizId', 'quizTitle',
+      'certificateNumber', 'issueDate', 'issuedBy', 'expiryDate',
+      'status', 'notes', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Member ID', 'Member Name', 'Certificate Type',
+      'Playlist ID', 'Playlist Title', 'Quiz ID', 'Quiz Title',
+      'Certificate Number', 'Issue Date', 'Issued By', 'Expiry Date',
+      'Status', 'Notes', 'Created At', 'Updated At'
+    ]
+  },
+
+  // ── SERMONS & WORSHIP ─────────────────────────────────────────────────────────
+
+  sermons: {
+    tab: 'Sermons',
+    fields: [
+      'id', 'title', 'preacherId', 'preacherName', 'date', 'serviceType',
+      'seriesId', 'seriesOrder', 'scriptureRefs', 'topicTags', 'summary',
+      'driveFileId', 'fileUrl', 'filename', 'fileType',
+      'audioDriveId', 'videoDriveId',
+      'status', 'visibility', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Title', 'Preacher ID', 'Preacher Name', 'Date', 'Service Type',
+      'Series ID', 'Series Order', 'Scripture Refs', 'Topic Tags', 'Summary',
+      'Drive File ID', 'File URL', 'Filename', 'File Type',
+      'Audio Drive ID', 'Video Drive ID',
+      'Status', 'Visibility', 'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  sermonSeries: {
+    tab: 'SermonSeries',
+    fields: [
+      'id', 'seriesName', 'description', 'themeScripture',
+      'startDate', 'endDate', 'preacherId', 'status',
+      'coverImageUrl', 'sermonCount', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Series Name', 'Description', 'Theme Scripture',
+      'Start Date', 'End Date', 'Preacher ID', 'Status',
+      'Cover Image URL', 'Sermon Count', 'Created At', 'Updated At'
+    ]
+  },
+
+  sermonReviews: {
+    tab: 'SermonReviews',
+    fields: [
+      'id', 'sermonId', 'reviewerId', 'reviewerName',
+      'decision', 'feedback', 'reviewedAt', 'privateNotes', 'createdAt'
+    ],
+    headers: [
+      'ID', 'Sermon ID', 'Reviewer ID', 'Reviewer Name',
+      'Decision', 'Feedback', 'Reviewed At', 'Private Notes', 'Created At'
+    ]
+  },
+
+  servicePlans: {
+    tab: 'ServicePlans',
+    fields: [
+      'id', 'serviceDate', 'serviceType', 'theme', 'scriptureFocus',
+      'sermonTitle', 'preacherId', 'worshipLeaderId', 'status', 'notes',
+      'createdBy', 'createdAt', 'updatedBy', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Service Date', 'Service Type', 'Theme', 'Scripture Focus',
+      'Sermon Title', 'Preacher ID', 'Worship Leader ID', 'Status', 'Notes',
+      'Created By', 'Created At', 'Updated By', 'Updated At'
+    ]
+  },
+
+  songs: {
+    tab: 'Songs',
+    fields: [
+      'id', 'title', 'artist', 'ccliNumber', 'defaultKey',
+      'tempoBpm', 'timeSignature', 'durationMin', 'genre', 'tags',
+      'lyrics', 'notes', 'active', 'driveFileId',
+      'createdBy', 'createdAt', 'updatedBy', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Title', 'Artist', 'CCLI Number', 'Default Key',
+      'Tempo BPM', 'Time Signature', 'Duration (min)', 'Genre', 'Tags',
+      'Lyrics', 'Notes', 'Active', 'Drive File ID',
+      'Created By', 'Created At', 'Updated By', 'Updated At'
+    ]
+  },
+
+  // ── THEOLOGY ─────────────────────────────────────────────────────────────────
+
+  theologyCategories: {
+    tab: 'TheologyCategories',
+    fields: [
+      'id', 'categoryId', 'title', 'subtitle', 'intro',
+      'icon', 'colorVar', 'sortOrder', 'visible', 'status',
+      'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Category ID', 'Title', 'Subtitle', 'Intro',
+      'Icon', 'Color Var', 'Sort Order', 'Visible', 'Status',
+      'Created At', 'Updated At'
+    ]
+  },
+
+  theologySections: {
+    tab: 'TheologySections',
+    fields: [
+      'id', 'categoryRowId', 'sectionId', 'title', 'content', 'summary',
+      'scriptureRefs', 'keywords', 'sortOrder', 'visible',
+      'approvedBy', 'approvedAt', 'version', 'status', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Category Row ID', 'Section ID', 'Title', 'Content', 'Summary',
+      'Scripture Refs', 'Keywords', 'Sort Order', 'Visible',
+      'Approved By', 'Approved At', 'Version', 'Status', 'Created At', 'Updated At'
+    ]
+  },
+
+  // ── MISSIONS ─────────────────────────────────────────────────────────────────
+
+  missionsRegistry: {
+    tab: 'MissionsRegistry',
+    fields: [
+      'id', 'countryName', 'isoCode', 'icon', 'tabName', 'region1040', 'continent',
+      'population', 'capital', 'officialLanguage', 'dominantReligion',
+      'persecutionRank', 'persecutionScore', 'persecutionLevel',
+      'gospelAccess', 'unreachedPeopleGroups', 'totalPeopleGroups',
+      'pctEvangelical', 'pctChristian', 'freedomIndex',
+      'regionCount', 'cityCount', 'partnerCount',
+      'lastUpdateAt', 'status', 'sortOrder', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Country Name', 'ISO Code', 'Icon', 'Tab Name', '1040 Window', 'Continent',
+      'Population', 'Capital', 'Official Language', 'Dominant Religion',
+      'Persecution Rank', 'Persecution Score', 'Persecution Level',
+      'Gospel Access', 'Unreached People Groups', 'Total People Groups',
+      'Pct Evangelical', 'Pct Christian', 'Freedom Index',
+      'Region Count', 'City Count', 'Partner Count',
+      'Last Update At', 'Status', 'Sort Order', 'Created At', 'Updated At'
+    ]
+  },
+
+  missionsRegions: {
+    tab: 'MissionsRegions',
+    fields: [
+      'id', 'countryId', 'regionName', 'regionType', 'population', 'coordinates',
+      'colorHex', 'dominantReligion', 'pctChristian', 'literacyRate',
+      'persecutionLevel', 'gospelAccess', 'unreachedGroups', 'securityThreat',
+      'humanitarianNeed', 'mediaRestriction', 'churchPresence',
+      'missionaryAccess', 'primaryHurdle', 'notes', 'status', 'sortOrder',
+      'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Country ID', 'Region Name', 'Region Type', 'Population', 'Coordinates',
+      'Color Hex', 'Dominant Religion', 'Pct Christian', 'Literacy Rate',
+      'Persecution Level', 'Gospel Access', 'Unreached Groups', 'Security Threat',
+      'Humanitarian Need', 'Media Restriction', 'Church Presence',
+      'Missionary Access', 'Primary Hurdle', 'Notes', 'Status', 'Sort Order',
+      'Created At', 'Updated At'
+    ]
+  },
+
+  missionsCities: {
+    tab: 'MissionsCities',
+    fields: [
+      'id', 'countryId', 'regionId', 'cityName', 'cityType', 'population',
+      'coordinates', 'colorHex', 'literacyRate', 'dominantReligion',
+      'pctChristian', 'persecutionLevel', 'violenceLevel',
+      'churchLife', 'nationalLife', 'socialLife', 'privateLife', 'familyLife',
+      'gospelAccess', 'mediaRestriction', 'securityThreat',
+      'humanitarianNeed', 'missionaryAccess', 'churchPresence',
+      'primaryHurdle', 'prayerFocus', 'notes', 'status', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Country ID', 'Region ID', 'City Name', 'City Type', 'Population',
+      'Coordinates', 'Color Hex', 'Literacy Rate', 'Dominant Religion',
+      'Pct Christian', 'Persecution Level', 'Violence Level',
+      'Church Life', 'National Life', 'Social Life', 'Private Life', 'Family Life',
+      'Gospel Access', 'Media Restriction', 'Security Threat',
+      'Humanitarian Need', 'Missionary Access', 'Church Presence',
+      'Primary Hurdle', 'Prayer Focus', 'Notes', 'Status', 'Created At', 'Updated At'
+    ]
+  },
+
+  missionsPartners: {
+    tab: 'MissionsPartners',
+    fields: [
+      'id', 'organizationName', 'partnerType', 'countryIds',
+      'contactName', 'contactEmail', 'contactPhone', 'website',
+      'focusArea', 'description', 'workersCount', 'relationshipStatus',
+      'financialSupport', 'prayerSupport', 'lastContactAt',
+      'securityLevel', 'notes', 'status', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Organization Name', 'Partner Type', 'Country IDs',
+      'Contact Name', 'Contact Email', 'Contact Phone', 'Website',
+      'Focus Area', 'Description', 'Workers Count', 'Relationship Status',
+      'Financial Support', 'Prayer Support', 'Last Contact At',
+      'Security Level', 'Notes', 'Status', 'Created At', 'Updated At'
+    ]
+  },
+
+  missionsPrayerFocus: {
+    tab: 'MissionsPrayerFocus',
+    fields: [
+      'id', 'countryId', 'cityId', 'title', 'description', 'scripture',
+      'startDate', 'endDate', 'priority', 'peopleGroup',
+      'prayerPoints', 'responsesCount', 'createdBy', 'status', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Country ID', 'City ID', 'Title', 'Description', 'Scripture',
+      'Start Date', 'End Date', 'Priority', 'People Group',
+      'Prayer Points', 'Responses Count', 'Created By', 'Status', 'Created At', 'Updated At'
+    ]
+  },
+
+  missionsUpdates: {
+    tab: 'MissionsUpdates',
+    fields: [
+      'id', 'countryId', 'cityId', 'title', 'body', 'updateType',
+      'severity', 'source', 'verified', 'securityLevel', 'published',
+      'publishedBy', 'attachmentUrl', 'notes', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Country ID', 'City ID', 'Title', 'Body', 'Update Type',
+      'Severity', 'Source', 'Verified', 'Security Level', 'Published',
+      'Published By', 'Attachment URL', 'Notes', 'Created At', 'Updated At'
+    ]
+  },
+
+  missionsTeams: {
+    tab: 'MissionsTeams',
+    fields: [
+      'id', 'teamName', 'countryId', 'teamLeadId', 'teamLeadName',
+      'memberIds', 'memberNames', 'memberCount', 'tripType',
+      'startDate', 'endDate', 'budget', 'raised', 'objectives',
+      'partnerId', 'tripStatus', 'debriefNotes', 'notes', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Team Name', 'Country ID', 'Team Lead ID', 'Team Lead Name',
+      'Member IDs', 'Member Names', 'Member Count', 'Trip Type',
+      'Start Date', 'End Date', 'Budget', 'Raised', 'Objectives',
+      'Partner ID', 'Trip Status', 'Debrief Notes', 'Notes', 'Created At', 'Updated At'
+    ]
+  },
+
+  missionsMetrics: {
+    tab: 'MissionsMetrics',
+    fields: [
+      'id', 'countryId', 'year',
+      'persecutionRank', 'persecutionScore', 'violenceScore', 'pressureScore',
+      'churchLifeScore', 'nationalLifeScore', 'socialLifeScore',
+      'privateLifeScore', 'familyLifeScore',
+      'population', 'pctChristian', 'pctEvangelical', 'unreachedGroups',
+      'source', 'notes', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Country ID', 'Year',
+      'Persecution Rank', 'Persecution Score', 'Violence Score', 'Pressure Score',
+      'Church Life Score', 'National Life Score', 'Social Life Score',
+      'Private Life Score', 'Family Life Score',
+      'Population', 'Pct Christian', 'Pct Evangelical', 'Unreached Groups',
+      'Source', 'Notes', 'Created At', 'Updated At'
+    ]
+  },
+
+  // ── STATISTICS ────────────────────────────────────────────────────────────────
+
+  statisticsConfig: {
+    tab: 'StatisticsConfig',
+    fields: [
+      'id', 'slot', 'label', 'description', 'category',
+      'sourceTab', 'sourceColumn', 'calcType', 'filterField', 'filterValue',
+      'dateField', 'formatType', 'unitLabel', 'displayOrder', 'widgetType',
+      'active', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Slot', 'Label', 'Description', 'Category',
+      'Source Tab', 'Source Column', 'Calc Type', 'Filter Field', 'Filter Value',
+      'Date Field', 'Format Type', 'Unit Label', 'Display Order', 'Widget Type',
+      'Active', 'Created At', 'Updated At'
+    ]
+  },
+
+  statisticsSnapshots: {
+    tab: 'StatisticsSnapshots',
+    fields: [
+      'id', 'snapshotDate', 'periodType', 'periodLabel',
+      'notes', 'createdBy', 'createdAt', 'status'
+    ],
+    headers: [
+      'ID', 'Snapshot Date', 'Period Type', 'Period Label',
+      'Notes', 'Created By', 'Created At', 'Status'
+    ]
+  },
+
+  statisticsViews: {
+    tab: 'StatisticsCustomViews',
+    fields: [
+      'id', 'viewName', 'description', 'layoutType', 'slotsIncluded',
+      'chartType', 'periodType', 'dateRange', 'roleRequired',
+      'isDefault', 'sortBy', 'createdBy', 'createdAt', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'View Name', 'Description', 'Layout Type', 'Slots Included',
+      'Chart Type', 'Period Type', 'Date Range', 'Role Required',
+      'Is Default', 'Sort By', 'Created By', 'Created At', 'Updated At'
+    ]
+  },
+
+  // ── STRATEGIC PLANNING ────────────────────────────────────────────────────────
+
+  strategicGoals: {
+    tab: 'StrategicGoals',
+    fields: [
+      'id', 'area', 'goal', 'progress', 'status',
+      'owner', 'notes', 'createdAt', 'createdBy', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Area', 'Goal', 'Progress', 'Status',
+      'Owner', 'Notes', 'Created At', 'Created By', 'Updated At'
+    ]
+  },
+
+  strategicInitiatives: {
+    tab: 'StrategicInitiatives',
+    fields: [
+      'id', 'title', 'ministry', 'owner', 'due', 'dueISO',
+      'progress', 'status', 'description', 'createdAt', 'createdBy', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Title', 'Ministry', 'Owner', 'Due', 'Due ISO',
+      'Progress', 'Status', 'Description', 'Created At', 'Created By', 'Updated At'
+    ]
+  },
+
+  strategicKeyDates: {
+    tab: 'StrategicKeyDates',
+    fields: [
+      'id', 'label', 'date', 'done', 'notes',
+      'createdAt', 'createdBy', 'updatedAt'
+    ],
+    headers: [
+      'ID', 'Label', 'Date', 'Done', 'Notes',
+      'Created At', 'Created By', 'Updated At'
+    ]
   }
+
 };
 
 
