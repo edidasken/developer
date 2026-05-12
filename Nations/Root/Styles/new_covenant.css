@@ -10832,6 +10832,54 @@ flock-tabs [role="tablist"], .tabs-bar {
 }
 .aow-btn-move:hover { background: var(--bg-base, #f2f4fb); color: var(--ink, #1b264f); }
 
+/* Edit button */
+.aow-btn-edit {
+  background: transparent; border: 1px solid var(--line, #e5e7ef); border-radius: 4px;
+  width: 22px; height: 22px; font-size: .78rem; cursor: pointer; color: var(--ink-muted, #7a7f96);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 100ms, color 100ms;
+}
+.aow-btn-edit:hover { background: rgba(232,168,56,.12); color: #c97d10; border-color: #c97d10; }
+
+/* Segment in editing state */
+.aow-segment--editing {
+  background: var(--bg-raised, #fff); border: 1.5px solid var(--gold, #e8a838);
+  box-shadow: 0 0 0 3px rgba(232,168,56,.12);
+  align-items: flex-start;
+}
+
+/* Inline edit form */
+.aow-seg-edit-form { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.aow-edit-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.aow-edit-input {
+  flex: 1; min-width: 80px; padding: 6px 8px;
+  background: var(--bg-base, #f2f4fb); border: 1px solid var(--line, #e5e7ef);
+  border-radius: 6px; font: 0.82rem var(--font-ui); color: var(--ink, #1b264f);
+  outline: none; transition: border-color 120ms;
+}
+.aow-edit-input:focus { border-color: var(--gold, #e8a838); }
+.aow-edit-input.aow-edit-mins { flex: 0 0 64px; min-width: 0; text-align: center; }
+.aow-edit-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+.aow-edit-save, .aow-edit-cancel, .aow-edit-delete {
+  padding: 5px 14px; border-radius: 6px; font: 600 0.78rem var(--font-ui); cursor: pointer;
+  border: 1px solid transparent; transition: background 120ms, color 120ms;
+}
+.aow-edit-save   { background: var(--ink, #1b264f); color: #fff; border-color: var(--ink, #1b264f); }
+.aow-edit-save:hover { background: #2d3b6b; }
+.aow-edit-cancel { background: var(--bg-base, #f2f4fb); color: var(--ink-muted, #7a7f96); border-color: var(--line, #e5e7ef); }
+.aow-edit-cancel:hover { background: var(--line, #e5e7ef); }
+.aow-edit-delete { background: transparent; color: #dc2626; border-color: rgba(220,38,38,.3); margin-left: auto; }
+.aow-edit-delete:hover { background: rgba(220,38,38,.08); }
+
+/* Add item button */
+.aow-btn-add {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px; border-radius: 8px; border: 1.5px dashed var(--line, #e5e7ef);
+  background: transparent; color: var(--ink-muted, #7a7f96); font: 600 0.84rem var(--font-ui);
+  cursor: pointer; transition: border-color 120ms, color 120ms, background 120ms;
+}
+.aow-btn-add:hover { border-color: var(--gold, #e8a838); color: #c97d10; background: rgba(232,168,56,.06); }
+
 
 /* ════════════════════════════════════════════════════════════════════════════
    PRAYERFUL ACTION — Prayer journal
