@@ -30748,18 +30748,22 @@ function syncFirestoreToSheet() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 var LARGE_COLLECTIONS = [
-  { collection: 'words',       tab: 'Words'       },
-  { collection: 'theology',    tab: 'Theology'    },
-  { collection: 'apologetics', tab: 'Apologetics' },
-  { collection: 'devotionals', tab: 'Devotionals' },
-  { collection: 'books',       tab: 'Books'       },
-  { collection: 'counseling',  tab: 'Counseling'  },
-  { collection: 'genealogy',   tab: 'Genealogy'   },
-  { collection: 'heart',       tab: 'Heart'       },
-  { collection: 'mirror',      tab: 'Mirror'      },
-  { collection: 'quiz',        tab: 'Quiz'        },
-  { collection: 'reading',     tab: 'Reading'     },
-  { collection: 'config',      tab: 'Config'      }
+  { collection: 'words',         tab: 'Words'         },
+  { collection: 'theology',      tab: 'Theology'      },
+  { collection: 'apologetics',   tab: 'Apologetics'   },
+  { collection: 'devotionals',   tab: 'Devotionals'   },
+  { collection: 'books',         tab: 'Books'         },
+  { collection: 'counseling',    tab: 'Counseling'    },
+  { collection: 'genealogy',     tab: 'Genealogy'     },
+  { collection: 'heart',         tab: 'Heart'         },
+  { collection: 'mirror',        tab: 'Mirror'        },
+  { collection: 'quiz',          tab: 'Quiz'          },
+  { collection: 'reading',       tab: 'Reading'       },
+  { collection: 'library',       tab: 'Library'       },
+  { collection: 'psalms',        tab: 'Psalms'        },
+  { collection: 'psalmThemes',   tab: 'PsalmThemes'   },
+  { collection: 'teachingPlans', tab: 'TeachingPlans' },
+  { collection: 'config',        tab: 'Config'        }
 ];
 
 var LARGE_SYNC_PAGE_SIZE = 200;  // docs per run per collection
@@ -31217,6 +31221,49 @@ var TRUTH_FIRESTORE_MAP = {
       'Testament': 'testament', 'Theme': 'theme',
       'Usage Count': 'usageCount', 'Verses': 'verses'
     }
+  },
+
+  'Library': {
+    collection: 'library',
+    docIdHeader: null,
+    docIdPrefix: 'lib',
+    headerMap: {
+      'Book': 'Book', 'Testament': 'Testament', 'Genre': 'Genre', 'Summary': 'Summary'
+    }
+  },
+
+  'Psalms': {
+    collection: 'psalms',
+    docIdHeader: 'Number',
+    headerMap: {
+      'Number': 'number', 'Display': 'display', 'Type': 'type',
+      'Types': 'types', 'Title': 'title'
+    }
+  },
+
+  'PsalmThemes': {
+    collection: 'psalmThemes',
+    docIdHeader: null,
+    docIdPrefix: 'ptheme',
+    headerMap: {
+      'Theme': 'theme', 'Intro': 'intro', 'Psalms': 'psalms'
+    }
+  },
+
+  'TeachingPlans': {
+    collection: 'teachingPlans',
+    docIdHeader: '_docId',
+    headerMap: {
+      '_docId': '_docId', 'Plan ID': 'planId', 'Plan Title': 'planTitle',
+      'Plan Description': 'planDescription', 'Audience': 'planAudience',
+      'Goal': 'planGoal', 'Session Number': 'sessionNumber',
+      'Session Title': 'sessionTitle', 'Memory Verse': 'memoryVerse',
+      'Memory Verse Ref': 'memoryVerseRef', 'Outcome': 'outcome',
+      'Duration (mins)': 'durationMinutes', 'Segments': 'segments',
+      'Scripture Refs': 'scriptureRefs', 'Tags': 'tags',
+      'Status': 'status', 'Approved By': 'approvedBy', 'Approved At': 'approvedAt',
+      'Sort Order': 'sortOrder'
+    }
   }
 };
 
@@ -31669,6 +31716,8 @@ function replicateTruthFromMaster() {
     // Truth content (12 core collections)
     'apologetics', 'books', 'counseling', 'devotionals', 'genealogy',
     'heart', 'mirror', 'quiz', 'reading', 'theology', 'theologyCategories', 'words',
+    // Extended content (library, psalms, teaching plans)
+    'library', 'psalms', 'psalmThemes', 'teachingPlans',
     // Missions (shared cross-church content, seeded into flockos-truth via seedSharedContentToTruth)
     'missionsRegistry', 'missionsRegions', 'missionsCities', 'missionsPartners',
     'missionsPrayerFocus', 'missionsUpdates', 'missionsTeams', 'missionsMetrics'
