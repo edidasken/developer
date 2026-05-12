@@ -48,7 +48,7 @@ The FlockChat app zone. Contains:
 - `functions/` — Firebase Functions entry point
 
 ### Courts/TheUpperRoom/
-The ATOG (At The Throne Of Grace) app zone. Contains:
+The ATOG (A Touch of the Gospel) app zone. Contains:
 - `ATOG/` — ATOG app (Pages, Scripts, Images, manifest)
 - `ATOG.html` — ATOG entry point
 - `Styles/american_garments.css` — build-managed copy
