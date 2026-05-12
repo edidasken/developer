@@ -234,24 +234,24 @@ function msEnsureStyles() {
         '#ms-av-key,#ms-sv-key { height:28px !important; min-width:0 !important; width:auto !important; padding:0 6px !important; border-radius:6px !important; border:1px solid rgba(0,0,0,0.15) !important; background:#f3f4f6 !important; color:#374151 !important; font-size:0.85rem !important; font-weight:700 !important; cursor:pointer !important; }',
 
         /* ── ChordPro rendered output ── */
-        '.ms-chord-display { background:#ffffff; border:1px solid rgba(0,0,0,0.08); border-radius:12px; padding:20px 24px; margin-bottom:0; overflow-y:auto; }',
-        /* Two-column layout on tablet/desktop */
-        '.ms-cp-song { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.97rem; line-height:1.3; color:#111827; column-count:2; column-gap:48px; }',
-        '.ms-cp-title { font-size:1.2rem; font-weight:800; color:#111827; margin:0 0 2px 0; column-span:all; }',
-        '.ms-cp-subtitle { font-size:0.85rem; color:#6b7280; margin:0 0 16px 0; column-span:all; }',
+        '.ms-chord-display { background:#ffffff; border:1px solid rgba(0,0,0,0.08); border-radius:12px; padding:12px 16px; margin-bottom:0; overflow-y:auto; }',
+        /* Two-column layout — tuned for iPad portrait */
+        '.ms-cp-song { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.86rem; line-height:1.22; color:#111827; column-count:2; column-gap:22px; }',
+        '.ms-cp-title { font-size:1.05rem; font-weight:800; color:#111827; margin:0 0 2px 0; column-span:all; }',
+        '.ms-cp-subtitle { font-size:0.8rem; color:#6b7280; margin:0 0 10px 0; column-span:all; }',
         /* Section label */
-        '.ms-cp-section-label { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#6b7280; margin:0 0 5px 0; padding:0; border:none; }',
+        '.ms-cp-section-label { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#6b7280; margin:0 0 3px 0; padding:0; border:none; }',
         /* Each section stays together */
-        '.ms-cp-section { break-inside:avoid; page-break-inside:avoid; margin-bottom:20px; }',
-        '.ms-cp-spacer { height:10px; }',
+        '.ms-cp-section { break-inside:avoid; page-break-inside:avoid; margin-bottom:12px; }',
+        '.ms-cp-spacer { height:6px; }',
         /* Each line = flex row of chord+lyric pairs, wraps as full pairs */
-        '.ms-cp-row { display:flex; flex-wrap:wrap; align-items:flex-end; gap:0; margin-bottom:2px; }',
+        '.ms-cp-row { display:flex; flex-wrap:wrap; align-items:flex-end; gap:0; margin-bottom:1px; }',
         '.ms-cp-pair { display:inline-flex; flex-direction:column; align-items:flex-start; }',
-        '.ms-cp-chord { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.8rem; font-weight:800; color:#dc2626; line-height:1.3; min-height:1.3em; white-space:pre; padding-right:6px; }',
+        '.ms-cp-chord { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.72rem; font-weight:800; color:#dc2626; line-height:1.2; min-height:1.2em; white-space:pre; padding-right:5px; }',
         '.ms-cp-chord--empty { color:transparent; }',
-        '.ms-cp-word { font-size:0.97rem; color:#111827; white-space:pre; line-height:1.5; }',
+        '.ms-cp-word { font-size:0.86rem; color:#111827; white-space:pre; line-height:1.4; }',
         '.ms-cp-word--space { color:transparent; }',
-        '.ms-cp-lyric-only { font-size:0.97rem; color:#111827; line-height:1.7; }',
+        '.ms-cp-lyric-only { font-size:0.86rem; color:#111827; line-height:1.5; }',
 
         '.ms-chord-line { color:#dc2626; font-weight:700; }',
         '.ms-lyric-line { color:#111827; }',
@@ -279,7 +279,9 @@ function msEnsureStyles() {
         '.ms-arr-key { font-weight:700; color:#c97d10; }',
 
         /* ── TABLET (768px+): two-column chord layout ── */
-        '@media (min-width:768px) { .ms-cp-song { column-count:2; } }',
+        '@media (min-width:768px) { .ms-cp-song { column-count:2; column-gap:22px; } }',
+        /* ── LARGE DESKTOP (1100px+): loosen gap slightly ── */
+        '@media (min-width:1100px) { .ms-cp-song { column-gap:32px; } }',
         /* ── MOBILE (≤ 640px) ── */
         '@media (max-width:640px) {',
         '  .ms-card { padding:14px 16px; }',
@@ -290,10 +292,10 @@ function msEnsureStyles() {
         '  #ms-import-song-btn, #ms-add-song-btn { width:100%; justify-content:center; }',
         '  .ms-song-table-wrap { display:none; }',
         '  .ms-song-cards { display:block; }',
-        '  .ms-cp-song { column-count:1; font-size:0.92rem; }',
-        '  .ms-cp-chord { font-size:0.75rem; padding-right:4px; }',
-        '  .ms-cp-word { font-size:0.92rem; }',
-        '  .ms-chord-display { padding:14px 16px; border-radius:8px; }',
+        '  .ms-cp-song { column-count:1; font-size:0.88rem; }',
+        '  .ms-cp-chord { font-size:0.72rem; padding-right:4px; }',
+        '  .ms-cp-word { font-size:0.88rem; }',
+        '  .ms-chord-display { padding:10px 12px; border-radius:8px; }',
         '  .ms-modal--fullscreen { padding:10px 12px 8px 12px !important; }',
         '  .ms-av-toolbar { gap:4px; padding:4px 0 6px 0; }',
         '  .ms-modal-title { font-size:0.95rem !important; }',
