@@ -2404,8 +2404,13 @@ function _wireMaintenancePanel(root) {
           for (const m of list) {
             if (m.primaryEmail)   existingEmails.set(m.primaryEmail.toLowerCase().trim(), m);
             if (m.secondaryEmail) existingEmails.set(m.secondaryEmail.toLowerCase().trim(), m);
+            if (m.email)          existingEmails.set(m.email.toLowerCase().trim(), m);
+            // Index by firstName+lastName, and also by displayName/name for members
+            // created before the firstName/lastName split was enforced
             const n = [m.firstName, m.lastName].filter(Boolean).join(' ').toLowerCase().trim();
             if (n) existingNames.set(n, m);
+            const dn = (m.displayName || m.name || '').toLowerCase().trim();
+            if (dn && !existingNames.has(dn)) existingNames.set(dn, m);
           }
         }
       } catch (_) {}
@@ -3517,7 +3522,9 @@ function _membersToVcfText(members) {
     lines.push(`N:${_vcfEsc(last)};${_vcfEsc(first)};${_vcfEsc(m.middleName||'')};${_vcfEsc(m.prefix||'')};${_vcfEsc(m.suffix||'')}`);
     if (m.primaryEmail)   lines.push(`EMAIL;TYPE=INTERNET,PREF:${m.primaryEmail}`);
     if (m.secondaryEmail) lines.push(`EMAIL;TYPE=INTERNET:${m.secondaryEmail}`);
-    if (m.cellPhone)  lines.push(`TEL;TYPE=CELL,VOICE:${m.cellPhone}`);
+    // Read canonical 'phone' field first (Fold save handler), fall back to cellPhone/mobilePhone
+    const mainPhone = m.phone || m.cellPhone || m.primaryPhone || m.mobilePhone || '';
+    if (mainPhone)    lines.push(`TEL;TYPE=CELL,VOICE:${mainPhone}`);
     if (m.homePhone)  lines.push(`TEL;TYPE=HOME,VOICE:${m.homePhone}`);
     if (m.workPhone)  lines.push(`TEL;TYPE=WORK,VOICE:${m.workPhone}`);
     const addrParts = [m.streetAddress1, m.city, m.state, m.zipCode, m.country];
@@ -3553,7 +3560,11 @@ function _renderVcfPreview(root, contacts, existingEmails, existingNames) {
   people.forEach(c => {
     const emailKey   = (c.primaryEmail || '').toLowerCase().trim();
     const nameStr    = [c.firstName, c.lastName].filter(Boolean).join(' ').toLowerCase().trim();
-    const matched    = (emailKey && existingEmails.get(emailKey)) || (nameStr && existingNames.get(nameStr)) || null;
+    const fnKey      = (c.fn || '').toLowerCase().trim(); // FN field — full display name from vCard
+    const matched    = (emailKey && existingEmails.get(emailKey))
+                    || (nameStr && existingNames.get(nameStr))
+                    || (fnKey   && existingNames.get(fnKey))
+                    || null;
     c._isDuplicate   = !!matched;
     c._existingMember = matched; // full Firestore member record
   });
@@ -3723,6 +3734,8 @@ async function _vcfImportSelected(root, btn) {
   setS(`Processing ${selected.length} contact${selected.length !== 1 ? 's' : ''}…`);
 
   // Helper: build a full field map from a parsed VCF contact
+  // NOTE: the app's canonical phone field is 'phone' (matches the Fold save handler).
+  // VCF TEL types are mapped: CELL/unlabelled → phone, HOME → homePhone, WORK → workPhone.
   const _vcfFields = (c) => ({
     firstName:      c.firstName      || (c.fn ? c.fn.split(' ')[0] : ''),
     lastName:       c.lastName       || (c.fn ? c.fn.split(' ').slice(1).join(' ') : ''),
@@ -3731,7 +3744,7 @@ async function _vcfImportSelected(root, btn) {
     suffix:         c.suffix         || '',
     primaryEmail:   c.primaryEmail   || '',
     secondaryEmail: c.secondaryEmail || '',
-    cellPhone:      c.cellPhone      || '',
+    phone:          c.cellPhone      || '',   // canonical field — Fold reads 'phone'
     homePhone:      c.homePhone      || '',
     workPhone:      c.workPhone      || '',
     streetAddress1: c.streetAddress1 || '',
