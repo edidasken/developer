@@ -1895,7 +1895,7 @@ function msParseSections(text) {
             type  = label.toLowerCase().replace(/[^a-z]/g, '');
         }
         labelCounts[label] = (labelCounts[label] || 0) + 1;
-        sections.push({ id: 'sec-' + sections.length, label: label, type: type, isRepeat: labelCounts[label] > 1, visible: labelCounts[label] === 1 });
+        sections.push({ id: 'sec-' + sections.length, label: label, type: type, isRepeat: labelCounts[label] > 1, visible: true });
     });
     return sections;
 }
