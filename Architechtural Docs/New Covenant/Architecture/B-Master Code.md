@@ -36,6 +36,43 @@
 //  8. Optional: run installFirestoreSyncTrigger() for hourly Firestore→Sheet backup
 // ══════════════════════════════════════════════════════════════════════════════
 
+// ══════════════════════════════════════════════════════════════════════════════
+//  GENERATION NOTE  —  May 11, 2026
+//
+//  Schema Registry Refactor (single source of truth)
+//  ─────────────────────────────────────────────────
+//  Previous architecture maintained the tab schema in two separate places:
+//    1. _buildCoreTabs_()  — 2200-line function with individual ensureTab()
+//       and addDropdowns() calls for each of the ~90 GAS tabs
+//    2. _TAB_HEADERS_      — a separate (incomplete) registry used only by
+//       getTab() for lazy auto-creation (previously contained only ServiceOrders)
+//
+//  These two were permanently out of sync by design — any new tab added to
+//  _buildCoreTabs_() had to also be manually added to _TAB_HEADERS_, and
+//  vice versa. Drift was inevitable.
+//
+//  This refactor collapses both into a single object:
+//
+//    var _TAB_HEADERS_ = {
+//      TabName: { headers: [...], dropdowns: { 'A': [...] } },
+//      ...  (all 90 tabs)
+//    };
+//
+//  _buildCoreTabs_() is now a 25-line loop over Object.keys(_TAB_HEADERS_).
+//  getTab() reads def.headers and def.dropdowns from the same object.
+//
+//  Result: add a tab once in _TAB_HEADERS_ — it is covered everywhere:
+//    • getTab()          auto-creates it on first access (lazy, any deployment)
+//    • _buildCoreTabs_() builds it during full setup
+//    • seedTheologyCategories_() and seedAppConfigDefaults_() remain as
+//      post-loop hooks (they insert row data, not schema)
+//
+//  Also added this session:
+//    • serviceOrders.get / serviceOrders.save router entries
+//    • ServiceOrders.gs section: SO_TAB, SO, SO_NUM_COLS, findServiceOrderRow_(),
+//      handleServiceOrdersGet(), handleServiceOrdersSave()
+// ══════════════════════════════════════════════════════════════════════════════
+
 // ── Deployment Configuration ──────────────────────────────────────────────────
 var DEPLOY_CONFIG = {
   churchName:    'FlockOS',                // e.g. 'Grace Community Church'
