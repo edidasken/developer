@@ -96,3 +96,20 @@ The application is configured as a Progressive Web App (PWA) with a defined serv
 *   **Push Notifications**:
     *   The service worker handles `push` events by showing notifications (`self.registration.showNotification()`) using data received from the push message (title, body, icon, badge, etc.).
     *   The `notificationclick` event listener allows users to interact with notifications. It closes the notification and attempts to focus an existing application window or open a new one, navigating to a specified URL from the notification data.
+
+
+---
+
+## 7. Standalone App Shells (`app.*/`)
+
+The `New_Covenant/` directory contains five self-contained PWA shells that each serve a distinct deployment surface. They are separate entry points — not loaded by the main `index.html` shell — and each sets `<base href="../">` (or an absolute GitHub Pages URL) to resolve shared assets from the `New_Covenant/` root.
+
+| Folder | Entry HTML | Title / Purpose | Auth | Manifest |
+|---|---|---|---|---|
+| `app.embeds/` | `embed-about.html`, `embed-flockos.html`, `embed-grow.html`, `embed-stand.html` | Embeddable standalone pages (About FlockOS, FlockOS app, GROW portal, Music Stand). Rendered inside `<iframe>` by views that need sandboxed content. No PWA install; no manifest. | N (public) | None |
+| `app.flockos/` | `app.flockos.html` / `index.html` | Full FlockOS PWA shell — an alternate installable entry point for the main church management app. Loads the same authenticated shell as `index.html`. | Y | `manifest.json` |
+| `app.grow/` | `app.grow.html` / `index.html` | GROW with FlockOS — public-facing spiritual growth PWA. Loads `grow_public.js` (no auth, no Firestore). Installable. | N (public) | `grow-manifest.json` |
+| `app.invite/` | `app.invite.html` / `index.html` | The Invitation — standalone PWA presenting Jesus (Great Invitations, I AM Declarations, Finished Work). Absolute `<base>` points to GitHub Pages root for shareable links. No auth. | N (public) | `manifest.json` |
+| `app.stand/` | `music_stand.html` / `index.html` | Music Stand — standalone worship-leader PWA. Auth-gated. Delegates all song library, chord, and presenter logic to `Scripts/the_shofar/index.js`. Manages app-level nav (dashboard, songs, services, import, settings) via `stand.js`. | Y | `manifest.json` |
+
+> **Note:** These shells share CSS and images from the `New_Covenant/` root via the `<base href>` tag. `app.embeds/` pages have no `<base>` re-routing — they are purely static content pages.
