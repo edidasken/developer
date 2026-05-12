@@ -13645,6 +13645,51 @@ flock-tabs [role="tablist"], .tabs-bar {
 .grow-scan-label { color:var(--muted, #aaa); }
 .grow-scan-meta  { color:var(--muted, #888); font-variant-numeric:tabular-nums; }
 
+/* ──── GROW · DIAGNOSTIC & ACTION CARDS ─────────────────────────────────── */
+/* Section head margin modifier */
+.grow-section-head--mt { margin-top:20px; }
+
+/* Category color bar (heart-check & mirror) */
+.grow-heart-cat-title { color:var(--heart-cat-color, var(--grow-accent,#2563eb)); display:flex; align-items:center; gap:6px; }
+.grow-cat-bar { width:6px; height:14px; background:var(--heart-cat-color, var(--grow-accent,#2563eb)); border-radius:2px; flex-shrink:0; }
+
+/* Mirror per-category load bars */
+.grow-mirror-bar-row { margin:10px 0; }
+.grow-mirror-bar-head { display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px; }
+.grow-mirror-bar-cat { color:var(--text,#f5f5f7); }
+.grow-mirror-bar-row .grow-progress-fill { background:var(--heart-cat-color, var(--grow-accent,#2563eb)); }
+
+/* Action plan cards (mirror + heart prescriptions) */
+.grow-action-card {
+  --action-color: var(--grow-accent,#2563eb);
+  border-left:3px solid var(--action-color);
+  padding:10px 14px; margin:8px 0;
+  background:color-mix(in srgb, var(--action-color) 8%, var(--surface,rgba(255,255,255,.03)));
+  border-radius:6px;
+}
+.grow-rx-card {
+  border-left:3px solid var(--grow-accent,#2563eb);
+  padding:10px 14px; margin:8px 0;
+  background:color-mix(in srgb, var(--grow-accent,#2563eb) 8%, var(--surface,rgba(255,255,255,.03)));
+  border-radius:6px;
+}
+.grow-action-cat { font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--action-color); font-weight:700; margin-bottom:4px; }
+.grow-action-q   { margin:4px 0; font-size:14px; line-height:1.5; color:var(--text,#f5f5f7); }
+.grow-action-rx  { margin:4px 0; font-size:13px; line-height:1.5; color:var(--text,#f5f5f7); }
+.grow-action-ref { margin:3px 0 0; font-size:12px; font-style:italic; color:var(--muted,#aaa); }
+.grow-plan-empty { text-align:center; font-style:italic; padding:14px 0; }
+
+/* Counseling card layout */
+.coun-card-body { display:none; }
+.coun-card-chevron { color:var(--muted,#888); font-size:12px; flex-shrink:0; margin-left:auto; }
+.coun-card-head .grow-counsel-icon { font-size:22px; margin:0; line-height:1; color:var(--grow-accent,#16a34a); flex-shrink:0; }
+
+/* OYB stream colour via CSS var */
+.grow-oyb-hero-stream-label { color:var(--stream-color, var(--grow-accent,#2563eb)); }
+
+/* Quiz score tone colour */
+.grow-quiz-score-pct { color:var(--score-tone, var(--grow-accent,#2563eb)); }
+
 /* journal */
 .grow-journal { border:1px solid var(--border, rgba(255,255,255,.08)); border-radius:12px; padding:16px; background:var(--surface, rgba(255,255,255,.03)); }
 .grow-journal-hd { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }

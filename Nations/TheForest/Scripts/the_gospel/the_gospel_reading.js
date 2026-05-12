@@ -160,7 +160,7 @@ function _oybTodayCard(e) {
       <div class="grow-oyb-hero-streams">
         ${streams.map((s) => `
           <div class="grow-oyb-hero-stream">
-            <span class="grow-oyb-hero-stream-label" style="color:${s.color}">${s.label}</span>
+            <span class="grow-oyb-hero-stream-label" style="--stream-color:${s.color}">${s.label}</span>
             <span class="grow-oyb-hero-stream-val">${esc(s.val)}</span>
           </div>
         `).join('')}

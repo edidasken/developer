@@ -91,9 +91,9 @@ function _paint(root) {
   let h = '';
 
   Object.entries(_state.cats).forEach(([cat, grp]) => {
-    h += `<section class="grow-heart-cat">
-      <h3 class="grow-heart-cat-title" style="color:${esc(grp.color)};">
-        <span style="display:inline-block; width:6px; height:14px; vertical-align:middle; margin-right:6px; background:${esc(grp.color)}; border-radius:2px;"></span>
+    h += `<section class="grow-heart-cat" style="--heart-cat-color:${esc(grp.color)}">
+      <h3 class="grow-heart-cat-title">
+        <span class="grow-cat-bar"></span>
         ${esc(cat)}
       </h3>`;
     grp.questions.forEach((q, idx) => {
@@ -128,32 +128,32 @@ function _paint(root) {
     const ansN  = items.filter((q) => _state.answers[q.__qid]).length;
     const yesN  = items.filter((q) => _state.answers[q.__qid] === 'yes').length;
     const pct   = items.length ? Math.round((yesN / items.length) * 100) : 0;
-    p += `<div style="margin:10px 0;">
-      <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:3px;">
-        <span style="color:var(--ink, #1b264f);">${esc(cat)}</span>
+    p += `<div class="grow-mirror-bar-row" style="--heart-cat-color:${esc(grp.color)}">
+      <div class="grow-mirror-bar-head">
+        <span class="grow-mirror-bar-cat">${esc(cat)}</span>
         <span class="grow-muted">${yesN}/${items.length} (${ansN}/${items.length} answered)</span>
       </div>
-      <div class="grow-progress"><div class="grow-progress-fill" style="width:${pct}%; background:${esc(grp.color)};"></div></div>
+      <div class="grow-progress"><div class="grow-progress-fill" style="width:${pct}%;"></div></div>
     </div>`;
   });
 
   if (flagged.length) {
-    p += `<div class="grow-section-head" style="margin-top:14px;"><h2 class="grow-section-title">Strategic Action Plan</h2></div>`;
+    p += `<div class="grow-section-head grow-section-head--mt"><h2 class="grow-section-title">Strategic Action Plan</h2></div>`;
     flagged.slice(0, 6).forEach((q) => {
       const cat   = q['Category Title'] || q.categoryTitle || 'General';
       const color = (_state.cats[cat] && _state.cats[cat].color) || accent;
       const rx    = q.Prescription || q.prescription || '';
       const ref   = q.Scripture || q.scripture || q['Verse Reference'] || '';
-      p += `<div style="border-left:3px solid ${esc(color)}; padding:8px 10px; margin:8px 0; background:var(--bg-base, #f7f8fb); border-radius:6px;">
-        <div style="font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:${esc(color)}; font-weight:700;">${esc(cat)}</div>
-        <p style="margin:6px 0; font-size:15px; line-height:1.5; color:var(--ink, #1b264f);">${esc(q.Question || '')}</p>
-        ${rx  ? `<p style="margin:6px 0; font-size:14px; line-height:1.5; color:var(--ink, #1b264f);"><strong>Step:</strong> ${esc(rx)}</p>` : ''}
-        ${ref ? `<p style="margin:4px 0 0; font-size:13px; font-style:italic; color:var(--ink-muted, #7a7f96);">${bibleLink(ref)}</p>` : ''}
+      p += `<div class="grow-action-card" style="--action-color:${esc(color)}">
+        <div class="grow-action-cat">${esc(cat)}</div>
+        <p class="grow-action-q">${esc(q.Question || '')}</p>
+        ${rx  ? `<p class="grow-action-rx"><strong>Step:</strong> ${esc(rx)}</p>` : ''}
+        ${ref ? `<p class="grow-action-ref">${bibleLink(ref)}</p>` : ''}
       </div>`;
     });
     p += helpButton({ label: 'Send this triage to my pastor', dataAttr: 'help-mirror' });
   } else {
-    p += `<p class="grow-muted" style="text-align:center; font-style:italic; padding:14px 0;">Complete the diagnostic to see your action plan…</p>`;
+    p += `<p class="grow-muted grow-plan-empty">Complete the diagnostic to see your action plan…</p>`;
   }
 
   plan.innerHTML = p;

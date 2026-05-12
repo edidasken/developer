@@ -141,14 +141,14 @@ function _paint(root) {
 function _prescriptionsHtml() {
   const flagged = _state.rows.filter((q) => _state.answers[q['Question ID'] || q.id] === 'yes');
   if (!flagged.length) return '';
-  let h = `<div class="grow-section-head" style="margin-top:14px;"><h2 class="grow-section-title">Prescriptions</h2></div>`;
+  let h = `<div class="grow-section-head grow-section-head--mt"><h2 class="grow-section-title">Prescriptions</h2></div>`;
   flagged.slice(0, 6).forEach((q) => {
     const rx  = q.Prescription || q.prescription || '';
     const ref = q['Verse Reference'] || q.verseReference || '';
-    h += `<div style="padding:8px 10px; margin:6px 0; background:var(--bg-base, #f7f8fb); border-left:3px solid ${accent}; border-radius:6px;">
-      <p style="margin:0; font-size:15px; line-height:1.5; color:var(--ink, #1b264f);">${esc(q.Question || '')}</p>
-      ${rx  ? `<p style="margin:6px 0 0; font-size:14px; line-height:1.5; color:var(--ink, #1b264f);"><strong>Step:</strong> ${esc(rx)}</p>` : ''}
-      ${ref ? `<p style="margin:4px 0 0; font-size:13px; font-style:italic; color:var(--ink-muted, #7a7f96);">${bibleLink(ref)}</p>` : ''}
+    h += `<div class="grow-rx-card">
+      <p class="grow-action-q">${esc(q.Question || '')}</p>
+      ${rx  ? `<p class="grow-action-rx"><strong>Step:</strong> ${esc(rx)}</p>` : ''}
+      ${ref ? `<p class="grow-action-ref">${bibleLink(ref)}</p>` : ''}
     </div>`;
   });
   return h;

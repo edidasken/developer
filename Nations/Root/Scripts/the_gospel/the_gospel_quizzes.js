@@ -90,7 +90,7 @@ function _paintLobby(root) {
 
   if (_state.course.length) {
     html += `
-      <div class="grow-section-head" style="margin-top:24px;"><h2 class="grow-section-title">Course Quizzes</h2></div>
+      <div class="grow-section-head grow-section-head--mt"><h2 class="grow-section-title">Course Quizzes</h2></div>
       <div class="grow-grid grow-grid--quizzes">${_state.course.map(_courseCard).join('')}</div>
     `;
   }
@@ -214,7 +214,7 @@ function _paintResults(root) {
             stroke-linecap="round" transform="rotate(-90 60 60)"/>
         </svg>
         <div class="grow-quiz-score-inner">
-          <div class="grow-quiz-score-pct" style="color:${tone};">${pct}%</div>
+          <div class="grow-quiz-score-pct" style="--score-tone:${tone};">${pct}%</div>
           <div class="grow-quiz-score-msg">${msg}</div>
         </div>
       </div>
@@ -226,7 +226,7 @@ function _paintResults(root) {
     </div>`;
 
   if (wrong.length) {
-    html += `<div class="grow-section-head" style="margin-top:20px;"><h2 class="grow-section-title">Review missed questions</h2></div>`;
+    html += `<div class="grow-section-head grow-section-head--mt"><h2 class="grow-section-title">Review missed questions</h2></div>`;
     html += `<div class="grow-list">`;
     wrong.forEach(({ q, ans, right }) => {
       html += `<div class="grow-quiz-review-card">

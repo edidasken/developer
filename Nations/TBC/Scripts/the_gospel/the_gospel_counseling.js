@@ -138,12 +138,12 @@ function _card(s) {
          data-id="${esc(s.id)}"
          data-search="${safeTitle.toLowerCase()}"
          style="--grow-accent:${esc(s.color)}; cursor:pointer;">
-      <div class="coun-card-head" style="display:flex; align-items:center; gap:10px; padding:14px 14px;">
-        <div class="grow-counsel-icon" style="font-size:22px; margin:0; color:${esc(s.color)}; line-height:1;">${esc(s.icon)}</div>
-        <h3 class="grow-card-title" style="margin:0; flex:1; text-align:left; font-size:14px;">${safeTitle}</h3>
-        <span class="coun-card-chevron" style="color:var(--ink-muted, #7a7f96); font-size:12px;">▼</span>
+      <div class="coun-card-head">
+        <div class="grow-counsel-icon">${esc(s.icon)}</div>
+        <h3 class="grow-card-title">${safeTitle}</h3>
+        <span class="coun-card-chevron">▼</span>
       </div>
-      <div class="coun-card-body" style="display:none; padding:0 14px 14px;"></div>
+      <div class="coun-card-body"></div>
     </div>
   `;
 }
