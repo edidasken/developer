@@ -37,8 +37,8 @@ export function render() {
       <div class="grow-toolbar">
         <input class="grow-search" data-q placeholder="Search psalms…" type="search">
         <div class="grow-filters">
-          <button class="grow-filter is-active" data-v="theme">By Theme</button>
-          <button class="grow-filter" data-v="number">By Number</button>
+          <button class="grow-filter" data-v="theme">By Theme</button>
+          <button class="grow-filter is-active" data-v="number">By Number</button>
         </div>
       </div>
 
@@ -52,7 +52,7 @@ export function render() {
 export function mount(root) {
   const gridEl = root.querySelector('[data-bind="grid"]');
   const qEl    = root.querySelector('[data-q]');
-  let _view    = 'theme';
+  let _view    = 'number';
   let _q       = '';
   let _data    = null;
 
@@ -93,8 +93,9 @@ export function mount(root) {
         const typeHtml = p.types.map(t => {
           return `<span class="grow-psalm-type" style="--type-color:${_themeColor(t)}">${esc(t)}</span>`;
         }).join('');
+        const bibleUrl = `https://www.bible.com/bible/59/PSA.${p.number}.ESV`;
         html += `<div class="grow-psalm-row grow-psalm-row--num" style="--psalm-color:${_themeColor(p.types[0] || '')}">`;
-        html += `<span class="grow-psalm-num">Psalm ${esc(p.display)}</span>`;
+        html += `<a class="grow-psalm-num grow-psalm-num--link" href="${bibleUrl}" target="_blank" rel="noopener noreferrer" title="Read Psalm ${esc(p.display)} on Bible.com (ESV)">Psalm ${esc(p.display)}</a>`;
         html += `<span class="grow-psalm-title grow-psalm-title--num">${esc(p.title)}</span>`;
         if (typeHtml) html += `<div class="grow-psalm-types">${typeHtml}</div>`;
         html += `</div>`;

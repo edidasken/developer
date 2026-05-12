@@ -14790,6 +14790,8 @@ flock-tabs [role="tablist"], .tabs-bar {
 .grow-psalm-title--num { font-size:13px; flex:1; color:var(--text,#d8d8d8); }
 .grow-psalm-types { display:flex; flex-wrap:wrap; gap:4px; }
 .grow-psalm-type { --type-color:#6366f1; font-size:11px; padding:2px 7px; border-radius:10px; background:color-mix(in srgb, var(--type-color) 15%, transparent); border:1px solid color-mix(in srgb, var(--type-color) 30%, transparent); color:var(--type-color); }
+.grow-psalm-num--link { color:var(--psalm-color); font-size:13px; min-width:60px; font-weight:700; text-decoration:none; flex-shrink:0; }
+.grow-psalm-num--link:hover { text-decoration:underline; }
 
 /* ══════════════════════════════════════════════════════════════════════════════
    GROW · THEOLOGY REDESIGN
