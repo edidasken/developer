@@ -93,7 +93,7 @@ async function _loadPentecost(root) {
 
   try {
     const res  = await MX.list({ limit: 100 });
-    const all  = _rows(res);
+    const all  = _rows(res).filter(ev => ev.status !== 'Cancelled');
     const special = all.filter(ev => {
       const t = (ev.type || ev.eventType || ev.category || '').toLowerCase();
       return SPECIAL_TYPES.has(t) || t.includes('baptism') || t.includes('revival') || t.includes('retreat') || t.includes('special');
@@ -240,9 +240,11 @@ function _openPentEventSheet(ev, onReload) {
     errEl.style.display = 'none';
     const btn = sheet.querySelector('[data-save]');
     btn.disabled = true; btn.textContent = isNew ? 'Scheduling…' : 'Saving…';
+    const typeVal = sheet.querySelector('[data-field="type"]').value;
     const payload = {
       title:       titleVal,
-      type:        sheet.querySelector('[data-field="type"]').value,
+      type:        typeVal,
+      eventType:   typeVal,
       startDate:   sheet.querySelector('[data-field="startDate"]').value || undefined,
       description: sheet.querySelector('[data-field="description"]').value.trim() || undefined,
     };
@@ -267,7 +269,7 @@ function _openPentEventSheet(ev, onReload) {
     const btn = sheet.querySelector('[data-delete]');
     btn.disabled = true; btn.textContent = 'Cancelling…';
     try {
-      await MX.cancel({ id: uid });
+      await MX.delete({ id: uid });
       _closePentSheet();
       onReload?.();
     } catch (err) { btn.disabled = false; btn.textContent = 'Cancel Event'; }

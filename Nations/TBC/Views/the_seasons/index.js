@@ -254,6 +254,7 @@ async function _loadEvents(root) {
     }
     const now = new Date(); now.setHours(0,0,0,0);
     const upcoming = rows
+      .filter((ev) => ev.status !== 'Cancelled')
       .map((ev) => {
         const raw = ev.startDate || ev.date || ev.createdAt || '';
         // Date-only strings (YYYY-MM-DD) must be parsed as local noon to avoid UTC off-by-one
@@ -538,7 +539,7 @@ function _openEventSheet(ev, onReload) {
     const btn = sheet.querySelector('[data-delete]');
     btn.disabled = true; btn.textContent = 'Cancelling…';
     try {
-      await MX.cancel({ id: uid });
+      await MX.delete({ id: uid });
       _closeEventSheet();
       onReload?.();
     } catch (err) {
