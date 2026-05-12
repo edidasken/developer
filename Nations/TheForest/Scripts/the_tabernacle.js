@@ -1588,6 +1588,9 @@ const Modules = (() => {
     bookName: 'Book Name', testament: 'Testament', genre: 'Genre',
     summary: 'Summary', coreTheology: 'Core Theology',
     practicalApplication: 'Practical Application', booknum: 'booknum',
+    christInBook: 'Core Theology', application: 'Practical Application',
+    keyVerse: 'Key Verse', themes: 'Themes', author: 'Author',
+    timePeriod: 'Time Period', order: 'booknum',
     name: 'Name', lifespan: 'Lifespan', meaning: 'Meaning',
     reference: 'Reference', bio: 'Bio', children: 'Children', personId: 'ID',
     icon: 'Icon', color: 'Color', definition: 'Definition',
@@ -5105,32 +5108,53 @@ const Modules = (() => {
         const summary = r['Summary'] || '';
         const theology = r['Core Theology'] || '';
         const application = r['Practical Application'] || '';
+        const keyVerse = r['Key Verse'] || '';
+        const themes = r['Themes'] || '';
+        const author = r['Author'] || '';
+        const timePeriod = r['Time Period'] || '';
         const isNT = testament === 'New';
         const accentColor = isNT ? 'var(--accent)' : 'var(--gold)';
-        const pillClass = _typePill[bookType.toLowerCase()] || (isNT ? 'pill-accent' : 'pill-gold');
-        const pillLabel = bookType || (isNT ? 'New Testament' : 'Old Testament');
-        const searchText = (name + ' ' + testament + ' ' + genre + ' ' + summary + ' ' + theology + ' ' + application).toLowerCase();
+        // Shorten genre for pill: extract parenthetical, strip leading "The "
+        var _pgMatch = bookType.match(/\(([^)]+)\)/);
+        var pillShort = (_pgMatch ? _pgMatch[1] : bookType).replace(/^The /, '');
+        const pillClass = _typePill[pillShort.toLowerCase()] || _typePill[bookType.toLowerCase()] || (isNT ? 'pill-accent' : 'pill-gold');
+        const pillLabel = pillShort || bookType || (isNT ? 'New Testament' : 'Old Testament');
+        const searchText = (name + ' ' + testament + ' ' + genre + ' ' + summary + ' ' + theology + ' ' + application + ' ' + themes).toLowerCase();
 
         html += '<details class="browse-item" data-search="' + _e(searchText) + '" data-testament="' + (isNT ? 'nt' : 'ot') + '">';
         html += '<summary class="browse-item-trigger">';
         html += '<span class="browse-item-icon" style="color:' + accentColor + ';">&#128214;</span>';
         html += '<div style="flex:1;min-width:0;">';
         html += '<span class="browse-item-title">' + _e(name) + '</span>';
-        if (genre) html += '<span class="browse-item-sub" style="margin-left:8px;">' + _e(genre) + '</span>';
+        if (author || timePeriod) {
+          html += '<span class="browse-item-sub" style="margin-left:8px;">';
+          if (author) html += _e(author);
+          if (author && timePeriod) html += ' &bull; ';
+          if (timePeriod) html += _e(timePeriod);
+          html += '</span>';
+        }
         html += '</div>';
         html += '<span class="pill ' + pillClass + '" style="font-size:0.68rem;">' + _e(pillLabel) + '</span>';
         html += '<span class="browse-item-chevron">&#9654;</span>';
         html += '</summary>';
 
         html += '<div class="browse-item-body">';
+        if (keyVerse) {
+          html += '<blockquote style="margin:0 0 10px;padding:8px 12px;border-left:3px solid var(--accent);background:var(--bg-raised);border-radius:0 6px 6px 0;font-size:0.84rem;color:var(--ink-muted);font-style:italic;">' + _e(keyVerse) + '</blockquote>';
+        }
         if (summary) {
           html += '<div class="browse-detail-card ' + (isNT ? 'browse-card-accent' : 'browse-card-gold') + '">';
           html += '<div class="browse-detail-head"><span class="browse-detail-icon">&#128214;</span><span class="browse-detail-label">Summary</span></div>';
           html += '<div class="browse-detail-body">' + _paras(summary) + '</div></div>';
         }
+        if (themes) {
+          html += '<div class="browse-detail-card browse-card-peach">';
+          html += '<div class="browse-detail-head"><span class="browse-detail-icon">&#127981;</span><span class="browse-detail-label">Themes</span></div>';
+          html += '<div class="browse-detail-body">' + _paras(themes) + '</div></div>';
+        }
         if (theology) {
           html += '<div class="browse-detail-card browse-card-lilac">';
-          html += '<div class="browse-detail-head"><span class="browse-detail-icon">&#128220;</span><span class="browse-detail-label">Core Theology</span></div>';
+          html += '<div class="browse-detail-head"><span class="browse-detail-icon">&#128220;</span><span class="browse-detail-label">Christ in This Book</span></div>';
           html += '<div class="browse-detail-body">' + _paras(theology) + '</div></div>';
         }
         if (application) {
