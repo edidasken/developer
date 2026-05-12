@@ -211,8 +211,9 @@ async function _loadMembers(root) {
     const all  = _rows(res);
     // Filter client-side: keep active/non-inactive members
     const rows = all.filter(r => {
-      const s = String(r.status || r.active || r.Status || '').toLowerCase();
-      return s !== 'inactive' && s !== 'false' && s !== '0' && s !== 'archived';
+      const ms = String(r.membershipStatus || '').toLowerCase();
+      const s  = String(r.status || r.active || r.Status || '').toLowerCase();
+      return ms !== 'archived' && s !== 'inactive' && s !== 'false' && s !== '0' && s !== 'archived';
     });
     if (!rows.length) {
       grid.innerHTML = '<div class="life-empty">No members found yet. Click “Add Person” to begin.</div>';
@@ -675,7 +676,7 @@ function _openMemberSheet(person, V, onReload) {
         const btn = sheet.querySelector('[data-archive]');
         btn.disabled = true;
         try {
-          await MXM.update({ id: docId || uid, status: 'Inactive' });
+          await MXM.update({ id: docId || uid, status: 'Inactive', membershipStatus: 'Archived' });
           _closeMemberSheet();
           onReload?.();
         } catch (err) {
