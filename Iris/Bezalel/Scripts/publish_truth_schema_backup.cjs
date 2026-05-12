@@ -28,11 +28,11 @@ function isoNow() {
 async function main() {
   const sqlPath = process.env.TRUTH_SCHEMA_SQL_PATH
     ? path.resolve(process.env.TRUTH_SCHEMA_SQL_PATH)
-    : resolveFromWorkspace('Architechtural Docs/New Covenant/Architecture/New Covenant Schema.sql');
+    : resolveFromWorkspace('Architechtural Docs/New Covenant/Architecture/Z-New Covenant Schema.sql');
 
   const manifestPath = process.env.TRUTH_SCHEMA_MANIFEST_PATH
     ? path.resolve(process.env.TRUTH_SCHEMA_MANIFEST_PATH)
-    : resolveFromWorkspace('Architechtural Docs/New Covenant/Architecture/combined_schema_manifest.deployable.json');
+    : resolveFromWorkspace('Architechtural Docs/New Covenant/Architecture/Z-Combined_Schema_Manifest.deployable.json');
 
   const serviceAccountPath = process.env.TRUTH_SCHEMA_SERVICE_ACCOUNT
     ? path.resolve(process.env.TRUTH_SCHEMA_SERVICE_ACCOUNT)

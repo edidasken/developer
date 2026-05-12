@@ -220,9 +220,9 @@ print('  → bezalel_codex.js regenerated (' + str(lines) + ' lines)')
 fi
 
 # ── Publish combined schema manifest to FlockOS-Truth backup store ─────────
-TRUTH_SCHEMA_MANIFEST="$WORKSPACE_ROOT/Architechtural Docs/New Covenant/Architecture/combined_schema_manifest.deployable.json"
+TRUTH_SCHEMA_MANIFEST="$WORKSPACE_ROOT/Architechtural Docs/New Covenant/Architecture/Z-Combined_Schema_Manifest.deployable.json"
 TRUTH_SCHEMA_PUBLISHER="$WORKSPACE_ROOT/Iris/Bezalel/Scripts/publish_truth_schema_backup.cjs"
-TRUTH_SCHEMA_SQL="$WORKSPACE_ROOT/Architechtural Docs/New Covenant/Architecture/New Covenant Schema.sql"
+TRUTH_SCHEMA_SQL="$WORKSPACE_ROOT/Architechtural Docs/New Covenant/Architecture/Z-New Covenant Schema.sql"
 if ! $SKIP_TRUTH_SCHEMA_PUBLISH; then
   echo "Publishing combined schema backup to FlockOS-Truth…"
   if $DRY_RUN; then
