@@ -73,7 +73,7 @@ Each section describes the purpose, inventory, and update source for its corresp
 - Temporary local secret files only
 - Never commit keys or credentials
 
-**Update Source:** `Architechtural Docs/New Covenant/Architecture/FLOW-POLICY.md`
+**Update Source:** `Architechtural Docs/New Covenant/Architecture/E-FLOW-POLICY.md`
 
 ---
 

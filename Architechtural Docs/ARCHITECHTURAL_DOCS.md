@@ -32,12 +32,12 @@ All architectural documentation is consolidated here. Key files:
 | File | Purpose |
 |------|---------|
 | `INDEX.md` | Master index — start here |
-| `AS-BUILT-Architecture-Overview.md` | Full system architecture overview |
-| `AS-BUILT-Script-Module-Inventory.md` | Every JS module inventoried |
-| `AS-BUILT-View-Inventory.md` | Every view and route inventoried |
-| `AS-BUILT-Data-Layer-Inventory.md` | All data files inventoried |
-| `AS-BUILT-Operations-Guide.md` | Day-to-day operations reference |
-| `AS-BUILT-Doc-Set-Index.md` | Index of all AS-BUILT documents |
+| `F-AS-BUILT-Architecture-Overview.md` | Full system architecture overview |
+| `G-AS-BUILT-Script-Module-Inventory.md` | Every JS module inventoried |
+| `H-AS-BUILT-View-Inventory.md` | Every view and route inventoried |
+| `I-AS-BUILT-Data-Layer-Inventory.md` | All data files inventoried |
+| `K-AS-BUILT-Operations-Guide.md` | Day-to-day operations reference |
+| `J-AS-BUILT-Doc-Set-Index.md` | Index of all AS-BUILT documents |
 | `FLOW-POLICY.md` | Branching, deployment, and commit policy |
 | `DEBUGGING-MAP.md` | Debugging guide and issue map |
 | `Structure-Parity-Map.md` | Old Covenant → New Covenant parity map |
@@ -76,7 +76,7 @@ Canonical deployment configuration files:
 **Local-only, never committed secret files.** Contains Firebase Admin SDK service account keys for all projects. This folder is gitignored and must never be pushed.
 
 ### New Covenant/Debugging/ · Migration/ · Runbooks/ · Tests/
-Operational folders. Contents documented in `Architecture/README.md`.
+Operational folders. Contents documented in `Architecture/P-README.md`.
 
 ---
 
