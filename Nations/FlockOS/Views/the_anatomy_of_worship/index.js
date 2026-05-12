@@ -33,16 +33,16 @@ const SEGMENT_TYPES = {
 /* ── Default template (used when no saved data exists) ────────────────────── */
 const DEFAULT_ORDER = [
   { type: 'prelude',    title: 'Prelude Music',              leader: 'Worship Team',   mins: 10, note: 'Instrumental — set a tone of reverence' },
-  { type: 'welcome',    title: 'Welcome & Announcements',    leader: 'Pastor Greg',    mins: 5,  note: '' },
+  { type: 'welcome',    title: 'Welcome & Announcements',    leader: '',               mins: 5,  note: '' },
   { type: 'worship',    title: 'Opening Worship Set',        leader: 'Worship Team',   mins: 20, note: '"How Great Is Our God", "10,000 Reasons", "Great Are You Lord"' },
   { type: 'responsive', title: 'Call to Worship',            leader: 'Congregation',   mins: 3,  note: 'Psalm 100 — responsive reading' },
-  { type: 'scripture',  title: 'Scripture Reading',          leader: 'Elder Thompson', mins: 5,  note: 'John 15:1-17 — The Vine and the Branches' },
-  { type: 'prayer',     title: 'Pastoral Prayer',            leader: 'Pastor Marcus',  mins: 5,  note: 'Intercession for congregation + community' },
-  { type: 'sermon',     title: 'Sermon: Abide in the Vine', leader: 'Pastor Greg',    mins: 40, note: 'Series: Kingdom Roots, Week 3' },
+  { type: 'scripture',  title: 'Scripture Reading',          leader: '',               mins: 5,  note: 'John 15:1-17 — The Vine and the Branches' },
+  { type: 'prayer',     title: 'Pastoral Prayer',            leader: '',               mins: 5,  note: 'Intercession for congregation + community' },
+  { type: 'sermon',     title: 'Sermon: Abide in the Vine', leader: '',               mins: 40, note: 'Series: Kingdom Roots, Week 3' },
   { type: 'offering',   title: 'Tithes & Offerings',         leader: 'Deacon Board',   mins: 5,  note: 'Online giving available — tithes.flockos.app' },
   { type: 'communion',  title: "Lord's Supper",              leader: 'Elder Board',    mins: 10, note: 'Open to all baptized believers' },
   { type: 'worship',    title: 'Closing Worship',            leader: 'Worship Team',   mins: 8,  note: '"Doxology", "Blessed Be Your Name"' },
-  { type: 'dismiss',    title: 'Benediction & Dismissal',    leader: 'Pastor Greg',    mins: 2,  note: '' },
+  { type: 'dismiss',    title: 'Benediction & Dismissal',    leader: '',               mins: 2,  note: '' },
 ];
 
 /* ── Render shell — list content is injected by mount() ──────────────────── */
