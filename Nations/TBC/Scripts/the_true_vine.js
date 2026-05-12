@@ -551,6 +551,7 @@ const TheVine = (() => {
     // ── Service Planning ─────────────────────────────────────────────────
     servicePlans:  _f('servicePlans', ['list', 'get', 'create', 'update', 'duplicate']),
     serviceItems:  _f('serviceItems', ['list', 'create', 'update', 'delete', 'reorder']),
+    serviceOrders: _f('serviceOrders', ['get', 'save']),
 
     // ── Spiritual Care ───────────────────────────────────────────────────
     care: (() => {

@@ -2784,6 +2784,24 @@
     });
   }
 
+  /* ── Service Orders (Anatomy of Worship per-service templates) ── */
+  function _serviceOrdersRef() { return _churchDoc().collection('serviceOrders'); }
+
+  function getServiceOrder(serviceId) {
+    return _serviceOrdersRef().doc(serviceId).get().then(function(d) {
+      if (!d.exists) return null;
+      var o = d.data(); o.id = d.id; return o;
+    });
+  }
+
+  function saveServiceOrder(serviceId, items) {
+    var ref = _serviceOrdersRef().doc(serviceId);
+    var data = { items: items, updatedAt: _now(), updatedBy: _userEmail };
+    return ref.set(data, { merge: true }).then(function() {
+      return { id: serviceId, success: true };
+    });
+  }
+
   /* ══════════════════════════════════════════════════════════════════
      SONGS
      ══════════════════════════════════════════════════════════════════ */
@@ -5001,6 +5019,10 @@
     createServicePlan:      createServicePlan,
     updateServicePlan:      updateServicePlan,
     deleteAllServicePlans:  deleteAllServicePlans,
+
+    // Service Orders (Anatomy of Worship)
+    getServiceOrder:    getServiceOrder,
+    saveServiceOrder:   saveServiceOrder,
 
     // Songs
     listSongs:               listSongs,

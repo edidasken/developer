@@ -70,6 +70,7 @@ export function render() {
   <div class="aow-budget-row">
     <div class="aow-budget-label">Service length: <strong id="aow-total-mins">—</strong></div>
     <div class="aow-budget-track" id="aow-budget-track"></div>
+    <span id="aow-save-status" style="font:600 0.74rem var(--font-ui,sans-serif);margin-left:8px;flex-shrink:0;"></span>
   </div>
 
   <!-- Editable segment list -->
@@ -86,26 +87,90 @@ export function render() {
 export function mount(root) {
   const LS_KEY = 'aow_orders_v1';
   let activeService = 'sunday';
+  let saving = false;
 
-  /* ── Persistence ── */
-  function loadOrders() {
-    try {
-      const raw = localStorage.getItem(LS_KEY);
-      if (raw) return JSON.parse(raw);
-    } catch (_) {}
-    return {
-      sunday:  JSON.parse(JSON.stringify(DEFAULT_ORDER)),
-      evening: JSON.parse(JSON.stringify(DEFAULT_ORDER)),
-      midweek: JSON.parse(JSON.stringify(DEFAULT_ORDER)),
-    };
+  /* ── Helpers ── */
+  function _isFB() {
+    return typeof UpperRoom !== 'undefined' && typeof UpperRoom.saveServiceOrder === 'function';
+  }
+  function _isGAS() {
+    return typeof TheVine !== 'undefined' && TheVine.flock && TheVine.flock.serviceOrders;
   }
 
-  function saveOrders() {
+  /* ── Local cache (write-through, used for immediate render) ── */
+  function loadLocal() {
+    try { const r = localStorage.getItem(LS_KEY); if (r) return JSON.parse(r); } catch (_) {}
+    return null;
+  }
+  function saveLocal(orders) {
     try { localStorage.setItem(LS_KEY, JSON.stringify(orders)); } catch (_) {}
   }
 
-  let orders = loadOrders();
+  /* ── In-memory orders, seeded from cache first, then Firestore ── */
+  let orders = loadLocal() || {
+    sunday:  JSON.parse(JSON.stringify(DEFAULT_ORDER)),
+    evening: JSON.parse(JSON.stringify(DEFAULT_ORDER)),
+    midweek: JSON.parse(JSON.stringify(DEFAULT_ORDER)),
+  };
+
   function getOrder() { return orders[activeService] || []; }
+
+  /* ── Save to backend (+ update local cache) ── */
+  async function saveOrder() {
+    saveLocal(orders);
+    if (!_isFB() && !_isGAS()) return;
+    saving = true;
+    setSaveStatus('saving');
+    try {
+      if (_isFB()) {
+        await UpperRoom.saveServiceOrder(activeService, getOrder());
+      } else {
+        await TheVine.flock.serviceOrders.save({ id: activeService, items: getOrder() });
+      }
+      setSaveStatus('saved');
+    } catch (err) {
+      console.error('AOW: save failed', err);
+      setSaveStatus('error');
+    } finally {
+      saving = false;
+    }
+  }
+
+  function setSaveStatus(state) {
+    const el = root.querySelector('#aow-save-status');
+    if (!el) return;
+    if (state === 'saving') { el.textContent = 'Saving…'; el.style.color = '#7a7f96'; }
+    else if (state === 'saved') { el.textContent = 'Saved ✓'; el.style.color = '#059669'; setTimeout(() => { el.textContent = ''; }, 2000); }
+    else if (state === 'error') { el.textContent = 'Save failed'; el.style.color = '#dc2626'; }
+  }
+
+  /* ── Load all three services from backend on mount ── */
+  async function loadFromFirestore() {
+    if (!_isFB() && !_isGAS()) return;
+    try {
+      const ids = ['sunday', 'evening', 'midweek'];
+      let results;
+      if (_isFB()) {
+        results = await Promise.all(ids.map(id => UpperRoom.getServiceOrder(id)));
+      } else {
+        results = await Promise.all(ids.map(id => TheVine.flock.serviceOrders.get({ id })
+          .then(r => r && r.items ? r : null).catch(() => null)));
+      }
+      let changed = false;
+      ids.forEach((id, i) => {
+        if (results[i] && Array.isArray(results[i].items) && results[i].items.length) {
+          orders[id] = results[i].items;
+          changed = true;
+        }
+      });
+      if (changed) {
+        saveLocal(orders);
+        renderList();
+      }
+    } catch (err) {
+      console.error('AOW: load failed', err);
+    }
+  }
 
   /* ── Build a read-only segment row ── */
   function segmentHTML(seg, i) {
@@ -221,7 +286,7 @@ export function mount(root) {
         mins:   Math.max(1, Number(editEl.querySelector('.aow-edit-mins').value) || seg.mins),
         note:   editEl.querySelector('.aow-edit-note').value.trim(),
       };
-      saveOrders();
+      saveOrder();
       renderList();
     });
 
@@ -230,7 +295,7 @@ export function mount(root) {
     editEl.querySelector('.aow-edit-delete').addEventListener('click', () => {
       if (!confirm(`Delete "${seg.title}"?`)) return;
       getOrder().splice(idx, 1);
-      saveOrders();
+      saveOrder();
       renderList();
     });
 
@@ -258,7 +323,7 @@ export function mount(root) {
         } else if (dir === 'down' && idx < order.length - 1) {
           [order[idx], order[idx + 1]] = [order[idx + 1], order[idx]];
         }
-        saveOrders();
+        saveOrder();
         renderList();
       });
     });
@@ -270,7 +335,7 @@ export function mount(root) {
     addBtn.addEventListener('click', () => {
       const order = getOrder();
       order.push({ type: 'worship', title: 'New Item', leader: '', mins: 5, note: '' });
-      saveOrders();
+      saveOrder();
       renderList();
       // Open edit immediately for the new item
       setTimeout(() => openEdit(order.length - 1), 30);
@@ -287,8 +352,9 @@ export function mount(root) {
     });
   });
 
-  /* ── Initial render ── */
+  /* ── Initial render + Firestore load ── */
   renderList();
+  loadFromFirestore();
 
   return () => {};
 }
