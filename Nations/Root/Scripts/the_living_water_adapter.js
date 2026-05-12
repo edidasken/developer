@@ -138,7 +138,8 @@ const _DOMAIN_MAP = {
     get:    { ur: 'getMember'     },
     create: { ur: 'createMember'  },
     update: { ur: 'updateMember'  },
-    delete: { ur: 'deleteMember'  },
+    // deleteMember(id) expects a bare string — extract .id if an object is passed
+    delete: { ur: 'deleteMember', urArgs: (p) => [typeof p === 'object' && p !== null ? p.id : p] },
   },
 
   // ── Permissions ───────────────────────────────────────────────────────────

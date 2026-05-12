@@ -608,46 +608,121 @@ function _openMemberSheet(person, V, onReload) {
     }
   });
 
-  // Archive (soft — hide from directory)
-  sheet.querySelector('[data-archive]').addEventListener('click', async () => {
-    const ok = confirm(`Archive ${name}?\n\nThey will be hidden from the directory but their records are preserved. You can restore them later.`);
-    if (!ok) return;
-    const btn = sheet.querySelector('[data-archive]');
-    btn.disabled = true;
-    try {
-      // Soft archive: flip status to Inactive (preserves all records)
-      await MXM.update({ id: docId || uid, status: 'Inactive' });
-      _closeMemberSheet();
-      onReload?.();
-    } catch (err) {
-      console.error('[TheFold] member archive error:', err);
-      btn.disabled = false;
-      alert(err?.message || 'Could not archive this person.');
+  // ── Inline confirmation modal helper ─────────────────────────────────────
+  // Shows a modal layered over the sheet panel itself — no browser dialog.
+  // opts: { title, body, confirmLabel, confirmClass, requireInput, inputPlaceholder, inputExpected, onConfirm }
+  function _sheetConfirm(opts) {
+    const existing = sheet.querySelector('.fold-sheet-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.className = 'fold-sheet-modal';
+    modal.style.cssText = [
+      'position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;',
+      'background:rgba(0,0,0,.45);backdrop-filter:blur(2px);border-radius:inherit;padding:20px;',
+    ].join('');
+
+    const inputHtml = opts.requireInput ? `
+      <input type="text" class="life-sheet-input fold-sheet-modal-input" placeholder="${_e(opts.inputPlaceholder || '')}" autocomplete="off"
+        style="margin:10px 0 4px;font-size:.92rem;" />
+      <div class="fold-sheet-modal-hint" style="font-size:.75rem;color:var(--ink-muted);margin-bottom:4px">${_e(opts.inputHint || '')}</div>
+    ` : '';
+
+    modal.innerHTML = `
+      <div style="background:var(--bg-raised,#fff);border-radius:14px;padding:22px 20px 18px;
+        box-shadow:0 8px 32px rgba(0,0,0,.22);max-width:340px;width:100%;">
+        <div style="font-weight:700;font-size:1rem;color:var(--ink,#1b264f);margin-bottom:8px">${opts.title || 'Are you sure?'}</div>
+        <div style="font-size:.85rem;color:var(--ink-muted);line-height:1.55;margin-bottom:12px">${opts.body || ''}</div>
+        ${inputHtml}
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+          <button class="flock-btn" data-modal-cancel type="button">Cancel</button>
+          <button class="flock-btn ${opts.confirmClass || 'flock-btn--primary'}" data-modal-confirm type="button"
+            ${opts.requireInput ? 'disabled' : ''}>${_e(opts.confirmLabel || 'Confirm')}</button>
+        </div>
+      </div>`;
+
+    // Position relative anchor on the panel
+    const panel = sheet.querySelector('.life-sheet-panel');
+    panel.style.position = 'relative';
+    panel.appendChild(modal);
+
+    const confirmBtn = modal.querySelector('[data-modal-confirm]');
+    const cancelBtn  = modal.querySelector('[data-modal-cancel]');
+
+    if (opts.requireInput) {
+      const inp = modal.querySelector('.fold-sheet-modal-input');
+      inp.addEventListener('input', () => {
+        confirmBtn.disabled = inp.value.trim().toLowerCase() !== opts.inputExpected.trim().toLowerCase();
+      });
+      inp.focus();
     }
+
+    cancelBtn.addEventListener('click', () => modal.remove());
+    confirmBtn.addEventListener('click', () => {
+      modal.remove();
+      opts.onConfirm();
+    });
+  }
+
+  // Archive (soft — hide from directory)
+  sheet.querySelector('[data-archive]').addEventListener('click', () => {
+    _sheetConfirm({
+      title: `Archive ${name}?`,
+      body: 'They will be hidden from the directory but their records are preserved. You can restore them from Admin later.',
+      confirmLabel: 'Archive',
+      confirmClass: 'flock-btn--secondary',
+      onConfirm: async () => {
+        const btn = sheet.querySelector('[data-archive]');
+        btn.disabled = true;
+        try {
+          await MXM.update({ id: docId || uid, status: 'Inactive' });
+          _closeMemberSheet();
+          onReload?.();
+        } catch (err) {
+          console.error('[TheFold] member archive error:', err);
+          btn.disabled = false;
+          _sheetConfirm({
+            title: 'Archive failed',
+            body: err?.message || 'Could not archive this person. Please try again.',
+            confirmLabel: 'OK',
+            onConfirm: () => {},
+          });
+        }
+      },
+    });
   });
 
   // Delete (hard — destructive, type-to-confirm)
-  sheet.querySelector('[data-delete]').addEventListener('click', async () => {
-    const typed = prompt(
-      `⚠️ PERMANENT DELETE\n\nThis will permanently remove ${name} and cannot be undone.\n\nType the first name ("${first || name.split(' ')[0] || name}") to confirm:`
-    );
-    if (typed == null) return;
+  sheet.querySelector('[data-delete]').addEventListener('click', () => {
     const expected = (first || name.split(' ')[0] || name).trim().toLowerCase();
-    if (typed.trim().toLowerCase() !== expected) {
-      alert('Name did not match. Delete cancelled.');
-      return;
-    }
-    const btn = sheet.querySelector('[data-delete]');
-    btn.disabled = true;
-    try {
-      await MXM.delete({ id: docId || uid });
-      _closeMemberSheet();
-      onReload?.();
-    } catch (err) {
-      console.error('[TheFold] member delete error:', err);
-      btn.disabled = false;
-      alert(err?.message || 'Could not delete this person.');
-    }
+    _sheetConfirm({
+      title: `Permanently delete ${name}?`,
+      body: `<strong style="color:#b91c1c">This cannot be undone.</strong> All records for this person will be permanently removed.`,
+      confirmLabel: 'Delete permanently',
+      confirmClass: 'flock-btn--danger',
+      requireInput: true,
+      inputPlaceholder: `Type "${first || name.split(' ')[0] || name}" to confirm`,
+      inputHint: `Type the first name exactly to enable the delete button.`,
+      inputExpected: expected,
+      onConfirm: async () => {
+        const btn = sheet.querySelector('[data-delete]');
+        btn.disabled = true;
+        try {
+          await MXM.delete(docId || uid);
+          _closeMemberSheet();
+          onReload?.();
+        } catch (err) {
+          console.error('[TheFold] member delete error:', err);
+          btn.disabled = false;
+          _sheetConfirm({
+            title: 'Delete failed',
+            body: err?.message || 'Could not delete this person. Please try again.',
+            confirmLabel: 'OK',
+            onConfirm: () => {},
+          });
+        }
+      },
+    });
   });
 }
 
