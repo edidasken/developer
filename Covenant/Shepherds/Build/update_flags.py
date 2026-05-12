@@ -1,1 +1,1 @@
-../../../Running to Jesus/Shepherds/Build/update_flags.py
+../../../Iris/Shepherds/Build/update_flags.py

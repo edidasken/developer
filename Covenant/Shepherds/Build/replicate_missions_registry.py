@@ -1,1 +1,1 @@
-../../../Running to Jesus/Shepherds/Build/replicate_missions_registry.py
+../../../Iris/Shepherds/Build/replicate_missions_registry.py
