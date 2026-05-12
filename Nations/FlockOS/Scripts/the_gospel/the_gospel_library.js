@@ -60,8 +60,8 @@ export function mount(root) {
 
 async function _load(root) {
   try {
-    const mod = await import('../../Data/library.js');
-    _state.rows = mod.default || [];
+    const mod = await import('../../Data/books-of-the-bible.js');
+    _state.rows = (mod.default || []).slice().sort((a, b) => (a.order || 0) - (b.order || 0));
   } catch (e) {
     console.error('[gospel/library] static bundle failed:', e);
     _state.rows = [];
@@ -72,26 +72,32 @@ async function _load(root) {
 function _filtered() {
   return _state.rows.filter((b) => {
     if (_state.test !== 'all') {
-      const t = (b.Testament || b.testament || '').toLowerCase();
+      const t = (b.testament || '').toLowerCase();
       if (_state.test === 'ot' && !t.startsWith('old')) return false;
       if (_state.test === 'nt' && !t.startsWith('new')) return false;
     }
     if (_state.q) {
-      const hay = ((b.Book || b.title || '') + ' ' + (b.Summary || '') + ' ' + (b.Genre || '')).toLowerCase();
+      const hay = (b.bookName + ' ' + b.summary + ' ' + b.genre + ' ' + (b.themes || '') + ' ' + (b.author || '')).toLowerCase();
       if (!hay.includes(_state.q)) return false;
     }
     return true;
   });
 }
 
+function _shortGenre(g) {
+  if (!g) return '';
+  const m = g.match(/\(([^)]+)\)/);
+  return (m ? m[1] : g).replace(/^The /, '');
+}
+
 function _paint(root) {
   const list = _filtered();
   const listEl = root.querySelector('[data-bind="list"]');
   if (!list.length) { listEl.innerHTML = emptyState({ icon: '📖', title: 'No matches' }); return; }
-  listEl.innerHTML = list.map((b, i) => `
-    <button class="grow-book-row ${_state.selected === (b.Book || i) ? 'is-active' : ''}" data-b="${esc(String(b.Book || i))}">
-      <span class="grow-book-name">${esc(b.Book || b.title || '')}</span>
-      <span class="grow-book-genre">${esc(b.Genre || b.genre || '')}</span>
+  listEl.innerHTML = list.map((b) => `
+    <button class="grow-book-row ${_state.selected === b.bookName ? 'is-active' : ''}" data-b="${esc(b.bookName)}">
+      <span class="grow-book-name">${esc(b.bookName)}</span>
+      <span class="grow-book-genre">${esc(_shortGenre(b.genre))}</span>
     </button>
   `).join('');
   listEl.querySelectorAll('[data-b]').forEach((btn) => btn.addEventListener('click', () => {
@@ -104,17 +110,21 @@ function _paint(root) {
 function _paintDetail(root) {
   const det = root.querySelector('[data-bind="detail"]');
   if (!_state.selected) return;
-  const list = _filtered();
-  const b = list.find((x, i) => String(x.Book || i) === String(_state.selected));
+  const b = _state.rows.find((x) => x.bookName === _state.selected);
   if (!b) return;
+  const genre = _shortGenre(b.genre);
   det.innerHTML = /* html */`
-    <h2 class="grow-detail-title">${esc(b.Book || b.title || '')}</h2>
+    <h2 class="grow-detail-title">${esc(b.bookName)}</h2>
     <div class="grow-lex-meta">
-      ${b.Testament ? chip(b.Testament + ' Testament', 'level') : ''}
-      ${b.Genre     ? chip(b.Genre, 'topic') : ''}
+      ${b.testament ? chip(b.testament + ' Testament', 'level') : ''}
+      ${genre       ? chip(genre, 'topic') : ''}
+      ${b.author    ? `<span class="grow-chip grow-chip--ref">\u270F\uFE0F ${esc(b.author)}</span>` : ''}
     </div>
-    ${b.Summary ? `<h4 class="grow-detail-h4">Summary</h4><p class="grow-detail-body">${esc(snip(b.Summary, 800))}</p>` : ''}
-    ${b['Core Theology'] ? `<h4 class="grow-detail-h4">Core Theology</h4><p class="grow-detail-body">${esc(snip(b['Core Theology'], 600))}</p>` : ''}
-    ${b['Practical Application'] ? `<h4 class="grow-detail-h4">Application</h4><p class="grow-detail-body">${esc(snip(b['Practical Application'], 600))}</p>` : ''}
+    ${b.timePeriod  ? `<p class="grow-detail-meta">\uD83D\uDD50 ${esc(b.timePeriod)}</p>` : ''}
+    ${b.keyVerse    ? `<blockquote class="grow-detail-quote">${esc(b.keyVerse)}</blockquote>` : ''}
+    ${b.summary     ? `<h4 class="grow-detail-h4">Summary</h4><p class="grow-detail-body">${esc(b.summary)}</p>` : ''}
+    ${b.themes      ? `<h4 class="grow-detail-h4">Themes</h4><p class="grow-detail-body">${esc(b.themes)}</p>` : ''}
+    ${b.christInBook? `<h4 class="grow-detail-h4">Christ in This Book</h4><p class="grow-detail-body">${esc(b.christInBook)}</p>` : ''}
+    ${b.application ? `<h4 class="grow-detail-h4">Application</h4><p class="grow-detail-body">${esc(b.application)}</p>` : ''}
   `;
 }

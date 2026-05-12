@@ -13511,8 +13511,11 @@ flock-tabs [role="tablist"], .tabs-bar {
 
 .grow-detail-title { margin:0 0 8px; font-size:22px; font-weight:600; color:var(--text, #f5f5f7); }
 .grow-detail-sub   { margin:0 0 16px; color:var(--muted, #aaa); font-size:14px; line-height:1.5; }
+.grow-detail-meta  { margin:4px 0 12px; color:var(--muted, #aaa); font-size:13px; }
+.grow-detail-quote { margin:0 0 16px; padding:10px 16px; border-left:3px solid var(--grow-accent, #9333ea); color:var(--text, #d8d8d8); font-style:italic; font-size:14px; line-height:1.6; }
 .grow-detail-h4    { margin:18px 0 6px; font-size:13px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--muted, #aaa); }
 .grow-detail-body  { margin:0 0 10px; line-height:1.65; color:var(--text, #d8d8d8); font-size:14px; }
+.grow-chip--ref    { display:inline-flex; align-items:center; gap:4px; font-size:11px; padding:3px 10px; border-radius:20px; background:rgba(147,51,234,.15); color:#c084fc; }
 .grow-detail-hd { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
 
 .grow-doctrine { padding:14px 0; border-top:1px solid var(--border, rgba(255,255,255,.06)); }
