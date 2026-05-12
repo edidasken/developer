@@ -19,7 +19,7 @@ set -euo pipefail
 
 # ── Resolve repo root (Software/) and Storehouse destination ──────────
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"           # .../FlockOS/Software
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"              # .../FlockOS/Software
 STOREHOUSE="$(cd "$REPO_ROOT/.." && pwd)/Storehouse"      # .../FlockOS/Storehouse
 
 # ── Flags ─────────────────────────────────────────────────────────────
