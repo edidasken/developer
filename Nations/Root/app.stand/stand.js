@@ -143,18 +143,31 @@ function _renderChordPro(text, opts = {}) {
     if (dirMatch) {
       const [, key, val] = dirMatch;
       const k = key.toLowerCase();
-      if (k === 'comment' || k === 'c' || k === 'verse' || k === 'chorus') {
+      // Metadata-only directives — silently skip
+      const META_KEYS = new Set(['title','t','subtitle','st','artist','album','key','tempo','time','capo','copyright','ccli','flow','duration','book','number','keywords','topic','restrictions','songselect','link','meta','env','sorttitle']);
+      if (!META_KEYS.has(k)) {
+        // All non-metadata directives open a labelled section
         if (inSection) html += '</div></div>';
-        const col = _secColor(val);
-        html += `<div class="ms-section"><div class="ms-section-label" style="--sc:var(${col})">${_e(val)}</div><div class="ms-section-body">`;
+        const label = val || k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        const col = _secColor(label);
+        html += `<div class="ms-section"><div class="ms-section-label" style="--sc:var(${col})">${_e(label)}</div><div class="ms-section-body">`;
         inSection = true;
       }
       continue;
     }
 
-    // Start-of-section shorthand: {sov:...} etc
-    if (/^\{sov?|sos?|soc?|sob?|sop?|soi?\}/.test(line)) continue;
-    if (/^\{eov?|eos?|eoc?|eob?|eop?|eoi?\}/.test(line)) {
+    // Start-of-section shorthand: {sov:...} / {start_of_verse:...} etc — open labelled section
+    const sovMatch = line.match(/^\{(?:start_of_|so)(\w+)(?::\s*(.*?))?\s*\}/i);
+    if (sovMatch) {
+      if (inSection) html += '</div></div>';
+      const secType  = sovMatch[1].toLowerCase().replace(/_/g, '-');
+      const secLabel = sovMatch[2] || (secType.charAt(0).toUpperCase() + secType.slice(1));
+      const col = _secColor(secLabel);
+      html += `<div class="ms-section"><div class="ms-section-label" style="--sc:var(${col})">${_e(secLabel)}</div><div class="ms-section-body">`;
+      inSection = true;
+      continue;
+    }
+    if (/^\{(?:end_of_|eo)\w+\}/i.test(line)) {
       if (inSection) { html += '</div></div>'; inSection = false; }
       continue;
     }
