@@ -1499,12 +1499,18 @@
   function listTouches(opts) {
     opts = opts || {};
     if (!opts.memberId) return Promise.reject('memberId required');
-    var q = _touchesRef()
-      .where('memberId', '==', opts.memberId)
-      .orderBy('loggedAt', 'desc');
-    if (opts.limit) q = q.limit(opts.limit);
+    // No orderBy — avoids requiring a composite Firestore index on a new collection.
+    // Sort client-side instead (descending by loggedAt).
+    var q = _touchesRef().where('memberId', '==', opts.memberId);
+    var limit = opts.limit || 50;
     return q.get().then(function(snap) {
-      return snap.docs.map(function(d) { var r = d.data(); r.id = d.id; return r; });
+      var rows = snap.docs.map(function(d) { var r = d.data(); r.id = d.id; return r; });
+      rows.sort(function(a, b) {
+        var ta = a.loggedAt && a.loggedAt.toMillis ? a.loggedAt.toMillis() : (a.loggedAt ? new Date(a.loggedAt).getTime() : 0);
+        var tb = b.loggedAt && b.loggedAt.toMillis ? b.loggedAt.toMillis() : (b.loggedAt ? new Date(b.loggedAt).getTime() : 0);
+        return tb - ta;
+      });
+      return rows.slice(0, limit);
     });
   }
 

@@ -988,6 +988,24 @@ service cloud.firestore {
         allow write: if isSignedIn() && prefDocId == userEmail().replace('[^a-zA-Z0-9@._-]', '_');
       }
 
+      // ── Touches (shepherd contact log — text/call/email per member) ──
+      match /touches/{touchId} {
+        // Read: leader+ (shepherds reviewing contact history)
+        allow read: if isSignedIn() && isLeaderOrAbove();
+
+        // Create: any signed-in member can log a touch
+        allow create: if isSignedIn();
+
+        // Update: creator or pastor/admin
+        allow update: if isSignedIn() && (
+          resource.data.loggedBy == userEmail()
+          || isPastorOrAdmin()
+        );
+
+        // Delete: pastor/admin only
+        allow delete: if isSignedIn() && isPastorOrAdmin();
+      }
+
       // ── Contact Log ───────────────────────────────────────────────
       match /contactLog/{docId} {
         allow read: if isLeaderOrAbove();
