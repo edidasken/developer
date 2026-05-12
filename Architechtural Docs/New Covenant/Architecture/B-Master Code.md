@@ -30727,6 +30727,212 @@ function syncFirestoreToSheet() {
 }
 
 
+// ── Chunked sync for large / content collections ─────────────────────────────
+//
+// Use this for collections that are too large to fetch in a single GAS
+// execution (words, theology, apologetics, devotionals, books, etc.).
+//
+// HOW TO USE:
+//   1. Run syncLargeCollections() from the GAS editor.
+//   2. If the collection is not finished (> PAGE_SIZE docs), run it again.
+//      Each run picks up where the last one left off via a stored page token.
+//   3. When done, the log will say "✅ All large collections synced."
+//   4. To do a full re-sync from scratch, run resetLargeCollectionSync() first.
+//
+// Each collection is appended to its sheet tab (rows added below existing data).
+// Run resetLargeCollectionSync() to wipe the tabs and start fresh.
+//
+// Large collections synced by this function (not in SYNC_COLLECTIONS):
+//   words, theology, apologetics, devotionals, books, counseling,
+//   genealogy, heart, mirror, quiz, reading, config
+// ─────────────────────────────────────────────────────────────────────────────
+
+var LARGE_COLLECTIONS = [
+  { collection: 'words',       tab: 'Words'       },
+  { collection: 'theology',    tab: 'Theology'    },
+  { collection: 'apologetics', tab: 'Apologetics' },
+  { collection: 'devotionals', tab: 'Devotionals' },
+  { collection: 'books',       tab: 'Books'       },
+  { collection: 'counseling',  tab: 'Counseling'  },
+  { collection: 'genealogy',   tab: 'Genealogy'   },
+  { collection: 'heart',       tab: 'Heart'       },
+  { collection: 'mirror',      tab: 'Mirror'      },
+  { collection: 'quiz',        tab: 'Quiz'        },
+  { collection: 'reading',     tab: 'Reading'     },
+  { collection: 'config',      tab: 'Config'      }
+];
+
+var LARGE_SYNC_PAGE_SIZE = 200;  // docs per run per collection
+
+/**
+ * Resume (or start) a chunked sync of LARGE_COLLECTIONS.
+ * Run repeatedly until the log says "✅ All large collections synced."
+ */
+function syncLargeCollections() {
+  var saJson = PropertiesService.getScriptProperties().getProperty('FIREBASE_SERVICE_ACCOUNT');
+  if (!saJson) {
+    Logger.log('[LargeSync] Skipping — FIREBASE_SERVICE_ACCOUNT not set.');
+    return;
+  }
+  var token = _getFirestoreAccessToken();
+  var ss    = SpreadsheetApp.openById(
+    PropertiesService.getScriptProperties().getProperty('SHEET_ID')
+  );
+  var props = PropertiesService.getScriptProperties();
+
+  var allDone = true;
+
+  for (var c = 0; c < LARGE_COLLECTIONS.length; c++) {
+    var cfg        = LARGE_COLLECTIONS[c];
+    var propKey    = 'LARGE_SYNC_TOKEN_' + cfg.collection;
+    var doneKey    = 'LARGE_SYNC_DONE_' + cfg.collection;
+
+    if (props.getProperty(doneKey) === 'true') {
+      Logger.log('[LargeSync] ' + cfg.collection + ': already complete, skipping.');
+      continue;
+    }
+
+    allDone = false;
+    var pageToken = props.getProperty(propKey) || null;
+    var isFirstPage = !pageToken;
+
+    Logger.log('[LargeSync] ' + cfg.collection + ': fetching page (pageSize=' + LARGE_SYNC_PAGE_SIZE + ')...');
+
+    var baseUrl = 'https://firestore.googleapis.com/v1/projects/' + FS_PROJECT_ID +
+      '/databases/(default)/documents/' + cfg.collection;
+    var url = baseUrl + '?pageSize=' + LARGE_SYNC_PAGE_SIZE;
+    if (pageToken) url += '&pageToken=' + encodeURIComponent(pageToken);
+
+    var resp = UrlFetchApp.fetch(url, {
+      method: 'get',
+      headers: { 'Authorization': 'Bearer ' + token },
+      muteHttpExceptions: true
+    });
+    var code = resp.getResponseCode();
+    if (code !== 200) {
+      Logger.log('[LargeSync] ERROR ' + cfg.collection + ': HTTP ' + code);
+      Logger.log(resp.getContentText().substring(0, 500));
+      continue;
+    }
+
+    var body      = JSON.parse(resp.getContentText());
+    var documents = body.documents || [];
+    var nextToken = body.nextPageToken || null;
+
+    if (documents.length === 0) {
+      Logger.log('[LargeSync] ' + cfg.collection + ': 0 docs returned — marking done.');
+      props.setProperty(doneKey, 'true');
+      props.deleteProperty(propKey);
+      continue;
+    }
+
+    // Parse docs — dynamic field discovery
+    var allFields = {};
+    var parsedDocs = [];
+    for (var i = 0; i < documents.length; i++) {
+      var fsDoc  = documents[i];
+      var parsed = _parseFirestoreDoc(fsDoc);
+      var nameParts = fsDoc.name.split('/');
+      parsed.id = nameParts[nameParts.length - 1];
+      parsedDocs.push(parsed);
+      var keys = Object.keys(parsed);
+      for (var k = 0; k < keys.length; k++) allFields[keys[k]] = true;
+    }
+
+    // Build ordered field list: id first, then alphabetical
+    var fieldList = Object.keys(allFields);
+    fieldList.sort();
+    if (fieldList.indexOf('id') !== -1) {
+      fieldList.splice(fieldList.indexOf('id'), 1);
+      fieldList.unshift('id');
+    }
+
+    var sheet = _getOrCreateSheet_(ss, cfg.tab, fieldList);
+
+    // On first page: clear existing content + validations and write headers
+    if (isFirstPage) {
+      sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns()).clearDataValidations();
+      sheet.clearContents();
+      // Ensure enough columns
+      if (sheet.getMaxColumns() < fieldList.length) {
+        sheet.insertColumnsAfter(sheet.getMaxColumns(), fieldList.length - sheet.getMaxColumns());
+      }
+      sheet.getRange(1, 1, 1, fieldList.length).setValues([fieldList]);
+    } else {
+      // Subsequent pages: read existing headers to keep column order consistent
+      var existingHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+      // Merge any new fields not in existing headers
+      for (var f = 0; f < fieldList.length; f++) {
+        if (existingHeaders.indexOf(fieldList[f]) === -1) {
+          existingHeaders.push(fieldList[f]);
+        }
+      }
+      fieldList = existingHeaders;
+      if (sheet.getMaxColumns() < fieldList.length) {
+        sheet.insertColumnsAfter(sheet.getMaxColumns(), fieldList.length - sheet.getMaxColumns());
+      }
+      // Update header row in case new fields were discovered
+      sheet.getRange(1, 1, 1, fieldList.length).setValues([fieldList]);
+    }
+
+    // Build rows
+    var rows = [];
+    for (var d = 0; d < parsedDocs.length; d++) {
+      var doc = parsedDocs[d];
+      var row = [];
+      for (var fi = 0; fi < fieldList.length; fi++) {
+        var v = doc[fieldList[fi]];
+        row.push(v !== undefined && v !== null ? v : '');
+      }
+      rows.push(row);
+    }
+
+    // Append rows after last row
+    var lastRow = sheet.getLastRow();
+    if (sheet.getMaxRows() < lastRow + rows.length) {
+      sheet.insertRowsAfter(sheet.getMaxRows(), rows.length);
+    }
+    sheet.getRange(lastRow + 1, 1, rows.length, fieldList.length).setValues(rows);
+
+    Logger.log('[LargeSync] ' + cfg.collection + ': wrote ' + rows.length + ' docs (total so far: ' + (lastRow - 1 + rows.length) + ')');
+
+    if (nextToken) {
+      props.setProperty(propKey, nextToken);
+      Logger.log('[LargeSync] ' + cfg.collection + ': more pages remain — run syncLargeCollections() again to continue.');
+      // Stop here so we don't time out — next run picks up the next collection
+      SpreadsheetApp.flush();
+      return;
+    } else {
+      props.setProperty(doneKey, 'true');
+      props.deleteProperty(propKey);
+      Logger.log('[LargeSync] ' + cfg.collection + ': ✅ complete.');
+    }
+  }
+
+  SpreadsheetApp.flush();
+  if (allDone) {
+    Logger.log('[LargeSync] ✅ All large collections synced.');
+  } else {
+    Logger.log('[LargeSync] ✅ This pass complete. Run syncLargeCollections() again if any collections remain.');
+  }
+}
+
+/**
+ * Reset all chunked-sync progress so the next syncLargeCollections() run
+ * starts each collection from scratch (page 1, sheet cleared).
+ * Run this before a full re-sync.
+ */
+function resetLargeCollectionSync() {
+  var props = PropertiesService.getScriptProperties();
+  for (var c = 0; c < LARGE_COLLECTIONS.length; c++) {
+    var cfg = LARGE_COLLECTIONS[c];
+    props.deleteProperty('LARGE_SYNC_TOKEN_' + cfg.collection);
+    props.deleteProperty('LARGE_SYNC_DONE_'  + cfg.collection);
+  }
+  Logger.log('[LargeSync] 🔄 Reset complete — run syncLargeCollections() to start fresh.');
+}
+
+
 // ── Firestore REST API — list all documents in a collection ──────────────────
 
 function _firestoreListAll(collectionName, accessToken) {
