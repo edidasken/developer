@@ -1,146 +1,247 @@
 # New Covenant — As-Built Operations Guide
 
+> Last updated: 2026-05-11
+
+---
+
 ## 1. Repo Layout
 
-The `Architechtural Docs/New Covenant/` directory structure organizes documentation and artifacts for the FlockOS New Covenant application.
+```
+Software/
+├── New_Covenant/               ★ PRIMARY SOURCE — all edits go here
+│   ├── index.html              App shell entry point
+│   ├── the_living_water.js     Service worker
+│   ├── Scripts/                All JS modules + the_gospel/ submodules
+│   ├── Styles/new_covenant.css All app CSS (New Covenant)
+│   ├── Views/                  49 JS-rendered view modules
+│   ├── Data/                   Bundled content (Strong's, OYB, devotionals, etc.)
+│   ├── app.flockos/            FlockOS authenticated app shell
+│   ├── app.grow/               GROW public outreach shell
+│   ├── app.invite/             The Invitation public shell
+│   ├── app.stand/              Music Stand standalone shell
+│   └── app.embeds/             Embeddable iframes
+│
+├── Nations/                    BUILD OUTPUT — B-Build rsync target
+│   ├── Root/                   FlockOS default
+│   ├── FlockOS/                FlockOS branded
+│   ├── TBC/                    Trinity Baptist Church
+│   ├── TheForest/              The Forest
+│   └── GAS/                    GAS backend variant
+│
+├── Covenant/                   Legacy GAS/Sheets generation (stable)
+│   ├── Courts/TheTabernacle/   Covenant source (Pages/ + Scripts/)
+│   ├── Nations/                Covenant build output (A-Build)
+│   ├── Scrolls/ChurchRegistry/ Church JSON configs (shared by A-Build + B-Build)
+│   └── Foundations/SharedVessels/styles/american_garments.css  Covenant shared CSS
+│
+├── Iris/                       Operational toolbox
+│   ├── Bezalel/Scripts/        Build scripts
+│   ├── Shepherds/Build/        13 Firestore seed/migration scripts
+│   └── Runbooks/Snapshot.sh    Incremental hardlink snapshot
+│
+└── flockchat-public/           FlockChat deploy source → Firebase hosting
+    ├── FlockChat.html
+    └── FlockChat/the_word.js
+```
 
-*   **`Architecture/`**: Contains core architectural design documents, schema definitions, and master GAS script files (`A-FlockOS New Covenant.md`, `A-State of Data.md`, `C-Master FirestoreSync.md`, `D-Master SyncHandler.md`, `E-Master CamelCase.md`, `New Covenant Schema.sql`, `Z-Variance.md`).
-*   **`Automation/`**: Houses utility scripts for schema generation and documentation mirroring (`generate_schema_manifest_from_sql.cjs`, `publish_truth_schema_backup.cjs`, `mirror_architecture_to_old_covenant.cjs`).
-*   **`Deployment/`**: Stores master configuration files for church deployments, Firebase Firestore rules, and indexes (`ChurchRegistry/`, `Firestore/`). This is the canonical source for these files.
-*   **`Migration/`**: Placeholder for migration-related documentation.
-*   **`Platforms/`**: Placeholder for platform-specific documentation (e.g., `ATOG/`, `FlockChat/`).
-*   **`Runbooks/`**: Placeholder for operational runbooks.
-*   **`Secrets/`**: Stores sensitive configuration details and service account keys (`Flock/`). Access is restricted.
-*   **`Tests/`**: Placeholder for test documentation.
+**CSS source of truth:**
+- New Covenant: `New_Covenant/Styles/new_covenant.css`
+- Covenant (legacy): `Covenant/Foundations/SharedVessels/styles/american_garments.css`
 
-## 2. Local Development
+Do **not** edit `Nations/<Church>/` directly — it is B-Build output. Do **not** edit `Covenant/Nations/<Church>/` directly — it is A-Build output.
 
-The FlockOS New Covenant application is built using vanilla JavaScript, ES modules, and native Web Components, with no build step required during development. Modules are served directly as plain `.js` files.
+---
 
-To run the application locally:
+## 2. Build System
 
-1.  Ensure you have a local HTTP server running. Python's `http.server`, Node.js `serve`, or similar static file servers are suitable.
-2.  Serve the root of the application (e.g., `Covenant/Nations/FlockOS/FlockOS/`).
-3.  Access the application in your browser. The app should load `FlockOS.html` and `the_ark.js`.
+### B-Build (New Covenant → Nations)
 
-The `FlockOS.html` file acts as the single HTML shell, into which all views are rendered.
+```bash
+bash "Iris/Bezalel/Scripts/B-Build_Nations.sh"
+```
 
-## 3. Deployment Pipeline
+Per church, B-Build:
+1. `rsync`s `New_Covenant/` → `Nations/<Church>/`
+2. Patches `the_true_vine.js` GAS endpoint URLs
+3. Patches `the_living_water.js` `CACHE_NAME` (e.g. `flockos-tbc-v1.01`)
+4. Patches Firebase config into app shells (`app.flockos.html`, `app.grow.html`, all `app.embeds/*.html`, `app.invite.html`)
+5. Strips Firebase config for GAS-only builds
+6. Patches `app.flockos/manifest.json` and `app.invite/manifest.json` with church name
+7. Patches `index.html` church selector
+8. Logs a Generations entry to Firestore on success
 
-New Covenant changes are deployed to individual "Nations" (churches) using a master-to-Nations synchronization approach.
+### A-Build (Covenant → Covenant/Nations)
 
-1.  **Source of Truth**: All application code is authored once under `/FlockOS/` (master).
-2.  **Build Script**: The primary deployment script is `bash "Iris/Bezalel/Scripts/A-Build_Churches.sh"`.
-3.  **Synchronization**: This script `rsyncs` the master code to every Nation's deployment directory.
-4.  **Auto-generation**: It regenerates `builds_codex.js` and syncs `SharedVessels` CSS (specifically `Covenant/Foundations/SharedVessels/styles/american_garments.css`).
-    *   **Crucial Note**: Files synced from master (e.g., `american_garments.css`) and those generated by the build script (`builds_codex.js`, `CamelCase.gs`) **should NOT be manually edited** in individual Nation deployments. All edits must occur in the master source under `/FlockOS/`.
-5.  **Firebase Configuration Injection**: The build script reads each church's Firebase configuration from `Covenant/Scrolls/ChurchRegistry/<Church>.json` and injects `window.FLOCK_FIREBASE_CONFIG`, `window.FLOCK_CHURCH_ID`, and `window.FLOCK_VAPID_KEY` directly into the `FlockOS.html` shell as an inline `<script>` block.
-6.  **Firestore Rules Integration**: It stitches the `flockchat-tenant.rules` (a starter set of Firestore rules for chat functionality) into each church's main `firestore.rules`.
-7.  **Schema Publication**: The build process also publishes the `Architechtural Docs/New Covenant/Architecture/combined_schema_manifest.deployable.json` into the `flockos-truth` Firestore project. This includes a `latest` document and immutable snapshots per run. Use `--skip-truth-schema-publish` only for emergency/offline builds.
-8.  **Backend (GAS)**: Each church's Google Apps Script (GAS) project is deployed as a Web App (`Execute as: Me, Access: Anyone`). This GAS project integrates with Firestore using `FirestoreSync.gs` (hourly Firestore → Sheet backup) and `SyncHandler.gs` (real-time Firestore → Sheet sync via Cloud Function).
-9.  **Frontend Hosting**: The PWA frontend is served via GitHub Pages and Firebase Hosting. FlockChat, when deployed standalone, uses `firebase deploy --only hosting --project flockos-comms`. The build script includes an optional `--skip-comms-legacy` flag to manage the retirement of standalone FlockChat hosting.
-10. **Service Worker**: A single service worker (`the_living_water.js`) handles app-shell caching, API caching, offline fallback, and FCM background message events.
+```bash
+bash "Iris/Bezalel/Scripts/A-Build_Churches.sh"
+```
 
-## 4. Church Registry
+Per church, A-Build:
+1. Fetches live church configs from the master API
+2. Regenerates `bezalel_codex.js` (Covenant)
+3. Publishes `Z-Combined_Schema_Manifest.deployable.json` to `flockos-truth` Firestore
+4. `rsync`s `Covenant/Courts/TheTabernacle/` → `Covenant/Nations/<Church>/`
+5. Patches database URL, theme colors, brand text, manifest per church
 
-The `Deployment/ChurchRegistry/` folder is the canonical storage for master church deployment JSON configurations.
+### BCP (A-Build + FlockChat deploy)
 
-*   **Purpose**: Each JSON file (`<ChurchName>.json`) represents a specific church deployment, containing its unique Firebase configuration and other deployment-specific parameters.
-*   **Contents**: These files define the `firebase` object (with `apiKey`, `authDomain`, `projectId`, etc.) and `churchId` that are injected into the client-side application during the build process.
-    ```json
-    {
-      "firebase": {
-        "apiKey": "...",
-        "authDomain": "...",
-        "projectId": "...",
-        "storageBucket": "...",
-        "messagingSenderId": "...",
-        "appId": "...",
-        "vapidKey": "..."
-      },
-      "churchId": "the-forest"
-    }
-    ```
-*   **How a New Church is Registered**:
-    1.  Create a new JSON file (e.g., `NewChurch.json`) in `Deployment/ChurchRegistry/`.
-    2.  Populate it with the specific Firebase web configuration and the unique `churchId` for the new church's Firebase project.
-    3.  The build script (`A-Build_Churches.sh`) will then use this configuration to build and deploy the application for the new church, injecting the correct Firebase settings.
+```bash
+bash "Iris/Bezalel/Scripts/A-Build_Churches.sh" --deploy-comms
+```
+
+### When to run which
+
+| What changed | Run |
+|---|---|
+| `New_Covenant/` source | B-Build → commit + push |
+| `Covenant/Courts/TheTabernacle/` source | A-Build → commit + push |
+| `flockchat-public/` | BCP (`--deploy-comms`) → commit + push |
+| Docs / `Architechtural Docs/` only | commit + push (no build) |
+
+---
+
+## 3. Church Registry
+
+Canonical location: `Covenant/Scrolls/ChurchRegistry/`
+
+Both A-Build and B-Build read config files from this folder. Each file is `<ShortName>.json`.
+
+```json
+{
+  "id": "",
+  "name": "",
+  "shortName": "",
+  "brandName": "",
+  "tagline": "Church Management & Ministry Platform",
+  "themeColor": "#e8a838",
+  "backgroundColor": "#1a1a2e",
+  "databaseUrl": "",
+  "adminEmail": "",
+  "firebaseConfig": { ... }
+}
+```
+
+**Active configs:** `FlockOS-Root.json`, `GAS.json`, `Trinity.json`, `TheForest.json`
+
+To add a new church:
+1. Copy `ChurchTemplate.json` → `<ShortName>.json` in `Covenant/Scrolls/ChurchRegistry/`
+2. Fill all fields
+3. Run B-Build (New Covenant) and/or A-Build (Covenant)
+4. Commit + push
+
+---
+
+## 4. Schema Artifacts
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `Z-New Covenant Schema.sql` | `Architechtural Docs/New Covenant/Architecture/` | Authoritative Firestore schema definition |
+| `Z-Combined_Schema_Manifest.deployable.json` | Same | Combined schema manifest — published to `flockos-truth` on every A-Build |
+
+The manifest is published by `Iris/Bezalel/Scripts/publish_truth_schema_backup.cjs` as:
+- `schemaBackups/combined_schema_manifest_deployable` (latest, overwritten each run)
+- `schemaBackups/snapshot_<timestamp>` (immutable per-run snapshot)
+
+Use `--skip-truth-schema-publish` only for offline/emergency builds.
+
+**Total Firestore collections:** 100
+- 90 canonical Covenant collections
+- 3 New Covenant strategic-plan extensions (`strategicGoals`, `strategicInitiatives`, `strategicKeyDates`)
+- 7 deployment/operations collections (`appConfig`, `masterConfig`, `churches`, `churchVault`, `deployConfigs`, `problems`, `quarterlyPlans`)
+
+---
 
 ## 5. Firestore Rules & Indexes
 
-The `Deployment/Firestore/` directory contains the master `firestore.rules` and `firestore.indexes.json` files that define data security and querying capabilities for all Firebase Firestore projects.
+| File | Location |
+|------|----------|
+| `FlockChat.Firestore.Rules` | Repo root |
+| `firestore.indexes.json` | Repo root |
+| `church-firestore.firebase.json` | Repo root |
 
-*   **Firestore Rules (`firestore.rules`)**:
-    *   Define access control for all collections.
-    *   Examples of security logic include:
-        *   `churches/{cid}/channels/{chid}/messages/{mid}`: Read access if the user is a member of the church; write/delete access if the user is the author or an administrator.
-        *   `churches/{cid}/dms/{tid}/messages/{mid}`: Read/write access only if the `tid` participants include the requesting user's UID.
-        *   `churches/{cid}/presence/{uid}`: Write access only to the user's own UID.
-    *   The build script (`A-Build_Churches.sh`) integrates a `flockchat-tenant.rules` file into the main `firestore.rules`.
-    *   Explicit `allow/role` logic must be ensured for strategic collections: `strategicGoals`, `strategicInitiatives`, and `strategicKeyDates`.
-*   **Firestore Indexes (`firestore.indexes.json`)**:
-    *   Defines composite and single-field indexes necessary for efficient query performance. This file ensures that queries spanning multiple fields or requiring specific ordering are optimized.
-    *   (Details about specific indexes are not provided in the source but the presence of the file indicates this is how they are managed.)
+Key rules:
+- `churches/{cid}/channels/{chid}/messages/{mid}` — read: church member; write/delete: author or admin
+- `churches/{cid}/dms/{tid}/messages/{mid}` — read/write: only if `tid` participants include requesting UID
+- `churches/{cid}/presence/{uid}` — write: own UID only
+- Strategic collections (`strategicGoals`, `strategicInitiatives`, `strategicKeyDates`) — role-gated write
 
-## 6. Adding a New View
+---
 
-New views in FlockOS New Covenant are implemented as ES modules, replacing the legacy `Pages/*.html` per-view files.
+## 6. Local Development
 
-1.  **Create View Module**: In the `views/` directory, create a new folder named after your view (e.g., `views/the_new_view/`). Inside, create `index.js`.
-2.  **Define View Properties**: In `index.js`, export `name`, `route`, and `title` for the view.
-    ```javascript
-    // views/the_good_shepherd/index.js (example)
-    export const name = 'the_good_shepherd';
-    export const route = '/';
-    export const title = 'The Good Shepherd';
-    ```
-3.  **Implement `render` Function**: Export a `render(params)` function that returns an HTML template literal. This is the UI markup for the view.
-4.  **Implement `mount` Function**: Export a `mount(root, ctx)` function. This function receives the DOM root element where the view is rendered and a context object. Use this for attaching event listeners, subscribing to data sources (`the_well`), and other dynamic setup. It must return an `unmount` function (a cleanup callback).
-5.  **Styling**: Add new CSS sections inside `Covenant/Foundations/SharedVessels/styles/american_garments.css` using biblical headers (e.g., `/* ===== The New View ===== */`). Use scoped class prefixes (e.g., `.new-view-section`) for view-specific styles within this shared stylesheet. **Do not create separate CSS files for views.**
-6.  **Register with Router**: The `the_scribes/index.js` module (router) will lazy-import views. Ensure the view is registered with `scribes.register(name, loader)`.
-7.  **UX Deliverables**: For each new view, ensure it covers the 5 UX states: empty, loading skeleton (no spinners), error, success/completion micro-moment, and keyboard entry via `the_herald` (command palette).
-8.  **Naming Convention**: Adhere to biblical naming conventions for all files and concepts.
-9.  **File Size Limit**: Keep JavaScript files small; **no JS file exceeds 300 lines** (soft target ~150). Split files into a folder structure (`index.js` + siblings) if they grow too large.
+No build step required. New Covenant is vanilla ES modules served as static files.
 
-## 7. Adding a New Script Module
+1. Run a local HTTP server from `New_Covenant/` (Python `http.server` or Node `serve`)
+2. Open `index.html` in browser
+3. The service worker (`the_living_water.js`) registers automatically
 
-New modules are introduced into the `Scripts/` folder to encapsulate specific responsibilities.
+The app shell is `New_Covenant/index.html`. All views render into it via `the_tabernacle.js`.
 
-1.  **Choose a Biblical Name**: Select a unique biblical name that is not already in use. Grep the existing tree to avoid collisions. Examples of reserved names include `the_well`, `the_shofar`, `the_living_water`, etc.
-2.  **Create Module File(s)**: Place the new module in `Scripts/` (e.g., `the_manna.js`) or create a new folder for it if it requires multiple files (e.g., `the_scribes/index.js`, `the_scribes/the_path.js`).
-3.  **Single Responsibility**: A module should do one thing and export a small surface. Cross-module communication happens through events (`the_shofar`) or data (`the_well`), not by accessing internal module details.
-4.  **ES Modules with Named Exports**: All modules must be ES modules and use **named exports only** (no default exports).
-5.  **File Size Limit**: Adhere to the hard rule: **no JS file exceeds 300 lines**. If a file grows, split it into a folder structure (e.g., `index.js` and supporting files).
-6.  **Define Public API**: Clearly define the module's public API (functions, constants) for other parts of the application to interact with.
-7.  **Update `american_garments.css` (if UI related)**: If the new module introduces new UI components or affects styling, add appropriate CSS rules to `Covenant/Foundations/SharedVessels/styles/american_garments.css` with a new biblical header (e.g., `/* ===== The Lampstand ===== */`).
+---
 
-## 8. Known Variance / Tech Debt
+## 7. Service Worker & Cache Versioning
 
-The `Z-Variance.md` audit identifies specific areas of divergence and considerations for the New Covenant codebase:
+- File: `New_Covenant/the_living_water.js`
+- Current `CACHE_NAME`: `flockos-new-covenant-v1.01`
+- **Do not change `CACHE_NAME` without discussion** — mismatched versions across Nations deployments cause cache staleness in production.
 
-### Drift Findings (Covenant vs New_Covenant)
+Per-church CACHE_NAME values are patched by B-Build:
 
-*   **Strategic Plan Domain (New_Covenant-only)**:
-    *   New API methods (`list/create/update/deleteStrategicGoal`, `list/create/update/deleteStrategicInitiative`, `list/create/update/deleteStrategicKeyDate`) exist only in `New_Covenant/Scripts/the_upper_room.js`.
-    *   Adapter-level schema extensions for `flock.strategicPlan.goals`, `flock.strategicPlan.initiatives`, and `flock.strategicPlan.keyDates` are present in `New_Covenant/Scripts/the_living_water_adapter.js`.
-    *   **Impact**: Without corresponding `SYNC_TAB_MAP` and `FIELD_REVERSE_MAP` entries, Firestore-to-Sheet mirroring may append unmanaged columns or skip intended tab routing for these collections. (Note: This has been addressed by updates in `D-Master SyncHandler.md` and `E-Master CamelCase.md`).
-*   **`sendMessage` Behavior in New_Covenant**:
-    *   `New_Covenant` uses `batch.set(..., { merge: true })` for updating conversation documents, allowing auto-creation of well-known channels.
-    *   **Impact**: This avoids first-post failures on missing channel documents and is operationally safe and compatible with the existing schema.
+| Church | CACHE_NAME |
+|--------|-----------|
+| Root | `flockos-root-v1.01` |
+| FlockOS | `flockos-v1.01` |
+| TBC | `flockos-tbc-v1.01` |
+| TheForest | `flockos-theforest-v1.01` |
+| GAS | `flockos-gas-v1.01` |
 
-### Combined Schema Manifest
+---
 
-*   A `combined_schema_manifest.deployable.json` artifact now includes all 90 canonical Covenant collections, the three New Covenant strategic collections, and seven deployment/operations collections (appConfig, masterConfig, churches, churchVault, deployConfigs, problems, quarterlyPlans).
-*   **Total Collections**: The combined manifest now accounts for **100 collections**.
-*   **Deployability Actions Completed**:
-    *   `SYNC_TAB_MAP` in `D-Master SyncHandler.md` has been updated to include `strategicGoals`, `strategicInitiatives`, and `strategicKeyDates`.
-    *   `FIELD_REVERSE_MAP` in `E-Master CamelCase.md` has been updated for these strategic collections.
-    *   The `A-Build_Churches.sh` script (BCP) now publishes the combined schema manifest into `flockos-truth` Firestore as a backup.
+## 8. Adding a New View
 
-### Audit Conclusion
+Views live in `New_Covenant/Views/<view_name>/`. Each view is a JS module.
 
-*   Covenant remains the canonical 90-collection base.
-*   New_Covenant introduces a valid strategic-plan extension of 3 collections.
-*   A combined, deployable schema exists at `Architechtural Docs/New Covenant/Architecture/combined_schema_manifest.deployable.json`.
-*   New_Covenant sync and field maps are aligned with the merged schema.
-*   `flockos-truth` now serves as the single-source schema backup target via BCP publication.
+1. Create `New_Covenant/Views/the_new_view/index.js`
+2. Export `render()` — returns HTML template literal
+3. Export `mount(root, ctx)` — attaches listeners, subscribes to data; returns `unmount` cleanup function
+4. Add CSS to `New_Covenant/Styles/new_covenant.css` under a biblical section header
+5. Register the view with the router in `the_tabernacle.js`
+
+**5 required UX states per view:** empty, loading skeleton (no spinners), error, success micro-moment, and offline/no-data fallback.
+
+**File size rule:** no JS file exceeds 300 lines (soft target ~150). Split into `index.js` + siblings if it grows.
+
+---
+
+## 9. Adding a New Script Module
+
+1. Choose a unique biblical name — grep `New_Covenant/Scripts/` to confirm it's unused
+2. Create `New_Covenant/Scripts/the_name.js` (single file) or `New_Covenant/Scripts/the_name/index.js` (if multi-file)
+3. ES modules only — **named exports only**, no default exports
+4. Single responsibility — cross-module communication via events or shared data layer, not direct internal access
+5. If UI-related, add CSS to `New_Covenant/Styles/new_covenant.css`
+6. 300-line hard limit per file
+
+---
+
+## 10. GROW Public Modules
+
+GROW (`app.grow/`) is the public outreach face of FlockOS. It loads modules from `New_Covenant/Scripts/the_gospel/`.
+
+Each module exports:
+- `render()` → HTML string
+- `mount(root, ctx)` → returns unmount function
+
+New GROW modules go in `New_Covenant/Scripts/the_gospel/the_gospel_<name>.js` and must be registered in `grow_public.js` under `ALL_MODULES`.
+
+The GROW router uses `import('./the_gospel/${name}.js')` — filenames must match the module `name` field exactly.
+
+---
+
+## 11. Known Variance / Tech Debt
+
+See `Z-Variance.md` for the full audit. Active items as of 2026-05-11:
+
+- **`the_tabernacle.js` size** — 21,764 lines in New Covenant. The design intent is to split this progressively into per-view modules. Do not add to it if a new view module can own the logic instead.
+- **Strategic Plan domain** — `strategicGoals`, `strategicInitiatives`, `strategicKeyDates` exist in `the_upper_room.js` and `the_living_water_adapter.js`. Schema manifest and Firestore rules are aligned. GAS `SYNC_TAB_MAP` / `FIELD_REVERSE_MAP` are updated in `B-Master Code.md`.
+- **`sendMessage` batch.set merge** — New Covenant uses `{ merge: true }` for channel documents. This is intentional and operationally safe (avoids first-post failures on missing channel docs).
