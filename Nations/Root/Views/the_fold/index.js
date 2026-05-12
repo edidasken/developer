@@ -112,6 +112,21 @@ export function mount(root) {
 let _personMap = {};
 let _activeFoldSheet = null;
 
+// ── Touch logging ─────────────────────────────────────────────────────────────
+// Fire-and-forget — never blocks UI or raises visible errors.
+function _logTouch(memberId, memberName, channel) {
+  if (!memberId) return;
+  const V  = window.TheVine;
+  const UR = window.UpperRoom;
+  const payload = { memberId, memberName, channel };
+  if (UR && typeof UR.createTouch === 'function') {
+    UR.createTouch(payload).catch(() => {});
+  } else if (V) {
+    const MXT = buildAdapter('flock.touches', V);
+    MXT.create(payload).catch(() => {});
+  }
+}
+
 // Sort state — persists across view switches via localStorage
 let _currentSort = (() => {
   try { return localStorage.getItem('flock_fold_sort') || 'firstName'; } catch (_) { return 'firstName'; }
@@ -163,6 +178,8 @@ function _wireCards(grid, root) {
         const name  = btn.dataset.name || '';
         const value = btn.dataset.value || '';
         const tel   = btn.dataset.tel   || value.replace(/[^\d+]/g, '');
+        const pid   = card.dataset.id   || '';
+        _logTouch(pid, name, kind);
         if (kind === 'text')  openContactComposer({ channel: 'text',  name, recipient: value, target: tel });
         if (kind === 'email') openContactComposer({ channel: 'email', name, recipient: value, target: value });
       });
@@ -414,6 +431,16 @@ function _openMemberSheet(person, V, onReload) {
             Copy ID
           </button>
         </div>
+        <!-- Touch / Contact History -->
+        <div class="fold-touches" data-bind="touches">
+          <div class="fold-touches-hd">
+            <span class="fold-touches-title">Contact History</span>
+            <span class="fold-touches-count" data-bind="touch-count"></span>
+          </div>
+          <div class="fold-touches-list" data-bind="touch-list">
+            <div class="fold-touches-empty">Loading…</div>
+          </div>
+        </div>
         <!-- Name -->
         <div class="fold-form-row">
           <div class="life-sheet-field">
@@ -527,6 +554,9 @@ function _openMemberSheet(person, V, onReload) {
     }).catch(() => {});
   }
 
+  // Load touch / contact history
+  _loadTouches(sheet, docId || uid, V);
+
   // Copy ID
   sheet.querySelector('[data-copy]')?.addEventListener('click', async (e) => {
     const id = e.currentTarget.dataset.copy;
@@ -563,9 +593,10 @@ function _openMemberSheet(person, V, onReload) {
       const n     = btn.dataset.name  || name;
       const value = btn.dataset.value || '';
       const tel   = btn.dataset.tel   || value.replace(/[^\d+]/g, '');
+      _logTouch(docId || uid, n, kind);
       if (kind === 'text')  { ev.preventDefault(); openContactComposer({ channel: 'text',  name: n, recipient: value, target: tel }); }
       if (kind === 'email') { ev.preventDefault(); openContactComposer({ channel: 'email', name: n, recipient: value, target: value }); }
-      // 'call' uses native <a href="tel:">
+      // 'call' falls through to native <a href="tel:"> — touch is logged above
     });
   });
 
@@ -725,6 +756,70 @@ function _openMemberSheet(person, V, onReload) {
       },
     });
   });
+}
+
+// ── Touch log loader & renderer ──────────────────────────────────────────────
+const _TOUCH_ICONS = {
+  text:    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.7-.8L3 21l1.9-5.3A8.4 8.4 0 1 1 21 11.5z"/></svg>',
+  call:    '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8 9.6a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/></svg>',
+  email:   '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>',
+  unknown: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>',
+};
+const _TOUCH_LABELS = { text: 'Texted', call: 'Called', email: 'Emailed', unknown: 'Contacted' };
+
+function _fmtTouchDate(ts) {
+  try {
+    const d = ts?.toDate ? ts.toDate() : new Date(ts);
+    if (isNaN(d)) return '';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+      ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  } catch { return ''; }
+}
+
+async function _loadTouches(sheet, memberId, V) {
+  const listEl  = sheet.querySelector('[data-bind="touch-list"]');
+  const countEl = sheet.querySelector('[data-bind="touch-count"]');
+  if (!listEl) return;
+
+  try {
+    const UR = window.UpperRoom;
+    let touches = [];
+    if (UR && typeof UR.listTouches === 'function') {
+      touches = await UR.listTouches({ memberId, limit: 50 });
+    } else if (V) {
+      const MXT = buildAdapter('flock.touches', V);
+      const res = await MXT.list({ memberId, limit: 50 });
+      touches = Array.isArray(res) ? res : (res?.rows || res?.data || []);
+    }
+
+    if (countEl) countEl.textContent = touches.length ? `${touches.length}` : '';
+
+    if (!touches.length) {
+      listEl.innerHTML = '<div class="fold-touches-empty">No contacts logged yet.</div>';
+      return;
+    }
+
+    listEl.innerHTML = touches.map(t => {
+      const ch      = t.channel || 'unknown';
+      const icon    = _TOUCH_ICONS[ch] || _TOUCH_ICONS.unknown;
+      const label   = _TOUCH_LABELS[ch] || 'Contacted';
+      const when    = _fmtTouchDate(t.loggedAt);
+      const by      = t.loggedBy ? `by ${_e(t.loggedBy)}` : '';
+      const note    = t.note     ? `<div class="fold-touch-note">${_e(t.note)}</div>` : '';
+      return `<div class="fold-touch-row">
+        <span class="fold-touch-icon fold-touch-icon--${_e(ch)}">${icon}</span>
+        <div class="fold-touch-body">
+          <span class="fold-touch-label">${_e(label)}</span>
+          ${when ? `<span class="fold-touch-when">${_e(when)}</span>` : ''}
+          ${by   ? `<span class="fold-touch-by">${by}</span>` : ''}
+          ${note}
+        </div>
+      </div>`;
+    }).join('');
+  } catch (err) {
+    if (listEl) listEl.innerHTML = '<div class="fold-touches-empty" style="color:#b91c1c">Could not load contact history.</div>';
+    console.warn('[TheFold] touches load error:', err);
+  }
 }
 
 function _e(s) {

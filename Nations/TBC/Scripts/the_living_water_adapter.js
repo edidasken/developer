@@ -166,6 +166,14 @@ const _DOMAIN_MAP = {
     create: { ur: 'createCareInteraction'  },
   },
 
+  // ── Touches (contact log) ────────────────────────────────────────────────
+  // Each touch is a record of a shepherd reaching out to a member via text,
+  // call, or email through The Fold. Stored in churches/{id}/touches.
+  'flock.touches': {
+    list:   { ur: 'listTouches'   },
+    create: { ur: 'createTouch'   },
+  },
+
   // ── Giving ────────────────────────────────────────────────────────────────
   'flock.giving': {
     list:    { ur: 'listGiving'    },

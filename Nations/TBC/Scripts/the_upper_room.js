@@ -1471,6 +1471,44 @@
   }
 
   /* ══════════════════════════════════════════════════════════════════
+     TOUCHES — churches/{churchId}/touches
+     Contact-log entries created whenever a shepherd reaches out to a
+     member via text, call, or email through The Fold.
+     ══════════════════════════════════════════════════════════════════ */
+
+  function _touchesRef() {
+    return _churchRef().collection('touches');
+  }
+
+  function createTouch(data) {
+    // data: { memberId, memberName, channel: 'text'|'call'|'email', note? }
+    if (!data || !data.memberId) return Promise.reject('memberId required');
+    var payload = {
+      memberId:    data.memberId,
+      memberName:  data.memberName  || '',
+      channel:     data.channel     || 'unknown',
+      note:        data.note        || '',
+      loggedBy:    _userEmail       || '',
+      loggedAt:    firebase.firestore.FieldValue.serverTimestamp(),
+    };
+    return _touchesRef().add(payload).then(function(ref) {
+      payload.id = ref.id; return payload;
+    });
+  }
+
+  function listTouches(opts) {
+    opts = opts || {};
+    if (!opts.memberId) return Promise.reject('memberId required');
+    var q = _touchesRef()
+      .where('memberId', '==', opts.memberId)
+      .orderBy('loggedAt', 'desc');
+    if (opts.limit) q = q.limit(opts.limit);
+    return q.get().then(function(snap) {
+      return snap.docs.map(function(d) { var r = d.data(); r.id = d.id; return r; });
+    });
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
      PERMISSIONS — churches/{churchId}/permissions
      ══════════════════════════════════════════════════════════════════ */
 
@@ -4874,6 +4912,10 @@
     updateMember:    updateMember,
     deleteMember:    deleteMember,
     deleteUserCascade: deleteUserCascade,
+
+    // Touches (contact log)
+    createTouch:     createTouch,
+    listTouches:     listTouches,
 
     // Member Cards
     listMemberCards:   listMemberCards,

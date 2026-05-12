@@ -11628,6 +11628,54 @@ flock-tabs [role="tablist"], .tabs-bar {
 }
 .fold-perm-section-sub { font: 0.78rem var(--font-ui); color: var(--ink-muted, #7a7f96); margin-bottom: 2px; }
 
+/* ── Touch / contact history ─────────────────────────────────────────────── */
+.fold-touches {
+  border-top: 1px solid var(--line, #e5e7ef);
+  border-bottom: 1px solid var(--line, #e5e7ef);
+  padding: 12px 0 14px;
+  margin-bottom: 10px;
+}
+.fold-touches-hd {
+  display: flex; align-items: baseline; gap: 7px;
+  margin-bottom: 8px;
+}
+.fold-touches-title {
+  font: 700 0.83rem var(--font-ui); color: var(--ink-muted, #7a7f96);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.fold-touches-count {
+  background: var(--c-sky, #0ea5e9); color: #fff;
+  font: 700 0.7rem var(--font-ui); padding: 1px 6px; border-radius: 99px;
+  min-width: 18px; text-align: center;
+}
+.fold-touches-list { display: flex; flex-direction: column; gap: 6px; }
+.fold-touches-empty { font: 0.82rem var(--font-ui); color: var(--ink-muted, #7a7f96); padding: 2px 0; }
+.fold-touch-row {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 6px 8px; border-radius: 7px;
+  background: var(--bg-base, #f5f6fa);
+}
+.fold-touch-icon {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; opacity: .85;
+}
+.fold-touch-icon--text  { background: rgba(124,58,237,.12); color: var(--c-violet, #7c3aed); }
+.fold-touch-icon--call  { background: rgba(5,150,105,.12);  color: var(--c-emerald, #059669); }
+.fold-touch-icon--email { background: rgba(14,165,233,.12); color: var(--c-sky, #0ea5e9); }
+.fold-touch-icon--unknown { background: var(--bg-raised, #fff); color: var(--ink-muted, #7a7f96); }
+.fold-touch-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.fold-touch-label {
+  font: 600 0.83rem var(--font-ui); color: var(--ink, #1b264f);
+}
+.fold-touch-when, .fold-touch-by {
+  font: 0.76rem var(--font-ui); color: var(--ink-muted, #7a7f96);
+}
+.fold-touch-note {
+  font: 0.78rem var(--font-ui); color: var(--ink, #1b264f);
+  margin-top: 2px; font-style: italic;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════════
    THE GREAT COMMISSION — Missions view
    ══════════════════════════════════════════════════════════════════════════════ */
