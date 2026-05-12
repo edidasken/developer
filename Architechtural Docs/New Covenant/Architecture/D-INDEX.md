@@ -22,25 +22,24 @@ Update flow: New Covenant -> Old Covenant
 ## Architecture Map
 
 - **Architecture/**
-	- [A-FlockOS New Covenant.md](Architecture/A-FlockOS%20New%20Covenant.md)
-	- [A-State of Data.md](Architecture/A-State%20of%20Data.md)
-	- [F-AS-BUILT-Architecture-Overview.md](Architecture/F-AS-BUILT-Architecture-Overview.md) *(AI-generated)*
-	- [I-AS-BUILT-Data-Layer-Inventory.md](Architecture/I-AS-BUILT-Data-Layer-Inventory.md) *(AI-generated)*
-	- [J-AS-BUILT-Doc-Set-Index.md](Architecture/J-AS-BUILT-Doc-Set-Index.md) *(AI-generated)*
-	- [K-AS-BUILT-Operations-Guide.md](Architecture/K-AS-BUILT-Operations-Guide.md) *(AI-generated)*
-	- [G-AS-BUILT-Script-Module-Inventory.md](Architecture/G-AS-BUILT-Script-Module-Inventory.md) *(AI-generated)*
-	- [H-AS-BUILT-View-Inventory.md](Architecture/H-AS-BUILT-View-Inventory.md) *(AI-generated)*
-	- [E-FLOW-POLICY.md](Architecture/E-FLOW-POLICY.md)
-	- [D-INDEX.md](Architecture/D-INDEX.md)
-	- [L-Structure-Parity-Map.md](Architecture/L-Structure-Parity-Map.md)
-	- [Assistants.md](Architecture/Assistants.md) — AI doc-gen workflow reference
-	- [B-Master Code.md](Architecture/B-Master%20Code.md)
-	- [C-Master FirestoreSync.md](Architecture/C-Master%20FirestoreSync.md)
-	- [D-Master SyncHandler.md](Architecture/D-Master%20SyncHandler.md)
-	- [E-Master CamelCase.md](Architecture/E-Master%20CamelCase.md)
-	- [New Covenant Schema.sql](Architecture/New%20Covenant%20Schema.sql)
-	- [Z-Variance.md](Architecture/Z-Variance.md)
-	- [combined_schema_manifest.deployable.json](Architecture/combined_schema_manifest.deployable.json)
+	- [A-FlockOS New Covenant.md](A-FlockOS%20New%20Covenant.md)
+	- [B-Master Code.md](B-Master%20Code.md)
+	- [C-Setup.md](C-Setup.md)
+	- [D-INDEX.md](D-INDEX.md)
+	- [E-FLOW-POLICY.md](E-FLOW-POLICY.md)
+	- [F-AS-BUILT-Architecture-Overview.md](F-AS-BUILT-Architecture-Overview.md) *(AI-generated)*
+	- [G-AS-BUILT-Script-Module-Inventory.md](G-AS-BUILT-Script-Module-Inventory.md) *(AI-generated)*
+	- [H-AS-BUILT-View-Inventory.md](H-AS-BUILT-View-Inventory.md) *(AI-generated)*
+	- [I-AS-BUILT-Data-Layer-Inventory.md](I-AS-BUILT-Data-Layer-Inventory.md) *(AI-generated)*
+	- [J-AS-BUILT-Doc-Set-Index.md](J-AS-BUILT-Doc-Set-Index.md) *(AI-generated)*
+	- [K-AS-BUILT-Operations-Guide.md](K-AS-BUILT-Operations-Guide.md) *(AI-generated)*
+	- [L-Structure-Parity-Map.md](L-Structure-Parity-Map.md)
+	- [M-DEBUGGING-MAP.md](M-DEBUGGING-MAP.md)
+	- [N-Automation-README.md](N-Automation-README.md)
+	- [O-Automation-Shepherds-README.md](O-Automation-Shepherds-README.md)
+	- [P-README.md](P-README.md)
+	- [Z-New Covenant Schema.sql](Z-New%20Covenant%20Schema.sql)
+	- [Z-Combined_Schema_Manifest.deployable.json](Z-Combined_Schema_Manifest.deployable.json)
 
 - **Automation/**
 	- [AI_Doc_Runner/](Automation/AI_Doc_Runner/) — Gemini-powered as-built doc generation pipeline

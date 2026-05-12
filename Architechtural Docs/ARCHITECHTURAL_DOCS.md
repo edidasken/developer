@@ -31,24 +31,24 @@ All architectural documentation is consolidated here. Key files:
 
 | File | Purpose |
 |------|---------|
-| `INDEX.md` | Master index — start here |
+| `D-INDEX.md` | Master index — start here |
 | `F-AS-BUILT-Architecture-Overview.md` | Full system architecture overview |
 | `G-AS-BUILT-Script-Module-Inventory.md` | Every JS module inventoried |
 | `H-AS-BUILT-View-Inventory.md` | Every view and route inventoried |
 | `I-AS-BUILT-Data-Layer-Inventory.md` | All data files inventoried |
 | `K-AS-BUILT-Operations-Guide.md` | Day-to-day operations reference |
 | `J-AS-BUILT-Doc-Set-Index.md` | Index of all AS-BUILT documents |
-| `FLOW-POLICY.md` | Branching, deployment, and commit policy |
-| `DEBUGGING-MAP.md` | Debugging guide and issue map |
-| `Structure-Parity-Map.md` | Old Covenant → New Covenant parity map |
+| `E-FLOW-POLICY.md` | Branching, deployment, and commit policy |
+| `M-DEBUGGING-MAP.md` | Debugging guide and issue map |
+| `L-Structure-Parity-Map.md` | Old Covenant → New Covenant parity map |
 | `A-FlockOS New Covenant.md` | Original New Covenant design document |
 | `B-Master Code.md` | Master code reference |
 | `C-Setup.md` | Environment setup guide |
-| `New Covenant Schema.sql` | Canonical Firestore schema (SQL format) |
-| `combined_schema_manifest.deployable.json` | Auto-generated deployable schema manifest |
-| `README.md` | Subfolder README reference (all subfolders documented here) |
-| `Automation-README.md` | Automation folder overview |
-| `Automation-Shepherds-README.md` | Shepherds automation overview |
+| `Z-New Covenant Schema.sql` | Canonical Firestore schema (SQL format) |
+| `Z-Combined_Schema_Manifest.deployable.json` | Auto-generated deployable schema manifest |
+| `P-README.md` | Subfolder README reference (all subfolders documented here) |
+| `N-Automation-README.md` | Automation folder overview |
+| `O-Automation-Shepherds-README.md` | Shepherds automation overview |
 
 ### New Covenant/Automation/
 Scripts that automate architecture and data tasks. **Do not edit scripts here by hand** — they are the canonical Python/Node tools for the data pipeline.
