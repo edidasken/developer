@@ -1267,6 +1267,9 @@ async function _init() {
           await window.UpperRoom.waitReady();
         }
       } catch (_) {}
+    }
+
+    await _load();
     _renderList();
     _renderSeries();
   });
