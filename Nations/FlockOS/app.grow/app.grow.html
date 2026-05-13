@@ -211,17 +211,7 @@
       .gp-hamburger { display: none !important; }
     }
 
-    /* ── Pull-to-Refresh ─────────────────────────────────────────────── */
-    @media (max-width: 860px) {
-      .ptr-indicator {
-        display: none; position: fixed; top: calc(var(--topbar-h, 60px) + var(--safe-top, 0px) + 8px);
-        left: 50%; transform: translateX(-50%);
-        z-index: 9998; background: var(--bg-raised, #fff); border: 1px solid var(--line, #e5e7ef);
-        border-radius: 20px; padding: 6px 14px; font-size: 0.75rem; color: var(--ink-muted, #7a7f96);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.18); white-space: nowrap;
-      }
-      .ptr-indicator.visible { display: block; }
-    }
+    /* .ptr-indicator now lives in new_covenant.css — single source of truth. */
   </style>
 </head>
 <body>

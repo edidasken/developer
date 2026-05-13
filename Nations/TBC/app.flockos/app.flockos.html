@@ -134,37 +134,8 @@
        own dark over the notch via padding-top: safe-top. */
     html { height: 100%; overflow: hidden; background: var(--bg); }
     body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); height: 100%; overflow: hidden; }
-    .veil-wrap {
-      display: grid;
-      grid-template-areas: "top top" "side main";
-      grid-template-columns: 256px 1fr;
-      grid-template-rows: 60px 1fr;
-      height: 100%;
-      min-height: 100vh;
-      position: relative;
-    }
-    #the-veil-top   { grid-area: top; }
-    #the-veil-side  { grid-area: side; overflow-y: auto; overflow-x: hidden; }
-    #the-holy-place { grid-area: main; min-width: 0; overflow-y: auto; }
-    #the-veil-foot  { grid-area: foot; }
-    @media (max-width: 860px) {
-      .veil-wrap {
-        grid-template-columns: 1fr;
-        grid-template-areas: "top" "main" "foot";
-      }
-      #the-veil-side { display: none; }
-    }
-
-    /* ── Pull-to-Refresh ─────────────────────────────────────────────── */
-    @media (max-width: 860px) {
-      .ptr-indicator {
-        display: none; position: fixed; top: 54px; left: 50%; transform: translateX(-50%);
-        z-index: 9998; background: var(--bg-raised); border: 1px solid var(--line);
-        border-radius: 20px; padding: 6px 14px; font-size: 0.75rem; color: var(--ink-muted);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.18); white-space: nowrap;
-      }
-      .ptr-indicator.visible { display: block; }
-    }
+    /* Shell grid (.veil-wrap), responsive collapse, and .ptr-indicator now
+       live in new_covenant.css — single source of truth. */
   </style>
 </head>
 <body class="veil-app">
