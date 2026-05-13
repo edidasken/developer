@@ -246,7 +246,13 @@ function _queueSave() {
   _saveTimer = setTimeout(async () => {
     const s = _active();
     if (s) {
+      const msChanged = _syncManuscriptToOutline(s);
       await _saveSermon(s);
+      if (msChanged && S.activeTab === 'manuscript') {
+        const area = _qs('bm-manuscript-area');
+        if (area && !_msPreviewMode) area.value = s.manuscript || '';
+        _refreshMsPreview();
+      }
       if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Saved'; }
       _updateStats();
     }
@@ -596,6 +602,91 @@ function _buildManuscriptFromOutline(s) {
     if (sec.notes) block += `\n${sec.notes}`;
     return block.trim();
   }).join('\n\n');
+}
+
+/* Build the seeded block for a single section (what we'd write if seeding it fresh) */
+function _buildSectionBlock(sec) {
+  let block = `== ${(sec.title || '').toUpperCase()} ==\n`;
+  if (sec.type === 'scripture' && sec.scriptureRef) block += `[${sec.scriptureRef}]\n${sec.scripture || ''}\n`;
+  if (sec.notes) block += `\n${sec.notes}`;
+  return block.trim();
+}
+
+/*
+ * Sync outline → manuscript on every save:
+ * - Missing sections are appended to the bottom.
+ * - Existing section blocks whose body still matches the original seed (pastor
+ *   hasn't expanded them yet) are updated in-place so title/notes/scripture
+ *   changes show up immediately.
+ * - Any block the pastor has genuinely written into is left untouched.
+ * Returns true if the manuscript was modified.
+ */
+function _syncManuscriptToOutline(s) {
+  if (!s || !s.sections || !s.sections.length) return false;
+
+  // Full rebuild if manuscript is still skeleton-only
+  if (_manuscriptIsEmpty(s.manuscript)) {
+    s.manuscript = _buildManuscriptFromOutline(s);
+    return true;
+  }
+
+  let ms = (s.manuscript || '').trimEnd();
+  let changed = false;
+
+  // Split manuscript into blocks keyed by their == TITLE == header
+  // We'll rebuild a map: titleUpper → {header, body, fullBlock}
+  const blockRe = /(==\s*[^=\n]+\s*==)([\s\S]*?)(?=(?:==\s*[^=\n]+\s*==)|$)/g;
+  const existingBlocks = {}; // key: normalized title → { header, body }
+  let m;
+  while ((m = blockRe.exec(ms)) !== null) {
+    const header = m[1].trim();
+    const body   = m[2];
+    const key    = header.replace(/^==\s*/, '').replace(/\s*==$/, '').trim().toUpperCase();
+    existingBlocks[key] = { header, body, full: m[0] };
+  }
+
+  s.sections.forEach(sec => {
+    if (!sec.title || !sec.title.trim()) return;
+    const key = sec.title.trim().toUpperCase();
+    const newBlock = _buildSectionBlock(sec);
+
+    if (!existingBlocks[key]) {
+      // Section doesn't exist in the manuscript yet — append it
+      ms = ms + '\n\n' + newBlock;
+      changed = true;
+    } else {
+      // Section exists — check if the body still matches what the seed would
+      // have produced (i.e., the pastor hasn't written custom prose in it yet).
+      // If so, we can safely update it with the latest outline content.
+      const existing = existingBlocks[key];
+      const existingBody = existing.body.trim();
+
+      // Build what the seed body would have been (everything after the header)
+      const seedBlock = newBlock;
+      const seedHeaderEnd = seedBlock.indexOf('\n');
+      const seedBody = (seedHeaderEnd >= 0 ? seedBlock.slice(seedHeaderEnd) : '').trim();
+
+      // Only auto-update if the current body == seed body (or the seed body is
+      // non-empty and the current body is empty — same thing as "not expanded")
+      const bodyMatchesSeed = existingBody === seedBody;
+      const bodyIsEmpty = existingBody.length === 0;
+
+      if (bodyMatchesSeed || bodyIsEmpty) {
+        // Safe to update in-place: replace old full block with new seeded block
+        if (existing.full.trim() !== newBlock) {
+          ms = ms.replace(existing.full, '\n' + newBlock + '\n');
+          changed = true;
+        }
+      }
+      // Otherwise: pastor has written custom content → leave it alone
+    }
+  });
+
+  if (changed) {
+    // Normalise double+ blank lines
+    s.manuscript = ms.replace(/\n{3,}/g, '\n\n').trim();
+  }
+  return changed;
 }
 
 function _renderManuscript() {
