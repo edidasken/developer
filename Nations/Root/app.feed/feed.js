@@ -24,7 +24,7 @@
 const BM_KEY        = 'bm_sermons_v1';
 const BM_PREFS_KEY  = 'bm_prefs_v1';
 
-const SECTION_TYPES = ['intro','scripture','point','illustration','application','prayer','conclusion','transition'];
+const SECTION_TYPES = ['intro','scripture','point','illustration','explanation','application','prayer','conclusion','transition'];
 
 const STATUS_CYCLE = ['draft', 'ready', 'preached'];
 const STATUS_LABELS = { draft: 'Draft', ready: 'Ready', preached: 'Preached' };
@@ -87,6 +87,7 @@ function _sectionTitle(type) {
     scripture:    'Scripture Reading',
     point:        'Main Point',
     illustration: 'Illustration',
+    explanation:  'Explanation',
     application:  'Application',
     prayer:       'Prayer',
     conclusion:   'Conclusion',
@@ -426,6 +427,7 @@ function _sectionPlaceholder(type) {
     scripture:    'Notes, context, observations on this passage…',
     point:        'Main idea, supporting arguments, sub-points…',
     illustration: 'Story, analogy, real-world example that illustrates the truth…',
+    explanation:  'Detailed explanation of this passage or point — historical background, original language, theological depth…',
     application:  'How does this change how we live? Practical steps for the congregation…',
     prayer:       'Prayer prompt or congregational prayer script…',
     conclusion:   'Summary, call back to the main theme, landing the message…',
@@ -777,7 +779,11 @@ function _refreshMsPreview() {
   const preview = document.getElementById('bm-ms-preview');
   const pane    = document.getElementById('bm-pane-manuscript');
   if (!preview) return;
-  const raw = area ? area.value : (_active() ? (_active().manuscript || '') : '');
+  // In preview mode always read from the sermon model (source of truth) so that
+  // sync updates are visible immediately without needing a textarea round-trip.
+  const raw = (_msPreviewMode || !area)
+    ? (_active() ? (_active().manuscript || '') : '')
+    : area.value;
   preview.innerHTML = _buildMsHtml(raw);
   if (pane) pane.classList.toggle('bm-preview-mode', _msPreviewMode);
   // Use explicit display control instead of element.hidden for reliability
