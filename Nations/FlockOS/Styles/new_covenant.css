@@ -10037,13 +10037,13 @@ flock-tabs [role="tablist"], .tabs-bar {
 
 /* Member grid */
 .fold-grid {
-  display: grid; gap: 12px;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
 }
 .fold-card {
-  display: flex; align-items: center; gap: 14px;
+  display: flex; align-items: center; gap: 16px;
   background: var(--bg-raised, #fff); border: 1px solid var(--line, #e5e7ef);
-  border-radius: var(--radius-lg); padding: 14px 16px;
+  border-radius: var(--radius-lg); padding: 16px 20px;
   cursor: pointer; box-shadow: var(--shadow-sm);
   transition: transform 200ms var(--spring), box-shadow 200ms var(--ease), border-color 180ms var(--ease);
 }
@@ -10053,14 +10053,14 @@ flock-tabs [role="tablist"], .tabs-bar {
 }
 .fold-card:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .fold-avatar {
-  width: 44px; height: 44px; border-radius: 50%; flex: none;
-  color: #fff; font: 700 0.88rem var(--font-ui);
+  width: 52px; height: 52px; border-radius: 50%; flex: none;
+  color: #fff; font: 700 1rem var(--font-ui);
   display: inline-flex; align-items: center; justify-content: center;
   box-shadow: var(--shadow-sm);
 }
 .fold-card-body { flex: 1; min-width: 0; }
 .fold-name {
-  font: 600 0.96rem var(--font-ui); color: var(--ink, #1b264f);
+  font: 600 1.02rem var(--font-ui); color: var(--ink, #1b264f);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .fold-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
