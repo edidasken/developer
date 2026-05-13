@@ -634,7 +634,7 @@
       white-space: nowrap;
     }
     .bm-translation-select {
-      flex: 1; padding: 4px 8px; background: var(--bg-input);
+      flex: 1; min-width: 0; padding: 4px 8px; background: var(--bg-input);
       border: 1px solid var(--bm-border); border-radius: 7px;
       font: 0.75rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
       outline: none; cursor: pointer;
@@ -642,6 +642,7 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a0a3b1'/%3E%3C/svg%3E");
       background-repeat: no-repeat; background-position: right 8px center;
       padding-right: 24px;
+      text-overflow: ellipsis; white-space: nowrap; overflow: hidden;
     }
     .bm-translation-select:focus { border-color: rgba(232,168,56,0.45); }
     .bm-lookup-result {
@@ -1084,6 +1085,45 @@
     /* Hide button text labels on small screens */
     @media (max-width: 600px) {
       .bm-btn-label-hide { display: none; }
+
+      /* ── Topbar: tighten on phones ─────────────────────────────── */
+      #bm-topbar { padding: 0 8px; gap: 4px; }
+      .bm-logo { gap: 5px; margin-right: 2px; }
+      .bm-logo-icon { width: 26px; height: 26px; }
+      .bm-logo-text { display: none; }
+      #bm-active-title { font-size: 0.78rem; }
+      .bm-topbar-right { gap: 4px; }
+      .bm-btn--sm { padding: 5px 7px; }
+      .bm-btn--icon { padding: 5px 6px; }
+      .bm-user-chip { padding: 2px 6px 2px 3px; }
+      .bm-user-chip #bm-user-name { display: none; }
+
+      /* ── Sermon header: stack cleanly ──────────────────────────── */
+      #bm-sermon-header { padding: 10px 12px 8px; gap: 8px; }
+      .bm-header-fields { gap: 8px; }
+      .bm-title-input { flex: 1 1 100%; min-width: 0; font-size: 0.92rem; padding: 7px 10px; }
+      .bm-meta-input {
+        flex: 1 1 calc(50% - 4px); min-width: 0; max-width: none !important;
+        padding: 6px 10px; font-size: 0.82rem;
+      }
+      #bm-field-passage { flex-basis: 100%; }
+      .bm-header-actions { width: 100%; justify-content: flex-end; gap: 6px; }
+
+      /* ── Tab bar: tighter ─────────────────────────────────────── */
+      #bm-tab-bar { padding: 0 10px; }
+
+      /* ── Outline editor: less side padding ─────────────────────── */
+      #bm-outline-main { padding: 14px 12px 80px; }
+      .bm-outline-section { margin-bottom: 14px; border-radius: 11px; }
+
+      /* ── Section header: tighter, hide drag (rarely used on touch) */
+      .bm-section-header { padding: 9px 10px 8px; gap: 6px; }
+      .bm-section-drag { display: none; }
+      .bm-section-type-select { font-size: 0.6rem; }
+      .bm-section-title-input { font-size: 0.92rem; min-width: 0; }
+      .bm-section-actions { gap: 2px; }
+      .bm-icon-btn { width: 24px; height: 24px; }
+      .bm-section-body { padding: 10px 12px 12px; }
     }
   </style>
 </head>
@@ -1285,18 +1325,18 @@
                 <div class="bm-translation-row">
                   <span class="bm-translation-label">Translation</span>
                   <select class="bm-translation-select" id="bm-translation-select">
-                    <option value="ESV" selected>ESV — English Standard</option>
-                    <option value="KJV">KJV — King James</option>
-                    <option value="NKJV">NKJV — New King James</option>
-                    <option value="NIV">NIV — New International</option>
-                    <option value="NASB">NASB — New American Std</option>
-                    <option value="NLT">NLT — New Living</option>
-                    <option value="AMP">AMP — Amplified</option>
-                    <option value="CSB">CSB — Christian Standard</option>
-                    <option value="ASV">ASV — American Standard</option>
-                    <option value="WEB">WEB — World English</option>
-                    <option value="YLT">YLT — Young's Literal</option>
-                    <option value="DARBY">DARBY — Darby Translation</option>
+                    <option value="ESV" selected>ESV</option>
+                    <option value="KJV">KJV</option>
+                    <option value="NKJV">NKJV</option>
+                    <option value="NIV">NIV</option>
+                    <option value="NASB">NASB</option>
+                    <option value="NLT">NLT</option>
+                    <option value="AMP">AMP</option>
+                    <option value="CSB">CSB</option>
+                    <option value="ASV">ASV</option>
+                    <option value="WEB">WEB</option>
+                    <option value="YLT">YLT</option>
+                    <option value="DARBY">DARBY</option>
                   </select>
                 </div>
                 <div class="bm-lookup-result" id="bm-lookup-result">
