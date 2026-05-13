@@ -1163,19 +1163,20 @@ function _bindResearch() {
 // ── Translation config ─────────────────────────────────────────────────────────
 // apiCode: translation code for bible-api.com (null = copyrighted, use BLB link only)
 // blbCode: translation code for blueletterbible.org URLs
+// bibleComVersion: YouVersion version_id — when set, Go opens bible.com instead of showing a "licensed" message
 const _TRANSLATIONS = {
-  KJV:   { apiCode: 'kjv',   blbCode: 'KJV'   },
-  NKJV:  { apiCode: null,    blbCode: 'NKJV'  },
-  ESV:   { apiCode: null,    blbCode: 'ESV'   },
-  NIV:   { apiCode: null,    blbCode: 'NIV'   },
-  NASB:  { apiCode: null,    blbCode: 'NASB'  },
-  NLT:   { apiCode: null,    blbCode: 'NLT'   },
-  AMP:   { apiCode: null,    blbCode: 'AMP'   },
-  CSB:   { apiCode: null,    blbCode: 'CSB'   },
-  ASV:   { apiCode: 'asv',   blbCode: 'ASV'   },
-  WEB:   { apiCode: 'web',   blbCode: 'WEB'   },
-  YLT:   { apiCode: 'ylt',   blbCode: 'YLT'   },
-  DARBY: { apiCode: 'darby', blbCode: 'DARBY' },
+  KJV:   { apiCode: 'kjv',   blbCode: 'KJV'                     },
+  NKJV:  { apiCode: null,    blbCode: 'NKJV', bibleComVersion: 114 },
+  ESV:   { apiCode: null,    blbCode: 'ESV',  bibleComVersion: 59  },
+  NIV:   { apiCode: null,    blbCode: 'NIV',  bibleComVersion: 111 },
+  NASB:  { apiCode: null,    blbCode: 'NASB', bibleComVersion: 100 },
+  NLT:   { apiCode: null,    blbCode: 'NLT',  bibleComVersion: 116 },
+  AMP:   { apiCode: null,    blbCode: 'AMP',  bibleComVersion: 1588 },
+  CSB:   { apiCode: null,    blbCode: 'CSB',  bibleComVersion: 1713 },
+  ASV:   { apiCode: 'asv',   blbCode: 'ASV'                     },
+  WEB:   { apiCode: 'web',   blbCode: 'WEB'                     },
+  YLT:   { apiCode: 'ylt',   blbCode: 'YLT'                     },
+  DARBY: { apiCode: 'darby', blbCode: 'DARBY'                   },
 };
 
 function _blbMultiVerseUrl(ref, blbCode) {
@@ -1223,6 +1224,12 @@ async function _doScriptureLookup(rawRef, suppressAdd = false) {
       }
     } catch (_) {}
     textEl.textContent = text || 'Verse not found. Check the reference (e.g. John 3:16 or John 3:16-18).';
+  } else if (transConf.bibleComVersion) {
+    // Licensed translation with YouVersion ID — open bible.com directly
+    const bcUrl = `https://www.bible.com/search/bible?q=${encodeURIComponent(rawRef)}&version_id=${transConf.bibleComVersion}`;
+    window.open(bcUrl, '_blank', 'noopener');
+    textEl.innerHTML = `<a href="${bcUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent)">${_e(rawRef)} · ${transKey} — Opening in Bible.com ↗</a>`;
+    text = '';
   } else {
     // Copyrighted translation — can't fetch; direct to BLB
     textEl.innerHTML = `<em style="color:var(--bm-muted);font-style:normal;font-size:0.75rem">${transKey} is a licensed translation and cannot be fetched directly. Use the Blue Letter Bible link below to read it.</em>`;
