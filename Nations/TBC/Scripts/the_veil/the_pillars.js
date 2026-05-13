@@ -46,7 +46,7 @@ const ICON = {
   info:       I('<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>'),
   sprout:     I('<path d="M12 22V11"/><path d="M5 13c0-3 3-5 7-4 0 4-3 6-7 4z"/><path d="M19 9c0-3-3-5-7-4 0 4 3 6 7 4z"/>'),
   envelope:   I('<path d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/>'),
-};
+  screen:     I('<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M12 17v4M8 21h8"/>'),
 
 const SECTIONS = [
   /* ── Home ────────────────────────────────────────────────────────────── */
@@ -90,6 +90,7 @@ const SECTIONS = [
       { name: 'quarterly_worship',       label: 'Worship Plan',      icon: ICON.music },
       { name: 'the_pentecost',           label: 'Special Services',  icon: ICON.flame },
       { name: 'music_stand',             label: 'Music Stand',       icon: ICON.music, href: 'app.stand/' },
+      { name: 'flockshow',               label: 'FlockShow',         icon: ICON.screen, href: 'app.flockshow/app.flockshow.html' },
     ],
   },
   /* ── Mission ─────────────────────────────────────────────────────────── */
