@@ -1050,31 +1050,74 @@ function _bindResearch() {
 }
 
 // ── Scripture lookup (sidebar) ────────────────────────────────────────────────
+// ── Translation config ─────────────────────────────────────────────────────────
+// apiCode: translation code for bible-api.com (null = copyrighted, use BLB link only)
+// blbCode: translation code for blueletterbible.org URLs
+const _TRANSLATIONS = {
+  KJV:   { apiCode: 'kjv',   blbCode: 'KJV'   },
+  NKJV:  { apiCode: null,    blbCode: 'NKJV'  },
+  ESV:   { apiCode: null,    blbCode: 'ESV'   },
+  NIV:   { apiCode: null,    blbCode: 'NIV'   },
+  NASB:  { apiCode: null,    blbCode: 'NASB'  },
+  NLT:   { apiCode: null,    blbCode: 'NLT'   },
+  AMP:   { apiCode: null,    blbCode: 'AMP'   },
+  CSB:   { apiCode: null,    blbCode: 'CSB'   },
+  ASV:   { apiCode: 'asv',   blbCode: 'ASV'   },
+  WEB:   { apiCode: 'web',   blbCode: 'WEB'   },
+  YLT:   { apiCode: 'ylt',   blbCode: 'YLT'   },
+  DARBY: { apiCode: 'darby', blbCode: 'DARBY' },
+};
+
+function _blbMultiVerseUrl(ref, blbCode) {
+  return `https://www.blueletterbible.org/tools/MultiVerse.cfm?t=${blbCode}&verses=${encodeURIComponent(ref)}`;
+}
+
 async function _doScriptureLookup(rawRef, suppressAdd = false) {
-  const refEl  = _qs('bm-lookup-ref');
-  const textEl = _qs('bm-lookup-text');
-  const resEl  = _qs('bm-lookup-result');
+  const refEl   = _qs('bm-lookup-ref');
+  const textEl  = _qs('bm-lookup-text');
+  const resEl   = _qs('bm-lookup-result');
+  const blbLink = _qs('bm-lookup-blb-link');
   if (!refEl || !textEl || !resEl) return;
 
-  refEl.textContent  = rawRef;
+  // Read selected translation
+  const selectEl   = _qs('bm-translation-select');
+  const transKey   = (selectEl ? selectEl.value : 'KJV') || 'KJV';
+  const transConf  = _TRANSLATIONS[transKey] || _TRANSLATIONS.KJV;
+
+  // Always wire the BLB MultiVerse link
+  if (blbLink) {
+    blbLink.href = _blbMultiVerseUrl(rawRef, transConf.blbCode);
+    blbLink.textContent = `View on Blue Letter Bible (${transKey})`;
+  }
+
+  refEl.textContent  = `${rawRef}  ·  ${transKey}`;
   textEl.textContent = 'Looking up…';
   resEl.classList.add('visible');
 
-  // Try local data first, fall back to bible-api.com (free, no key, KJV)
-  let text = _fetchVerse(rawRef);
-  if (!text) {
+  let text = '';
+
+  if (transConf.apiCode) {
+    // Public domain — fetch inline via bible-api.com
     try {
-      const encoded = encodeURIComponent(rawRef);
-      const resp = await fetch(`https://bible-api.com/${encoded}?translation=kjv`);
+      const resp = await fetch(
+        `https://bible-api.com/${encodeURIComponent(rawRef)}?translation=${transConf.apiCode}`
+      );
       if (resp.ok) {
         const data = await resp.json();
-        text = (data.verses || []).map(v => v.text.trim()).join(' ') || data.text || '';
-        text = text.trim();
+        // Multi-verse refs return an array in data.verses; single refs return data.text
+        if (Array.isArray(data.verses) && data.verses.length) {
+          text = data.verses.map(v => `[${v.book_name} ${v.chapter}:${v.verse}] ${v.text.trim()}`).join('\n');
+        } else {
+          text = (data.text || '').trim();
+        }
       }
     } catch (_) {}
+    textEl.textContent = text || 'Verse not found. Check the reference (e.g. John 3:16 or John 3:16-18).';
+  } else {
+    // Copyrighted translation — can't fetch; direct to BLB
+    textEl.innerHTML = `<em style="color:var(--bm-muted);font-style:normal;font-size:0.75rem">${transKey} is a licensed translation and cannot be fetched directly. Use the Blue Letter Bible link below to read it.</em>`;
+    text = '';
   }
-
-  textEl.textContent = text || 'Verse not found. Check the reference format (e.g. John 3:16).';
 
   const addBtn = _qs('bm-lookup-add-btn');
   if (addBtn) {
@@ -1093,12 +1136,10 @@ async function _doScriptureLookup(rawRef, suppressAdd = false) {
   }
 }
 
-// Try to fetch verse from any Bible data loaded on window
+// Try to fetch verse from any Bible data loaded on window (legacy local cache)
 function _fetchVerse(ref) {
-  // GROW may expose window._bibleKJV or similar
   if (window._bibleKJV && typeof window._bibleKJV === 'object') {
-    const norm = ref.trim();
-    return window._bibleKJV[norm] || '';
+    return window._bibleKJV[ref.trim()] || '';
   }
   return '';
 }

@@ -589,6 +589,24 @@
     }
     .bm-lookup-input::placeholder { color: var(--bm-muted); }
     .bm-lookup-input:focus { border-color: rgba(232,168,56,0.45); }
+    .bm-translation-row {
+      display: flex; align-items: center; gap: 6px; margin-top: 6px;
+    }
+    .bm-translation-label {
+      font: 500 0.68rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted);
+      white-space: nowrap;
+    }
+    .bm-translation-select {
+      flex: 1; padding: 4px 8px; background: var(--bg-input);
+      border: 1px solid var(--bm-border); border-radius: 7px;
+      font: 0.75rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      outline: none; cursor: pointer;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a0a3b1'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 8px center;
+      padding-right: 24px;
+    }
+    .bm-translation-select:focus { border-color: rgba(232,168,56,0.45); }
     .bm-lookup-result {
       margin-top: 8px; padding: 9px 11px;
       background: rgba(232,168,56,0.06); border: 1px solid rgba(232,168,56,0.15);
@@ -597,6 +615,16 @@
     .bm-lookup-result.visible { display: block; }
     .bm-lookup-ref { font: 600 0.75rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent); margin-bottom: 4px; }
     .bm-lookup-text { font: italic 0.82rem/1.60 'Noto Serif', Georgia, serif; color: rgba(232,168,56,0.80); }
+    .bm-lookup-blb {
+      display: flex; align-items: center; gap: 5px; margin-top: 8px;
+      padding-top: 7px; border-top: 1px solid rgba(232,168,56,0.12);
+    }
+    .bm-lookup-blb-link {
+      flex: 1; font: 500 0.70rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-muted); text-decoration: none; transition: color 0.12s;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .bm-lookup-blb-link:hover { color: var(--bm-accent); }
     .bm-lookup-add {
       margin-top: 7px; width: 100%; padding: 5px 10px; border-radius: 7px;
       font: 600 0.72rem 'Plus Jakarta Sans', sans-serif; background: rgba(232,168,56,0.12);
@@ -1125,12 +1153,35 @@
               </div>
               <div class="bm-sidebar-card-body">
                 <div class="bm-lookup-row">
-                  <input class="bm-lookup-input" id="bm-lookup-input" type="text" placeholder="John 3:16" autocomplete="off">
+                  <input class="bm-lookup-input" id="bm-lookup-input" type="text" placeholder="John 3:16 or John 3:16-18" autocomplete="off">
                   <button class="bm-btn bm-btn--primary bm-btn--sm" id="bm-lookup-btn">Go</button>
+                </div>
+                <div class="bm-translation-row">
+                  <span class="bm-translation-label">Translation</span>
+                  <select class="bm-translation-select" id="bm-translation-select">
+                    <option value="KJV" selected>KJV — King James</option>
+                    <option value="NKJV">NKJV — New King James</option>
+                    <option value="ESV">ESV — English Standard</option>
+                    <option value="NIV">NIV — New International</option>
+                    <option value="NASB">NASB — New American Std</option>
+                    <option value="NLT">NLT — New Living</option>
+                    <option value="AMP">AMP — Amplified</option>
+                    <option value="CSB">CSB — Christian Standard</option>
+                    <option value="ASV">ASV — American Standard</option>
+                    <option value="WEB">WEB — World English</option>
+                    <option value="YLT">YLT — Young's Literal</option>
+                    <option value="DARBY">DARBY — Darby Translation</option>
+                  </select>
                 </div>
                 <div class="bm-lookup-result" id="bm-lookup-result">
                   <div class="bm-lookup-ref" id="bm-lookup-ref"></div>
                   <div class="bm-lookup-text" id="bm-lookup-text"></div>
+                  <div class="bm-lookup-blb">
+                    <a class="bm-lookup-blb-link" id="bm-lookup-blb-link" href="#" target="_blank" rel="noopener">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                      View on Blue Letter Bible
+                    </a>
+                  </div>
                   <button class="bm-lookup-add" id="bm-lookup-add-btn">+ Add to Outline</button>
                 </div>
               </div>
