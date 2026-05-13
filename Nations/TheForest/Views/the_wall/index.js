@@ -58,6 +58,7 @@ const SECTIONS = [
         { type: 'missions-source', id: 'ms-src-vom', label: 'Voice of the Martyrs',  desc: 'Persecuted church news & prayer',              url: 'https://www.persecution.com' },
         { type: 'missions-source', id: 'ms-src-bal', label: 'Bible Access List',      desc: 'Scripture access restrictions by country',     url: 'https://bibleaccesslist.org' },
         { type: 'missions-source', id: 'ms-src-ftt', label: 'Finishing the Task',     desc: 'Zero UPG movement coordination',               url: 'https://finishingthetask.com' },
+        { type: 'missions-source', id: 'ms-src-afb', label: 'AfghanBibles.net',        desc: 'Dari, Pashto & Turkmen scripture resources',   url: 'https://afghanbibles.net' },
       ];
     },
   },
@@ -1065,6 +1066,7 @@ const _MISSIONS_SOURCES = [
   { id: 'ms-src-vom', url: 'https://www.persecution.com' },
   { id: 'ms-src-bal', url: 'https://bibleaccesslist.org' },
   { id: 'ms-src-ftt', url: 'https://finishingthetask.com' },
+  { id: 'ms-src-afb', url: 'https://afghanbibles.net' },
 ];
 
 // Poll each missions data source via a no-cors HEAD request.
