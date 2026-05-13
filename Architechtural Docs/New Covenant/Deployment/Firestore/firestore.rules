@@ -678,6 +678,27 @@ service cloud.firestore {
         allow update, delete: if isSignedIn() && isPastorOrAdmin();
       }
 
+      // ── Presentations (FlockShow slides pushed from Feed) ───────────
+      match /presentations/{presentationId} {
+        // Read: any church member (FlockShow displays on screen for all)
+        allow read: if isSignedIn();
+
+        // Create: leader or above (pastor pushes sermon → slides)
+        allow create: if isSignedIn() && isLeaderOrAbove();
+
+        // Update: creator or pastor/admin (edit slides after creation)
+        allow update: if isSignedIn() && (
+          resource.data.createdBy == userEmail()
+          || isPastorOrAdmin()
+        );
+
+        // Delete: creator or pastor/admin
+        allow delete: if isSignedIn() && (
+          resource.data.createdBy == userEmail()
+          || isPastorOrAdmin()
+        );
+      }
+
       // ── Giving ─────────────────────────────────────────────────────
       match /giving/{giftId} {
         // Read: own records or leader+
