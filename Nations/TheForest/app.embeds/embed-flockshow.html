@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Absolute base so all relative URLs resolve to GitHub Pages regardless of embed host -->
+  <base href="https://flock-os.github.io/FlockOS/New_Covenant/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FlockShow">
+  <meta name="theme-color" content="#0b0d14">
+  <title>FlockShow — FlockOS</title>
+
+  <!-- Icons -->
+  <link rel="icon" type="image/png" href="Images/NewCovenant.png">
+  <link rel="apple-touch-icon" href="Images/NewCovenant.png">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+  </style>
+
+  <!-- Firebase config — patched per-church by B-Build -->
+  <script>
+        window.FLOCK_FIREBASE_CONFIG = {
+      apiKey:  'AIzaSyCnIbShg2ra1t4EiP3CffsivwvIK-bNu8M',
+      authDomain:  'flockos-theforest.firebaseapp.com',
+      projectId:  'flockos-theforest',
+      storageBucket:  'flockos-theforest.firebasestorage.app',
+      messagingSenderId:  '476522944133',
+      appId:  '1:476522944133:web:29ad5d19cf5a84c11b7bec',
+      measurementId:  'G-WMGPRHXP0Q',
+    };
+  </script>
+</head>
+<body>
+
+  <!-- FlockShow is embedded as a full standalone module — no auth overlay needed -->
+  <!-- The app.flockshow.html shell is recreated inline here for embed contexts  -->
+
+  <!-- ── Root shell (mirrors app.flockshow.html structure) ── -->
+  <div id="fs-root" style="
+    display:grid;
+    grid-template-rows:54px 1fr;
+    height:100%;
+    background:#0b0d14;
+    color:#f0f1f8;
+    font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  ">
+
+    <header id="fs-topbar" style="
+      display:flex;align-items:center;gap:10px;padding:0 18px;
+      background:#0d0f1a;border-bottom:1px solid rgba(167,139,250,0.12);
+      z-index:200;position:relative;
+    ">
+      <div class="fs-logo" style="display:flex;align-items:center;gap:8px;font:700 0.95rem 'Plus Jakarta Sans',sans-serif;color:#f0f1f8;flex-shrink:0;margin-right:6px;">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#a78bfa,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:15px;">🎬</div>
+        <span>FlockShow</span>
+      </div>
+      <div class="fs-tab-bar" id="fs-tabs" style="display:flex;gap:2px;background:rgba(255,255,255,0.05);border-radius:8px;padding:3px;"></div>
+      <div id="fs-topbar-right" style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+        <button id="fs-present-btn" disabled style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:8px;font:600 0.78rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none;background:#a78bfa;color:#0b0d14;white-space:nowrap;">▶ Present</button>
+      </div>
+    </header>
+
+    <div id="fs-library" style="overflow-y:auto;padding:28px 32px 80px;"></div>
+    <div id="fs-editor" hidden style="display:grid;grid-template-rows:46px 1fr;overflow:hidden;"></div>
+
+  </div>
+
+  <!-- FlockShow main module (absolute URL — unaffected by embed host's base) -->
+  <script type="module" src="https://flock-os.github.io/FlockOS/New_Covenant/app.flockshow/flockshow.js"></script>
+
+</body>
+</html>

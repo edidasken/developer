@@ -1,0 +1,797 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   FLOCKSHOW — Church Presentation App for FlockOS
+   Inspired by FreeShow (github.com/ChurchApps/FreeShow — GPL-3.0)
+
+   Features:
+     • Show library with search, create, duplicate, delete
+     • Slide editor — lyrics, scripture, announcement, blank types
+     • Live colour + font-size controls per slide
+     • Import lyrics (auto-split on blank lines)
+     • Present mode — opens projector window, keyboard / swipe navigable
+     • Stage notes visible in present window
+     • Offline-first: localStorage persistence, no server required
+
+   Storage key: 'flockshow_shows_v1'
+   No Firebase dependency — pure client-side.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+const FS_KEY = 'flockshow_shows_v1';
+
+const SLIDE_TYPES = {
+  lyrics:    { bg: '#0b0d14', text: '#f0f1f8', label: 'Lyrics',       icon: '🎵' },
+  scripture: { bg: '#0d1a2b', text: '#e8d5a3', label: 'Scripture',    icon: '📖' },
+  announce:  { bg: '#1a0e3c', text: '#ffffff',  label: 'Announcement', icon: '📣' },
+  blank:     { bg: '#000000', text: '#ffffff',  label: 'Blank',        icon: '⬛' },
+};
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const _st = {
+  view:         'library',  // 'library' | 'editor'
+  shows:        [],
+  activeId:     null,
+  activeSlide:  0,
+  presentWin:   null,       // reference to projector window
+  presentSlide: 0,          // slide currently shown in projector
+  search:       '',
+};
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+const _uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+const _e = s => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const _esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function _fmtDate(ts) {
+  if (!ts) return '';
+  return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// ── Storage ───────────────────────────────────────────────────────────────────
+function _load() {
+  try { _st.shows = JSON.parse(localStorage.getItem(FS_KEY) || '[]'); }
+  catch { _st.shows = []; }
+}
+
+function _save() {
+  try { localStorage.setItem(FS_KEY, JSON.stringify(_st.shows)); }
+  catch (_) { /* storage quota exceeded — graceful no-op */ }
+}
+
+// ── Model factories ───────────────────────────────────────────────────────────
+function _makeSlide(type = 'lyrics', text = '') {
+  return { id: _uid(), type, text, reference: '', bgColor: '', textColor: '', notes: '' };
+}
+
+function _makeShow(name = 'New Show') {
+  const now = Date.now();
+  return {
+    id:        _uid(),
+    name,
+    slides:    [_makeSlide('announce', name)],
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+// ── Accessors ─────────────────────────────────────────────────────────────────
+function _activeShow()  { return _st.shows.find(s => s.id === _st.activeId) || null; }
+function _activeSlide() { const sh = _activeShow(); return sh?.slides[_st.activeSlide] || null; }
+
+function _touch(show) { show.updatedAt = Date.now(); _save(); }
+
+// ── Slide appearance ──────────────────────────────────────────────────────────
+function _slideBg(sl)   { return sl.bgColor   || SLIDE_TYPES[sl.type]?.bg   || '#000'; }
+function _slideCol(sl)  { return sl.textColor || SLIDE_TYPES[sl.type]?.text || '#fff'; }
+
+function _slideFontSize(sl) {
+  const len = (sl.text || '').length;
+  if (len === 0)   return '4rem';
+  if (len < 40)    return '3.2rem';
+  if (len < 100)   return '2.4rem';
+  if (len < 200)   return '1.8rem';
+  if (len < 400)   return '1.3rem';
+  return '1rem';
+}
+
+// ── Present window document generator ────────────────────────────────────────
+function _buildPresentDoc(show, idx) {
+  const sl     = show.slides[idx];
+  if (!sl) return '';
+  const bg     = _slideBg(sl);
+  const col    = _slideCol(sl);
+  const fs     = _slideFontSize(sl);
+  const body   = sl.type === 'blank' ? '' : _esc(sl.text || '');
+  const refHtml = (sl.type === 'scripture' && sl.reference)
+    ? `<div style="margin-top:1.2rem;font-size:.65em;opacity:.6;font-style:italic">${_esc(sl.reference)}</div>`
+    : '';
+  const next    = show.slides[idx + 1];
+  const nextHtml = next
+    ? `<div style="position:fixed;bottom:14px;left:14px;font:0.68rem system-ui,sans-serif;color:rgba(255,255,255,.38);background:rgba(255,255,255,.07);padding:4px 10px;border-radius:6px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">NEXT: ${_esc((next.text || 'Blank').slice(0, 42))}</div>`
+    : '';
+  const noteHtml = sl.notes
+    ? `<div style="position:fixed;bottom:14px;right:14px;font:0.68rem system-ui,sans-serif;color:rgba(255,255,255,.45);background:rgba(255,255,255,.08);padding:4px 10px;border-radius:6px;max-width:260px;text-align:right">${_esc(sl.notes)}</div>`
+    : '';
+  const counter = `<div style="position:fixed;top:12px;right:14px;font:0.65rem system-ui,sans-serif;color:rgba(255,255,255,.22)">${idx + 1}&thinsp;/&thinsp;${show.slides.length}</div>`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FlockShow — ${_esc(show.name)}</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: ${bg};
+  font-family: Georgia, 'Noto Serif', serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none; cursor: none;
+}
+.slide {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  padding: 6vw 12vw; text-align: center;
+  color: ${col};
+}
+.slide-text {
+  font-size: ${fs}; font-weight: 400;
+  white-space: pre-wrap; max-width: 960px; line-height: 1.48;
+  animation: fi .22s ease;
+}
+@keyframes fi {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="slide-text">${body}</div>
+  ${refHtml}
+</div>
+${counter}${nextHtml}${noteHtml}
+<script>
+document.addEventListener('keydown', function(e) {
+  var o = window.opener;
+  if (!o || !o._fsKey) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+    e.preventDefault(); o._fsKey('next');
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+    e.preventDefault(); o._fsKey('prev');
+  } else if (e.key === 'f' || e.key === 'F') {
+    document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+  } else if (e.key === 'Escape') {
+    window.close();
+  }
+});
+// Touch swipe
+var _tx = 0;
+document.addEventListener('touchstart', function(e) { _tx = e.touches[0].clientX; }, { passive: true });
+document.addEventListener('touchend', function(e) {
+  var dx = e.changedTouches[0].clientX - _tx;
+  if (Math.abs(dx) > 50) {
+    var o = window.opener;
+    if (o && o._fsKey) o._fsKey(dx < 0 ? 'next' : 'prev');
+  }
+}, { passive: true });
+<\/script>
+</body>
+</html>`;
+}
+
+// ── Present navigation (called by projector window) ───────────────────────────
+window._fsKey = function(dir) {
+  const show = _activeShow();
+  if (!show) return;
+  if (dir === 'next') _st.presentSlide = Math.min(_st.presentSlide + 1, show.slides.length - 1);
+  if (dir === 'prev') _st.presentSlide = Math.max(_st.presentSlide - 1, 0);
+  _pushToPresent();
+  // Mirror selection in editor
+  _st.activeSlide = _st.presentSlide;
+  _renderSlideList();
+  _renderPreview();
+  _renderProps();
+};
+
+function _pushToPresent() {
+  if (!_st.presentWin || _st.presentWin.closed) return;
+  const show = _activeShow();
+  if (!show) return;
+  _st.presentWin.document.open();
+  _st.presentWin.document.write(_buildPresentDoc(show, _st.presentSlide));
+  _st.presentWin.document.close();
+}
+
+// ── Render: library grid ──────────────────────────────────────────────────────
+function _renderLibrary() {
+  const grid = document.getElementById('fs-shows-grid');
+  if (!grid) return;
+  const q = _st.search.toLowerCase().trim();
+  const shows = q
+    ? _st.shows.filter(s => s.name.toLowerCase().includes(q))
+    : _st.shows;
+
+  if (!shows.length) {
+    grid.innerHTML = `
+      <div class="fs-empty">
+        <div class="fs-empty-icon">🎬</div>
+        <div style="font:600 1rem 'Plus Jakarta Sans',sans-serif;color:rgba(240,241,248,0.7)">
+          ${q ? 'No shows match your search' : 'No shows yet'}
+        </div>
+        <div style="font:0.82rem 'Plus Jakarta Sans',sans-serif">
+          ${q ? 'Try a different search term' : 'Click "New Show" to create your first presentation'}
+        </div>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = shows.map(show => {
+    const pips = show.slides.slice(0, 10).map(sl =>
+      `<div class="fs-slide-pip" style="background:${_e(_slideBg(sl))}"></div>`).join('');
+    const overflow = show.slides.length > 10
+      ? `<div class="fs-slide-pip" style="background:rgba(255,255,255,0.08);font-size:0.42rem;color:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center">+${show.slides.length - 10}</div>`
+      : '';
+    return `
+      <div class="fs-show-card" data-show-id="${_e(show.id)}">
+        <div class="fs-show-name">${_e(show.name)}</div>
+        <div class="fs-show-meta">
+          ${show.slides.length} slide${show.slides.length !== 1 ? 's' : ''}&nbsp;&middot;&nbsp;${_fmtDate(show.updatedAt)}
+        </div>
+        <div class="fs-show-preview">${pips}${overflow}</div>
+        <div class="fs-show-actions" onclick="event.stopPropagation()">
+          <button class="fs-show-action-btn fs-show-action-btn--edit" data-act="edit" data-id="${_e(show.id)}">Edit</button>
+          <button class="fs-show-action-btn fs-show-action-btn--dup"  data-act="dup"  data-id="${_e(show.id)}">Duplicate</button>
+          <button class="fs-show-action-btn fs-show-action-btn--del"  data-act="del"  data-id="${_e(show.id)}">Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Render: slide thumbnails ──────────────────────────────────────────────────
+function _renderSlideList() {
+  const list = document.getElementById('fs-slide-list');
+  if (!list) return;
+  const show = _activeShow();
+
+  // Remove old slide items, keep the add-slide wrapper
+  list.querySelectorAll('.fs-slide-item').forEach(el => el.remove());
+
+  if (!show) return;
+
+  const fragment = document.createDocumentFragment();
+  show.slides.forEach((sl, i) => {
+    const div = document.createElement('div');
+    div.className = 'fs-slide-item' + (i === _st.activeSlide ? ' fs-slide-item--active' : '');
+    div.dataset.slideIdx = i;
+    div.innerHTML = `
+      <div class="fs-slide-num">${i + 1}</div>
+      <div class="fs-slide-thumb" style="background:${_e(_slideBg(sl))}">
+        <div class="fs-slide-thumb-text" style="color:${_e(_slideCol(sl))}">${_e((sl.text || '').slice(0, 80))}</div>
+        <div class="fs-type-chip">${_e(SLIDE_TYPES[sl.type]?.icon || '')}</div>
+      </div>`;
+    fragment.appendChild(div);
+  });
+
+  // Insert before the add-slide wrapper
+  const addWrap = list.querySelector('#fs-add-slide-wrap');
+  list.insertBefore(fragment, addWrap);
+}
+
+// ── Render: center preview ────────────────────────────────────────────────────
+function _renderPreview() {
+  const canvas   = document.getElementById('fs-slide-canvas');
+  const textEl   = document.getElementById('fs-canvas-text');
+  const refEl    = document.getElementById('fs-canvas-ref');
+  const counter  = document.getElementById('fs-prev-counter');
+  const prevBtn  = document.getElementById('fs-prev-btn');
+  const nextBtn  = document.getElementById('fs-next-btn');
+  const goLiveBtn = document.getElementById('fs-go-live-btn');
+  if (!canvas) return;
+
+  const show = _activeShow();
+  const sl   = _activeSlide();
+  if (!show || !sl) {
+    counter && (counter.textContent = '— / —');
+    return;
+  }
+
+  canvas.style.background = _slideBg(sl);
+  textEl.style.color      = _slideCol(sl);
+  textEl.style.fontSize   = _slideFontSize(sl);
+  textEl.textContent      = sl.type === 'blank' ? '' : (sl.text || '');
+
+  if (sl.type === 'scripture' && sl.reference) {
+    refEl.textContent  = sl.reference;
+    refEl.style.color  = _slideCol(sl);
+    refEl.hidden = false;
+  } else {
+    refEl.hidden = true;
+  }
+
+  counter.textContent  = `${_st.activeSlide + 1} / ${show.slides.length}`;
+  prevBtn.disabled     = _st.activeSlide === 0;
+  nextBtn.disabled     = _st.activeSlide === show.slides.length - 1;
+  if (goLiveBtn) goLiveBtn.disabled = !(_st.presentWin && !_st.presentWin.closed);
+}
+
+// ── Render: properties panel ──────────────────────────────────────────────────
+function _renderProps() {
+  const show = _activeShow();
+  const sl   = _activeSlide();
+  if (!show || !sl) return;
+
+  // Type buttons
+  document.querySelectorAll('.fs-type-btn').forEach(btn => {
+    btn.classList.toggle('fs-type-btn--active', btn.dataset.type === sl.type);
+  });
+
+  // Text
+  const textEl = document.getElementById('fs-prop-text');
+  if (textEl && textEl !== document.activeElement) textEl.value = sl.text || '';
+
+  // Ref section
+  const refEl      = document.getElementById('fs-prop-ref');
+  const refSection = document.getElementById('fs-prop-ref-section');
+  if (refEl && refEl !== document.activeElement) refEl.value = sl.reference || '';
+  if (refSection) refSection.hidden = sl.type !== 'scripture';
+
+  // Text section (hidden for blank)
+  const textSection = document.getElementById('fs-prop-text-section');
+  if (textSection) textSection.hidden = sl.type === 'blank';
+
+  // Background color
+  const bgInput = document.getElementById('fs-prop-bg');
+  const bgLabel = document.getElementById('fs-prop-bg-label');
+  if (bgInput) bgInput.value = sl.bgColor || SLIDE_TYPES[sl.type]?.bg || '#000000';
+  if (bgLabel) bgLabel.textContent = sl.bgColor || 'Default';
+
+  // Text color
+  const tcInput = document.getElementById('fs-prop-tc');
+  const tcLabel = document.getElementById('fs-prop-tc-label');
+  if (tcInput) tcInput.value = sl.textColor || SLIDE_TYPES[sl.type]?.text || '#ffffff';
+  if (tcLabel) tcLabel.textContent = sl.textColor || 'Default';
+
+  // Notes
+  const notesEl = document.getElementById('fs-prop-notes');
+  if (notesEl && notesEl !== document.activeElement) notesEl.value = sl.notes || '';
+
+  // Editor bar
+  const titleEl   = document.getElementById('fs-show-title');
+  const countEl   = document.getElementById('fs-slide-count');
+  if (titleEl && titleEl !== document.activeElement) titleEl.value = show.name;
+  if (countEl) countEl.textContent = `${show.slides.length} slide${show.slides.length !== 1 ? 's' : ''}`;
+}
+
+// ── Render: topbar header ─────────────────────────────────────────────────────
+function _renderHeader() {
+  const editorTab  = document.getElementById('fs-editor-tab');
+  const presentBtn = document.getElementById('fs-present-btn');
+  const topRight   = document.getElementById('fs-topbar-right');
+  const show       = _activeShow();
+  const isLive     = _st.presentWin && !_st.presentWin.closed;
+
+  if (editorTab)  editorTab.disabled = !show;
+  if (presentBtn) {
+    presentBtn.disabled  = !show;
+    presentBtn.textContent = isLive ? '⏹ Stop' : '▶ Present';
+    presentBtn.className   = isLive
+      ? 'fs-btn fs-btn--danger'
+      : 'fs-btn fs-btn--primary';
+  }
+
+  const badge = document.getElementById('fs-live-badge');
+  if (isLive && !badge && topRight) {
+    const el = document.createElement('div');
+    el.id = 'fs-live-badge';
+    el.className = 'fs-live-badge';
+    el.innerHTML = '<div class="fs-live-dot"></div>LIVE';
+    topRight.insertBefore(el, presentBtn);
+  } else if (!isLive && badge) {
+    badge.remove();
+  }
+}
+
+// ── Full re-render ────────────────────────────────────────────────────────────
+function _renderAll() {
+  _renderLibrary();
+  _renderHeader();
+  if (_st.view === 'editor') {
+    _renderSlideList();
+    _renderPreview();
+    _renderProps();
+  }
+}
+
+// ── View switching ────────────────────────────────────────────────────────────
+function _setView(view) {
+  _st.view = view;
+  document.getElementById('fs-library').hidden = view !== 'library';
+  document.getElementById('fs-editor').hidden  = view !== 'editor';
+  document.querySelectorAll('.fs-tab').forEach(t => {
+    t.classList.toggle('fs-tab--active', t.dataset.tab === view);
+  });
+  if (view === 'editor') {
+    _renderSlideList();
+    _renderPreview();
+    _renderProps();
+  }
+}
+
+// ── Show CRUD ─────────────────────────────────────────────────────────────────
+function _openShow(id) {
+  _st.activeId    = id;
+  _st.activeSlide = 0;
+  _setView('editor');
+  _renderHeader();
+}
+
+function _newShow() {
+  const name = prompt('Show name:', 'New Show');
+  if (name === null) return;
+  const show = _makeShow(name.trim() || 'New Show');
+  _st.shows.unshift(show);
+  _save();
+  _openShow(show.id);
+}
+
+function _dupShow(id) {
+  const src = _st.shows.find(s => s.id === id);
+  if (!src) return;
+  const copy = JSON.parse(JSON.stringify(src));
+  copy.id = _uid();
+  copy.name = src.name + ' (copy)';
+  copy.createdAt = copy.updatedAt = Date.now();
+  copy.slides.forEach(sl => { sl.id = _uid(); });
+  const idx = _st.shows.findIndex(s => s.id === id);
+  _st.shows.splice(idx + 1, 0, copy);
+  _save();
+  _renderLibrary();
+}
+
+function _delShow(id) {
+  const show = _st.shows.find(s => s.id === id);
+  if (!show) return;
+  if (!confirm(`Delete "${show.name}"? This cannot be undone.`)) return;
+  _st.shows = _st.shows.filter(s => s.id !== id);
+  if (_st.activeId === id) { _st.activeId = null; _setView('library'); }
+  _save();
+  _renderLibrary();
+  _renderHeader();
+}
+
+// ── Slide CRUD ────────────────────────────────────────────────────────────────
+function _addSlide(type) {
+  const show = _activeShow();
+  if (!show) return;
+  const sl = _makeSlide(type, '');
+  show.slides.splice(_st.activeSlide + 1, 0, sl);
+  _st.activeSlide += 1;
+  _touch(show);
+  _renderSlideList();
+  _renderPreview();
+  _renderProps();
+  _pushToPresent();
+}
+
+function _dupSlide() {
+  const show = _activeShow();
+  const sl   = _activeSlide();
+  if (!show || !sl) return;
+  const copy = { ...sl, id: _uid() };
+  show.slides.splice(_st.activeSlide + 1, 0, copy);
+  _st.activeSlide += 1;
+  _touch(show);
+  _renderSlideList();
+  _renderPreview();
+  _renderProps();
+  _pushToPresent();
+}
+
+function _delSlide() {
+  const show = _activeShow();
+  if (!show || show.slides.length <= 1) {
+    alert('A show must have at least one slide.');
+    return;
+  }
+  if (!confirm('Delete this slide?')) return;
+  show.slides.splice(_st.activeSlide, 1);
+  _st.activeSlide = Math.min(_st.activeSlide, show.slides.length - 1);
+  _touch(show);
+  _renderSlideList();
+  _renderPreview();
+  _renderProps();
+  _pushToPresent();
+}
+
+function _selectSlide(idx) {
+  const show = _activeShow();
+  if (!show) return;
+  const clamped = Math.max(0, Math.min(idx, show.slides.length - 1));
+  if (clamped === _st.activeSlide) return;
+  _st.activeSlide = clamped;
+  _renderSlideList();
+  _renderPreview();
+  _renderProps();
+}
+
+// ── Import lyrics ─────────────────────────────────────────────────────────────
+function _importLyrics() {
+  const area = document.getElementById('fs-import-area');
+  if (!area) return;
+  const raw = area.value.trim();
+  if (!raw) return;
+  const show = _activeShow();
+  if (!show) return;
+
+  // Split on two or more blank lines
+  const stanzas = raw.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
+  if (!stanzas.length) return;
+
+  const newSlides = stanzas.map(text => _makeSlide('lyrics', text));
+  show.slides.splice(_st.activeSlide + 1, 0, ...newSlides);
+  _st.activeSlide += 1;
+  _touch(show);
+  area.value = '';
+  _renderSlideList();
+  _renderPreview();
+  _renderProps();
+  _pushToPresent();
+}
+
+// ── Present mode ──────────────────────────────────────────────────────────────
+function _togglePresent() {
+  // Stop if already live
+  if (_st.presentWin && !_st.presentWin.closed) {
+    _st.presentWin.close();
+    _st.presentWin = null;
+    _renderHeader();
+    _renderPreview();
+    return;
+  }
+
+  const show = _activeShow();
+  if (!show) return;
+  _st.presentSlide = _st.activeSlide;
+
+  const win = window.open(
+    '', 'flockshow-present',
+    'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no,scrollbars=no'
+  );
+  if (!win) {
+    alert('Pop-up blocked — please allow pop-ups for this site to use Present mode.');
+    return;
+  }
+
+  _st.presentWin = win;
+  win.document.open();
+  win.document.write(_buildPresentDoc(show, _st.presentSlide));
+  win.document.close();
+
+  win.addEventListener('beforeunload', () => {
+    _st.presentWin = null;
+    _renderHeader();
+    _renderPreview();
+  });
+
+  _renderHeader();
+  _renderPreview();
+}
+
+// ── Event wiring ──────────────────────────────────────────────────────────────
+function _wire() {
+
+  /* ── Tab bar ── */
+  document.getElementById('fs-tabs')?.addEventListener('click', e => {
+    const tab = e.target.closest('[data-tab]');
+    if (!tab || tab.disabled) return;
+    if (tab.dataset.tab === 'library') { _setView('library'); _renderLibrary(); }
+    if (tab.dataset.tab === 'editor' && _activeShow()) _setView('editor');
+  });
+
+  /* ── Library: new show ── */
+  document.getElementById('fs-new-show-btn')?.addEventListener('click', _newShow);
+
+  /* ── Library: search ── */
+  document.getElementById('fs-search')?.addEventListener('input', e => {
+    _st.search = e.target.value;
+    _renderLibrary();
+  });
+
+  /* ── Library: card interactions ── */
+  document.getElementById('fs-shows-grid')?.addEventListener('click', e => {
+    const btn = e.target.closest('[data-act]');
+    if (btn) {
+      const id = btn.dataset.id;
+      if (btn.dataset.act === 'edit') _openShow(id);
+      if (btn.dataset.act === 'dup')  _dupShow(id);
+      if (btn.dataset.act === 'del')  _delShow(id);
+      return;
+    }
+    const card = e.target.closest('[data-show-id]');
+    if (card) _openShow(card.dataset.showId);
+  });
+
+  /* ── Editor: back to library ── */
+  document.getElementById('fs-back-btn')?.addEventListener('click', () => {
+    _setView('library');
+    _renderLibrary();
+  });
+
+  /* ── Editor: show title rename ── */
+  document.getElementById('fs-show-title')?.addEventListener('input', e => {
+    const show = _activeShow();
+    if (!show) return;
+    show.name = e.target.value;
+    _touch(show);
+  });
+
+  /* ── Slide list: select slide ── */
+  document.getElementById('fs-slide-list')?.addEventListener('click', e => {
+    const item = e.target.closest('[data-slide-idx]');
+    if (item) _selectSlide(+item.dataset.slideIdx);
+  });
+
+  /* ── Add slide button ── */
+  document.getElementById('fs-add-slide-btn')?.addEventListener('click', e => {
+    e.stopPropagation();
+    const menu = document.getElementById('fs-add-type-menu');
+    if (menu) menu.hidden = !menu.hidden;
+  });
+
+  /* ── Add type menu items ── */
+  document.getElementById('fs-add-type-menu')?.addEventListener('click', e => {
+    const item = e.target.closest('[data-type]');
+    if (!item) return;
+    document.getElementById('fs-add-type-menu').hidden = true;
+    _addSlide(item.dataset.type);
+  });
+
+  /* Close add-type menu on outside click */
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#fs-add-slide-wrap')) {
+      const menu = document.getElementById('fs-add-type-menu');
+      if (menu) menu.hidden = true;
+    }
+  });
+
+  /* ── Duplicate / delete slide ── */
+  document.getElementById('fs-dup-slide-btn')?.addEventListener('click', _dupSlide);
+  document.getElementById('fs-del-slide-btn')?.addEventListener('click', _delSlide);
+
+  /* ── Preview navigation ── */
+  document.getElementById('fs-prev-btn')?.addEventListener('click', () => _selectSlide(_st.activeSlide - 1));
+  document.getElementById('fs-next-btn')?.addEventListener('click', () => _selectSlide(_st.activeSlide + 1));
+
+  /* ── Go Live: push current editor slide to projector ── */
+  document.getElementById('fs-go-live-btn')?.addEventListener('click', () => {
+    _st.presentSlide = _st.activeSlide;
+    _pushToPresent();
+  });
+
+  /* ── Type buttons ── */
+  document.querySelectorAll('.fs-type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sl   = _activeSlide();
+      const show = _activeShow();
+      if (!sl || !show) return;
+      sl.type = btn.dataset.type;
+      _touch(show);
+      _renderSlideList();
+      _renderPreview();
+      _renderProps();
+      _pushToPresent();
+    });
+  });
+
+  /* ── Text field ── */
+  document.getElementById('fs-prop-text')?.addEventListener('input', e => {
+    const sl = _activeSlide(); const show = _activeShow();
+    if (!sl || !show) return;
+    sl.text = e.target.value;
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _pushToPresent();
+  });
+
+  /* ── Scripture reference ── */
+  document.getElementById('fs-prop-ref')?.addEventListener('input', e => {
+    const sl = _activeSlide(); const show = _activeShow();
+    if (!sl || !show) return;
+    sl.reference = e.target.value;
+    _touch(show);
+    _renderPreview();
+    _pushToPresent();
+  });
+
+  /* ── Background color ── */
+  document.getElementById('fs-prop-bg')?.addEventListener('input', e => {
+    const sl = _activeSlide(); const show = _activeShow();
+    if (!sl || !show) return;
+    sl.bgColor = e.target.value;
+    const label = document.getElementById('fs-prop-bg-label');
+    if (label) label.textContent = e.target.value;
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _pushToPresent();
+  });
+  document.getElementById('fs-prop-bg-reset')?.addEventListener('click', () => {
+    const sl = _activeSlide(); const show = _activeShow();
+    if (!sl || !show) return;
+    sl.bgColor = '';
+    const input = document.getElementById('fs-prop-bg');
+    const label = document.getElementById('fs-prop-bg-label');
+    if (input) input.value = SLIDE_TYPES[sl.type]?.bg || '#000000';
+    if (label) label.textContent = 'Default';
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _pushToPresent();
+  });
+
+  /* ── Text color ── */
+  document.getElementById('fs-prop-tc')?.addEventListener('input', e => {
+    const sl = _activeSlide(); const show = _activeShow();
+    if (!sl || !show) return;
+    sl.textColor = e.target.value;
+    const label = document.getElementById('fs-prop-tc-label');
+    if (label) label.textContent = e.target.value;
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _pushToPresent();
+  });
+  document.getElementById('fs-prop-tc-reset')?.addEventListener('click', () => {
+    const sl = _activeSlide(); const show = _activeShow();
+    if (!sl || !show) return;
+    sl.textColor = '';
+    const input = document.getElementById('fs-prop-tc');
+    const label = document.getElementById('fs-prop-tc-label');
+    if (input) input.value = SLIDE_TYPES[sl.type]?.text || '#ffffff';
+    if (label) label.textContent = 'Default';
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _pushToPresent();
+  });
+
+  /* ── Stage notes ── */
+  document.getElementById('fs-prop-notes')?.addEventListener('input', e => {
+    const sl = _activeSlide(); const show = _activeShow();
+    if (!sl || !show) return;
+    sl.notes = e.target.value;
+    _touch(show);
+    _pushToPresent();
+  });
+
+  /* ── Import lyrics ── */
+  document.getElementById('fs-import-btn')?.addEventListener('click', _importLyrics);
+
+  /* ── Present button ── */
+  document.getElementById('fs-present-btn')?.addEventListener('click', _togglePresent);
+
+  /* ── Keyboard shortcuts in editor ── */
+  document.addEventListener('keydown', e => {
+    if (_st.view !== 'editor') return;
+    if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); _selectSlide(_st.activeSlide + 1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); _selectSlide(_st.activeSlide - 1); }
+    if (e.key === 'p' || e.key === 'P') _togglePresent();
+    if (e.key === 'd' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); _dupSlide(); }
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      // Only delete slide if not in an input
+      _delSlide();
+    }
+  });
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+_load();
+_wire();
+_renderAll();

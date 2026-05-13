@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Resolve all relative resource paths from New_Covenant/ -->
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FlockShow">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="FlockShow — Church presentation and worship display for FlockOS.">
+
+  <title>FlockShow</title>
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="app.flockshow/manifest.json">
+  <link rel="icon" type="image/png" href="Images/NewCovenant.png">
+  <link rel="apple-touch-icon" href="Images/NewCovenant.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Shared stylesheet -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── FlockShow design tokens ───────────────────────────────────────── */
+    :root {
+      --fs-bg:        #0b0d14;
+      --fs-panel:     #13151f;
+      --fs-panel-alt: #1a1d2e;
+      --fs-border:    rgba(167,139,250,0.12);
+      --fs-accent:    #a78bfa;
+      --fs-accent-dk: #7c3aed;
+      --fs-accent-dim:rgba(167,139,250,0.13);
+      --fs-ink:       #f0f1f8;
+      --fs-muted:     rgba(240,241,248,0.50);
+      --fs-danger:    #f87171;
+      --topbar-h:     54px;
+    }
+
+    html, body {
+      height: 100%; background: var(--fs-bg); color: var(--fs-ink);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased; overflow: hidden;
+    }
+
+    /* ── Root grid ─────────────────────────────────────────────────────── */
+    #fs-root {
+      display: grid;
+      grid-template-rows: var(--topbar-h) 1fr;
+      height: 100%;
+    }
+
+    /* ── Topbar ────────────────────────────────────────────────────────── */
+    #fs-topbar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 18px;
+      background: #0d0f1a;
+      border-bottom: 1px solid var(--fs-border);
+      z-index: 200;
+      position: relative;
+    }
+    #fs-topbar::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, #a78bfa 0%, #7c3aed 30%, #818cf8 60%, #a78bfa 100%);
+      background-size: 200% 100%;
+      animation: fs-bar 6s linear infinite;
+      opacity: 0.6;
+    }
+    @keyframes fs-bar { from { background-position: 0 0; } to { background-position: 200% 0; } }
+
+    .fs-logo {
+      display: flex; align-items: center; gap: 8px;
+      font: 700 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink);
+      flex-shrink: 0; margin-right: 6px;
+    }
+    .fs-logo-icon {
+      width: 30px; height: 30px; border-radius: 7px;
+      background: linear-gradient(135deg, var(--fs-accent), var(--fs-accent-dk));
+      display: flex; align-items: center; justify-content: center; font-size: 15px;
+    }
+
+    .fs-tab-bar { display: flex; gap: 2px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 3px; }
+    .fs-tab {
+      padding: 5px 14px; border-radius: 6px; font: 500 0.80rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--fs-muted); cursor: pointer; border: none; background: none;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .fs-tab:hover:not(:disabled) { color: var(--fs-ink); background: rgba(255,255,255,0.06); }
+    .fs-tab.fs-tab--active { background: var(--fs-accent-dim); color: var(--fs-accent); }
+    .fs-tab:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .fs-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+    .fs-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 13px; border-radius: 8px; font: 600 0.78rem 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
+    }
+    .fs-btn--primary { background: var(--fs-accent); color: #0b0d14; }
+    .fs-btn--primary:hover { background: #b89ffd; }
+    .fs-btn--ghost { background: rgba(255,255,255,0.07); color: var(--fs-ink); }
+    .fs-btn--ghost:hover { background: rgba(255,255,255,0.12); }
+    .fs-btn--danger { background: rgba(248,113,113,0.15); color: var(--fs-danger); }
+    .fs-btn--danger:hover { background: rgba(248,113,113,0.25); }
+    .fs-btn:disabled { opacity: 0.35; pointer-events: none; }
+    .fs-btn--sm { padding: 4px 10px; font-size: 0.73rem; }
+
+    .fs-live-badge {
+      display: flex; align-items: center; gap: 5px;
+      font: 600 0.70rem 'Plus Jakarta Sans', sans-serif; color: #4ade80;
+      background: rgba(74,222,128,0.10); border: 1px solid rgba(74,222,128,0.22);
+      border-radius: 999px; padding: 3px 10px; flex-shrink: 0;
+    }
+    .fs-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; animation: fs-pulse 1.5s ease-in-out infinite; }
+    @keyframes fs-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+    /* ── Library view ──────────────────────────────────────────────────── */
+    #fs-library {
+      overflow-y: auto; padding: 28px 32px 80px;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .fs-lib-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .fs-lib-title { font: 700 1.25rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink); flex: 1; }
+    .fs-search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 300px; }
+    .fs-search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--fs-muted); pointer-events: none; }
+    .fs-search {
+      width: 100%; padding: 8px 14px 8px 34px;
+      background: var(--fs-panel); border: 1px solid var(--fs-border); border-radius: 10px;
+      font: 0.83rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink); outline: none;
+    }
+    .fs-search::placeholder { color: var(--fs-muted); }
+    .fs-search:focus { border-color: var(--fs-accent); }
+
+    .fs-shows-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+    .fs-show-card {
+      background: var(--fs-panel); border: 1px solid var(--fs-border); border-radius: 14px;
+      padding: 18px 18px 14px; cursor: pointer; transition: all 0.15s;
+      display: flex; flex-direction: column; gap: 7px; position: relative; overflow: hidden;
+    }
+    .fs-show-card:hover { border-color: rgba(167,139,250,0.4); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.18); }
+    .fs-show-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
+      background: linear-gradient(90deg, var(--fs-accent), var(--fs-accent-dk));
+      border-radius: 14px 14px 0 0; opacity: 0; transition: opacity 0.15s;
+    }
+    .fs-show-card:hover::before { opacity: 1; }
+    .fs-show-name { font: 700 0.92rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink); line-height: 1.3; word-break: break-word; }
+    .fs-show-meta { font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted); }
+    .fs-show-preview { display: flex; gap: 3px; margin-top: 2px; flex-wrap: wrap; }
+    .fs-slide-pip { width: 26px; height: 17px; border-radius: 3px; flex-shrink: 0; }
+    .fs-show-actions { display: flex; gap: 4px; margin-top: 6px; }
+    .fs-show-action-btn {
+      padding: 3px 8px; border-radius: 6px; font: 500 0.70rem 'Plus Jakarta Sans', sans-serif;
+      border: none; cursor: pointer; transition: all 0.12s;
+    }
+    .fs-show-action-btn--edit { background: var(--fs-accent-dim); color: var(--fs-accent); }
+    .fs-show-action-btn--edit:hover { background: rgba(167,139,250,0.22); }
+    .fs-show-action-btn--dup { background: rgba(255,255,255,0.05); color: var(--fs-muted); }
+    .fs-show-action-btn--dup:hover { background: rgba(255,255,255,0.10); color: var(--fs-ink); }
+    .fs-show-action-btn--del { background: rgba(248,113,113,0.08); color: var(--fs-danger); }
+    .fs-show-action-btn--del:hover { background: rgba(248,113,113,0.18); }
+
+    .fs-empty {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; padding: 80px 20px; text-align: center; color: var(--fs-muted);
+      grid-column: 1 / -1;
+    }
+    .fs-empty-icon { font-size: 3rem; opacity: 0.4; }
+
+    /* ── Editor view ───────────────────────────────────────────────────── */
+    #fs-editor { display: grid; grid-template-rows: 46px 1fr; overflow: hidden; }
+
+    .fs-editor-bar {
+      display: flex; align-items: center; gap: 8px; padding: 0 14px;
+      background: #0f1120; border-bottom: 1px solid var(--fs-border); overflow: hidden;
+    }
+    .fs-show-title-input {
+      background: transparent; border: none; outline: none;
+      font: 700 0.90rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink);
+      min-width: 100px; max-width: 220px; flex-shrink: 1;
+    }
+    .fs-show-title-input::placeholder { color: var(--fs-muted); }
+    .fs-slide-count { font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted); flex-shrink: 0; }
+
+    .fs-editor-body { display: grid; grid-template-columns: 196px 1fr 260px; overflow: hidden; }
+
+    /* ── Slide list (left) ─────────────────────────────────────────────── */
+    #fs-slide-list {
+      background: #0f1120; border-right: 1px solid var(--fs-border);
+      overflow-y: auto; padding: 6px 5px; display: flex; flex-direction: column; gap: 4px;
+      scrollbar-width: thin; scrollbar-color: rgba(167,139,250,0.15) transparent;
+    }
+    #fs-slide-list::-webkit-scrollbar { width: 3px; }
+    #fs-slide-list::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.18); border-radius: 3px; }
+
+    .fs-slide-item {
+      border-radius: 8px; cursor: pointer; padding: 2px; transition: all 0.12s;
+      flex-shrink: 0; border: 2px solid transparent; user-select: none;
+    }
+    .fs-slide-item:hover { border-color: rgba(167,139,250,0.3); }
+    .fs-slide-item.fs-slide-item--active { border-color: var(--fs-accent); }
+
+    .fs-slide-thumb {
+      width: 100%; aspect-ratio: 16/9; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 6px; overflow: hidden; position: relative;
+    }
+    .fs-slide-thumb-text {
+      font-size: 0.48rem; text-align: center; line-height: 1.3;
+      white-space: pre-wrap; overflow: hidden; max-height: 100%;
+      font-family: Georgia, serif;
+    }
+    .fs-slide-num { font: 500 0.63rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted); padding: 2px 4px; }
+    .fs-type-chip {
+      position: absolute; top: 2px; right: 2px; font-size: 0.42rem;
+      background: rgba(0,0,0,0.45); border-radius: 3px; padding: 1px 3px; color: rgba(255,255,255,0.65);
+    }
+
+    .fs-add-slide-wrap { padding: 5px 4px; position: relative; flex-shrink: 0; }
+    .fs-add-slide-btn {
+      width: 100%; padding: 7px; border-radius: 8px;
+      font: 600 0.73rem 'Plus Jakarta Sans', sans-serif; background: rgba(167,139,250,0.07);
+      color: var(--fs-accent); border: 1px dashed rgba(167,139,250,0.28); cursor: pointer; transition: all 0.12s;
+    }
+    .fs-add-slide-btn:hover { background: rgba(167,139,250,0.14); }
+
+    .fs-add-type-menu {
+      position: absolute; bottom: calc(100% + 4px); left: 4px; right: 4px;
+      background: #1a1d2e; border: 1px solid var(--fs-border); border-radius: 10px;
+      overflow: hidden; z-index: 50; box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+    }
+    .fs-add-type-item {
+      padding: 9px 13px; font: 0.80rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink);
+      cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.1s;
+    }
+    .fs-add-type-item:hover { background: var(--fs-accent-dim); }
+
+    /* ── Slide preview (center) ────────────────────────────────────────── */
+    #fs-slide-preview {
+      display: flex; flex-direction: column; background: #080a10; overflow: hidden;
+    }
+    .fs-preview-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .fs-slide-canvas {
+      aspect-ratio: 16/9; border-radius: 10px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 20px 60px rgba(0,0,0,0.7);
+      padding: 5%; position: relative; overflow: hidden;
+      width: 100%; max-height: 100%;
+    }
+    .fs-canvas-text {
+      text-align: center; line-height: 1.45; font-family: Georgia, 'Noto Serif', serif;
+      white-space: pre-wrap; max-width: 100%; overflow-wrap: break-word;
+    }
+    .fs-canvas-ref {
+      margin-top: 1rem; font-size: 0.68em; opacity: 0.65; font-style: italic;
+      font-family: Georgia, serif; text-align: center;
+    }
+
+    .fs-preview-nav {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      padding: 10px; border-top: 1px solid var(--fs-border);
+    }
+    .fs-nav-btn {
+      width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.06);
+      border: none; color: var(--fs-ink); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.12s;
+    }
+    .fs-nav-btn:hover { background: rgba(255,255,255,0.12); }
+    .fs-nav-btn:disabled { opacity: 0.2; pointer-events: none; }
+    .fs-prev-counter { font: 0.75rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted); min-width: 50px; text-align: center; }
+
+    /* ── Properties panel (right) ──────────────────────────────────────── */
+    #fs-slide-props {
+      background: #0f1120; border-left: 1px solid var(--fs-border);
+      overflow-y: auto; padding: 14px 13px; display: flex; flex-direction: column; gap: 14px;
+      scrollbar-width: thin; scrollbar-color: rgba(167,139,250,0.10) transparent;
+    }
+
+    .fs-prop-section { display: flex; flex-direction: column; gap: 7px; }
+    .fs-prop-label { font: 600 0.68rem 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; letter-spacing: .07em; color: var(--fs-muted); }
+    .fs-prop-divider { border: none; border-top: 1px solid var(--fs-border); margin: 0; }
+    .fs-prop-input {
+      width: 100%; padding: 7px 10px; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--fs-border); border-radius: 8px;
+      font: 0.80rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink); outline: none; resize: vertical;
+    }
+    .fs-prop-input:focus { border-color: var(--fs-accent); background: rgba(167,139,250,0.05); }
+    .fs-prop-textarea { min-height: 90px; }
+
+    .fs-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .fs-type-btn {
+      padding: 7px 4px; border-radius: 7px; font: 500 0.70rem 'Plus Jakarta Sans', sans-serif;
+      border: 1px solid var(--fs-border); background: rgba(255,255,255,0.03);
+      color: var(--fs-muted); cursor: pointer; transition: all 0.12s; text-align: center;
+    }
+    .fs-type-btn:hover { background: rgba(255,255,255,0.07); color: var(--fs-ink); }
+    .fs-type-btn.fs-type-btn--active { border-color: var(--fs-accent); background: var(--fs-accent-dim); color: var(--fs-accent); }
+
+    .fs-color-row { display: flex; align-items: center; gap: 8px; }
+    .fs-color-input { width: 34px; height: 28px; padding: 1px 2px; border: 1px solid var(--fs-border); border-radius: 6px; cursor: pointer; background: none; }
+    .fs-color-val { font: 0.75rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted); flex: 1; }
+    .fs-color-reset { font: 0.70rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-accent); background: none; border: none; cursor: pointer; padding: 2px 4px; }
+
+    .fs-import-area {
+      width: 100%; min-height: 70px; background: rgba(255,255,255,0.03);
+      border: 1px dashed rgba(167,139,250,0.22); border-radius: 8px;
+      padding: 8px 10px; font: 0.78rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--fs-muted); resize: vertical; outline: none;
+    }
+    .fs-import-area:focus { border-color: var(--fs-accent); color: var(--fs-ink); }
+
+    /* ── Mobile collapse ───────────────────────────────────────────────── */
+    @media (max-width: 680px) {
+      .fs-editor-body { grid-template-columns: 1fr; grid-template-rows: 80px 1fr auto; }
+      #fs-slide-list { flex-direction: row; overflow-x: auto; overflow-y: hidden; border-right: none; border-bottom: 1px solid var(--fs-border); padding: 4px 5px; max-height: 80px; }
+      .fs-slide-item { flex-shrink: 0; width: 76px; }
+      #fs-slide-props { border-left: none; border-top: 1px solid var(--fs-border); max-height: 260px; }
+    }
+    @media (max-width: 480px) {
+      #fs-library { padding: 18px 16px 60px; }
+      .fs-lib-header { gap: 8px; }
+      #fs-topbar { padding: 0 12px; gap: 6px; }
+      .fs-logo span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="fs-root">
+
+  <!-- ── Topbar ──────────────────────────────────────────────────────── -->
+  <header id="fs-topbar">
+    <div class="fs-logo">
+      <div class="fs-logo-icon">🎬</div>
+      <span>FlockShow</span>
+    </div>
+
+    <div class="fs-tab-bar" id="fs-tabs">
+      <button class="fs-tab fs-tab--active" data-tab="library">Library</button>
+      <button class="fs-tab" data-tab="editor" id="fs-editor-tab" disabled>Editor</button>
+    </div>
+
+    <div class="fs-topbar-right" id="fs-topbar-right">
+      <button class="fs-btn fs-btn--primary" id="fs-present-btn" disabled>▶ Present</button>
+    </div>
+  </header>
+
+  <!-- ── Library view ─────────────────────────────────────────────────── -->
+  <div id="fs-library">
+    <div class="fs-lib-header">
+      <div class="fs-lib-title">My Shows</div>
+      <div class="fs-search-wrap">
+        <svg class="fs-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="fs-search" class="fs-search" type="search" placeholder="Search shows…">
+      </div>
+      <button class="fs-btn fs-btn--primary" id="fs-new-show-btn">+ New Show</button>
+    </div>
+    <div id="fs-shows-grid" class="fs-shows-grid"></div>
+  </div>
+
+  <!-- ── Editor view ──────────────────────────────────────────────────── -->
+  <div id="fs-editor" hidden>
+    <div class="fs-editor-bar">
+      <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-back-btn">← Library</button>
+      <input id="fs-show-title" class="fs-show-title-input" type="text" placeholder="Show name…" maxlength="80">
+      <span class="fs-slide-count" id="fs-slide-count"></span>
+      <div style="margin-left:auto;display:flex;gap:5px">
+        <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-dup-slide-btn">Duplicate</button>
+        <button class="fs-btn fs-btn--danger fs-btn--sm" id="fs-del-slide-btn">Delete</button>
+      </div>
+    </div>
+
+    <div class="fs-editor-body">
+
+      <!-- Left: slide list -->
+      <div id="fs-slide-list">
+        <div class="fs-add-slide-wrap" id="fs-add-slide-wrap">
+          <button class="fs-add-slide-btn" id="fs-add-slide-btn">+ Add Slide</button>
+          <div class="fs-add-type-menu" id="fs-add-type-menu" hidden>
+            <div class="fs-add-type-item" data-type="lyrics">🎵 Lyrics / Text</div>
+            <div class="fs-add-type-item" data-type="scripture">📖 Scripture</div>
+            <div class="fs-add-type-item" data-type="announce">📣 Announcement</div>
+            <div class="fs-add-type-item" data-type="blank">⬛ Blank Screen</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: slide preview -->
+      <div id="fs-slide-preview">
+        <div class="fs-preview-wrap">
+          <div class="fs-slide-canvas" id="fs-slide-canvas">
+            <div class="fs-canvas-text" id="fs-canvas-text"></div>
+            <div class="fs-canvas-ref" id="fs-canvas-ref" hidden></div>
+          </div>
+        </div>
+        <div class="fs-preview-nav">
+          <button class="fs-nav-btn" id="fs-prev-btn" title="Previous slide">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <span class="fs-prev-counter" id="fs-prev-counter">— / —</span>
+          <button class="fs-nav-btn" id="fs-next-btn" title="Next slide">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-go-live-btn" style="margin-left:8px" title="Go to this slide in present window">Go Live</button>
+        </div>
+      </div>
+
+      <!-- Right: properties -->
+      <div id="fs-slide-props">
+        <div class="fs-prop-section">
+          <div class="fs-prop-label">Slide Type</div>
+          <div class="fs-type-grid">
+            <button class="fs-type-btn" data-type="lyrics">🎵 Lyrics</button>
+            <button class="fs-type-btn" data-type="scripture">📖 Scripture</button>
+            <button class="fs-type-btn" data-type="announce">📣 Announce</button>
+            <button class="fs-type-btn" data-type="blank">⬛ Blank</button>
+          </div>
+        </div>
+
+        <hr class="fs-prop-divider">
+
+        <div class="fs-prop-section" id="fs-prop-text-section">
+          <div class="fs-prop-label">Text</div>
+          <textarea class="fs-prop-input fs-prop-textarea" id="fs-prop-text" placeholder="Type slide text…" rows="5"></textarea>
+        </div>
+
+        <div class="fs-prop-section" id="fs-prop-ref-section" hidden>
+          <div class="fs-prop-label">Scripture Reference</div>
+          <input class="fs-prop-input" id="fs-prop-ref" type="text" placeholder="e.g. John 3:16 (ESV)">
+        </div>
+
+        <hr class="fs-prop-divider">
+
+        <div class="fs-prop-section">
+          <div class="fs-prop-label">Background Color</div>
+          <div class="fs-color-row">
+            <input class="fs-color-input" id="fs-prop-bg" type="color" value="#0b0d14">
+            <span class="fs-color-val" id="fs-prop-bg-label">Default</span>
+            <button class="fs-color-reset" id="fs-prop-bg-reset">Reset</button>
+          </div>
+        </div>
+
+        <div class="fs-prop-section">
+          <div class="fs-prop-label">Text Color</div>
+          <div class="fs-color-row">
+            <input class="fs-color-input" id="fs-prop-tc" type="color" value="#f0f1f8">
+            <span class="fs-color-val" id="fs-prop-tc-label">Default</span>
+            <button class="fs-color-reset" id="fs-prop-tc-reset">Reset</button>
+          </div>
+        </div>
+
+        <hr class="fs-prop-divider">
+
+        <div class="fs-prop-section">
+          <div class="fs-prop-label">Stage Notes</div>
+          <textarea class="fs-prop-input" id="fs-prop-notes" placeholder="Notes visible to presenter in present window…" rows="3"></textarea>
+        </div>
+
+        <hr class="fs-prop-divider">
+
+        <div class="fs-prop-section">
+          <div class="fs-prop-label">Import Lyrics</div>
+          <textarea class="fs-import-area" id="fs-import-area"
+            placeholder="Paste full lyrics — blank lines become separate slides…" rows="5"></textarea>
+          <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-import-btn" style="margin-top:4px;align-self:flex-start">Split into slides</button>
+        </div>
+      </div>
+
+    </div><!-- /.fs-editor-body -->
+  </div><!-- /#fs-editor -->
+
+</div><!-- /#fs-root -->
+
+<script type="module" src="app.flockshow/flockshow.js"></script>
+</body>
+</html>
