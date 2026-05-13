@@ -2227,6 +2227,15 @@ async function _init() {
     if (el) el.addEventListener('click', _newSermon);
   });
 
+  // Browse Sermons button (empty state) — opens sidebar on mobile, focuses list on desktop
+  const browseBtn = _qs('bm-empty-browse-btn');
+  if (browseBtn) {
+    browseBtn.addEventListener('click', () => {
+      const sb = _qs('bm-sidebar');
+      if (sb) sb.classList.add('is-open');
+    });
+  }
+
   // New series button (opens new sermon with series prompt)
   const nsBtn = _qs('bm-new-series-btn');
   if (nsBtn) {

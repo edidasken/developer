@@ -294,6 +294,7 @@
       padding: 12px 20px; border-left: 2px solid rgba(232,168,56,0.25);
       text-align: left;
     }
+    .bm-empty-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
 
     /* ════════════════════════════════════════════════════
        EDITOR AREA
@@ -1349,12 +1350,18 @@
       <div id="bm-empty">
         <div class="bm-empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#e8a838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
         <div class="bm-empty-h">Your Sermon Workshop</div>
-        <div class="bm-empty-p">Create a new sermon or select one from the sidebar to begin. The Feed gives you everything you need — from outline to manuscript to delivery notes.</div>
+        <div class="bm-empty-p">Create a new sermon or open one you've already started. The Feed gives you everything you need — from outline to manuscript to delivery notes.</div>
         <div class="bm-empty-verse">"So then faith comes by hearing, and hearing by the word of God." — Romans 10:17</div>
-        <button class="bm-btn bm-btn--primary" id="bm-empty-new-btn" style="margin-top:8px">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Create First Sermon
-        </button>
+        <div class="bm-empty-actions">
+          <button class="bm-btn bm-btn--primary" id="bm-empty-new-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Sermon
+          </button>
+          <button class="bm-btn bm-btn--ghost" id="bm-empty-browse-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+            Browse Sermons
+          </button>
+        </div>
       </div>
 
       <!-- Editor (hidden until sermon selected) -->
