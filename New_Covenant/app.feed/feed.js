@@ -1080,51 +1080,57 @@ function _bindDelivery() {
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
+// The Feed uses the standalone login page at app.feed/index.html (mirrors Stand).
+// If the user isn't authenticated, redirect them there. Otherwise run the app.
 function _waitForAuth(cb) {
-  const N = window.Nehemiah;
-  if (N && typeof N.onAuthReady === 'function') {
-    N.onAuthReady(user => {
-      if (user) { S.user = user; cb(user); }
-      else { _showAuth(); }
-    });
-  } else {
-    // Retry up to 5s
-    let tries = 0;
-    const check = setInterval(() => {
-      tries++;
-      const Nn = window.Nehemiah;
-      if (Nn && typeof Nn.onAuthReady === 'function') {
-        clearInterval(check);
-        Nn.onAuthReady(user => {
-          if (user) { S.user = user; cb(user); }
-          else { _showAuth(); }
-        });
-      } else if (tries > 50) {
-        clearInterval(check);
-        // Auth system unavailable — force sign-in screen instead of silent guest fallback
-        _showAuth();
-      }
-    }, 100);
-  }
-}
+  const LOGIN_URL = 'app.feed/index.html';
 
-function _showAuth() {
-  const overlay = _qs('bm-auth-overlay');
-  if (overlay) overlay.removeAttribute('hidden');
-  const btn = _qs('bm-auth-btn');
-  if (btn) {
-    btn.addEventListener('click', () => {
-      const N = window.Nehemiah;
-      if (N && typeof N.signIn === 'function') N.signIn();
-      else _toast('Sign-in not available — offline mode', 'info');
-    }, { once: true });
-  }
+  const tryAuth = () => {
+    const N = window.Nehemiah;
+    if (!N) return false;
+
+    // Prefer onAuthReady if available — handles async session restore
+    if (typeof N.onAuthReady === 'function') {
+      N.onAuthReady(user => {
+        if (user) { S.user = user; cb(user); }
+        else { window.location.replace(LOGIN_URL); }
+      });
+      return true;
+    }
+
+    // Fallback: synchronous isAuthenticated()/getSession() (Stand pattern)
+    if (typeof N.isAuthenticated === 'function') {
+      if (!N.isAuthenticated()) { window.location.replace(LOGIN_URL); return true; }
+      const sess = (N.getSession ? N.getSession() : null) || {};
+      const user = {
+        displayName: sess.displayName || sess.email || 'User',
+        email:       sess.email || '',
+        role:        sess.role  || 'member',
+      };
+      S.user = user;
+      cb(user);
+      return true;
+    }
+    return false;
+  };
+
+  if (tryAuth()) return;
+
+  // Retry up to 5s for Nehemiah to load
+  let tries = 0;
+  const check = setInterval(() => {
+    tries++;
+    if (tryAuth()) { clearInterval(check); return; }
+    if (tries > 50) {
+      clearInterval(check);
+      // Auth system never loaded — send to login screen
+      window.location.replace(LOGIN_URL);
+    }
+  }, 100);
 }
 
 function _hideAuth(user) {
-  const overlay = _qs('bm-auth-overlay');
-  if (overlay) overlay.hidden = true;
-
+  // Login screen is a separate page; nothing to hide here.
   // User chip
   const avatar = _qs('bm-user-avatar');
   const name   = _qs('bm-user-name');

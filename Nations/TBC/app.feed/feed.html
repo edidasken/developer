@@ -925,21 +925,7 @@
 </head>
 <body>
 
-<!-- ── Auth gate ────────────────────────────────────────────────────── -->
-<div id="bm-auth-overlay">
-  <div class="bm-auth-card">
-    <div class="bm-auth-icon"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-    <h1>The Feed</h1>
-    <p>Sermon preparation &amp; manuscript builder for FlockOS pastors and teachers. Craft the Word with clarity and depth.</p>
-    <p class="bm-auth-verse">"Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." — 2 Timothy 2:15</p>
-    <button class="bm-btn bm-btn--primary" id="bm-auth-btn" style="margin-top:8px;width:100%;justify-content:center;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-      Sign in with FlockOS
-    </button>
-  </div>
-</div>
-
-<!-- ── App root ──────────────────────────────────────────────────────── -->
+<!-- App root (auth handled by app.feed/index.html — feed.js redirects there if unauthenticated) -->
 <div id="bm-root">
 
   <!-- Topbar -->
