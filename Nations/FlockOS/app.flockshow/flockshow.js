@@ -1412,7 +1412,7 @@ async function _boot() {
     await _waitFor(() => typeof window.Nehemiah !== 'undefined');
   } catch (_) {
     // firm_foundation.js didn't load (e.g. local dev) — run ungated
-    _load(); _wire(); _renderAll();
+    await _load(); _wire(); _renderAll();
     return;
   }
 
@@ -1428,7 +1428,14 @@ async function _boot() {
   // Authenticated — dismiss overlay and launch
   _dismissAuthOverlay();
   _renderUserChip(N);
-  _load();
+  // Wait for UpperRoom to finish its async authentication before loading Firestore data.
+  // Without this, _fsFB() may return false and _load() falls back to empty localStorage.
+  try {
+    await _waitFor(() => window.UpperRoom && typeof window.UpperRoom.isReady === 'function' && window.UpperRoom.isReady(), 8000);
+  } catch (_) {
+    // UpperRoom didn't come up in time — proceed with GAS/localStorage fallback
+  }
+  await _load();
   _wire();
   _renderAll();
 }
