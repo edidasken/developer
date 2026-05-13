@@ -1274,44 +1274,74 @@ function _doLexLookup(query) {
   const res = _qs('bm-lex-result');
   if (!res || !query) return;
 
+  const isStrongs = /^[GH]\d+$/i.test(query.trim());
+  const blbUrl = _blbLexUrl(query.trim());
+
+  // ── 1. Firestore words collection (flockos-notify) ────────────────────────
+  if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
+    const db = firebase.firestore();
+
+    const _applyDoc = (docData) => {
+      _qs('bm-lex-word').textContent     = docData.lemma       || query;
+      _qs('bm-lex-strongs').textContent  = docData.strongs     || docData.id || '';
+      _qs('bm-lex-translit').textContent = docData.xlit        || docData.pron || '';
+      _qs('bm-lex-def').innerHTML        = `${_e(docData.strongs_def || docData.kjv_def || '')} <a href="${blbUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent);font-size:0.78rem;white-space:nowrap">Open in BLB ↗</a>`;
+      _qs('bm-lex-origin').textContent   = docData.derivation  || '';
+      res.classList.add('visible');
+    };
+
+    if (isStrongs) {
+      db.collection('words').doc(query.toUpperCase().trim()).get()
+        .then(doc => { if (doc.exists) { _applyDoc({ id: doc.id, ...doc.data() }); } else { _applyFallback(); } })
+        .catch(e => { console.warn('[TheFeed] Lexicon lookup failed:', e); _applyFallback(); });
+      return;
+    } else {
+      const lq = query.trim();
+      Promise.all([
+        db.collection('words').where('lemma', '==', lq).limit(1).get(),
+        db.collection('words').where('kjv_def', '>=', lq.toLowerCase()).where('kjv_def', '<=', lq.toLowerCase() + '\uf8ff').limit(1).get()
+      ]).then(([byLemma, byKjv]) => {
+        const hit = !byLemma.empty ? byLemma.docs[0] : (!byKjv.empty ? byKjv.docs[0] : null);
+        if (hit) { _applyDoc({ id: hit.id, ...hit.data() }); } else { _applyFallback(); }
+      }).catch(e => { console.warn('[TheFeed] Lexicon lookup failed:', e); _applyFallback(); });
+      return;
+    }
+  }
+
+  // ── 2. Legacy window globals fallback ─────────────────────────────────────
   let entry = null;
-
-  // Try local Strong's data if loaded
-  const isGreek  = /^G\d+$/i.test(query);
-  const isHebrew = /^H\d+$/i.test(query);
-
-  if (isGreek && window._strongsGreek) {
-    const num = query.toUpperCase().replace('G','');
+  if (isStrongs && /^G/i.test(query) && window._strongsGreek) {
+    const num = query.toUpperCase().replace('G', '');
     entry = window._strongsGreek[num] || window._strongsGreek['G' + num];
-  } else if (isHebrew && window._strongsHebrew) {
-    const num = query.toUpperCase().replace('H','');
+  } else if (isStrongs && /^H/i.test(query) && window._strongsHebrew) {
+    const num = query.toUpperCase().replace('H', '');
     entry = window._strongsHebrew[num] || window._strongsHebrew['H' + num];
-  } else if (window._strongsGreek || window._strongsHebrew) {
+  } else if (!isStrongs && (window._strongsGreek || window._strongsHebrew)) {
     const lq = query.toLowerCase();
     const gk = window._strongsGreek  ? Object.values(window._strongsGreek).find(e => (e.word || '').toLowerCase() === lq || (e.translit || '').toLowerCase() === lq) : null;
     const hb = window._strongsHebrew ? Object.values(window._strongsHebrew).find(e => (e.word || '').toLowerCase() === lq || (e.translit || '').toLowerCase() === lq) : null;
     entry = gk || hb;
   }
-
-  const blbUrl = _blbLexUrl(query);
-
   if (entry) {
-    _qs('bm-lex-word').textContent    = entry.word        || query;
-    _qs('bm-lex-strongs').textContent = entry.strongs     || '';
-    _qs('bm-lex-translit').textContent= entry.translit    || '';
-    _qs('bm-lex-def').innerHTML       = `${_e(entry.definition || entry.def || '')} <a href="${blbUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent);font-size:0.78rem;white-space:nowrap">Open in BLB ↗</a>`;
-    _qs('bm-lex-origin').textContent  = entry.origin      || '';
+    _qs('bm-lex-word').textContent     = entry.word        || query;
+    _qs('bm-lex-strongs').textContent  = entry.strongs     || '';
+    _qs('bm-lex-translit').textContent = entry.translit    || '';
+    _qs('bm-lex-def').innerHTML        = `${_e(entry.definition || entry.def || '')} <a href="${blbUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent);font-size:0.78rem;white-space:nowrap">Open in BLB ↗</a>`;
+    _qs('bm-lex-origin').textContent   = entry.origin      || '';
     res.classList.add('visible');
     return;
   }
 
-  // No local data — link directly to BLB MGNT/BDB
-  _qs('bm-lex-word').textContent     = query;
-  _qs('bm-lex-strongs').textContent  = '';
-  _qs('bm-lex-translit').textContent = '';
-  _qs('bm-lex-def').innerHTML        = `<a href="${blbUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent)">Search BLB Lexicon ↗</a>`;
-  _qs('bm-lex-origin').textContent   = '';
-  res.classList.add('visible');
+  _applyFallback();
+
+  function _applyFallback() {
+    _qs('bm-lex-word').textContent     = query;
+    _qs('bm-lex-strongs').textContent  = '';
+    _qs('bm-lex-translit').textContent = '';
+    _qs('bm-lex-def').innerHTML        = `<a href="${blbUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent)">Search BLB Lexicon ↗</a>`;
+    _qs('bm-lex-origin').textContent   = '';
+    res.classList.add('visible');
+  }
 }
 
 // ── Delivery fields ───────────────────────────────────────────────────────────
