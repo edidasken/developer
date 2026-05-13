@@ -1215,6 +1215,11 @@ function _openNewMemberSheet(onReload) {
             <option value="">— No access —</option>
             ${ACCESS_ROLES.map(r => `<option value="${_e(r.value)}">${_e(r.label)}</option>`).join('')}
           </select>
+          <div data-passcode-row style="display:none;margin-top:10px">
+            <div class="life-sheet-label" style="margin-bottom:4px">Initial Passcode <span style="color:#dc2626">*</span></div>
+            <input class="life-sheet-input" data-field="passcode" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
+            <div style="font-size:.78rem;color:var(--c-muted,#888);margin-top:4px">The person will use this to log in. They can change it later.</div>
+          </div>
         </div>
         <!-- Error slot -->
         <div class="fold-form-error" data-error style="display:none;color:#dc2626;font-size:.85rem;margin-top:8px"></div>
@@ -1235,6 +1240,12 @@ function _openNewMemberSheet(onReload) {
 
   sheet.querySelector('[data-cancel]').addEventListener('click', () => _closeMemberSheet());
   sheet.querySelector('.life-sheet-close').addEventListener('click', () => _closeMemberSheet());
+
+  // Show/hide passcode field based on access role selection
+  sheet.querySelector('[data-field="accessRole"]').addEventListener('change', function() {
+    const row = sheet.querySelector('[data-passcode-row]');
+    if (row) row.style.display = this.value ? '' : 'none';
+  });
 
   sheet.querySelector('[data-save]').addEventListener('click', async () => {
     const firstName = sheet.querySelector('[data-field="firstName"]').value.trim();
@@ -1257,12 +1268,47 @@ function _openNewMemberSheet(onReload) {
     // Firestore rejects `undefined` field values — strip empty optional fields.
     Object.keys(payload).forEach(k => { if (payload[k] === undefined) delete payload[k]; });
     const accessRole = sheet.querySelector('[data-field="accessRole"]').value;
+    const passcode    = sheet.querySelector('[data-field="passcode"]')?.value.trim() || '';
+
+    // Validate access requirements before hitting the server
+    if (accessRole) {
+      if (!payload.email) {
+        errEl.textContent = 'Email is required when granting FlockOS access.'; errEl.style.display = ''; btn.disabled = false; btn.textContent = 'Add Person'; return;
+      }
+      if (passcode.length < 6) {
+        errEl.textContent = 'Passcode must be at least 6 characters.'; errEl.style.display = ''; btn.disabled = false; btn.textContent = 'Add Person'; return;
+      }
+    }
+
     try {
       const res = await MXM.create(payload);
       const newId = res?.id || res?.memberId || res?.memberNumber;
+
       if (accessRole && newId) {
+        // 1. Write Firestore memberRole doc
         await MXP.set({ memberId: newId, role: accessRole });
+
+        // 2. Create GAS auth credentials (AuthUsers + AccessControl sheets)
+        if (V && payload.email) {
+          try {
+            await V.flock.users.create({
+              email:     payload.email,
+              role:      accessRole,
+              passcode,
+              firstName: payload.firstName || '',
+              lastName:  payload.lastName  || '',
+            });
+          } catch (authErr) {
+            // Member + role saved — surface the auth failure non-fatally
+            console.warn('[TheFold] GAS user create failed:', authErr);
+            errEl.textContent = `Member added, but login account could not be created: ${authErr?.message || authErr}. Use Admin → Users to set their passcode manually.`;
+            errEl.style.display = '';
+            setTimeout(() => { _closeMemberSheet(); onReload?.(); }, 4000);
+            return;
+          }
+        }
       }
+
       _closeMemberSheet();
       onReload?.();
     } catch (err) {
