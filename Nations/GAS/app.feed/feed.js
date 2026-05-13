@@ -1209,12 +1209,18 @@ async function _init() {
   _waitForAuth(async user => {
     _hideAuth(user);
 
-    // Wait for UpperRoom if available
-    if (window.UpperRoom && typeof window.UpperRoom.waitReady === 'function') {
-      try { await window.UpperRoom.waitReady(); } catch (_) {}
-    }
-
-    await _load();
+    // Initialize Firestore (UpperRoom) if the login page didn't already do it.
+    // On feed.html, UpperRoom is defined but never init'd unless we do it here.
+    if (window.UpperRoom) {
+      try {
+        if (!window.UpperRoom.isReady()) {
+          await window.UpperRoom.init();
+          await window.UpperRoom.authenticate();
+        }
+        if (typeof window.UpperRoom.waitReady === 'function') {
+          await window.UpperRoom.waitReady();
+        }
+      } catch (_) {}
     _renderList();
     _renderSeries();
   });

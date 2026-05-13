@@ -4875,6 +4875,17 @@
 
     // State
     isReady:        function() { return _ready; },
+    waitReady:      function() {
+      if (_ready) return Promise.resolve();
+      return new Promise(function(resolve, reject) {
+        var tries = 0;
+        var iv = setInterval(function() {
+          tries++;
+          if (_ready) { clearInterval(iv); resolve(); return; }
+          if (tries >= 100) { clearInterval(iv); reject(new Error('UpperRoom.waitReady() timed out after 10s')); }
+        }, 100);
+      });
+    },
     churchId:       function() { return _churchId; },
     userEmail:      function() { return _userEmail; },
 
