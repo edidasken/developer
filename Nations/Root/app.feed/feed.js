@@ -1055,13 +1055,21 @@ function _doPrint() {
   // ── Outline sections ───────────────────────────────────────────────────────
   html += '<div id="bmp-sections">';
 
+  // Trim trailing whitespace and collapse 3+ consecutive newlines to 2 — keeps
+  // intentional paragraph breaks but strips empty trailing space that was making
+  // section cards balloon to the bottom of the page.
+  const _cleanNotes = (raw) => (raw || '')
+    .replace(/[ \t]+$/gm, '')        // trim trailing spaces per line
+    .replace(/\n{3,}/g, '\n\n')      // collapse runs of blank lines
+    .replace(/\s+$/, '');           // strip trailing whitespace at end
+
   const prayerSections = [];
   (s.sections || []).forEach(sec => {
     if (sec.type === 'prayer') { prayerSections.push(sec); return; }
 
     const t      = _TYPE[sec.type] || _TYPE.point;
     const title  = (sec.title       || '').trim();
-    const notes  = (sec.notes       || '').trim();
+    const notes  = _cleanNotes(sec.notes);
     const ref    = (sec.scriptureRef|| '').trim();
     const verse  = (sec.scripture   || '').trim();
     if (!title && !notes && !ref && !verse) return;
@@ -1162,21 +1170,22 @@ function _openPrintWindow(s, bodyHtml) {
     .bmp-section-accent { width: 4.5pt; flex-shrink: 0; }
     .bmp-section-content { flex: 1; padding: 8pt 12pt; }
     .bmp-section-head { display: flex; align-items: baseline; gap: 7pt; margin-bottom: 5pt; flex-wrap: wrap; }
-    .bmp-type-pill { font: 700 6.5pt 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; letter-spacing: .10em; border: 1pt solid; padding: 1.5pt 5pt; border-radius: 3pt; flex-shrink: 0; }
-    .bmp-section-title { font: 600 11.5pt 'Plus Jakarta Sans', sans-serif; color: #111; line-height: 1.3; }
+    .bmp-type-pill { font: 700 8pt 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; letter-spacing: .10em; border: 1pt solid; padding: 2pt 6pt; border-radius: 3pt; flex-shrink: 0; }
+    .bmp-section-title { font: 600 14pt 'Plus Jakarta Sans', sans-serif; color: #111; line-height: 1.3; }
     .bmp-transition-section { display: flex; align-items: center; gap: 8pt; padding: 5pt 10pt; border: none; border-top: 1pt dashed #ccc; border-bottom: 1pt dashed #ccc; background: transparent !important; }
     .bmp-transition-section .bmp-section-accent { display: none; }
-    .bmp-verse-block { margin: 5pt 0 5pt; padding: 7pt 10pt 7pt 11pt; background: #fef9ec; border-left: 3pt solid #e8a838; }
-    .bmp-verse-ref { font: 700 9.5pt 'Plus Jakarta Sans', sans-serif; color: #c48a20; margin-bottom: 3pt; }
-    .bmp-verse-text { font: italic 11pt/1.72 Georgia, serif; color: #2c2c2c; }
-    .bmp-notes { font: 10.5pt/1.68 Georgia, serif; color: #2c2c2c; }
-    #bmp-prayer { margin-top: 16pt; padding-top: 13pt; border-top: 2pt solid #7c3aed; }
-    #bmp-prayer-head { display: flex; align-items: center; gap: 7pt; margin-bottom: 10pt; }
-    #bmp-prayer-bar { width: 3.5pt; height: 14pt; background: #7c3aed; border-radius: 2pt; flex-shrink: 0; }
-    #bmp-prayer-label { font: 700 9.5pt 'Plus Jakarta Sans', sans-serif; color: #7c3aed; text-transform: uppercase; letter-spacing: .10em; }
-    .bmp-prayer-item { break-inside: avoid; margin-bottom: 8pt; padding-left: 10pt; border-left: 2pt solid #e9d5ff; }
-    .bmp-prayer-item-title { font: 700 10.5pt 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; margin-bottom: 2pt; }
-    .bmp-prayer-item-notes { font: 10pt/1.6 Georgia, serif; color: #444; }
+    .bmp-verse-block { margin: 6pt 0; padding: 9pt 12pt 9pt 13pt; background: #fef9ec; border-left: 3pt solid #e8a838; }
+    .bmp-verse-ref { font: 700 11.5pt 'Plus Jakarta Sans', sans-serif; color: #c48a20; margin-bottom: 4pt; }
+    .bmp-verse-text { font: italic 13pt/1.7 Georgia, serif; color: #2c2c2c; }
+    .bmp-notes { font: 13pt/1.6 Georgia, serif; color: #2c2c2c; }
+    /* Prayer points start on a fresh page (last page) */
+    #bmp-prayer { margin-top: 18pt; padding-top: 14pt; border-top: 2pt solid #7c3aed; page-break-before: always; break-before: page; }
+    #bmp-prayer-head { display: flex; align-items: center; gap: 8pt; margin-bottom: 12pt; }
+    #bmp-prayer-bar { width: 4pt; height: 16pt; background: #7c3aed; border-radius: 2pt; flex-shrink: 0; }
+    #bmp-prayer-label { font: 700 11pt 'Plus Jakarta Sans', sans-serif; color: #7c3aed; text-transform: uppercase; letter-spacing: .10em; }
+    .bmp-prayer-item { break-inside: avoid; margin-bottom: 10pt; padding-left: 12pt; border-left: 2pt solid #e9d5ff; }
+    .bmp-prayer-item-title { font: 700 13pt 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; margin-bottom: 3pt; }
+    .bmp-prayer-item-notes { font: 13pt/1.6 Georgia, serif; color: #444; }
 
     /* ── On-screen toolbar (hidden when printing) ─────────────────────── */
     .pd-toolbar {
