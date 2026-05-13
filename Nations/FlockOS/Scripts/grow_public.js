@@ -172,7 +172,7 @@ function _sidebarHTML() {
     <div style="margin-top:auto;padding:24px 14px 8px;border-top:1px solid rgba(255,255,255,0.07);text-align:center;">
       <a href="index.html" target="_self"
          style="color:rgba(255,255,255,0.32);font:0.72rem var(--font-ui);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;">
-        <img src="Images/NewCovenant.png" alt="" width="14" height="14" style="border-radius:3px;opacity:0.5;">
+        <img src="Images/FlockOS.png" alt="" width="14" height="14" style="border-radius:3px;opacity:0.5;">
         Powered by FlockOS
       </a>
     </div>

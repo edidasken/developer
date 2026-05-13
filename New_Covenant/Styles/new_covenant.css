@@ -14993,3 +14993,81 @@ flock-tabs [role="tablist"], .tabs-bar {
 .grow-counsel-verse { font-style:italic; font-size:14px; line-height:1.55; color:var(--muted,#bbb); }
 .grow-counsel-steps { padding-left:22px; margin:8px 0; font-size:14px; line-height:1.7; color:var(--text,#d8d8d8); }
 .grow-counsel-steps li { margin:5px 0; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FLOCKCHAT v2 — Reply-to · Prayer Chain · Announcements · Misc
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Reply-quote block (appears above message text) ─────────────────────── */
+.reply-quote {
+  display: flex; gap: 6px; align-items: baseline;
+  background: color-mix(in srgb, var(--accent, #38bdf8) 8%, transparent);
+  border-left: 3px solid var(--accent, #38bdf8);
+  border-radius: 0 6px 6px 0;
+  padding: 4px 8px; margin-bottom: 4px;
+  font-size: 0.76rem; cursor: pointer;
+  transition: background 0.15s;
+}
+.reply-quote:hover { background: color-mix(in srgb, var(--accent, #38bdf8) 15%, transparent); }
+.reply-quote-author { font-weight: 700; color: var(--accent, #38bdf8); white-space: nowrap; }
+.reply-quote-text { color: var(--ink-muted, #888); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+
+/* ── Message highlight (jump-to-message animation) ──────────────────────── */
+.msg-highlight {
+  animation: fc-msg-hl 1.8s ease;
+}
+@keyframes fc-msg-hl {
+  0%   { background: color-mix(in srgb, var(--accent, #38bdf8) 22%, transparent); }
+  100% { background: transparent; }
+}
+
+/* ── Sidebar section nav bar (Chat / Prayer / Announce tabs) ────────────── */
+.sidebar-section-nav { transition: color 0.15s, border-color 0.15s; }
+.sidebar-section-nav:hover { color: var(--ink) !important; }
+.sidebar-section-nav.active {
+  color: var(--accent, #38bdf8) !important;
+  border-bottom-color: var(--accent, #38bdf8) !important;
+}
+
+/* ── Prayer Chain ───────────────────────────────────────────────────────── */
+.prayer-item {
+  padding: 8px 12px; cursor: pointer; border-radius: 8px;
+  margin: 2px 6px; transition: background 0.14s;
+}
+.prayer-item:hover, .prayer-item.active {
+  background: color-mix(in srgb, #a78bfa 12%, transparent);
+}
+.prayer-status-badge {
+  display: inline-block; font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 1px 6px; border-radius: 4px; margin-top: 4px;
+}
+.prayer-status-badge.new    { background: rgba(167,139,250,0.18); color: #a78bfa; }
+.prayer-status-badge.answered { background: rgba(52,211,153,0.18); color: #34d399; }
+.prayer-status-badge.archived { background: rgba(150,150,150,0.15); color: #888; }
+.prayer-cat-label {
+  display: inline-block; font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: #a78bfa; background: rgba(167,139,250,0.1);
+  padding: 2px 8px; border-radius: 4px; margin-bottom: 0.75rem;
+}
+
+/* ── Announcements ──────────────────────────────────────────────────────── */
+:root { --announce-color: #fbbf24; }
+.announce-item {
+  padding: 8px 12px; cursor: pointer; border-radius: 8px;
+  margin: 2px 6px; transition: background 0.14s;
+}
+.announce-item:hover, .announce-item.active {
+  background: color-mix(in srgb, #fbbf24 10%, transparent);
+}
+
+/* ── Reply bar (above composer) ─────────────────────────────────────────── */
+#reply-bar { border-radius: 0; }
+
+/* ── Prayer / Announce detail panels ───────────────────────────────────── */
+.prayer-detail-panel,
+.announce-detail-panel {
+  border-left: 1px solid var(--border, rgba(255,255,255,0.08));
+}
+

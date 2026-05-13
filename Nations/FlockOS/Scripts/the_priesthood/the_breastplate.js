@@ -49,7 +49,7 @@ function _shell(p) {
     <div class="bp-panel" role="document">
       <header class="bp-head">
         <div class="bp-mono" aria-hidden="true">
-          <img alt="" src="Images/NewCovenant.png" onerror="this.style.display='none'">
+          <img alt="" src="Images/FlockOS.png" onerror="this.style.display='none'">
         </div>
         <div class="bp-id">
           <div class="bp-name">${_e(fullName)}</div>

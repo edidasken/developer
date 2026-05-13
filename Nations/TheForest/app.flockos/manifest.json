@@ -16,7 +16,7 @@
   ],
   "icons": [
     {
-      "src": "../Images/NewCovenant.png",
+      "src": "../Images/FlockOS.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -36,7 +36,7 @@
       "url": "./app.flockos.html?view=the_good_shepherd",
       "icons": [
         {
-          "src": "../Images/NewCovenant.png",
+          "src": "../Images/FlockOS.png",
           "sizes": "512x512"
         }
       ]

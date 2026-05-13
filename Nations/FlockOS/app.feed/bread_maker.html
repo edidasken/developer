@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Resolve all relative resource paths from New_Covenant/ -->
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bread Maker">
+  <meta name="theme-color" content="#060c1f">
+  <meta name="description" content="Bread Maker — Sermon preparation and management for FlockOS. Craft the Word with clarity, depth, and purpose.">
+
+  <title>Bread Maker — FlockOS</title>
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="app.feed/manifest.json">
+  <link rel="icon" type="image/png" href="Images/FlockOS.png">
+  <link rel="apple-touch-icon" href="Images/FlockOS.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Firebase preconnect -->
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
+
+  <!-- Shared stylesheet -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Bread Maker design tokens ─────────────────────────────────────── */
+    :root {
+      --bm-bg:         #060c1f;
+      --bm-panel:      #0c1445;
+      --bm-panel-alt:  #1a0e3c;
+      --bm-panel-mid:  #0d1535;
+      --bm-border:     rgba(255,255,255,0.09);
+      --bm-border-lit: rgba(255,255,255,0.15);
+      --bm-accent:     #e8a838;
+      --bm-accent-dk:  #c48a20;
+      --bm-accent-dim: rgba(232,168,56,0.12);
+      --bm-accent-glow:rgba(232,168,56,0.25);
+      --bm-purple:     #a78bfa;
+      --bm-blue:       #38bdf8;
+      --bm-green:      #34d399;
+      --bm-red:        #f87171;
+      --bm-ink:        #f0f1f8;
+      --bm-muted:      rgba(240,241,248,0.48);
+      --bm-faint:      rgba(240,241,248,0.22);
+      --topbar-h:      54px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bm-bg);
+      color: var(--bm-ink);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    /* ── Root grid ─────────────────────────────────────────────────────── */
+    #bm-root {
+      display: grid;
+      grid-template-rows: var(--topbar-h) 1fr;
+      height: 100%;
+    }
+
+    /* ════════════════════════════════════════════════════
+       TOPBAR
+    ════════════════════════════════════════════════════ */
+    #bm-topbar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 18px;
+      background: linear-gradient(90deg, #0c1445 0%, #14103a 60%, #0a1128 100%);
+      z-index: 200; position: relative; flex-shrink: 0;
+    }
+    #bm-topbar::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5px;
+      background: linear-gradient(90deg,#38bdf8,#818cf8,#a78bfa,#e8a838,#34d399,#38bdf8);
+      background-size: 200% 100%;
+      animation: bm-rainbow 9s linear infinite;
+      opacity: 0.72;
+    }
+    @keyframes bm-rainbow { from { background-position: 0% 0; } to { background-position: 200% 0; } }
+    @media (prefers-reduced-motion: reduce) { #bm-topbar::after { animation: none; opacity: 0.5; } }
+
+    .bm-logo {
+      display: flex; align-items: center; gap: 8px;
+      font: 700 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      flex-shrink: 0; margin-right: 4px;
+    }
+    .bm-logo-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: linear-gradient(135deg, #c48a20, #e8a838);
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+      box-shadow: 0 2px 10px rgba(232,168,56,0.40);
+      flex-shrink: 0;
+    }
+    .bm-logo-text { white-space: nowrap; }
+
+    /* Sermon title in topbar */
+    #bm-active-title {
+      flex: 1; min-width: 0;
+      font: 600 0.85rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: color 0.2s;
+    }
+    #bm-active-title.has-sermon { color: var(--bm-ink); }
+
+    .bm-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+
+    .bm-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 13px; border-radius: 8px; font: 600 0.78rem 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
+    }
+    .bm-btn--primary { background: var(--bm-accent); color: #080500; }
+    .bm-btn--primary:hover { background: #f0b84a; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(232,168,56,0.40); }
+    .bm-btn--ghost { background: rgba(255,255,255,0.07); color: var(--bm-ink); }
+    .bm-btn--ghost:hover { background: rgba(255,255,255,0.12); }
+    .bm-btn--danger { background: rgba(248,113,113,0.13); color: var(--bm-red); }
+    .bm-btn--danger:hover { background: rgba(248,113,113,0.23); }
+    .bm-btn--success { background: rgba(52,211,153,0.13); color: var(--bm-green); }
+    .bm-btn--success:hover { background: rgba(52,211,153,0.22); }
+    .bm-btn:disabled { opacity: 0.32; pointer-events: none; }
+    .bm-btn--sm { padding: 4px 10px; font-size: 0.73rem; }
+    .bm-btn--icon { padding: 6px 8px; }
+
+    .bm-user-chip {
+      display: flex; align-items: center; gap: 6px;
+      font: 500 0.76rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted);
+      background: rgba(255,255,255,0.05); border: 1px solid var(--bm-border);
+      border-radius: 999px; padding: 3px 10px 3px 4px; cursor: pointer;
+      transition: all 0.15s; flex-shrink: 0;
+    }
+    .bm-user-chip:hover { background: rgba(255,255,255,0.09); color: var(--bm-ink); }
+    .bm-user-avatar {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--bm-accent-dim), rgba(167,139,250,0.25));
+      border: 1px solid var(--bm-border); display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: var(--bm-accent); font-weight: 700; flex-shrink: 0;
+    }
+
+    /* ════════════════════════════════════════════════════
+       BODY — sidebar + content
+    ════════════════════════════════════════════════════ */
+    #bm-body {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 0; height: 100%; overflow: hidden;
+    }
+
+    /* ── Sidebar ──────────────────────────────────────────────────────── */
+    #bm-sidebar {
+      background: linear-gradient(170deg, #0c1445 0%, #160e38 55%, #0a1128 100%);
+      border-right: 1px solid var(--bm-border);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    #bm-sidebar-top {
+      padding: 14px 12px 10px;
+      border-bottom: 1px solid var(--bm-border);
+      flex-shrink: 0;
+    }
+    .bm-search-wrap { position: relative; }
+    .bm-search-icon {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      color: var(--bm-muted); pointer-events: none;
+    }
+    .bm-search {
+      width: 100%; padding: 8px 10px 8px 32px;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--bm-border);
+      border-radius: 10px; font: 0.82rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-ink); outline: none;
+    }
+    .bm-search::placeholder { color: var(--bm-muted); }
+    .bm-search:focus { border-color: rgba(232,168,56,0.50); background: rgba(255,255,255,0.08); }
+
+    #bm-sermon-list {
+      flex: 1; overflow-y: auto; padding: 8px 8px 24px;
+      scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.12) transparent;
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    #bm-sermon-list::-webkit-scrollbar { width: 4px; }
+    #bm-sermon-list::-webkit-scrollbar-thumb { background: rgba(232,168,56,0.14); border-radius: 4px; }
+
+    .bm-sermon-item {
+      padding: 10px 12px; border-radius: 10px; cursor: pointer;
+      border: 1px solid transparent; transition: all 0.14s;
+      display: flex; flex-direction: column; gap: 3px; user-select: none;
+    }
+    .bm-sermon-item:hover { background: rgba(255,255,255,0.05); border-color: var(--bm-border); }
+    .bm-sermon-item.is-active {
+      background: var(--bm-accent-dim);
+      border-color: rgba(232,168,56,0.30);
+    }
+    .bm-sermon-item-title {
+      font: 600 0.84rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .bm-sermon-item.is-active .bm-sermon-item-title { color: var(--bm-accent); }
+    .bm-sermon-item-meta {
+      font: 0.70rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted);
+      display: flex; gap: 8px; align-items: center;
+    }
+    .bm-sermon-item-series {
+      font: 0.68rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-purple);
+      background: rgba(167,139,250,0.12); border-radius: 4px; padding: 1px 6px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px;
+    }
+
+    .bm-sidebar-new {
+      padding: 10px 8px 16px; flex-shrink: 0; border-top: 1px solid var(--bm-border);
+    }
+    .bm-sidebar-new-btn {
+      width: 100%; padding: 8px 12px; border-radius: 10px;
+      font: 600 0.82rem 'Plus Jakarta Sans', sans-serif;
+      background: rgba(232,168,56,0.10); color: var(--bm-accent);
+      border: 1px dashed rgba(232,168,56,0.28); cursor: pointer; transition: all 0.14s;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+    }
+    .bm-sidebar-new-btn:hover { background: rgba(232,168,56,0.18); border-color: rgba(232,168,56,0.50); }
+
+    /* Section labels in sidebar */
+    .bm-sidebar-label {
+      padding: 8px 12px 4px;
+      font: 600 0.65rem 'Plus Jakarta Sans', sans-serif;
+      text-transform: uppercase; letter-spacing: .08em; color: var(--bm-faint);
+      flex-shrink: 0;
+    }
+
+    /* ── Main workspace ────────────────────────────────────────────────── */
+    #bm-main {
+      display: flex; flex-direction: column; overflow: hidden;
+      background: var(--bm-bg);
+    }
+
+    /* ── Empty state ────────────────────────────────────────────────────── */
+    #bm-empty {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 16px; padding: 40px 24px; text-align: center;
+    }
+    .bm-empty-icon {
+      width: 80px; height: 80px; border-radius: 20px;
+      background: linear-gradient(135deg, rgba(232,168,56,0.15), rgba(167,139,250,0.12));
+      border: 1px solid rgba(232,168,56,0.20);
+      display: flex; align-items: center; justify-content: center; font-size: 36px;
+      box-shadow: 0 8px 32px rgba(232,168,56,0.12);
+    }
+    .bm-empty-h { font: 700 1.3rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); }
+    .bm-empty-p { font: 0.88rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); line-height: 1.55; max-width: 360px; }
+    .bm-empty-verse {
+      font: italic 0.80rem 'Noto Serif', Georgia, serif; color: var(--bm-faint);
+      max-width: 380px; line-height: 1.65; margin-top: 8px;
+      padding: 12px 20px; border-left: 2px solid rgba(232,168,56,0.25);
+      text-align: left;
+    }
+
+    /* ════════════════════════════════════════════════════
+       EDITOR AREA
+    ════════════════════════════════════════════════════ */
+    #bm-editor { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* ── Sermon header bar ──────────────────────────────────────────────── */
+    #bm-sermon-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 20px 10px;
+      border-bottom: 1px solid var(--bm-border);
+      flex-shrink: 0; flex-wrap: wrap;
+      background: rgba(12,20,69,0.40);
+    }
+    .bm-header-fields { display: flex; gap: 10px; flex: 1; min-width: 0; flex-wrap: wrap; }
+    .bm-title-input {
+      flex: 2; min-width: 180px; padding: 7px 12px;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--bm-border);
+      border-radius: 9px; font: 600 0.95rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-ink); outline: none;
+    }
+    .bm-title-input::placeholder { color: var(--bm-muted); font-weight: 400; }
+    .bm-title-input:focus { border-color: rgba(232,168,56,0.50); background: rgba(255,255,255,0.09); }
+
+    .bm-meta-input {
+      flex: 1; min-width: 120px; padding: 7px 12px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--bm-border);
+      border-radius: 9px; font: 400 0.82rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-ink); outline: none;
+    }
+    .bm-meta-input::placeholder { color: var(--bm-muted); }
+    .bm-meta-input:focus { border-color: rgba(232,168,56,0.40); background: rgba(255,255,255,0.07); }
+
+    .bm-header-actions { display: flex; gap: 7px; flex-shrink: 0; align-items: center; flex-wrap: wrap; }
+
+    .bm-status-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 999px; font: 600 0.68rem 'Plus Jakarta Sans', sans-serif;
+      flex-shrink: 0; cursor: pointer; border: 1px solid transparent; transition: all 0.14s;
+    }
+    .bm-status-chip.draft   { background: rgba(56,189,248,0.12); color: var(--bm-blue);   border-color: rgba(56,189,248,0.25); }
+    .bm-status-chip.ready   { background: rgba(232,168,56,0.12); color: var(--bm-accent); border-color: rgba(232,168,56,0.25); }
+    .bm-status-chip.preached{ background: rgba(52,211,153,0.12); color: var(--bm-green);  border-color: rgba(52,211,153,0.25); }
+    .bm-status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    /* ── Tab bar ─────────────────────────────────────────────────────────── */
+    #bm-tab-bar {
+      display: flex; align-items: center; gap: 2px;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--bm-border);
+      background: rgba(6,12,31,0.60);
+      flex-shrink: 0; overflow-x: auto;
+      scrollbar-width: none;
+    }
+    #bm-tab-bar::-webkit-scrollbar { display: none; }
+    .bm-tab {
+      padding: 10px 16px 9px; font: 500 0.80rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-muted); cursor: pointer; border: none; background: none;
+      border-bottom: 2px solid transparent; transition: all 0.14s; white-space: nowrap;
+      flex-shrink: 0; margin-bottom: -1px;
+    }
+    .bm-tab:hover { color: var(--bm-ink); }
+    .bm-tab.bm-tab--active { color: var(--bm-accent); border-bottom-color: var(--bm-accent); }
+
+    /* ── Tab panes ──────────────────────────────────────────────────────── */
+    .bm-pane { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+    .bm-pane[hidden] { display: none !important; }
+
+    /* ════════════════════════════════════════════════════
+       PANE: OUTLINE
+    ════════════════════════════════════════════════════ */
+    #bm-pane-outline { display: flex; flex-direction: row; min-height: 0; overflow: hidden; }
+
+    #bm-outline-main {
+      flex: 1; overflow-y: auto; padding: 20px 24px 80px; min-width: 0;
+      scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.12) transparent;
+    }
+    #bm-outline-main::-webkit-scrollbar { width: 5px; }
+    #bm-outline-main::-webkit-scrollbar-thumb { background: rgba(232,168,56,0.14); border-radius: 4px; }
+
+    .bm-outline-section {
+      margin-bottom: 24px;
+      background: rgba(12,20,69,0.45); border: 1px solid var(--bm-border);
+      border-radius: 14px; overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .bm-outline-section:focus-within { border-color: rgba(232,168,56,0.35); }
+
+    .bm-section-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px 10px;
+      border-bottom: 1px solid var(--bm-border);
+      background: rgba(255,255,255,0.02);
+    }
+    .bm-section-drag {
+      color: var(--bm-faint); cursor: grab; flex-shrink: 0;
+    }
+    .bm-section-drag:active { cursor: grabbing; }
+
+    .bm-section-type {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 2px 9px; border-radius: 6px; font: 600 0.65rem 'Plus Jakarta Sans', sans-serif;
+      flex-shrink: 0; text-transform: uppercase; letter-spacing: .05em;
+    }
+    .bm-section-type.intro      { background: rgba(56,189,248,0.13);  color: var(--bm-blue);   }
+    .bm-section-type.scripture  { background: rgba(232,168,56,0.13);  color: var(--bm-accent); }
+    .bm-section-type.point      { background: rgba(167,139,250,0.13); color: var(--bm-purple); }
+    .bm-section-type.illustration { background: rgba(52,211,153,0.12); color: var(--bm-green); }
+    .bm-section-type.application { background: rgba(248,113,113,0.12); color: var(--bm-red);   }
+    .bm-section-type.conclusion  { background: rgba(232,168,56,0.20);  color: var(--bm-accent-dk); }
+    .bm-section-type.prayer     { background: rgba(167,139,250,0.20); color: var(--bm-purple); }
+    .bm-section-type.transition { background: rgba(255,255,255,0.06); color: var(--bm-muted);  }
+
+    .bm-section-title-input {
+      flex: 1; background: none; border: none; outline: none;
+      font: 600 0.88rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+    }
+    .bm-section-title-input::placeholder { color: var(--bm-faint); font-weight: 500; }
+
+    .bm-section-actions { display: flex; gap: 5px; flex-shrink: 0; }
+    .bm-icon-btn {
+      width: 26px; height: 26px; border-radius: 6px; background: none; border: none;
+      color: var(--bm-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.12s;
+    }
+    .bm-icon-btn:hover { background: rgba(255,255,255,0.09); color: var(--bm-ink); }
+    .bm-icon-btn.danger:hover { background: rgba(248,113,113,0.15); color: var(--bm-red); }
+
+    .bm-section-body { padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* Scripture block */
+    .bm-scripture-block {
+      background: rgba(232,168,56,0.06); border: 1px solid rgba(232,168,56,0.18);
+      border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .bm-scripture-ref-row { display: flex; gap: 7px; align-items: center; }
+    .bm-scripture-ref-input {
+      flex: 1; padding: 5px 10px; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--bm-border); border-radius: 7px;
+      font: 600 0.80rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent); outline: none;
+    }
+    .bm-scripture-ref-input::placeholder { color: rgba(232,168,56,0.35); font-weight: 400; }
+    .bm-scripture-ref-input:focus { border-color: rgba(232,168,56,0.50); }
+    .bm-scripture-text {
+      font: italic 0.88rem/1.65 'Noto Serif', Georgia, serif;
+      color: rgba(232,168,56,0.85); white-space: pre-wrap;
+    }
+    .bm-scripture-textarea {
+      width: 100%; resize: none; padding: 7px 10px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--bm-border); border-radius: 7px;
+      font: italic 0.88rem/1.65 'Noto Serif', Georgia, serif;
+      color: rgba(232,168,56,0.85); outline: none; min-height: 70px;
+    }
+    .bm-scripture-textarea:focus { border-color: rgba(232,168,56,0.40); }
+
+    .bm-notes-textarea {
+      width: 100%; resize: none; padding: 10px 12px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--bm-border); border-radius: 9px;
+      font: 0.85rem/1.7 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); outline: none;
+      min-height: 90px;
+      scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.10) transparent;
+    }
+    .bm-notes-textarea:focus { border-color: rgba(232,168,56,0.35); background: rgba(255,255,255,0.05); }
+    .bm-notes-textarea::placeholder { color: var(--bm-faint); }
+
+    .bm-add-section-bar {
+      display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+      margin-top: 4px; margin-bottom: 8px;
+    }
+    .bm-add-section-label {
+      font: 500 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      flex-shrink: 0;
+    }
+    .bm-add-section-btn {
+      padding: 4px 11px; border-radius: 7px; font: 500 0.72rem 'Plus Jakarta Sans', sans-serif;
+      border: 1px solid var(--bm-border); background: rgba(255,255,255,0.03);
+      color: var(--bm-muted); cursor: pointer; transition: all 0.12s; white-space: nowrap;
+    }
+    .bm-add-section-btn:hover { background: rgba(255,255,255,0.08); color: var(--bm-ink); border-color: var(--bm-border-lit); }
+
+    /* ── Outline sidebar (scripture lookup, word count) ──────────────── */
+    #bm-outline-sidebar {
+      width: 270px; flex-shrink: 0;
+      background: rgba(12,20,69,0.55); border-left: 1px solid var(--bm-border);
+      overflow-y: auto; padding: 16px 14px 40px;
+      display: flex; flex-direction: column; gap: 16px;
+      scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.10) transparent;
+    }
+    #bm-outline-sidebar::-webkit-scrollbar { width: 4px; }
+    #bm-outline-sidebar::-webkit-scrollbar-thumb { background: rgba(232,168,56,0.12); border-radius: 4px; }
+
+    .bm-sidebar-card {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--bm-border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .bm-sidebar-card-head {
+      padding: 10px 13px 8px;
+      border-bottom: 1px solid var(--bm-border);
+      font: 600 0.72rem 'Plus Jakarta Sans', sans-serif;
+      text-transform: uppercase; letter-spacing: .07em; color: var(--bm-muted);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .bm-sidebar-card-body { padding: 12px 13px; }
+
+    /* Stats grid */
+    .bm-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .bm-stat {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--bm-border);
+      border-radius: 9px; padding: 8px 10px; text-align: center;
+    }
+    .bm-stat-val { font: 700 1.15rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent); }
+    .bm-stat-lbl { font: 0.62rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); margin-top: 1px; }
+
+    /* Scripture lookup */
+    .bm-lookup-row { display: flex; gap: 6px; }
+    .bm-lookup-input {
+      flex: 1; padding: 6px 10px; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--bm-border); border-radius: 8px;
+      font: 0.79rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); outline: none;
+    }
+    .bm-lookup-input::placeholder { color: var(--bm-muted); }
+    .bm-lookup-input:focus { border-color: rgba(232,168,56,0.45); }
+    .bm-lookup-result {
+      margin-top: 8px; padding: 9px 11px;
+      background: rgba(232,168,56,0.06); border: 1px solid rgba(232,168,56,0.15);
+      border-radius: 9px; display: none;
+    }
+    .bm-lookup-result.visible { display: block; }
+    .bm-lookup-ref { font: 600 0.75rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent); margin-bottom: 4px; }
+    .bm-lookup-text { font: italic 0.82rem/1.60 'Noto Serif', Georgia, serif; color: rgba(232,168,56,0.80); }
+    .bm-lookup-add {
+      margin-top: 7px; width: 100%; padding: 5px 10px; border-radius: 7px;
+      font: 600 0.72rem 'Plus Jakarta Sans', sans-serif; background: rgba(232,168,56,0.12);
+      color: var(--bm-accent); border: none; cursor: pointer; transition: all 0.13s;
+    }
+    .bm-lookup-add:hover { background: rgba(232,168,56,0.22); }
+
+    /* Suggestion chips */
+    .bm-suggest-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .bm-chip {
+      padding: 3px 9px; border-radius: 7px; font: 500 0.70rem 'Plus Jakarta Sans', sans-serif;
+      background: rgba(167,139,250,0.10); border: 1px solid rgba(167,139,250,0.18);
+      color: var(--bm-purple); cursor: pointer; transition: all 0.12s;
+    }
+    .bm-chip:hover { background: rgba(167,139,250,0.20); }
+
+    /* ════════════════════════════════════════════════════
+       PANE: MANUSCRIPT
+    ════════════════════════════════════════════════════ */
+    #bm-pane-manuscript {
+      display: flex; flex-direction: row; min-height: 0; overflow: hidden;
+    }
+
+    #bm-manuscript-editor {
+      flex: 1; min-width: 0; overflow-y: auto; padding: 28px 36px 80px;
+      scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.12) transparent;
+    }
+    #bm-manuscript-editor::-webkit-scrollbar { width: 5px; }
+    #bm-manuscript-editor::-webkit-scrollbar-thumb { background: rgba(232,168,56,0.14); border-radius: 4px; }
+
+    /* toolbar */
+    .bm-ms-toolbar {
+      display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+      padding: 8px 36px 6px; border-bottom: 1px solid var(--bm-border);
+      background: rgba(6,12,31,0.70); flex-shrink: 0;
+    }
+    .bm-ms-tool {
+      width: 28px; height: 28px; border-radius: 6px; background: none; border: none;
+      color: var(--bm-muted); font: 600 0.80rem 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.12s; flex-shrink: 0;
+    }
+    .bm-ms-tool:hover { background: rgba(255,255,255,0.09); color: var(--bm-ink); }
+    .bm-ms-tool.active { background: var(--bm-accent-dim); color: var(--bm-accent); }
+    .bm-ms-sep { width: 1px; height: 20px; background: var(--bm-border); margin: 0 3px; flex-shrink: 0; }
+    .bm-ms-tool-label { font-size: 0.68rem; letter-spacing: .02em; }
+
+    #bm-manuscript-area {
+      width: 100%; max-width: 780px; margin: 0 auto;
+      min-height: 400px; background: none; border: none; outline: none; resize: none;
+      font: 400 1rem/1.85 'Noto Serif', Georgia, serif; color: var(--bm-ink);
+      caret-color: var(--bm-accent);
+      scrollbar-width: none;
+    }
+    #bm-manuscript-area::placeholder { color: var(--bm-faint); font-style: italic; }
+    #bm-manuscript-area::-webkit-scrollbar { display: none; }
+
+    .bm-ms-word-count {
+      text-align: center; padding: 16px 0;
+      font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      max-width: 780px; margin: 0 auto;
+    }
+
+    /* ════════════════════════════════════════════════════
+       PANE: RESEARCH
+    ════════════════════════════════════════════════════ */
+    #bm-pane-research {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      min-height: 0; overflow: hidden;
+    }
+    .bm-research-col {
+      overflow-y: auto; padding: 20px 22px 60px;
+      scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.10) transparent;
+    }
+    .bm-research-col::-webkit-scrollbar { width: 4px; }
+    .bm-research-col::-webkit-scrollbar-thumb { background: rgba(232,168,56,0.12); border-radius: 4px; }
+    .bm-research-col + .bm-research-col { border-left: 1px solid var(--bm-border); }
+
+    .bm-research-h { font: 700 0.90rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); margin-bottom: 12px; display: flex; align-items: center; gap: 7px; }
+    .bm-research-h svg { color: var(--bm-accent); flex-shrink: 0; }
+
+    .bm-res-section { margin-bottom: 20px; }
+    .bm-res-label { font: 600 0.65rem 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; letter-spacing: .08em; color: var(--bm-muted); margin-bottom: 8px; }
+
+    .bm-lexicon-input {
+      width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.05);
+      border: 1px solid var(--bm-border); border-radius: 10px;
+      font: 0.84rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); outline: none;
+    }
+    .bm-lexicon-input::placeholder { color: var(--bm-muted); }
+    .bm-lexicon-input:focus { border-color: rgba(232,168,56,0.45); }
+
+    .bm-lexicon-result {
+      margin-top: 10px; padding: 12px 14px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--bm-border);
+      border-radius: 10px; display: none;
+    }
+    .bm-lexicon-result.visible { display: block; }
+    .bm-lex-word { font: 700 1.05rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent); }
+    .bm-lex-strongs { font: 600 0.70rem 'JetBrains Mono', monospace; color: var(--bm-purple); background: rgba(167,139,250,0.10); border-radius: 5px; padding: 1px 7px; }
+    .bm-lex-transliteration { font: italic 0.80rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); }
+    .bm-lex-definition { font: 0.83rem/1.65 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); margin-top: 7px; }
+    .bm-lex-origin { font: 0.72rem/1.5 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); margin-top: 5px; border-top: 1px solid var(--bm-border); padding-top: 6px; }
+
+    .bm-cross-ref-list { display: flex; flex-direction: column; gap: 7px; }
+    .bm-cross-ref-item {
+      padding: 9px 12px; border-radius: 9px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--bm-border);
+      cursor: pointer; transition: all 0.13s;
+    }
+    .bm-cross-ref-item:hover { background: rgba(232,168,56,0.06); border-color: rgba(232,168,56,0.22); }
+    .bm-cross-ref-ref { font: 600 0.76rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent); margin-bottom: 3px; }
+    .bm-cross-ref-text { font: italic 0.79rem/1.55 'Noto Serif', Georgia, serif; color: var(--bm-muted); }
+
+    .bm-quote-block {
+      padding: 10px 14px; border-left: 3px solid var(--bm-purple);
+      background: rgba(167,139,250,0.06); border-radius: 0 9px 9px 0; margin-bottom: 8px;
+    }
+    .bm-quote-text { font: italic 0.84rem/1.65 'Noto Serif', Georgia, serif; color: var(--bm-ink); }
+    .bm-quote-attr { font: 0.70rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-purple); margin-top: 5px; }
+
+    /* ════════════════════════════════════════════════════
+       PANE: DELIVERY
+    ════════════════════════════════════════════════════ */
+    #bm-pane-delivery {
+      overflow-y: auto; padding: 24px 28px 80px;
+      scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.12) transparent;
+    }
+    #bm-pane-delivery::-webkit-scrollbar { width: 5px; }
+    #bm-pane-delivery::-webkit-scrollbar-thumb { background: rgba(232,168,56,0.14); border-radius: 4px; }
+
+    .bm-delivery-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 960px;
+    }
+    @media (max-width: 800px) { .bm-delivery-grid { grid-template-columns: 1fr; } }
+
+    .bm-dcard {
+      background: rgba(12,20,69,0.50); border: 1px solid var(--bm-border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .bm-dcard-head {
+      padding: 13px 16px 10px; border-bottom: 1px solid var(--bm-border);
+      font: 600 0.82rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .bm-dcard-head svg { color: var(--bm-accent); flex-shrink: 0; }
+    .bm-dcard-body { padding: 14px 16px; }
+
+    .bm-delivery-label { font: 600 0.68rem 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; letter-spacing: .07em; color: var(--bm-muted); margin-bottom: 6px; }
+    .bm-delivery-textarea {
+      width: 100%; resize: none; padding: 9px 12px; min-height: 80px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--bm-border);
+      border-radius: 9px; font: 0.84rem/1.65 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-ink); outline: none;
+    }
+    .bm-delivery-textarea:focus { border-color: rgba(232,168,56,0.35); }
+    .bm-delivery-textarea::placeholder { color: var(--bm-faint); }
+
+    /* Altar call card */
+    .bm-altar-block {
+      background: linear-gradient(135deg, rgba(232,168,56,0.08), rgba(167,139,250,0.08));
+      border: 1px solid rgba(232,168,56,0.22); border-radius: 14px;
+      padding: 18px 20px; margin-bottom: 16px; max-width: 960px;
+    }
+    .bm-altar-h { font: 700 0.92rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+    /* Timer / time estimate */
+    .bm-timer-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .bm-timer-display {
+      font: 700 2rem 'JetBrains Mono', monospace; color: var(--bm-accent);
+      background: rgba(232,168,56,0.07); border: 1px solid rgba(232,168,56,0.20);
+      border-radius: 10px; padding: 8px 20px; letter-spacing: .05em; min-width: 140px; text-align: center;
+    }
+    .bm-timer-controls { display: flex; gap: 7px; }
+
+    .bm-checklist { display: flex; flex-direction: column; gap: 6px; }
+    .bm-check-item { display: flex; align-items: flex-start; gap: 9px; cursor: pointer; padding: 6px 0; }
+    .bm-check-box {
+      width: 16px; height: 16px; border-radius: 4px; flex-shrink: 0; margin-top: 1px;
+      border: 2px solid var(--bm-border); background: none; transition: all 0.12s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .bm-check-item.checked .bm-check-box {
+      background: var(--bm-accent); border-color: var(--bm-accent);
+    }
+    .bm-check-text { font: 0.83rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); line-height: 1.4; }
+    .bm-check-item.checked .bm-check-text { text-decoration: line-through; color: var(--bm-muted); }
+
+    /* ════════════════════════════════════════════════════
+       PANE: SERIES
+    ════════════════════════════════════════════════════ */
+    #bm-pane-series {
+      overflow-y: auto; padding: 24px 28px 80px;
+      scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.12) transparent;
+    }
+    #bm-pane-series::-webkit-scrollbar { width: 5px; }
+    #bm-pane-series::-webkit-scrollbar-thumb { background: rgba(232,168,56,0.14); border-radius: 4px; }
+
+    .bm-series-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px;
+      max-width: 1100px;
+    }
+    .bm-series-card {
+      background: rgba(12,20,69,0.50); border: 1px solid var(--bm-border);
+      border-radius: 14px; padding: 18px; cursor: pointer; transition: all 0.15s;
+      display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden;
+    }
+    .bm-series-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      border-radius: 14px 14px 0 0; opacity: 0; transition: opacity 0.15s;
+    }
+    .bm-series-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(232,168,56,0.12); border-color: rgba(232,168,56,0.30); }
+    .bm-series-card:hover::before { opacity: 1; background: linear-gradient(90deg, var(--bm-accent), var(--bm-purple)); }
+    .bm-series-name { font: 700 0.92rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); }
+    .bm-series-count { font: 500 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); }
+    .bm-series-date  { font: 0.68rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint); }
+
+    /* ════════════════════════════════════════════════════
+       AUTH OVERLAY
+    ════════════════════════════════════════════════════ */
+    #bm-auth-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bm-bg);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+    #bm-auth-overlay[hidden] { display: none !important; }
+    .bm-auth-card {
+      width: 100%; max-width: 380px;
+      background: linear-gradient(145deg, #0c1445, #160e38);
+      border: 1px solid rgba(232,168,56,0.22); border-radius: 20px;
+      padding: 40px 36px 32px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.72), 0 0 0 1px rgba(232,168,56,0.06);
+      margin: 0 16px;
+    }
+    .bm-auth-icon {
+      width: 72px; height: 72px; border-radius: 18px;
+      background: linear-gradient(135deg, #c48a20, #e8a838);
+      display: flex; align-items: center; justify-content: center; font-size: 34px;
+      box-shadow: 0 8px 32px rgba(232,168,56,0.40); margin-bottom: 4px;
+    }
+    .bm-auth-card h1 { font: 800 1.4rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); margin: 0; }
+    .bm-auth-card p  { font: 0.84rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); margin: 0; text-align: center; line-height: 1.55; }
+    .bm-auth-verse {
+      font: italic 0.74rem 'Noto Serif', Georgia, serif;
+      color: rgba(240,241,248,0.28); margin-top: 8px; text-align: center;
+      padding: 10px 16px; border: 1px solid rgba(232,168,56,0.12); border-radius: 9px;
+    }
+
+    /* ── Toast ─────────────────────────────────────────────────────────── */
+    #bm-toasts {
+      position: fixed; bottom: 24px; right: 24px; z-index: 10000;
+      display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+    }
+    .bm-toast {
+      padding: 10px 16px; border-radius: 10px; font: 500 0.82rem 'Plus Jakarta Sans', sans-serif;
+      background: #1a2755; border: 1px solid var(--bm-border-lit); color: var(--bm-ink);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.50);
+      opacity: 0; transform: translateY(10px); transition: all 0.22s;
+      pointer-events: auto; max-width: 320px;
+    }
+    .bm-toast.visible { opacity: 1; transform: none; }
+    .bm-toast--success { border-color: rgba(52,211,153,0.35); color: var(--bm-green); }
+    .bm-toast--error   { border-color: rgba(248,113,113,0.35); color: var(--bm-red); }
+    .bm-toast--info    { border-color: rgba(56,189,248,0.30); color: var(--bm-blue); }
+
+    /* ── Confirm modal ─────────────────────────────────────────────────── */
+    #bm-confirm-modal {
+      position: fixed; inset: 0; z-index: 8000;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #bm-confirm-modal[hidden] { display: none !important; }
+    .bm-modal-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(6,12,31,0.80); backdrop-filter: blur(3px);
+    }
+    .bm-modal-box {
+      position: relative; z-index: 1;
+      background: var(--bm-panel); border: 1px solid var(--bm-border-lit);
+      border-radius: 16px; padding: 28px 28px 22px;
+      max-width: 360px; width: 90%;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.65);
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .bm-modal-h { font: 700 1rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); }
+    .bm-modal-p { font: 0.83rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); line-height: 1.5; }
+    .bm-modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+    /* ── Delete animation ──────────────────────────────────────────────── */
+    .bm-sermon-item.removing { opacity: 0; transform: translateX(-16px); transition: all 0.22s; }
+
+    /* ── Mobile responsive ─────────────────────────────────────────────── */
+    @media (max-width: 860px) {
+      #bm-body { grid-template-columns: 1fr; }
+      #bm-sidebar {
+        display: none; position: fixed;
+        top: var(--topbar-h); left: 0; bottom: 0;
+        width: min(280px, 85vw); z-index: 300;
+        transform: translateX(-100%);
+        transition: transform 220ms cubic-bezier(.2,.8,.2,1);
+      }
+      #bm-sidebar.is-open { display: flex; transform: translateX(0); }
+      #bm-sidebar.is-open::before {
+        content: ''; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.50); z-index: -1;
+        left: min(280px, 85vw); width: calc(100vw - min(280px, 85vw));
+      }
+      .bm-hamburger { display: inline-flex !important; }
+      #bm-pane-research { grid-template-columns: 1fr; }
+      #bm-outline-sidebar { display: none; }
+      #bm-manuscript-editor { padding: 16px 16px 60px; }
+      .bm-ms-toolbar { padding: 8px 16px 6px; }
+      #bm-pane-delivery, #bm-pane-series { padding: 16px 16px 60px; }
+    }
+    @media (min-width: 861px) {
+      .bm-hamburger { display: none !important; }
+    }
+
+    /* Input resets */
+    input:not([type=color]):not([type=range]),
+    textarea, select { -webkit-appearance: none; appearance: none; }
+    input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
+      -webkit-text-fill-color: var(--bm-ink) !important;
+      -webkit-box-shadow: 0 0 0 100px #0c1445 inset !important;
+    }
+    textarea { resize: none; }
+
+    /* Drag over highlight */
+    .bm-outline-section.drag-over { border-color: rgba(232,168,56,0.55); background: rgba(232,168,56,0.04); }
+  </style>
+</head>
+<body>
+
+<!-- ── Auth gate ────────────────────────────────────────────────────── -->
+<div id="bm-auth-overlay">
+  <div class="bm-auth-card">
+    <div class="bm-auth-icon">🍞</div>
+    <h1>Bread Maker</h1>
+    <p>Sermon preparation & management for FlockOS pastors and teachers. Craft the Word with clarity and depth.</p>
+    <p class="bm-auth-verse">"Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." — 2 Timothy 2:15</p>
+    <button class="bm-btn bm-btn--primary" id="bm-auth-btn" style="margin-top:8px;width:100%;justify-content:center;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      Sign in with FlockOS
+    </button>
+  </div>
+</div>
+
+<!-- ── App root ──────────────────────────────────────────────────────── -->
+<div id="bm-root">
+
+  <!-- Topbar -->
+  <header id="bm-topbar">
+    <!-- Hamburger (mobile) -->
+    <button class="bm-btn bm-btn--ghost bm-btn--icon bm-hamburger" id="bm-hamburger" aria-label="Open sidebar" style="display:none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <div class="bm-logo">
+      <div class="bm-logo-icon">🍞</div>
+      <span class="bm-logo-text">Bread Maker</span>
+    </div>
+    <span id="bm-active-title">No sermon selected</span>
+    <div class="bm-topbar-right">
+      <button class="bm-btn bm-btn--success bm-btn--sm" id="bm-save-btn" disabled title="Save sermon">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save
+      </button>
+      <div class="bm-user-chip" id="bm-user-chip">
+        <div class="bm-user-avatar" id="bm-user-avatar">?</div>
+        <span id="bm-user-name">Account</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <div id="bm-body">
+
+    <!-- ── Sidebar ─────────────────────────────────────────────────── -->
+    <aside id="bm-sidebar">
+      <div id="bm-sidebar-top">
+        <div class="bm-search-wrap">
+          <svg class="bm-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input class="bm-search" type="text" id="bm-search" placeholder="Search sermons…" autocomplete="off">
+        </div>
+      </div>
+      <div class="bm-sidebar-label">Sermons</div>
+      <div id="bm-sermon-list">
+        <!-- populated by JS -->
+      </div>
+      <div class="bm-sidebar-new">
+        <button class="bm-sidebar-new-btn" id="bm-new-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Sermon
+        </button>
+      </div>
+    </aside>
+
+    <!-- ── Main workspace ──────────────────────────────────────────── -->
+    <main id="bm-main">
+
+      <!-- Empty state -->
+      <div id="bm-empty">
+        <div class="bm-empty-icon">🍞</div>
+        <div class="bm-empty-h">Your Sermon Workshop</div>
+        <div class="bm-empty-p">Create a new sermon or select one from the sidebar to begin. Bread Maker gives you everything you need — from outline to manuscript to delivery notes.</div>
+        <div class="bm-empty-verse">"So then faith comes by hearing, and hearing by the word of God." — Romans 10:17</div>
+        <button class="bm-btn bm-btn--primary" id="bm-empty-new-btn" style="margin-top:8px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Create First Sermon
+        </button>
+      </div>
+
+      <!-- Editor (hidden until sermon selected) -->
+      <div id="bm-editor" hidden>
+
+        <!-- Sermon header -->
+        <div id="bm-sermon-header">
+          <div class="bm-header-fields">
+            <input class="bm-title-input" id="bm-field-title" type="text" placeholder="Sermon title…" autocomplete="off">
+            <input class="bm-meta-input" id="bm-field-series" type="text" placeholder="Series…" autocomplete="off" style="max-width:180px">
+            <input class="bm-meta-input" id="bm-field-date" type="date" style="max-width:160px">
+            <input class="bm-meta-input" id="bm-field-speaker" type="text" placeholder="Speaker…" autocomplete="off" style="max-width:160px">
+            <input class="bm-meta-input" id="bm-field-passage" type="text" placeholder="Key passage…" autocomplete="off" style="max-width:160px">
+          </div>
+          <div class="bm-header-actions">
+            <button class="bm-status-chip draft" id="bm-status-btn" title="Toggle status">
+              <span class="bm-status-dot"></span>
+              <span id="bm-status-label">Draft</span>
+            </button>
+            <button class="bm-btn bm-btn--danger bm-btn--sm" id="bm-delete-btn" title="Delete sermon">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab bar -->
+        <nav id="bm-tab-bar" role="tablist">
+          <button class="bm-tab bm-tab--active" data-tab="outline" role="tab">📋 Outline</button>
+          <button class="bm-tab" data-tab="manuscript" role="tab">📝 Manuscript</button>
+          <button class="bm-tab" data-tab="research" role="tab">🔍 Research</button>
+          <button class="bm-tab" data-tab="delivery" role="tab">🎙 Delivery</button>
+          <button class="bm-tab" data-tab="series" role="tab">📚 All Series</button>
+        </nav>
+
+        <!-- ════════════════════════ OUTLINE PANE ════════════════════════ -->
+        <div class="bm-pane" id="bm-pane-outline" role="tabpanel">
+          <div id="bm-outline-main">
+            <!-- sections injected by JS -->
+            <div id="bm-sections-container"></div>
+
+            <!-- Add section bar -->
+            <div class="bm-add-section-bar" id="bm-add-section-bar">
+              <span class="bm-add-section-label">Add section:</span>
+              <button class="bm-add-section-btn" data-type="intro">Intro</button>
+              <button class="bm-add-section-btn" data-type="scripture">Scripture</button>
+              <button class="bm-add-section-btn" data-type="point">Point</button>
+              <button class="bm-add-section-btn" data-type="illustration">Illustration</button>
+              <button class="bm-add-section-btn" data-type="application">Application</button>
+              <button class="bm-add-section-btn" data-type="prayer">Prayer</button>
+              <button class="bm-add-section-btn" data-type="conclusion">Conclusion</button>
+              <button class="bm-add-section-btn" data-type="transition">Transition</button>
+            </div>
+          </div>
+
+          <!-- Outline sidebar -->
+          <aside id="bm-outline-sidebar">
+
+            <!-- Stats -->
+            <div class="bm-sidebar-card">
+              <div class="bm-sidebar-card-head">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                Sermon Stats
+              </div>
+              <div class="bm-sidebar-card-body">
+                <div class="bm-stats-grid">
+                  <div class="bm-stat">
+                    <div class="bm-stat-val" id="stat-sections">0</div>
+                    <div class="bm-stat-lbl">Sections</div>
+                  </div>
+                  <div class="bm-stat">
+                    <div class="bm-stat-val" id="stat-scriptures">0</div>
+                    <div class="bm-stat-lbl">Scriptures</div>
+                  </div>
+                  <div class="bm-stat">
+                    <div class="bm-stat-val" id="stat-words">0</div>
+                    <div class="bm-stat-lbl">Words</div>
+                  </div>
+                  <div class="bm-stat">
+                    <div class="bm-stat-val" id="stat-min">~0</div>
+                    <div class="bm-stat-lbl">Est. min</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Scripture lookup -->
+            <div class="bm-sidebar-card">
+              <div class="bm-sidebar-card-head">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                Scripture Lookup
+              </div>
+              <div class="bm-sidebar-card-body">
+                <div class="bm-lookup-row">
+                  <input class="bm-lookup-input" id="bm-lookup-input" type="text" placeholder="John 3:16" autocomplete="off">
+                  <button class="bm-btn bm-btn--primary bm-btn--sm" id="bm-lookup-btn">Go</button>
+                </div>
+                <div class="bm-lookup-result" id="bm-lookup-result">
+                  <div class="bm-lookup-ref" id="bm-lookup-ref"></div>
+                  <div class="bm-lookup-text" id="bm-lookup-text"></div>
+                  <button class="bm-lookup-add" id="bm-lookup-add-btn">+ Add to Outline</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Key themes / suggestions -->
+            <div class="bm-sidebar-card">
+              <div class="bm-sidebar-card-head">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Suggested Themes
+              </div>
+              <div class="bm-sidebar-card-body">
+                <div class="bm-suggest-chips" id="bm-suggest-chips">
+                  <span class="bm-chip">Salvation</span>
+                  <span class="bm-chip">Grace</span>
+                  <span class="bm-chip">Faith</span>
+                  <span class="bm-chip">Repentance</span>
+                  <span class="bm-chip">Hope</span>
+                  <span class="bm-chip">Love</span>
+                  <span class="bm-chip">Holiness</span>
+                  <span class="bm-chip">Mission</span>
+                  <span class="bm-chip">Prayer</span>
+                  <span class="bm-chip">Stewardship</span>
+                  <span class="bm-chip">Discipleship</span>
+                  <span class="bm-chip">Worship</span>
+                </div>
+              </div>
+            </div>
+
+          </aside>
+        </div><!-- /pane-outline -->
+
+        <!-- ════════════════════════ MANUSCRIPT PANE ════════════════════ -->
+        <div class="bm-pane" id="bm-pane-manuscript" hidden role="tabpanel">
+          <div class="bm-ms-toolbar">
+            <button class="bm-ms-tool" data-cmd="bold" title="Bold"><b>B</b></button>
+            <button class="bm-ms-tool" data-cmd="italic" title="Italic"><i>I</i></button>
+            <button class="bm-ms-tool" data-cmd="underline" title="Underline"><u>U</u></button>
+            <div class="bm-ms-sep"></div>
+            <button class="bm-ms-tool bm-ms-tool-label" data-insert="¶ " title="Paragraph mark">¶</button>
+            <button class="bm-ms-tool bm-ms-tool-label" data-insert="[PAUSE] " title="Insert pause">[pause]</button>
+            <button class="bm-ms-tool bm-ms-tool-label" data-insert="[EMPHASIS] " title="Emphasis note">[emph]</button>
+            <button class="bm-ms-tool bm-ms-tool-label" data-insert="[STORY] " title="Insert story note">[story]</button>
+            <div class="bm-ms-sep"></div>
+            <button class="bm-ms-tool" id="bm-ms-import-btn" title="Import from outline">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            </button>
+            <div style="margin-left:auto;font:0.72rem 'Plus Jakarta Sans',sans-serif;color:var(--bm-muted);" id="bm-ms-count">0 words</div>
+          </div>
+          <div id="bm-manuscript-editor">
+            <textarea id="bm-manuscript-area" placeholder="Begin writing your full manuscript here… Let the Holy Spirit guide every word. 'Open my eyes, that I may behold wondrous things out of your law.' — Psalm 119:18"></textarea>
+            <div class="bm-ms-word-count" id="bm-ms-word-count-footer"></div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════ RESEARCH PANE ════════════════════ -->
+        <div class="bm-pane" id="bm-pane-research" hidden role="tabpanel">
+          <!-- Left col: Lexicon -->
+          <div class="bm-research-col">
+            <div class="bm-research-h">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              Greek / Hebrew Lexicon
+            </div>
+
+            <div class="bm-res-section">
+              <div class="bm-res-label">Search Strong's</div>
+              <input class="bm-lexicon-input" id="bm-lex-input" type="text" placeholder="Enter Greek or Hebrew word, or G3056, H1254…" autocomplete="off">
+              <div class="bm-lexicon-result" id="bm-lex-result">
+                <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:5px">
+                  <span class="bm-lex-word" id="bm-lex-word"></span>
+                  <span class="bm-lex-strongs" id="bm-lex-strongs"></span>
+                  <span class="bm-lex-transliteration" id="bm-lex-translit"></span>
+                </div>
+                <div class="bm-lex-definition" id="bm-lex-def"></div>
+                <div class="bm-lex-origin" id="bm-lex-origin"></div>
+              </div>
+            </div>
+
+            <div class="bm-res-section">
+              <div class="bm-res-label">Key Words in This Sermon</div>
+              <div id="bm-key-words" style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px">
+                <span style="font:0.78rem 'Plus Jakarta Sans',sans-serif;color:var(--bm-faint)">Add scripture passages to the outline to extract key words.</span>
+              </div>
+            </div>
+
+            <div class="bm-res-section">
+              <div class="bm-res-label">Theological Notes</div>
+              <textarea class="bm-notes-textarea" id="bm-research-notes" placeholder="Personal study notes, commentary insights, historical context…" style="min-height:120px"></textarea>
+            </div>
+          </div>
+
+          <!-- Right col: Cross refs & quotes -->
+          <div class="bm-research-col">
+            <div class="bm-research-h">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Cross References
+            </div>
+
+            <div class="bm-res-section">
+              <div class="bm-res-label">Related Passages</div>
+              <div class="bm-cross-ref-list" id="bm-cross-refs">
+                <div class="bm-cross-ref-item" data-ref="Romans 8:28">
+                  <div class="bm-cross-ref-ref">Romans 8:28</div>
+                  <div class="bm-cross-ref-text">And we know that in all things God works for the good of those who love him…</div>
+                </div>
+                <div class="bm-cross-ref-item" data-ref="Isaiah 55:11">
+                  <div class="bm-cross-ref-ref">Isaiah 55:11</div>
+                  <div class="bm-cross-ref-text">So is my word that goes out from my mouth: it will not return to me empty…</div>
+                </div>
+                <div class="bm-cross-ref-item" data-ref="Hebrews 4:12">
+                  <div class="bm-cross-ref-ref">Hebrews 4:12</div>
+                  <div class="bm-cross-ref-text">For the word of God is alive and active. Sharper than any double-edged sword…</div>
+                </div>
+                <div class="bm-cross-ref-item" data-ref="2 Timothy 3:16">
+                  <div class="bm-cross-ref-ref">2 Timothy 3:16–17</div>
+                  <div class="bm-cross-ref-text">All Scripture is God-breathed and is useful for teaching, rebuking, correcting…</div>
+                </div>
+                <div class="bm-cross-ref-item" data-ref="Nehemiah 8:8">
+                  <div class="bm-cross-ref-ref">Nehemiah 8:8</div>
+                  <div class="bm-cross-ref-text">They read from the Book of the Law of God, making it clear and giving the meaning…</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bm-res-section">
+              <div class="bm-res-label">Quotes & Illustrations</div>
+              <div class="bm-quote-block">
+                <div class="bm-quote-text">"Preach the gospel to yourself every day before you preach it to anyone else."</div>
+                <div class="bm-quote-attr">— Martin Luther</div>
+              </div>
+              <div class="bm-quote-block">
+                <div class="bm-quote-text">"A Bible that is falling apart usually belongs to someone who is not."</div>
+                <div class="bm-quote-attr">— Charles Spurgeon</div>
+              </div>
+              <div class="bm-quote-block">
+                <div class="bm-quote-text">"God does not need our strength; He asks for our weakness."</div>
+                <div class="bm-quote-attr">— Hudson Taylor</div>
+              </div>
+              <textarea class="bm-notes-textarea" id="bm-research-quotes" placeholder="Add your own quotes, illustrations, or stories here…" style="min-height:80px;margin-top:6px"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════ DELIVERY PANE ════════════════════ -->
+        <div class="bm-pane" id="bm-pane-delivery" hidden role="tabpanel">
+
+          <!-- Altar call -->
+          <div class="bm-altar-block">
+            <div class="bm-altar-h">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              Altar Call / Invitation
+            </div>
+            <textarea class="bm-delivery-textarea" id="bm-altar-call" placeholder="Write your altar call here — the invitation to respond to the Word. How will you call people to Christ, to rededication, or to action today?"></textarea>
+          </div>
+
+          <div class="bm-delivery-grid">
+
+            <!-- Timer card -->
+            <div class="bm-dcard">
+              <div class="bm-dcard-head">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Delivery Timer
+              </div>
+              <div class="bm-dcard-body" style="display:flex;flex-direction:column;gap:12px">
+                <div class="bm-timer-row">
+                  <div class="bm-timer-display" id="bm-timer-display">00:00</div>
+                  <div class="bm-timer-controls">
+                    <button class="bm-btn bm-btn--primary" id="bm-timer-start">Start</button>
+                    <button class="bm-btn bm-btn--ghost" id="bm-timer-reset">Reset</button>
+                  </div>
+                </div>
+                <div style="font:0.78rem 'Plus Jakarta Sans',sans-serif;color:var(--bm-muted)">
+                  <span id="bm-timer-est">Estimated: ~0 min (based on manuscript words)</span>
+                </div>
+                <div>
+                  <div class="bm-delivery-label" style="margin-bottom:8px">Target Duration (min)</div>
+                  <input type="range" min="5" max="90" value="30" id="bm-duration-slider" style="width:100%;accent-color:var(--bm-accent)">
+                  <div style="display:flex;justify-content:space-between;font:0.68rem 'Plus Jakarta Sans',sans-serif;color:var(--bm-muted);margin-top:3px">
+                    <span>5 min</span>
+                    <span id="bm-duration-val" style="color:var(--bm-accent);font-weight:700">30 min</span>
+                    <span>90 min</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delivery notes -->
+            <div class="bm-dcard">
+              <div class="bm-dcard-head">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                Delivery Notes
+              </div>
+              <div class="bm-dcard-body" style="display:flex;flex-direction:column;gap:10px">
+                <textarea class="bm-delivery-textarea" id="bm-delivery-notes" placeholder="Stage directions, transitions, vocal cues, props needed…" style="min-height:110px"></textarea>
+              </div>
+            </div>
+
+            <!-- Prayer prep -->
+            <div class="bm-dcard">
+              <div class="bm-dcard-head">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" transform="rotate(180,12,12)"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Prayer Preparation
+              </div>
+              <div class="bm-dcard-body">
+                <textarea class="bm-delivery-textarea" id="bm-prayer-prep" placeholder="Pre-sermon prayer points. What are you trusting God for in this message? What hearts need to be touched?"></textarea>
+              </div>
+            </div>
+
+            <!-- Pre-sermon checklist -->
+            <div class="bm-dcard">
+              <div class="bm-dcard-head">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Pre-Sermon Checklist
+              </div>
+              <div class="bm-dcard-body">
+                <div class="bm-checklist" id="bm-checklist">
+                  <div class="bm-check-item" data-key="prayed">
+                    <div class="bm-check-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <span class="bm-check-text">Prayed over this message</span>
+                  </div>
+                  <div class="bm-check-item" data-key="outline_complete">
+                    <div class="bm-check-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <span class="bm-check-text">Outline complete</span>
+                  </div>
+                  <div class="bm-check-item" data-key="scriptures_verified">
+                    <div class="bm-check-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <span class="bm-check-text">All scripture references verified</span>
+                  </div>
+                  <div class="bm-check-item" data-key="manuscript_ready">
+                    <div class="bm-check-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <span class="bm-check-text">Manuscript or notes ready</span>
+                  </div>
+                  <div class="bm-check-item" data-key="practiced">
+                    <div class="bm-check-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <span class="bm-check-text">Practiced / run-through done</span>
+                  </div>
+                  <div class="bm-check-item" data-key="altar_ready">
+                    <div class="bm-check-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <span class="bm-check-text">Altar call prepared</span>
+                  </div>
+                  <div class="bm-check-item" data-key="team_notified">
+                    <div class="bm-check-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <span class="bm-check-text">Ministry team notified</span>
+                  </div>
+                  <div class="bm-check-item" data-key="gas_outreach">
+                    <div class="bm-check-box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                    <span class="bm-check-text">Outreach/evangelism component noted</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /delivery grid -->
+        </div><!-- /pane-delivery -->
+
+        <!-- ════════════════════════ SERIES PANE ════════════════════ -->
+        <div class="bm-pane" id="bm-pane-series" hidden role="tabpanel">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;max-width:1100px;flex-wrap:wrap">
+            <h2 style="font:700 1.15rem 'Plus Jakarta Sans',sans-serif;color:var(--bm-ink);flex:1">Sermon Series</h2>
+            <button class="bm-btn bm-btn--primary bm-btn--sm" id="bm-new-series-btn">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Series
+            </button>
+          </div>
+          <div class="bm-series-grid" id="bm-series-grid">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+      </div><!-- /bm-editor -->
+    </main>
+
+  </div><!-- /bm-body -->
+</div><!-- /bm-root -->
+
+<!-- Confirm modal -->
+<div id="bm-confirm-modal" hidden>
+  <div class="bm-modal-backdrop" id="bm-modal-backdrop"></div>
+  <div class="bm-modal-box">
+    <div class="bm-modal-h" id="bm-modal-h">Are you sure?</div>
+    <div class="bm-modal-p" id="bm-modal-p"></div>
+    <div class="bm-modal-actions">
+      <button class="bm-btn bm-btn--ghost" id="bm-modal-cancel">Cancel</button>
+      <button class="bm-btn bm-btn--danger" id="bm-modal-confirm">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div id="bm-toasts" aria-live="polite"></div>
+
+<!-- Firebase config — patched per-church by B-Build -->
+<script>
+  window.FLOCK_FIREBASE_CONFIG = {
+    apiKey:            'AIzaSyBA-fkxjABbwIHn0i6MPiXbGwahfJmuJeo',
+    authDomain:        'flockos-notify.firebaseapp.com',
+    projectId:         'flockos-notify',
+    storageBucket:     'flockos-notify.firebasestorage.app',
+    messagingSenderId: '321766738616',
+    appId:             '1:321766738616:web:d2c1c53ad7493fcde4c24d',
+    measurementId:     'G-EFMSZE581W'
+  };
+</script>
+<script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+<!-- FlockOS auth (resolved via absolute <base href>) -->
+<script defer src="Scripts/firm_foundation.js"></script>
+<script defer src="Scripts/the_upper_room.js"></script>
+<script defer src="Scripts/the_true_vine.js"></script>
+
+<!-- Bread Maker logic -->
+<script defer src="app.feed/bread_maker.js"></script>
+
+</body>
+</html>

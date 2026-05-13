@@ -13,7 +13,7 @@
   "categories": ["productivity", "utilities"],
   "icons": [
     {
-      "src": "../Images/NewCovenant.png",
+      "src": "../Images/FlockOS.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -31,7 +31,7 @@
       "short_name": "Home",
       "description": "Go to the Good Shepherd dashboard",
       "url": "./app.flockos.html?view=the_good_shepherd",
-      "icons": [{ "src": "../Images/NewCovenant.png", "sizes": "512x512" }]
+      "icons": [{ "src": "../Images/FlockOS.png", "sizes": "512x512" }]
     },
     {
       "name": "Fellowship",

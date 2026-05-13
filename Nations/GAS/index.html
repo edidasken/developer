@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <title>FlockOS-GAS</title>
-  <link rel="icon" type="image/png" href="Images/NewCovenant.png">
-  <link rel="apple-touch-icon" href="Images/NewCovenant.png">
+  <link rel="icon" type="image/png" href="Images/FlockOS.png">
+  <link rel="apple-touch-icon" href="Images/FlockOS.png">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,11 +16,11 @@
   <!-- Open Graph -->
   <meta property="og:title" content="FlockOS-GAS">
   <meta property="og:description" content="Complete pastoral care, member management, discipleship, and outreach. Free forever. 210 countries. 256-bit encrypted.">
-  <meta property="og:image" content="Images/NewCovenant.png">
+  <meta property="og:image" content="Images/FlockOS.png">
   <meta property="og:type" content="website">
 
   <!-- Preload critical images so the launcher paints instantly -->
-  <link rel="preload" as="image" href="Images/NewCovenant.png">
+  <link rel="preload" as="image" href="Images/FlockOS.png">
   <link rel="preload" as="image" href="Images/GrowIcon.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -155,11 +155,13 @@
     .app-btn--flock  { border-color: rgba(91,141,238,0.20); }
     .app-btn--stand  { border-color: rgba(168,85,247,0.20); }
     .app-btn--show   { border-color: rgba(239,68,68,0.20);  }
+    .app-btn--chat   { border-color: rgba(34,211,238,0.20); }
     .app-btn:hover.app-btn--grow   { border-color: rgba(232,168,56,0.50); }
     .app-btn:hover.app-btn--invite { border-color: rgba(61,179,79,0.50);  }
     .app-btn:hover.app-btn--flock  { border-color: rgba(91,141,238,0.50); }
     .app-btn:hover.app-btn--stand  { border-color: rgba(168,85,247,0.50); }
     .app-btn:hover.app-btn--show   { border-color: rgba(239,68,68,0.50);  }
+    .app-btn:hover.app-btn--chat   { border-color: rgba(34,211,238,0.50); }
 
     .app-icon {
       width: 42px; height: 42px;
@@ -180,6 +182,7 @@
     .app-btn--flock  .app-label strong { color: #a0beff; }
     .app-btn--stand  .app-label strong { color: #d8b4fe; }
     .app-btn--show   .app-label strong { color: #fca5a5; }
+    .app-btn--chat   .app-label strong { color: #67e8f9; }
     .app-label span {
       display: block;
       font-size: 0.77rem;
@@ -236,7 +239,7 @@
   <div class="launcher">
 
     <div class="church-id">
-      <img src="Images/NewCovenant.png" alt="FlockOS-GAS" fetchpriority="high">
+      <img src="Images/FlockOS.png" alt="FlockOS-GAS" fetchpriority="high">
       <h1>FlockOS-GAS</h1>
     </div>
 
@@ -280,7 +283,7 @@
         <nav class="apps" aria-label="Secure apps">
 
           <a class="app-btn app-btn--flock" href="app.flockos/app.flockos.html">
-            <img class="app-icon" src="Images/NewCovenant.png" alt="FlockOS" loading="lazy">
+            <img class="app-icon" src="Images/FlockOS.png" alt="FlockOS" loading="lazy">
             <div class="app-label">
               <strong>FlockOS</strong>
               <span>Church management &amp; pastoral care</span>
@@ -302,6 +305,15 @@
             <div class="app-label">
               <strong>FlockShow</strong>
               <span>Worship slides &amp; service presentation</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
+          <a class="app-btn app-btn--chat" href="app.flockchat/app.flockchat.html">
+            <img class="app-icon" src="Images/chat.png" alt="FlockChat" loading="lazy">
+            <div class="app-label">
+              <strong>FlockChat</strong>
+              <span>Messaging, prayer chain &amp; announcements</span>
             </div>
             <span class="app-arrow" aria-hidden="true">&#8594;</span>
           </a>

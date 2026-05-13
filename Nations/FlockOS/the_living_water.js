@@ -41,7 +41,7 @@ const PRECACHE_URLS = [
   'Styles/new_covenant.css', /* american_garments merged in — one CSS file */
 
   /* ── Images ───────────────────────────────────────────────────────────── */
-  'Images/NewCovenant.png',
+  'Images/FlockOS.png',
   'Images/GrowIcon.png',
   'Images/Invite.png',
 
@@ -365,8 +365,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body:    data.body,
-      icon:    '/Images/NewCovenant.png',
-      badge:   '/Images/NewCovenant.png',
+      icon:    '/Images/FlockOS.png',
+      badge:   '/Images/FlockOS.png',
       data:    data,
       vibrate: [150, 60, 150],
       tag:     data.tag || 'flockos',

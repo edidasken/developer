@@ -1,0 +1,14 @@
+{
+  "name": "FlockChat",
+  "short_name": "FlockChat",
+  "description": "Church team messaging, prayer chain, and announcements.",
+  "start_url": "./app.flockchat.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#09102e",
+  "theme_color": "#22d3ee",
+  "icons": [
+    { "src": "../Images/chat.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "../Images/chat.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -67,6 +67,13 @@ const TheWord = (() => {
   let _searchActive = false; // is message search bar open
   let _searchQuery  = '';    // current search filter text
   let _emojiTarget = null;   // message id for reaction target (null = composer)
+  let _replyTarget  = null;   // { id, authorName, text } | null
+  let _prayers      = [];     // prayer request docs
+  let _announces    = [];     // broadcast/announcement docs
+  let _prayerUnsub  = null;   // Firestore unsub for prayer list
+  let _announceUnsub = null;  // Firestore unsub for announce list
+  let _activePrayerId = null; // currently open prayer id
+  let _activeAnnounceId = null; // currently open announce id
 
   // ── Emoji set ──────────────────────────────────────────────────────────
   const EMOJIS = [
@@ -106,6 +113,7 @@ const TheWord = (() => {
     _bindQuickSwitcher();
     _bindMessageSearch();
     _bindProfileModal();
+    _bindPrayerUI();
 
     // Auth state observer
     F.onAuthStateChanged(auth, async (user) => {
@@ -699,6 +707,12 @@ const TheWord = (() => {
       const text      = msg.deletedAt
         ? '<em style="color:var(--ink-faint)">This message was deleted.</em>'
         : _formatText(msg.text || '');
+      const replyHtml = msg.replyTo
+        ? `<div class="reply-quote" data-jump="${_esc(msg.replyTo.id)}">
+            <span class="reply-quote-author">${_esc(msg.replyTo.authorName || 'Unknown')}</span>
+            <span class="reply-quote-text">${_esc((msg.replyTo.text || '').substring(0, 80))}${(msg.replyTo.text || '').length > 80 ? '…' : ''}</span>
+          </div>`
+        : '';
 
       row.innerHTML = `
         <div class="msg-avatar">${_esc(initials)}</div>
@@ -707,10 +721,12 @@ const TheWord = (() => {
             <span class="msg-author">${_esc(msg.authorName || 'Unknown')}</span>
             <span class="msg-time">${timeStr}</span>
           </div>
+          ${replyHtml}
           <div class="msg-text">${text}${msg.editedAt ? '<span class="msg-edited">(edited)</span>' : ''}</div>
           ${reactions}
         </div>
         ${!msg.deletedAt ? `<div class="msg-actions">
+          <button class="msg-action-btn" title="Reply" data-action="reply" data-id="${msg.id}" data-author="${_esc(msg.authorName || '')}" data-text="${_esc((msg.text || '').substring(0, 100))}">↩</button>
           <button class="msg-action-btn" title="React" data-action="react" data-id="${msg.id}">😊</button>
           ${_hasRole('leader') ? `<button class="msg-action-btn" title="${isPinned ? 'Unpin' : 'Pin'}" data-action="pin" data-id="${msg.id}" data-text="${_esc((msg.text || '').substring(0,100))}">${isPinned ? '📌' : '📎'}</button>` : ''}
           ${canEdit ? `<button class="msg-action-btn" title="Edit"   data-action="edit"   data-id="${msg.id}">✏️</button>` : ''}
@@ -721,11 +737,19 @@ const TheWord = (() => {
       row.querySelectorAll('.reaction-chip').forEach(chip => {
         chip.addEventListener('click', () => _toggleReaction(msg.id, chip.dataset.emoji));
       });
+      // Jump to quoted message
+      row.querySelectorAll('.reply-quote').forEach(el => {
+        el.addEventListener('click', () => {
+          const target = list.querySelector(`[data-msg-id="${el.dataset.jump}"]`);
+          if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); target.classList.add('msg-highlight'); setTimeout(() => target.classList.remove('msg-highlight'), 1800); }
+        });
+      });
       // Wire action buttons
       row.querySelectorAll('.msg-action-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const { action, id } = btn.dataset;
+          if (action === 'reply')  _setReplyTarget({ id, authorName: btn.dataset.author, text: msg.text || '' });
           if (action === 'react')   _showEmojiPicker(e, id);
           if (action === 'pin')     _togglePinMessage(id, btn.dataset.text);
           if (action === 'edit')    _editMessage(msg);
@@ -853,7 +877,7 @@ const TheWord = (() => {
     _isTyping = false;
 
     try {
-      await F.addDoc(msgCol, {
+      const payload = {
         authorId:    _me.uid,
         authorName:  _me.displayName,
         text:        text,
@@ -861,7 +885,12 @@ const TheWord = (() => {
         editedAt:    null,
         deletedAt:   null,
         timestamp:   F.serverTimestamp()
-      });
+      };
+      if (_replyTarget) {
+        payload.replyTo = { id: _replyTarget.id, authorName: _replyTarget.authorName, text: (_replyTarget.text || '').substring(0, 200) };
+        _clearReplyTarget();
+      }
+      await F.addDoc(msgCol, payload);
       // Update parent doc lastMessage
       await F.updateDoc(F.doc(db, _col(collPath), _activeId), {
         lastMessage:   text.substring(0, 100),
@@ -2039,6 +2068,239 @@ const TheWord = (() => {
       .map(w => w[0]?.toUpperCase() || '')
       .join('');
   }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // REPLY TO MESSAGE
+  // ─────────────────────────────────────────────────────────────────────────
+  function _setReplyTarget(target) {
+    _replyTarget = target;
+    const bar = _el('reply-bar'); if (!bar) return;
+    bar.style.display = 'flex';
+    const nameEl = bar.querySelector('.reply-author');
+    const textEl = bar.querySelector('.reply-text');
+    if (nameEl) nameEl.textContent = target.authorName || 'Unknown';
+    if (textEl) textEl.textContent = (target.text || '').substring(0, 80) + ((target.text || '').length > 80 ? '…' : '');
+    _el('composer-input')?.focus();
+  }
+
+  function _clearReplyTarget() {
+    _replyTarget = null;
+    const bar = _el('reply-bar'); if (bar) bar.style.display = 'none';
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // PRAYER CHAIN
+  // ─────────────────────────────────────────────────────────────────────────
+  function _startPrayerListener() {
+    if (_prayerUnsub) return;
+    const q = F.query(F.collection(db, _col('prayers')), F.orderBy('submittedAt', 'desc'), F.limit(50));
+    _prayerUnsub = F.onSnapshot(q, snap => {
+      _prayers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      _renderPrayerList();
+    }, () => {});
+  }
+
+  function _renderPrayerList() {
+    const el = _el('prayer-list'); if (!el) return;
+    if (!_prayers.length) {
+      el.innerHTML = '<div style="text-align:center;padding:1.5rem 1rem;font-size:0.78rem;color:var(--ink-faint)"><div style="font-size:2rem">🙏</div><p>No prayer requests yet.</p></div>';
+      return;
+    }
+    el.innerHTML = _prayers.map(p => {
+      const status = (p.status || 'New').toLowerCase();
+      return `<div class="prayer-item${_activePrayerId === p.id ? ' active' : ''}" data-id="${_esc(p.id)}" tabindex="0" role="button">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--accent)">${_esc(p.submitterName || 'Anonymous')}</div>
+        <div style="font-size:0.7rem;color:var(--ink-faint);margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${_esc(p.prayerText || '')}</div>
+        <span class="prayer-status-badge ${status}">${_esc(p.status || 'New')}</span>
+      </div>`;
+    }).join('');
+    el.querySelectorAll('.prayer-item').forEach(item => {
+      item.addEventListener('click', () => _openPrayer(item.dataset.id));
+      item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') _openPrayer(item.dataset.id); });
+    });
+  }
+
+  function _openPrayer(prayerId) {
+    _activePrayerId = prayerId; _activeAnnounceId = null;
+    const p = _prayers.find(x => x.id === prayerId); if (!p) return;
+    const panel = _el('prayer-detail-panel');
+    const threadPane = _el('thread-pane');
+    const announcePanel = _el('announce-detail-panel');
+    if (threadPane) threadPane.style.display = 'none';
+    if (announcePanel) announcePanel.style.display = 'none';
+    if (panel) panel.style.display = 'flex';
+    const ts = p.submittedAt?.toDate?.() || new Date();
+    const detail = _el('prayer-detail-content');
+    if (detail) detail.innerHTML = `
+      ${p.category ? `<div class="prayer-cat-label">${_esc(p.category)}</div>` : ''}
+      <h2 style="font-size:1.05rem;font-weight:800;margin:0.5rem 0">${_esc('Prayer for ' + (p.submitterName || 'Anonymous'))}</h2>
+      <p style="font-size:0.88rem;line-height:1.7;white-space:pre-wrap;margin-bottom:0.85rem">${_esc(p.prayerText || '')}</p>
+      <div style="font-size:0.72rem;color:var(--ink-faint)">
+        Submitted ${ts.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })}
+        &nbsp;·&nbsp;<span class="prayer-status-badge ${(p.status||'New').toLowerCase()}">${_esc(p.status || 'New')}</span>
+        ${p.isConfidential === 'TRUE' ? '&nbsp;·&nbsp;<span style="color:var(--ink-faint);font-style:italic">Confidential</span>' : ''}
+      </div>`;
+    const markBtn = _el('btn-mark-answered');
+    if (markBtn) markBtn.style.display = _isAdmin() ? '' : 'none';
+    el.querySelectorAll('.prayer-item')?.forEach(x => x.classList.toggle('active', x.dataset.id === prayerId));
+  }
+
+  async function _markPrayerAnswered() {
+    if (!_activePrayerId) return;
+    await F.updateDoc(F.doc(db, _col('prayers'), _activePrayerId), {
+      status: 'Answered', answeredAt: F.serverTimestamp()
+    });
+    _toast('Marked as answered! 🎉', 'success');
+  }
+
+  async function _submitNewPrayer() {
+    const nameEl = _el('prayer-submit-name');
+    const textEl = _el('prayer-submit-text');
+    const catEl  = _el('prayer-submit-category');
+    const confEl = _el('prayer-submit-confidential');
+    const text = textEl?.value.trim() || '';
+    if (!text) { _toast('Please describe your prayer request.', 'error'); return; }
+    const okBtn = _el('prayer-modal-ok'); if (okBtn) okBtn.disabled = true;
+    await F.addDoc(F.collection(db, _col('prayers')), {
+      submitterName:  nameEl?.value.trim() || _me?.displayName || 'Anonymous',
+      submitterEmail: _me?.email || '',
+      submitterUid:   _me?.uid || '',
+      prayerText:     text,
+      category:       catEl?.value || '',
+      isConfidential: confEl?.checked ? 'TRUE' : 'FALSE',
+      status:         'New',
+      submittedAt:    F.serverTimestamp()
+    });
+    _closeModal(_el('prayer-modal'));
+    if (nameEl) nameEl.value = ''; if (textEl) textEl.value = '';
+    if (catEl) catEl.value = ''; if (confEl) confEl.checked = false;
+    if (okBtn) okBtn.disabled = false;
+    _toast('Prayer request submitted 🙏', 'success');
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ANNOUNCEMENTS
+  // ─────────────────────────────────────────────────────────────────────────
+  function _startAnnounceListener() {
+    if (_announceUnsub) return;
+    const q = F.query(F.collection(db, _col('broadcasts')), F.orderBy('createdAt', 'desc'), F.limit(50));
+    _announceUnsub = F.onSnapshot(q, snap => {
+      _announces = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      _renderAnnounceList();
+    }, () => {});
+  }
+
+  function _renderAnnounceList() {
+    const el = _el('announce-list'); if (!el) return;
+    if (!_announces.length) {
+      el.innerHTML = '<div style="text-align:center;padding:1.5rem 1rem;font-size:0.78rem;color:var(--ink-faint)"><div style="font-size:2rem">📢</div><p>No announcements yet.</p></div>';
+      return;
+    }
+    el.innerHTML = _announces.map(a => `
+      <div class="announce-item${_activeAnnounceId === a.id ? ' active' : ''}" data-id="${_esc(a.id)}" tabindex="0" role="button">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--announce-color)">${_esc(a.subject || 'Announcement')}</div>
+        <div style="font-size:0.7rem;color:var(--ink-faint);margin-top:2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${_esc(a.body || a.message || '')}</div>
+      </div>`).join('');
+    el.querySelectorAll('.announce-item').forEach(item => {
+      item.addEventListener('click', () => _openAnnouncement(item.dataset.id));
+      item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') _openAnnouncement(item.dataset.id); });
+    });
+  }
+
+  function _openAnnouncement(announceId) {
+    _activeAnnounceId = announceId; _activePrayerId = null;
+    const a = _announces.find(x => x.id === announceId); if (!a) return;
+    const panel = _el('announce-detail-panel');
+    const threadPane = _el('thread-pane');
+    const prayerPanel = _el('prayer-detail-panel');
+    if (threadPane) threadPane.style.display = 'none';
+    if (prayerPanel) prayerPanel.style.display = 'none';
+    if (panel) panel.style.display = 'flex';
+    const ts = a.createdAt?.toDate?.() || new Date();
+    const detail = _el('announce-detail-content');
+    if (detail) detail.innerHTML = `
+      <div style="display:inline-block;font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--announce-color);background:rgba(251,191,36,0.1);padding:2px 8px;border-radius:4px;margin-bottom:0.75rem">📢 Announcement</div>
+      <h2 style="font-size:1.05rem;font-weight:800;margin:0 0 0.5rem">${_esc(a.subject || 'Announcement')}</h2>
+      <p style="font-size:0.88rem;line-height:1.7;white-space:pre-wrap">${_esc(a.body || a.message || '')}</p>
+      <div style="font-size:0.72rem;color:var(--ink-faint);margin-top:0.85rem">${a.sentBy ? 'Posted by ' + _esc(a.sentBy) : ''} · ${ts.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })}</div>`;
+    el.querySelectorAll?.('.announce-item')?.forEach(x => x.classList.toggle('active', x.dataset.id === announceId));
+  }
+
+  async function _submitAnnouncement() {
+    const subjectEl = _el('announce-submit-subject');
+    const bodyEl    = _el('announce-submit-body');
+    const subject = subjectEl?.value.trim() || '';
+    const body    = bodyEl?.value.trim() || '';
+    if (!subject) { _toast('Please enter a subject.', 'error'); return; }
+    if (!body)    { _toast('Please write the announcement.', 'error'); return; }
+    const okBtn = _el('announce-modal-ok'); if (okBtn) okBtn.disabled = true;
+    await F.addDoc(F.collection(db, _col('broadcasts')), {
+      subject, body,
+      sentBy:    _me?.displayName || _me?.email || 'Admin',
+      sentByUid: _me?.uid || '',
+      audience:  'all',
+      createdAt: F.serverTimestamp()
+    });
+    _closeModal(_el('announce-modal'));
+    if (subjectEl) subjectEl.value = ''; if (bodyEl) bodyEl.value = '';
+    if (okBtn) okBtn.disabled = false;
+    _toast('Announcement posted! 📢', 'success');
+  }
+
+  function _bindPrayerUI() {
+    // Sidebar Prayer section
+    const prayerTab = _el('btn-nav-prayer');
+    if (prayerTab) prayerTab.addEventListener('click', () => {
+      _startPrayerListener();
+      const scroll = _el('sidebar-prayer-scroll');
+      const chatScroll = document.querySelector('.sidebar-scroll');
+      if (chatScroll) chatScroll.style.display = 'none';
+      if (scroll) scroll.style.display = '';
+      document.querySelectorAll('.sidebar-section-nav').forEach(b => b.classList.toggle('active', b === prayerTab));
+    });
+
+    // New Prayer btn
+    _el('btn-new-prayer')?.addEventListener('click', () => _openModal(_el('prayer-modal')));
+
+    // Modal buttons
+    _el('prayer-modal-cancel')?.addEventListener('click', () => _closeModal(_el('prayer-modal')));
+    _el('prayer-modal-ok')?.addEventListener('click', _submitNewPrayer);
+
+    // Mark answered
+    _el('btn-mark-answered')?.addEventListener('click', _markPrayerAnswered);
+
+    // Announce
+    const announceTab = _el('btn-nav-announce');
+    if (announceTab) announceTab.addEventListener('click', () => {
+      _startAnnounceListener();
+      const scroll = _el('sidebar-announce-scroll');
+      const chatScroll = document.querySelector('.sidebar-scroll');
+      if (chatScroll) chatScroll.style.display = 'none';
+      if (scroll) scroll.style.display = '';
+      document.querySelectorAll('.sidebar-section-nav').forEach(b => b.classList.toggle('active', b === announceTab));
+    });
+
+    const chatTab = _el('btn-nav-channels');
+    if (chatTab) chatTab.addEventListener('click', () => {
+      const chatScroll = document.querySelector('.sidebar-scroll');
+      if (chatScroll) chatScroll.style.display = '';
+      ['sidebar-prayer-scroll', 'sidebar-announce-scroll'].forEach(id => {
+        const el = _el(id); if (el) el.style.display = 'none';
+      });
+      document.querySelectorAll('.sidebar-section-nav').forEach(b => b.classList.toggle('active', b === chatTab));
+    });
+
+    // New Announce btn
+    _el('btn-new-announce')?.addEventListener('click', () => _openModal(_el('announce-modal')));
+    _el('announce-modal-cancel')?.addEventListener('click', () => _closeModal(_el('announce-modal')));
+    _el('announce-modal-ok')?.addEventListener('click', _submitAnnouncement);
+
+    // Reply bar cancel
+    _el('reply-cancel-btn')?.addEventListener('click', _clearReplyTarget);
+  }
+
+  function _openModal(el) { if (el) el.removeAttribute('hidden'); }
+  function _closeModal(el) { if (el) el.setAttribute('hidden', ''); }
 
   // ─────────────────────────────────────────────────────────────────────────
   return { init };
