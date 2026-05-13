@@ -182,10 +182,18 @@
 
     /* ── Sidebar ──────────────────────────────────────────────────────── */
     #bm-sidebar {
-      background: var(--bg-sunken);
-      border-right: 1px solid var(--bm-border);
+      background: var(--side-bg);
+      border-right: 1px solid rgba(255,255,255,0.06);
       display: flex; flex-direction: column;
       overflow: hidden;
+      color: var(--top-ink);
+      /* Dark-chrome token overrides scoped to sidebar */
+      --bm-ink:        var(--top-ink);
+      --bm-muted:      var(--top-ink-muted);
+      --bm-faint:      rgba(255,255,255,0.30);
+      --bm-border:     rgba(255,255,255,0.08);
+      --bm-border-lit: rgba(255,255,255,0.18);
+      --bg-overlay:    rgba(255,255,255,0.05);
     }
     #bm-sidebar-top {
       padding: 14px 12px 10px;
