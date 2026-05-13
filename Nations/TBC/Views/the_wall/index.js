@@ -49,6 +49,8 @@ const SECTIONS = [
         { label: 'Firebase Project',  value: projId,                       type: 'text'  },
         { label: 'GAS Endpoint',      value: 'Connected (TheScrolls)',      type: 'badge', status: 'ok'   },
         { label: 'Push Notifications',value: 'VAPID key set',              type: 'badge', status: 'ok'   },
+        { type: 'network-status-heading' },
+        { type: 'missions-source', id: 'ms-src-flock', label: 'Flock Network Status', desc: 'Core Flock platform connectivity', url: 'https://www.yhwh.one' },
         { label: 'Joshua Project API', type: 'jp-api' },
         { label: 'api.bible',           type: 'bible-api' },
         { type: 'missions-sources-heading' },
@@ -1060,6 +1062,7 @@ function _setBibleBadge(badge, state) {
 /* ── Missions sources polling ─────────────────────────────────────────────── */
 
 const _MISSIONS_SOURCES = [
+  { id: 'ms-src-flock', url: 'https://www.yhwh.one' },
   { id: 'ms-src-jp',  url: 'https://joshuaproject.net' },
   { id: 'ms-src-od',  url: 'https://www.opendoorsusa.org' },
   { id: 'ms-src-ow',  url: 'https://operationworld.org' },
@@ -3168,6 +3171,17 @@ function _settingRow(s) {
           </div>
           <a href="https://scripture.api.bible/sign-up" target="_blank" rel="noopener noreferrer"
             style="font-size:.75rem;color:var(--accent,#4a7fa5);text-decoration:none">Get a free key at api.bible ↗</a>
+        </div>
+      </div>`;
+  }
+  if (s.type === 'network-status-heading') {
+    return /* html */`
+      <div class="wall-setting-row" style="border-top:1px solid var(--line,#e5e7ef);margin-top:6px;padding-top:18px;align-items:center">
+        <div style="font:700 0.78rem var(--font-ui);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-muted,#7a7f96)">
+          Network Status
+        </div>
+        <div style="font:0.77rem var(--font-ui);color:var(--ink-muted,#7a7f96);text-align:right">
+          Live polling
         </div>
       </div>`;
   }
