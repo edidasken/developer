@@ -431,6 +431,28 @@
     .fs-nm-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(232,168,56,0.12); }
     .fs-nm-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
+    /* ── Confirm modal ──────────────────────────────────────────────── */
+    #fs-confirm-modal {
+      position: fixed; inset: 0; z-index: 1001;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #fs-confirm-modal[hidden] { display: none !important; }
+    .fs-cm-backdrop {
+      position: absolute; inset: 0;
+      background: var(--modal-dim); backdrop-filter: blur(4px);
+    }
+    .fs-cm-box {
+      position: relative; z-index: 1;
+      background: var(--bg-raised); border: 1px solid var(--line);
+      border-radius: 16px; width: min(380px, 92vw);
+      padding: 22px 24px 18px;
+      box-shadow: 0 24px 72px rgba(0,0,0,0.18);
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .fs-cm-title { font: 700 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--ink); }
+    .fs-cm-msg   { font: 0.84rem 'Plus Jakarta Sans', sans-serif; color: var(--ink-muted); line-height: 1.5; }
+    .fs-cm-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
     /* ── Song picker modal (Flock Stand import) ─────────────────────── */
     #fs-song-picker {
       position: fixed; inset: 0; z-index: 1000;
@@ -818,6 +840,19 @@
     <div class="fs-nm-actions">
       <button class="fs-btn fs-btn--ghost" id="fs-nm-cancel">Cancel</button>
       <button class="fs-btn fs-btn--primary" id="fs-nm-ok">Create Show</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm modal (delete show, delete slide, sign out) -->
+<div id="fs-confirm-modal" hidden aria-modal="true" role="alertdialog">
+  <div class="fs-cm-backdrop" id="fs-cm-backdrop"></div>
+  <div class="fs-cm-box">
+    <div class="fs-cm-title" id="fs-cm-title">Are you sure?</div>
+    <div class="fs-cm-msg"   id="fs-cm-msg"></div>
+    <div class="fs-cm-actions">
+      <button class="fs-btn fs-btn--ghost"  id="fs-cm-cancel">Cancel</button>
+      <button class="fs-btn fs-btn--danger" id="fs-cm-ok">Delete</button>
     </div>
   </div>
 </div>

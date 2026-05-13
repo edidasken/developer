@@ -88,7 +88,7 @@ function _lsSync() {
 async function _load() {
   if (_fsFB()) {
     try {
-      const result = await window.UpperRoom.listPresentations({ pageSize: 200 });
+      const result = await window.UpperRoom.listPresentations({ limit: 200 });
       const rows = Array.isArray(result) ? result : (result.results || result.rows || []);
       _st.shows = rows.map(r => { r._fsId = r.id; return r; });
       _lsSync();
@@ -611,6 +611,40 @@ function _openNameModal(defaultValue, title, onConfirm) {
   input.addEventListener('keydown', _key);
 }
 
+// Open the #fs-confirm-modal and call onConfirm() when OK is pressed
+function _openConfirmModal(title, msg, okLabel, onConfirm) {
+  const modal     = document.getElementById('fs-confirm-modal');
+  const titleEl   = document.getElementById('fs-cm-title');
+  const msgEl     = document.getElementById('fs-cm-msg');
+  const okBtn     = document.getElementById('fs-cm-ok');
+  const cancelBtn = document.getElementById('fs-cm-cancel');
+  const backdrop  = document.getElementById('fs-cm-backdrop');
+  if (!modal) { if (window.confirm(msg)) onConfirm(); return; }
+
+  if (titleEl) titleEl.textContent = title;
+  if (msgEl)   msgEl.textContent   = msg;
+  if (okBtn)   okBtn.textContent   = okLabel || 'Confirm';
+  modal.hidden = false;
+  okBtn.focus();
+
+  function _close() {
+    modal.hidden = true;
+    okBtn.removeEventListener('click', _ok);
+    cancelBtn.removeEventListener('click', _close);
+    backdrop.removeEventListener('click', _close);
+    document.removeEventListener('keydown', _key);
+  }
+  function _ok() { _close(); onConfirm(); }
+  function _key(e) {
+    if (e.key === 'Enter')  { e.preventDefault(); _ok(); }
+    if (e.key === 'Escape') { _close(); }
+  }
+  okBtn.addEventListener('click', _ok);
+  cancelBtn.addEventListener('click', _close);
+  backdrop.addEventListener('click', _close);
+  document.addEventListener('keydown', _key);
+}
+
 function _dupShow(id) {
   const src = _st.shows.find(s => s.id === id);
   if (!src) return;
@@ -629,12 +663,18 @@ function _dupShow(id) {
 function _delShow(id) {
   const show = _st.shows.find(s => s.id === id);
   if (!show) return;
-  if (!confirm(`Delete "${show.name}"? This cannot be undone.`)) return;
-  _st.shows = _st.shows.filter(s => s.id !== id);
-  if (_st.activeId === id) { _st.activeId = null; _setView('library'); }
-  _removeShow(show); // handles Firestore/GAS deletion + lsSync
-  _renderLibrary();
-  _renderHeader();
+  _openConfirmModal(
+    'Delete Show',
+    `"${show.name}" will be permanently deleted. This cannot be undone.`,
+    'Delete',
+    () => {
+      _st.shows = _st.shows.filter(s => s.id !== id);
+      if (_st.activeId === id) { _st.activeId = null; _setView('library'); }
+      _removeShow(show);
+      _renderLibrary();
+      _renderHeader();
+    }
+  );
 }
 
 // ── Slide CRUD ────────────────────────────────────────────────────────────────
@@ -671,14 +711,15 @@ function _delSlide() {
     alert('A show must have at least one slide.');
     return;
   }
-  if (!confirm('Delete this slide?')) return;
-  show.slides.splice(_st.activeSlide, 1);
-  _st.activeSlide = Math.min(_st.activeSlide, show.slides.length - 1);
-  _touch(show);
-  _renderSlideList();
-  _renderPreview();
-  _renderProps();
-  _pushToPresent();
+  _openConfirmModal('Delete Slide', 'This slide will be permanently removed.', 'Delete', () => {
+    show.slides.splice(_st.activeSlide, 1);
+    _st.activeSlide = Math.min(_st.activeSlide, show.slides.length - 1);
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _renderProps();
+    _pushToPresent();
+  });
 }
 
 function _selectSlide(idx) {
@@ -1358,10 +1399,10 @@ function _renderUserChip(N) {
   chip.removeAttribute('hidden');
 
   chip.addEventListener('click', () => {
-    if (confirm(`Sign out of FlockShow?\n(${displayName})`)) {
+    _openConfirmModal('Sign Out', `Sign out of FlockShow? (${displayName})`, 'Sign Out', () => {
       if (N && typeof N.logout === 'function') N.logout();
       else location.reload();
-    }
+    });
   });
 }
 

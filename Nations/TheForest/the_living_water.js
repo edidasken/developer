@@ -288,7 +288,9 @@ self.addEventListener('install', (event) => {
       }
     })
   );
-  self.skipWaiting();
+  /* Do NOT call self.skipWaiting() here — let the launcher detect the
+     waiting SW and show the "Update Available" banner. The user then
+     explicitly triggers the update, which sends SKIP_WAITING. */
 });
 
 /* ─── Activate: purge old caches ────────────────────────────────────────────── */

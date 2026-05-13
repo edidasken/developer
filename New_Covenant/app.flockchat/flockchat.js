@@ -613,9 +613,10 @@
   }
 
   async function _deleteMessage(msgId){
-    if(!confirm('Delete this message?')) return;
-    const colName=_activeType==='channel'?'channels':'dms';
-    await _db.collection(colName).doc(_activeId).collection('messages').doc(msgId).update({deletedAt:firebase.firestore.FieldValue.serverTimestamp(),text:''});
+    _openConfirmModal('Delete Message', 'This message will be permanently deleted.', 'Delete', async () => {
+      const colName=_activeType==='channel'?'channels':'dms';
+      await _db.collection(colName).doc(_activeId).collection('messages').doc(msgId).update({deletedAt:firebase.firestore.FieldValue.serverTimestamp(),text:''});
+    });
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -739,11 +740,12 @@
     _toast('Joined #'+ch.name+'!','success');
   }
   async function _leaveChannel(chId,chName){
-    if(!confirm('Leave #'+chName+'?')) return;
-    await _db.collection('channels').doc(chId).update({members:firebase.firestore.FieldValue.arrayRemove(_me.uid)});
-    _activeId=null; _activeType=null;
-    _showWelcome(); _renderChannelList();
-    _toast('Left #'+chName);
+    _openConfirmModal('Leave Channel', `Leave #${chName}? You can rejoin at any time.`, 'Leave', async () => {
+      await _db.collection('channels').doc(chId).update({members:firebase.firestore.FieldValue.arrayRemove(_me.uid)});
+      _activeId=null; _activeType=null;
+      _showWelcome(); _renderChannelList();
+      _toast('Left #'+chName);
+    });
   }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -951,10 +953,11 @@
       });
       container.querySelectorAll('.fc-admin-remove-btn').forEach(btn=>{
         btn.addEventListener('click',async()=>{
-          if(!confirm('Remove '+btn.dataset.name+'?')) return;
-          await _db.collection('users').doc(btn.dataset.uid).delete();
-          $('adrow-'+btn.dataset.uid)?.remove();
-          _toast(btn.dataset.name+' removed.');
+          _openConfirmModal('Remove User', `Remove ${btn.dataset.name} from this workspace?`, 'Remove', async () => {
+            await _db.collection('users').doc(btn.dataset.uid).delete();
+            $('adrow-'+btn.dataset.uid)?.remove();
+            _toast(btn.dataset.name+' removed.');
+          });
         });
       });
     }catch(err){container.innerHTML='<p style="color:var(--fc-danger)">Could not load users.</p>';console.error(err);}
@@ -1001,6 +1004,25 @@
   ═══════════════════════════════════════════════════════════════════ */
   function _openModal(id){const el=$(id);if(el)el.removeAttribute('hidden');}
   function _closeModal(id){const el=$(id);if(el)el.setAttribute('hidden','');}
+
+  /* Inline confirm modal — renders into body, calls onConfirm() on OK */
+  function _openConfirmModal(title, msg, okLabel, onConfirm) {
+    const id = 'fc-confirm-' + Date.now();
+    document.body.insertAdjacentHTML('beforeend', `
+      <div id="${id}" class="fc-modal-backdrop">
+        <div class="fc-modal" style="max-width:360px">
+          <h3>${title}</h3>
+          <p style="font-size:0.84rem;color:var(--fc-muted);line-height:1.5;margin:0 0 16px">${msg}</p>
+          <div class="fc-modal-actions">
+            <button class="fc-btn fc-btn--ghost" id="${id}-cancel">Cancel</button>
+            <button class="fc-btn fc-btn--danger" id="${id}-ok">${okLabel || 'Confirm'}</button>
+          </div>
+        </div>
+      </div>`);
+    function _close() { document.getElementById(id)?.remove(); }
+    document.getElementById(`${id}-ok`).onclick     = () => { _close(); onConfirm(); };
+    document.getElementById(`${id}-cancel`).onclick  = _close;
+  }
 
   /* ═══════════════════════════════════════════════════════════════════
      PANEL ROUTING

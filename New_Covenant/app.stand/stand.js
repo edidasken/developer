@@ -88,6 +88,44 @@ function _fb() {
          UpperRoom.isReady();
 }
 
+/* Confirm modal — renders into #ms-sheet-host, calls onConfirm() on OK */
+function _openConfirmModal(title, msg, okLabel, onConfirm) {
+  const host = document.getElementById('ms-sheet-host');
+  if (!host) { if (window.confirm(msg)) onConfirm(); return; }
+  const id = 'ms-confirm-' + Date.now();
+  host.insertAdjacentHTML('beforeend', `
+    <div id="${id}" style="
+      position:fixed;inset:0;z-index:1100;
+      display:flex;align-items:center;justify-content:center;">
+      <div style="
+        position:absolute;inset:0;
+        background:var(--modal-dim);backdrop-filter:blur(4px);"
+        id="${id}-bd"></div>
+      <div style="
+        position:relative;z-index:1;
+        background:var(--bg-raised);border:1px solid var(--line);
+        border-radius:16px;width:min(360px,92vw);
+        padding:22px 24px 18px;
+        box-shadow:0 24px 72px rgba(0,0,0,0.22);
+        display:flex;flex-direction:column;gap:12px;">
+        <div style="font:700 0.95rem 'Plus Jakarta Sans',sans-serif;color:var(--ink)">${title}</div>
+        <div style="font:0.84rem 'Plus Jakarta Sans',sans-serif;color:var(--ink-muted);line-height:1.5">${msg}</div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button id="${id}-cancel" style="
+            padding:8px 16px;border-radius:8px;border:1px solid var(--line);
+            background:transparent;color:var(--ink);font:600 0.84rem 'Plus Jakarta Sans',sans-serif;cursor:pointer">Cancel</button>
+          <button id="${id}-ok" style="
+            padding:8px 16px;border-radius:8px;border:none;
+            background:#ef4444;color:#fff;font:600 0.84rem 'Plus Jakarta Sans',sans-serif;cursor:pointer">${okLabel || 'Delete'}</button>
+        </div>
+      </div>
+    </div>`);
+  function _close() { document.getElementById(id)?.remove(); }
+  document.getElementById(`${id}-ok`).onclick     = () => { _close(); onConfirm(); };
+  document.getElementById(`${id}-cancel`).onclick  = _close;
+  document.getElementById(`${id}-bd`).onclick      = _close;
+}
+
 function _fmtDate(raw) {
   if (!raw) return '';
   const s = String(raw);
@@ -683,13 +721,19 @@ async function _loadAndRenderPlans(main) {
         e.stopPropagation();
         const plan = S.plans.find(p => p.id === btn.dataset.planId);
         if (!plan) return;
-        if (!confirm(`Delete "${plan.serviceType || 'Service Plan'}" on ${_fmtDate(plan.serviceDate)}?`)) return;
-        try {
-          if (_fb() && UpperRoom.deleteServicePlan) await UpperRoom.deleteServicePlan(plan.id);
-          S.plans = S.plans.filter(p => p.id !== plan.id);
-          _toast('Plan deleted', 'success');
-          _renderServices(main);
-        } catch (err) { _toast('Delete failed: ' + err.message, 'error'); }
+        _openConfirmModal(
+          'Delete Service Plan',
+          `Delete "${plan.serviceType || 'Service Plan'}" on ${_fmtDate(plan.serviceDate)}? This cannot be undone.`,
+          'Delete',
+          async () => {
+            try {
+              if (_fb() && UpperRoom.deleteServicePlan) await UpperRoom.deleteServicePlan(plan.id);
+              S.plans = S.plans.filter(p => p.id !== plan.id);
+              _toast('Plan deleted', 'success');
+              _renderServices(main);
+            } catch (err) { _toast('Delete failed: ' + err.message, 'error'); }
+          }
+        );
       });
     });
   } catch (err) {
