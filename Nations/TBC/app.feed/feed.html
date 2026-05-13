@@ -583,6 +583,123 @@
       .bmp-prayer-item-notes { font: 10pt/1.6 Georgia, serif; color: #444; }
     }
 
+    /* ════════════════════════════════════════════════════
+       PRESENTATION MODE — fullscreen sermon view
+    ════════════════════════════════════════════════════ */
+    #bm-present-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #faf7f1; color: #1a1a1a;
+      display: none; flex-direction: column;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    #bm-present-overlay.is-open { display: flex; }
+
+    .bm-present-toolbar {
+      flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; background: #1a1320; color: #fff;
+      border-bottom: 2px solid #c48a20;
+    }
+    .bm-present-toolbar-title {
+      flex: 1; min-width: 0;
+      font: 600 0.95rem 'Plus Jakarta Sans', sans-serif;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      color: #f5e9c8;
+    }
+    .bm-present-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+      padding: 6px 11px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.07); color: #fff;
+      font: 600 0.78rem 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; transition: all 0.13s; flex-shrink: 0;
+    }
+    .bm-present-btn:hover { background: rgba(255,255,255,0.16); }
+    .bm-present-btn--icon { width: 32px; height: 32px; padding: 0; }
+    .bm-present-btn--exit { background: rgba(248,113,113,0.18); border-color: rgba(248,113,113,0.35); color: #fecaca; }
+    .bm-present-btn--exit:hover { background: rgba(248,113,113,0.30); color: #fff; }
+    .bm-present-fontsize {
+      display: inline-flex; align-items: center; gap: 0;
+      border: 1px solid rgba(255,255,255,0.18); border-radius: 8px; overflow: hidden;
+      flex-shrink: 0;
+    }
+    .bm-present-fontsize button {
+      width: 30px; height: 30px; background: rgba(255,255,255,0.05); border: none;
+      color: #fff; cursor: pointer; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .bm-present-fontsize button:hover { background: rgba(255,255,255,0.16); }
+    .bm-present-fontsize button + button { border-left: 1px solid rgba(255,255,255,0.18); }
+
+    .bm-present-wake-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #34d399; box-shadow: 0 0 8px rgba(52,211,153,0.8);
+      flex-shrink: 0; animation: bm-wake-pulse 2s ease-in-out infinite;
+    }
+    .bm-present-wake-dot.is-off { background: #6b7280; box-shadow: none; animation: none; }
+    @keyframes bm-wake-pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .bm-present-scroll {
+      flex: 1; overflow-y: auto; overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: 36px 48px 80px;
+      font-size: var(--bmpres-scale, 1rem);
+    }
+    .bm-present-scroll::-webkit-scrollbar { width: 8px; }
+    .bm-present-scroll::-webkit-scrollbar-thumb { background: rgba(196,138,32,0.35); border-radius: 4px; }
+
+    /* Screen-mode .bmp-* (mirrors print but in pixels & scalable) */
+    #bm-present-overlay #bmp-wrap { max-width: 880px; margin: 0 auto; }
+    #bm-present-overlay #bmp-header { margin-bottom: 28px; }
+    #bm-present-overlay #bmp-header-bar { height: 7px; background: linear-gradient(90deg, #c48a20, #e8a838); border-radius: 3px; margin-bottom: 18px; }
+    #bm-present-overlay #bmp-header-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; gap: 12px; flex-wrap: wrap; }
+    #bm-present-overlay #bmp-series { font: 600 0.85em 'Plus Jakarta Sans', sans-serif; color: #c48a20; text-transform: uppercase; letter-spacing: .08em; }
+    #bm-present-overlay #bmp-date { font: 400 0.85em 'Plus Jakarta Sans', sans-serif; color: #888; }
+    #bm-present-overlay #bmp-title { font: 700 2.2em 'Plus Jakarta Sans', sans-serif; color: #0f0f0f; margin: 0 0 12px; line-height: 1.18; }
+    #bm-present-overlay #bmp-meta-row { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 6px; padding-top: 10px; border-top: 2px solid #e8a838; }
+    #bm-present-overlay .bmp-meta-chip { font: 500 0.88em 'Plus Jakarta Sans', sans-serif; color: #555; }
+
+    #bm-present-overlay #bmp-sections { display: flex; flex-direction: column; gap: 14px; }
+    #bm-present-overlay .bmp-section { display: flex; border: 1px solid #e2ded8; border-radius: 8px; overflow: hidden; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+    #bm-present-overlay .bmp-section-accent { width: 6px; flex-shrink: 0; }
+    #bm-present-overlay .bmp-section-content { flex: 1; padding: 14px 18px; min-width: 0; }
+    #bm-present-overlay .bmp-section-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+    #bm-present-overlay .bmp-type-pill { font: 700 0.65em 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; letter-spacing: .10em; border: 1.5px solid; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; }
+    #bm-present-overlay .bmp-section-title { font: 600 1.18em 'Plus Jakarta Sans', sans-serif; color: #111; line-height: 1.3; }
+    #bm-present-overlay .bmp-transition-section { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border: none; border-top: 1px dashed #ccc; border-bottom: 1px dashed #ccc; background: transparent; box-shadow: none; }
+    #bm-present-overlay .bmp-transition-section .bmp-section-accent { display: none; }
+
+    #bm-present-overlay .bmp-verse-block { margin: 8px 0; padding: 10px 14px; background: #fef9ec; border-left: 4px solid #e8a838; border-radius: 0 6px 6px 0; }
+    #bm-present-overlay .bmp-verse-ref { font: 700 1em 'Plus Jakarta Sans', sans-serif; color: #c48a20; margin-bottom: 5px; }
+    #bm-present-overlay .bmp-verse-text { font: italic 1.15em/1.72 Georgia, serif; color: #2c2c2c; }
+
+    #bm-present-overlay .bmp-notes { font: 1.08em/1.72 Georgia, serif; color: #2c2c2c; white-space: normal; }
+
+    #bm-present-overlay #bmp-prayer { margin-top: 26px; padding-top: 18px; border-top: 2px solid #7c3aed; }
+    #bm-present-overlay #bmp-prayer-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    #bm-present-overlay #bmp-prayer-bar { width: 5px; height: 20px; background: #7c3aed; border-radius: 2px; flex-shrink: 0; }
+    #bm-present-overlay #bmp-prayer-label { font: 700 1em 'Plus Jakarta Sans', sans-serif; color: #7c3aed; text-transform: uppercase; letter-spacing: .10em; }
+    #bm-present-overlay .bmp-prayer-item { margin-bottom: 12px; padding: 8px 14px; border-left: 3px solid #e9d5ff; background: #faf5ff; border-radius: 0 6px 6px 0; }
+    #bm-present-overlay .bmp-prayer-item-title { font: 700 1.05em 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; margin-bottom: 4px; }
+    #bm-present-overlay .bmp-prayer-item-notes { font: 1em/1.65 Georgia, serif; color: #444; }
+
+    /* Mobile responsive for present mode */
+    @media (max-width: 700px) {
+      .bm-present-toolbar { padding: 8px 10px; gap: 6px; }
+      .bm-present-toolbar-title { font-size: 0.82rem; }
+      .bm-present-btn { padding: 5px 8px; font-size: 0.72rem; }
+      .bm-present-btn--icon { width: 30px; height: 30px; }
+      .bm-present-fontsize button { width: 28px; height: 28px; }
+      .bm-present-scroll { padding: 18px 14px 60px; }
+      #bm-present-overlay #bmp-title { font-size: 1.6em; }
+      #bm-present-overlay #bmp-section-content { padding: 12px 14px; }
+      #bm-present-overlay .bmp-section-content { padding: 12px 14px; }
+      #bm-present-overlay .bmp-section-title { font-size: 1.05em; }
+      #bm-present-overlay .bmp-verse-text { font-size: 1.05em; line-height: 1.65; }
+      #bm-present-overlay .bmp-notes { font-size: 1em; line-height: 1.65; }
+    }
+
     /* ── Outline sidebar (scripture lookup, word count) ──────────────── */
     #bm-outline-sidebar {
       width: 280px; flex-shrink: 0;
@@ -1155,6 +1272,10 @@
       <button class="bm-btn bm-btn--ghost bm-btn--sm" id="bm-send-flockshow-btn" title="Send to FlockShow" disabled style="color:var(--bm-accent)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
         <span class="bm-btn-label-hide">FlockShow</span>
+      </button>
+      <button class="bm-btn bm-btn--ghost bm-btn--sm" id="bm-present-btn" title="Present sermon (fullscreen)" disabled>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span class="bm-btn-label-hide">Present</span>
       </button>
       <button class="bm-btn bm-btn--success bm-btn--sm" id="bm-save-btn" disabled title="Save sermon (Ctrl+S)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>

@@ -928,9 +928,11 @@ function _selectSermon(id) {
   const dupBtn  = _qs('bm-duplicate-btn');
   const cpyBtn  = _qs('bm-copy-outline-btn');
   const fsBtn   = _qs('bm-send-flockshow-btn');
+  const presBtn = _qs('bm-present-btn');
   if (dupBtn)  dupBtn.disabled  = false;
   if (cpyBtn)  cpyBtn.disabled  = false;
   if (fsBtn)   fsBtn.disabled   = false;
+  if (presBtn) presBtn.disabled = false;
 
   _renderList();
   _renderEditor();
@@ -1126,6 +1128,223 @@ function _doPrint() {
   document.body.appendChild(doc);
   window.print();
   document.body.removeChild(doc);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   PRESENTATION MODE — fullscreen, wake-locked, mobile-responsive
+═════════════════════════════════════════════════════════════════════════ */
+let _presentWakeLock = null;
+let _presentScale = 1;
+
+function _buildPresentHtml(s) {
+  const _TYPE = {
+    intro:        { label: 'INTRO',        color: '#0284c7' },
+    scripture:    { label: 'SCRIPTURE',    color: '#c48a20' },
+    point:        { label: 'POINT',        color: '#7c3aed' },
+    illustration: { label: 'ILLUSTRATION', color: '#059669' },
+    explanation:  { label: 'EXPLANATION',  color: '#0f766e' },
+    application:  { label: 'APPLICATION',  color: '#ea580c' },
+    prayer:       { label: 'PRAYER',       color: '#7c3aed' },
+    conclusion:   { label: 'CONCLUSION',   color: '#c48a20' },
+    transition:   { label: 'TRANSITION',   color: '#94a3b8' },
+  };
+  const dateStr = s.date
+    ? new Date(s.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    : '';
+
+  let html = '<div id="bmp-wrap">';
+  html += `
+    <div id="bmp-header">
+      <div id="bmp-header-bar"></div>
+      <div id="bmp-header-body">
+        <div id="bmp-header-top">
+          ${s.series ? `<span id="bmp-series">${_e(s.series)}</span>` : '<span></span>'}
+          ${dateStr ? `<span id="bmp-date">${_e(dateStr)}</span>` : ''}
+        </div>
+        <h1 id="bmp-title">${_e(s.title || 'Untitled Sermon')}</h1>
+        <div id="bmp-meta-row">
+          ${s.passage ? `<span class="bmp-meta-chip">&#128214; ${_e(s.passage)}</span>` : ''}
+          ${s.speaker ? `<span class="bmp-meta-chip">&#9998; ${_e(s.speaker)}</span>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+
+  html += '<div id="bmp-sections">';
+  const prayerSections = [];
+  (s.sections || []).forEach(sec => {
+    if (sec.type === 'prayer') { prayerSections.push(sec); return; }
+    const t      = _TYPE[sec.type] || _TYPE.point;
+    const title  = (sec.title       || '').trim();
+    const notes  = (sec.notes       || '').trim();
+    const ref    = (sec.scriptureRef|| '').trim();
+    const verse  = (sec.scripture   || '').trim();
+    if (!title && !notes && !ref && !verse) return;
+    const isTransition = sec.type === 'transition';
+    html += `
+      <div class="bmp-section${isTransition ? ' bmp-transition-section' : ''}">
+        <div class="bmp-section-accent" style="background:${t.color}"></div>
+        <div class="bmp-section-content">
+          <div class="bmp-section-head">
+            <span class="bmp-type-pill" style="color:${t.color};border-color:${t.color}">${t.label}</span>
+            ${title ? `<span class="bmp-section-title">${_e(title)}</span>` : ''}
+          </div>
+          ${sec.type === 'scripture' && (ref || verse) ? `
+            <div class="bmp-verse-block">
+              ${ref   ? `<div class="bmp-verse-ref">${_e(ref)}</div>` : ''}
+              ${verse ? `<div class="bmp-verse-text">${_e(verse)}</div>` : ''}
+            </div>
+          ` : ''}
+          ${notes ? `<div class="bmp-notes">${_e(notes).replace(/\n/g, '<br>')}</div>` : ''}
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+
+  const prepEl   = document.getElementById('bm-prayer-prep');
+  const prepText = prepEl ? prepEl.value.trim() : '';
+  if (prayerSections.length || prepText) {
+    html += '<div id="bmp-prayer">';
+    html += `
+      <div id="bmp-prayer-head">
+        <div id="bmp-prayer-bar"></div>
+        <span id="bmp-prayer-label">PRAYER POINTS</span>
+      </div>
+    `;
+    if (prepText) {
+      html += `<div class="bmp-prayer-item">
+        <div class="bmp-prayer-item-title">Pre-Sermon Prayer</div>
+        <div class="bmp-prayer-item-notes">${_e(prepText).replace(/\n/g, '<br>')}</div>
+      </div>`;
+    }
+    prayerSections.forEach(sec => {
+      const title = (sec.title || '').trim();
+      const notes = (sec.notes || '').trim();
+      if (!title && !notes) return;
+      html += `<div class="bmp-prayer-item">
+        ${title ? `<div class="bmp-prayer-item-title">${_e(title)}</div>` : ''}
+        ${notes ? `<div class="bmp-prayer-item-notes">${_e(notes).replace(/\n/g, '<br>')}</div>` : ''}
+      </div>`;
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+async function _acquireWakeLock(dotEl) {
+  if (!('wakeLock' in navigator)) {
+    if (dotEl) { dotEl.classList.add('is-off'); dotEl.title = 'Wake Lock not supported on this browser'; }
+    return;
+  }
+  try {
+    _presentWakeLock = await navigator.wakeLock.request('screen');
+    if (dotEl) { dotEl.classList.remove('is-off'); dotEl.title = 'Screen will stay awake'; }
+    _presentWakeLock.addEventListener('release', () => {
+      if (dotEl) dotEl.classList.add('is-off');
+    });
+  } catch (err) {
+    if (dotEl) { dotEl.classList.add('is-off'); dotEl.title = 'Wake Lock denied: ' + (err && err.message || err); }
+  }
+}
+
+async function _releaseWakeLock() {
+  try { if (_presentWakeLock) await _presentWakeLock.release(); } catch {}
+  _presentWakeLock = null;
+}
+
+function _applyPresentScale(overlay) {
+  const scroll = overlay.querySelector('.bm-present-scroll');
+  if (scroll) scroll.style.setProperty('--bmpres-scale', _presentScale + 'rem');
+}
+
+function _exitPresent() {
+  const overlay = document.getElementById('bm-present-overlay');
+  if (!overlay) return;
+  overlay.classList.remove('is-open');
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(() => {});
+  }
+  _releaseWakeLock();
+  document.removeEventListener('keydown', _presentKeyHandler);
+  document.removeEventListener('visibilitychange', _presentVisHandler);
+  setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 50);
+}
+
+function _presentKeyHandler(e) {
+  if (e.key === 'Escape') { e.preventDefault(); _exitPresent(); }
+}
+function _presentVisHandler() {
+  // Re-acquire wake lock when tab returns to foreground (lock auto-released on visibility change)
+  if (document.visibilityState === 'visible' && document.getElementById('bm-present-overlay')) {
+    const dot = document.getElementById('bm-present-wake-dot');
+    _acquireWakeLock(dot);
+  }
+}
+
+function _doPresent() {
+  const s = _active();
+  if (!s) { _toast('No sermon selected', 'error'); return; }
+
+  // Remove any existing overlay
+  const existing = document.getElementById('bm-present-overlay');
+  if (existing) existing.parentNode.removeChild(existing);
+
+  _presentScale = 1;
+  const overlay = document.createElement('div');
+  overlay.id = 'bm-present-overlay';
+  overlay.innerHTML = `
+    <div class="bm-present-toolbar">
+      <span class="bm-present-wake-dot is-off" id="bm-present-wake-dot" title="Screen wake status"></span>
+      <span class="bm-present-toolbar-title">${_e(s.title || 'Untitled Sermon')}</span>
+      <div class="bm-present-fontsize" title="Adjust text size">
+        <button type="button" id="bm-present-font-down" aria-label="Decrease text size">A−</button>
+        <button type="button" id="bm-present-font-up" aria-label="Increase text size">A+</button>
+      </div>
+      <button type="button" class="bm-present-btn bm-present-btn--icon" id="bm-present-fs-btn" title="Toggle fullscreen" aria-label="Toggle fullscreen">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6"/></svg>
+      </button>
+      <button type="button" class="bm-present-btn bm-present-btn--exit" id="bm-present-exit-btn" title="Exit presentation (Esc)">Exit</button>
+    </div>
+    <div class="bm-present-scroll" id="bm-present-scroll"></div>
+  `;
+  document.body.appendChild(overlay);
+
+  const scroll = overlay.querySelector('#bm-present-scroll');
+  scroll.innerHTML = _buildPresentHtml(s);
+  _applyPresentScale(overlay);
+
+  overlay.classList.add('is-open');
+
+  // Wire toolbar buttons
+  const dot = overlay.querySelector('#bm-present-wake-dot');
+  overlay.querySelector('#bm-present-exit-btn').addEventListener('click', _exitPresent);
+  overlay.querySelector('#bm-present-fs-btn').addEventListener('click', () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    } else {
+      overlay.requestFullscreen().catch(() => {});
+    }
+  });
+  overlay.querySelector('#bm-present-font-up').addEventListener('click', () => {
+    _presentScale = Math.min(1.8, _presentScale + 0.1);
+    _applyPresentScale(overlay);
+  });
+  overlay.querySelector('#bm-present-font-down').addEventListener('click', () => {
+    _presentScale = Math.max(0.7, _presentScale - 0.1);
+    _applyPresentScale(overlay);
+  });
+
+  // Keyboard + visibility listeners
+  document.addEventListener('keydown', _presentKeyHandler);
+  document.addEventListener('visibilitychange', _presentVisHandler);
+
+  // Request fullscreen + wake lock (user gesture preserved)
+  if (overlay.requestFullscreen) {
+    overlay.requestFullscreen().catch(() => { /* user can toggle later */ });
+  }
+  _acquireWakeLock(dot);
 }
 
 async function _copyOutline() {  const s = _active();
@@ -2109,6 +2328,10 @@ async function _init() {
   // Send to FlockShow
   const fsBtn = _qs('bm-send-flockshow-btn');
   if (fsBtn) fsBtn.addEventListener('click', _sendToFlockShow);
+
+  // Present (fullscreen)
+  const presBtn = _qs('bm-present-btn');
+  if (presBtn) presBtn.addEventListener('click', _doPresent);
 
   // Print / export to PDF
   const printBtn = _qs('bm-print-btn');
