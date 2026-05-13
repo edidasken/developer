@@ -611,7 +611,100 @@ function _renderManuscript() {
     area.value = s.manuscript || '';
     _autoResize(area);
   }
+  _refreshMsPreview();
   _updateStats();
+}
+
+// ── Manuscript preview renderer ───────────────────────────────────────────────
+function _renderInlineCues(text) {
+  // Escape HTML, then replace delivery cues with styled badges
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\[PAUSE\]/g,    '<span class="bm-ms-cue bm-ms-cue--pause">PAUSE</span>')
+    .replace(/\[EMPHASIS\]/g, '<span class="bm-ms-cue bm-ms-cue--emph">EMPH</span>')
+    .replace(/\[STORY\]/g,    '<span class="bm-ms-cue bm-ms-cue--story">STORY</span>')
+    .replace(/¶/g,            '<span class="bm-ms-cue bm-ms-cue--para">¶</span>');
+}
+
+function _buildMsHtml(raw) {
+  if (!raw || !raw.trim()) {
+    return '<div class="bm-ms-empty">No manuscript yet. Import your outline or switch to Edit to start writing.</div>';
+  }
+
+  const lines = raw.split('\n');
+  let html = '';
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Section header == TEXT ==
+    const headerMatch = trimmed.match(/^==\s*(.+?)\s*==\s*$/);
+    if (headerMatch) {
+      html += `<div class="bm-ms-sec-head">${headerMatch[1]}</div>`;
+      i++; continue;
+    }
+
+    // Scripture reference on its own line: [Ref]
+    const scrRefMatch = trimmed.match(/^\[(.+?)\]$/);
+    if (scrRefMatch) {
+      html += `<div class="bm-ms-scripture-wrap"><div class="bm-ms-scripture-ref">${scrRefMatch[1]}</div>`;
+      i++;
+      // Collect subsequent non-header, non-bracket lines as scripture body
+      let body = '';
+      while (i < lines.length) {
+        const next = lines[i].trim();
+        if (!next || next.match(/^==/) || next.match(/^\[/)) break;
+        body += (body ? ' ' : '') + next;
+        i++;
+      }
+      if (body) html += `<div class="bm-ms-scripture-text">${_renderInlineCues(body)}</div>`;
+      html += '</div>';
+      continue;
+    }
+
+    // Empty line
+    if (!trimmed) {
+      i++; continue;
+    }
+
+    // Regular paragraph
+    html += `<p class="bm-ms-para">${_renderInlineCues(trimmed)}</p>`;
+    i++;
+  }
+
+  return html;
+}
+
+let _msPreviewMode = true;  // default: preview
+
+function _refreshMsPreview() {
+  const area    = _qs('bm-manuscript-area');
+  const preview = document.getElementById('bm-ms-preview');
+  const pane    = document.getElementById('bm-pane-manuscript');
+  if (!preview) return;
+  const raw = area ? area.value : (_active() ? (_active().manuscript || '') : '');
+  preview.innerHTML = _buildMsHtml(raw);
+  if (pane) pane.classList.toggle('bm-preview-mode', _msPreviewMode);
+  if (area) area.hidden = _msPreviewMode;
+  preview.hidden = !_msPreviewMode;
+}
+
+function _setMsMode(isPreview) {
+  const area    = _qs('bm-manuscript-area');
+  const s       = _active();
+  // Switching TO edit: populate textarea from active sermon
+  if (!isPreview && area && s) { area.value = s.manuscript || ''; _autoResize(area); }
+  // Switching FROM edit: save any typed changes back before re-rendering
+  if (isPreview && area && s)  { s.manuscript = area.value; _queueSave(); }
+  _msPreviewMode = isPreview;
+  _refreshMsPreview();
+  // Update toggle button states
+  const editBtn = document.getElementById('bm-ms-edit-btn');
+  const viewBtn = document.getElementById('bm-ms-view-btn');
+  if (editBtn) editBtn.classList.toggle('bm-active', !isPreview);
+  if (viewBtn) viewBtn.classList.toggle('bm-active',  isPreview);
 }
 
 // ── Research ──────────────────────────────────────────────────────────────────
@@ -963,7 +1056,7 @@ function _bindManuscript() {
     _updateStats();
   });
 
-  // Toolbar
+  // Toolbar formatting (only meaningful in edit mode)
   document.querySelectorAll('.bm-ms-tool[data-cmd]').forEach(btn => {
     btn.addEventListener('click', () => {
       area.focus();
@@ -972,6 +1065,8 @@ function _bindManuscript() {
   });
   document.querySelectorAll('.bm-ms-tool[data-insert]').forEach(btn => {
     btn.addEventListener('click', () => {
+      // If in preview mode, switch to edit first
+      if (_msPreviewMode) _setMsMode(false);
       area.focus();
       const start = area.selectionStart;
       const val   = area.value;
@@ -982,19 +1077,31 @@ function _bindManuscript() {
     });
   });
 
+  // Edit / View toggle buttons
+  const editBtn = document.getElementById('bm-ms-edit-btn');
+  const viewBtn = document.getElementById('bm-ms-view-btn');
+  if (editBtn) editBtn.addEventListener('click', () => _setMsMode(false));
+  if (viewBtn) viewBtn.addEventListener('click', () => _setMsMode(true));
+
+  // Click on preview → switch to edit at that position
+  const preview = document.getElementById('bm-ms-preview');
+  if (preview) preview.addEventListener('dblclick', () => _setMsMode(false));
+
   // Import from outline
   const importBtn = _qs('bm-ms-import-btn');
   if (importBtn) {
     importBtn.addEventListener('click', () => {
       const s = _active();
       if (!s || !s.sections.length) { _toast('No outline sections to import', 'error'); return; }
-      const existing = area.value.trim();
+      const existing = (s.manuscript || '').trim();
       const imported = _buildManuscriptFromOutline(s);
-      area.value = (existing ? existing + '\n\n' : '') + imported;
-      s.manuscript = area.value;
+      s.manuscript = (existing ? existing + '\n\n' : '') + imported;
+      area.value = s.manuscript;
       _autoResize(area);
       _updateStats();
       _queueSave();
+      _refreshMsPreview();
+      if (!_msPreviewMode) { /* stay in edit */ } else { _setMsMode(true); }
       _toast('Outline imported to manuscript', 'success');
     });
   }
