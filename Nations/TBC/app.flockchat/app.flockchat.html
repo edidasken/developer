@@ -1161,7 +1161,7 @@
     <!-- Top bar -->
     <header class="fc-topbar">
       <div class="fc-topbar-brand">
-        <a href="../" title="Back to launcher" style="display:flex;align-items:center;opacity:0.75;flex-shrink:0" aria-label="Home">
+        <a href="./" title="Back to launcher" style="display:flex;align-items:center;opacity:0.75;flex-shrink:0" aria-label="Back to launcher">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
         </a>
         <button class="fc-icon-btn" id="fc-menu-toggle" title="Toggle sidebar" style="padding:5px 6px" aria-label="Menu">
@@ -1169,7 +1169,9 @@
             <path d="M3 6h18M3 12h18M3 18h18"/>
           </svg>
         </button>
-        <img src="Images/chat.png" alt="FlockChat" onerror="this.style.display='none'">
+        <span class="fc-brand-icon" aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#0c4a6e,#06b6d4);color:#fff">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </span>
         <span>FlockChat</span>
       </div>
 
@@ -1179,6 +1181,7 @@
       </div>
 
       <div class="fc-topbar-right">
+        <button data-app-switcher data-app-switcher-current="flockchat" title="Switch app"></button>
         <button class="fc-icon-btn" id="fc-search-btn" title="Search (Ctrl+F)" style="display:none">🔍</button>
         <button class="fc-icon-btn" id="fc-admin-menu-btn" title="Admin panel" style="display:none">⚙️ Admin</button>
         <span id="fc-user-chip" tabindex="0" style="font-size:0.75rem; color:var(--fc-muted); max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;"></span>
@@ -1517,6 +1520,9 @@
   <script defer src="Scripts/the_true_vine.js"></script>
   <script defer src="Scripts/firm_foundation.js"></script>
   <script defer src="Scripts/the_upper_room.js"></script>
+
+  <!-- Cross-app navigation switcher -->
+  <script type="module" src="Scripts/the_app_switcher.js"></script>
 
   <!-- FlockChat app logic -->
   <script defer src="app.flockchat/flockchat.js"></script>

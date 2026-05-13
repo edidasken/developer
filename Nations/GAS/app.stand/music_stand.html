@@ -70,19 +70,22 @@
   <div id="ms-app" hidden>
     <!-- Header -->
     <header class="ms-header" id="ms-header">
-      <a class="ms-header-brand" href="../" title="Back to launcher" style="text-decoration:none;color:inherit">
+      <a class="ms-header-brand" href="./" title="Back to launcher" style="text-decoration:none;color:inherit">
         <button class="ms-menu-toggle" id="ms-menu-toggle" aria-label="Toggle menu">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
             <path d="M3 6h18M3 12h18M3 18h18"/>
           </svg>
         </button>
-        <span class="ms-header-logo">🎵</span>
+        <span class="ms-header-logo" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#4c1d95,#a855f7);color:#fff">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </span>
         <span class="ms-header-title">Flock Stand</span>
       </a>
       <div class="ms-header-tools" id="ms-header-tools">
         <!-- populated by stand.js per-view -->
       </div>
       <div class="ms-header-right">
+        <button data-app-switcher data-app-switcher-current="stand" title="Switch app"></button>
         <button class="ms-btn ms-btn--ghost ms-btn--sm" id="ms-live-btn" title="Enter live presenter mode">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
           <span>Live</span>
@@ -203,6 +206,7 @@
   <script defer src="Scripts/the_shofar/index.js"></script>
 
   <!-- Flock Stand main module -->
+  <script type="module" src="Scripts/the_app_switcher.js"></script>
   <script type="module" src="app.stand/stand.js"></script>
 
 </body>

@@ -5,6 +5,7 @@
    ══════════════════════════════════════════════════════════════════════════════ */
 
 import { installScriptureLinks } from './the_scrolls/the_bible_link.js';
+import { mountSwitcher } from './the_app_switcher.js';
 
 /* ─── Module registry ────────────────────────────────────────────────────────
    Only public-safe modules. Excluded: Journal, Analytics, Certificates,
@@ -85,9 +86,13 @@ topbar.innerHTML = /* html */`
     </svg>
   </button>
   <button class="veil-brand" id="gp-home-btn" aria-label="GROW home">
+    <span class="veil-brand-icon" aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#78350f,#d97706);color:#fff;margin-right:8px;vertical-align:middle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    </span>
     <span class="veil-brand-text">GROW</span>
   </button>
   <span class="veil-spacer"></span>
+  <button id="gp-app-switcher" data-app-switcher data-app-switcher-current="grow" title="Switch app" aria-label="Switch app" style="margin-right:8px"></button>
   <div class="gp-avatar-wrap" style="position:relative;">
     <button class="veil-avatar" id="gp-signin-btn" aria-label="Sign in to FlockOS" aria-haspopup="true" aria-expanded="false">
       <img class="veil-avatar-logo" alt="GROW" src="Images/GrowIcon.png" style="border-radius:10px;">
@@ -116,6 +121,9 @@ topbar.innerHTML = /* html */`
 (function() {
   const homeBtn = document.getElementById('gp-home-btn');
   if (homeBtn) homeBtn.addEventListener('click', () => go(''));
+  // Wire cross-app switcher
+  const sw = document.getElementById('gp-app-switcher');
+  if (sw) mountSwitcher(sw, { current: 'grow' });
 })();
 
 /* ─── Sign-in dropdown toggle ─────────────────────────────────────────────── */

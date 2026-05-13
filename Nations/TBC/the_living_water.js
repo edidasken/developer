@@ -55,6 +55,7 @@ const PRECACHE_URLS = [
   'Scripts/the_living_water_register.js',
   'Scripts/fine_linen.js',
   'Scripts/firm_foundation.js',
+  'Scripts/the_app_switcher.js',
 
   /* ── Chrome / shell ───────────────────────────────────────────────────── */
   'Scripts/the_veil/index.js',

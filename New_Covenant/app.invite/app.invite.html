@@ -215,12 +215,17 @@
 
   <!-- ── Topbar ──────────────────────────────────────────────────── -->
   <header id="inv-topbar" role="banner">
-    <div class="inv-brand-icon">✉️</div>
-    <div>
-      <div class="inv-brand-name">The Invitation</div>
-      <div class="inv-brand-church" id="inv-church-name"></div>
-    </div>
+    <a class="inv-brand-link" href="./" title="Back to launcher" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;flex:1;min-width:0" aria-label="Back to launcher">
+      <div class="inv-brand-icon" style="display:inline-flex;align-items:center;justify-content:center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="4.5" y1="8.5" x2="19.5" y2="8.5"/></svg>
+      </div>
+      <div style="min-width:0">
+        <div class="inv-brand-name">The Invitation</div>
+        <div class="inv-brand-church" id="inv-church-name"></div>
+      </div>
+    </a>
     <div class="inv-topbar-right">
+      <button data-app-switcher data-app-switcher-current="invite" title="Switch app"></button>
       <button class="inv-share-pill" id="inv-topbar-share" aria-label="Share this page">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         Share
@@ -265,6 +270,7 @@
     window._INVITE_SHARE_URL = location.href.split('?')[0].split('#')[0];
   </script>
 
+  <script type="module" src="https://flock-os.github.io/FlockOS/New_Covenant/Scripts/the_app_switcher.js"></script>
   <script type="module" src="https://flock-os.github.io/FlockOS/New_Covenant/Scripts/the_gospel/the_gospel_invitation.js">
   </script>
   <script type="module">
