@@ -135,14 +135,16 @@
     }
     #fc-app[hidden] { display: none; }
 
-    /* ─── Top bar ────────────────────────────────────────────────────── */
+    /* ─── Top bar — canonical FlockOS dark navy chrome ──────────────── */
     .fc-topbar {
       height: var(--topbar-h);
       padding-top: var(--safe-top);
       min-height: calc(var(--topbar-h) + var(--safe-top));
       flex-shrink: 0;
-      background: var(--fc-panel);
-      border-bottom: 1px solid var(--fc-border);
+      background: var(--top-bg);
+      border-bottom: 1px solid var(--top-line);
+      color: var(--top-ink);
+      position: relative;
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -150,6 +152,16 @@
       padding-right: 1rem;
       z-index: 100;
     }
+    .fc-topbar::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5px;
+      background: var(--grad-rainbow);
+      background-size: 200% 100%;
+      animation: fc-rainbow 9s linear infinite;
+      opacity: 0.72;
+      pointer-events: none;
+    }
+    @keyframes fc-rainbow { from { background-position: 0% 0; } to { background-position: 200% 0; } }
+    @media (prefers-reduced-motion: reduce) { .fc-topbar::after { animation: none; opacity: 0.5; } }
     .fc-topbar-brand {
       display: flex;
       align-items: center;

@@ -66,6 +66,8 @@
       --fs-danger:    var(--danger, #b22234);
 
       --topbar-h:     54px;
+      --safe-top:     env(safe-area-inset-top, 0px);
+      --safe-bot:     env(safe-area-inset-bottom, 0px);
     }
 
     html, body {
@@ -77,14 +79,15 @@
     /* ── Root grid ─────────────────────────────────────────────────────── */
     #fs-root {
       display: grid;
-      grid-template-rows: var(--topbar-h) 1fr;
+      grid-template-rows: calc(var(--topbar-h) + var(--safe-top)) 1fr;
       height: 100%;
     }
 
     /* ── Topbar — canonical FlockOS dark navy chrome ─────────────────── */
     #fs-topbar {
       display: flex; align-items: center; gap: 10px;
-      padding: 0 18px;
+      padding: var(--safe-top) 18px 0;
+      min-height: calc(var(--topbar-h) + var(--safe-top));
       background: var(--top-bg);
       border-bottom: 1px solid var(--top-line);
       color: var(--top-ink);
