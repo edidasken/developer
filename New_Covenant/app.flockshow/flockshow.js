@@ -50,15 +50,106 @@ function _fmtDate(ts) {
   return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// ── Storage ───────────────────────────────────────────────────────────────────
-function _load() {
-  try { _st.shows = JSON.parse(localStorage.getItem(FS_KEY) || '[]'); }
-  catch { _st.shows = []; }
+// ── Firestore / GAS / localStorage storage layer ─────────────────────────────
+
+// True when UpperRoom (Firestore) is initialised and ready
+function _fsFB() {
+  return !!(window.UpperRoom &&
+            typeof window.UpperRoom.isReady === 'function' &&
+            window.UpperRoom.isReady());
 }
 
-function _save() {
-  try { localStorage.setItem(FS_KEY, JSON.stringify(_st.shows)); }
-  catch (_) { /* storage quota exceeded — graceful no-op */ }
+// Lightweight GAS API call (mirrors msApiCall in the_shofar)
+async function _fsApiCall(action, params) {
+  const endpoint = String(window.PASTORAL_DB_V2_ENDPOINT || '').trim();
+  if (!endpoint) return null;
+  const N = window.Nehemiah;
+  const sess = (N && typeof N.getSession === 'function') ? N.getSession() : null;
+  if (!sess) return null;
+  const p = new URLSearchParams({ action, token: sess.token, email: sess.email, _: String(Date.now()) });
+  if (params) Object.keys(params).forEach(k => { if (params[k] != null) p.set(k, String(params[k])); });
+  try {
+    const resp = await fetch(endpoint + '?' + p.toString(), { referrerPolicy: 'no-referrer' });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    return (data && data.ok) ? data : null;
+  } catch (e) {
+    console.warn('[FlockShow] GAS call failed:', action, e);
+    return null;
+  }
+}
+
+// Write current shows to localStorage (offline cache)
+function _lsSync() {
+  try { localStorage.setItem(FS_KEY, JSON.stringify(_st.shows)); } catch (_) {}
+}
+
+// Load all shows: Firestore → GAS → localStorage
+async function _load() {
+  if (_fsFB()) {
+    try {
+      const result = await window.UpperRoom.listPresentations({ pageSize: 200 });
+      const rows = Array.isArray(result) ? result : (result.results || result.rows || []);
+      _st.shows = rows.map(r => { r._fsId = r.id; return r; });
+      _lsSync();
+      return;
+    } catch (e) {
+      console.warn('[FlockShow] Firestore load failed, trying GAS:', e);
+    }
+  }
+  // GAS fallback
+  const gasData = await _fsApiCall('presentations.list', {});
+  if (gasData && Array.isArray(gasData.rows)) {
+    _st.shows = gasData.rows.map(r => { r._gasId = r.id; return r; });
+    _lsSync();
+    return;
+  }
+  // localStorage last resort
+  try { _st.shows = JSON.parse(localStorage.getItem(FS_KEY) || '[]'); }
+  catch (_) { _st.shows = []; }
+}
+
+// Sync a single show to Firestore/GAS/localStorage (fire-and-forget safe)
+async function _syncShow(show) {
+  if (_fsFB()) {
+    try {
+      if (show._fsId) {
+        await window.UpperRoom.updatePresentation({ id: show._fsId, name: show.name, slides: show.slides });
+      } else {
+        const res = await window.UpperRoom.createPresentation({ name: show.name, slides: show.slides });
+        show._fsId = res.id;
+      }
+      _lsSync();
+      return;
+    } catch (e) {
+      console.warn('[FlockShow] Firestore sync failed:', e);
+    }
+  }
+  // GAS fallback
+  if (String(window.PASTORAL_DB_V2_ENDPOINT || '').trim()) {
+    try {
+      if (show._gasId) {
+        await _fsApiCall('presentations.update', { id: show._gasId, name: show.name, slides: JSON.stringify(show.slides) });
+      } else {
+        const res = await _fsApiCall('presentations.create', { name: show.name, slides: JSON.stringify(show.slides) });
+        if (res && res.row) show._gasId = res.row.id;
+      }
+    } catch (e) {
+      console.warn('[FlockShow] GAS sync failed:', e);
+    }
+  }
+  _lsSync();
+}
+
+// Delete a show from Firestore/GAS (fire-and-forget safe)
+async function _removeShow(show) {
+  if (_fsFB() && show._fsId) {
+    try { await window.UpperRoom.deletePresentation(show._fsId); }
+    catch (e) { console.warn('[FlockShow] Firestore delete failed:', e); }
+  } else if (String(window.PASTORAL_DB_V2_ENDPOINT || '').trim() && show._gasId) {
+    await _fsApiCall('presentations.delete', { id: show._gasId });
+  }
+  _lsSync();
 }
 
 // ── Model factories ───────────────────────────────────────────────────────────

@@ -9642,6 +9642,12 @@ function routeExpansionAction(action, params, auth) {
   if (action === 'setlistSongs.remove')       return handleSetlistSongsRemove(params, auth);
   if (action === 'musicStand.get')            return handleMusicStandGet(params, auth);
 
+  // ── Presentation Shows (FlockShow) ────────────────────────────────────────
+  if (action === 'presentations.list')        return handlePresentationsList(params, auth);
+  if (action === 'presentations.get')         return handlePresentationsGet(params, auth);
+  if (action === 'presentations.save')        return handlePresentationsSave(params, auth);
+  if (action === 'presentations.delete')      return handlePresentationsDelete(params, auth);
+
   // ── Spiritual Care ─────────────────────────────────────────────────────────
   if (action === 'care.list')                return handleCareList(params, auth);
   if (action === 'care.get')                 return handleCareGet(params, auth);
@@ -25324,6 +25330,122 @@ function handleMusicStandGet(params, auth) {
     setlist: setlist,
     songCount: setlist.filter(function(e) { return e.itemType === 'Song'; }).length
   });
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+//  Presentation Shows (FlockShow)
+// ═══════════════════════════════════════════════════════════════
+
+var PRES_TAB      = 'Presentations';
+var PRES_NUM_COLS = 7;
+var PRES = { ID: 0, NAME: 1, SLIDES_JSON: 2, CREATED_AT: 3, CREATED_BY: 4, UPDATED_AT: 5, UPDATED_BY: 6 };
+
+function presRowToObject(row) {
+  var slides = [];
+  try { slides = JSON.parse(row[PRES.SLIDES_JSON] || '[]'); } catch (e) {}
+  return {
+    id:         String(row[PRES.ID]        || ''),
+    name:       String(row[PRES.NAME]      || ''),
+    slides:     slides,
+    createdAt:  String(row[PRES.CREATED_AT] || ''),
+    createdBy:  String(row[PRES.CREATED_BY] || ''),
+    updatedAt:  String(row[PRES.UPDATED_AT] || ''),
+    updatedBy:  String(row[PRES.UPDATED_BY] || '')
+  };
+}
+
+function handlePresentationsList(params, auth) {
+  requireRole(auth, 'volunteer');
+  var sheet = getTab(PRES_TAB);
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return jsonOk({ rows: [] });
+
+  var data = sheet.getRange(2, 1, lastRow - 1, PRES_NUM_COLS).getValues();
+  var q = String(params.q || '').trim().toLowerCase();
+  var rows = [];
+
+  for (var i = 0; i < data.length; i++) {
+    if (!data[i][PRES.ID]) continue;
+    var obj = presRowToObject(data[i]);
+    if (q && obj.name.toLowerCase().indexOf(q) === -1) continue;
+    rows.push(obj);
+  }
+
+  // Most recently updated first
+  rows.sort(function(a, b) { return b.updatedAt > a.updatedAt ? 1 : -1; });
+  return jsonOk({ rows: rows });
+}
+
+function handlePresentationsGet(params, auth) {
+  requireRole(auth, 'volunteer');
+  var id = String(params.id || '').trim();
+  if (!id) return jsonErr('id is required.');
+
+  var sheet = getTab(PRES_TAB);
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return jsonErr('Presentation not found.');
+
+  var data = sheet.getRange(2, 1, lastRow - 1, PRES_NUM_COLS).getValues();
+  for (var i = 0; i < data.length; i++) {
+    if (String(data[i][PRES.ID]) === id) {
+      return jsonOk({ row: presRowToObject(data[i]) });
+    }
+  }
+  return jsonErr('Presentation not found.');
+}
+
+function handlePresentationsSave(params, auth) {
+  requireRole(auth, 'volunteer');
+  if (!params.name) return jsonErr('name is required.');
+  var slidesJson = JSON.stringify(params.slides || []);
+  var now = isoNow();
+
+  // If id provided, try update
+  if (params.id) {
+    var hit = findRowById(db(), PRES_TAB, PRES_NUM_COLS, params.id);
+    if (hit) {
+      var sheet = getTab(PRES_TAB);
+      var existing = hit.vals;
+      existing[PRES.NAME]       = String(params.name);
+      existing[PRES.SLIDES_JSON] = slidesJson;
+      existing[PRES.UPDATED_AT]  = now;
+      existing[PRES.UPDATED_BY]  = auth.email;
+      sheet.getRange(hit.rowIndex, 1, 1, PRES_NUM_COLS).setValues([existing]);
+      writeAudit(auth, 'presentations.save', PRES_TAB, hit.rowIndex, String(params.name));
+      return jsonOk({ row: presRowToObject(existing) });
+    }
+  }
+
+  // Create new
+  var newId = params.id || generateId();
+  var row = new Array(PRES_NUM_COLS);
+  row[PRES.ID]          = newId;
+  row[PRES.NAME]        = String(params.name);
+  row[PRES.SLIDES_JSON] = slidesJson;
+  row[PRES.CREATED_AT]  = now;
+  row[PRES.CREATED_BY]  = auth.email;
+  row[PRES.UPDATED_AT]  = now;
+  row[PRES.UPDATED_BY]  = auth.email;
+  var sheet = getTab(PRES_TAB);
+  sheet.appendRow(row);
+  var newIndex = sheet.getLastRow();
+  writeAudit(auth, 'presentations.save', PRES_TAB, newIndex, String(params.name));
+  return jsonOk({ row: presRowToObject(row) });
+}
+
+function handlePresentationsDelete(params, auth) {
+  requireRole(auth, 'volunteer');
+  var id = String(params.id || '').trim();
+  if (!id) return jsonErr('id is required.');
+
+  var hit = findRowById(db(), PRES_TAB, PRES_NUM_COLS, id);
+  if (!hit) return jsonErr('Presentation not found.');
+
+  var sheet = getTab(PRES_TAB);
+  sheet.deleteRow(hit.rowIndex);
+  writeAudit(auth, 'presentations.delete', PRES_TAB, hit.rowIndex, id);
+  return jsonOk({ success: true });
 }
 
 

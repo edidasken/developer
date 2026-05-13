@@ -2958,6 +2958,52 @@
   }
 
   /* ══════════════════════════════════════════════════════════════════
+     PRESENTATIONS (FlockShow)
+     ══════════════════════════════════════════════════════════════════ */
+
+  function _presentationsRef() { return _churchDoc().collection('presentations'); }
+
+  function listPresentations(opts) {
+    opts = opts || {};
+    var q = _presentationsRef().orderBy('updatedAt', 'desc');
+    if (opts.createdBy) q = q.where('createdBy', '==', opts.createdBy);
+    return _paginatedGet(q, opts);
+  }
+
+  function getPresentation(id) {
+    return _presentationsRef().doc(id).get().then(function(d) {
+      if (!d.exists) throw new Error('Presentation not found');
+      var o = d.data(); o.id = d.id; return o;
+    });
+  }
+
+  function createPresentation(data) {
+    data = Object.assign({}, data);
+    data.createdAt = _now();
+    data.createdBy = _userEmail;
+    data.updatedAt = _now();
+    data.updatedBy = _userEmail;
+    return _presentationsRef().add(data).then(function(ref) {
+      return { id: ref.id, success: true };
+    });
+  }
+
+  function updatePresentation(data) {
+    var id = data.id; if (!id) throw new Error('id required');
+    data = Object.assign({}, data); delete data.id;
+    data.updatedAt = _now();
+    data.updatedBy = _userEmail;
+    return _presentationsRef().doc(id).update(data).then(function() {
+      return { id: id, success: true };
+    });
+  }
+
+  function deletePresentation(id) {
+    if (!id) throw new Error('id required');
+    return _presentationsRef().doc(id).delete().then(function() { return { success: true }; });
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
      SERMONS
      ══════════════════════════════════════════════════════════════════ */
 
@@ -5121,6 +5167,13 @@
     createSermonSeries: createSermonSeries,
     updateSermonSeries: updateSermonSeries,
     deleteSermonSeries: deleteSermonSeries,
+
+    // Presentations (FlockShow)
+    listPresentations:   listPresentations,
+    getPresentation:     getPresentation,
+    createPresentation:  createPresentation,
+    updatePresentation:  updatePresentation,
+    deletePresentation:  deletePresentation,
 
     // Sermon Reviews
     listSermonReviews:  listSermonReviews,
