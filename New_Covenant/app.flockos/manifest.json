@@ -3,7 +3,7 @@
   "short_name": "FlockOS",
   "description": "Complete church management and pastoral care platform. Google Sheets, Firebase, or fully offline via The Wellspring. 30+ modules. 210 countries. 256-bit encrypted. Free forever.",
   "start_url": "./app.flockos.html",
-  "scope": "../",
+  "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0c1445",
@@ -16,15 +16,21 @@
   ],
   "icons": [
     {
+      "src": "../Images/icon-flockos.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "../Images/icon-flockos.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
       "src": "../Images/FlockOS.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "../Images/flockos-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
       "purpose": "any"
     }
   ],
@@ -48,7 +54,7 @@
       "url": "./app.flockos.html?view=the_fellowship",
       "icons": [
         {
-          "src": "../Images/flockos-icon.svg",
+          "src": "../Images/icon-flockos.svg",
           "sizes": "any"
         }
       ]
@@ -60,7 +66,7 @@
       "url": "./app.flockos.html?view=the_life",
       "icons": [
         {
-          "src": "../Images/flockos-icon.svg",
+          "src": "../Images/icon-flockos.svg",
           "sizes": "any"
         }
       ]

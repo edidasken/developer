@@ -1,22 +1,39 @@
 {
-  "name": "FlockChat",
+  "name": "{{CHURCH_NAME}} \u00b7 FlockChat",
   "short_name": "FlockChat",
   "description": "Church team messaging, prayer chain, and announcements.",
   "start_url": "./app.flockchat.html",
+  "id": "./app.flockchat.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0c1445",
-  "theme_color": "#0c1445",
+  "background_color": "#0c4a6e",
+  "theme_color": "#06b6d4",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
   "icons": [
     {
-      "src": "../Images/chat.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "../Images/icon-chat.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
-      "src": "../Images/chat.png",
+      "src": "../Images/icon-chat.svg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "../Images/Chat.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }
