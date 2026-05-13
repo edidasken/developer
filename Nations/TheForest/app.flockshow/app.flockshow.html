@@ -163,7 +163,7 @@
     }
     .fs-auth-card .fs-auth-verse {
       font: italic 0.73rem 'Plus Jakarta Sans', sans-serif;
-      color: rgba(240,241,248,0.28); margin-top: 10px;
+      color: var(--ink-faint); margin-top: 10px;
     }
     /* ── User chip in topbar ────────────────────────────────────────── */
     .fs-user-chip {
@@ -232,8 +232,8 @@
     }
     .fs-show-action-btn--edit { background: var(--fs-accent-dim); color: var(--fs-accent); }
     .fs-show-action-btn--edit:hover { background: rgba(232,168,56,0.22); }
-    .fs-show-action-btn--dup { background: rgba(255,255,255,0.05); color: var(--fs-muted); }
-    .fs-show-action-btn--dup:hover { background: rgba(255,255,255,0.10); color: var(--fs-ink); }
+    .fs-show-action-btn--dup { background: var(--bg-overlay); color: var(--fs-muted); }
+    .fs-show-action-btn--dup:hover { background: var(--bg-hover); color: var(--fs-ink); }
     .fs-show-action-btn--del { background: rgba(248,113,113,0.08); color: var(--fs-danger); }
     .fs-show-action-btn--del:hover { background: rgba(248,113,113,0.18); }
 
@@ -249,7 +249,7 @@
 
     .fs-editor-bar {
       display: flex; align-items: center; gap: 8px; padding: 0 14px;
-      background: #0d1035; border-bottom: 1px solid var(--fs-border); overflow: hidden;
+      background: var(--bg-raised); border-bottom: 1px solid var(--fs-border); overflow: hidden;
     }
     .fs-show-title-input {
       background: transparent; border: none; outline: none;
@@ -263,7 +263,7 @@
 
     /* ── Slide list (left) ─────────────────────────────────────────────── */
     #fs-slide-list {
-      background: #0d1035; border-right: 1px solid var(--fs-border);
+      background: var(--bg-sunken); border-right: 1px solid var(--fs-border);
       overflow-y: auto; padding: 6px 5px; display: flex; flex-direction: column; gap: 4px;
       scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.15) transparent;
     }
@@ -303,8 +303,8 @@
 
     .fs-add-type-menu {
       position: absolute; bottom: calc(100% + 4px); left: 4px; right: 4px;
-      background: #1a0e3c; border: 1px solid var(--fs-border); border-radius: 10px;
-      overflow: hidden; z-index: 50; box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+      background: var(--bg-raised); border: 1px solid var(--fs-border); border-radius: 10px;
+      overflow: hidden; z-index: 50; box-shadow: 0 8px 28px rgba(0,0,0,0.22);
     }
     .fs-add-type-item {
       padding: 9px 13px; font: 0.80rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink);
@@ -314,7 +314,7 @@
 
     /* ── Slide preview (center) ────────────────────────────────────────── */
     #fs-slide-preview {
-      display: flex; flex-direction: column; background: #050812; overflow: hidden;
+      display: flex; flex-direction: column; background: var(--bg-sunken); overflow: hidden;
     }
     .fs-preview-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; }
     .fs-slide-canvas {
@@ -338,17 +338,17 @@
       padding: 10px; border-top: 1px solid var(--fs-border);
     }
     .fs-nav-btn {
-      width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.06);
+      width: 34px; height: 34px; border-radius: 50%; background: var(--bg-overlay);
       border: none; color: var(--fs-ink); cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: background 0.12s;
     }
-    .fs-nav-btn:hover { background: rgba(255,255,255,0.12); }
+    .fs-nav-btn:hover { background: var(--bg-hover); }
     .fs-nav-btn:disabled { opacity: 0.2; pointer-events: none; }
     .fs-prev-counter { font: 0.75rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted); min-width: 50px; text-align: center; }
 
     /* ── Properties panel (right) ──────────────────────────────────────── */
     #fs-slide-props {
-      background: #0d1035; border-left: 1px solid var(--fs-border);
+      background: var(--bg-sunken); border-left: 1px solid var(--fs-border);
       overflow-y: auto; padding: 14px 13px; display: flex; flex-direction: column; gap: 14px;
       scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.12) transparent;
     }
@@ -367,10 +367,10 @@
     .fs-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
     .fs-type-btn {
       padding: 7px 4px; border-radius: 7px; font: 500 0.70rem 'Plus Jakarta Sans', sans-serif;
-      border: 1px solid var(--fs-border); background: rgba(255,255,255,0.03);
+      border: 1px solid var(--fs-border); background: var(--bg-overlay);
       color: var(--fs-muted); cursor: pointer; transition: all 0.12s; text-align: center;
     }
-    .fs-type-btn:hover { background: rgba(255,255,255,0.07); color: var(--fs-ink); }
+    .fs-type-btn:hover { background: var(--bg-hover); color: var(--fs-ink); }
     .fs-type-btn.fs-type-btn--active { border-color: var(--fs-accent); background: var(--fs-accent-dim); color: var(--fs-accent); }
 
     .fs-color-row { display: flex; align-items: center; gap: 8px; }
@@ -379,7 +379,7 @@
     .fs-color-reset { font: 0.70rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-accent); background: none; border: none; cursor: pointer; padding: 2px 4px; }
 
     .fs-import-area {
-      width: 100%; min-height: 70px; background: rgba(255,255,255,0.03);
+      width: 100%; min-height: 70px; background: var(--bg-input);
       border: 1px dashed rgba(232,168,56,0.25); border-radius: 8px;
       padding: 8px 10px; font: 0.78rem 'Plus Jakarta Sans', sans-serif;
       color: var(--fs-muted); resize: vertical; outline: none;
@@ -408,7 +408,7 @@
     #fs-song-picker[hidden] { display: none !important; }
     .fs-sp-backdrop {
       position: absolute; inset: 0;
-      background: rgba(6,12,31,0.82); backdrop-filter: blur(4px);
+      background: var(--modal-dim); backdrop-filter: blur(4px);
     }
     .fs-sp-panel {
       position: relative; z-index: 1;
@@ -430,11 +430,11 @@
     .fs-sp-title svg { color: var(--fs-accent); flex-shrink: 0; }
     .fs-sp-close {
       width: 28px; height: 28px; border-radius: 7px;
-      background: rgba(255,255,255,0.06); border: none; color: var(--fs-muted);
+      background: var(--bg-overlay); border: none; color: var(--fs-muted);
       font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: all 0.12s; flex-shrink: 0;
     }
-    .fs-sp-close:hover { background: rgba(255,255,255,0.12); color: var(--fs-ink); }
+    .fs-sp-close:hover { background: var(--bg-hover); color: var(--fs-ink); }
     .fs-sp-search-wrap {
       position: relative; padding: 12px 18px; flex-shrink: 0;
       border-bottom: 1px solid var(--fs-border);
@@ -445,7 +445,7 @@
     }
     .fs-sp-search {
       width: 100%; padding: 8px 14px 8px 36px;
-      background: rgba(255,255,255,0.05); border: 1px solid var(--fs-border); border-radius: 10px;
+      background: var(--bg-input); border: 1px solid var(--fs-border); border-radius: 10px;
       font: 0.84rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink); outline: none;
     }
     .fs-sp-search::placeholder { color: var(--fs-muted); }
@@ -478,7 +478,7 @@
     input[type="search"]::-webkit-search-results-button { display: none; }
     input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
       -webkit-text-fill-color: var(--fs-ink) !important;
-      -webkit-box-shadow: 0 0 0 100px #0c1445 inset !important;
+      -webkit-box-shadow: 0 0 0 100px #faf9f6 inset !important;
       transition: background-color 9999s ease-in-out 0s;
     }
 
@@ -486,7 +486,7 @@
     .fs-range {
       -webkit-appearance: none; appearance: none;
       flex: 1; height: 4px; border-radius: 4px; outline: none; cursor: pointer;
-      background: rgba(255,255,255,0.10);
+      background: var(--line);
     }
     .fs-range::-webkit-slider-thumb {
       -webkit-appearance: none; appearance: none;
@@ -513,7 +513,7 @@
     /* ── Bible picker section ───────────────────────────────────────── */
     .fs-bible-row { display: flex; gap: 6px; margin-bottom: 5px; }
     .fs-bible-select {
-      flex: 1; padding: 6px 28px 6px 10px; background: rgba(255,255,255,0.04);
+      flex: 1; padding: 6px 28px 6px 10px; background: var(--bg-input);
       border: 1px solid var(--fs-border); border-radius: 8px;
       font: 0.79rem 'Plus Jakarta Sans',sans-serif; color: var(--fs-ink); outline: none;
       cursor: pointer; -webkit-appearance: none; appearance: none;
@@ -521,10 +521,10 @@
       background-repeat: no-repeat; background-position: right 9px center;
     }
     .fs-bible-select:focus { border-color: var(--fs-accent); background-color: rgba(232,168,56,0.05); }
-    .fs-bible-select option, select.fs-prop-input option { background: #0c1445; color: var(--fs-ink); }
+    .fs-bible-select option, select.fs-prop-input option { background: var(--bg); color: var(--fs-ink); }
     .fs-bible-status {
       font: 0.73rem 'Plus Jakarta Sans',sans-serif; color: var(--fs-muted);
-      background: rgba(255,255,255,0.03); border: 1px solid transparent;
+      background: var(--bg-panel); border: 1px solid transparent;
       border-radius: 6px; padding: 6px 9px; line-height: 1.5;
       word-break: break-word; margin-top: 4px;
     }
@@ -544,8 +544,8 @@
     /* ── Props panel visual polish ────────────────────────────────────── */
     .fs-prop-section {
       display: flex; flex-direction: column; gap: 7px;
-      padding: 10px 11px; background: rgba(255,255,255,0.025);
-      border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;
+      padding: 10px 11px; background: var(--bg-panel);
+      border: 1px solid var(--line); border-radius: 10px;
     }
     .fs-prop-label {
       font: 600 0.65rem 'Plus Jakarta Sans', sans-serif;
@@ -553,13 +553,13 @@
       color: var(--fs-accent); opacity: 0.8;
     }
     .fs-prop-input {
-      width: 100%; padding: 8px 10px; background: rgba(6,12,31,0.6);
-      border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
+      width: 100%; padding: 8px 10px; background: var(--bg-input);
+      border: 1px solid var(--line); border-radius: 8px;
       font: 0.80rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink); outline: none; resize: vertical;
       transition: border-color 0.15s, background 0.15s;
     }
     .fs-prop-input:focus { border-color: var(--fs-accent); background: rgba(232,168,56,0.05); }
-    .fs-prop-input::placeholder { color: rgba(240,241,248,0.3); }
+    .fs-prop-input::placeholder { color: var(--ink-faint); }
     .fs-prop-textarea { min-height: 90px; }
     .fs-prop-divider { display: none; }
   </style>

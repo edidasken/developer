@@ -134,6 +134,12 @@ input, select, textarea { font-size: max(1rem, 16px); }
   --paper-line:    #d4c5a9;
   --paper-margin:  #e8a0a0;
 
+  /* ── Content-surface helpers — use these instead of hardcoded rgba() overlays */
+  --bg-input:      var(--bg-sunken);   /* input / textarea field background      */
+  --bg-overlay:    var(--bg-raised);   /* sub-header / panel tint over --bg      */
+  --bg-panel:      var(--bg-raised);   /* elevated panel / card                  */
+  --modal-dim:     rgba(0,0,0,0.42);   /* full-screen dim scrim behind modals    */
+
   color-scheme: light;
 }
 
@@ -8890,7 +8896,7 @@ html[data-platform="xbox"] .topbar-toggle { display: none !important; }
   --font-mono:    ui-monospace, 'SF Mono', monospace;
 }
 
-/* Dark-theme shadow adjustments */
+/* Dark-theme shadow + surface adjustments */
 html[data-theme*="dark"], html[data-theme="ink"] {
   --shadow-sm:  0 1px 3px rgba(0,0,0,0.50);
   --shadow-md:  0 8px 28px rgba(0,0,0,0.55);
@@ -8899,6 +8905,11 @@ html[data-theme*="dark"], html[data-theme="ink"] {
     radial-gradient(ellipse 100% 60% at 88% -8%, rgba(232,168,56,0.14) 0%, transparent 55%),
     radial-gradient(ellipse 70% 50% at -4% 108%, rgba(108,63,168,0.12) 0%, transparent 60%),
     linear-gradient(180deg, var(--bg-raised, #181b24) 0%, var(--bg, #0e1320) 100%);
+  /* Dark-theme content surfaces */
+  --bg-input:   rgba(255,255,255,0.06);
+  --bg-overlay: rgba(255,255,255,0.04);
+  --bg-panel:   rgba(255,255,255,0.04);
+  --modal-dim:  rgba(0,0,0,0.65);
 }
 
 *, *::before, *::after { box-sizing: border-box; }

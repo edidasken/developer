@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="The Feed">
-  <meta name="theme-color" content="#060c1f">
+  <meta name="theme-color" content="#0c1445">
   <meta name="description" content="The Feed — Sermon preparation and manuscript builder for FlockOS. Craft the Word with clarity, depth, and purpose.">
 
   <title>The Feed — FlockOS</title>
@@ -29,42 +29,72 @@
   <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
   <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
 
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+
   <!-- Shared stylesheet -->
   <link rel="stylesheet" href="Styles/new_covenant.css">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Bread Maker design tokens ─────────────────────────────────────── */
+    /* ── Bread Maker design tokens — aliased to active NC theme ──────── */
     :root {
-      --bm-bg:         #060c1f;
-      --bm-panel:      #0c1445;
-      --bm-panel-alt:  #1a0e3c;
-      --bm-panel-mid:  #0d1535;
-      --bm-border:     rgba(255,255,255,0.09);
-      --bm-border-lit: rgba(255,255,255,0.15);
-      --bm-accent:     #e8a838;
-      --bm-accent-dk:  #c48a20;
-      --bm-accent-dim: rgba(232,168,56,0.12);
-      --bm-accent-glow:rgba(232,168,56,0.25);
-      --bm-purple:     #a78bfa;
-      --bm-blue:       #38bdf8;
-      --bm-green:      #34d399;
-      --bm-red:        #f87171;
-      --bm-ink:        #f0f1f8;
-      --bm-muted:      rgba(240,241,248,0.48);
-      --bm-faint:      rgba(240,241,248,0.22);
+      --bm-bg:         var(--bg);
+      --bm-panel:      var(--bg-raised);
+      --bm-panel-alt:  var(--bg-sunken);
+      --bm-panel-mid:  var(--bg-hover);
+      --bm-border:     var(--line);
+      --bm-border-lit: var(--line-strong);
+      --bm-accent:     var(--gold);
+      --bm-accent-dk:  var(--gold-deep);
+      --bm-accent-dim: var(--gold-soft);
+      --bm-accent-glow:var(--gold-glow);
+      --bm-purple:     var(--c-violet);
+      --bm-blue:       var(--c-sky);
+      --bm-green:      var(--c-emerald);
+      --bm-red:        var(--danger);
+      --bm-ink:        var(--ink);
+      --bm-muted:      var(--ink-muted);
+      --bm-faint:      var(--ink-faint);
       --topbar-h:      54px;
     }
 
     html, body {
       height: 100%;
-      background: var(--bm-bg);
-      color: var(--bm-ink);
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-ui, 'Plus Jakarta Sans', system-ui, sans-serif);
       -webkit-font-smoothing: antialiased;
       overflow: hidden;
     }
+
+    /* ── Dark chrome context overrides ────────────────────────────────── */
+    /* Topbar sits on --top-bg (dark navy) — text must be top-ink */
+    #bm-topbar { color: var(--top-ink); }
+    #bm-topbar #bm-active-title { color: var(--top-ink-muted); }
+    #bm-topbar #bm-active-title.has-sermon { color: var(--top-ink); }
+    #bm-topbar .bm-btn--ghost { color: var(--top-ink); }
+    #bm-topbar .bm-btn--ghost:hover { color: var(--top-ink); }
+    #bm-topbar .bm-user-chip { color: var(--top-ink-muted); }
+    #bm-topbar .bm-user-chip:hover { color: var(--top-ink); }
+    /* Sidebar sits on --side-bg (dark navy) — text must be side-ink */
+    #bm-sidebar { color: var(--side-ink-hi); }
+    #bm-sidebar .bm-search { color: var(--side-ink-hi); background: rgba(255,255,255,0.06); border-color: var(--side-line); }
+    #bm-sidebar .bm-search::placeholder { color: var(--side-ink); }
+    #bm-sidebar .bm-search-icon { color: var(--side-ink); }
+    #bm-sidebar .bm-sermon-item-title { color: var(--side-ink-hi); }
+    #bm-sidebar .bm-sermon-item-meta { color: var(--side-ink); }
+    #bm-sidebar .bm-sidebar-label { color: rgba(255,255,255,0.32); }
 
     /* ── Root grid ─────────────────────────────────────────────────────── */
     #bm-root {
@@ -79,12 +109,12 @@
     #bm-topbar {
       display: flex; align-items: center; gap: 10px;
       padding: 0 18px;
-      background: linear-gradient(90deg, #0c1445 0%, #14103a 60%, #0a1128 100%);
+      background: var(--top-bg);
       z-index: 200; position: relative; flex-shrink: 0;
     }
     #bm-topbar::after {
       content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5px;
-      background: linear-gradient(90deg,#38bdf8,#818cf8,#a78bfa,#e8a838,#34d399,#38bdf8);
+      background: var(--grad-rainbow);
       background-size: 200% 100%;
       animation: bm-rainbow 9s linear infinite;
       opacity: 0.72;
@@ -94,12 +124,12 @@
 
     .bm-logo {
       display: flex; align-items: center; gap: 8px;
-      font: 700 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      font: 700 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--top-ink);
       flex-shrink: 0; margin-right: 4px;
     }
     .bm-logo-icon {
       width: 30px; height: 30px; border-radius: 8px;
-      background: linear-gradient(135deg, #c48a20, #e8a838);
+      background: linear-gradient(135deg, var(--gold-deep), var(--gold));
       display: flex; align-items: center; justify-content: center; font-size: 16px;
       box-shadow: 0 2px 10px rgba(232,168,56,0.40);
       flex-shrink: 0;
@@ -124,7 +154,7 @@
     }
     .bm-btn--primary { background: var(--bm-accent); color: #080500; }
     .bm-btn--primary:hover { background: #f0b84a; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(232,168,56,0.40); }
-    .bm-btn--ghost { background: rgba(255,255,255,0.07); color: var(--bm-ink); }
+    .bm-btn--ghost { background: rgba(255,255,255,0.07); color: var(--ink); }
     .bm-btn--ghost:hover { background: rgba(255,255,255,0.12); }
     .bm-btn--danger { background: rgba(248,113,113,0.13); color: var(--bm-red); }
     .bm-btn--danger:hover { background: rgba(248,113,113,0.23); }
@@ -160,7 +190,7 @@
 
     /* ── Sidebar ──────────────────────────────────────────────────────── */
     #bm-sidebar {
-      background: linear-gradient(170deg, #0c1445 0%, #160e38 55%, #0a1128 100%);
+      background: var(--side-bg);
       border-right: 1px solid var(--bm-border);
       display: flex; flex-direction: column;
       overflow: hidden;
@@ -276,26 +306,26 @@
       padding: 12px 20px 10px;
       border-bottom: 1px solid var(--bm-border);
       flex-shrink: 0; flex-wrap: wrap;
-      background: rgba(12,20,69,0.40);
+      background: var(--bg-raised);
     }
     .bm-header-fields { display: flex; gap: 10px; flex: 1; min-width: 0; flex-wrap: wrap; }
     .bm-title-input {
       flex: 2; min-width: 180px; padding: 7px 12px;
-      background: rgba(255,255,255,0.06); border: 1px solid var(--bm-border);
+      background: var(--bg); border: 1px solid var(--line);
       border-radius: 9px; font: 600 0.95rem 'Plus Jakarta Sans', sans-serif;
       color: var(--bm-ink); outline: none;
     }
     .bm-title-input::placeholder { color: var(--bm-muted); font-weight: 400; }
-    .bm-title-input:focus { border-color: rgba(232,168,56,0.50); background: rgba(255,255,255,0.09); }
+    .bm-title-input:focus { border-color: var(--gold); background: var(--bg); }
 
     .bm-meta-input {
       flex: 1; min-width: 120px; padding: 7px 12px;
-      background: rgba(255,255,255,0.04); border: 1px solid var(--bm-border);
+      background: var(--bg); border: 1px solid var(--line);
       border-radius: 9px; font: 400 0.82rem 'Plus Jakarta Sans', sans-serif;
       color: var(--bm-ink); outline: none;
     }
     .bm-meta-input::placeholder { color: var(--bm-muted); }
-    .bm-meta-input:focus { border-color: rgba(232,168,56,0.40); background: rgba(255,255,255,0.07); }
+    .bm-meta-input:focus { border-color: var(--gold); background: var(--bg); }
 
     .bm-header-actions { display: flex; gap: 7px; flex-shrink: 0; align-items: center; flex-wrap: wrap; }
 
@@ -314,7 +344,7 @@
       display: flex; align-items: center; gap: 2px;
       padding: 0 20px;
       border-bottom: 1px solid var(--bm-border);
-      background: rgba(6,12,31,0.60);
+      background: var(--bg);
       flex-shrink: 0; overflow-x: auto;
       scrollbar-width: none;
     }
@@ -600,7 +630,7 @@
     .bm-ms-toolbar {
       display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
       padding: 8px 36px 6px; border-bottom: 1px solid var(--bm-border);
-      background: rgba(6,12,31,0.70); flex-shrink: 0;
+      background: var(--bg-overlay); flex-shrink: 0;
     }
     .bm-ms-tool {
       width: 28px; height: 28px; border-radius: 6px; background: none; border: none;
@@ -841,7 +871,7 @@
     #bm-confirm-modal[hidden] { display: none !important; }
     .bm-modal-backdrop {
       position: absolute; inset: 0;
-      background: rgba(6,12,31,0.80); backdrop-filter: blur(3px);
+      background: var(--modal-dim); backdrop-filter: blur(3px);
     }
     .bm-modal-box {
       position: relative; z-index: 1;
@@ -871,7 +901,7 @@
       #bm-sidebar.is-open { display: flex; transform: translateX(0); }
       #bm-sidebar.is-open::before {
         content: ''; position: fixed; inset: 0;
-        background: rgba(0,0,0,0.50); z-index: -1;
+        background: var(--modal-dim); z-index: -1;
         left: min(280px, 85vw); width: calc(100vw - min(280px, 85vw));
       }
       .bm-hamburger { display: inline-flex !important; }
@@ -890,7 +920,7 @@
     textarea, select { -webkit-appearance: none; appearance: none; }
     input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
       -webkit-text-fill-color: var(--bm-ink) !important;
-      -webkit-box-shadow: 0 0 0 100px #0c1445 inset !important;
+      -webkit-box-shadow: 0 0 0 100px #faf9f6 inset !important;
     }
     textarea { resize: none; }
 

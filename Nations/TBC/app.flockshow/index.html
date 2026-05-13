@@ -28,20 +28,16 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg-page:   #060c1f;
-      --bg-card:   #0c1445;
-      --border:    rgba(255,255,255,.10);
-      --ink:       #f0f1f8;
-      --muted:     rgba(240,241,248,.55);
-      --accent:    #e8a838;
+      --border:    var(--line);
+      --muted:     var(--ink-muted);
+      --accent:    var(--gold, #e8a838);
       --accent-dk: #c48a20;
-      --danger:    #f87171;
       --radius:    18px;
     }
 
     html, body {
       height: 100%;
-      background: var(--bg-page);
+      background: var(--bg);
       color: var(--ink);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -61,16 +57,16 @@
 
     .card {
       position: relative; z-index: 1;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+      background: var(--bg-raised);
+      border: 1px solid var(--line);
       border-radius: var(--radius);
       padding: 44px 40px 40px;
       width: 100%;
       max-width: 420px;
       box-shadow:
-        0 0 0 1px rgba(255,255,255,.04),
-        0 24px 64px rgba(0,0,0,.55),
-        0 4px 16px rgba(0,0,0,.3);
+        0 0 0 1px rgba(0,0,0,.04),
+        0 24px 64px rgba(0,0,0,.15),
+        0 4px 16px rgba(0,0,0,.08);
     }
 
     .brand {
@@ -117,8 +113,8 @@
     input[type="email"],
     input[type="password"] {
       width: 100%;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
+      background: var(--bg-input);
+      border: 1px solid var(--line);
       border-radius: 10px;
       color: var(--ink);
       font-family: inherit;
@@ -132,7 +128,7 @@
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(232,168,56,.18);
     }
-    input::placeholder { color: rgba(240,241,248,.3); }
+    input::placeholder { color: var(--ink-faint); }
 
     .btn-signin {
       width: 100%;

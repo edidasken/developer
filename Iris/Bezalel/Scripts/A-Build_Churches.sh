@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ======================================================================
 # FlockOS — Multi-Church Build Script
-# Reads each JSON config in Scrolls/ChurchRegistry/ and produces a
+# Reads each JSON config in Architechtural Docs/New Covenant/Deployment/ChurchRegistry/ and produces a
 # fully-branded deployment under Nations/<shortName>/
 #
 # BRANDING SOURCE OF TRUTH:
 #   NewCovenant/brand.md
 #   All brand values (colors, fonts, names, copy) are defined there.
-#   Church-specific overrides live in Scrolls/ChurchRegistry/<church>.json
+#   Church-specific overrides live in Architechtural Docs/New Covenant/Deployment/ChurchRegistry/<church>.json
 #   under the brandName field. This script reads brandName from each config
 #   and injects it into the deployed HTML at build time.
 #
@@ -44,7 +44,7 @@ if [ ! -d "$COVENANT_ROOT/Courts/TheTabernacle" ]; then
   fi
 fi
 WORKSPACE_ROOT="$(cd "$COVENANT_ROOT/.." && pwd)"
-CONFIGS_DIR="$COVENANT_ROOT/Scrolls/ChurchRegistry"
+CONFIGS_DIR="$WORKSPACE_ROOT/Architechtural Docs/New Covenant/Deployment/ChurchRegistry"
 CHURCH_DIR="$COVENANT_ROOT/Nations"
 SOURCE_DIR="$COVENANT_ROOT/Courts/TheTabernacle"
 ROOT_MANIFEST="$CHURCH_DIR/FlockOS/manifest.json"

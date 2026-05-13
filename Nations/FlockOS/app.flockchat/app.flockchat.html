@@ -750,7 +750,7 @@
     /* ─── Modal overlay ──────────────────────────────────────────────── */
     .fc-modal-backdrop {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.55);
+      background: var(--modal-dim);
       backdrop-filter: blur(3px);
       z-index: 800;
       display: flex; align-items: center; justify-content: center;
@@ -1484,7 +1484,7 @@
   </div>
 
   <!-- ── Quick switcher (Ctrl+K) ───────────────────────────────────────── -->
-  <div id="fc-quick-switcher" hidden style="position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:900; display:flex; align-items:flex-start; justify-content:center; padding-top:80px;">
+  <div id="fc-quick-switcher" hidden style="position:fixed; inset:0; background:var(--modal-dim); z-index:900; display:flex; align-items:flex-start; justify-content:center; padding-top:80px;">
     <div style="background:var(--fc-panel-2); border:1px solid var(--fc-border-hi); border-radius:14px; width:100%; max-width:460px; box-shadow:0 24px 60px rgba(0,0,0,0.6); overflow:hidden;">
       <div style="padding:0.75rem;">
         <input id="fc-qs-input" type="text" placeholder="Jump to channel or DM…"
@@ -1500,7 +1500,7 @@
   </div>
 
   <!-- ── Sidebar scrim (mobile) ────────────────────────────────────────── -->
-  <div id="fc-sidebar-scrim" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:290;"></div>
+  <div id="fc-sidebar-scrim" style="display:none; position:fixed; inset:0; background:var(--modal-dim); z-index:290;"></div>
 
   <!-- ── Firebase + core scripts ──────────────────────────────────────── -->
   <script>

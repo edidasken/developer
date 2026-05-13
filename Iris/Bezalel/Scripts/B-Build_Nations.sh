@@ -11,7 +11,7 @@
 #   • manifest.json             → church name / branding
 #   • index.html                → <title>, window.FLOCK_FIREBASE_CONFIG
 #
-# Config data read from:  Covenant/Scrolls/ChurchRegistry/<church>.json
+# Config data read from:  Architechtural Docs/New Covenant/Deployment/ChurchRegistry/<church>.json
 #
 # Usage:
 #   bash Covenant/Bezalel/Scripts/B-Build_Nations.sh
@@ -34,7 +34,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WORKSPACE="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 NEW_COVENANT="$WORKSPACE/New_Covenant"
 NATIONS_DIR="$WORKSPACE/Nations"
-CONFIGS_DIR="$WORKSPACE/Covenant/Scrolls/ChurchRegistry"
+CONFIGS_DIR="$WORKSPACE/Architechtural Docs/New Covenant/Deployment/ChurchRegistry"
 
 # ── Dependency check ──────────────────────────────────────────────────
 if ! command -v jq &>/dev/null; then
