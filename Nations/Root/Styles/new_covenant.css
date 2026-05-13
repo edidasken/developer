@@ -11752,6 +11752,33 @@ flock-tabs [role="tablist"], .tabs-bar {
 }
 .gc-country-card.is-open {
   border-color: var(--accent, #5b8fcf);
+  /* Break out of the multi-column grid so the expanded detail never stretches
+     sibling cards. On desktop this gives a full-width master/detail layout. */
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 0 28px;
+  align-items: start;
+}
+/* Summary column (left) — each direct child except the expand panel */
+.gc-country-card.is-open .gc-card-top,
+.gc-country-card.is-open .gc-country-name,
+.gc-country-card.is-open .gc-badges,
+.gc-country-card.is-open .gc-country-meta {
+  grid-column: 1;
+}
+/* Expand panel (right) — spans all rows in column 2 */
+.gc-country-card.is-open .gc-country-expand {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: none;
+  border-left: 1px solid var(--line, #e5e7ef);
+  padding-top: 0;
+  margin-top: 0;
+  padding-left: 24px;
 }
 .gc-card-top   { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
 .gc-flag       { font-size: 1.8rem; line-height: 1; }
@@ -12123,6 +12150,22 @@ flock-tabs [role="tablist"], .tabs-bar {
   .gc-tabs          { gap: 4px; }
   .gc-tab           { padding: 6px 10px; font-size: 0.78rem; }
   .gc-team-grid, .gc-partner-grid, .gc-resources-grid { grid-template-columns: 1fr; }
+
+  /* Tablet: opened country card goes back to simple flex column (no sidebar) */
+  .gc-country-card.is-open {
+    display: flex;
+    flex-direction: column;
+    grid-column: 1 / -1;
+  }
+  .gc-country-card.is-open .gc-country-expand {
+    grid-column: unset;
+    grid-row: unset;
+    border-left: none;
+    border-top: 1px solid var(--line, #e5e7ef);
+    padding-left: 0;
+    padding-top: 10px;
+    margin-top: 6px;
+  }
 }
 
 /* Narrow phones — single column for country cards so expanded detail fits */
@@ -12139,6 +12182,22 @@ flock-tabs [role="tablist"], .tabs-bar {
   .gc-rank-pill       { font-size: 0.72rem; padding: 2px 7px; }
   /* Keep edit button visible on touch (no hover) */
   .gc-edit-btn        { opacity: 1; pointer-events: auto; }
+
+  /* Mobile: revert the desktop master/detail to a simple accordion */
+  .gc-country-card.is-open {
+    display: flex;
+    flex-direction: column;
+    grid-column: unset;
+  }
+  .gc-country-card.is-open .gc-country-expand {
+    grid-column: unset;
+    grid-row: unset;
+    border-left: none;
+    border-top: 1px solid var(--line, #e5e7ef);
+    padding-left: 0;
+    padding-top: 10px;
+    margin-top: 6px;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
