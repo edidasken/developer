@@ -579,7 +579,7 @@
       border-radius: 9px; padding: 8px 10px; text-align: center;
     }
     .bm-stat-val { font: 700 1.15rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent); }
-    .bm-stat-lbl { font: 0.62rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); margin-top: 1px; }
+    .bm-stat-lbl { font: 0.62rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* Scripture lookup */
     .bm-lookup-row { display: flex; gap: 6px; }
@@ -758,7 +758,7 @@
        PANE: RESEARCH
     ════════════════════════════════════════════════════ */
     #bm-pane-research {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr; gap: 0;
       min-height: 0; overflow: hidden;
     }
     .bm-research-col {
@@ -771,6 +771,23 @@
 
     .bm-research-h { font: 700 1.02rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
     .bm-research-h svg { color: var(--bm-accent); flex-shrink: 0; }
+
+    /* Book overview bar */
+    #bm-book-overview { grid-column: 1 / -1; border-bottom: 1px solid var(--bm-border); background: var(--bg-overlay); }
+    .bm-book-ov-inner { padding: 14px 22px; display: flex; flex-direction: column; gap: 8px; }
+    .bm-book-ov-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .bm-book-ov-name { font: 700 1.08rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); }
+    .bm-book-ov-badge { font: 700 0.66rem 'Plus Jakarta Sans', sans-serif; letter-spacing: .06em; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; }
+    .bm-book-ov-badge.ot { background: rgba(232,168,56,0.14); color: var(--bm-accent); }
+    .bm-book-ov-badge.nt { background: rgba(96,165,250,0.14); color: var(--bm-blue); }
+    .bm-book-ov-meta { font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); }
+    .bm-book-ov-purpose { font: 500 0.88rem/1.55 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); }
+    .bm-book-ov-row { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+    .bm-book-ov-themes { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; min-width: 0; }
+    .bm-book-ov-theme-chip { font: 600 0.70rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent); background: rgba(232,168,56,0.10); border: 1px solid rgba(232,168,56,0.22); border-radius: 20px; padding: 2px 8px; white-space: nowrap; }
+    .bm-book-ov-verses { display: flex; flex-wrap: wrap; gap: 5px; }
+    .bm-book-ov-verse { font: 600 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-purple); background: rgba(167,139,250,0.10); border: 1px solid rgba(167,139,250,0.22); border-radius: 6px; padding: 3px 8px; cursor: pointer; transition: all 0.12s; white-space: nowrap; }
+    .bm-book-ov-verse:hover { background: rgba(167,139,250,0.20); border-color: rgba(167,139,250,0.40); }
 
     .bm-res-section { margin-bottom: 20px; }
     .bm-res-label { font: 600 0.65rem 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; letter-spacing: .08em; color: var(--bm-muted); margin-bottom: 8px; }
@@ -1225,9 +1242,9 @@
                 <div class="bm-translation-row">
                   <span class="bm-translation-label">Translation</span>
                   <select class="bm-translation-select" id="bm-translation-select">
-                    <option value="KJV" selected>KJV — King James</option>
+                    <option value="KJV">KJV — King James</option>
                     <option value="NKJV">NKJV — New King James</option>
-                    <option value="ESV">ESV — English Standard</option>
+                    <option value="ESV" selected>ESV — English Standard</option>
                     <option value="NIV">NIV — New International</option>
                     <option value="NASB">NASB — New American Std</option>
                     <option value="NLT">NLT — New Living</option>
@@ -1319,6 +1336,8 @@
 
         <!-- ════════════════════════ RESEARCH PANE ════════════════════ -->
         <div class="bm-pane" id="bm-pane-research" hidden role="tabpanel">
+          <!-- Book overview bar (shown when sermon has a passage) -->
+          <div id="bm-book-overview" style="display:none"></div>
           <!-- Left col: Lexicon -->
           <div class="bm-research-col">
             <div class="bm-research-h">

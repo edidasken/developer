@@ -714,6 +714,7 @@ function _setMsMode(isPreview) {
 function _renderResearch() {
   const s = _active();
   if (!s) return;
+  _renderBookOverview();
   const rn = _qs('bm-research-notes');
   const rq = _qs('bm-research-quotes');
   if (rn) { rn.value = s.researchNotes || ''; _autoResize(rn); }
@@ -1029,6 +1030,7 @@ function _bindHeaderFields() {
         if (titleEl) { titleEl.textContent = el.value || 'Untitled Sermon'; titleEl.classList.toggle('has-sermon', !!el.value); }
         _renderList();
       }
+      if (f === 'passage' && S.activeTab === 'research') _renderBookOverview();
       _queueSave();
     });
   });
@@ -1285,34 +1287,24 @@ function _doLexLookup(query) {
   const blbUrl = _blbLexUrl(query.trim());
 
   // ── 1. Firestore words collection (flockos-notify) ────────────────────────
-  if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
-    const db = firebase.firestore();
+  // Must wait for auth — Firestore rules require request.auth != null
+  if (_fsFB()) {
+    _doLexFirestore(query, isStrongs, blbUrl, res);
+    return;
+  }
 
-    const _applyDoc = (docData) => {
-      _qs('bm-lex-word').textContent     = docData.lemma       || query;
-      _qs('bm-lex-strongs').textContent  = docData.strongs     || docData.id || '';
-      _qs('bm-lex-translit').textContent = docData.xlit        || docData.pron || '';
-      _qs('bm-lex-def').innerHTML        = `${_e(docData.strongs_def || docData.kjv_def || '')} <a href="${blbUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent);font-size:0.78rem;white-space:nowrap">Open in BLB ↗</a>`;
-      _qs('bm-lex-origin').textContent   = docData.derivation  || '';
-      res.classList.add('visible');
-    };
-
-    if (isStrongs) {
-      db.collection('words').doc(query.toUpperCase().trim()).get()
-        .then(doc => { if (doc.exists) { _applyDoc({ id: doc.id, ...doc.data() }); } else { _applyFallback(); } })
-        .catch(e => { console.warn('[TheFeed] Lexicon lookup failed:', e); _applyFallback(); });
-      return;
-    } else {
-      const lq = query.trim();
-      Promise.all([
-        db.collection('words').where('lemma', '==', lq).limit(1).get(),
-        db.collection('words').where('kjv_def', '>=', lq.toLowerCase()).where('kjv_def', '<=', lq.toLowerCase() + '\uf8ff').limit(1).get()
-      ]).then(([byLemma, byKjv]) => {
-        const hit = !byLemma.empty ? byLemma.docs[0] : (!byKjv.empty ? byKjv.docs[0] : null);
-        if (hit) { _applyDoc({ id: hit.id, ...hit.data() }); } else { _applyFallback(); }
-      }).catch(e => { console.warn('[TheFeed] Lexicon lookup failed:', e); _applyFallback(); });
-      return;
-    }
+  if (window.UpperRoom && typeof window.UpperRoom.waitReady === 'function') {
+    // Show a "connecting" state and retry once auth resolves
+    _qs('bm-lex-word').textContent    = query;
+    _qs('bm-lex-strongs').textContent = '';
+    _qs('bm-lex-translit').textContent = '';
+    _qs('bm-lex-def').textContent     = 'Connecting to database…';
+    _qs('bm-lex-origin').textContent  = '';
+    res.classList.add('visible');
+    window.UpperRoom.waitReady()
+      .then(() => _doLexFirestore(query, isStrongs, blbUrl, res))
+      .catch(() => _doLexFallback(query, blbUrl, res));
+    return;
   }
 
   // ── 2. Legacy window globals fallback ─────────────────────────────────────
@@ -1339,16 +1331,209 @@ function _doLexLookup(query) {
     return;
   }
 
-  _applyFallback();
+  _doLexFallback(query, blbUrl, res);
+}
 
-  function _applyFallback() {
-    _qs('bm-lex-word').textContent     = query;
-    _qs('bm-lex-strongs').textContent  = '';
-    _qs('bm-lex-translit').textContent = '';
-    _qs('bm-lex-def').innerHTML        = `<a href="${blbUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent)">Search BLB Lexicon ↗</a>`;
-    _qs('bm-lex-origin').textContent   = '';
+// Extracted Firestore query — called once auth is confirmed ready
+function _doLexFirestore(query, isStrongs, blbUrl, res) {
+  const db = firebase.firestore();
+
+  const _applyDoc = (docData) => {
+    _qs('bm-lex-word').textContent     = docData.lemma       || query;
+    _qs('bm-lex-strongs').textContent  = docData.strongs     || docData.id || '';
+    _qs('bm-lex-translit').textContent = docData.xlit        || docData.pron || '';
+    _qs('bm-lex-def').innerHTML        = `${_e(docData.strongs_def || docData.kjv_def || '')} <a href="${blbUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent);font-size:0.78rem;white-space:nowrap">Open in BLB ↗</a>`;
+    _qs('bm-lex-origin').textContent   = docData.derivation  || '';
     res.classList.add('visible');
+  };
+
+  if (isStrongs) {
+    db.collection('words').doc(query.toUpperCase().trim()).get()
+      .then(doc => {
+        if (doc.exists) { _applyDoc({ id: doc.id, ...doc.data() }); }
+        else { _doLexFallback(query, blbUrl, res); }
+      })
+      .catch(e => { console.warn('[TheFeed] Lexicon lookup failed:', e); _doLexFallback(query, blbUrl, res); });
+  } else {
+    const lq = query.trim();
+    Promise.all([
+      db.collection('words').where('lemma', '==', lq).limit(1).get(),
+      db.collection('words').where('kjv_def', '>=', lq.toLowerCase()).where('kjv_def', '<=', lq.toLowerCase() + '\uf8ff').limit(1).get()
+    ]).then(([byLemma, byKjv]) => {
+      const hit = !byLemma.empty ? byLemma.docs[0] : (!byKjv.empty ? byKjv.docs[0] : null);
+      if (hit) { _applyDoc({ id: hit.id, ...hit.data() }); } else { _doLexFallback(query, blbUrl, res); }
+    }).catch(e => { console.warn('[TheFeed] Lexicon lookup failed:', e); _doLexFallback(query, blbUrl, res); });
   }
+}
+
+function _doLexFallback(query, blbUrl, res) {
+  _qs('bm-lex-word').textContent     = query;
+  _qs('bm-lex-strongs').textContent  = '';
+  _qs('bm-lex-translit').textContent = '';
+  _qs('bm-lex-def').innerHTML        = `<a href="${blbUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent)">Search BLB Lexicon ↗</a>`;
+  _qs('bm-lex-origin').textContent   = '';
+  if (res) res.classList.add('visible');
+}
+
+// ── Bible Book Overview ───────────────────────────────────────────────────────
+const _BIBLE_BOOKS = {
+  // Old Testament
+  'genesis':        { name:'Genesis',         testament:'OT', author:'Moses',                                   date:'c. 1446–1406 BC', chapters:50,  purpose:'The beginning — God creates, humanity falls, covenant begins with Abraham, Isaac, Jacob, and Joseph.',          themes:['Creation','The Fall','Covenant','God\'s Faithfulness','Redemption'],                keyVerses:['Genesis 1:1','Genesis 3:15','Genesis 12:1-3','Genesis 50:20'] },
+  'exodus':         { name:'Exodus',          testament:'OT', author:'Moses',                                   date:'c. 1446–1406 BC', chapters:40,  purpose:'God redeems Israel from Egypt and establishes His covenant at Sinai.',                                          themes:['Redemption','The Law','God\'s Presence','Passover','Worship'],                      keyVerses:['Exodus 3:14','Exodus 12:13','Exodus 20:1-17','Exodus 33:14'] },
+  'leviticus':      { name:'Leviticus',        testament:'OT', author:'Moses',                                   date:'c. 1446–1406 BC', chapters:27,  purpose:'Instructions for holiness — how a holy God\'s people are to worship and live.',                               themes:['Holiness','Sacrifice','Atonement','Priesthood','Worship'],                          keyVerses:['Leviticus 11:44','Leviticus 17:11','Leviticus 19:18'] },
+  'numbers':        { name:'Numbers',          testament:'OT', author:'Moses',                                   date:'c. 1446–1406 BC', chapters:36,  purpose:'Israel\'s wilderness journey — failure, discipline, and God\'s sustained faithfulness.',                      themes:['Faithfulness','Discipline','Wandering','Trust','God\'s Provision'],                 keyVerses:['Numbers 6:24-26','Numbers 14:18','Numbers 21:8-9'] },
+  'deuteronomy':    { name:'Deuteronomy',      testament:'OT', author:'Moses',                                   date:'c. 1406 BC',       chapters:34,  purpose:'Moses\' farewell — covenant renewed, the greatest commandment, and the path to blessing.',                   themes:['Obedience','The Law','Covenant Renewal','Love for God','Blessing & Curse'],         keyVerses:['Deuteronomy 6:4-5','Deuteronomy 8:3','Deuteronomy 30:19'] },
+  'joshua':         { name:'Joshua',           testament:'OT', author:'Joshua',                                  date:'c. 1405–1380 BC', chapters:24,  purpose:'Israel conquers and inherits the Promised Land under Joshua\'s leadership.',                                 themes:['Faith','Obedience','God\'s Promises','Victory','Inheritance'],                      keyVerses:['Joshua 1:8-9','Joshua 24:15'] },
+  'judges':         { name:'Judges',           testament:'OT', author:'Unknown (Samuel?)',                        date:'c. 1380–1050 BC', chapters:21,  purpose:'A cycle of sin, oppression, repentance, and deliverance.',                                                   themes:['Sin Cycles','Repentance','Deliverance','Leadership','Idolatry'],                    keyVerses:['Judges 2:18-19','Judges 21:25'] },
+  'ruth':           { name:'Ruth',             testament:'OT', author:'Unknown (Samuel?)',                        date:'c. 1100 BC',       chapters:4,   purpose:'Loyalty, redemption, and God\'s providence through a Moabite woman — ancestor of David and Jesus.',         themes:['Loyalty','Redemption','Providence','Faithfulness','Family'],                        keyVerses:['Ruth 1:16-17','Ruth 2:12','Ruth 4:14'] },
+  '1samuel':        { name:'1 Samuel',         testament:'OT', author:'Samuel / Nathan / Gad',                   date:'c. 1050–1000 BC', chapters:31,  purpose:'Israel\'s transition to monarchy — Samuel, Saul, and the rise of David.',                                  themes:['Leadership','Obedience','God\'s Sovereignty','The Heart','Repentance'],             keyVerses:['1 Samuel 15:22','1 Samuel 16:7','1 Samuel 17:47'] },
+  '2samuel':        { name:'2 Samuel',         testament:'OT', author:'Nathan / Gad',                            date:'c. 1000–965 BC',  chapters:24,  purpose:'David\'s reign — triumphs, failures, and the Davidic Covenant.',                                            themes:['The Davidic Covenant','Sin & Consequences','Worship','Kingship','Grace'],           keyVerses:['2 Samuel 7:12-13','2 Samuel 12:13'] },
+  '1kings':         { name:'1 Kings',          testament:'OT', author:'Unknown (Jeremiah?)',                      date:'c. 560–540 BC',   chapters:22,  purpose:'Solomon\'s wisdom and temple, followed by the kingdom\'s division.',                                        themes:['Wisdom','Idolatry','Obedience','God\'s Faithfulness','Apostasy'],                   keyVerses:['1 Kings 3:9','1 Kings 8:27','1 Kings 18:21','1 Kings 19:12'] },
+  '2kings':         { name:'2 Kings',          testament:'OT', author:'Unknown (Jeremiah?)',                      date:'c. 560–540 BC',   chapters:25,  purpose:'The downfall of both kingdoms — Israel and Judah — due to persistent sin.',                                themes:['Judgment','Idolatry','The Prophets','Exile','God\'s Patience'],                     keyVerses:['2 Kings 17:7-8','2 Kings 22:8','2 Kings 25:21'] },
+  '1chronicles':    { name:'1 Chronicles',     testament:'OT', author:'Ezra',                                    date:'c. 450–430 BC',   chapters:29,  purpose:'David\'s legacy and preparations for the temple — from God\'s perspective.',                                themes:['Worship','David\'s Legacy','The Temple','Genealogy','God\'s Kingdom'],              keyVerses:['1 Chronicles 16:11','1 Chronicles 29:11-12'] },
+  '2chronicles':    { name:'2 Chronicles',     testament:'OT', author:'Ezra',                                    date:'c. 450–430 BC',   chapters:36,  purpose:'Judah\'s history through the temple — obedience, worship, and eventual exile.',                             themes:['Worship','Repentance','Revival','The Temple','Consequences of Sin'],                keyVerses:['2 Chronicles 7:14','2 Chronicles 15:2','2 Chronicles 20:15'] },
+  'ezra':           { name:'Ezra',             testament:'OT', author:'Ezra',                                    date:'c. 458–440 BC',   chapters:10,  purpose:'Return from exile — restoring the temple and covenant faithfulness.',                                        themes:['Restoration','God\'s Word','Obedience','Repentance','Community'],                   keyVerses:['Ezra 7:10','Ezra 9:6'] },
+  'nehemiah':       { name:'Nehemiah',         testament:'OT', author:'Nehemiah',                                date:'c. 445–420 BC',   chapters:13,  purpose:'Rebuilding Jerusalem\'s walls and renewing covenant commitment.',                                            themes:['Prayer','Leadership','Perseverance','Community','Covenant Renewal'],               keyVerses:['Nehemiah 1:4','Nehemiah 6:3','Nehemiah 8:8','Nehemiah 8:10'] },
+  'esther':         { name:'Esther',           testament:'OT', author:'Unknown (Mordecai?)',                      date:'c. 483–473 BC',   chapters:10,  purpose:'God\'s hidden providence preserving His people through Esther.',                                            themes:['Providence','Courage','God\'s Sovereignty','Deliverance','Identity'],               keyVerses:['Esther 4:14','Esther 8:17'] },
+  'job':            { name:'Job',              testament:'OT', author:'Unknown',                                 date:'Unknown',          chapters:42,  purpose:'Suffering, sovereignty, and trust — why do the righteous suffer?',                                          themes:['Suffering','God\'s Sovereignty','Faith','Wisdom','Redemption'],                     keyVerses:['Job 1:21','Job 19:25-26','Job 38:4','Job 42:5'] },
+  'psalms':         { name:'Psalms',           testament:'OT', author:'David, Asaph, Sons of Korah, Moses',      date:'c. 1400–400 BC',  chapters:150, purpose:'Israel\'s prayer book and hymnal — the full range of human emotion directed toward God.',                  themes:['Worship','Lament','Trust','Praise','God\'s Faithfulness'],                         keyVerses:['Psalm 1:1-2','Psalm 23:1','Psalm 51:10','Psalm 139:14'] },
+  'proverbs':       { name:'Proverbs',         testament:'OT', author:'Solomon (primarily)',                      date:'c. 970–700 BC',   chapters:31,  purpose:'Practical wisdom for godly living — the fear of the Lord is the beginning of wisdom.',                   themes:['Wisdom','The Fear of God','Speech','Work','Family'],                                keyVerses:['Proverbs 1:7','Proverbs 3:5-6','Proverbs 11:2','Proverbs 22:6'] },
+  'ecclesiastes':   { name:'Ecclesiastes',     testament:'OT', author:'Solomon',                                 date:'c. 935 BC',        chapters:12,  purpose:'The search for meaning apart from God is vanity — fear God and keep His commandments.',                    themes:['Meaning','Vanity','Wisdom','Time','Eternity'],                                      keyVerses:['Ecclesiastes 1:2','Ecclesiastes 3:1','Ecclesiastes 12:13'] },
+  'songofsolomon':  { name:'Song of Solomon',  testament:'OT', author:'Solomon',                                 date:'c. 960 BC',        chapters:8,   purpose:'The beauty of covenant love — human love as a picture of God\'s love for His people.',                   themes:['Love','Marriage','Covenant','Desire','Faithfulness'],                               keyVerses:['Song of Solomon 2:16','Song of Solomon 8:6-7'] },
+  'isaiah':         { name:'Isaiah',           testament:'OT', author:'Isaiah',                                  date:'c. 740–700 BC',   chapters:66,  purpose:'Judgment and hope — the coming Messiah and the new creation.',                                             themes:['The Messiah','Salvation','Holiness','Judgment','New Creation'],                     keyVerses:['Isaiah 6:8','Isaiah 9:6','Isaiah 40:31','Isaiah 53:5-6','Isaiah 55:11'] },
+  'jeremiah':       { name:'Jeremiah',         testament:'OT', author:'Jeremiah',                                date:'c. 627–580 BC',   chapters:52,  purpose:'Warning of coming judgment and the promise of a new covenant.',                                             themes:['New Covenant','Judgment','Repentance','God\'s Word','Faithfulness'],                keyVerses:['Jeremiah 1:5','Jeremiah 17:9','Jeremiah 29:11','Jeremiah 31:33'] },
+  'lamentations':   { name:'Lamentations',     testament:'OT', author:'Jeremiah',                                date:'c. 586 BC',        chapters:5,   purpose:'Grief over Jerusalem\'s destruction — yet God\'s mercies are new every morning.',                         themes:['Grief','God\'s Faithfulness','Suffering','Hope','Repentance'],                      keyVerses:['Lamentations 3:22-23','Lamentations 3:40'] },
+  'ezekiel':        { name:'Ezekiel',          testament:'OT', author:'Ezekiel',                                 date:'c. 593–571 BC',   chapters:48,  purpose:'God\'s glory departs and returns — vision of restoration and the new temple.',                             themes:['God\'s Glory','Judgment','Restoration','The Spirit','New Temple'],                  keyVerses:['Ezekiel 18:31','Ezekiel 36:26','Ezekiel 37:14'] },
+  'daniel':         { name:'Daniel',           testament:'OT', author:'Daniel',                                  date:'c. 605–535 BC',   chapters:12,  purpose:'Faithfulness under pressure and God\'s sovereignty over all kingdoms.',                                    themes:['God\'s Sovereignty','Faithfulness','End Times','Prayer','Courage'],                 keyVerses:['Daniel 1:8','Daniel 3:17-18','Daniel 6:10','Daniel 9:3'] },
+  'hosea':          { name:'Hosea',            testament:'OT', author:'Hosea',                                   date:'c. 755–715 BC',   chapters:14,  purpose:'God\'s unfailing love for an unfaithful people — return to the Lord.',                                    themes:['God\'s Love','Unfaithfulness','Repentance','Restoration','Marriage'],               keyVerses:['Hosea 2:19-20','Hosea 6:6','Hosea 11:1','Hosea 14:4'] },
+  'joel':           { name:'Joel',             testament:'OT', author:'Joel',                                    date:'c. 835 BC',        chapters:3,   purpose:'The Day of the Lord — call to repentance and the promise of the Spirit.',                                  themes:['The Day of the Lord','Repentance','The Holy Spirit','Restoration'],                 keyVerses:['Joel 2:12-13','Joel 2:28','Joel 2:32'] },
+  'amos':           { name:'Amos',             testament:'OT', author:'Amos',                                    date:'c. 760–750 BC',   chapters:9,   purpose:'Social justice and judgment — let justice roll down like waters.',                                          themes:['Justice','Judgment','Social Responsibility','False Religion','Repentance'],         keyVerses:['Amos 3:7','Amos 5:24','Amos 7:7-8'] },
+  'obadiah':        { name:'Obadiah',          testament:'OT', author:'Obadiah',                                 date:'c. 586 BC',        chapters:1,   purpose:'Judgment on Edom for pride and betrayal of Judah.',                                                         themes:['Pride','Judgment','Betrayal','God\'s Justice'],                                     keyVerses:['Obadiah 1:3','Obadiah 1:15'] },
+  'jonah':          { name:'Jonah',            testament:'OT', author:'Jonah',                                   date:'c. 786–746 BC',   chapters:4,   purpose:'God\'s compassion for all nations — even Nineveh — and a reluctant prophet.',                             themes:['God\'s Compassion','Repentance','Obedience','Missions','Grace'],                    keyVerses:['Jonah 1:3','Jonah 2:9','Jonah 4:2'] },
+  'micah':          { name:'Micah',            testament:'OT', author:'Micah',                                   date:'c. 735–700 BC',   chapters:7,   purpose:'Justice, mercy, and walking humbly with God.',                                                              themes:['Justice','Mercy','Humility','The Messiah','Judgment'],                              keyVerses:['Micah 5:2','Micah 6:8','Micah 7:18-19'] },
+  'nahum':          { name:'Nahum',            testament:'OT', author:'Nahum',                                   date:'c. 663–612 BC',   chapters:3,   purpose:'God\'s judgment on Nineveh — the LORD is slow to anger but will not leave the guilty unpunished.',         themes:['God\'s Justice','Judgment','God\'s Power','Comfort'],                               keyVerses:['Nahum 1:7','Nahum 1:3'] },
+  'habakkuk':       { name:'Habakkuk',         testament:'OT', author:'Habakkuk',                                date:'c. 612–589 BC',   chapters:3,   purpose:'Wrestling with God over injustice — the righteous shall live by faith.',                                  themes:['Faith','God\'s Sovereignty','Suffering','Prayer','Worship'],                        keyVerses:['Habakkuk 1:2','Habakkuk 2:4','Habakkuk 3:17-18'] },
+  'zephaniah':      { name:'Zephaniah',        testament:'OT', author:'Zephaniah',                               date:'c. 640–609 BC',   chapters:3,   purpose:'The Day of the Lord is near — seek righteousness, seek humility.',                                          themes:['The Day of the Lord','Judgment','Humility','Restoration','Remnant'],                keyVerses:['Zephaniah 2:3','Zephaniah 3:17'] },
+  'haggai':         { name:'Haggai',           testament:'OT', author:'Haggai',                                  date:'c. 520 BC',        chapters:2,   purpose:'Rebuild the temple — put God\'s priorities first and He will bless.',                                     themes:['Priorities','Worship','God\'s Presence','Obedience','Blessing'],                    keyVerses:['Haggai 1:7','Haggai 2:4','Haggai 2:9'] },
+  'zechariah':      { name:'Zechariah',        testament:'OT', author:'Zechariah',                               date:'c. 520–480 BC',   chapters:14,  purpose:'Visions of restoration and messianic prophecy — the coming King.',                                         themes:['The Messiah','Restoration','God\'s Sovereignty','End Times','Worship'],             keyVerses:['Zechariah 4:6','Zechariah 9:9','Zechariah 12:10','Zechariah 14:9'] },
+  'malachi':        { name:'Malachi',          testament:'OT', author:'Malachi',                                 date:'c. 430 BC',        chapters:4,   purpose:'Covenant faithfulness in the final OT book — prepare the way for the Lord.',                               themes:['Covenant','Faithfulness','Tithing','God\'s Love','Coming Messenger'],               keyVerses:['Malachi 3:1','Malachi 3:10','Malachi 4:2'] },
+  // New Testament
+  'matthew':        { name:'Matthew',          testament:'NT', author:'Matthew (Levi)',                          date:'c. AD 50–70',     chapters:28,  purpose:'Jesus is the promised Messiah, King of Kings — fulfillment of all the OT promises.',                       themes:['The Kingdom of Heaven','Discipleship','The Messiah','Fulfillment','The Church'],    keyVerses:['Matthew 5:3','Matthew 6:33','Matthew 16:18','Matthew 28:18-20'] },
+  'mark':           { name:'Mark',             testament:'NT', author:'John Mark (from Peter)',                   date:'c. AD 55–65',     chapters:16,  purpose:'Jesus the Servant — the action-packed gospel of the Son of God who came to serve.',                      themes:['Service','Urgency','The Kingdom','Miracles','Discipleship'],                        keyVerses:['Mark 1:15','Mark 8:34','Mark 10:45','Mark 16:15'] },
+  'luke':           { name:'Luke',             testament:'NT', author:'Luke (physician)',                         date:'c. AD 60–70',     chapters:24,  purpose:'Jesus the perfect Son of Man — compassion for the lost, poor, and outcast.',                             themes:['Compassion','Prayer','The Holy Spirit','The Lost','Women & Outcasts'],              keyVerses:['Luke 4:18-19','Luke 15:24','Luke 19:10','Luke 23:34'] },
+  'john':           { name:'John',             testament:'NT', author:'Apostle John',                            date:'c. AD 85–90',     chapters:21,  purpose:'That you may believe Jesus is the Christ, the Son of God, and have life in His name.',                  themes:['Belief','Eternal Life','Light & Darkness','I AM Statements','The Word'],            keyVerses:['John 1:1','John 3:16','John 10:10','John 11:25','John 14:6','John 20:31'] },
+  'acts':           { name:'Acts',             testament:'NT', author:'Luke',                                    date:'c. AD 62–70',     chapters:28,  purpose:'The birth and expansion of the Church through the power of the Holy Spirit.',                            themes:['The Holy Spirit','Missions','The Church','Persecution','Salvation'],                keyVerses:['Acts 1:8','Acts 2:38','Acts 4:12','Acts 16:31'] },
+  'romans':         { name:'Romans',           testament:'NT', author:'Paul',                                    date:'c. AD 57',         chapters:16,  purpose:'The systematic presentation of the gospel — all have sinned, all can be saved.',                        themes:['Justification by Faith','Sin','Grace','The Gospel','Sanctification'],               keyVerses:['Romans 1:16','Romans 3:23','Romans 5:8','Romans 6:23','Romans 8:28','Romans 10:9'] },
+  '1corinthians':   { name:'1 Corinthians',    testament:'NT', author:'Paul',                                    date:'c. AD 54–55',     chapters:16,  purpose:'Church unity, spiritual gifts, and love — the cross is the power of God.',                              themes:['Unity','Love','Spiritual Gifts','Resurrection','The Cross'],                        keyVerses:['1 Corinthians 1:18','1 Corinthians 2:2','1 Corinthians 13:4-7','1 Corinthians 15:3-4'] },
+  '2corinthians':   { name:'2 Corinthians',    testament:'NT', author:'Paul',                                    date:'c. AD 55–56',     chapters:13,  purpose:'Ministry in weakness — God\'s power made perfect in weakness.',                                          themes:['Weakness & Strength','Ministry','Suffering','Reconciliation','Generosity'],        keyVerses:['2 Corinthians 1:3-4','2 Corinthians 5:17','2 Corinthians 5:21','2 Corinthians 12:9'] },
+  'galatians':      { name:'Galatians',        testament:'NT', author:'Paul',                                    date:'c. AD 48–55',     chapters:6,   purpose:'Freedom from the law — justified by faith alone, not works.',                                            themes:['Grace','Justification by Faith','Freedom','The Spirit','The Law'],                  keyVerses:['Galatians 2:20','Galatians 3:28','Galatians 5:1','Galatians 5:22-23'] },
+  'ephesians':      { name:'Ephesians',        testament:'NT', author:'Paul',                                    date:'c. AD 60–62',     chapters:6,   purpose:'The Church — our identity in Christ and our walk worthy of the calling.',                               themes:['Identity in Christ','The Church','Grace','Unity','Spiritual Warfare'],              keyVerses:['Ephesians 1:4','Ephesians 2:8-9','Ephesians 4:1','Ephesians 6:10-11'] },
+  'philippians':    { name:'Philippians',      testament:'NT', author:'Paul',                                    date:'c. AD 61',         chapters:4,   purpose:'Joy in all circumstances — the mind of Christ and contentment in Him.',                                themes:['Joy','Contentment','Humility','The Mind of Christ','Partnership'],                  keyVerses:['Philippians 1:6','Philippians 2:5-8','Philippians 3:14','Philippians 4:7','Philippians 4:13'] },
+  'colossians':     { name:'Colossians',       testament:'NT', author:'Paul',                                    date:'c. AD 60–62',     chapters:4,   purpose:'Christ is supreme over all creation — the fullness of God dwells in Him.',                              themes:['Supremacy of Christ','Fullness in Christ','Warning Against Heresy','Christian Living'], keyVerses:['Colossians 1:15-17','Colossians 2:9-10','Colossians 3:1-2','Colossians 3:17'] },
+  '1thessalonians': { name:'1 Thessalonians',  testament:'NT', author:'Paul',                                    date:'c. AD 51',         chapters:5,   purpose:'Encouragement in persecution and instruction about the return of Christ.',                              themes:['The Second Coming','Holiness','Encouragement','Prayer','Hope'],                     keyVerses:['1 Thessalonians 4:16-17','1 Thessalonians 5:16-18','1 Thessalonians 5:23'] },
+  '2thessalonians': { name:'2 Thessalonians',  testament:'NT', author:'Paul',                                    date:'c. AD 51–52',     chapters:3,   purpose:'Clarifying the Day of the Lord and calling for perseverance and faithfulness.',                        themes:['The Day of the Lord','Perseverance','Work','Judgment','God\'s Justice'],            keyVerses:['2 Thessalonians 1:11','2 Thessalonians 2:15','2 Thessalonians 3:3'] },
+  '1timothy':       { name:'1 Timothy',        testament:'NT', author:'Paul',                                    date:'c. AD 62–64',     chapters:6,   purpose:'Pastoral instruction — guard the faith, lead well, pursue godliness.',                                 themes:['Church Leadership','Sound Doctrine','Godliness','Prayer','Faithfulness'],           keyVerses:['1 Timothy 1:15','1 Timothy 2:1-2','1 Timothy 4:12','1 Timothy 6:6','1 Timothy 6:12'] },
+  '2timothy':       { name:'2 Timothy',        testament:'NT', author:'Paul',                                    date:'c. AD 66–67',     chapters:4,   purpose:'Paul\'s final charge — preach the Word, endure hardship, finish the race.',                           themes:['Perseverance','God\'s Word','Ministry','Legacy','Faithfulness'],                    keyVerses:['2 Timothy 1:7','2 Timothy 2:15','2 Timothy 3:16-17','2 Timothy 4:2','2 Timothy 4:7'] },
+  'titus':          { name:'Titus',            testament:'NT', author:'Paul',                                    date:'c. AD 63–65',     chapters:3,   purpose:'Sound doctrine and godly living — the grace of God trains us to say no to ungodliness.',               themes:['Grace','Godliness','Sound Doctrine','Church Order','Good Works'],                   keyVerses:['Titus 1:5','Titus 2:11-13','Titus 3:5'] },
+  'philemon':       { name:'Philemon',         testament:'NT', author:'Paul',                                    date:'c. AD 60–61',     chapters:1,   purpose:'A personal plea for forgiveness and reconciliation — receive Onesimus as a brother.',                  themes:['Forgiveness','Reconciliation','Brotherhood','Grace','Freedom'],                     keyVerses:['Philemon 1:10','Philemon 1:16','Philemon 1:18'] },
+  'hebrews':        { name:'Hebrews',          testament:'NT', author:'Unknown (Paul? Apollos?)',                 date:'c. AD 60–70',     chapters:13,  purpose:'Jesus is greater — greater than angels, Moses, priests, and the old covenant.',                       themes:['Supremacy of Christ','Faith','The New Covenant','Perseverance','Priesthood'],       keyVerses:['Hebrews 4:12','Hebrews 4:16','Hebrews 11:1','Hebrews 12:1-2','Hebrews 13:8'] },
+  'james':          { name:'James',            testament:'NT', author:'James (brother of Jesus)',                 date:'c. AD 45–50',     chapters:5,   purpose:'Faith without works is dead — practical godliness in everyday life.',                                  themes:['Practical Faith','Wisdom','Trials','Speech','Prayer'],                              keyVerses:['James 1:2-4','James 1:22','James 2:17','James 4:7','James 5:16'] },
+  '1peter':         { name:'1 Peter',          testament:'NT', author:'Peter',                                   date:'c. AD 62–64',     chapters:5,   purpose:'Suffering and hope — stand firm as strangers and exiles; the God of all grace will restore.',         themes:['Suffering','Hope','Holiness','God\'s Grace','Identity'],                            keyVerses:['1 Peter 1:3','1 Peter 2:9','1 Peter 4:10','1 Peter 5:7','1 Peter 5:10'] },
+  '2peter':         { name:'2 Peter',          testament:'NT', author:'Peter',                                   date:'c. AD 65–68',     chapters:3,   purpose:'Guard against false teachers and grow in grace and knowledge of Christ.',                              themes:['False Teaching','Godliness','God\'s Word','The Day of the Lord','Growth'],          keyVerses:['2 Peter 1:3-4','2 Peter 1:21','2 Peter 3:9'] },
+  '1john':          { name:'1 John',           testament:'NT', author:'Apostle John',                            date:'c. AD 85–95',     chapters:5,   purpose:'Assurance of salvation — walk in the light, love one another, abide in Christ.',                     themes:['Love','Assurance','Fellowship with God','Truth vs. Falsehood','Abiding'],           keyVerses:['1 John 1:9','1 John 3:16','1 John 4:7-8','1 John 5:13'] },
+  '2john':          { name:'2 John',           testament:'NT', author:'Apostle John',                            date:'c. AD 90',         chapters:1,   purpose:'Walk in truth and love; do not welcome false teachers.',                                               themes:['Truth','Love','False Teaching','Obedience'],                                        keyVerses:['2 John 1:6','2 John 1:9'] },
+  '3john':          { name:'3 John',           testament:'NT', author:'Apostle John',                            date:'c. AD 90',         chapters:1,   purpose:'Support faithful workers; do not imitate evil but imitate what is good.',                             themes:['Hospitality','Truth','Leadership','Faithfulness'],                                  keyVerses:['3 John 1:4','3 John 1:11'] },
+  'jude':           { name:'Jude',             testament:'NT', author:'Jude (brother of Jesus)',                  date:'c. AD 65–80',     chapters:1,   purpose:'Contend earnestly for the faith once delivered to the saints.',                                         themes:['Apostasy','Contending for Faith','False Teachers','God\'s Judgment','Perseverance'],keyVerses:['Jude 1:3','Jude 1:24-25'] },
+  'revelation':     { name:'Revelation',       testament:'NT', author:'Apostle John',                            date:'c. AD 90–95',     chapters:22,  purpose:'The triumph of Christ over evil — God wins, and His people will dwell with Him forever.',            themes:['Christ\'s Victory','End Times','Worship','God\'s Sovereignty','New Creation'],      keyVerses:['Revelation 1:8','Revelation 3:20','Revelation 12:11','Revelation 21:4','Revelation 22:20'] },
+};
+
+/** Parse a passage string like "John 3:16" or "1 Cor 13:4–7" into a _BIBLE_BOOKS key */
+function _parseBookFromPassage(passage) {
+  if (!passage) return null;
+  const raw = passage.trim();
+
+  const aliases = {
+    'gen':'genesis','exo':'exodus','exod':'exodus','lev':'leviticus','num':'numbers',
+    'deu':'deuteronomy','deut':'deuteronomy','jos':'joshua','jdg':'judges','jud':'judges',
+    'rut':'ruth','1sa':'1samuel','1sam':'1samuel','1 sam':'1samuel','1 samuel':'1samuel',
+    '2sa':'2samuel','2sam':'2samuel','2 sam':'2samuel','2 samuel':'2samuel',
+    '1ki':'1kings','1kgs':'1kings','1 kgs':'1kings','1 kings':'1kings',
+    '2ki':'2kings','2kgs':'2kings','2 kgs':'2kings','2 kings':'2kings',
+    '1ch':'1chronicles','1chr':'1chronicles','1 chr':'1chronicles','1 chron':'1chronicles','1 chronicles':'1chronicles',
+    '2ch':'2chronicles','2chr':'2chronicles','2 chr':'2chronicles','2 chron':'2chronicles','2 chronicles':'2chronicles',
+    'ezr':'ezra','neh':'nehemiah','est':'esther',
+    'psa':'psalms','pss':'psalms','psalm':'psalms','ps':'psalms',
+    'pro':'proverbs','prov':'proverbs','ecc':'ecclesiastes','eccl':'ecclesiastes','qoh':'ecclesiastes',
+    'son':'songofsolomon','sos':'songofsolomon','sol':'songofsolomon',
+    'song of songs':'songofsolomon','song of solomon':'songofsolomon','sng':'songofsolomon',
+    'isa':'isaiah','jer':'jeremiah','lam':'lamentations','eze':'ezekiel','ezek':'ezekiel',
+    'dan':'daniel','hos':'hosea','joe':'joel','amo':'amos','oba':'obadiah',
+    'jon':'jonah','mic':'micah','nah':'nahum','hab':'habakkuk','zep':'zephaniah',
+    'hag':'haggai','zec':'zechariah','zech':'zechariah','mal':'malachi',
+    'mat':'matthew','matt':'matthew','mrk':'mark','luk':'luke',
+    'joh':'john','jhn':'john','act':'acts','rom':'romans',
+    '1co':'1corinthians','1cor':'1corinthians','1 cor':'1corinthians','1 corinthians':'1corinthians',
+    '2co':'2corinthians','2cor':'2corinthians','2 cor':'2corinthians','2 corinthians':'2corinthians',
+    'gal':'galatians','eph':'ephesians','phi':'philippians','php':'philippians','phl':'philippians',
+    'col':'colossians',
+    '1th':'1thessalonians','1 thess':'1thessalonians','1 thessalonians':'1thessalonians',
+    '2th':'2thessalonians','2 thess':'2thessalonians','2 thessalonians':'2thessalonians',
+    '1ti':'1timothy','1tim':'1timothy','1 tim':'1timothy','1 timothy':'1timothy',
+    '2ti':'2timothy','2tim':'2timothy','2 tim':'2timothy','2 timothy':'2timothy',
+    'tit':'titus','phm':'philemon','heb':'hebrews','jas':'james',
+    '1pe':'1peter','1pet':'1peter','1 pet':'1peter','1 peter':'1peter',
+    '2pe':'2peter','2pet':'2peter','2 pet':'2peter','2 peter':'2peter',
+    '1jo':'1john','1joh':'1john','1 john':'1john','1jn':'1john',
+    '2jo':'2john','2joh':'2john','2 john':'2john','2jn':'2john',
+    '3jo':'3john','3joh':'3john','3 john':'3john','3jn':'3john',
+    'jde':'jude','rev':'revelation','rvl':'revelation',
+  };
+
+  // Strip chapter:verse to get just the book portion
+  const bookPart = raw.replace(/\s*\d+[:\s].*$/, '').replace(/\s*\d+[–\-]?\d*$/, '').trim().toLowerCase();
+  if (_BIBLE_BOOKS[bookPart]) return bookPart;
+  if (aliases[bookPart]) return aliases[bookPart];
+
+  // More aggressive strip
+  const stripped = raw.replace(/[\s:,\-–].*$/, '').trim().toLowerCase();
+  if (_BIBLE_BOOKS[stripped]) return stripped;
+  if (aliases[stripped]) return aliases[stripped];
+
+  return null;
+}
+
+/** Render the book overview bar at the top of the Research pane */
+function _renderBookOverview() {
+  const el = _qs('bm-book-overview');
+  if (!el) return;
+  const s = _active();
+  const passage = (s && s.passage) ? s.passage.trim() : '';
+  const key  = _parseBookFromPassage(passage);
+  const book = key ? _BIBLE_BOOKS[key] : null;
+
+  if (!book) { el.style.display = 'none'; return; }
+
+  el.style.display = '';
+  el.innerHTML = `
+    <div class="bm-book-ov-inner">
+      <div class="bm-book-ov-header">
+        <span class="bm-book-ov-name">${_e(book.name)}</span>
+        <span class="bm-book-ov-badge ${book.testament.toLowerCase()}">${_e(book.testament)}</span>
+        <span class="bm-book-ov-meta">${_e(book.chapters)} chapters &nbsp;·&nbsp; ${_e(book.author)} &nbsp;·&nbsp; ${_e(book.date)}</span>
+      </div>
+      <div class="bm-book-ov-purpose">${_e(book.purpose)}</div>
+      <div class="bm-book-ov-row">
+        <div class="bm-book-ov-themes">${book.themes.map(t => `<span class="bm-book-ov-theme-chip">${_e(t)}</span>`).join('')}</div>
+        <div class="bm-book-ov-verses">${book.keyVerses.map(v =>
+          `<span class="bm-book-ov-verse" data-ref="${_e(v)}">${_e(v)}</span>`
+        ).join('')}</div>
+      </div>
+    </div>
+  `;
+
+  el.querySelectorAll('.bm-book-ov-verse').forEach(chip => {
+    chip.addEventListener('click', () => _doScriptureLookup(chip.dataset.ref));
+  });
 }
 
 // ── Delivery fields ───────────────────────────────────────────────────────────
