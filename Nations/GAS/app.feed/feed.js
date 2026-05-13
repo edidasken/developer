@@ -1384,10 +1384,10 @@ const _BC_BOOKS = {
 /**
  * Parse a freeform reference (e.g. "John 3:16", "1 Cor 13:4-7", "Proverbs 11:23-25")
  * and return a direct bible.com URL using the YouVersion USFM path format:
- *   https://www.bible.com/bible/{versionId}/{CODE}.{chapter}.{verse(-end)}.ESV
+ *   https://www.bible.com/bible/{versionId}/{CODE}.{chapter}.{verse(-end)}.ABBREV
  * Returns null if the reference can't be parsed.
  */
-function _bibleComDirectUrl(rawRef, versionId) {
+function _bibleComDirectUrl(rawRef, versionId, abbrev) {
   const s = rawRef.toLowerCase().replace(/\s+/g, ' ').trim();
   // Match: optional numbered prefix (1/2/3/i/ii/iii) + book name + chapter + optional :verse(-end)
   const m = s.match(/^((?:[1-3]|i{1,3}v?|iv)\s+)?([a-z]+(?:\s[a-z]+)*)\s+(\d+)(?::(\d+)(?:[\-\u2013](\d+))?)?$/);
@@ -1406,6 +1406,7 @@ function _bibleComDirectUrl(rawRef, versionId) {
     path += `.${verse}`;
     if (verseEnd) path += `-${verseEnd}`;
   }
+  if (abbrev) path += `.${abbrev}`;
   return `https://www.bible.com/bible/${versionId}/${path}`;
 }
 
@@ -1452,11 +1453,10 @@ async function _doScriptureLookup(rawRef, suppressAdd = false) {
     textEl.textContent = text || 'Verse not found. Check the reference (e.g. John 3:16 or John 3:16-18).';
   } else if (transConf.bibleComVersion) {
     // Licensed translation — build a direct USFM verse URL (same pattern as Grow referenceUrls)
-    const directUrl = _bibleComDirectUrl(rawRef, transConf.bibleComVersion);
+    const directUrl = _bibleComDirectUrl(rawRef, transConf.bibleComVersion, transKey);
     const fallbackUrl = `https://www.bible.com/search/bible?q=${encodeURIComponent(rawRef)}&version_id=${transConf.bibleComVersion}`;
     const bcUrl = directUrl || fallbackUrl;
-    window.open(bcUrl, '_blank', 'noopener');
-    textEl.innerHTML = `<a class="bm-lookup-bible-link" href="${bcUrl}" target="_blank" rel="noopener">Open ${_e(rawRef)} · ${transKey} in Bible.com ↗</a>`;
+    textEl.innerHTML = `<a class="bm-lookup-bible-link" href="${bcUrl}" target="_blank" rel="noopener">Open ${_e(rawRef)} · ${transKey} on Bible.com ↗</a>`;
     text = '';
   } else {
     // Copyrighted translation — can't fetch; direct to BLB
