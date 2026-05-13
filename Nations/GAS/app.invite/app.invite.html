@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>window.FLOCK_NO_FIREBASE = true;</script>
   <meta charset="UTF-8">
   <!-- Absolute base so all relative URLs resolve to GitHub Pages regardless of host -->
   <base href="https://flock-os.github.io/FlockOS/New_Covenant/">
@@ -245,8 +244,20 @@
   </div>
 
   <!-- Firebase config — patched per-church by B-Build -->
+  <script>
+    window.FLOCK_FIREBASE_CONFIG = {
+      apiKey:            'AIzaSyBA-fkxjABbwIHn0i6MPiXbGwahfJmuJeo',
+      authDomain:        'flockos-notify.firebaseapp.com',
+      projectId:         'flockos-notify',
+      storageBucket:     'flockos-notify.firebasestorage.app',
+      messagingSenderId: '321766738616',
+      appId:             '1:321766738616:web:d2c1c53ad7493fcde4c24d',
+    };
+  </script>
 
   <!-- Firebase (for church map / Come Join Us Firestore reads) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
   <!-- Standalone invite boot -->
   <script>

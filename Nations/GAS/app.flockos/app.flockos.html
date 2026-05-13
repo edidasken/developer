@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>window.FLOCK_NO_FIREBASE = true;</script>
   <script>window.FLOCK_CHURCH_ID = "gas";</script>
   <meta charset="UTF-8">
   <!-- base: resolves all relative resource paths from the parent New_Covenant/ folder -->
@@ -48,6 +47,8 @@
   <!-- Fonts + single stylesheet (SharedVessels is the source of truth) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com">
   <!-- Firebase Auth endpoints — on the critical boot path (whoAmI) -->
   <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
   <link rel="preconnect" href="https://securetoken.googleapis.com">
@@ -93,6 +94,7 @@
   <link rel="modulepreload" href="Scripts/the_priesthood/the_breastplate.js">
   <!-- Comms / realtime (used by sidebar badge counts) -->
   <link rel="modulepreload" href="Scripts/the_upper_room/index.js">
+  <link rel="modulepreload" href="Scripts/the_upper_room/the_firebase_config.js">
   <link rel="modulepreload" href="Scripts/the_upper_room/the_tenant.js">
   <link rel="modulepreload" href="Scripts/the_upper_room/the_identity.js">
   <link rel="modulepreload" href="Scripts/the_upper_room/the_channels.js">
@@ -193,12 +195,27 @@
   </script>
 
   <!-- ── Firebase config — flockos-notify project ──────────────────────── -->
+  <script>
+    window.FLOCK_FIREBASE_CONFIG = {
+      apiKey:            'AIzaSyBA-fkxjABbwIHn0i6MPiXbGwahfJmuJeo',
+      authDomain:        'flockos-notify.firebaseapp.com',
+      projectId:         'flockos-notify',
+      storageBucket:     'flockos-notify.firebasestorage.app',
+      messagingSenderId: '321766738616',
+      appId:             '1:321766738616:web:d2c1c53ad7493fcde4c24d',
+      measurementId:     'G-EFMSZE581W'
+    };
+  </script>
 
   <!-- ── Backend: same scripts as FlockOS Root ───────────────────────────
        the_legacy_bridge.js polls window for these globals (TheShepherd,
        TheLife, TheFold, TheScrolls, Nehemiah, TheUpperRoom, etc.). Loading
        the same set here connects this shell to the live Firestore + GAS data.
   ──────────────────────────────────────────────────────────────────────── -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
   <script defer src="Scripts/firm_foundation.js"></script>
   <script defer src="Scripts/the_upper_room.js"></script>
   <script defer src="Scripts/fine_linen.js"></script>
