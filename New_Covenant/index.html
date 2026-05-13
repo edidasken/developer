@@ -52,8 +52,8 @@
       background: var(--bg);
       color: var(--ink);
       overflow-x: hidden;
-      overscroll-behavior: none;
     }
+    body { overscroll-behavior-y: none; }
 
     /* Single cheap gradient — no double radial on every repaint */
     body { background-image: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(91,141,238,0.14) 0%, transparent 60%); }
