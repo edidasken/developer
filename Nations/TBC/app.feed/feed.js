@@ -110,6 +110,7 @@ function _makeSermon(title = 'Untitled Sermon') {
       _makeSection('intro', 'Introduction'),
     ],
     manuscript:   '',
+    _msSeeded:    true, // true = manuscript is outline-derived; false = pastor has written custom prose
     researchNotes:'',
     researchQuotes:'',
     deliveryNotes:'',
@@ -622,8 +623,9 @@ function _buildSectionBlock(sec) {
 function _syncManuscriptToOutline(s) {
   if (!s || !s.sections || !s.sections.length) return false;
 
-  // Full rebuild if manuscript is still skeleton-only
-  if (_manuscriptIsEmpty(s.manuscript)) {
+  // Full rebuild if manuscript is empty OR the pastor hasn't written custom prose yet.
+  // _msSeeded stays true until the pastor types directly in the manuscript editor.
+  if (_manuscriptIsEmpty(s.manuscript) || s._msSeeded !== false) {
     s.manuscript = _buildManuscriptFromOutline(s);
     return true;
   }
@@ -672,7 +674,8 @@ function _syncManuscriptToOutline(s) {
       if (bodyMatchesSeed || bodyIsEmpty) {
         // Safe to update in-place: replace old full block with new seeded block
         if (existing.full.trim() !== newBlock) {
-          ms = ms.replace(existing.full, '\n' + newBlock + '\n');
+          // Use a replacer function so $ characters in newBlock aren't misinterpreted
+          ms = ms.replace(existing.full, () => '\n' + newBlock + '\n');
           changed = true;
         }
       }
@@ -1150,6 +1153,7 @@ function _bindManuscript() {
     const s = _active();
     if (!s) return;
     s.manuscript = area.value;
+    s._msSeeded = false; // pastor is writing custom prose — stop auto-rebuilding from outline
     _queueSave();
     _updateStats();
   });

@@ -449,7 +449,8 @@ const TheVine = (() => {
     // ── Auth ─────────────────────────────────────────────────────────────
     auth: {
       login: async (params) => {
-        const data = await _call(_resolveUrl('FLOCK'), 'auth.login', params, { skipAuth: true });
+        // POST so credentials go in the request body, not the URL query string
+        const data = await _call(_resolveUrl('FLOCK'), 'auth.login', params, { skipAuth: true, method: 'POST' });
         if (data && data.ok) {
           if (data.session) _saveSession(data.session);
           else if (data.token) _saveSession(data);
