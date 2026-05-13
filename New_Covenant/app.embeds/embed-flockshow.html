@@ -16,7 +16,6 @@
   <!-- Icons -->
   <link rel="icon" type="image/png" href="Images/NewCovenant.png">
   <link rel="apple-touch-icon" href="Images/NewCovenant.png">
-  <link rel="manifest" href="manifest.json">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,7 +27,86 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; overflow: hidden; }
+    html, body { height: 100%; overflow: hidden; background: #0b0d14; }
+
+    /* ── Embed auth overlay ───────────────────────────────────────────────── */
+    #embed-auth-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #0b0d14;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+    #embed-auth-overlay.hidden { display: none; }
+
+    .embed-auth-card {
+      width: 100%; max-width: 360px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(212,175,55,0.18);
+      border-radius: 16px;
+      padding: 36px 32px 28px;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+      margin: 0 16px;
+    }
+    .embed-auth-icon {
+      width: 56px; height: 56px; border-radius: 12px; margin-bottom: 6px;
+    }
+    .embed-auth-card h1 {
+      font-size: 1.35rem; font-weight: 800;
+      color: #f0f1f8; margin-bottom: 2px;
+    }
+    .embed-auth-card p {
+      font-size: 0.8rem; color: rgba(240,241,248,0.5);
+      text-align: center; margin-bottom: 18px; line-height: 1.5;
+    }
+    .embed-auth-field {
+      width: 100%; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;
+    }
+    .embed-auth-input {
+      width: 100%;
+      background: rgba(6,12,31,0.7);
+      border: 1px solid rgba(212,175,55,0.25);
+      border-radius: 8px;
+      padding: 10px 13px;
+      color: #f0f1f8;
+      font: 500 0.88rem 'Plus Jakarta Sans', sans-serif;
+      outline: none;
+      -webkit-appearance: none; appearance: none;
+      transition: border-color 0.15s;
+    }
+    .embed-auth-input:focus {
+      border-color: rgba(212,175,55,0.6);
+      box-shadow: 0 0 0 3px rgba(212,175,55,0.08);
+    }
+    .embed-auth-input::placeholder { color: rgba(240,241,248,0.3); }
+    .embed-auth-btn {
+      width: 100%; padding: 11px 0;
+      background: linear-gradient(135deg, #d4af37, #b8962e);
+      border: none; border-radius: 9px;
+      color: #0b0d14; font: 700 0.88rem 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; transition: opacity 0.15s, transform 0.1s;
+      margin-top: 4px;
+    }
+    .embed-auth-btn:hover { opacity: 0.92; }
+    .embed-auth-btn:active { transform: scale(0.98); }
+    .embed-auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .embed-auth-err {
+      width: 100%;
+      background: rgba(220,50,50,0.12);
+      border: 1px solid rgba(220,50,50,0.3);
+      border-radius: 7px;
+      padding: 8px 12px;
+      color: #ff8080;
+      font-size: 0.78rem;
+      text-align: center;
+      margin-top: 8px;
+    }
+    .embed-auth-verse {
+      margin-top: 22px;
+      font: italic 0.72rem 'Noto Serif', serif;
+      color: rgba(212,175,55,0.45);
+      text-align: center;
+    }
   </style>
 
   <!-- Firebase config — patched per-church by B-Build -->
@@ -43,13 +121,128 @@
       measurementId:     'G-EFMSZE581W'
     };
   </script>
+
+  <!-- Firebase SDK (must load before auth init script) -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <!-- Firebase initializer + Firestore wrapper -->
+  <script defer src="Scripts/the_true_vine.js"></script>
+  <script defer src="Scripts/the_upper_room.js"></script>
+
+  <!-- Embed auth controller — runs after all defer scripts above -->
+  <script defer>
+    var _fsBooted = false;
+
+    function _embedFriendlyError(code) {
+      var map = {
+        'auth/user-not-found':    'No account found with that email.',
+        'auth/wrong-password':    'Incorrect password.',
+        'auth/invalid-email':     'Please enter a valid email address.',
+        'auth/too-many-requests': 'Too many attempts. Please try again later.',
+        'auth/invalid-credential':'Invalid email or password.',
+        'auth/network-request-failed': 'Network error. Check your connection.'
+      };
+      return map[code] || 'Sign-in failed. Please try again.';
+    }
+
+    function _showEmbedErr(msg) {
+      var el = document.getElementById('embed-login-err');
+      if (!el) return;
+      el.textContent = msg;
+      el.hidden = false;
+    }
+    function _hideEmbedErr() {
+      var el = document.getElementById('embed-login-err');
+      if (el) el.hidden = true;
+    }
+
+    // Called once the Firebase user is confirmed — boots FlockShow module
+    function _embedBoot(user) {
+      if (_fsBooted) return;
+      _fsBooted = true;
+
+      // Expose a minimal Nehemiah so flockshow.js auth gate passes
+      window.Nehemiah = {
+        isAuthenticated: function() { return !!firebase.auth().currentUser; },
+        getSession: function() {
+          var u = firebase.auth().currentUser;
+          return u ? { uid: u.uid, email: u.email, displayName: u.displayName || u.email } : null;
+        },
+        logout: function() {
+          firebase.auth().signOut().then(function() { location.reload(); });
+        }
+      };
+
+      // Hide the auth overlay
+      var overlay = document.getElementById('embed-auth-overlay');
+      if (overlay) overlay.classList.add('hidden');
+
+      // Dynamically import FlockShow (absolute URL bypasses base-href ambiguity in import())
+      import('https://flock-os.github.io/FlockOS/New_Covenant/app.flockshow/flockshow.js')
+        .catch(function(e) { console.error('[FlockShow embed] module load failed', e); });
+    }
+
+    // Wire up Firebase auth state listener
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        _embedBoot(user);
+      } else {
+        // Ensure login overlay is visible
+        var overlay = document.getElementById('embed-auth-overlay');
+        if (overlay) overlay.classList.remove('hidden');
+      }
+    });
+
+    // Login form handler
+    document.getElementById('embed-login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var email    = document.getElementById('embed-email').value.trim();
+      var password = document.getElementById('embed-password').value;
+      var btn      = document.getElementById('embed-login-btn');
+      _hideEmbedErr();
+      btn.disabled = true;
+      btn.textContent = 'Signing in…';
+
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .catch(function(err) {
+          _showEmbedErr(_embedFriendlyError(err.code));
+          btn.disabled = false;
+          btn.textContent = 'Sign In';
+        });
+      // On success, onAuthStateChanged fires and calls _embedBoot()
+    });
+  </script>
 </head>
 <body>
 
-  <!-- FlockShow is embedded as a full standalone module — no auth overlay needed -->
-  <!-- The app.flockshow.html shell is recreated inline here for embed contexts  -->
+  <!-- ── Auth overlay (shown by default; hidden after successful sign-in) ── -->
+  <div id="embed-auth-overlay">
+    <div class="embed-auth-card">
+      <img class="embed-auth-icon" src="Images/Show.png" alt="FlockShow" onerror="this.style.display='none'">
+      <h1>FlockShow</h1>
+      <p>Sign in with your FlockOS account to access worship presentations.</p>
+      <form id="embed-login-form" class="embed-auth-field" novalidate>
+        <input  id="embed-email"
+                class="embed-auth-input"
+                type="email"
+                placeholder="Email address"
+                autocomplete="email"
+                required>
+        <input  id="embed-password"
+                class="embed-auth-input"
+                type="password"
+                placeholder="Password"
+                autocomplete="current-password"
+                required>
+        <button id="embed-login-btn" class="embed-auth-btn" type="submit">Sign In</button>
+        <div    id="embed-login-err" class="embed-auth-err" hidden></div>
+      </form>
+      <p class="embed-auth-verse">"Praise Him with strings and pipe." — Psalm 150:4</p>
+    </div>
+  </div>
 
-  <!-- ── Root shell (mirrors app.flockshow.html structure) ── -->
+  <!-- ── FlockShow shell (mirrors app.flockshow.html; populated by flockshow.js) ── -->
   <div id="fs-root" style="
     display:grid;
     grid-template-rows:54px 1fr;
@@ -60,7 +253,6 @@
     -webkit-font-smoothing:antialiased;
     overflow:hidden;
   ">
-
     <header id="fs-topbar" style="
       display:flex;align-items:center;gap:10px;padding:0 18px;
       background:#0d0f1a;border-bottom:1px solid rgba(167,139,250,0.12);
@@ -78,11 +270,10 @@
 
     <div id="fs-library" style="overflow-y:auto;padding:28px 32px 80px;"></div>
     <div id="fs-editor" hidden style="display:grid;grid-template-rows:46px 1fr;overflow:hidden;"></div>
-
   </div>
 
-  <!-- FlockShow main module (absolute URL — unaffected by embed host's base) -->
-  <script type="module" src="https://flock-os.github.io/FlockOS/New_Covenant/app.flockshow/flockshow.js"></script>
+  <!-- flockshow.js is dynamically imported by the embed auth controller above -->
+  <!-- after Firebase auth confirms the user is signed in.                      -->
 
 </body>
 </html>

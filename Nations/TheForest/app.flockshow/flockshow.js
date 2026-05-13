@@ -1344,7 +1344,14 @@ async function _boot() {
   const N = window.Nehemiah;
 
   if (typeof N.isAuthenticated === 'function' && !N.isAuthenticated()) {
-    _showAuthGate(N);
+    // Redirect directly to the FlockOS login page — no intermediate overlay
+    if (typeof N.login === 'function') {
+      N.login();
+    } else {
+      const returnUrl = encodeURIComponent(location.href);
+      const base = location.href.replace(/\/app\.flockshow\/app\.flockshow\.html.*$/, '/');
+      location.href = base + 'Scripts/the_priesthood/the_garments.html?return=' + returnUrl;
+    }
     return;
   }
 
