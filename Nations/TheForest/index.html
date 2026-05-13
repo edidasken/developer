@@ -21,7 +21,7 @@
   <meta property="og:type" content="website">
 
   <!-- Preload critical images so the launcher paints instantly -->
-  <link rel="preload" as="image" href="Images/NewCovenant.png">
+  <link rel="preload" as="image" href="Images/FlockOS.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -476,8 +476,9 @@
     navigator.serviceWorker.register('./the_living_water.js').then(function (reg) {
       _swReg = reg;
 
-      // Already waiting (e.g. page was refreshed after a new SW installed)
-      if (reg.waiting) { _showUpdateBanner(); }
+      // Already waiting — only show update banner if there's already an active
+      // controller (i.e. this is a genuine update, not the very first install)
+      if (reg.waiting && navigator.serviceWorker.controller) { _showUpdateBanner(); }
 
       // New SW found while this page is open
       reg.addEventListener('updatefound', function () {
