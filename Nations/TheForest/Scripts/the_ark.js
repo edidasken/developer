@@ -73,9 +73,14 @@ const flock = {
     //    SWR reads return them synchronously on first paint.
     await Promise.all([hydratePromise, dressPromise]);
     await _registerViews();
-    await go(_initialRoute(), { replace: true });
-    installScriptureLinks(document.body); // auto-linkify all scripture refs to bible.com (ESV)
-    darken();               // splash off (with fade via the_oil)
+    try {
+      await go(_initialRoute(), { replace: true });
+      installScriptureLinks(document.body); // auto-linkify all scripture refs to bible.com (ESV)
+    } catch (err) {
+      report(err, 'initial-route');
+    } finally {
+      darken();             // splash off — always, even if the initial view crashed
+    }
 
     livingWater.register().catch(() => {}); // SW after the first paint
   },

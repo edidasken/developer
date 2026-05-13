@@ -34,6 +34,45 @@ const musicStandAppState = {
 let _msActiveEditRow = null;
 let _msArrEditRow = null;
 let _msSongsLoadedAt = 0;
+
+// ── In-place song filter (called on every search keystroke — no DOM rebuild) ─
+function msFilterSongsInPlace() {
+    var q = (musicStandAppState.filter || '').toLowerCase();
+    var visibleTable = 0;
+    var visibleCards = 0;
+    var total = musicStandAppState.songs.length;
+
+    // Desktop table rows
+    var tbody = document.querySelector('#ms-tab-songs .ms-table tbody');
+    if (tbody) {
+        tbody.querySelectorAll('tr[data-song-idx]').forEach(function(tr) {
+            var title  = (tr.dataset.title  || '').toLowerCase();
+            var artist = (tr.dataset.artist || '').toLowerCase();
+            var show = !q || title.indexOf(q) !== -1 || artist.indexOf(q) !== -1;
+            tr.style.display = show ? '' : 'none';
+            if (show) visibleTable++;
+        });
+    }
+
+    // Mobile cards
+    document.querySelectorAll('#ms-tab-songs .ms-song-card[data-song-idx]').forEach(function(card) {
+        var title  = (card.dataset.title  || '').toLowerCase();
+        var artist = (card.dataset.artist || '').toLowerCase();
+        var show = !q || title.indexOf(q) !== -1 || artist.indexOf(q) !== -1;
+        card.style.display = show ? '' : 'none';
+        if (show) visibleCards++;
+    });
+
+    var shown = tbody ? visibleTable : visibleCards;
+
+    // Update count label
+    var counter = document.getElementById('ms-song-count');
+    if (counter) counter.textContent = shown + ' of ' + total + ' songs';
+
+    // Show/hide "no match" placeholder
+    var noMatch = document.getElementById('ms-no-match');
+    if (noMatch) noMatch.style.display = (shown === 0 && total > 0) ? '' : 'none';
+}
 var _msSongDetailCache = {};          // keyed by songId → full song+arrangements
 const _MS_SONG_TTL = 120000;         // 2-min warm window for song list
 
@@ -528,12 +567,8 @@ function msRenderSongsTab() {
         return;
     }
 
-    var filterVal = musicStandAppState.filter.toLowerCase();
-    var filtered = musicStandAppState.songs.filter(function(s) {
-        if (!filterVal) return true;
-        return (s.title || '').toLowerCase().indexOf(filterVal) !== -1 ||
-               (s.artist || '').toLowerCase().indexOf(filterVal) !== -1;
-    });
+    // Render all songs — filtering is applied in-place via msFilterSongsInPlace().
+    var songs = musicStandAppState.songs;
 
     var html =
         '<div class="ms-search-bar">' +
@@ -542,11 +577,9 @@ function msRenderSongsTab() {
             '<button class="ms-btn ms-btn-primary" id="ms-add-song-btn">+ Add Song</button>' +
         '</div>';
 
-    if (filtered.length === 0) {
+    if (songs.length === 0) {
         html += '<div class="ms-card" style="text-align:center; padding:30px;">' +
-                    '<p style="color:#94a3b8;">' +
-                        (musicStandAppState.songs.length === 0 ? 'No songs yet. Add your first song!' : 'No songs match your search.') +
-                    '</p>' +
+                    '<p style="color:#94a3b8;">No songs yet. Add your first song!</p>' +
                 '</div>';
     } else {
         /* ── Desktop table ── (hidden on mobile via CSS) */
@@ -561,9 +594,9 @@ function msRenderSongsTab() {
                     '</tr></thead>' +
                     '<tbody>';
 
-        for (var i = 0; i < filtered.length; i++) {
-            var s = filtered[i];
-            html += '<tr>' +
+        for (var i = 0; i < songs.length; i++) {
+            var s = songs[i];
+            html += '<tr data-song-idx="' + i + '" data-title="' + msEscapeHtml(s.title || '') + '" data-artist="' + msEscapeHtml(s.artist || '') + '">' +
                 '<td><a href="#" class="ms-song-link" data-song-idx="' + i + '" style="color:#c97d10;text-decoration:none;font-weight:600;">' + msEscapeHtml(s.title) + '</a></td>' +
                 '<td style="color:#6b7280;">' + msEscapeHtml(s.artist) + '</td>' +
                 '<td><span class="ms-stand-badge">' + msEscapeHtml(s.defaultKey || '—') + '</span></td>' +
@@ -579,9 +612,9 @@ function msRenderSongsTab() {
 
         /* ── Mobile card list ── (hidden on desktop via CSS) */
         html += '<div class="ms-song-cards">';
-        for (var j = 0; j < filtered.length; j++) {
-            var sc = filtered[j];
-            html += '<div class="ms-song-card">' +
+        for (var j = 0; j < songs.length; j++) {
+            var sc = songs[j];
+            html += '<div class="ms-song-card" data-song-idx="' + j + '" data-title="' + msEscapeHtml(sc.title || '') + '" data-artist="' + msEscapeHtml(sc.artist || '') + '">' +
                 '<div class="ms-song-card-info">' +
                     '<div class="ms-song-card-title">' + msEscapeHtml(sc.title) + '</div>' +
                     '<div class="ms-song-card-meta">' +
@@ -597,23 +630,28 @@ function msRenderSongsTab() {
                 '</div>' +
             '</div>';
         }
+        /* "No songs match" placeholder — shown by msFilterSongsInPlace() when filter yields nothing */
+        html += '<div id="ms-no-match" style="display:none;" class="ms-card" style="text-align:center; padding:30px;"><p style="color:#94a3b8;">No songs match your search.</p></div>';
         html += '</div>';
     }
 
-    html += '<p style="color:#64748b; font-size:0.8rem; margin-top:12px;">' +
-                filtered.length + ' of ' + musicStandAppState.songs.length + ' songs' +
+    html += '<p id="ms-song-count" style="color:#64748b; font-size:0.8rem; margin-top:12px;">' +
+                songs.length + ' of ' + songs.length + ' songs' +
             '</p>';
 
     panel.innerHTML = html;
+
+    // Apply the current filter without rebuilding the DOM.
+    msFilterSongsInPlace();
 
     // Bind events
     var searchInput = document.getElementById('ms-song-search');
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             musicStandAppState.filter = searchInput.value;
-            msRenderSongsTab();
+            msFilterSongsInPlace(); // in-place show/hide — no DOM rebuild
         });
-        searchInput.focus();
+        // NOTE: no searchInput.focus() here — it causes scroll + layout churn on every render
     }
 
     var addBtn = document.getElementById('ms-add-song-btn');
@@ -630,18 +668,12 @@ function msRenderSongsTab() {
         importBtn.addEventListener('click', function() { msOpenSongSelectImport(); });
     }
 
-    // Play buttons → open chord chart directly
+    // Play buttons — idx is now the index into the full songs array
     panel.querySelectorAll('.ms-play-song').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             var idx = Number(btn.getAttribute('data-song-idx'));
-            var filteredP = musicStandAppState.songs.filter(function(s2) {
-                var f = musicStandAppState.filter.toLowerCase();
-                if (!f) return true;
-                return (s2.title || '').toLowerCase().indexOf(f) !== -1 ||
-                       (s2.artist || '').toLowerCase().indexOf(f) !== -1;
-            });
-            if (filteredP[idx]) msQuickPlaySong(filteredP[idx]);
+            if (musicStandAppState.songs[idx]) msQuickPlaySong(musicStandAppState.songs[idx]);
         });
     });
 
@@ -650,13 +682,7 @@ function msRenderSongsTab() {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             var idx = Number(link.getAttribute('data-song-idx'));
-            var filtered2 = musicStandAppState.songs.filter(function(s2) {
-                var f = musicStandAppState.filter.toLowerCase();
-                if (!f) return true;
-                return (s2.title || '').toLowerCase().indexOf(f) !== -1 ||
-                       (s2.artist || '').toLowerCase().indexOf(f) !== -1;
-            });
-            if (filtered2[idx]) msOpenSongDetail(filtered2[idx]);
+            if (musicStandAppState.songs[idx]) msOpenSongDetail(musicStandAppState.songs[idx]);
         });
     });
 
@@ -664,13 +690,7 @@ function msRenderSongsTab() {
     panel.querySelectorAll('.ms-edit-song').forEach(function(btn) {
         btn.addEventListener('click', function() {
             var idx = Number(btn.getAttribute('data-song-idx'));
-            var filtered2 = musicStandAppState.songs.filter(function(s2) {
-                var f = musicStandAppState.filter.toLowerCase();
-                if (!f) return true;
-                return (s2.title || '').toLowerCase().indexOf(f) !== -1 ||
-                       (s2.artist || '').toLowerCase().indexOf(f) !== -1;
-            });
-            var song = filtered2[idx];
+            var song = musicStandAppState.songs[idx];
             if (song) {
                 musicStandAppState.editorMode = 'edit';
                 _msActiveEditRow = song;

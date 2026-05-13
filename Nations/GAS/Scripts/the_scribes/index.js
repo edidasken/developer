@@ -46,8 +46,11 @@ export async function go(name, params = {}, { replace = false } = {}) {
     console.warn('[the_scribes] no mount slot — call setMountSlot first');
     return;
   }
-  _mountSlot.innerHTML = mod.render ? mod.render(params) : '';
-  const unmount = mod.mount ? mod.mount(_mountSlot, { params, go }) : null;
+  let html = '';
+  try { html = mod.render ? mod.render(params) : ''; } catch (e) { console.error('[the_scribes] render error in', name, e); }
+  _mountSlot.innerHTML = html;
+  let unmount = null;
+  try { unmount = mod.mount ? mod.mount(_mountSlot, { params, go }) : null; } catch (e) { console.error('[the_scribes] mount error in', name, e); }
   if (mod.title) document.title = mod.title + ' · FlockOS';
 
   _active = { name, params, unmount };
