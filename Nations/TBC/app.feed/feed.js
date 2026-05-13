@@ -1104,24 +1104,35 @@ function _doPrint() {
   if (prayerSections.length || prepText) {
     html += '<div id="bmp-prayer">';
     html += `
-      <div id="bmp-prayer-head">
-        <div id="bmp-prayer-bar"></div>
-        <span id="bmp-prayer-label">PRAYER POINTS</span>
+      <div id="bmp-prayer-hero">
+        <div id="bmp-prayer-eyebrow">PRAYER POINTS</div>
+        <h2 id="bmp-prayer-title">${_e(s.title || 'Sermon')}</h2>
+        ${s.scriptureRef ? `<div id="bmp-prayer-ref">${_e(s.scriptureRef)}</div>` : ''}
+        <div id="bmp-prayer-rule"></div>
       </div>
     `;
+    let n = 0;
     if (prepText) {
+      n++;
       html += `<div class="bmp-prayer-item">
-        <div class="bmp-prayer-item-title">Pre-Sermon Prayer</div>
-        <div class="bmp-prayer-item-notes">${_e(prepText).replace(/\n/g, '<br>')}</div>
+        <div class="bmp-prayer-num">${n}</div>
+        <div class="bmp-prayer-body">
+          <div class="bmp-prayer-item-title">Pre-Sermon Prayer</div>
+          <div class="bmp-prayer-item-notes">${_e(prepText).replace(/\n/g, '<br>')}</div>
+        </div>
       </div>`;
     }
     prayerSections.forEach(sec => {
       const title = (sec.title || '').trim();
-      const notes = (sec.notes || '').trim();
+      const notes = _cleanNotes(sec.notes);
       if (!title && !notes) return;
+      n++;
       html += `<div class="bmp-prayer-item">
-        ${title ? `<div class="bmp-prayer-item-title">${_e(title)}</div>` : ''}
-        ${notes ? `<div class="bmp-prayer-item-notes">${_e(notes).replace(/\n/g, '<br>')}</div>` : ''}
+        <div class="bmp-prayer-num">${n}</div>
+        <div class="bmp-prayer-body">
+          ${title ? `<div class="bmp-prayer-item-title">${_e(title)}</div>` : ''}
+          ${notes ? `<div class="bmp-prayer-item-notes">${_e(notes).replace(/\n/g, '<br>')}</div>` : ''}
+        </div>
       </div>`;
     });
     html += '</div>'; // #bmp-prayer
@@ -1152,7 +1163,7 @@ function _openPrintWindow(s, bodyHtml) {
   // exists for printing/PDF export).
   const printCss = `
     @page { margin: 0.7in 0.8in; }
-    html, body { margin: 0; padding: 0; background: #f5f1ea; font-family: 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    html, body { margin: 0; padding: 0; background: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     body { padding: 0 24px 32px; max-width: 8.5in; margin: 0 auto; box-sizing: border-box; }
     #bm-print-document { font-family: 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; }
     #bmp-wrap { max-width: 100%; }
@@ -1178,14 +1189,18 @@ function _openPrintWindow(s, bodyHtml) {
     .bmp-verse-ref { font: 700 11.5pt 'Plus Jakarta Sans', sans-serif; color: #c48a20; margin-bottom: 4pt; }
     .bmp-verse-text { font: italic 13pt/1.7 Georgia, serif; color: #2c2c2c; }
     .bmp-notes { font: 13pt/1.6 Georgia, serif; color: #2c2c2c; }
-    /* Prayer points start on a fresh page (last page) */
-    #bmp-prayer { margin-top: 18pt; padding-top: 14pt; border-top: 2pt solid #7c3aed; page-break-before: always; break-before: page; }
-    #bmp-prayer-head { display: flex; align-items: center; gap: 8pt; margin-bottom: 12pt; }
-    #bmp-prayer-bar { width: 4pt; height: 16pt; background: #7c3aed; border-radius: 2pt; flex-shrink: 0; }
-    #bmp-prayer-label { font: 700 11pt 'Plus Jakarta Sans', sans-serif; color: #7c3aed; text-transform: uppercase; letter-spacing: .10em; }
-    .bmp-prayer-item { break-inside: avoid; margin-bottom: 10pt; padding-left: 12pt; border-left: 2pt solid #e9d5ff; }
-    .bmp-prayer-item-title { font: 700 13pt 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; margin-bottom: 3pt; }
-    .bmp-prayer-item-notes { font: 13pt/1.6 Georgia, serif; color: #444; }
+    /* ── Prayer points: own page, hero header, numbered cards ──────────── */
+    #bmp-prayer { page-break-before: always; break-before: page; padding-top: 0; }
+    #bmp-prayer-hero { text-align: center; padding: 6pt 0 18pt; margin-bottom: 18pt; border-bottom: 2pt solid #7c3aed; }
+    #bmp-prayer-eyebrow { font: 700 10pt 'Plus Jakarta Sans', sans-serif; color: #7c3aed; text-transform: uppercase; letter-spacing: .22em; margin-bottom: 8pt; }
+    #bmp-prayer-title { font: 700 22pt 'Plus Jakarta Sans', sans-serif; color: #0f0f0f; margin: 0 0 6pt; line-height: 1.2; }
+    #bmp-prayer-ref { font: 500 11pt 'Plus Jakarta Sans', sans-serif; color: #888; }
+    #bmp-prayer-rule { display: none; }
+    .bmp-prayer-item { display: flex; gap: 12pt; align-items: flex-start; break-inside: avoid; margin-bottom: 14pt; padding: 10pt 12pt; background: #faf7ff; border: 1pt solid #ede4ff; border-left: 3pt solid #7c3aed; border-radius: 4pt; }
+    .bmp-prayer-num { flex-shrink: 0; width: 22pt; height: 22pt; border-radius: 50%; background: #7c3aed; color: #fff; font: 700 11pt 'Plus Jakarta Sans', sans-serif; display: flex; align-items: center; justify-content: center; }
+    .bmp-prayer-body { flex: 1; min-width: 0; }
+    .bmp-prayer-item-title { font: 700 13pt 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; margin-bottom: 4pt; line-height: 1.3; }
+    .bmp-prayer-item-notes { font: 13pt/1.55 Georgia, serif; color: #333; }
 
     /* ── On-screen toolbar (hidden when printing) ─────────────────────── */
     .pd-toolbar {
