@@ -1265,7 +1265,7 @@ function _blbLexUrl(query) {
   }
   if (/^H\d+/i.test(uq)) {
     const num = uq.replace('H','');
-    return `https://www.blueletterbible.org/lexicon/h${num}/nasb95/bdb/0-1/`;
+    return `https://www.blueletterbible.org/lexicon/h${num}/nasb95/wlc/0-1/`;
   }
   return `https://www.blueletterbible.org/search/search.cfm?Criteria=${encodeURIComponent(query)}&t=NASB95`;
 }
