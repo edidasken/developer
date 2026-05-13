@@ -551,7 +551,7 @@ const TheHarvest = (() => {
   }
 
   // ══════════════════════════════════════════════════════════════════════════
-  // 5. SONGS — Song catalog with Music Stand launcher
+  // 5. SONGS — Song catalog with Flock Stand launcher
   // ══════════════════════════════════════════════════════════════════════════
 
   async function _renderSongs() {
@@ -566,7 +566,7 @@ const TheHarvest = (() => {
                  + '<div style="display:flex;gap:6px;">'
                  + _actionBtn('+ Add Song', 'TheHarvest._newSong()')
                  + (typeof openMusicStandApp === 'function'
-                     ? _actionBtn('\u266B Music Stand', 'openMusicStandApp()')
+                     ? _actionBtn('\u266B Flock Stand', 'openMusicStandApp()')
                      : '')
                  + '</div></div>';
 

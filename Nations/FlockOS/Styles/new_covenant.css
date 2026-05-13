@@ -14301,15 +14301,15 @@ flock-tabs [role="tablist"], .tabs-bar {
 
 
 /* ════════════════════════════════════════════════════════════════════════════
-   MUSIC STAND — app.stand styling
+   FLOCK STAND — app.stand styling
    "Make a joyful noise to the LORD." — Psalm 100:1
 
-   All Music Stand styles live HERE — stand.css is gone. One CSS file rules.
+   All Flock Stand styles live HERE — stand.css is gone. One CSS file rules.
    Colors map to New Covenant design tokens; layout vars are stand-specific.
    Header + sidebar match the FlockOS/Grow dark-navy cathedral aesthetic.
    ════════════════════════════════════════════════════════════════════════════ */
 
-/* ── Music Stand design token bridge ────────────────────────────────────── */
+/* ── Flock Stand design token bridge ────────────────────────────────────── */
 :root {
   /* Layout — stand-specific */
   --ms-header-h:    58px;

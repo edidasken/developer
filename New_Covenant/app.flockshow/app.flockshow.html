@@ -377,7 +377,7 @@
       .fs-logo span { display: none; }
     }
 
-    /* ── Song picker modal (Music Stand import) ─────────────────────── */
+    /* ── Song picker modal (Flock Stand import) ─────────────────────── */
     #fs-song-picker {
       position: fixed; inset: 0; z-index: 1000;
       display: flex; align-items: center; justify-content: center;
@@ -739,7 +739,7 @@
           <div class="fs-prop-label">Import Lyrics</div>
           <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-from-stand-btn" style="align-self:flex-start;margin-bottom:8px">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 17V7m0 10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m0 10a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m0 10V7m0 10a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2"/></svg>
-            From Music Stand…
+            From Flock Stand…
           </button>
           <textarea class="fs-import-area" id="fs-import-area"
             placeholder="Paste full lyrics — blank lines become separate slides…" rows="5"></textarea>
@@ -755,14 +755,14 @@
 <!-- Auth overlay (shown until Nehemiah confirms session) -->
 <div id="fs-auth-overlay"></div>
 
-<!-- Song picker modal (Music Stand → FlockShow import) -->
-<div id="fs-song-picker" hidden aria-modal="true" role="dialog" aria-label="Pick a song from Music Stand">
+<!-- Song picker modal (Flock Stand → FlockShow import) -->
+<div id="fs-song-picker" hidden aria-modal="true" role="dialog" aria-label="Pick a song from Flock Stand">
   <div class="fs-sp-backdrop" id="fs-sp-backdrop"></div>
   <div class="fs-sp-panel">
     <div class="fs-sp-header">
       <div class="fs-sp-title">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17V7m0 10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m0 10a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m0 10V7m0 10a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2"/></svg>
-        Import from Music Stand
+        Import from Flock Stand
       </div>
       <button class="fs-sp-close" id="fs-sp-close" aria-label="Close">&times;</button>
     </div>
@@ -777,7 +777,7 @@
   </div>
 </div>
 
-<!-- Firebase (Auth + Firestore — used by Nehemiah auth gate and Music Stand song picker) -->
+<!-- Firebase (Auth + Firestore — used by Nehemiah auth gate and Flock Stand song picker) -->
 <script>
   window.FLOCK_FIREBASE_CONFIG = window.FLOCK_FIREBASE_CONFIG || null;
 </script>
@@ -789,7 +789,7 @@
 <script defer src="Scripts/the_true_vine.js"></script>
 <script defer src="Scripts/firm_foundation.js"></script>
 
-<!-- Music Stand song library (for "From Music Stand" picker) -->
+<!-- Flock Stand song library (for "From Flock Stand" picker) -->
 <script defer src="Scripts/the_upper_room.js"></script>
 
 <script type="module" src="app.flockshow/flockshow.js"></script>

@@ -484,6 +484,28 @@ else:
         f.write(content)
 PYEOF
 
+  # ── 9d. Patch app.embeds/embed-launcher.html — church name + base URL ─
+  python3 << 'PYEOF'
+import os
+
+t      = os.environ['_NC_TARGET']
+name   = os.environ['_NC_CHURCH_NAME']
+folder = os.path.basename(t)
+path   = t + '/app.embeds/embed-launcher.html'
+
+if not os.path.exists(path):
+    print('  ✓ app.embeds/embed-launcher.html not present — skip patch')
+else:
+    with open(path, 'r') as f:
+        content = f.read()
+    base_url = f'https://flock-os.github.io/FlockOS/Nations/{folder}/'
+    content = content.replace('{{CHURCH_NAME}}', name)
+    content = content.replace('{{BASE_URL}}', base_url)
+    with open(path, 'w') as f:
+        f.write(content)
+    print(f'  ✓ app.embeds/embed-launcher.html → {name} / {base_url}')
+PYEOF
+
   # ── 10. Patch app.invite/app.invite.html — Firebase config ───────────
   python3 << 'PYEOF'
 import os, json, re

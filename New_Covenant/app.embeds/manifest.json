@@ -1,7 +1,7 @@
 {
   "name": "FlockOS Embeds",
   "short_name": "FlockOS",
-  "description": "Embeddable standalone pages for the FlockOS platform — About, GROW, The Invitation, and the Music Stand.",
+  "description": "Embeddable standalone pages for the FlockOS platform — About, GROW, The Invitation, and the Flock Stand.",
   "start_url": "./embed-about.html",
   "id": "./embed-about.html",
   "display": "standalone",

@@ -44,7 +44,7 @@ New_Covenant/
   app.flockos/               ← FlockOS PWA sub-app shell
   app.grow/                  ← Grow PWA sub-app shell
   app.invite/                ← Invite PWA sub-app shell
-  app.stand/                 ← Stand (Music Stand) PWA sub-app shell
+  app.stand/                 ← Stand (Flock Stand) PWA sub-app shell
 ```
 
 ---
@@ -90,7 +90,7 @@ Each `app.*/` folder is a standalone PWA shell with its own `index.html` and `ma
 | `app.flockos/` | FlockOS PWA installable shell |
 | `app.grow/` | Grow PWA installable shell |
 | `app.invite/` | Invite PWA installable shell |
-| `app.stand/` | Music Stand PWA installable shell |
+| `app.stand/` | Flock Stand PWA installable shell |
 
 ---
 

@@ -1,8 +1,8 @@
 /* ══════════════════════════════════════════════════════════════════════════════
-   STAND.JS — Music Stand App Entry Point
+   STAND.JS — Flock Stand App Entry Point
    "Praise Him with the sound of the trumpet." — Psalm 150:3
 
-   This is the standalone PWA shell for the Music Stand app (app.stand/).
+   This is the standalone PWA shell for the Flock Stand app (app.stand/).
    It handles:
      • FlockOS auth gate (Nehemiah / firm_foundation.js)
      • App-level navigation (dashboard, songs, services, import, settings)
@@ -276,8 +276,8 @@ function _renderAuthGate(N) {
   overlay.removeAttribute('hidden'); overlay.style.display = ''
   overlay.innerHTML = `
     <div class="ms-auth-card">
-      <img src="Images/stand.png" alt="Music Stand">
-      <h1>Music Stand</h1>
+      <img src="Images/stand.png" alt="Flock Stand">
+      <h1>Flock Stand</h1>
       <p>Sign in with your FlockOS account to access the worship team music stand.</p>
       <button class="ms-btn ms-btn--primary" id="ms-signin-btn" style="margin-bottom:12px;">Sign In to FlockOS</button>
       <p style="font-size:.75rem;color:var(--ms-ink-muted);">Access is limited to authenticated FlockOS users.</p>
@@ -1170,7 +1170,7 @@ function _renderSettings(main) {
       <div class="ms-page-hero">
         <div class="ms-page-hero-text">
           <h1>Settings</h1>
-          <p>Customize your Music Stand experience.</p>
+          <p>Customize your Flock Stand experience.</p>
         </div>
       </div>
 
@@ -1343,7 +1343,7 @@ function _renderLiveOverlay(overlay) {
     <!-- Top bar -->
     <div class="ms-live-topbar" id="live-topbar">
       <button class="ms-live-close" id="live-close">✕ Exit</button>
-      <div class="ms-live-title">${song ? _e(song.title||song.songTitle||'') : (plan ? _e(plan.serviceType||'Service') : 'Music Stand')}</div>
+      <div class="ms-live-title">${song ? _e(song.title||song.songTitle||'') : (plan ? _e(plan.serviceType||'Service') : 'Flock Stand')}</div>
       ${song ? `<div class="ms-live-key-display" id="live-key-display">${_e(currentKey)}${S.liveSemitones !== 0 ? ` <span style="font-size:.6em;color:rgba(255,255,255,.5)">(orig ${_e(origKey)})</span>` : ''}</div>` : ''}
       ${total > 0 ? `<div style="color:rgba(255,255,255,.5);font-size:.8rem;white-space:nowrap">${idx+1} / ${total}</div>` : ''}
     </div>

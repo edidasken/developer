@@ -2,48 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- base href patched per-church by B-Build -->
+  <base href="https://flock-os.github.io/FlockOS/Nations/Root/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <title>FlockOS-GAS</title>
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <title>FlockOS</title>
   <link rel="icon" type="image/png" href="Images/NewCovenant.png">
-  <link rel="apple-touch-icon" href="Images/NewCovenant.png">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="FlockOS-GAS">
-  <meta name="theme-color" content="#0c1445">
-  <meta name="description" content="FlockOS-GAS — FlockOS church management and GROW discipleship tools. Free forever. 210 countries.">
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="FlockOS-GAS">
-  <meta property="og:description" content="Complete pastoral care, member management, discipleship, and outreach. Free forever. 210 countries. 256-bit encrypted.">
-  <meta property="og:image" content="Images/NewCovenant.png">
-  <meta property="og:type" content="website">
-
-  <!-- Preload critical images so the launcher paints instantly -->
+  <!-- Preload hero image for instant paint -->
   <link rel="preload" as="image" href="Images/NewCovenant.png">
   <link rel="preload" as="image" href="Images/GrowIcon.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Only weights actually used — trimmed from full family for faster load -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Merriweather:ital@1&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #09102e;
-      --card:     #111b44;
-      --ink:      #eef1fb;
-      --muted:    #9ba8d0;
-      --faint:    #3d4f7c;
-      --gold:     #e8a838;
-      --blue:     #5b8dee;
-      --line:     rgba(255,255,255,0.09);
-      --font:     'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      --serif:    'Merriweather', Georgia, serif;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bot: env(safe-area-inset-bottom, 0px);
+      --bg:    #09102e;
+      --card:  #111b44;
+      --ink:   #eef1fb;
+      --muted: #9ba8d0;
+      --faint: #3d4f7c;
+      --gold:  #e8a838;
+      --line:  rgba(255,255,255,0.09);
+      --font:  'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --serif: 'Merriweather', Georgia, serif;
     }
 
     html, body {
@@ -51,21 +37,19 @@
       font-family: var(--font);
       -webkit-font-smoothing: antialiased;
       background: var(--bg);
+      background-image: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(91,141,238,0.14) 0%, transparent 60%);
       color: var(--ink);
       overflow-x: hidden;
     }
 
-    /* Single cheap gradient — no double radial on every repaint */
-    body { background-image: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(91,141,238,0.14) 0%, transparent 60%); }
-
-    /* ── Launcher shell ────────────────────────────────────────────── */
+    /* ── Shell ─────────────────────────────────────────────────────── */
     .launcher {
       min-height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: calc(var(--safe-top) + 2rem) 1.25rem calc(var(--safe-bot) + 2rem);
-      gap: 2rem;
+      padding: 2rem 1.25rem 2rem;
+      gap: 1.75rem;
     }
 
     /* ── Church identity ───────────────────────────────────────────── */
@@ -73,16 +57,16 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.55rem;
       text-align: center;
     }
     .church-id img {
-      width: 60px; height: 60px;
-      border-radius: 15px;
-      box-shadow: 0 6px 22px rgba(0,0,0,0.40);
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.45);
     }
     .church-id h1 {
-      font-size: clamp(1.25rem, 5vw, 1.8rem);
+      font-size: clamp(1.1rem, 5vw, 1.6rem);
       font-weight: 800;
       letter-spacing: -0.025em;
       color: var(--gold);
@@ -92,21 +76,20 @@
     /* ── App sections ──────────────────────────────────────────────── */
     .app-sections {
       width: 100%;
-      max-width: 420px;
+      max-width: 400px;
       display: flex;
       flex-direction: column;
-      gap: 1.4rem;
+      gap: 1.2rem;
     }
 
-    /* Section label row */
     .section-label {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 0.55rem;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
     }
     .section-label span {
-      font-size: 0.68rem;
+      font-size: 0.66rem;
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -118,60 +101,55 @@
       height: 1px;
       background: var(--line);
     }
-    .section-label .section-icon {
-      font-size: 0.78rem;
-      opacity: 0.6;
-    }
+    .section-icon { font-size: 0.76rem; opacity: 0.55; }
 
-    /* Apps list */
+    /* ── Apps list ─────────────────────────────────────────────────── */
     .apps {
       display: flex;
       flex-direction: column;
-      gap: 0.65rem;
+      gap: 0.6rem;
     }
 
     /* ── App button ────────────────────────────────────────────────── */
     .app-btn {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
-      padding: 0.9rem 1.1rem;
+      gap: 0.8rem;
+      padding: 0.85rem 1rem;
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 13px;
       text-decoration: none;
       color: var(--ink);
-      box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.22);
       transition: transform 0.13s ease, box-shadow 0.13s ease, border-color 0.13s ease;
-      /* GPU-hint so transition uses compositor */
       will-change: transform;
     }
-    .app-btn:hover  { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.36); }
+    .app-btn:hover  { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,0,0,0.36); }
     .app-btn:active { transform: scale(0.985); box-shadow: none; }
 
-    /* accent border per app */
     .app-btn--grow   { border-color: rgba(232,168,56,0.20); }
     .app-btn--invite { border-color: rgba(61,179,79,0.20);  }
     .app-btn--flock  { border-color: rgba(91,141,238,0.20); }
     .app-btn--stand  { border-color: rgba(168,85,247,0.20); }
     .app-btn--show   { border-color: rgba(239,68,68,0.20);  }
-    .app-btn:hover.app-btn--grow   { border-color: rgba(232,168,56,0.50); }
-    .app-btn:hover.app-btn--invite { border-color: rgba(61,179,79,0.50);  }
-    .app-btn:hover.app-btn--flock  { border-color: rgba(91,141,238,0.50); }
-    .app-btn:hover.app-btn--stand  { border-color: rgba(168,85,247,0.50); }
-    .app-btn:hover.app-btn--show   { border-color: rgba(239,68,68,0.50);  }
+    .app-btn:hover.app-btn--grow   { border-color: rgba(232,168,56,0.55); }
+    .app-btn:hover.app-btn--invite { border-color: rgba(61,179,79,0.55);  }
+    .app-btn:hover.app-btn--flock  { border-color: rgba(91,141,238,0.55); }
+    .app-btn:hover.app-btn--stand  { border-color: rgba(168,85,247,0.55); }
+    .app-btn:hover.app-btn--show   { border-color: rgba(239,68,68,0.55);  }
 
     .app-icon {
-      width: 42px; height: 42px;
-      border-radius: 10px;
+      width: 40px; height: 40px;
+      border-radius: 9px;
       object-fit: contain;
       flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.28);
+      box-shadow: 0 2px 7px rgba(0,0,0,0.28);
     }
     .app-label { flex: 1; }
     .app-label strong {
       display: block;
-      font-size: 0.97rem;
+      font-size: 0.92rem;
       font-weight: 800;
       letter-spacing: -0.01em;
     }
@@ -182,52 +160,40 @@
     .app-btn--show   .app-label strong { color: #fca5a5; }
     .app-label span {
       display: block;
-      font-size: 0.77rem;
+      font-size: 0.73rem;
       color: var(--muted);
-      margin-top: 0.1rem;
+      margin-top: 0.08rem;
     }
     .app-arrow {
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: var(--faint);
-      transition: color 0.13s, transform 0.13s;
       flex-shrink: 0;
+      transition: color 0.13s, transform 0.13s;
     }
     .app-btn:hover .app-arrow { color: var(--ink); transform: translateX(3px); }
 
     /* ── Scripture footer ──────────────────────────────────────────── */
     .verse {
       text-align: center;
-      max-width: 38ch;
+      max-width: 36ch;
     }
     .verse p {
       font-family: var(--serif);
       font-style: italic;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--muted);
       line-height: 1.75;
     }
     .verse cite {
       display: block;
-      margin-top: 0.4rem;
+      margin-top: 0.35rem;
       font-family: var(--font);
       font-style: normal;
-      font-size: 0.7rem;
+      font-size: 0.67rem;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--gold);
-    }
-
-    /* ── PTR ───────────────────────────────────────────────────────── */
-    @media (max-width: 860px) {
-      .ptr-indicator {
-        display: none; position: fixed; top: calc(var(--safe-top) + 8px);
-        left: 50%; transform: translateX(-50%);
-        z-index: 9998; background: var(--card); border: 1px solid var(--line);
-        border-radius: 20px; padding: 5px 13px; font-size: 0.72rem; color: var(--muted);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.28); white-space: nowrap;
-      }
-      .ptr-indicator.visible { display: block; }
     }
   </style>
 </head>
@@ -236,13 +202,13 @@
   <div class="launcher">
 
     <div class="church-id">
-      <img src="Images/NewCovenant.png" alt="FlockOS-GAS" fetchpriority="high">
-      <h1>FlockOS-GAS</h1>
+      <img src="Images/NewCovenant.png" alt="FlockOS" fetchpriority="high">
+      <h1>FlockOS</h1>
     </div>
 
     <div class="app-sections">
 
-      <!-- ── Public ─────────────────────────────────────────────── -->
+      <!-- ── Public ───────────────────────────────────────────────── -->
       <div>
         <div class="section-label">
           <span class="section-icon">🌐</span>
@@ -250,7 +216,7 @@
         </div>
         <nav class="apps" aria-label="Public apps">
 
-          <a class="app-btn app-btn--grow" href="app.grow/app.grow.html">
+          <a class="app-btn app-btn--grow" href="app.grow/app.grow.html" target="_blank" rel="noopener">
             <img class="app-icon" src="Images/GrowIcon.png" alt="GROW" fetchpriority="high">
             <div class="app-label">
               <strong>GROW</strong>
@@ -259,7 +225,7 @@
             <span class="app-arrow" aria-hidden="true">&#8594;</span>
           </a>
 
-          <a class="app-btn app-btn--invite" href="app.invite/app.invite.html">
+          <a class="app-btn app-btn--invite" href="app.invite/app.invite.html" target="_blank" rel="noopener">
             <img class="app-icon" src="Images/Invite.png" alt="The Invitation" loading="lazy">
             <div class="app-label">
               <strong>The Invitation</strong>
@@ -271,7 +237,7 @@
         </nav>
       </div>
 
-      <!-- ── Secure ──────────────────────────────────────────────── -->
+      <!-- ── Secure ────────────────────────────────────────────────── -->
       <div>
         <div class="section-label">
           <span class="section-icon">🔒</span>
@@ -279,7 +245,7 @@
         </div>
         <nav class="apps" aria-label="Secure apps">
 
-          <a class="app-btn app-btn--flock" href="app.flockos/app.flockos.html">
+          <a class="app-btn app-btn--flock" href="app.flockos/app.flockos.html" target="_blank" rel="noopener">
             <img class="app-icon" src="Images/NewCovenant.png" alt="FlockOS" loading="lazy">
             <div class="app-label">
               <strong>FlockOS</strong>
@@ -288,7 +254,7 @@
             <span class="app-arrow" aria-hidden="true">&#8594;</span>
           </a>
 
-          <a class="app-btn app-btn--stand" href="app.stand/">
+          <a class="app-btn app-btn--stand" href="app.stand/" target="_blank" rel="noopener">
             <img class="app-icon" src="Images/stand.png" alt="Flock Stand" loading="lazy">
             <div class="app-label">
               <strong>Flock Stand</strong>
@@ -297,7 +263,7 @@
             <span class="app-arrow" aria-hidden="true">&#8594;</span>
           </a>
 
-          <a class="app-btn app-btn--show" href="app.flockshow/app.flockshow.html">
+          <a class="app-btn app-btn--show" href="app.flockshow/app.flockshow.html" target="_blank" rel="noopener">
             <img class="app-icon" src="Images/Show.png" alt="FlockShow" loading="lazy">
             <div class="app-label">
               <strong>FlockShow</strong>
@@ -318,32 +284,5 @@
 
   </div>
 
-  <!-- Pull-to-Refresh indicator -->
-  <div class="ptr-indicator" id="ptrIndicator">&#8635; Release to refresh</div>
-  <script>
-  (function () {
-    if (window.innerWidth > 860) return;
-    var ptr = document.getElementById('ptrIndicator');
-    if (!ptr) return;
-    var startY = 0, pulling = false, triggered = false;
-
-    document.addEventListener('touchstart', function (e) {
-      if ((window.scrollY || document.documentElement.scrollTop) > 5) return;
-      startY = e.touches[0].clientY; pulling = true; triggered = false;
-    }, { passive: true });
-
-    document.addEventListener('touchmove', function (e) {
-      if (!pulling) return;
-      if (e.touches[0].clientY - startY > 60) { triggered = true; ptr.classList.add('visible'); }
-      else if (!triggered) { ptr.classList.remove('visible'); }
-    }, { passive: true });
-
-    document.addEventListener('touchend', function () {
-      if (triggered) { ptr.textContent = 'Refreshing\u2026'; setTimeout(function () { location.reload(); }, 300); }
-      else { ptr.classList.remove('visible'); }
-      pulling = triggered = false;
-    }, { passive: true });
-  })();
-  </script>
 </body>
 </html>
