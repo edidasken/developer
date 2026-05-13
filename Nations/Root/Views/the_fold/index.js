@@ -1289,14 +1289,17 @@ function _openNewMemberSheet(onReload) {
         await MXP.set({ memberId: newId, role: accessRole });
 
         // 2. Create GAS auth credentials (AuthUsers + AccessControl sheets)
+        // Use flock.call() directly to bypass TheVine's camelCase→Title Case
+        // normalization (_WRITE_VERBS), which would mangle the param keys
+        // (email→Email, passcode→Passcode) before GAS reads them.
         if (V && payload.email) {
           try {
-            await V.flock.users.create({
-              email:     payload.email,
-              role:      accessRole,
+            await V.flock.call('users.create', {
+              targetEmail: payload.email,
+              role:        accessRole,
               passcode,
-              firstName: payload.firstName || '',
-              lastName:  payload.lastName  || '',
+              firstName:   payload.firstName || '',
+              lastName:    payload.lastName  || '',
             });
           } catch (authErr) {
             // Member + role saved — surface the auth failure non-fatally
