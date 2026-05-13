@@ -34,6 +34,7 @@ const S = {
   activePlanId:  null,
   plans:         [],
   songs:         [],
+  sermons:       [],
   livePlan:      null,   // plan loaded for live mode
   liveIdx:       0,      // current song index in live mode
   liveSemitones: 0,
@@ -515,6 +516,12 @@ async function _loadDashboardData(main) {
       ]);
       S.plans = plans || [];
       S.songs = songs || [];
+      // Best-effort sermon fetch for linked-sermon display on plan cards
+      if (!S.sermons.length) {
+        UpperRoom.listSermons?.().then(rows => {
+          S.sermons = Array.isArray(rows) ? rows : (rows?.results || rows?.rows || []);
+        }).catch(() => {});
+      }
     }
   } catch (_) { /* graceful */ }
 
@@ -684,6 +691,8 @@ async function _loadAndRenderPlans(main) {
             ${songs.length > 5 ? `<div style="font-size:.73rem;color:var(--ms-ink-faint)">+${songs.length-5} more songs</div>` : ''}
             ${!songs.length ? '<div style="font-size:.78rem;color:var(--ms-ink-faint);padding:4px 0">No songs yet — tap to add</div>' : ''}
           </div>
+          ${(() => { const sr = p.sermonId && S.sermons.find(s => s.id === p.sermonId); return sr ? `<div style="font-size:.75rem;color:var(--ms-ink-muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--ms-line);">📖 ${_e(sr.title||'Sermon')}${sr.passage ? ' · ' + _e(sr.passage) : ''}</div>` : ''; })()}
+          </div>
           <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
             <button class="ms-btn ms-btn--ghost ms-btn--sm svc-edit-btn" data-plan-id="${_e(p.id)}">Edit</button>
             <button class="ms-btn ms-btn--ghost ms-btn--sm svc-live-btn" data-plan-id="${_e(p.id)}" style="color:var(--ms-rose);">▶ Live</button>
@@ -773,6 +782,14 @@ function _openServiceEditor(plan) {
           <div class="ms-label">Theme / Series</div>
           <input class="ms-input" type="text" id="svc-f-theme" value="${_e(p.theme||p.seriesTitle||'')}" placeholder="e.g. Kingdom Come — Week 3">
         </div>
+        <div class="ms-field" style="margin-bottom:20px;">
+          <div class="ms-label">Linked Sermon</div>
+          <select class="ms-select" id="svc-f-sermon">
+            <option value="">— None —</option>
+            ${S.sermons.map(sr => `<option value="${_e(sr.id)}"${(p.sermonId||''===sr.id)?' selected':''}>${_e(sr.title||'Untitled')}${sr.date?' ('+_fmtDate(sr.date)+')':''}</option>`).join('')}
+          </select>
+          <div id="svc-sermon-preview" style="margin-top:6px;font-size:.78rem;color:var(--ms-ink-muted)"></div>
+        </div>
         <div class="ms-label" style="margin-bottom:8px;">Songs</div>
         <div class="ms-setlist" id="svc-setlist">
           ${songs.map((s, i) => _setlistItemHtml(s, i)).join('')}
@@ -840,12 +857,40 @@ function _openServiceEditor(plan) {
     if (e.target.id === 'svc-editor-backdrop') host.innerHTML = '';
   });
 
+  // Populate sermon select + preview (best-effort async)
+  (async () => {
+    try {
+      if (_fb() && !S.sermons.length) {
+        const rows = (await UpperRoom.listSermons?.()) || [];
+        S.sermons = Array.isArray(rows) ? rows : (rows?.results || rows?.rows || []);
+      }
+      const sel = document.getElementById('svc-f-sermon');
+      if (sel && S.sermons.length) {
+        // Rebuild options now that we have data
+        sel.innerHTML = `<option value="">— None —</option>` +
+          S.sermons.map(sr => `<option value="${_e(sr.id)}"${(p.sermonId||'')=== sr.id?' selected':''}>${_e(sr.title||'Untitled')}${sr.date?' ('+_fmtDate(sr.date)+')':''}</option>`).join('');
+      }
+      // Show preview for pre-selected sermon
+      _updateSermonPreview();
+    } catch (_) { /* non-fatal */ }
+  })();
+
+  function _updateSermonPreview() {
+    const sel = document.getElementById('svc-f-sermon');
+    const prev = document.getElementById('svc-sermon-preview');
+    if (!sel || !prev) return;
+    const sr = S.sermons.find(s => s.id === sel.value);
+    prev.textContent = sr ? (sr.passage ? sr.passage + (sr.speaker ? ' · ' + sr.speaker : '') : '') : '';
+  }
+  document.getElementById('svc-f-sermon')?.addEventListener('change', _updateSermonPreview);
+
   // Save
   document.getElementById('svc-editor-save').addEventListener('click', async () => {
     const payload = {
       serviceDate:  document.getElementById('svc-f-date').value,
       serviceType:  document.getElementById('svc-f-type').value,
       theme:        document.getElementById('svc-f-theme').value.trim(),
+      sermonId:     document.getElementById('svc-f-sermon')?.value || '',
       songs:        _songs,
     };
     const btn = document.getElementById('svc-editor-save');

@@ -726,8 +726,10 @@ function _selectSermon(id) {
   // Enable action buttons that require an active sermon
   const dupBtn  = _qs('bm-duplicate-btn');
   const cpyBtn  = _qs('bm-copy-outline-btn');
+  const fsBtn   = _qs('bm-send-flockshow-btn');
   if (dupBtn)  dupBtn.disabled  = false;
   if (cpyBtn)  cpyBtn.disabled  = false;
+  if (fsBtn)   fsBtn.disabled   = false;
 
   _renderList();
   _renderEditor();
@@ -761,8 +763,52 @@ function _duplicateSermon() {
   _toast('Sermon duplicated', 'success');
 }
 
-async function _copyOutline() {
+// ── Send to FlockShow ─────────────────────────────────────────────────────────
+async function _sendToFlockShow() {
   const s = _active();
+  if (!s) return;
+  const slides = [];
+
+  // Title slide
+  slides.push({ type: 'announce', text: (s.title || 'Untitled Sermon') + (s.speaker ? '\n' + s.speaker : '') });
+
+  // Passage slide if top-level passage field is set
+  if (s.passage) {
+    slides.push({ type: 'scripture', text: s.passage, ref: s.passage });
+  }
+
+  // One slide per section — scripture sections become scripture slides, points become lyrics
+  (s.sections || []).forEach(sec => {
+    if (sec.type === 'scripture' && (sec.scriptureRef || sec.scripture)) {
+      slides.push({ type: 'scripture', ref: sec.scriptureRef || '', text: sec.scripture || sec.notes || '' });
+    } else if (sec.type === 'point' || sec.type === 'intro' || sec.type === 'application') {
+      slides.push({ type: 'lyrics', text: sec.title || sec.type, notes: sec.notes || '' });
+    }
+    // Other types (illustration, transition, prayer, conclusion) are skipped — they are prep material
+  });
+
+  // Altar call slide if present
+  if (s.altarCall && s.altarCall.trim()) {
+    slides.push({ type: 'announce', text: s.altarCall.trim() });
+  }
+
+  if (!slides.length) { _toast('No slideable content in this sermon', 'error'); return; }
+
+  const btn = _qs('bm-send-flockshow-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+  try {
+    const UR = window.UpperRoom;
+    if (!UR || !UR.isReady()) throw new Error('FlockShow backend not available');
+    await UR.createPresentation({ name: s.title || 'Untitled Sermon', slides, sermonId: s.id, serviceDate: s.date || '' });
+    _toast('Sent to FlockShow ✓ — open FlockShow to view', 'success');
+  } catch (err) {
+    _toast('FlockShow send failed: ' + err.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span class="bm-btn-label-hide">FlockShow</span>'; }
+  }
+}
+
+async function _copyOutline() {  const s = _active();
   if (!s) return;
   const lines = [`${s.title || 'Untitled Sermon'}`, s.passage ? `Key Passage: ${s.passage}` : '', ''];
   (s.sections || []).forEach((sec, i) => {
@@ -1334,6 +1380,10 @@ async function _init() {
   // Copy outline to clipboard
   const cpyBtn = _qs('bm-copy-outline-btn');
   if (cpyBtn) cpyBtn.addEventListener('click', _copyOutline);
+
+  // Send to FlockShow
+  const fsBtn = _qs('bm-send-flockshow-btn');
+  if (fsBtn) fsBtn.addEventListener('click', _sendToFlockShow);
 
   // Print / export to PDF
   const printBtn = _qs('bm-print-btn');

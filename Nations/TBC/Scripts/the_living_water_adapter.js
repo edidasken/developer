@@ -55,6 +55,15 @@ const _DOMAIN_MAP = {
     delete: { ur: 'deleteSermonSeries' },
   },
 
+  // ── Presentations (FlockShow) ─────────────────────────────────────────────
+  'flock.presentations': {
+    list:   { ur: 'listPresentations'   },
+    get:    { ur: 'getPresentation'     },
+    create: { ur: 'createPresentation'  },
+    update: { ur: 'updatePresentation'  },
+    delete: { ur: 'deletePresentation'  },
+  },
+
   // ── Events ────────────────────────────────────────────────────────────────
   'flock.events': {
     list:   { ur: 'listEvents'   },

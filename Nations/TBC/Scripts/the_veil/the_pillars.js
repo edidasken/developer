@@ -91,6 +91,7 @@ const SECTIONS = [
       { name: 'quarterly_worship',       label: 'Worship Plan',      icon: ICON.music },
       { name: 'the_pentecost',           label: 'Special Services',  icon: ICON.flame },
       { name: 'music_stand',             label: 'Flock Stand',       icon: ICON.music, href: 'app.stand/' },
+      { name: 'the_feed',                label: 'Sermon Builder',    icon: ICON.pen,   href: 'app.feed/feed.html' },
       { name: 'flockshow',               label: 'FlockShow',         icon: ICON.screen, href: 'app.flockshow/app.flockshow.html' },
     ],
   },

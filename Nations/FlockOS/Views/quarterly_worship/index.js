@@ -12,14 +12,14 @@ export const name  = 'quarterly_worship';
 export const title = 'Quarterly Worship';
 
 // ── Constants ────────────────────────────────────────────────────────────────
-const FIELDS       = ['serviceTime','psalm','worship','announce','prayer','preacher','scripture','proverb','notes'];
+const FIELDS       = ['serviceTime','psalm','worship','announce','prayer','preacher','scripture','proverb','notes','sermonId'];
 const QLIST        = ['Q1','Q2','Q3','Q4'];
 const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const MONTHS_LONG  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS_SHORT   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 // ── Module state ─────────────────────────────────────────────────────────────
-const S = { rows: [], importedIds: {}, dirty: false, saveTimer: null };
+const S = { rows: [], importedIds: {}, dirty: false, saveTimer: null, sermons: [] };
 let _calMode  = 'grid';
 let _calDate  = new Date();
 let _activeDow = -1;
@@ -33,7 +33,7 @@ function _e(s) {
 }
 function mkRow(date) {
   return { id: uid(), date: date || '', serviceTime: '', psalm: '', worship: '',
-    announce: '', prayer: '', preacher: '', scripture: '', proverb: '', notes: '' };
+    announce: '', prayer: '', preacher: '', scripture: '', proverb: '', notes: '', sermonId: '' };
 }
 function isoDate(d) {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -97,7 +97,7 @@ function renderGrid() {
     return new Date(y, m - 1, d).getDay() === _activeDow;
   });
   if (!filtered.length) {
-    tbody.innerHTML = `<tr class="qwp-empty-row"><td colspan="12">No rows yet — click ⟳ Generate to populate Sundays, or + Row to add one.</td></tr>`;
+    tbody.innerHTML = `<tr class="qwp-empty-row"><td colspan="13">No rows yet — click ⟳ Generate to populate Sundays, or + Row to add one.</td></tr>`;
     updateSummary(); return;
   }
   tbody.innerHTML = filtered.map(row => {
@@ -113,6 +113,10 @@ function renderGrid() {
       <td><input class="qwp-cell-input" type="text"   data-field="scripture"   value="${_e(row.scripture)}"   placeholder="Scripture"></td>
       <td><input class="qwp-cell-input" type="text"   data-field="proverb"     value="${_e(row.proverb)}"     placeholder="Proverb"></td>
       <td><input class="qwp-cell-input" type="text"   data-field="notes"       value="${_e(row.notes)}"       placeholder="Theme / notes"></td>
+      <td><select class="qwp-cell-input" data-field="sermonId" style="max-width:160px">
+        <option value="">— sermon —</option>
+        ${S.sermons.map(sr => `<option value="${_e(sr.id)}"${row.sermonId===sr.id?' selected':''}>${_e(sr.title||'Untitled')}${sr.date?' ('+friendlyDate(sr.date)+')':''}</option>`).join('')}
+      </select></td>
       <td style="text-align:center"><input type="checkbox" class="qwp-push-ck" data-id="${_e(row.id)}" ${pushed ? 'checked' : ''}></td>
       <td><div class="qwp-row-actions">
         <button class="qwp-row-btn"     data-dup="${_e(row.id)}" title="Duplicate row">⧉</button>
@@ -514,6 +518,7 @@ function _buildPayload(row, svcType, isUpdate) {
     const val = (row[rowKey] || '').trim();
     if (val || !isUpdate) p[map[rowKey]] = val;
   });
+  if (row.sermonId) p.sermonId = row.sermonId;
   return p;
 }
 
@@ -859,6 +864,7 @@ export function render() {
               <th style="min-width:140px">Scripture</th>
               <th style="min-width:100px">Proverb</th>
               <th style="min-width:140px">Theme</th>
+              <th style="min-width:160px">Sermon</th>
               <th style="width:36px;text-align:center"><input type="checkbox" data-ckall title="Select / deselect all for push"></th>
               <th style="width:50px"></th>
             </tr></thead>
@@ -957,14 +963,16 @@ export function mount(root) {
   });
 
   // Grid body delegation — field edits + row actions
-  root.querySelector('[data-tbody]').addEventListener('input', e => {
+  function _handleCellInput(e) {
     const inp = e.target.closest('.qwp-cell-input'); if (!inp) return;
     const rid   = inp.closest('tr')?.dataset.rid;
     const field = inp.dataset.field;
     if (!rid || !field) return;
     const r = S.rows.find(r => r.id === rid);
     if (r) { r[field] = inp.value; markDirty(); }
-  });
+  }
+  root.querySelector('[data-tbody]').addEventListener('input',  _handleCellInput);
+  root.querySelector('[data-tbody]').addEventListener('change', _handleCellInput);
   root.querySelector('[data-tbody]').addEventListener('click', e => {
     const dupBtn = e.target.closest('[data-dup]');
     const delBtn = e.target.closest('[data-del]');
@@ -1007,6 +1015,18 @@ export function mount(root) {
       if (localData?.rows?.length) { _applyPlanData(localData); setStatus('', 'Loaded from local storage'); }
       else { generate(true); S.dirty = false; setStatus('', ''); }
     }
+  })();
+
+  // Pre-fetch sermon list for the sermonId dropdowns (best-effort, silent)
+  (async () => {
+    try {
+      const UR = window.UpperRoom;
+      if (UR && typeof UR.listSermons === 'function') {
+        const rows = await UR.listSermons({ limit: 200 });
+        S.sermons = Array.isArray(rows) ? rows : (rows?.results || rows?.rows || []);
+        renderGrid(); // re-render so dropdowns are populated
+      }
+    } catch (_) { /* non-fatal */ }
   })();
 
   // Periodic retry when dirty

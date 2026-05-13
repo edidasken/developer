@@ -945,10 +945,10 @@
     <button class="bm-btn bm-btn--ghost bm-btn--icon bm-hamburger" id="bm-hamburger" aria-label="Open sidebar" style="display:none">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
-    <div class="bm-logo">
+    <a class="bm-logo" href="../" title="Back to launcher" style="text-decoration:none;color:inherit">
       <div class="bm-logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
       <span class="bm-logo-text">The Feed</span>
-    </div>
+    </a>
     <span id="bm-active-title">No sermon selected</span>
     <div class="bm-topbar-right">
       <button class="bm-btn bm-btn--ghost bm-btn--sm" id="bm-duplicate-btn" title="Duplicate this sermon" disabled>
@@ -958,6 +958,10 @@
       <button class="bm-btn bm-btn--ghost bm-btn--sm" id="bm-copy-outline-btn" title="Copy outline to clipboard" disabled>
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
         <span class="bm-btn-label-hide">Outline</span>
+      </button>
+      <button class="bm-btn bm-btn--ghost bm-btn--sm" id="bm-send-flockshow-btn" title="Send to FlockShow" disabled style="color:var(--bm-accent)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <span class="bm-btn-label-hide">FlockShow</span>
       </button>
       <button class="bm-btn bm-btn--success bm-btn--sm" id="bm-save-btn" disabled title="Save sermon (Ctrl+S)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
