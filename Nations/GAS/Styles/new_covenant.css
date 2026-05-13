@@ -415,6 +415,7 @@ h4 { font-size: 1.1rem; }
   justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 1.25rem;
+  min-height: 44px;          /* WCAG 2.5.5 touch target */
   font-size: 0.875rem;
   font-weight: 600;
   border: 1px solid transparent;
@@ -423,6 +424,7 @@ h4 { font-size: 1.1rem; }
   transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
   white-space: nowrap;
   line-height: 1.4;
+  touch-action: manipulation;  /* prevent 300ms delay on iOS */
 }
 
 .btn:active { transform: scale(0.97); }
@@ -467,8 +469,8 @@ h4 { font-size: 1.1rem; }
   border-color: var(--danger);
 }
 
-.btn-sm   { padding: 0.3rem 0.85rem; font-size: 0.75rem; }
-.btn-icon { padding: 0.5rem; border-radius: var(--radius-md); }
+.btn-sm   { padding: 0.3rem 0.85rem; font-size: 0.75rem; min-height: 36px; }
+.btn-icon { padding: 0.5rem; border-radius: var(--radius-md); min-width: 44px; min-height: 44px; }
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
@@ -502,7 +504,7 @@ h4 { font-size: 1.1rem; }
   color: var(--ink-faint);
 }
 
-.textarea { resize: vertical; min-height: 100px; }
+.textarea { resize: vertical; min-height: 100px; max-height: 60vh; overflow-y: auto; }
 
 .label {
   display: block;
@@ -617,7 +619,8 @@ h4 { font-size: 1.1rem; }
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 20px;
+  padding: 10px 20px;    /* was 8px — bumped for 44px touch target */
+  min-height: 44px;
   font-size: 0.88rem;
   font-weight: 500;
   letter-spacing: 0.005em;
@@ -626,6 +629,7 @@ h4 { font-size: 1.1rem; }
   transition: all 0.15s;
   text-decoration: none;
   border-left: 3px solid transparent;
+  touch-action: manipulation;
 }
 .nav-item:hover { background: var(--bg-hover); color: var(--accent); }
 .nav-item.active {

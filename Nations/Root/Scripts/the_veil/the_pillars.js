@@ -147,7 +147,7 @@ export function mountPillars(host) {
   items.forEach((btn) => {
     btn.addEventListener('click', () => {
       if (btn.dataset.href) {
-        window.location.href = btn.dataset.href;
+        window.open(btn.dataset.href, '_blank', 'noopener');
         return;
       }
       go(btn.dataset.view).catch((err) => console.warn('[pillars]', err));

@@ -611,6 +611,8 @@ function _renderManuscript() {
     area.value = s.manuscript || '';
     _autoResize(area);
   }
+  // Always start in preview mode when loading a sermon
+  _msPreviewMode = true;
   _refreshMsPreview();
   _updateStats();
 }
@@ -687,8 +689,14 @@ function _refreshMsPreview() {
   const raw = area ? area.value : (_active() ? (_active().manuscript || '') : '');
   preview.innerHTML = _buildMsHtml(raw);
   if (pane) pane.classList.toggle('bm-preview-mode', _msPreviewMode);
-  if (area) area.hidden = _msPreviewMode;
-  preview.hidden = !_msPreviewMode;
+  // Use explicit display control instead of element.hidden for reliability
+  if (area) { area.style.display = _msPreviewMode ? 'none' : ''; }
+  preview.style.display = _msPreviewMode ? '' : 'none';
+  // Sync toggle button active states
+  const editBtn = document.getElementById('bm-ms-edit-btn');
+  const viewBtn = document.getElementById('bm-ms-view-btn');
+  if (editBtn) editBtn.classList.toggle('bm-active', !_msPreviewMode);
+  if (viewBtn) viewBtn.classList.toggle('bm-active',  _msPreviewMode);
 }
 
 function _setMsMode(isPreview) {
@@ -700,11 +708,6 @@ function _setMsMode(isPreview) {
   if (isPreview && area && s)  { s.manuscript = area.value; _queueSave(); }
   _msPreviewMode = isPreview;
   _refreshMsPreview();
-  // Update toggle button states
-  const editBtn = document.getElementById('bm-ms-edit-btn');
-  const viewBtn = document.getElementById('bm-ms-view-btn');
-  if (editBtn) editBtn.classList.toggle('bm-active', !isPreview);
-  if (viewBtn) viewBtn.classList.toggle('bm-active',  isPreview);
 }
 
 // ── Research ──────────────────────────────────────────────────────────────────
