@@ -444,6 +444,101 @@
       padding: 10px 18px; border-top: 1px solid var(--fs-border); flex-shrink: 0;
     }
     .fs-sp-status { font: 0.73rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted); }
+
+    /* ── Browser default overrides ──────────────────────────────────── */
+    input:not([type=color]):not([type=range]),
+    textarea, select {
+      -webkit-appearance: none; appearance: none;
+    }
+    input[type="search"]::-webkit-search-decoration,
+    input[type="search"]::-webkit-search-cancel-button,
+    input[type="search"]::-webkit-search-results-button { display: none; }
+    input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
+      -webkit-text-fill-color: var(--fs-ink) !important;
+      -webkit-box-shadow: 0 0 0 100px #0c1445 inset !important;
+      transition: background-color 9999s ease-in-out 0s;
+    }
+
+    /* ── Range slider ───────────────────────────────────────────────── */
+    .fs-range {
+      -webkit-appearance: none; appearance: none;
+      flex: 1; height: 4px; border-radius: 4px; outline: none; cursor: pointer;
+      background: rgba(255,255,255,0.10);
+    }
+    .fs-range::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--fs-accent); cursor: pointer;
+      box-shadow: 0 2px 8px rgba(232,168,56,0.45);
+    }
+    .fs-range::-moz-range-thumb {
+      width: 16px; height: 16px; border-radius: 50%; border: none;
+      background: var(--fs-accent); cursor: pointer;
+    }
+    .fs-font-row { display: flex; align-items: center; gap: 8px; }
+    .fs-range-val { font: 600 0.75rem 'Plus Jakarta Sans',sans-serif; color: var(--fs-accent); min-width: 40px; text-align: right; flex-shrink: 0; }
+
+    /* ── Background theme swatches ──────────────────────────────────── */
+    .fs-theme-swatches { display: flex; flex-wrap: wrap; gap: 5px; }
+    .fs-swatch {
+      width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
+      border: 2px solid transparent; transition: all 0.13s; flex-shrink: 0;
+    }
+    .fs-swatch:hover { transform: scale(1.15); border-color: rgba(255,255,255,0.35); }
+    .fs-swatch.fs-swatch--active { border-color: var(--fs-accent); box-shadow: 0 0 0 3px var(--fs-accent-dim); }
+
+    /* ── Bible picker section ───────────────────────────────────────── */
+    .fs-bible-row { display: flex; gap: 6px; margin-bottom: 5px; }
+    .fs-bible-select {
+      flex: 1; padding: 6px 28px 6px 10px; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--fs-border); border-radius: 8px;
+      font: 0.79rem 'Plus Jakarta Sans',sans-serif; color: var(--fs-ink); outline: none;
+      cursor: pointer; -webkit-appearance: none; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(240,241,248,0.35)'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 9px center;
+    }
+    .fs-bible-select:focus { border-color: var(--fs-accent); background-color: rgba(232,168,56,0.05); }
+    .fs-bible-select option, select.fs-prop-input option { background: #0c1445; color: var(--fs-ink); }
+    .fs-bible-status {
+      font: 0.73rem 'Plus Jakarta Sans',sans-serif; color: var(--fs-muted);
+      background: rgba(255,255,255,0.03); border: 1px solid transparent;
+      border-radius: 6px; padding: 6px 9px; line-height: 1.5;
+      word-break: break-word; margin-top: 4px;
+    }
+    .fs-bible-status--ok  { color: #4ade80; background: rgba(74,222,128,0.07); border-color: rgba(74,222,128,0.15); }
+    .fs-bible-status--err { color: var(--fs-danger); background: rgba(248,113,113,0.07); border-color: rgba(248,113,113,0.15); }
+    .fs-bible-btn-row { display: flex; gap: 5px; margin-top: 5px; }
+
+    /* ── Select override (props panel) ──────────────────────────────── */
+    select.fs-prop-input {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(240,241,248,0.35)'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+      padding-right: 28px; cursor: pointer;
+    }
+    /* ── Library header actions ──────────────────────────────────────── */
+    .fs-lib-actions { display: flex; gap: 5px; flex-shrink: 0; }
+
+    /* ── Props panel visual polish ────────────────────────────────────── */
+    .fs-prop-section {
+      display: flex; flex-direction: column; gap: 7px;
+      padding: 10px 11px; background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;
+    }
+    .fs-prop-label {
+      font: 600 0.65rem 'Plus Jakarta Sans', sans-serif;
+      text-transform: uppercase; letter-spacing: .08em;
+      color: var(--fs-accent); opacity: 0.8;
+    }
+    .fs-prop-input {
+      width: 100%; padding: 8px 10px; background: rgba(6,12,31,0.6);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
+      font: 0.80rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink); outline: none; resize: vertical;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .fs-prop-input:focus { border-color: var(--fs-accent); background: rgba(232,168,56,0.05); }
+    .fs-prop-input::placeholder { color: rgba(240,241,248,0.3); }
+    .fs-prop-textarea { min-height: 90px; }
+    .fs-prop-divider { display: none; }
   </style>
 </head>
 <body>
@@ -478,6 +573,16 @@
       <div class="fs-search-wrap">
         <svg class="fs-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input id="fs-search" class="fs-search" type="search" placeholder="Search shows…">
+      </div>
+      <div class="fs-lib-actions">
+        <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-import-show-btn" title="Import show from JSON file">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Import
+        </button>
+        <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-export-show-btn" title="Export active show as JSON file" disabled>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
       </div>
       <button class="fs-btn fs-btn--primary" id="fs-new-show-btn">+ New Show</button>
     </div>
@@ -552,7 +657,30 @@
 
         <div class="fs-prop-section" id="fs-prop-ref-section" hidden>
           <div class="fs-prop-label">Scripture Reference</div>
-          <input class="fs-prop-input" id="fs-prop-ref" type="text" placeholder="e.g. John 3:16 (ESV)">
+          <input class="fs-prop-input" id="fs-prop-ref" type="text" placeholder="e.g. John 3:16 (KJV)">
+        </div>
+
+        <!-- Bible verse lookup — visible when type = scripture -->
+        <div class="fs-prop-section" id="fs-bible-section" hidden>
+          <div class="fs-prop-label">Bible Verse Lookup</div>
+          <div class="fs-bible-row">
+            <select class="fs-bible-select" id="fs-bible-translation" title="Translation">
+              <option value="kjv">KJV</option>
+              <option value="web">WEB (World English)</option>
+              <option value="asv">ASV</option>
+              <option value="bbe">BBE (Basic English)</option>
+              <option value="darby">Darby</option>
+              <option value="ylt">Young's Literal</option>
+              <option value="dra">Douay-Rheims</option>
+            </select>
+          </div>
+          <input class="fs-prop-input" id="fs-bible-query" type="text"
+            placeholder="e.g. John 3:16 or Romans 8:28-30" autocomplete="off">
+          <div class="fs-bible-btn-row">
+            <button class="fs-btn fs-btn--primary fs-btn--sm" id="fs-bible-fetch-btn">Fetch Verse</button>
+            <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-bible-split-btn" hidden>Split Verses</button>
+          </div>
+          <div id="fs-bible-status" class="fs-bible-status" hidden></div>
         </div>
 
         <hr class="fs-prop-divider">
@@ -572,6 +700,29 @@
             <input class="fs-color-input" id="fs-prop-tc" type="color" value="#f0f1f8">
             <span class="fs-color-val" id="fs-prop-tc-label">Default</span>
             <button class="fs-color-reset" id="fs-prop-tc-reset">Reset</button>
+          </div>
+        </div>
+
+        <div class="fs-prop-section">
+          <div class="fs-prop-label">Font Size</div>
+          <div class="fs-font-row">
+            <input type="range" class="fs-range" id="fs-prop-font-size" min="12" max="120" step="4" value="0">
+            <span class="fs-range-val" id="fs-prop-font-size-val">Auto</span>
+          </div>
+          <button class="fs-color-reset" id="fs-prop-font-reset" style="align-self:flex-start;margin-top:3px">Reset to Auto</button>
+        </div>
+
+        <div class="fs-prop-section">
+          <div class="fs-prop-label">Background Theme</div>
+          <div class="fs-theme-swatches" id="fs-theme-swatches">
+            <button class="fs-swatch" data-bg="" data-tc="" title="Default (by type)" style="background:linear-gradient(135deg,#0b0d14 50%,#1a0e3c)"></button>
+            <button class="fs-swatch" data-bg="#000000" data-tc="#ffffff" title="Pure Black" style="background:#000"></button>
+            <button class="fs-swatch" data-bg="#0d1a2b" data-tc="#e8d5a3" title="Night Sky" style="background:#0d1a2b"></button>
+            <button class="fs-swatch" data-bg="#0a1a0f" data-tc="#86efac" title="Forest" style="background:#0a1a0f"></button>
+            <button class="fs-swatch" data-bg="#1a0e0e" data-tc="#fca5a5" title="Deep Red" style="background:#1a0e0e"></button>
+            <button class="fs-swatch" data-bg="#0a0a1e" data-tc="#c4b5fd" title="Deep Purple" style="background:#0a0a1e"></button>
+            <button class="fs-swatch" data-bg="#1a1200" data-tc="#fde68a" title="Amber" style="background:#1a1200"></button>
+            <button class="fs-swatch" data-bg="#0d1a2b" data-tc="#7dd3fc" title="Ocean" style="background:linear-gradient(135deg,#0d1a2b,#082030)"></button>
           </div>
         </div>
 

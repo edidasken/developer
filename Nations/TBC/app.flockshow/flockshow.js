@@ -172,13 +172,22 @@ function _makeShow(name = 'New Show') {
 function _activeShow()  { return _st.shows.find(s => s.id === _st.activeId) || null; }
 function _activeSlide() { const sh = _activeShow(); return sh?.slides[_st.activeSlide] || null; }
 
-function _touch(show) { show.updatedAt = Date.now(); _save(); }
+// ── Save / sync ──────────────────────────────────────────────────────────────────
+// Sync a specific show (or active show) to storage + localStorage.
+function _save(show) {
+  _lsSync();
+  const toSync = show || _activeShow();
+  if (toSync) _syncShow(toSync); // fire-and-forget
+}
+
+function _touch(show) { show.updatedAt = Date.now(); _save(show); }
 
 // ── Slide appearance ──────────────────────────────────────────────────────────
 function _slideBg(sl)   { return sl.bgColor   || SLIDE_TYPES[sl.type]?.bg   || '#000'; }
 function _slideCol(sl)  { return sl.textColor || SLIDE_TYPES[sl.type]?.text || '#fff'; }
 
 function _slideFontSize(sl) {
+  if (sl.fontSize && sl.fontSize > 0) return sl.fontSize + 'px';
   const len = (sl.text || '').length;
   if (len === 0)   return '4rem';
   if (len < 40)    return '3.2rem';
@@ -247,13 +256,21 @@ html, body {
 </div>
 ${counter}${nextHtml}${noteHtml}
 <script>
+var _blacked = false;
 document.addEventListener('keydown', function(e) {
   var o = window.opener;
+  // B = black screen toggle
+  if (e.key === 'b' || e.key === 'B') {
+    _blacked = !_blacked;
+    document.body.style.background = _blacked ? '#000' : '${bg}';
+    document.querySelector('.slide').style.visibility = _blacked ? 'hidden' : 'visible';
+    return;
+  }
   if (!o || !o._fsKey) return;
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
-    e.preventDefault(); o._fsKey('next');
+    e.preventDefault(); _blacked = false; document.body.style.background='${bg}'; document.querySelector('.slide').style.visibility='visible'; o._fsKey('next');
   } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
-    e.preventDefault(); o._fsKey('prev');
+    e.preventDefault(); _blacked = false; document.body.style.background='${bg}'; document.querySelector('.slide').style.visibility='visible'; o._fsKey('prev');
   } else if (e.key === 'f' || e.key === 'F') {
     document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
   } else if (e.key === 'Escape') {
@@ -451,11 +468,36 @@ function _renderProps() {
   const notesEl = document.getElementById('fs-prop-notes');
   if (notesEl && notesEl !== document.activeElement) notesEl.value = sl.notes || '';
 
+  // Bible section (scripture only)
+  const bibleSection = document.getElementById('fs-bible-section');
+  if (bibleSection) bibleSection.hidden = sl.type !== 'scripture';
+  // Restore saved translation preference
+  const transEl = document.getElementById('fs-bible-translation');
+  if (transEl && transEl !== document.activeElement) {
+    transEl.value = _getBibleTranslation();
+  }
+
+  // Font size slider
+  const fsSlider = document.getElementById('fs-prop-font-size');
+  const fsLabel  = document.getElementById('fs-prop-font-size-val');
+  if (fsSlider) fsSlider.value = sl.fontSize || 0;
+  if (fsLabel)  fsLabel.textContent = (sl.fontSize && sl.fontSize > 0) ? sl.fontSize + 'px' : 'Auto';
+
+  // Theme swatches — mark active
+  const activeBg = sl.bgColor || '';
+  document.querySelectorAll('.fs-swatch').forEach(sw => {
+    sw.classList.toggle('fs-swatch--active', sw.dataset.bg === activeBg);
+  });
+
   // Editor bar
   const titleEl   = document.getElementById('fs-show-title');
   const countEl   = document.getElementById('fs-slide-count');
   if (titleEl && titleEl !== document.activeElement) titleEl.value = show.name;
   if (countEl) countEl.textContent = `${show.slides.length} slide${show.slides.length !== 1 ? 's' : ''}`;
+
+  // Export button enabled when in editor
+  const expBtn = document.getElementById('fs-export-show-btn');
+  if (expBtn) expBtn.disabled = false;
 }
 
 // ── Render: topbar header ─────────────────────────────────────────────────────
@@ -526,7 +568,7 @@ function _newShow() {
   if (name === null) return;
   const show = _makeShow(name.trim() || 'New Show');
   _st.shows.unshift(show);
-  _save();
+  _save(show);
   _openShow(show.id);
 }
 
@@ -537,10 +579,11 @@ function _dupShow(id) {
   copy.id = _uid();
   copy.name = src.name + ' (copy)';
   copy.createdAt = copy.updatedAt = Date.now();
+  delete copy._fsId; delete copy._gasId;
   copy.slides.forEach(sl => { sl.id = _uid(); });
   const idx = _st.shows.findIndex(s => s.id === id);
   _st.shows.splice(idx + 1, 0, copy);
-  _save();
+  _save(copy);
   _renderLibrary();
 }
 
@@ -550,7 +593,7 @@ function _delShow(id) {
   if (!confirm(`Delete "${show.name}"? This cannot be undone.`)) return;
   _st.shows = _st.shows.filter(s => s.id !== id);
   if (_st.activeId === id) { _st.activeId = null; _setView('library'); }
-  _save();
+  _removeShow(show); // handles Firestore/GAS deletion + lsSync
   _renderLibrary();
   _renderHeader();
 }
@@ -632,6 +675,135 @@ function _importLyrics() {
   _renderPreview();
   _renderProps();
   _pushToPresent();
+}
+
+// ── Bible verse fetch (bible-api.com — free, no key required) ────────────────
+function _getBibleTranslation() {
+  return localStorage.getItem('flockshow_bible_trans') || 'kjv';
+}
+function _setBibleTranslation(t) {
+  localStorage.setItem('flockshow_bible_trans', t);
+}
+
+let _lastBibleData = null;
+
+async function _fetchBibleVerse() {
+  const queryEl    = document.getElementById('fs-bible-query');
+  const transEl    = document.getElementById('fs-bible-translation');
+  const splitBtn   = document.getElementById('fs-bible-split-btn');
+  const query      = (queryEl?.value || '').trim();
+  const translation = transEl?.value || 'kjv';
+
+  if (!query) { _bibleStatus('Enter a verse reference (e.g. John 3:16)', 'err'); return; }
+  _bibleStatus('Fetching from Bible API…', '');
+  if (splitBtn) splitBtn.hidden = true;
+
+  try {
+    const url  = `https://bible-api.com/${encodeURIComponent(query)}?translation=${translation}`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`Server error (${resp.status})`);
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+
+    _lastBibleData = data;
+    _setBibleTranslation(translation);
+
+    const sl   = _activeSlide();
+    const show = _activeShow();
+    if (!sl || !show) { _bibleStatus('Select a slide first.', 'err'); return; }
+
+    const verses = data.verses || [];
+    const text   = verses.map(v => v.text.trim()).join('\n');
+    const ref    = data.reference || query;
+    const label  = translation.toUpperCase();
+
+    sl.text      = text;
+    sl.reference = `${ref} (${label})`;
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _renderProps();
+    _pushToPresent();
+
+    const count = verses.length;
+    _bibleStatus(`✓ ${ref} — ${count} verse${count !== 1 ? 's' : ''} (${label})`, 'ok');
+    if (splitBtn) splitBtn.hidden = count <= 1;
+  } catch (e) {
+    console.warn('[FlockShow] Bible fetch failed:', e);
+    _bibleStatus(`Could not fetch: ${e.message}`, 'err');
+  }
+}
+
+function _bibleStatus(msg, type) {
+  const el = document.getElementById('fs-bible-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'fs-bible-status' + (type ? ` fs-bible-status--${type}` : '');
+  el.hidden = false;
+}
+
+function _splitBibleVerses() {
+  if (!_lastBibleData || !(_lastBibleData.verses || []).length) return;
+  const show = _activeShow();
+  if (!show) return;
+  const label  = (document.getElementById('fs-bible-translation')?.value || 'kjv').toUpperCase();
+  const verses = _lastBibleData.verses;
+
+  const newSlides = verses.map(v => {
+    const sl = _makeSlide('scripture', v.text.trim());
+    sl.reference = `${v.book_name} ${v.chapter}:${v.verse} (${label})`;
+    return sl;
+  });
+  // Replace current slide with one per verse
+  show.slides.splice(_st.activeSlide, 1, ...newSlides);
+  _touch(show);
+  _renderSlideList();
+  _renderPreview();
+  _renderProps();
+  _pushToPresent();
+  const splitBtn = document.getElementById('fs-bible-split-btn');
+  if (splitBtn) splitBtn.hidden = true;
+  _bibleStatus(`Split into ${verses.length} slide${verses.length !== 1 ? 's' : ''}`, 'ok');
+}
+
+// ── Export / Import show as JSON file ────────────────────────────────────────
+function _exportShow() {
+  const show = _activeShow() || _st.shows[0];
+  if (!show) return;
+  const clean = JSON.parse(JSON.stringify(show));
+  delete clean._fsId; delete clean._gasId;
+  const blob = new Blob([JSON.stringify(clean, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = (show.name || 'FlockShow').replace(/[^a-zA-Z0-9 _-]/g, '') + '.flockshow.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function _importShow() {
+  const input = document.createElement('input');
+  input.type   = 'file';
+  input.accept = '.json,.flockshow.json';
+  input.addEventListener('change', async () => {
+    const file = input.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const show = JSON.parse(text);
+      if (!show.id || !Array.isArray(show.slides)) throw new Error('Not a valid FlockShow file');
+      show.id   = _uid();
+      show.name = (show.name || 'Imported Show') + ' (imported)';
+      show.slides.forEach(sl => { sl.id = _uid(); });
+      _st.shows.unshift(show);
+      _lsSync();
+      _syncShow(show);
+      _renderLibrary();
+    } catch (e) {
+      alert('Could not import show: ' + e.message);
+    }
+  });
+  input.click();
 }
 
 // ── Present mode ──────────────────────────────────────────────────────────────
@@ -860,6 +1032,61 @@ function _wire() {
     _touch(show);
     _pushToPresent();
   });
+
+  /* ── Font size slider ── */
+  document.getElementById('fs-prop-font-size')?.addEventListener('input', e => {
+    const sl = _activeSlide(); const show = _activeShow();
+    if (!sl || !show) return;
+    sl.fontSize = +e.target.value;
+    const label = document.getElementById('fs-prop-font-size-val');
+    if (label) label.textContent = sl.fontSize > 0 ? sl.fontSize + 'px' : 'Auto';
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _pushToPresent();
+  });
+  document.getElementById('fs-prop-font-reset')?.addEventListener('click', () => {
+    const sl = _activeSlide(); const show = _activeShow();
+    if (!sl || !show) return;
+    sl.fontSize = 0;
+    const slider = document.getElementById('fs-prop-font-size');
+    const label  = document.getElementById('fs-prop-font-size-val');
+    if (slider) slider.value = 0;
+    if (label)  label.textContent = 'Auto';
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _pushToPresent();
+  });
+
+  /* ── Theme swatches ── */
+  document.getElementById('fs-theme-swatches')?.addEventListener('click', e => {
+    const swatch = e.target.closest('.fs-swatch');
+    if (!swatch) return;
+    const sl = _activeSlide(); const show = _activeShow();
+    if (!sl || !show) return;
+    sl.bgColor   = swatch.dataset.bg   || '';
+    sl.textColor = swatch.dataset.tc   || '';
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _renderProps();
+    _pushToPresent();
+  });
+
+  /* ── Bible verse lookup ── */
+  document.getElementById('fs-bible-fetch-btn')?.addEventListener('click', _fetchBibleVerse);
+  document.getElementById('fs-bible-split-btn')?.addEventListener('click', _splitBibleVerses);
+  document.getElementById('fs-bible-query')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); _fetchBibleVerse(); }
+  });
+  document.getElementById('fs-bible-translation')?.addEventListener('change', e => {
+    _setBibleTranslation(e.target.value);
+  });
+
+  /* ── Export / Import ── */
+  document.getElementById('fs-export-show-btn')?.addEventListener('click', _exportShow);
+  document.getElementById('fs-import-show-btn')?.addEventListener('click', _importShow);
 
   /* ── Import lyrics ── */
   document.getElementById('fs-import-btn')?.addEventListener('click', _importLyrics);
