@@ -791,7 +791,98 @@ function _wire() {
   });
 }
 
+// ── Auth gate ─────────────────────────────────────────────────────────────────
+function _waitFor(predicate, timeout = 6000) {
+  return new Promise((resolve, reject) => {
+    if (predicate()) return resolve();
+    const start = Date.now();
+    const id = setInterval(() => {
+      if (predicate())                    { clearInterval(id); resolve(); }
+      else if (Date.now() - start > timeout) { clearInterval(id); reject(new Error('timeout')); }
+    }, 80);
+  });
+}
+
+function _showAuthGate(N) {
+  const overlay = document.getElementById('fs-auth-overlay');
+  if (!overlay) return;
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:var(--fs-bg);display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = `
+    <div class="fs-auth-card">
+      <img class="fs-auth-icon" src="Images/Show.png" alt="FlockShow">
+      <h1>FlockShow</h1>
+      <p>Sign in with your FlockOS account to access worship presentations.</p>
+      <button class="fs-btn fs-btn--primary" id="fs-signin-btn" style="width:100%;justify-content:center;padding:10px 0;font-size:0.88rem;">
+        Sign In to FlockOS
+      </button>
+      <p style="font-size:.75rem;color:rgba(240,241,248,0.35)">Access is limited to authenticated FlockOS users.</p>
+      <p class="fs-auth-verse">"Praise Him with strings and pipe." — Psalm 150:4</p>
+    </div>`;
+  document.getElementById('fs-signin-btn')?.addEventListener('click', () => {
+    if (N && typeof N.login === 'function') {
+      const returnUrl = encodeURIComponent(location.href);
+      const base = location.href.replace(/\/app\.flockshow\/app\.flockshow\.html.*$/, '/');
+      location.href = base + 'Scripts/the_priesthood/the_garments.html?return=' + returnUrl;
+    } else {
+      location.reload();
+    }
+  });
+}
+
+function _dismissAuthOverlay() {
+  const overlay = document.getElementById('fs-auth-overlay');
+  if (overlay) overlay.remove();
+}
+
+function _renderUserChip(N) {
+  const chip   = document.getElementById('fs-user-chip');
+  const avatar = document.getElementById('fs-user-avatar');
+  const name   = document.getElementById('fs-user-name');
+  if (!chip) return;
+
+  const sess = (N && typeof N.getSession === 'function' ? N.getSession() : null) || {};
+  const displayName = sess.displayName || sess.email || 'Account';
+  const initial = displayName.charAt(0).toUpperCase();
+
+  if (avatar) avatar.textContent = initial;
+  if (name)   name.textContent   = displayName;
+  chip.removeAttribute('hidden');
+
+  chip.addEventListener('click', () => {
+    if (confirm(`Sign out of FlockShow?\n(${displayName})`)) {
+      if (N && typeof N.logout === 'function') N.logout();
+      else location.reload();
+    }
+  });
+}
+
 // ── Boot ──────────────────────────────────────────────────────────────────────
-_load();
-_wire();
-_renderAll();
+async function _boot() {
+  try {
+    await _waitFor(() => typeof window.Nehemiah !== 'undefined');
+  } catch (_) {
+    // firm_foundation.js didn't load (e.g. local dev) — run ungated
+    _load(); _wire(); _renderAll();
+    return;
+  }
+
+  const N = window.Nehemiah;
+
+  if (typeof N.isAuthenticated === 'function' && !N.isAuthenticated()) {
+    _showAuthGate(N);
+    return;
+  }
+
+  // Authenticated — dismiss overlay and launch
+  _dismissAuthOverlay();
+  _renderUserChip(N);
+  _load();
+  _wire();
+  _renderAll();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _boot);
+} else {
+  _boot();
+}
