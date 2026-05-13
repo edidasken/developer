@@ -134,12 +134,14 @@
     .app-btn--stand  { border-color: rgba(168,85,247,0.20); }
     .app-btn--show   { border-color: rgba(239,68,68,0.20);  }
     .app-btn--chat   { border-color: rgba(6,182,212,0.20);  }
+    .app-btn--bread  { border-color: rgba(232,168,56,0.20); }
     .app-btn:hover.app-btn--grow   { border-color: rgba(232,168,56,0.55); }
     .app-btn:hover.app-btn--invite { border-color: rgba(61,179,79,0.55);  }
     .app-btn:hover.app-btn--flock  { border-color: rgba(91,141,238,0.55); }
     .app-btn:hover.app-btn--stand  { border-color: rgba(168,85,247,0.55); }
     .app-btn:hover.app-btn--show   { border-color: rgba(239,68,68,0.55);  }
     .app-btn:hover.app-btn--chat   { border-color: rgba(6,182,212,0.55);  }
+    .app-btn:hover.app-btn--bread  { border-color: rgba(232,168,56,0.55); }
 
     .app-icon {
       width: 40px; height: 40px;
@@ -161,6 +163,7 @@
     .app-btn--stand  .app-label strong { color: #d8b4fe; }
     .app-btn--show   .app-label strong { color: #fca5a5; }
     .app-btn--chat   .app-label strong { color: #67e8f9; }
+    .app-btn--bread  .app-label strong { color: var(--gold); }
     .app-label span {
       display: block;
       font-size: 0.73rem;
@@ -280,6 +283,15 @@
             <div class="app-label">
               <strong>FlockShow</strong>
               <span>Worship slides &amp; service presentation</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
+          <a class="app-btn app-btn--bread" href="app.feed/bread_maker.html" target="_blank" rel="noopener">
+            <div class="app-icon" style="background:linear-gradient(135deg,#c48a20,#e8a838);display:flex;align-items:center;justify-content:center;font-size:22px;border-radius:9px;box-shadow:0 2px 7px rgba(0,0,0,0.28);flex-shrink:0;width:40px;height:40px" aria-hidden="true">🍞</div>
+            <div class="app-label">
+              <strong>Bread Maker</strong>
+              <span>Sermon preparation &amp; manuscript builder</span>
             </div>
             <span class="app-arrow" aria-hidden="true">&#8594;</span>
           </a>

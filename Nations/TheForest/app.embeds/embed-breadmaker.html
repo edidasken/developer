@@ -444,6 +444,78 @@
     }
     .bm-add-section-btn:hover { background: rgba(255,255,255,0.08); color: var(--bm-ink); border-color: var(--bm-border-lit); }
 
+    /* ── Section collapse ───────────────────────────────────────────── */
+    .bm-outline-section.collapsed .bm-section-body { display: none; }
+    .bm-collapse-btn svg { transition: transform 0.18s; }
+    .bm-outline-section.collapsed .bm-collapse-btn svg { transform: rotate(-90deg); }
+
+    /* ── Section type select ────────────────────────────────────────── */
+    .bm-section-type-select {
+      appearance: none; -webkit-appearance: none;
+      background: none; border: none; outline: none;
+      font: 600 0.65rem 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: .06em; text-transform: uppercase;
+      cursor: pointer; padding: 2px 3px;
+      border-radius: 5px; transition: background 0.12s;
+    }
+    .bm-section-type-select.intro        { color: #60a5fa; }
+    .bm-section-type-select.scripture    { color: var(--bm-accent); }
+    .bm-section-type-select.point        { color: #34d399; }
+    .bm-section-type-select.illustration { color: #c084fc; }
+    .bm-section-type-select.application  { color: #f97316; }
+    .bm-section-type-select.prayer       { color: #f9a8d4; }
+    .bm-section-type-select.conclusion   { color: #fbbf24; }
+    .bm-section-type-select.transition   { color: var(--bm-muted); }
+    .bm-section-type-select:hover { background: rgba(255,255,255,0.07); }
+    .bm-section-type-select option { background: #0c1445; color: var(--bm-ink); }
+
+    /* ── Sidebar controls (filter + sort) ───────────────────────────── */
+    .bm-sidebar-controls {
+      display: flex; align-items: center; gap: 6px; padding: 6px 12px 8px;
+    }
+    .bm-filter-pills { display: flex; gap: 4px; flex: 1; flex-wrap: wrap; }
+    .bm-filter-pill {
+      padding: 2px 8px; border-radius: 6px; border: 1px solid var(--bm-border);
+      background: rgba(255,255,255,0.03); color: var(--bm-muted);
+      font: 500 0.65rem 'Plus Jakarta Sans', sans-serif; cursor: pointer; transition: all 0.12s;
+    }
+    .bm-filter-pill:hover { border-color: var(--bm-border-lit); color: var(--bm-ink); }
+    .bm-filter-pill.bm-filter-pill--active { border-color: rgba(232,168,56,0.50); background: rgba(232,168,56,0.10); color: var(--bm-accent); }
+    .bm-sort-select {
+      background: none; border: 1px solid var(--bm-border); border-radius: 6px;
+      color: var(--bm-muted); font: 500 0.65rem 'Plus Jakarta Sans', sans-serif;
+      padding: 2px 6px; cursor: pointer; outline: none; flex-shrink: 0;
+    }
+    .bm-sort-select option { background: #0c1445; color: var(--bm-ink); }
+    .bm-sort-select:hover { border-color: var(--bm-border-lit); color: var(--bm-ink); }
+
+    /* ── Completion progress bar ────────────────────────────────────── */
+    .bm-progress-track {
+      height: 5px; border-radius: 3px; background: rgba(255,255,255,0.07); overflow: hidden;
+    }
+    .bm-progress-bar {
+      height: 100%; border-radius: 3px; width: 0%;
+      background: linear-gradient(90deg, var(--bm-accent-dk), var(--bm-accent));
+      transition: width 0.35s ease;
+    }
+
+    /* ── Print styles ───────────────────────────────────────────────── */
+    @media print {
+      #bm-topbar, #bm-sidebar, #bm-tab-bar, #bm-add-section-bar,
+      #bm-outline-sidebar, .bm-ms-toolbar, .bm-section-actions,
+      .bm-section-drag, #bm-auth-overlay, #bm-toasts, #bm-confirm-modal,
+      #bm-empty, #bm-pane-delivery, #bm-pane-series, #bm-pane-research,
+      .bm-auth-card { display: none !important; }
+      html, body, #bm-root, #bm-body, #bm-main, #bm-editor { overflow: visible !important; height: auto !important; display: block !important; }
+      #bm-pane-outline, #bm-outline-main, #bm-sections-container { display: block !important; overflow: visible !important; }
+      .bm-pane[hidden] { display: none !important; }
+      #bm-pane-outline:not([hidden]) { display: block !important; }
+      #bm-sermon-header { border: none !important; padding: 0 !important; }
+      .bm-outline-section { break-inside: avoid; box-shadow: none !important; border: 1px solid #ccc !important; background: white !important; color: #000 !important; }
+      .bm-section-body .bm-notes-textarea { color: #111 !important; }
+      #bm-manuscript-area { font: 12pt/1.8 Georgia, serif !important; color: #000 !important; }
+    }
+
     /* ── Outline sidebar (scripture lookup, word count) ──────────────── */
     #bm-outline-sidebar {
       width: 270px; flex-shrink: 0;
@@ -824,6 +896,11 @@
 
     /* Drag over highlight */
     .bm-outline-section.drag-over { border-color: rgba(232,168,56,0.55); background: rgba(232,168,56,0.04); }
+
+    /* Hide button text labels on small screens */
+    @media (max-width: 600px) {
+      .bm-btn-label-hide { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -857,7 +934,15 @@
     </div>
     <span id="bm-active-title">No sermon selected</span>
     <div class="bm-topbar-right">
-      <button class="bm-btn bm-btn--success bm-btn--sm" id="bm-save-btn" disabled title="Save sermon">
+      <button class="bm-btn bm-btn--ghost bm-btn--sm" id="bm-duplicate-btn" title="Duplicate this sermon" disabled>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span class="bm-btn-label-hide">Duplicate</span>
+      </button>
+      <button class="bm-btn bm-btn--ghost bm-btn--sm" id="bm-copy-outline-btn" title="Copy outline to clipboard" disabled>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+        <span class="bm-btn-label-hide">Outline</span>
+      </button>
+      <button class="bm-btn bm-btn--success bm-btn--sm" id="bm-save-btn" disabled title="Save sermon (Ctrl+S)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Save
       </button>
@@ -878,6 +963,20 @@
           <svg class="bm-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
           <input class="bm-search" type="text" id="bm-search" placeholder="Search sermons…" autocomplete="off">
         </div>
+      </div>
+      <div class="bm-sidebar-controls">
+        <div class="bm-filter-pills" id="bm-filter-pills">
+          <button class="bm-filter-pill bm-filter-pill--active" data-filter="all">All</button>
+          <button class="bm-filter-pill" data-filter="draft">Draft</button>
+          <button class="bm-filter-pill" data-filter="ready">Ready</button>
+          <button class="bm-filter-pill" data-filter="preached">Done</button>
+        </div>
+        <select class="bm-sort-select" id="bm-sort-select" title="Sort by">
+          <option value="updated">Recent</option>
+          <option value="date">Date</option>
+          <option value="title">A–Z</option>
+          <option value="status">Status</option>
+        </select>
       </div>
       <div class="bm-sidebar-label">Sermons</div>
       <div id="bm-sermon-list">
@@ -987,6 +1086,13 @@
                     <div class="bm-stat-lbl">Est. min</div>
                   </div>
                 </div>
+                <div style="margin-top:10px">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+                    <span style="font:500 0.70rem 'Plus Jakarta Sans',sans-serif;color:var(--bm-muted)">Completion</span>
+                    <span id="stat-completion" style="font:700 0.72rem 'Plus Jakarta Sans',sans-serif;color:var(--bm-accent)">0%</span>
+                  </div>
+                  <div class="bm-progress-track"><div class="bm-progress-bar" id="stat-progress-bar" style="width:0%"></div></div>
+                </div>
               </div>
             </div>
 
@@ -1050,6 +1156,9 @@
             <div class="bm-ms-sep"></div>
             <button class="bm-ms-tool" id="bm-ms-import-btn" title="Import from outline">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            </button>
+            <button class="bm-ms-tool" id="bm-print-btn" title="Print / export to PDF">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
             </button>
             <div style="margin-left:auto;font:0.72rem 'Plus Jakarta Sans',sans-serif;color:var(--bm-muted);" id="bm-ms-count">0 words</div>
           </div>

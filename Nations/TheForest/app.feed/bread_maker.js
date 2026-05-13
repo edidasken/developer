@@ -51,6 +51,8 @@ const S = {
   sermons:      [],   // full list
   activeId:     null,
   search:       '',
+  filterStatus: 'all',   // 'all' | 'draft' | 'ready' | 'preached'
+  sortBy:       'updated', // 'updated' | 'date' | 'title' | 'status'
   activeTab:    'outline',
   timer: {
     running:    false,
@@ -244,41 +246,75 @@ function _queueSave() {
   }, 1200);
 }
 
-// ── Render helpers ────────────────────────────────────────────────────────────
+// ── Completion score ──────────────────────────────────────────────────────────
+function _computeCompletion(s) {
+  if (!s) return 0;
+  let score = 0, total = 7;
+  if ((s.title || '').trim())              score++;
+  if ((s.passage || '').trim())            score++;
+  if ((s.sections || []).length >= 3)      score++;
+  const hasNotes = (s.sections || []).some(x => (x.notes || '').trim().length > 20);
+  if (hasNotes)                            score++;
+  if (_wordCount(s.manuscript) > 100)      score++;
+  if (Object.values(s.checklist || {}).filter(Boolean).length >= 3) score++;
+  if ((s.altarCall || '').trim().length > 20) score++;
+  return Math.round((score / total) * 100);
+}
 
-// Sidebar list
+// ── Sidebar list ──────────────────────────────────────────────────────────────
 function _renderList() {
   const container = _qs('bm-sermon-list');
   if (!container) return;
   const q = S.search.toLowerCase();
-  const filtered = S.sermons.filter(s =>
-    !q ||
-    (s.title || '').toLowerCase().includes(q) ||
-    (s.series || '').toLowerCase().includes(q) ||
-    (s.passage || '').toLowerCase().includes(q)
-  );
-  // Sort by updatedAt desc
-  filtered.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  let filtered = S.sermons.filter(s => {
+    const matchesSearch = !q ||
+      (s.title || '').toLowerCase().includes(q) ||
+      (s.series || '').toLowerCase().includes(q) ||
+      (s.passage || '').toLowerCase().includes(q);
+    const matchesFilter = S.filterStatus === 'all' || (s.status || 'draft') === S.filterStatus;
+    return matchesSearch && matchesFilter;
+  });
+
+  // Sort
+  const sortFns = {
+    updated: (a, b) => (b.updatedAt || 0) - (a.updatedAt || 0),
+    date:    (a, b) => (b.date || '').localeCompare(a.date || ''),
+    title:   (a, b) => (a.title || '').localeCompare(b.title || ''),
+    status:  (a, b) => {
+      const order = { draft: 0, ready: 1, preached: 2 };
+      return (order[a.status] ?? 0) - (order[b.status] ?? 0);
+    },
+  };
+  filtered.sort(sortFns[S.sortBy] || sortFns.updated);
 
   if (filtered.length === 0) {
-    container.innerHTML = `<div style="padding:16px 12px;font:0.78rem 'Plus Jakarta Sans',sans-serif;color:var(--bm-faint);text-align:center">${q ? 'No results.' : 'No sermons yet. Create one below.'}</div>`;
+    container.innerHTML = `<div style="padding:16px 12px;font:0.78rem 'Plus Jakarta Sans',sans-serif;color:var(--bm-faint);text-align:center">${q || S.filterStatus !== 'all' ? 'No results.' : 'No sermons yet. Create one below.'}</div>`;
     return;
   }
 
-  container.innerHTML = filtered.map(s => `
-    <div class="bm-sermon-item${s.id === S.activeId ? ' is-active' : ''}" data-id="${_e(s.id)}">
-      <div class="bm-sermon-item-title">${_e(s.title || 'Untitled')}</div>
-      <div class="bm-sermon-item-meta">
-        <span>${_fmtDate(s.date ? new Date(s.date).getTime() : s.createdAt)}</span>
-        ${s.series ? `<span class="bm-sermon-item-series">${_e(s.series)}</span>` : ''}
+  const statusDot = { draft: '#60a5fa', ready: '#34d399', preached: '#e8a838' };
+
+  container.innerHTML = filtered.map(s => {
+    const pct = _computeCompletion(s);
+    const dotColor = statusDot[s.status || 'draft'] || '#60a5fa';
+    return `
+      <div class="bm-sermon-item${s.id === S.activeId ? ' is-active' : ''}" data-id="${_e(s.id)}">
+        <div style="display:flex;align-items:center;gap:6px;min-width:0">
+          <span style="width:7px;height:7px;border-radius:50%;background:${dotColor};flex-shrink:0" title="${_e(STATUS_LABELS[s.status||'draft'])}"></span>
+          <div class="bm-sermon-item-title">${_e(s.title || 'Untitled')}</div>
+        </div>
+        <div class="bm-sermon-item-meta">
+          <span>${_fmtDate(s.date ? new Date(s.date + 'T00:00:00').getTime() : s.createdAt)}</span>
+          ${s.series ? `<span class="bm-sermon-item-series">${_e(s.series)}</span>` : ''}
+        </div>
+        ${pct > 0 ? `<div style="margin-top:4px;height:3px;border-radius:2px;background:rgba(255,255,255,0.07);overflow:hidden"><div style="height:100%;width:${pct}%;background:${pct>=80?'#34d399':pct>=40?'#e8a838':'#60a5fa'};border-radius:2px;transition:width 0.3s"></div></div>` : ''}
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   container.querySelectorAll('.bm-sermon-item').forEach(el => {
     el.addEventListener('click', () => {
       _selectSermon(el.dataset.id);
-      // Close mobile sidebar
       const sb = _qs('bm-sidebar');
       if (sb) sb.classList.remove('is-open');
     });
@@ -324,13 +360,22 @@ function _renderOutline() {
   const container = _qs('bm-sections-container');
   if (!s || !container) return;
 
+  const typeOptions = SECTION_TYPES.map(t =>
+    `<option value="${t}">${t.charAt(0).toUpperCase() + t.slice(1)}</option>`
+  ).join('');
+
   container.innerHTML = (s.sections || []).map((sec, idx) => `
-    <div class="bm-outline-section" data-sid="${_e(sec.id)}" draggable="true">
+    <div class="bm-outline-section${sec._collapsed ? ' collapsed' : ''}" data-sid="${_e(sec.id)}" draggable="true">
       <div class="bm-section-header">
+        <button class="bm-icon-btn bm-collapse-btn" data-action="toggle-collapse" data-sid="${_e(sec.id)}" title="${sec._collapsed ? 'Expand' : 'Collapse'}" aria-expanded="${!sec._collapsed}">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
         <span class="bm-section-drag" title="Drag to reorder">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg>
         </span>
-        <span class="bm-section-type ${_e(sec.type)}">${_e(sec.type)}</span>
+        <select class="bm-section-type-select ${_e(sec.type)}" data-field="type" data-sid="${_e(sec.id)}" title="Change section type">
+          ${SECTION_TYPES.map(t => `<option value="${t}"${t === sec.type ? ' selected' : ''}>${t.charAt(0).toUpperCase() + t.slice(1)}</option>`).join('')}
+        </select>
         <input class="bm-section-title-input" type="text" value="${_e(sec.title)}" placeholder="Section title…" data-field="title" data-sid="${_e(sec.id)}" autocomplete="off">
         <div class="bm-section-actions">
           <button class="bm-icon-btn" data-action="move-up" data-sid="${_e(sec.id)}" title="Move up"${idx === 0 ? ' disabled' : ''}>
@@ -377,14 +422,23 @@ function _sectionPlaceholder(type) {
 }
 
 function _bindOutlineEvents(container) {
-  // Text inputs / textareas
+  // Text inputs / textareas / selects
   container.querySelectorAll('[data-field][data-sid]').forEach(el => {
     el.addEventListener('input', () => {
       const s = _active();
       if (!s) return;
       const sec = s.sections.find(x => x.id === el.dataset.sid);
       if (!sec) return;
-      sec[el.dataset.field] = el.value;
+      const field = el.dataset.field;
+      sec[field] = el.tagName === 'SELECT' ? el.value : el.value;
+      // If type changed, update CSS class on select and re-render so scripture block shows/hides
+      if (field === 'type') {
+        if (sec.title === _sectionTitle(SECTION_TYPES.find(t => t !== el.value) || 'point')) {
+          sec.title = _sectionTitle(el.value);
+        }
+        _renderOutline(); // re-render to show/hide scripture block
+        return;
+      }
       _queueSave();
       _updateStats();
     });
@@ -404,7 +458,18 @@ function _bindOutlineEvents(container) {
       const idx = s.sections.findIndex(x => x.id === sid);
       if (idx === -1) return;
       const action = btn.dataset.action;
-      if (action === 'delete-section') {
+      if (action === 'toggle-collapse') {
+        const sec = s.sections[idx];
+        sec._collapsed = !sec._collapsed;
+        const el = container.querySelector(`.bm-outline-section[data-sid="${sid}"]`);
+        if (el) {
+          el.classList.toggle('collapsed', !!sec._collapsed);
+          btn.setAttribute('aria-expanded', String(!sec._collapsed));
+          btn.title = sec._collapsed ? 'Expand' : 'Collapse';
+        }
+        // Don't trigger full save — just a view state change; persist quietly
+        _lsSync();
+      } else if (action === 'delete-section') {
         s.sections.splice(idx, 1);
         _renderOutline();
         _queueSave();
@@ -466,6 +531,18 @@ function _updateStats() {
 
   const $ = id => { const el = _qs(id); if (el) el.textContent = id === 'stat-min' ? `~${estMin}` : (id === 'stat-words' ? totalWords : (id === 'stat-sections' ? secs : scrips)); };
   $('stat-sections'); $('stat-scriptures'); $('stat-words'); $('stat-min');
+
+  // Completion bar
+  const pct = _computeCompletion(s);
+  const pctEl = _qs('stat-completion');
+  const barEl = _qs('stat-progress-bar');
+  if (pctEl) pctEl.textContent = `${pct}%`;
+  if (barEl) {
+    barEl.style.width = `${pct}%`;
+    barEl.style.background = pct >= 80 ? 'linear-gradient(90deg,#16a34a,#34d399)' :
+                             pct >= 40 ? 'linear-gradient(90deg,var(--bm-accent-dk),var(--bm-accent))' :
+                                         'linear-gradient(90deg,#2563eb,#60a5fa)';
+  }
 
   // Manuscript word count
   const msCountEl   = _qs('bm-ms-count');
@@ -624,6 +701,12 @@ function _selectSermon(id) {
   const saveBtn = _qs('bm-save-btn');
   if (saveBtn) saveBtn.disabled = false;
 
+  // Enable action buttons that require an active sermon
+  const dupBtn  = _qs('bm-duplicate-btn');
+  const cpyBtn  = _qs('bm-copy-outline-btn');
+  if (dupBtn)  dupBtn.disabled  = false;
+  if (cpyBtn)  cpyBtn.disabled  = false;
+
   _renderList();
   _renderEditor();
 }
@@ -639,6 +722,62 @@ function _newSermon() {
 }
 
 // ── Delete sermon ─────────────────────────────────────────────────────────────
+// ── Duplicate + Copy + Print ──────────────────────────────────────────────────
+function _duplicateSermon() {
+  const s = _active();
+  if (!s) return;
+  const copy = JSON.parse(JSON.stringify(s));
+  copy.id        = _uid();
+  copy.title     = (s.title || 'Untitled') + ' (Copy)';
+  copy.createdAt = copy.updatedAt = _now();
+  delete copy._fsId;
+  delete copy._gasId;
+  S.sermons.unshift(copy);
+  _lsSync();
+  _selectSermon(copy.id);
+  _queueSave();
+  _toast('Sermon duplicated', 'success');
+}
+
+async function _copyOutline() {
+  const s = _active();
+  if (!s) return;
+  const lines = [`${s.title || 'Untitled Sermon'}`, s.passage ? `Key Passage: ${s.passage}` : '', ''];
+  (s.sections || []).forEach((sec, i) => {
+    lines.push(`${i + 1}. [${sec.type.toUpperCase()}] ${sec.title || ''}`);
+    if (sec.type === 'scripture' && sec.scriptureRef) {
+      lines.push(`   ${sec.scriptureRef}${sec.scripture ? ': ' + sec.scripture.slice(0, 100) : ''}`);
+    }
+    if ((sec.notes || '').trim()) lines.push(`   ${sec.notes.trim()}`);
+    lines.push('');
+  });
+  try {
+    await navigator.clipboard.writeText(lines.join('\n').trim());
+    _toast('Outline copied to clipboard', 'success');
+  } catch {
+    _toast('Could not access clipboard', 'error');
+  }
+}
+
+function _bindKeyboardShortcuts() {
+  document.addEventListener('keydown', e => {
+    // Ctrl/Cmd+S — Save
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      const s = _active();
+      if (!s) return;
+      clearTimeout(_saveTimer);
+      _saveSermon(s).then(() => _toast('Saved', 'success'));
+    }
+    // Ctrl/Cmd+N — New sermon
+    if ((e.ctrlKey || e.metaKey) && e.key === 'n' && !e.shiftKey) {
+      e.preventDefault();
+      _newSermon();
+    }
+  });
+}
+
+// ── Confirm delete ────────────────────────────────────────────────────────────
 function _confirmDelete() {
   const s = _active();
   if (!s) return;
@@ -1118,6 +1257,38 @@ async function _init() {
       if (sb) sb.classList.toggle('is-open');
     });
   }
+
+  // Duplicate sermon
+  const dupBtn = _qs('bm-duplicate-btn');
+  if (dupBtn) dupBtn.addEventListener('click', _duplicateSermon);
+
+  // Copy outline to clipboard
+  const cpyBtn = _qs('bm-copy-outline-btn');
+  if (cpyBtn) cpyBtn.addEventListener('click', _copyOutline);
+
+  // Print / export to PDF
+  const printBtn = _qs('bm-print-btn');
+  if (printBtn) printBtn.addEventListener('click', () => window.print());
+
+  // Filter pills
+  document.querySelectorAll('.bm-filter-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      S.filterStatus = btn.dataset.filter || 'all';
+      document.querySelectorAll('.bm-filter-pill').forEach(p =>
+        p.classList.toggle('bm-filter-pill--active', p === btn)
+      );
+      _renderList();
+    });
+  });
+
+  // Sort select
+  const sortSel = _qs('bm-sort-select');
+  if (sortSel) {
+    sortSel.addEventListener('change', () => { S.sortBy = sortSel.value; _renderList(); });
+  }
+
+  // Keyboard shortcuts
+  _bindKeyboardShortcuts();
 
   // User chip → sign out
   const userChip = _qs('bm-user-chip');
