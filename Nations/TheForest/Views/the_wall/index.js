@@ -51,6 +51,13 @@ const SECTIONS = [
         { label: 'Push Notifications',value: 'VAPID key set',              type: 'badge', status: 'ok'   },
         { label: 'Joshua Project API', type: 'jp-api' },
         { label: 'api.bible',           type: 'bible-api' },
+        { type: 'missions-sources-heading' },
+        { type: 'missions-source', id: 'ms-src-jp',  label: 'Joshua Project',       desc: 'Unreached people groups & country profiles', url: 'https://joshuaproject.net' },
+        { type: 'missions-source', id: 'ms-src-od',  label: 'Open Doors USA',        desc: 'World Watch List · Persecution data',          url: 'https://www.opendoorsusa.org' },
+        { type: 'missions-source', id: 'ms-src-ow',  label: 'Operation World',       desc: 'Country-by-country prayer guide',              url: 'https://operationworld.org' },
+        { type: 'missions-source', id: 'ms-src-vom', label: 'Voice of the Martyrs',  desc: 'Persecuted church news & prayer',              url: 'https://www.persecution.com' },
+        { type: 'missions-source', id: 'ms-src-bal', label: 'Bible Access List',      desc: 'Scripture access restrictions by country',     url: 'https://bibleaccesslist.org' },
+        { type: 'missions-source', id: 'ms-src-ftt', label: 'Finishing the Task',     desc: 'Zero UPG movement coordination',               url: 'https://finishingthetask.com' },
       ];
     },
   },
@@ -178,6 +185,7 @@ export function mount(root) {
       btn.addEventListener('click', () => {
         _loadJpStatus(root);
         _loadBibleApiStatus(root);
+        _pollMissionsSources(root);
       });
     }
     if (btn.dataset.wallSection === 'wellspring') {
@@ -884,6 +892,7 @@ function _wireIntegrationsPanel(root) {
   // Load saved key statuses on first render
   _loadJpStatus(root);
   _loadBibleApiStatus(root);
+  _pollMissionsSources(root);
 }
 
 async function _loadJpStatus(root) {
@@ -1045,6 +1054,44 @@ function _setBibleBadge(badge, state) {
   const { status, text } = map[state] || map['not-set'];
   badge.className = `wall-status-badge wall-status--${status}`;
   badge.textContent = text;
+}
+
+/* ── Missions sources polling ─────────────────────────────────────────────── */
+
+const _MISSIONS_SOURCES = [
+  { id: 'ms-src-jp',  url: 'https://joshuaproject.net' },
+  { id: 'ms-src-od',  url: 'https://www.opendoorsusa.org' },
+  { id: 'ms-src-ow',  url: 'https://operationworld.org' },
+  { id: 'ms-src-vom', url: 'https://www.persecution.com' },
+  { id: 'ms-src-bal', url: 'https://bibleaccesslist.org' },
+  { id: 'ms-src-ftt', url: 'https://finishingthetask.com' },
+];
+
+// Poll each missions data source via a no-cors HEAD request.
+// A network-level response (even opaque) means the server is reachable.
+// A network error (DNS failure, timeout) means it's unreachable.
+async function _pingSource(url) {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 8000);
+    await fetch(url, { method: 'HEAD', mode: 'no-cors', cache: 'no-store', signal: ctrl.signal });
+    clearTimeout(t);
+    return true; // opaque response still means server answered
+  } catch (_) {
+    return false;
+  }
+}
+
+function _pollMissionsSources(root) {
+  _MISSIONS_SOURCES.forEach(async ({ id, url }) => {
+    const badge = root.querySelector(`[data-bind="ms-src-badge-${id}"]`);
+    if (!badge) return;
+    badge.className = 'wall-status-badge wall-status--muted';
+    badge.textContent = 'Checking…';
+    const live = await _pingSource(url);
+    badge.className = `wall-status-badge wall-status--${live ? 'ok' : 'warn'}`;
+    badge.textContent = live ? 'Connected' : 'Unreachable';
+  });
 }
 
 /* ── The Wellspring panel ───────────────────────────────────────────────────
@@ -3120,6 +3167,29 @@ function _settingRow(s) {
           <a href="https://scripture.api.bible/sign-up" target="_blank" rel="noopener noreferrer"
             style="font-size:.75rem;color:var(--accent,#4a7fa5);text-decoration:none">Get a free key at api.bible ↗</a>
         </div>
+      </div>`;
+  }
+  if (s.type === 'missions-sources-heading') {
+    return /* html */`
+      <div class="wall-setting-row" style="border-top:1px solid var(--line,#e5e7ef);margin-top:6px;padding-top:18px;align-items:center">
+        <div style="font:700 0.78rem var(--font-ui);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-muted,#7a7f96)">
+          Missions Data Sources
+        </div>
+        <div style="font:0.77rem var(--font-ui);color:var(--ink-muted,#7a7f96);text-align:right">
+          Live polling — status reflects website availability
+        </div>
+      </div>`;
+  }
+  if (s.type === 'missions-source') {
+    return /* html */`
+      <div class="wall-setting-row wall-ms-src-row" data-ms-src-id="${_e(s.id)}" style="align-items:center;gap:14px">
+        <div style="flex:1;min-width:0">
+          <div style="font:600 0.88rem var(--font-ui);color:var(--ink,#1b264f)">${_e(s.label)}</div>
+          <div style="font:0.77rem var(--font-ui);color:var(--ink-muted,#7a7f96);margin-top:2px">${_e(s.desc)}</div>
+          <a href="${_e(s.url)}" target="_blank" rel="noopener noreferrer"
+             style="font:0.74rem var(--font-ui);color:var(--accent,#4a7fa5);text-decoration:none">${_e(s.url.replace(/^https?:\/\//, ''))} ↗</a>
+        </div>
+        <span class="wall-status-badge wall-status--muted" data-bind="ms-src-badge-${_e(s.id)}">Checking…</span>
       </div>`;
   }
   if (s.type === 'toggle') {
