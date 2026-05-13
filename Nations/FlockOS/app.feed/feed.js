@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════════════
-   BREAD_MAKER.JS — Sermon Preparation & Management for FlockOS
+   FEED.JS — The Feed: Sermon Preparation & Management for FlockOS
    "Study to show thyself approved unto God, a workman that needeth not to
     be ashamed, rightly dividing the word of truth." — 2 Timothy 2:15
 
@@ -160,7 +160,7 @@ async function _gasCall(action, params = {}) {
     const data = await resp.json();
     return (data && data.ok) ? data : null;
   } catch (e) {
-    console.warn('[BreadMaker] GAS call failed:', action, e);
+    console.warn('[TheFeed] GAS call failed:', action, e);
     return null;
   }
 }
@@ -181,7 +181,7 @@ async function _load() {
         _lsSync();
         return;
       }
-    } catch (e) { console.warn('[BreadMaker] Firestore load failed:', e); }
+    } catch (e) { console.warn('[TheFeed] Firestore load failed:', e); }
   }
   // GAS
   const gasData = await _gasCall('sermons.list');
@@ -208,7 +208,7 @@ async function _saveSermon(sermon) {
         sermon._fsId = res.id;
       }
       return;
-    } catch (e) { console.warn('[BreadMaker] Firestore save failed:', e); }
+    } catch (e) { console.warn('[TheFeed] Firestore save failed:', e); }
   }
   // GAS
   const payload = JSON.stringify(sermon);
@@ -1101,8 +1101,8 @@ function _waitForAuth(cb) {
         });
       } else if (tries > 50) {
         clearInterval(check);
-        // No auth system detected — run anyway (offline/GAS-only mode)
-        cb({ displayName: 'Guest', email: '' });
+        // Auth system unavailable — force sign-in screen instead of silent guest fallback
+        _showAuth();
       }
     }, 100);
   }
@@ -1296,7 +1296,7 @@ async function _init() {
     userChip.addEventListener('click', () => {
       const N = window.Nehemiah;
       if (N && typeof N.signOut === 'function') {
-        if (confirm('Sign out of Bread Maker?')) N.signOut();
+        if (confirm('Sign out of The Feed?')) N.signOut();
       }
     });
   }

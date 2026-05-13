@@ -6,11 +6,23 @@
   <base href="../">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="The Feed">
-  <meta name="theme-color" content="#060c1f">
+  <meta name="theme-color" content="#f7f8fb">
   <meta name="description" content="The Feed — Sermon preparation and manuscript builder for FlockOS. Craft the Word with clarity, depth, and purpose.">
 
   <title>The Feed — FlockOS</title>
@@ -35,25 +47,33 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Bread Maker design tokens ─────────────────────────────────────── */
+    /* ── The Feed design tokens — alias FlockOS theme tokens (new_covenant.css) ─── */
     :root {
-      --bm-bg:         #060c1f;
-      --bm-panel:      #0c1445;
-      --bm-panel-alt:  #1a0e3c;
-      --bm-panel-mid:  #0d1535;
-      --bm-border:     rgba(255,255,255,0.09);
-      --bm-border-lit: rgba(255,255,255,0.15);
+      /* Surfaces — pulled from active FlockOS theme */
+      --bm-bg:         var(--bg);
+      --bm-panel:      var(--bg-raised);
+      --bm-panel-alt:  var(--bg-sunken);
+      --bm-panel-mid:  var(--bg-hover);
+      --bm-border:     var(--line);
+      --bm-border-lit: var(--line-strong);
+
+      /* The Feed accent — kept amber per design */
       --bm-accent:     #e8a838;
       --bm-accent-dk:  #c48a20;
       --bm-accent-dim: rgba(232,168,56,0.12);
       --bm-accent-glow:rgba(232,168,56,0.25);
-      --bm-purple:     #a78bfa;
-      --bm-blue:       #38bdf8;
-      --bm-green:      #34d399;
-      --bm-red:        #f87171;
-      --bm-ink:        #f0f1f8;
-      --bm-muted:      rgba(240,241,248,0.48);
-      --bm-faint:      rgba(240,241,248,0.22);
+
+      /* Semantic colors — from FlockOS palette */
+      --bm-purple:     var(--lilac);
+      --bm-blue:       var(--accent);
+      --bm-green:      var(--success);
+      --bm-red:        var(--danger);
+
+      /* Ink — from active FlockOS theme */
+      --bm-ink:        var(--ink);
+      --bm-muted:      var(--ink-muted);
+      --bm-faint:      var(--ink-faint);
+
       --topbar-h:      54px;
     }
 
@@ -79,7 +99,7 @@
     #bm-topbar {
       display: flex; align-items: center; gap: 10px;
       padding: 0 18px;
-      background: linear-gradient(90deg, #0c1445 0%, #14103a 60%, #0a1128 100%);
+      background: var(--bg-raised);
       z-index: 200; position: relative; flex-shrink: 0;
     }
     #bm-topbar::after {
@@ -160,7 +180,7 @@
 
     /* ── Sidebar ──────────────────────────────────────────────────────── */
     #bm-sidebar {
-      background: linear-gradient(170deg, #0c1445 0%, #160e38 55%, #0a1128 100%);
+      background: var(--bg-sunken);
       border-right: 1px solid var(--bm-border);
       display: flex; flex-direction: column;
       overflow: hidden;
@@ -467,7 +487,7 @@
     .bm-section-type-select.conclusion   { color: #fbbf24; }
     .bm-section-type-select.transition   { color: var(--bm-muted); }
     .bm-section-type-select:hover { background: rgba(255,255,255,0.07); }
-    .bm-section-type-select option { background: #0c1445; color: var(--bm-ink); }
+    .bm-section-type-select option { background: var(--bg-raised); color: var(--bm-ink); }
 
     /* ── Sidebar controls (filter + sort) ───────────────────────────── */
     .bm-sidebar-controls {
@@ -486,7 +506,7 @@
       color: var(--bm-muted); font: 500 0.65rem 'Plus Jakarta Sans', sans-serif;
       padding: 2px 6px; cursor: pointer; outline: none; flex-shrink: 0;
     }
-    .bm-sort-select option { background: #0c1445; color: var(--bm-ink); }
+    .bm-sort-select option { background: var(--bg-raised); color: var(--bm-ink); }
     .bm-sort-select:hover { border-color: var(--bm-border-lit); color: var(--bm-ink); }
 
     /* ── Completion progress bar ────────────────────────────────────── */
@@ -795,11 +815,11 @@
     #bm-auth-overlay[hidden] { display: none !important; }
     .bm-auth-card {
       width: 100%; max-width: 380px;
-      background: linear-gradient(145deg, #0c1445, #160e38);
+      background: var(--bg-raised);
       border: 1px solid rgba(232,168,56,0.22); border-radius: 20px;
       padding: 40px 36px 32px;
       display: flex; flex-direction: column; align-items: center; gap: 8px;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.72), 0 0 0 1px rgba(232,168,56,0.06);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.32), 0 0 0 1px rgba(232,168,56,0.06);
       margin: 0 16px;
     }
     .bm-auth-icon {
@@ -890,7 +910,7 @@
     textarea, select { -webkit-appearance: none; appearance: none; }
     input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
       -webkit-text-fill-color: var(--bm-ink) !important;
-      -webkit-box-shadow: 0 0 0 100px #0c1445 inset !important;
+      -webkit-box-shadow: 0 0 0 100px var(--bg-raised) inset !important;
     }
     textarea { resize: none; }
 
@@ -908,9 +928,9 @@
 <!-- ── Auth gate ────────────────────────────────────────────────────── -->
 <div id="bm-auth-overlay">
   <div class="bm-auth-card">
-    <div class="bm-auth-icon">🍞</div>
-    <h1>Bread Maker</h1>
-    <p>Sermon preparation & management for FlockOS pastors and teachers. Craft the Word with clarity and depth.</p>
+    <div class="bm-auth-icon"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+    <h1>The Feed</h1>
+    <p>Sermon preparation &amp; manuscript builder for FlockOS pastors and teachers. Craft the Word with clarity and depth.</p>
     <p class="bm-auth-verse">"Study to show thyself approved unto God, a workman that needeth not to be ashamed, rightly dividing the word of truth." — 2 Timothy 2:15</p>
     <button class="bm-btn bm-btn--primary" id="bm-auth-btn" style="margin-top:8px;width:100%;justify-content:center;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
@@ -929,8 +949,8 @@
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
     <div class="bm-logo">
-      <div class="bm-logo-icon">🍞</div>
-      <span class="bm-logo-text">Bread Maker</span>
+      <div class="bm-logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+      <span class="bm-logo-text">The Feed</span>
     </div>
     <span id="bm-active-title">No sermon selected</span>
     <div class="bm-topbar-right">
@@ -995,9 +1015,9 @@
 
       <!-- Empty state -->
       <div id="bm-empty">
-        <div class="bm-empty-icon">🍞</div>
+        <div class="bm-empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#e8a838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
         <div class="bm-empty-h">Your Sermon Workshop</div>
-        <div class="bm-empty-p">Create a new sermon or select one from the sidebar to begin. Bread Maker gives you everything you need — from outline to manuscript to delivery notes.</div>
+        <div class="bm-empty-p">Create a new sermon or select one from the sidebar to begin. The Feed gives you everything you need — from outline to manuscript to delivery notes.</div>
         <div class="bm-empty-verse">"So then faith comes by hearing, and hearing by the word of God." — Romans 10:17</div>
         <button class="bm-btn bm-btn--primary" id="bm-empty-new-btn" style="margin-top:8px">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
