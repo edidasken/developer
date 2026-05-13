@@ -73,7 +73,53 @@ for entry in "${CHURCHES[@]}"; do
   [ -f "$CFG" ] || { echo "  ✗ MISSING config: $CFG"; PREFLIGHT_OK=false; }
 done
 
-$PREFLIGHT_OK || { echo ""; echo "Pre-flight FAILED."; exit 1; }
+# ── Theme policy check ────────────────────────────────────────────────
+# Every New_Covenant/app.*/<entry>.html MUST:
+#   1. Run the theme bootstrap script before first paint
+#      (sets <html data-theme="…"> from localStorage.flock_theme)
+#   2. NOT redeclare core NC theme tokens (--bg, --bg-raised, --ink, --line)
+#      in its local :root — those belong to new_covenant.css
+echo ""
+echo "Running NC theme policy checks…"
+THEME_OK=true
+APP_HTMLS=$(find "$NEW_COVENANT" -maxdepth 2 -type f -path "*/app.*/*.html" \
+              ! -name "embed-*.html" ! -name "index.html" 2>/dev/null)
+
+for html in $APP_HTMLS; do
+  rel="${html#$NEW_COVENANT/}"
+
+  # Rule 1: theme bootstrap present
+  if ! grep -q "localStorage.getItem('flock_theme')" "$html"; then
+    echo "  ✗ THEME POLICY: $rel missing theme bootstrap script"
+    echo "      (must read localStorage.flock_theme and set <html data-theme=…> before first paint)"
+    THEME_OK=false
+  fi
+
+  # Rule 2: no local override of core NC theme tokens in :root
+  bad=$(python3 - "$html" << 'PYEOF'
+import sys, re
+src = open(sys.argv[1]).read()
+forbidden = ('--bg:', '--bg-raised:', '--ink:', '--line:')
+v = set()
+for m in re.finditer(r':root\s*\{([^}]*)\}', src):
+    body = m.group(1)
+    for t in forbidden:
+        if t in body:
+            v.add(t.rstrip(':'))
+if v:
+    print(' '.join(sorted(v)))
+PYEOF
+)
+  if [ -n "$bad" ]; then
+    echo "  ✗ THEME POLICY: $rel overrides core NC tokens in :root → $bad"
+    echo "      (remove from local :root; let new_covenant.css define them)"
+    THEME_OK=false
+  fi
+done
+
+$THEME_OK && echo "  ✓ NC theme policy: all app HTMLs comply"
+
+$PREFLIGHT_OK && $THEME_OK || { echo ""; echo "Pre-flight FAILED."; exit 1; }
 echo "  ✓ All checks passed"
 echo ""
 

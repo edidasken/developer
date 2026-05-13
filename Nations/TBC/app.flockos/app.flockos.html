@@ -9,6 +9,18 @@
   <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
   <title>Trinity Baptist Church</title>
 
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+
   <!-- PWA manifest — path relative to base (New_Covenant/) -->
   <link rel="manifest" href="app.flockos/manifest.json">
 
@@ -115,7 +127,7 @@
   <!-- Flash prevention only — the_adornment.js applies data-theme after boot. -->
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    :root { --bg: #f7f8fb; --bg-raised: #ffffff; --ink: #1b264f; --line: #e5e7ef; }
+    /* Core NC tokens (--bg, --bg-raised, --ink, --line) live in new_covenant.css */
     /* html/body share the page background so the iOS PWA safe-area at the
        bottom (home indicator) flows seamlessly with the page — no visible
        seam between content and the safe-area band. The topbar paints its
