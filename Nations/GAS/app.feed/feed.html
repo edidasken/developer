@@ -375,18 +375,18 @@
     #bm-outline-main::-webkit-scrollbar-thumb { background: rgba(232,168,56,0.14); border-radius: 4px; }
 
     .bm-outline-section {
-      margin-bottom: 24px;
-      background: var(--bg-panel); border: 1px solid var(--bm-border);
+      margin-bottom: 20px;
+      background: var(--bg-panel); border: 1px solid var(--line);
       border-radius: 14px; overflow: hidden;
       transition: border-color 0.15s;
     }
-    .bm-outline-section:focus-within { border-color: rgba(232,168,56,0.35); }
+    .bm-outline-section:focus-within { border-color: rgba(232,168,56,0.50); box-shadow: 0 0 0 3px rgba(232,168,56,0.08); }
 
     .bm-section-header {
       display: flex; align-items: center; gap: 10px;
       padding: 12px 16px 10px;
       border-bottom: 1px solid var(--bm-border);
-      background: var(--bg-overlay);
+      background: var(--bg-sunken);
     }
     .bm-section-drag {
       color: var(--bm-faint); cursor: grab; flex-shrink: 0;
@@ -431,33 +431,34 @@
     }
     .bm-scripture-ref-row { display: flex; gap: 7px; align-items: center; }
     .bm-scripture-ref-input {
-      flex: 1; padding: 5px 10px; background: var(--bg-input);
-      border: 1px solid var(--bm-border); border-radius: 7px;
-      font: 600 0.80rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent); outline: none;
+      flex: 1; padding: 5px 10px; background: var(--bg-sunken);
+      border: 1px solid var(--line); border-radius: 7px;
+      font: 600 0.82rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent); outline: none;
     }
-    .bm-scripture-ref-input::placeholder { color: rgba(232,168,56,0.35); font-weight: 400; }
+    .bm-scripture-ref-input::placeholder { color: rgba(232,168,56,0.55); font-weight: 400; }
     .bm-scripture-ref-input:focus { border-color: rgba(232,168,56,0.50); }
     .bm-scripture-text {
-      font: italic 0.88rem/1.65 'Noto Serif', Georgia, serif;
-      color: rgba(232,168,56,0.85); white-space: pre-wrap;
+      font: italic 0.90rem/1.70 'Noto Serif', Georgia, serif;
+      color: var(--ink); white-space: pre-wrap;
     }
     .bm-scripture-textarea {
-      width: 100%; resize: none; padding: 7px 10px;
-      background: var(--bg-input); border: 1px solid var(--bm-border); border-radius: 7px;
-      font: italic 0.88rem/1.65 'Noto Serif', Georgia, serif;
-      color: rgba(232,168,56,0.85); outline: none; min-height: 70px;
+      width: 100%; resize: none; padding: 8px 10px;
+      background: var(--bg-sunken); border: 1px solid var(--line); border-radius: 7px;
+      font: italic 0.90rem/1.70 'Noto Serif', Georgia, serif;
+      color: var(--ink); outline: none; min-height: 80px;
     }
-    .bm-scripture-textarea:focus { border-color: rgba(232,168,56,0.40); }
+    .bm-scripture-textarea::placeholder { color: var(--ink-muted); font-style: italic; }
+    .bm-scripture-textarea:focus { border-color: rgba(232,168,56,0.50); }
 
     .bm-notes-textarea {
       width: 100%; resize: none; padding: 10px 12px;
-      background: var(--bg-input); border: 1px solid var(--bm-border); border-radius: 9px;
-      font: 0.85rem/1.7 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); outline: none;
+      background: var(--bg-sunken); border: 1px solid var(--line); border-radius: 9px;
+      font: 0.88rem/1.75 'Plus Jakarta Sans', sans-serif; color: var(--ink); outline: none;
       min-height: 90px;
       scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.10) transparent;
     }
-    .bm-notes-textarea:focus { border-color: var(--gold); background: var(--bg-input); }
-    .bm-notes-textarea::placeholder { color: var(--bm-faint); }
+    .bm-notes-textarea:focus { border-color: var(--gold); background: var(--bg-input); box-shadow: 0 0 0 3px rgba(232,168,56,0.08); }
+    .bm-notes-textarea::placeholder { color: var(--ink-muted); }
 
     .bm-add-section-bar {
       display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
@@ -548,8 +549,8 @@
 
     /* ── Outline sidebar (scripture lookup, word count) ──────────────── */
     #bm-outline-sidebar {
-      width: 270px; flex-shrink: 0;
-      background: var(--bg-sunken); border-left: 1px solid var(--bm-border);
+      width: 280px; flex-shrink: 0;
+      background: var(--bg-raised); border-left: 1px solid var(--line);
       overflow-y: auto; padding: 16px 14px 40px;
       display: flex; flex-direction: column; gap: 16px;
       scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.10) transparent;
@@ -1413,6 +1414,19 @@
     <div class="bm-modal-actions">
       <button class="bm-btn bm-btn--ghost" id="bm-modal-cancel">Cancel</button>
       <button class="bm-btn bm-btn--danger" id="bm-modal-confirm">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Input modal (series name, etc.) -->
+<div id="bm-input-modal" hidden>
+  <div class="bm-modal-backdrop" id="bm-input-modal-backdrop"></div>
+  <div class="bm-modal-box">
+    <div class="bm-modal-h" id="bm-input-modal-h">Enter Name</div>
+    <input id="bm-input-modal-field" class="bm-title-input" type="text" autocomplete="off" style="width:100%;font-size:0.92rem;">
+    <div class="bm-modal-actions">
+      <button class="bm-btn bm-btn--ghost" id="bm-input-modal-cancel">Cancel</button>
+      <button class="bm-btn bm-btn--primary" id="bm-input-modal-ok">Create</button>
     </div>
   </div>
 </div>

@@ -174,7 +174,7 @@ async function _load() {
   // Firestore
   if (_fsFB()) {
     try {
-      const result = await window.UpperRoom.listSermons({ pageSize: 500 });
+      const result = await window.UpperRoom.listSermons({ limit: 500 });
       const rows = Array.isArray(result) ? result : (result.results || result.rows || []);
       if (rows.length > 0) {
         S.sermons = rows.map(r => { r._fsId = r.id; return r; });
@@ -198,14 +198,21 @@ async function _load() {
 async function _saveSermon(sermon) {
   sermon.updatedAt = _now();
   _lsSync();
+  // Ensure UpperRoom is ready before attempting Firestore (timing race on new tab)
+  if (window.UpperRoom && !_fsFB() && typeof window.UpperRoom.waitReady === 'function') {
+    try { await window.UpperRoom.waitReady(); } catch (_) {}
+  }
   // Firestore
   if (_fsFB()) {
     try {
       if (sermon._fsId) {
-        await window.UpperRoom.updateSermon({ id: sermon._fsId, ...sermon });
+        // Strip local-only fields — sermon.id (local UID) must NOT overwrite id: sermon._fsId
+        const { id: _localId, _fsId, _gasId, ...payload } = sermon;
+        await window.UpperRoom.updateSermon({ id: _fsId, ...payload });
       } else {
         const res = await window.UpperRoom.createSermon(sermon);
         sermon._fsId = res.id;
+        _lsSync(); // persist _fsId so next save uses updateSermon
       }
       return;
     } catch (e) { console.warn('[TheFeed] Firestore save failed:', e); }
@@ -216,7 +223,7 @@ async function _saveSermon(sermon) {
     await _gasCall('sermons.save', { id: sermon._gasId, data: payload });
   } else {
     const res = await _gasCall('sermons.save', { data: payload });
-    if (res && res.row) sermon._gasId = res.row.id;
+    if (res && res.row) { sermon._gasId = res.row.id; _lsSync(); }
   }
 }
 
@@ -777,6 +784,45 @@ function _bindKeyboardShortcuts() {
   });
 }
 
+// ── Input modal (replaces prompt() for text input) ────────────────────────────
+function _openInputModal(placeholder, title, okLabel, onConfirm) {
+  const modal  = _qs('bm-input-modal');
+  const field  = _qs('bm-input-modal-field');
+  const titleEl = _qs('bm-input-modal-h');
+  const okBtn  = _qs('bm-input-modal-ok');
+  const cancelBtn = _qs('bm-input-modal-cancel');
+  const backdrop  = _qs('bm-input-modal-backdrop');
+  if (!modal || !field) { onConfirm(placeholder); return; }
+
+  if (titleEl) titleEl.textContent = title || 'Enter Name';
+  if (okBtn)   okBtn.textContent   = okLabel || 'OK';
+  field.value       = '';
+  field.placeholder = placeholder || '';
+  modal.hidden      = false;
+  field.focus();
+
+  function _close() {
+    modal.hidden = true;
+    okBtn.removeEventListener('click', _ok);
+    cancelBtn.removeEventListener('click', _close);
+    backdrop.removeEventListener('click', _close);
+    field.removeEventListener('keydown', _key);
+  }
+  function _ok() {
+    const val = field.value.trim();
+    _close();
+    onConfirm(val || null);
+  }
+  function _key(e) {
+    if (e.key === 'Enter')  { e.preventDefault(); _ok(); }
+    if (e.key === 'Escape') { _close(); }
+  }
+  okBtn.addEventListener('click', _ok);
+  cancelBtn.addEventListener('click', _close);
+  backdrop.addEventListener('click', _close);
+  field.addEventListener('keydown', _key);
+}
+
 // ── Confirm delete ────────────────────────────────────────────────────────────
 function _confirmDelete() {
   const s = _active();
@@ -1179,15 +1225,16 @@ async function _init() {
   const nsBtn = _qs('bm-new-series-btn');
   if (nsBtn) {
     nsBtn.addEventListener('click', () => {
-      const name = prompt('Series name:');
-      if (!name) return;
-      const s = _makeSermon(`${name} — Week 1`);
-      s.series = name.trim();
-      S.sermons.unshift(s);
-      _lsSync();
-      _selectSermon(s.id);
-      _queueSave();
-      _toast(`Series "${name}" created`, 'success');
+      _openInputModal('New Series', 'Series Name', 'Create', name => {
+        if (!name) return;
+        const s = _makeSermon(`${name} — Week 1`);
+        s.series = name.trim();
+        S.sermons.unshift(s);
+        _lsSync();
+        _selectSermon(s.id);
+        _queueSave();
+        _toast(`Series "${name}" created`, 'success');
+      });
     });
   }
 

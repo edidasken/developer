@@ -400,6 +400,37 @@
       .fs-logo span { display: none; }
     }
 
+    /* ── New Show name modal ────────────────────────────────────────── */
+    #fs-name-modal {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #fs-name-modal[hidden] { display: none !important; }
+    .fs-nm-backdrop {
+      position: absolute; inset: 0;
+      background: var(--modal-dim); backdrop-filter: blur(4px);
+    }
+    .fs-nm-box {
+      position: relative; z-index: 1;
+      background: var(--bg-raised); border: 1px solid var(--line);
+      border-radius: 16px; width: min(400px, 92vw);
+      padding: 24px 24px 20px;
+      box-shadow: 0 24px 72px rgba(0,0,0,0.18);
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .fs-nm-title {
+      font: 700 1rem 'Plus Jakarta Sans', sans-serif; color: var(--ink);
+    }
+    .fs-nm-input {
+      width: 100%; padding: 10px 14px;
+      background: var(--bg-sunken); border: 1.5px solid var(--line);
+      border-radius: 10px;
+      font: 500 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--ink);
+      outline: none;
+    }
+    .fs-nm-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(232,168,56,0.12); }
+    .fs-nm-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
     /* ── Song picker modal (Flock Stand import) ─────────────────────── */
     #fs-song-picker {
       position: fixed; inset: 0; z-index: 1000;
@@ -777,6 +808,19 @@
 
 <!-- Auth overlay (shown until Nehemiah confirms session) -->
 <div id="fs-auth-overlay"></div>
+
+<!-- New Show name modal -->
+<div id="fs-name-modal" hidden aria-modal="true" role="dialog" aria-label="Name your show">
+  <div class="fs-nm-backdrop" id="fs-nm-backdrop"></div>
+  <div class="fs-nm-box">
+    <div class="fs-nm-title" id="fs-nm-title">Show Name</div>
+    <input id="fs-nm-input" class="fs-nm-input" type="text" value="New Show" maxlength="80" autocomplete="off" spellcheck="false">
+    <div class="fs-nm-actions">
+      <button class="fs-btn fs-btn--ghost" id="fs-nm-cancel">Cancel</button>
+      <button class="fs-btn fs-btn--primary" id="fs-nm-ok">Create Show</button>
+    </div>
+  </div>
+</div>
 
 <!-- Song picker modal (Flock Stand → FlockShow import) -->
 <div id="fs-song-picker" hidden aria-modal="true" role="dialog" aria-label="Pick a song from Flock Stand">

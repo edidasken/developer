@@ -564,12 +564,51 @@ function _openShow(id) {
 }
 
 function _newShow() {
-  const name = prompt('Show name:', 'New Show');
-  if (name === null) return;
-  const show = _makeShow(name.trim() || 'New Show');
-  _st.shows.unshift(show);
-  _save(show);
-  _openShow(show.id);
+  _openNameModal('New Show', 'Show Name', name => {
+    const show = _makeShow(name);
+    _st.shows.unshift(show);
+    _save(show);
+    _openShow(show.id);
+  });
+}
+
+// Open the #fs-name-modal and call onConfirm(name) when OK is pressed
+function _openNameModal(defaultValue, title, onConfirm) {
+  const modal  = document.getElementById('fs-name-modal');
+  const input  = document.getElementById('fs-nm-input');
+  const titleEl = document.getElementById('fs-nm-title');
+  const okBtn  = document.getElementById('fs-nm-ok');
+  const cancelBtn = document.getElementById('fs-nm-cancel');
+  const backdrop  = document.getElementById('fs-nm-backdrop');
+  if (!modal || !input) { onConfirm(defaultValue); return; }
+
+  if (titleEl) titleEl.textContent = title;
+  input.value = defaultValue;
+  modal.hidden = false;
+  input.focus();
+  input.select();
+
+  function _close() {
+    modal.hidden = true;
+    okBtn.removeEventListener('click', _ok);
+    cancelBtn.removeEventListener('click', _close);
+    backdrop.removeEventListener('click', _close);
+    input.removeEventListener('keydown', _key);
+  }
+  function _ok() {
+    const name = input.value.trim() || defaultValue;
+    _close();
+    onConfirm(name);
+  }
+  function _key(e) {
+    if (e.key === 'Enter') { e.preventDefault(); _ok(); }
+    if (e.key === 'Escape') { _close(); }
+  }
+
+  okBtn.addEventListener('click', _ok);
+  cancelBtn.addEventListener('click', _close);
+  backdrop.addEventListener('click', _close);
+  input.addEventListener('keydown', _key);
 }
 
 function _dupShow(id) {
