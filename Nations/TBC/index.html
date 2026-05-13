@@ -515,7 +515,8 @@
       }, 3000);
       return;
     }
-    if (btn) { btn.disabled = true; btn.textContent = 'Updating\u2026'; }
+    // Hide banner immediately — page will reload once new SW takes control
+    document.getElementById('updateBanner').hidden = true;
     var reg = _swReg || (await navigator.serviceWorker.getRegistration('./'));
     if (reg && reg.waiting) {
       reg.waiting.postMessage({ type: 'SKIP_WAITING' });

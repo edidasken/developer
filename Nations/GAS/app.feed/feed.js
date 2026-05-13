@@ -580,11 +580,26 @@ function _renderTab(tab) {
 }
 
 // ── Manuscript ────────────────────────────────────────────────────────────────
+/* Build a structured draft from outline sections (shared by auto-seed + import btn) */
+function _buildManuscriptFromOutline(s) {
+  return (s.sections || []).map(sec => {
+    let block = `== ${sec.title.toUpperCase()} ==\n`;
+    if (sec.type === 'scripture' && sec.scriptureRef) block += `[${sec.scriptureRef}]\n${sec.scripture || ''}\n`;
+    if (sec.notes) block += `\n${sec.notes}`;
+    return block.trim();
+  }).join('\n\n');
+}
+
 function _renderManuscript() {
   const s = _active();
   if (!s) return;
   const area = _qs('bm-manuscript-area');
   if (area) {
+    // Auto-seed from outline the first time the manuscript tab is opened
+    if (!s.manuscript && s.sections && s.sections.length) {
+      s.manuscript = _buildManuscriptFromOutline(s);
+      _queueSave();
+    }
     area.value = s.manuscript || '';
     _autoResize(area);
   }
@@ -920,12 +935,7 @@ function _bindManuscript() {
       const s = _active();
       if (!s || !s.sections.length) { _toast('No outline sections to import', 'error'); return; }
       const existing = area.value.trim();
-      const imported = s.sections.map(sec => {
-        let block = `== ${sec.title.toUpperCase()} ==\n`;
-        if (sec.type === 'scripture' && sec.scriptureRef) block += `[${sec.scriptureRef}]\n${sec.scripture || ''}\n`;
-        if (sec.notes) block += `\n${sec.notes}`;
-        return block.trim();
-      }).join('\n\n');
+      const imported = _buildManuscriptFromOutline(s);
       area.value = (existing ? existing + '\n\n' : '') + imported;
       s.manuscript = area.value;
       _autoResize(area);
