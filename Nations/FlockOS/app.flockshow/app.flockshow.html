@@ -13,6 +13,18 @@
   <meta name="theme-color" content="#0c1445">
   <meta name="description" content="FlockShow — Church presentation and worship display for FlockOS.">
 
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+
   <title>FlockShow</title>
 
   <!-- PWA manifest -->
@@ -35,18 +47,20 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── FlockShow design tokens ───────────────────────────────────────── */
+    /* ── FlockShow design tokens — aliased to NC theme tokens ─────────── */
     :root {
-      --fs-bg:        #060c1f;               /* deep navy — matches NC side-2 */
-      --fs-panel:     #0c1445;               /* NC --side-0 */
-      --fs-panel-alt: #1a0e3c;               /* NC --side-1 */
+      /* Chrome stays dark navy (presentation app) — pulled from NC chrome palette */
+      --fs-bg:        #060c1f;
+      --fs-panel:     #0c1445;
+      --fs-panel-alt: #1a0e3c;
       --fs-border:    rgba(255,255,255,0.10);
-      --fs-accent:    #e8a838;               /* NC gold */
-      --fs-accent-dk: #c48a20;               /* darker gold */
-      --fs-accent-dim:rgba(232,168,56,0.13); /* gold soft */
+      /* Accents from NC palette */
+      --fs-accent:    var(--gold, #e8a838);
+      --fs-accent-dk: #c48a20;
+      --fs-accent-dim:rgba(232,168,56,0.13);
       --fs-ink:       #f0f1f8;
       --fs-muted:     rgba(240,241,248,0.50);
-      --fs-danger:    #f87171;
+      --fs-danger:    var(--danger, #f87171);
       --topbar-h:     54px;
     }
 

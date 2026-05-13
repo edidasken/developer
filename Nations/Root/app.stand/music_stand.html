@@ -32,6 +32,18 @@
   <link rel="preconnect" href="https://securetoken.googleapis.com">
   <link rel="dns-prefetch" href="https://firestore.googleapis.com">
 
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+
   <!-- App CSS — one source of truth: new_covenant.css (includes all Flock Stand + AG styles) -->
   <link rel="stylesheet" href="Styles/new_covenant.css">
 

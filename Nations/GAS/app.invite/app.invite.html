@@ -29,6 +29,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+
   <!-- One CSS file: american_garments is merged into new_covenant.css -->
   <link rel="stylesheet" href="Styles/new_covenant.css">
 
@@ -36,9 +48,7 @@
     *, *::before, *::after { box-sizing: border-box; }
 
     :root {
-      --gold:      #e8a838;
-      --gold-text: #b45309;
-      /* Safe area insets — set via CSS env() so they work without JS */
+      /* Inherit --gold/--gold-text from new_covenant.css; only define safe-area helpers here */
       --safe-top:    env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-left:   env(safe-area-inset-left, 0px);

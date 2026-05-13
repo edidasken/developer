@@ -31,6 +31,18 @@
   <link rel="dns-prefetch" href="https://firestore.googleapis.com">
   <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
 
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+
   <!-- Shared stylesheet -->
   <link rel="stylesheet" href="Styles/new_covenant.css">
 
@@ -39,22 +51,23 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
 
-    /* ─── Design tokens ──────────────────────────────────────────────── */
+    /* ─── Design tokens — aliased to NC theme tokens where possible ───── */
     :root {
+      /* Chrome stays dark navy (chat app) — pulled from NC chrome palette */
       --fc-bg:         #060d24;
       --fc-panel:      #0c1445;
       --fc-panel-2:    #111b44;
       --fc-panel-3:    #1a2660;
       --fc-border:     rgba(255,255,255,0.09);
       --fc-border-hi:  rgba(255,255,255,0.15);
-      --fc-accent:     #22d3ee;   /* cyan — distinct from gold/purple/red already used */
+      --fc-accent:     #22d3ee;   /* cyan — chat brand */
       --fc-accent-dk:  #0ea5e9;
       --fc-accent-dim: rgba(34,211,238,0.12);
-      --fc-gold:       #e8a838;
+      --fc-gold:       var(--gold, #e8a838);
       --fc-ink:        #eef1fb;
       --fc-muted:      #9ba8d0;
       --fc-faint:      rgba(255,255,255,0.22);
-      --fc-danger:     #f87171;
+      --fc-danger:     var(--danger, #f87171);
       --fc-prayer:     #a78bfa;   /* violet for prayer chain */
       --fc-announce:   #fbbf24;  /* amber for announcements */
       --fc-font:       'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
