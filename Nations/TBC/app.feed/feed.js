@@ -1011,55 +1011,121 @@ async function _sendToFlockShow() {
 
 function _doPrint() {
   const s = _active();
+  if (!s) { _toast('No sermon selected', 'error'); return; }
 
-  // Mark prayer sections so CSS hides them from their inline position
-  const prayerEls = [];
-  document.querySelectorAll('.bm-outline-section').forEach(el => {
-    const sel = el.querySelector('.bm-section-type-select');
-    if (sel && sel.value === 'prayer') {
-      el.classList.add('prayer-print-hidden');
-      prayerEls.push(el);
-    }
+  // Section type → print accent color + label
+  const _TYPE = {
+    intro:        { label: 'INTRO',        color: '#0284c7' },
+    scripture:    { label: 'SCRIPTURE',    color: '#c48a20' },
+    point:        { label: 'POINT',        color: '#7c3aed' },
+    illustration: { label: 'ILLUSTRATION', color: '#059669' },
+    explanation:  { label: 'EXPLANATION',  color: '#0f766e' },
+    application:  { label: 'APPLICATION',  color: '#ea580c' },
+    prayer:       { label: 'PRAYER',       color: '#7c3aed' },
+    conclusion:   { label: 'CONCLUSION',   color: '#c48a20' },
+    transition:   { label: 'TRANSITION',   color: '#94a3b8' },
+  };
+
+  const dateStr = s.date
+    ? new Date(s.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    : '';
+
+  // ── Sermon header ──────────────────────────────────────────────────────────
+  let html = '<div id="bmp-wrap">';
+
+  html += `
+    <div id="bmp-header">
+      <div id="bmp-header-bar"></div>
+      <div id="bmp-header-body">
+        <div id="bmp-header-top">
+          ${s.series ? `<span id="bmp-series">${_e(s.series)}</span>` : '<span></span>'}
+          ${dateStr ? `<span id="bmp-date">${_e(dateStr)}</span>` : ''}
+        </div>
+        <h1 id="bmp-title">${_e(s.title || 'Untitled Sermon')}</h1>
+        <div id="bmp-meta-row">
+          ${s.passage ? `<span class="bmp-meta-chip">&#128214; ${_e(s.passage)}</span>` : ''}
+          ${s.speaker ? `<span class="bmp-meta-chip">&#9998; ${_e(s.speaker)}</span>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // ── Outline sections ───────────────────────────────────────────────────────
+  html += '<div id="bmp-sections">';
+
+  const prayerSections = [];
+  (s.sections || []).forEach(sec => {
+    if (sec.type === 'prayer') { prayerSections.push(sec); return; }
+
+    const t      = _TYPE[sec.type] || _TYPE.point;
+    const title  = (sec.title       || '').trim();
+    const notes  = (sec.notes       || '').trim();
+    const ref    = (sec.scriptureRef|| '').trim();
+    const verse  = (sec.scripture   || '').trim();
+    if (!title && !notes && !ref && !verse) return;
+
+    const isTransition = sec.type === 'transition';
+    html += `
+      <div class="bmp-section${isTransition ? ' bmp-transition-section' : ''}">
+        <div class="bmp-section-accent" style="background:${t.color}"></div>
+        <div class="bmp-section-content">
+          <div class="bmp-section-head">
+            <span class="bmp-type-pill" style="color:${t.color};border-color:${t.color}">${t.label}</span>
+            ${title ? `<span class="bmp-section-title">${_e(title)}</span>` : ''}
+          </div>
+          ${sec.type === 'scripture' && (ref || verse) ? `
+            <div class="bmp-verse-block">
+              ${ref   ? `<div class="bmp-verse-ref">${_e(ref)}</div>` : ''}
+              ${verse ? `<div class="bmp-verse-text">${_e(verse)}</div>` : ''}
+            </div>
+          ` : ''}
+          ${notes ? `<div class="bmp-notes">${_e(notes).replace(/\n/g, '<br>')}</div>` : ''}
+        </div>
+      </div>
+    `;
   });
 
-  // Collect prayer points: outline prayer sections + delivery prayer prep
-  const items = [];
+  html += '</div>'; // #bmp-sections
 
-  if (s) {
-    (s.sections || []).filter(sec => sec.type === 'prayer').forEach(sec => {
+  // ── Prayer points ──────────────────────────────────────────────────────────
+  const prepEl   = document.getElementById('bm-prayer-prep');
+  const prepText = prepEl ? prepEl.value.trim() : '';
+
+  if (prayerSections.length || prepText) {
+    html += '<div id="bmp-prayer">';
+    html += `
+      <div id="bmp-prayer-head">
+        <div id="bmp-prayer-bar"></div>
+        <span id="bmp-prayer-label">PRAYER POINTS</span>
+      </div>
+    `;
+    if (prepText) {
+      html += `<div class="bmp-prayer-item">
+        <div class="bmp-prayer-item-title">Pre-Sermon Prayer</div>
+        <div class="bmp-prayer-item-notes">${_e(prepText).replace(/\n/g, '<br>')}</div>
+      </div>`;
+    }
+    prayerSections.forEach(sec => {
       const title = (sec.title || '').trim();
       const notes = (sec.notes || '').trim();
       if (!title && !notes) return;
-      let html = '<div class="bm-pp-item">';
-      if (title) html += `<div class="bm-pp-title">${_e(title)}</div>`;
-      if (notes) html += `<div class="bm-pp-notes">${_e(notes)}</div>`;
-      html += '</div>';
-      items.push(html);
+      html += `<div class="bmp-prayer-item">
+        ${title ? `<div class="bmp-prayer-item-title">${_e(title)}</div>` : ''}
+        ${notes ? `<div class="bmp-prayer-item-notes">${_e(notes).replace(/\n/g, '<br>')}</div>` : ''}
+      </div>`;
     });
+    html += '</div>'; // #bmp-prayer
   }
 
-  // Also include prayer prep from the Delivery tab
-  const prepEl = document.getElementById('bm-prayer-prep');
-  const prepText = prepEl ? prepEl.value.trim() : '';
-  if (prepText) {
-    items.push(`<div class="bm-pp-item"><div class="bm-pp-title">Pre-Sermon Prayer</div><div class="bm-pp-notes">${_e(prepText)}</div></div>`);
-  }
+  html += '</div>'; // #bmp-wrap
 
-  // Inject print-only prayer points block
-  let ppEl = null;
-  if (items.length) {
-    ppEl = document.createElement('div');
-    ppEl.id = 'bm-print-prayer-points';
-    ppEl.innerHTML = '<h3>Prayer Points</h3>' + items.join('');
-    const container = document.getElementById('bm-sections-container');
-    if (container) container.after(ppEl);
-  }
-
+  // Inject, print, remove
+  const doc = document.createElement('div');
+  doc.id = 'bm-print-document';
+  doc.innerHTML = html;
+  document.body.appendChild(doc);
   window.print();
-
-  // Clean up
-  prayerEls.forEach(el => el.classList.remove('prayer-print-hidden'));
-  if (ppEl) ppEl.remove();
+  document.body.removeChild(doc);
 }
 
 async function _copyOutline() {  const s = _active();

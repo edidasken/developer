@@ -534,31 +534,53 @@
 
     /* ── Print styles ───────────────────────────────────────────────── */
     @media print {
-      #bm-topbar, #bm-sidebar, #bm-tab-bar, #bm-add-section-bar,
-      #bm-outline-sidebar, .bm-ms-toolbar, .bm-section-actions,
-      .bm-section-drag, #bm-auth-overlay, #bm-toasts, #bm-confirm-modal,
-      #bm-empty, #bm-pane-delivery, #bm-pane-series, #bm-pane-research,
-      #bm-sermon-header, .bm-auth-card,
-      .bm-section-header .bm-collapse-btn,
-      .prayer-print-hidden { display: none !important; }
-      html, body, #bm-root, #bm-body, #bm-main, #bm-editor { overflow: visible !important; height: auto !important; display: block !important; }
-      #bm-pane-outline, #bm-outline-main, #bm-sections-container { display: block !important; overflow: visible !important; }
-      .bm-pane[hidden] { display: none !important; }
-      #bm-pane-outline:not([hidden]) { display: block !important; }
-      .bm-outline-section { break-inside: avoid; break-before: auto; break-after: auto; box-shadow: none !important; border: 1px solid #ccc !important; background: white !important; color: #000 !important; margin-bottom: 6pt !important; }
-      .bm-section-header { background: #f5f5f5 !important; padding: 6pt 10pt !important; border-bottom: 1px solid #ddd !important; }
-      .bm-section-type-select { font-weight: 700 !important; color: #000 !important; border: none !important; background: transparent !important; -webkit-appearance: none; appearance: none; pointer-events: none; }
-      .bm-section-title-input { font-weight: 600 !important; color: #111 !important; border: none !important; background: transparent !important; pointer-events: none; width: auto !important; }
-      .bm-section-body { padding: 8pt 10pt !important; }
-      .bm-section-body .bm-notes-textarea, .bm-scripture-textarea { color: #111 !important; border: none !important; background: transparent !important; resize: none !important; pointer-events: none; }
-      .bm-scripture-ref-input { font-weight: 600 !important; color: #111 !important; border: none !important; background: transparent !important; pointer-events: none; }
-      #bm-manuscript-area { font: 12pt/1.8 Georgia, serif !important; color: #000 !important; }
-      /* ── Print-only Prayer Points section ────────────────────────── */
-      #bm-print-prayer-points { display: block !important; margin-top: 20pt !important; padding-top: 12pt !important; border-top: 2pt solid #333 !important; }
-      #bm-print-prayer-points h3 { font: 700 13pt 'Plus Jakarta Sans', sans-serif; margin: 0 0 10pt; color: #000; text-transform: uppercase; letter-spacing: .06em; }
-      .bm-pp-item { margin-bottom: 10pt; }
-      .bm-pp-title { font: 700 10.5pt 'Plus Jakarta Sans', sans-serif; color: #000; margin-bottom: 3pt; }
-      .bm-pp-notes { font: 10pt/1.6 Georgia, serif; color: #222; white-space: pre-wrap; }
+      @page { margin: 0.7in 0.8in; }
+
+      /* Hide everything except the injected print document */
+      body > *:not(#bm-print-document) { display: none !important; }
+      #bm-print-document { display: block !important; font-family: 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+      /* ── Wrapper ──────────────────────────────────────────────────── */
+      #bmp-wrap { max-width: 100%; }
+
+      /* ── Header ───────────────────────────────────────────────────── */
+      #bmp-header { margin-bottom: 20pt; }
+      #bmp-header-bar { height: 5pt; background: linear-gradient(90deg, #c48a20, #e8a838); border-radius: 2pt; margin-bottom: 14pt; }
+      #bmp-header-body { padding: 0; }
+      #bmp-header-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4pt; }
+      #bmp-series { font: 600 9pt 'Plus Jakarta Sans', sans-serif; color: #c48a20; text-transform: uppercase; letter-spacing: .08em; }
+      #bmp-date { font: 400 9pt 'Plus Jakarta Sans', sans-serif; color: #888; }
+      #bmp-title { font: 700 24pt 'Plus Jakarta Sans', sans-serif; color: #0f0f0f; margin: 0 0 8pt; line-height: 1.15; }
+      #bmp-meta-row { display: flex; gap: 14pt; flex-wrap: wrap; margin-top: 5pt; padding-top: 7pt; border-top: 1.5pt solid #e8a838; }
+      .bmp-meta-chip { font: 500 9pt 'Plus Jakarta Sans', sans-serif; color: #555; }
+
+      /* ── Sections ─────────────────────────────────────────────────── */
+      #bmp-sections { display: flex; flex-direction: column; gap: 9pt; }
+      .bmp-section { display: flex; break-inside: avoid; border: 1pt solid #e2ded8; border-radius: 4pt; overflow: hidden; background: #fff; }
+      .bmp-section-accent { width: 4.5pt; flex-shrink: 0; }
+      .bmp-section-content { flex: 1; padding: 8pt 12pt; }
+      .bmp-section-head { display: flex; align-items: baseline; gap: 7pt; margin-bottom: 5pt; flex-wrap: wrap; }
+      .bmp-type-pill { font: 700 6.5pt 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; letter-spacing: .10em; border: 1pt solid; padding: 1.5pt 5pt; border-radius: 3pt; flex-shrink: 0; }
+      .bmp-section-title { font: 600 11.5pt 'Plus Jakarta Sans', sans-serif; color: #111; line-height: 1.3; }
+      .bmp-transition-section { display: flex; align-items: center; gap: 8pt; padding: 5pt 10pt; border: none; border-top: 1pt dashed #ccc; border-bottom: 1pt dashed #ccc; background: transparent !important; }
+      .bmp-transition-section .bmp-section-accent { display: none; }
+
+      /* ── Scripture block ──────────────────────────────────────────── */
+      .bmp-verse-block { margin: 5pt 0 5pt; padding: 7pt 10pt 7pt 11pt; background: #fef9ec; border-left: 3pt solid #e8a838; }
+      .bmp-verse-ref { font: 700 9.5pt 'Plus Jakarta Sans', sans-serif; color: #c48a20; margin-bottom: 3pt; }
+      .bmp-verse-text { font: italic 11pt/1.72 Georgia, serif; color: #2c2c2c; }
+
+      /* ── Notes ────────────────────────────────────────────────────── */
+      .bmp-notes { font: 10.5pt/1.68 Georgia, serif; color: #2c2c2c; }
+
+      /* ── Prayer Points ────────────────────────────────────────────── */
+      #bmp-prayer { margin-top: 16pt; padding-top: 13pt; border-top: 2pt solid #7c3aed; }
+      #bmp-prayer-head { display: flex; align-items: center; gap: 7pt; margin-bottom: 10pt; }
+      #bmp-prayer-bar { width: 3.5pt; height: 14pt; background: #7c3aed; border-radius: 2pt; flex-shrink: 0; }
+      #bmp-prayer-label { font: 700 9.5pt 'Plus Jakarta Sans', sans-serif; color: #7c3aed; text-transform: uppercase; letter-spacing: .10em; }
+      .bmp-prayer-item { break-inside: avoid; margin-bottom: 8pt; padding-left: 10pt; border-left: 2pt solid #e9d5ff; }
+      .bmp-prayer-item-title { font: 700 10.5pt 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; margin-bottom: 2pt; }
+      .bmp-prayer-item-notes { font: 10pt/1.6 Georgia, serif; color: #444; }
     }
 
     /* ── Outline sidebar (scripture lookup, word count) ──────────────── */
