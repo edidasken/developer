@@ -773,6 +773,12 @@ function _wire() {
   /* ── Import lyrics ── */
   document.getElementById('fs-import-btn')?.addEventListener('click', _importLyrics);
 
+  /* ── From Music Stand song picker ── */
+  document.getElementById('fs-from-stand-btn')?.addEventListener('click', _openSongPicker);
+  document.getElementById('fs-sp-close')?.addEventListener('click', _closeSongPicker);
+  document.getElementById('fs-sp-backdrop')?.addEventListener('click', _closeSongPicker);
+  document.getElementById('fs-sp-search')?.addEventListener('input', _filterSongPicker);
+
   /* ── Present button ── */
   document.getElementById('fs-present-btn')?.addEventListener('click', _togglePresent);
 
@@ -789,6 +795,157 @@ function _wire() {
       _delSlide();
     }
   });
+}
+
+// ── Music Stand song picker ───────────────────────────────────────────────────
+let _spAllSongs = [];   // full list fetched from UpperRoom
+let _spLoaded = false;
+
+function _openSongPicker() {
+  const picker = document.getElementById('fs-song-picker');
+  if (!picker) return;
+  picker.hidden = false;
+  document.getElementById('fs-sp-search').value = '';
+  _filterSongPicker();
+  document.getElementById('fs-sp-search').focus();
+  if (!_spLoaded) _loadSongPickerSongs();
+}
+
+function _closeSongPicker() {
+  const picker = document.getElementById('fs-song-picker');
+  if (picker) picker.hidden = true;
+}
+
+async function _loadSongPickerSongs() {
+  const statusEl = document.getElementById('fs-sp-status');
+  const listEl = document.getElementById('fs-sp-list');
+  if (statusEl) statusEl.textContent = 'Loading songs…';
+  if (listEl) listEl.innerHTML = '';
+  try {
+    const UR = window.UpperRoom;
+    if (!UR || typeof UR.listSongs !== 'function') {
+      if (statusEl) statusEl.textContent = 'Music Stand library unavailable.';
+      return;
+    }
+    // listSongs returns paginated — fetch up to 500 rows
+    const result = await UR.listSongs({ pageSize: 500 });
+    _spAllSongs = Array.isArray(result) ? result : (result.rows || []);
+    _spLoaded = true;
+    _renderSongPickerList(_spAllSongs);
+    if (statusEl) statusEl.textContent = `${_spAllSongs.length} song${_spAllSongs.length === 1 ? '' : 's'} in library`;
+  } catch (err) {
+    console.error('FlockShow: song picker load failed', err);
+    if (statusEl) statusEl.textContent = 'Could not load songs. Are you signed in?';
+  }
+}
+
+function _filterSongPicker() {
+  const q = (document.getElementById('fs-sp-search')?.value || '').trim().toLowerCase();
+  const filtered = q ? _spAllSongs.filter(s =>
+    (s.title || '').toLowerCase().includes(q) ||
+    (s.artist || '').toLowerCase().includes(q)
+  ) : _spAllSongs;
+  _renderSongPickerList(filtered);
+  const statusEl = document.getElementById('fs-sp-status');
+  if (statusEl && _spLoaded) {
+    statusEl.textContent = q
+      ? `${filtered.length} result${filtered.length === 1 ? '' : 's'}`
+      : `${_spAllSongs.length} song${_spAllSongs.length === 1 ? '' : 's'} in library`;
+  }
+}
+
+function _renderSongPickerList(songs) {
+  const listEl = document.getElementById('fs-sp-list');
+  if (!listEl) return;
+  if (!songs.length) {
+    listEl.innerHTML = '<div style="padding:24px;text-align:center;color:var(--fs-muted);font-size:0.83rem;">' +
+      (_spLoaded ? 'No songs match.' : 'Loading…') + '</div>';
+    return;
+  }
+  listEl.innerHTML = songs.map(s => {
+    const meta = [s.artist, s.key ? `Key of ${s.key}` : ''].filter(Boolean).join(' · ');
+    return `<div class="fs-sp-item" data-song-id="${s.id}" role="button" tabindex="0">
+      <div class="fs-sp-item-title">${_spEscape(s.title || 'Untitled')}</div>
+      ${meta ? `<div class="fs-sp-item-meta">${_spEscape(meta)}</div>` : ''}
+    </div>`;
+  }).join('');
+  listEl.querySelectorAll('.fs-sp-item').forEach(el => {
+    const id = el.dataset.songId;
+    const song = songs.find(s => s.id === id);
+    if (!song) return;
+    el.addEventListener('click', () => _importSongFromStand(song));
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') _importSongFromStand(song); });
+  });
+}
+
+function _spEscape(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Strip ChordPro chords and section directives → return plain lyric text
+function _stripChordPro(text) {
+  if (!text) return '';
+  return text
+    .split('\n')
+    .map(line => {
+      // Remove section directives like {start_of_verse:Verse 1}, {chorus}, {eov}
+      if (/^\{[^}]+\}$/.test(line.trim())) return '';
+      // Strip chord brackets [G], [Am7], etc.
+      return line.replace(/\[[^\]]+\]/g, '').trimEnd();
+    })
+    .join('\n');
+}
+
+// Split stripped text into stanzas (double-blank-line or single-blank-line separation)
+function _splitStanzas(text) {
+  // First try double-newline splits (common ChordPro structure)
+  const stanzas = text.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
+  return stanzas;
+}
+
+async function _importSongFromStand(song) {
+  const statusEl = document.getElementById('fs-sp-status');
+  if (statusEl) statusEl.textContent = `Loading "${song.title}"…`;
+
+  try {
+    const UR = window.UpperRoom;
+    let chordProText = '';
+    let songTitle = song.title || 'Untitled';
+
+    if (UR && typeof UR.getSongWithArrangements === 'function') {
+      const full = await UR.getSongWithArrangements(song.id);
+      songTitle = full.title || songTitle;
+      // Prefer first arrangement's lyricsWithChords, fall back to song.chordSheet
+      const arr = (full.arrangements || [])[0];
+      chordProText = (arr && arr.lyricsWithChords) || full.chordSheet || '';
+    } else {
+      chordProText = song.chordSheet || '';
+    }
+
+    const stripped = _stripChordPro(chordProText);
+    const stanzas = _splitStanzas(stripped);
+
+    const show = _activeShow();
+    if (!show) { _closeSongPicker(); return; }
+
+    // Insert stanzas as slides after the current active slide
+    if (stanzas.length) {
+      const newSlides = stanzas.map(t => _makeSlide('lyrics', t));
+      show.slides.splice(_st.activeSlide + 1, 0, ...newSlides);
+      _st.activeSlide += 1;
+      _touch(show);
+      _renderSlideList();
+      _renderPreview();
+      _renderProps();
+      _pushToPresent();
+    }
+
+    _closeSongPicker();
+    if (statusEl) statusEl.textContent = `Imported "${songTitle}" (${stanzas.length} slide${stanzas.length === 1 ? '' : 's'})`;
+  } catch (err) {
+    console.error('FlockShow: song import failed', err);
+    if (statusEl) statusEl.textContent = 'Import failed. Please try again.';
+  }
 }
 
 // ── Auth gate ─────────────────────────────────────────────────────────────────

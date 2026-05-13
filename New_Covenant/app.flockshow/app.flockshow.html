@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="FlockShow">
-  <meta name="theme-color" content="#0b0d14">
+  <meta name="theme-color" content="#0c1445">
   <meta name="description" content="FlockShow — Church presentation and worship display for FlockOS.">
 
   <title>FlockShow</title>
@@ -37,13 +37,13 @@
 
     /* ── FlockShow design tokens ───────────────────────────────────────── */
     :root {
-      --fs-bg:        #0b0d14;
-      --fs-panel:     #13151f;
-      --fs-panel-alt: #1a1d2e;
-      --fs-border:    rgba(167,139,250,0.12);
-      --fs-accent:    #a78bfa;
-      --fs-accent-dk: #7c3aed;
-      --fs-accent-dim:rgba(167,139,250,0.13);
+      --fs-bg:        #060c1f;               /* deep navy — matches NC side-2 */
+      --fs-panel:     #0c1445;               /* NC --side-0 */
+      --fs-panel-alt: #1a0e3c;               /* NC --side-1 */
+      --fs-border:    rgba(255,255,255,0.10);
+      --fs-accent:    #e8a838;               /* NC gold */
+      --fs-accent-dk: #c48a20;               /* darker gold */
+      --fs-accent-dim:rgba(232,168,56,0.13); /* gold soft */
       --fs-ink:       #f0f1f8;
       --fs-muted:     rgba(240,241,248,0.50);
       --fs-danger:    #f87171;
@@ -63,23 +63,21 @@
       height: 100%;
     }
 
-    /* ── Topbar ────────────────────────────────────────────────────────── */
+    /* ── Topbar — matches NC dark-navy cathedral header ─────────────── */
     #fs-topbar {
       display: flex; align-items: center; gap: 10px;
       padding: 0 18px;
-      background: #0d0f1a;
-      border-bottom: 1px solid var(--fs-border);
+      background: linear-gradient(90deg, #0c1445 0%, #14103a 60%, #0a1128 100%);
       z-index: 200;
       position: relative;
     }
     #fs-topbar::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, #a78bfa 0%, #7c3aed 30%, #818cf8 60%, #a78bfa 100%);
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5px;
+      background: var(--grad-rainbow, linear-gradient(90deg,#38bdf8,#818cf8,#a78bfa,#e8a838,#34d399,#38bdf8));
       background-size: 200% 100%;
-      animation: fs-bar 6s linear infinite;
-      opacity: 0.6;
+      animation: rainbow-scroll 9s linear infinite;
+      opacity: 0.72;
     }
-    @keyframes fs-bar { from { background-position: 0 0; } to { background-position: 200% 0; } }
 
     .fs-logo {
       display: flex; align-items: center; gap: 8px;
@@ -109,8 +107,8 @@
       padding: 6px 13px; border-radius: 8px; font: 600 0.78rem 'Plus Jakarta Sans', sans-serif;
       cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
     }
-    .fs-btn--primary { background: var(--fs-accent); color: #0b0d14; }
-    .fs-btn--primary:hover { background: #b89ffd; }
+    .fs-btn--primary { background: var(--fs-accent); color: #0c0a00; }
+    .fs-btn--primary:hover { background: #f0b84a; }
     .fs-btn--ghost { background: rgba(255,255,255,0.07); color: var(--fs-ink); }
     .fs-btn--ghost:hover { background: rgba(255,255,255,0.12); }
     .fs-btn--danger { background: rgba(248,113,113,0.15); color: var(--fs-danger); }
@@ -132,7 +130,7 @@
     }
     .fs-auth-icon {
       width: 72px; height: 72px; border-radius: 18px; object-fit: contain;
-      box-shadow: 0 8px 28px rgba(124,58,237,0.35);
+      box-shadow: 0 8px 28px rgba(232,168,56,0.35);
     }
     .fs-auth-card h1 {
       font: 700 1.4rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink); margin: 0;
@@ -193,7 +191,7 @@
       padding: 18px 18px 14px; cursor: pointer; transition: all 0.15s;
       display: flex; flex-direction: column; gap: 7px; position: relative; overflow: hidden;
     }
-    .fs-show-card:hover { border-color: rgba(167,139,250,0.4); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.18); }
+    .fs-show-card:hover { border-color: rgba(232,168,56,0.4); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(232,168,56,0.15); }
     .fs-show-card::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
       background: linear-gradient(90deg, var(--fs-accent), var(--fs-accent-dk));
@@ -210,7 +208,7 @@
       border: none; cursor: pointer; transition: all 0.12s;
     }
     .fs-show-action-btn--edit { background: var(--fs-accent-dim); color: var(--fs-accent); }
-    .fs-show-action-btn--edit:hover { background: rgba(167,139,250,0.22); }
+    .fs-show-action-btn--edit:hover { background: rgba(232,168,56,0.22); }
     .fs-show-action-btn--dup { background: rgba(255,255,255,0.05); color: var(--fs-muted); }
     .fs-show-action-btn--dup:hover { background: rgba(255,255,255,0.10); color: var(--fs-ink); }
     .fs-show-action-btn--del { background: rgba(248,113,113,0.08); color: var(--fs-danger); }
@@ -228,7 +226,7 @@
 
     .fs-editor-bar {
       display: flex; align-items: center; gap: 8px; padding: 0 14px;
-      background: #0f1120; border-bottom: 1px solid var(--fs-border); overflow: hidden;
+      background: #0d1035; border-bottom: 1px solid var(--fs-border); overflow: hidden;
     }
     .fs-show-title-input {
       background: transparent; border: none; outline: none;
@@ -242,18 +240,18 @@
 
     /* ── Slide list (left) ─────────────────────────────────────────────── */
     #fs-slide-list {
-      background: #0f1120; border-right: 1px solid var(--fs-border);
+      background: #0d1035; border-right: 1px solid var(--fs-border);
       overflow-y: auto; padding: 6px 5px; display: flex; flex-direction: column; gap: 4px;
-      scrollbar-width: thin; scrollbar-color: rgba(167,139,250,0.15) transparent;
+      scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.15) transparent;
     }
     #fs-slide-list::-webkit-scrollbar { width: 3px; }
-    #fs-slide-list::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.18); border-radius: 3px; }
+    #fs-slide-list::-webkit-scrollbar-thumb { background: rgba(232,168,56,0.22); border-radius: 3px; }
 
     .fs-slide-item {
       border-radius: 8px; cursor: pointer; padding: 2px; transition: all 0.12s;
       flex-shrink: 0; border: 2px solid transparent; user-select: none;
     }
-    .fs-slide-item:hover { border-color: rgba(167,139,250,0.3); }
+    .fs-slide-item:hover { border-color: rgba(232,168,56,0.3); }
     .fs-slide-item.fs-slide-item--active { border-color: var(--fs-accent); }
 
     .fs-slide-thumb {
@@ -275,14 +273,14 @@
     .fs-add-slide-wrap { padding: 5px 4px; position: relative; flex-shrink: 0; }
     .fs-add-slide-btn {
       width: 100%; padding: 7px; border-radius: 8px;
-      font: 600 0.73rem 'Plus Jakarta Sans', sans-serif; background: rgba(167,139,250,0.07);
-      color: var(--fs-accent); border: 1px dashed rgba(167,139,250,0.28); cursor: pointer; transition: all 0.12s;
+      font: 600 0.73rem 'Plus Jakarta Sans', sans-serif; background: rgba(232,168,56,0.07);
+      color: var(--fs-accent); border: 1px dashed rgba(232,168,56,0.30); cursor: pointer; transition: all 0.12s;
     }
-    .fs-add-slide-btn:hover { background: rgba(167,139,250,0.14); }
+    .fs-add-slide-btn:hover { background: rgba(232,168,56,0.14); }
 
     .fs-add-type-menu {
       position: absolute; bottom: calc(100% + 4px); left: 4px; right: 4px;
-      background: #1a1d2e; border: 1px solid var(--fs-border); border-radius: 10px;
+      background: #1a0e3c; border: 1px solid var(--fs-border); border-radius: 10px;
       overflow: hidden; z-index: 50; box-shadow: 0 8px 28px rgba(0,0,0,0.55);
     }
     .fs-add-type-item {
@@ -293,7 +291,7 @@
 
     /* ── Slide preview (center) ────────────────────────────────────────── */
     #fs-slide-preview {
-      display: flex; flex-direction: column; background: #080a10; overflow: hidden;
+      display: flex; flex-direction: column; background: #050812; overflow: hidden;
     }
     .fs-preview-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; }
     .fs-slide-canvas {
@@ -327,9 +325,9 @@
 
     /* ── Properties panel (right) ──────────────────────────────────────── */
     #fs-slide-props {
-      background: #0f1120; border-left: 1px solid var(--fs-border);
+      background: #0d1035; border-left: 1px solid var(--fs-border);
       overflow-y: auto; padding: 14px 13px; display: flex; flex-direction: column; gap: 14px;
-      scrollbar-width: thin; scrollbar-color: rgba(167,139,250,0.10) transparent;
+      scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.12) transparent;
     }
 
     .fs-prop-section { display: flex; flex-direction: column; gap: 7px; }
@@ -340,7 +338,7 @@
       border: 1px solid var(--fs-border); border-radius: 8px;
       font: 0.80rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink); outline: none; resize: vertical;
     }
-    .fs-prop-input:focus { border-color: var(--fs-accent); background: rgba(167,139,250,0.05); }
+    .fs-prop-input:focus { border-color: var(--fs-accent); background: rgba(232,168,56,0.05); }
     .fs-prop-textarea { min-height: 90px; }
 
     .fs-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
@@ -359,7 +357,7 @@
 
     .fs-import-area {
       width: 100%; min-height: 70px; background: rgba(255,255,255,0.03);
-      border: 1px dashed rgba(167,139,250,0.22); border-radius: 8px;
+      border: 1px dashed rgba(232,168,56,0.25); border-radius: 8px;
       padding: 8px 10px; font: 0.78rem 'Plus Jakarta Sans', sans-serif;
       color: var(--fs-muted); resize: vertical; outline: none;
     }
@@ -378,6 +376,74 @@
       #fs-topbar { padding: 0 12px; gap: 6px; }
       .fs-logo span { display: none; }
     }
+
+    /* ── Song picker modal (Music Stand import) ─────────────────────── */
+    #fs-song-picker {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #fs-song-picker[hidden] { display: none !important; }
+    .fs-sp-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(6,12,31,0.82); backdrop-filter: blur(4px);
+    }
+    .fs-sp-panel {
+      position: relative; z-index: 1;
+      background: var(--fs-panel); border: 1px solid var(--fs-border);
+      border-radius: 18px; width: min(520px, 92vw); max-height: min(620px, 88vh);
+      display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 32px 96px rgba(0,0,0,0.7);
+    }
+    .fs-sp-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid var(--fs-border);
+      flex-shrink: 0;
+    }
+    .fs-sp-title {
+      display: flex; align-items: center; gap: 8px;
+      font: 700 0.92rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink);
+    }
+    .fs-sp-title svg { color: var(--fs-accent); flex-shrink: 0; }
+    .fs-sp-close {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: rgba(255,255,255,0.06); border: none; color: var(--fs-muted);
+      font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.12s; flex-shrink: 0;
+    }
+    .fs-sp-close:hover { background: rgba(255,255,255,0.12); color: var(--fs-ink); }
+    .fs-sp-search-wrap {
+      position: relative; padding: 12px 18px; flex-shrink: 0;
+      border-bottom: 1px solid var(--fs-border);
+    }
+    .fs-sp-search-icon {
+      position: absolute; left: 30px; top: 50%; transform: translateY(-50%);
+      color: var(--fs-muted); pointer-events: none;
+    }
+    .fs-sp-search {
+      width: 100%; padding: 8px 14px 8px 36px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--fs-border); border-radius: 10px;
+      font: 0.84rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink); outline: none;
+    }
+    .fs-sp-search::placeholder { color: var(--fs-muted); }
+    .fs-sp-search:focus { border-color: var(--fs-accent); }
+    .fs-sp-list {
+      flex: 1; overflow-y: auto; padding: 8px 10px;
+      scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.15) transparent;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .fs-sp-item {
+      padding: 10px 12px; border-radius: 10px; cursor: pointer;
+      border: 1px solid transparent; transition: all 0.12s;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .fs-sp-item:hover { background: rgba(232,168,56,0.08); border-color: rgba(232,168,56,0.20); }
+    .fs-sp-item-title { font: 600 0.86rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink); }
+    .fs-sp-item-meta { font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted); }
+    .fs-sp-footer {
+      padding: 10px 18px; border-top: 1px solid var(--fs-border); flex-shrink: 0;
+    }
+    .fs-sp-status { font: 0.73rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted); }
   </style>
 </head>
 <body>
@@ -520,6 +586,10 @@
 
         <div class="fs-prop-section">
           <div class="fs-prop-label">Import Lyrics</div>
+          <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-from-stand-btn" style="align-self:flex-start;margin-bottom:8px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 17V7m0 10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m0 10a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m0 10V7m0 10a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2"/></svg>
+            From Music Stand…
+          </button>
           <textarea class="fs-import-area" id="fs-import-area"
             placeholder="Paste full lyrics — blank lines become separate slides…" rows="5"></textarea>
           <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-import-btn" style="margin-top:4px;align-self:flex-start">Split into slides</button>
@@ -534,15 +604,41 @@
 <!-- Auth overlay (shown until Nehemiah confirms session) -->
 <div id="fs-auth-overlay"></div>
 
-<!-- Firebase (Auth only — FlockShow has no Firestore dependency) -->
+<!-- Song picker modal (Music Stand → FlockShow import) -->
+<div id="fs-song-picker" hidden aria-modal="true" role="dialog" aria-label="Pick a song from Music Stand">
+  <div class="fs-sp-backdrop" id="fs-sp-backdrop"></div>
+  <div class="fs-sp-panel">
+    <div class="fs-sp-header">
+      <div class="fs-sp-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17V7m0 10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m0 10a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m0 10V7m0 10a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2"/></svg>
+        Import from Music Stand
+      </div>
+      <button class="fs-sp-close" id="fs-sp-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="fs-sp-search-wrap">
+      <svg class="fs-sp-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="fs-sp-search" class="fs-sp-search" type="search" placeholder="Search songs…" autocomplete="off">
+    </div>
+    <div id="fs-sp-list" class="fs-sp-list"></div>
+    <div class="fs-sp-footer">
+      <span id="fs-sp-status" class="fs-sp-status">Loading songs…</span>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase (Auth + Firestore — used by Nehemiah auth gate and Music Stand song picker) -->
 <script>
   window.FLOCK_FIREBASE_CONFIG = window.FLOCK_FIREBASE_CONFIG || null;
 </script>
 <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 
 <!-- FlockOS auth gate (Nehemiah) -->
 <script defer src="Scripts/firm_foundation.js"></script>
+
+<!-- Music Stand song library (for "From Music Stand" picker) -->
+<script defer src="Scripts/the_upper_room.js"></script>
 
 <script type="module" src="app.flockshow/flockshow.js"></script>
 </body>
