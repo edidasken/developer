@@ -15097,3 +15097,84 @@ flock-tabs [role="tablist"], .tabs-bar {
   border-left: 1px solid var(--border, rgba(255,255,255,0.08));
 }
 
+
+
+/* ════════════════════════════════════════════════════════════════════════════
+   NEW COVENANT — RESPONSIVE NORMALIZATION LAYER
+   Appended 2026-05-13. This layer adds the missing tablet tier, landscape /
+   short-height phone rules, hover-vs-touch differentiation, tiny-phone topbar
+   tightening, and modal width safety. It does NOT replace existing breakpoints
+   — it complements them. Edit ONLY here for shared responsive rules.
+
+   Canonical breakpoints (target devices):
+     ≤ 360px   tiny phone   (iPhone SE-1, Galaxy Fold cover)
+     ≤ 480px   phone-S      (most phones portrait, narrow)
+     ≤ 768px   phone-L      (large phones, small tablet portrait edge)
+     ≤ 1024px  tablet       (iPad / iPad Pro 11" portrait, Surface)
+     > 1024px  desktop
+   Plus orientation/short-height overlays for landscape phones.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tablet tier (769–1024): tighter shell padding, friendlier card grids ── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .veil-main { padding-left: 24px !important; padding-right: 24px !important; }
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+  /* iPad Pro 12.9 portrait keeps the sidebar; tighten its width slightly */
+  :root { --sidebar-w: 232px; }
+}
+
+/* ── Landscape phones (short height): collapse vertical chrome ────────────
+   Triggered by height ≤ 480 to catch phones rotated landscape. Keeps the
+   topbar usable but shrinks fixed verticals so content gets the screen. */
+@media (max-height: 480px) and (orientation: landscape) {
+  :root { --topbar-h: 44px; --footer-h: 24px; }
+  .veil-top, .topbar { padding-left: 12px !important; padding-right: 12px !important; }
+  .welcome-hero { padding: 18px 12px 12px !important; }
+  .welcome-hero h1 { font-size: 1.2rem !important; }
+  /* Sidebar drawer takes more horizontal space landscape — keep narrow */
+  body.veil-side-open #the-veil-side { width: min(260px, 60vw) !important; }
+}
+
+/* ── Tiny phones (≤360): tighten topbar so brand + actions never overflow ─ */
+@media (max-width: 360px) {
+  .veil-top, .topbar { padding-left: 10px !important; padding-right: 10px !important; gap: 6px !important; }
+  .veil-brand img { width: 26px; height: 26px; }
+  .veil-brand-text { font-size: 0.95rem !important; }
+  .topbar-brand { font-size: 0.95rem !important; }
+  .topbar-brand span { display: none; }
+  .card-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important; gap: 8px !important; }
+  /* Modals: never exceed viewport on smallest phones */
+  .modal, .modal-content, [class*="-modal"] {
+    min-width: 0 !important;
+    max-width: calc(100vw - 16px) !important;
+  }
+}
+
+/* ── Touch (no-hover) devices: kill hover-only effects that "stick" ─────── */
+@media (hover: none), (pointer: coarse) {
+  .card:hover { transform: none !important; border-color: var(--line) !important; }
+  .nav-item:hover { background: transparent; color: var(--ink); }
+  /* Ensure all interactive icon buttons meet 44×44 touch target */
+  .btn-icon, .topbar-icon-btn, .veil-menu, .topbar-toggle,
+  button[aria-label], a[aria-label] {
+    min-width: 44px; min-height: 44px;
+  }
+}
+
+/* ── Modal safety on phones: cap width, never overflow ──────────────────── */
+@media (max-width: 480px) {
+  .modal, .modal-content, [class*="-modal"] {
+    min-width: 0 !important;
+    width: min(100%, calc(100vw - 16px)) !important;
+    max-width: calc(100vw - 16px) !important;
+  }
+}
+
+/* ── Use dynamic viewport units where 100vh is referenced for full-height
+   panels (iOS Safari URL bar). Keeps content from being cut off when the
+   browser chrome animates. */
+@supports (height: 100dvh) {
+  .launcher { min-height: 100dvh; }
+}
+
+/* === End Responsive Normalization Layer === */
