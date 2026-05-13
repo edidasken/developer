@@ -1262,7 +1262,7 @@ function _bindResearch() {
 // ── Translation config ─────────────────────────────────────────────────────────
 // apiCode: translation code for bible-api.com (null = copyrighted, use BLB link only)
 // blbCode: translation code for blueletterbible.org URLs
-// bibleComVersion: YouVersion version_id — when set, Go opens bible.com instead of showing a "licensed" message
+// bibleComVersion: YouVersion version_id — when set, Go opens bible.com directly
 const _TRANSLATIONS = {
   KJV:   { apiCode: 'kjv',   blbCode: 'KJV'                     },
   NKJV:  { apiCode: null,    blbCode: 'NKJV', bibleComVersion: 114 },
@@ -1280,6 +1280,80 @@ const _TRANSLATIONS = {
 
 function _blbMultiVerseUrl(ref, blbCode) {
   return `https://www.blueletterbible.org/tools/MultiVerse.cfm?t=${blbCode}&verses=${encodeURIComponent(ref)}`;
+}
+
+// Compact book-name → YouVersion USFM code map for direct bible.com verse URLs.
+// Same pattern as the_bible_link.js / Grow referenceUrl format: /bible/59/JHN.3.16.ESV
+const _BC_BOOKS = {
+  'genesis':'GEN','gen':'GEN','exodus':'EXO','exo':'EXO','exod':'EXO',
+  'leviticus':'LEV','lev':'LEV','numbers':'NUM','num':'NUM',
+  'deuteronomy':'DEU','deut':'DEU','deu':'DEU','joshua':'JOS','josh':'JOS','jos':'JOS',
+  'judges':'JDG','judg':'JDG','jdg':'JDG','ruth':'RUT','rut':'RUT',
+  '1 samuel':'1SA','1samuel':'1SA','1 sam':'1SA','1sam':'1SA',
+  '2 samuel':'2SA','2samuel':'2SA','2 sam':'2SA','2sam':'2SA',
+  '1 kings':'1KI','1kings':'1KI','1 kgs':'1KI','1kgs':'1KI',
+  '2 kings':'2KI','2kings':'2KI','2 kgs':'2KI','2kgs':'2KI',
+  '1 chronicles':'1CH','1chronicles':'1CH','1 chr':'1CH','1chr':'1CH',
+  '2 chronicles':'2CH','2chronicles':'2CH','2 chr':'2CH','2chr':'2CH',
+  'ezra':'EZR','ezr':'EZR','nehemiah':'NEH','neh':'NEH','esther':'EST','est':'EST','job':'JOB',
+  'psalm':'PSA','psalms':'PSA','ps':'PSA','psa':'PSA',
+  'proverbs':'PRO','prov':'PRO','pro':'PRO',
+  'ecclesiastes':'ECC','eccl':'ECC','ecc':'ECC',
+  'song of solomon':'SNG','song of songs':'SNG','song':'SNG','sng':'SNG','sos':'SNG','canticles':'SNG',
+  'isaiah':'ISA','isa':'ISA','jeremiah':'JER','jer':'JER','lamentations':'LAM','lam':'LAM',
+  'ezekiel':'EZK','ezek':'EZK','ezk':'EZK','daniel':'DAN','dan':'DAN',
+  'hosea':'HOS','hos':'HOS','joel':'JOL','jol':'JOL','amos':'AMO','amo':'AMO',
+  'obadiah':'OBA','oba':'OBA','jonah':'JON','jon':'JON','micah':'MIC','mic':'MIC',
+  'nahum':'NAM','nah':'NAM','nam':'NAM','habakkuk':'HAB','hab':'HAB',
+  'zephaniah':'ZEP','zeph':'ZEP','zep':'ZEP','haggai':'HAG','hag':'HAG',
+  'zechariah':'ZEC','zech':'ZEC','zec':'ZEC','malachi':'MAL','mal':'MAL',
+  'matthew':'MAT','matt':'MAT','mat':'MAT','mark':'MRK','mrk':'MRK','mk':'MRK',
+  'luke':'LUK','luk':'LUK','lk':'LUK','john':'JHN','jhn':'JHN','jn':'JHN',
+  'acts':'ACT','act':'ACT','romans':'ROM','rom':'ROM',
+  '1 corinthians':'1CO','1corinthians':'1CO','1 cor':'1CO','1cor':'1CO',
+  '2 corinthians':'2CO','2corinthians':'2CO','2 cor':'2CO','2cor':'2CO',
+  'galatians':'GAL','gal':'GAL','ephesians':'EPH','eph':'EPH',
+  'philippians':'PHP','phil':'PHP','php':'PHP','colossians':'COL','col':'COL',
+  '1 thessalonians':'1TH','1thessalonians':'1TH','1 thess':'1TH','1 thes':'1TH',
+  '2 thessalonians':'2TH','2thessalonians':'2TH','2 thess':'2TH','2 thes':'2TH',
+  '1 timothy':'1TI','1timothy':'1TI','1 tim':'1TI','1tim':'1TI',
+  '2 timothy':'2TI','2timothy':'2TI','2 tim':'2TI','2tim':'2TI',
+  'titus':'TIT','tit':'TIT','philemon':'PHM','philem':'PHM','phm':'PHM',
+  'hebrews':'HEB','heb':'HEB','james':'JAS','jas':'JAS',
+  '1 peter':'1PE','1peter':'1PE','1 pet':'1PE','1pet':'1PE',
+  '2 peter':'2PE','2peter':'2PE','2 pet':'2PE','2pet':'2PE',
+  '1 john':'1JN','1john':'1JN','1 jn':'1JN','1jn':'1JN',
+  '2 john':'2JN','2john':'2JN','2 jn':'2JN','2jn':'2JN',
+  '3 john':'3JN','3john':'3JN','3 jn':'3JN','3jn':'3JN',
+  'jude':'JUD','revelation':'REV','rev':'REV','revelations':'REV',
+};
+
+/**
+ * Parse a freeform reference (e.g. "John 3:16", "1 Cor 13:4-7", "Proverbs 11:23-25")
+ * and return a direct bible.com URL using the YouVersion USFM path format:
+ *   https://www.bible.com/bible/{versionId}/{CODE}.{chapter}.{verse(-end)}.ESV
+ * Returns null if the reference can't be parsed.
+ */
+function _bibleComDirectUrl(rawRef, versionId) {
+  const s = rawRef.toLowerCase().replace(/\s+/g, ' ').trim();
+  // Match: optional numbered prefix (1/2/3/i/ii/iii) + book name + chapter + optional :verse(-end)
+  const m = s.match(/^((?:[1-3]|i{1,3}v?|iv)\s+)?([a-z]+(?:\s[a-z]+)*)\s+(\d+)(?::(\d+)(?:[\-\u2013](\d+))?)?$/);
+  if (!m) return null;
+  const prefix  = (m[1] || '').replace(/\s$/, '');
+  const rawBook = (prefix ? prefix + ' ' + m[2] : m[2]).trim();
+  const chapter  = m[3];
+  const verse    = m[4];
+  const verseEnd = m[5];
+
+  const code = _BC_BOOKS[rawBook] || _BC_BOOKS[m[2].trim()];
+  if (!code) return null;
+
+  let path = `${code}.${chapter}`;
+  if (verse) {
+    path += `.${verse}`;
+    if (verseEnd) path += `-${verseEnd}`;
+  }
+  return `https://www.bible.com/bible/${versionId}/${path}`;
 }
 
 async function _doScriptureLookup(rawRef, suppressAdd = false) {
@@ -1324,10 +1398,12 @@ async function _doScriptureLookup(rawRef, suppressAdd = false) {
     } catch (_) {}
     textEl.textContent = text || 'Verse not found. Check the reference (e.g. John 3:16 or John 3:16-18).';
   } else if (transConf.bibleComVersion) {
-    // Licensed translation with YouVersion ID — open bible.com directly
-    const bcUrl = `https://www.bible.com/search/bible?q=${encodeURIComponent(rawRef)}&version_id=${transConf.bibleComVersion}`;
+    // Licensed translation — build a direct USFM verse URL (same pattern as Grow referenceUrls)
+    const directUrl = _bibleComDirectUrl(rawRef, transConf.bibleComVersion);
+    const fallbackUrl = `https://www.bible.com/search/bible?q=${encodeURIComponent(rawRef)}&version_id=${transConf.bibleComVersion}`;
+    const bcUrl = directUrl || fallbackUrl;
     window.open(bcUrl, '_blank', 'noopener');
-    textEl.innerHTML = `<a href="${bcUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent)">${_e(rawRef)} · ${transKey} — Opening in Bible.com ↗</a>`;
+    textEl.innerHTML = `<a class="bm-lookup-bible-link" href="${bcUrl}" target="_blank" rel="noopener">Open ${_e(rawRef)} · ${transKey} in Bible.com ↗</a>`;
     text = '';
   } else {
     // Copyrighted translation — can't fetch; direct to BLB

@@ -617,7 +617,13 @@
     }
     .bm-lookup-result.visible { display: block; }
     .bm-lookup-ref { font: 700 0.88rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent); margin-bottom: 6px; }
-    .bm-lookup-text { font: italic 1rem/1.72 'Noto Serif', Georgia, serif; color: var(--bm-ink); }
+    .bm-lookup-text { font: italic 1rem/1.72 'Noto Serif', Georgia, serif; color: var(--bm-ink); overflow-wrap: break-word; word-break: break-word; }
+    .bm-lookup-bible-link {
+      display: block; font: 600 0.78rem 'Plus Jakarta Sans', sans-serif;
+      font-style: normal; color: var(--bm-accent); text-decoration: none;
+      padding: 4px 0;
+    }
+    .bm-lookup-bible-link:hover { text-decoration: underline; }
     .bm-lookup-blb {
       display: flex; align-items: center; gap: 5px; margin-top: 8px;
       padding-top: 7px; border-top: 1px solid rgba(232,168,56,0.12);
@@ -1245,9 +1251,9 @@
                 <div class="bm-translation-row">
                   <span class="bm-translation-label">Translation</span>
                   <select class="bm-translation-select" id="bm-translation-select">
+                    <option value="ESV" selected>ESV — English Standard</option>
                     <option value="KJV">KJV — King James</option>
                     <option value="NKJV">NKJV — New King James</option>
-                    <option value="ESV" selected>ESV — English Standard</option>
                     <option value="NIV">NIV — New International</option>
                     <option value="NASB">NASB — New American Std</option>
                     <option value="NLT">NLT — New Living</option>
