@@ -371,6 +371,20 @@
     var key = 'list_' + type;
     _unlisten(key);
 
+    // _userEmail is set by authenticate(), but the new shell doesn't call that
+    // during boot — only during login or when the Learning Hub opens.  Self-heal
+    // by reading the session directly so Fellowship works without a prior auth call.
+    if (!_userEmail) {
+      var _sess = null;
+      if (typeof Nehemiah !== 'undefined' && Nehemiah.getSession) _sess = Nehemiah.getSession();
+      else if (typeof TheVine !== 'undefined' && TheVine.session) _sess = TheVine.session();
+      if (_sess && _sess.email) {
+        _userEmail = _sess.email;
+        _userName  = _sess.displayName || _sess.email;
+      }
+    }
+    if (!_userEmail) { callback([]); return; } // no session at all — return empty
+
     var field = type === 'channel' ? 'subscribers' : 'participants';
     _listeners[key] = _convosRef()
       .where(field, 'array-contains', _userEmail)
