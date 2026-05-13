@@ -85,7 +85,7 @@ const LITURGY = [
   {
     id: 'vespers',
     time: 'Evening',
-    label: 'Evening Vespers',
+    label: 'Evening Prayers',
     icon: '🌙',
     text: '"Let my prayer be counted as incense before you." — Psalm 141:2 (ESV)',
     range: [17, 23],
