@@ -128,10 +128,12 @@
     .app-btn--flock  { --btn-glow: rgba(91,141,238,0.10); border-color: rgba(91,141,238,0.18); }
     .app-btn--invite { --btn-glow: rgba(61,139,79,0.12);  border-color: rgba(61,139,79,0.22); }
     .app-btn--stand  { --btn-glow: rgba(168,85,247,0.10); border-color: rgba(168,85,247,0.22); }
+    .app-btn--show   { --btn-glow: rgba(239,68,68,0.10);  border-color: rgba(239,68,68,0.22); }
     .app-btn:hover.app-btn--grow   { border-color: rgba(232,168,56,0.40); }
     .app-btn:hover.app-btn--flock  { border-color: rgba(91,141,238,0.40); }
     .app-btn:hover.app-btn--invite { border-color: rgba(61,139,79,0.50); }
     .app-btn:hover.app-btn--stand  { border-color: rgba(168,85,247,0.50); }
+    .app-btn:hover.app-btn--show   { border-color: rgba(239,68,68,0.50); }
 
     .app-icon {
       width: 52px; height: 52px;
@@ -252,6 +254,15 @@
         <div class="app-label">
           <strong>FlockOS</strong>
           <span>Church management &amp; pastoral care</span>
+        </div>
+        <span class="app-arrow" aria-hidden="true">&#8594;</span>
+      </a>
+
+      <a class="app-btn app-btn--show" href="app.flockshow/app.flockshow.html">
+        <img class="app-icon" src="Images/Show.png" alt="FlockShow">
+        <div class="app-label">
+          <strong>FlockShow</strong>
+          <span>Worship slides &amp; service presentation</span>
         </div>
         <span class="app-arrow" aria-hidden="true">&#8594;</span>
       </a>
