@@ -21,7 +21,6 @@
 
   <!-- Preload critical images so the launcher paints instantly -->
   <link rel="preload" as="image" href="Images/FlockOS.png">
-  <link rel="preload" as="image" href="Images/GrowIcon.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,10 +167,17 @@
     .app-icon {
       width: 42px; height: 42px;
       border-radius: 10px;
-      object-fit: contain;
       flex-shrink: 0;
       box-shadow: 0 2px 8px rgba(0,0,0,0.28);
+      display: flex; align-items: center; justify-content: center;
     }
+    .app-icon--grow   { background: linear-gradient(135deg,#78350f,#d97706); }
+    .app-icon--invite { background: linear-gradient(135deg,#14532d,#22c55e); }
+    .app-icon--flock  { background: linear-gradient(135deg,#1e3a8a,#3b82f6); }
+    .app-icon--stand  { background: linear-gradient(135deg,#4c1d95,#a855f7); }
+    .app-icon--chat   { background: linear-gradient(135deg,#0c4a6e,#06b6d4); }
+    .app-icon--show   { background: linear-gradient(135deg,#7f1d1d,#ef4444); }
+    .app-icon--feed   { background: linear-gradient(135deg,#c48a20,#e8a838); }
     .app-label { flex: 1; }
     .app-label strong {
       display: block;
@@ -257,7 +263,9 @@
         <nav class="apps" aria-label="Public apps">
 
           <a class="app-btn app-btn--grow" href="app.grow/app.grow.html">
-            <img class="app-icon" src="Images/GrowIcon.png" alt="GROW" fetchpriority="high">
+            <div class="app-icon app-icon--grow" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
             <div class="app-label">
               <strong>GROW</strong>
               <span>Discipleship &amp; Bible study</span>
@@ -266,7 +274,9 @@
           </a>
 
           <a class="app-btn app-btn--invite" href="app.invite/app.invite.html">
-            <img class="app-icon" src="Images/Invite.png" alt="The Invitation" loading="lazy">
+            <div class="app-icon app-icon--invite" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="4.5" y1="8.5" x2="19.5" y2="8.5"/></svg>
+            </div>
             <div class="app-label">
               <strong>The Invitation</strong>
               <span>Share the hope of Jesus Christ</span>
@@ -286,7 +296,9 @@
         <nav class="apps" aria-label="Secure apps">
 
           <a class="app-btn app-btn--flock" href="app.flockos/app.flockos.html">
-            <img class="app-icon" src="Images/FlockOS.png" alt="FlockOS" loading="lazy">
+            <div class="app-icon app-icon--flock" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+            </div>
             <div class="app-label">
               <strong>FlockOS</strong>
               <span>Church management &amp; pastoral care</span>
@@ -295,7 +307,9 @@
           </a>
 
           <a class="app-btn app-btn--stand" href="app.stand/">
-            <img class="app-icon" src="Images/stand.png" alt="Flock Stand" loading="lazy">
+            <div class="app-icon app-icon--stand" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </div>
             <div class="app-label">
               <strong>Flock Stand</strong>
               <span>Songs, setlists &amp; live presenter</span>
@@ -304,7 +318,9 @@
           </a>
 
           <a class="app-btn app-btn--show" href="app.flockshow/app.flockshow.html">
-            <img class="app-icon" src="Images/Show.png" alt="FlockShow" loading="lazy">
+            <div class="app-icon app-icon--show" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8" fill="white" stroke="none"/></svg>
+            </div>
             <div class="app-label">
               <strong>FlockShow</strong>
               <span>Worship slides &amp; service presentation</span>
@@ -313,7 +329,9 @@
           </a>
 
           <a class="app-btn app-btn--chat" href="app.flockchat/app.flockchat.html">
-            <img class="app-icon" src="Images/chat.png" alt="FlockChat" loading="lazy">
+            <div class="app-icon app-icon--chat" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
             <div class="app-label">
               <strong>FlockChat</strong>
               <span>Messaging, prayer chain &amp; announcements</span>
@@ -322,7 +340,9 @@
           </a>
 
           <a class="app-btn app-btn--feed" href="app.feed/feed.html">
-            <div class="app-icon app-icon--feed" aria-hidden="true" style="background:linear-gradient(135deg,#c48a20,#e8a838);display:flex;align-items:center;justify-content:center;">
+            <div class="app-icon app-icon--feed" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </div>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             </div>
             <div class="app-label">
