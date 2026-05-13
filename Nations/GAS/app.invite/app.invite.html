@@ -113,15 +113,22 @@
     .grow-hero-title { margin: 0 0 4px; font-size: 26px; font-weight: 700; letter-spacing: -.01em; color: var(--text, #f5f5f7); }
     .grow-hero-sub   { margin: 0; color: var(--text, #f5f5f7); opacity: .88; font-size: 14px; line-height: 1.55; max-width: 60ch; }
 
-    /* ── Minimal topbar ─────────────────────────────────────────── */
+    /* ── Minimal topbar — canonical FlockOS dark navy chrome ───────── */
     #inv-topbar {
       position: sticky; top: 0; z-index: 100;
-      background: linear-gradient(90deg, #0c1445 0%, #14103a 60%, #0a1128 100%);
+      background: var(--top-bg);
+      color: var(--top-ink);
       height: calc(52px + var(--safe-top, 0px));
       padding: var(--safe-top, 0px) 20px 0;
       display: flex; align-items: center; gap: 14px;
-      border-bottom: 1.5px solid rgba(232,168,56,.22);
+      border-bottom: 1px solid var(--top-line);
       box-shadow: 0 2px 12px rgba(12,20,69,.35);
+    }
+    #inv-topbar::after {
+      content: ''; position: absolute; bottom: -2.5px; left: 0; right: 0; height: 2.5px;
+      background: var(--grad-rainbow);
+      background-size: 200% 100%;
+      opacity: 0.72;
     }
     .inv-brand-icon {
       width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;

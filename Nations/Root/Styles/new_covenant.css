@@ -8842,6 +8842,12 @@ html[data-platform="xbox"] .topbar-toggle { display: none !important; }
   --side-ink-hi:   rgba(255,255,255,0.92);
   --side-line:     rgba(255,255,255,0.08);
 
+  /* Topbar — canonical FlockOS dark navy chrome (matches sidebar) */
+  --top-bg:        linear-gradient(90deg, #0c1445 0%, #14103a 60%, #0a1128 100%);
+  --top-ink:       rgba(255,255,255,0.92);
+  --top-ink-muted: rgba(255,255,255,0.62);
+  --top-line:      rgba(255,255,255,0.08);
+
   /* Layout */
   --topbar-h:      60px;
   --sidebar-w:     256px;
@@ -8983,8 +8989,10 @@ html, body {
 .veil-top {
   display: flex; align-items: center; gap: 12px;
   padding: var(--safe-top, 0px) 20px 0;
-  /* Same dark cathedral tone as the sidebar */
-  background: linear-gradient(90deg, #0c1445 0%, #14103a 60%, #0a1128 100%);
+  /* Canonical FlockOS dark navy chrome — single source of truth */
+  background: var(--top-bg);
+  border-bottom: 1px solid var(--top-line);
+  color: var(--top-ink);
   position: relative;
   z-index: 400;
 }
@@ -14377,13 +14385,15 @@ flock-tabs [role="tablist"], .tabs-bar {
   padding-top: calc(var(--ms-header-h) + var(--ms-safe-top));
 }
 
-/* ── Header — dark navy + rainbow shimmer (matches .veil-top) ────────────── */
+/* ── Header — canonical FlockOS dark navy chrome ─────────────────────────── */
 .ms-header {
   position: fixed;
   top: 0; left: 0; right: 0;
   height: calc(var(--ms-header-h) + var(--ms-safe-top));
   padding-top: var(--ms-safe-top);
-  background: linear-gradient(90deg, var(--side-0,#0c1445) 0%, #14103a 60%, var(--side-2,#0a1128) 100%);
+  background: var(--top-bg);
+  border-bottom: 1px solid var(--top-line);
+  color: var(--top-ink);
   display: flex; align-items: center; gap: 8px;
   padding-left: 16px; padding-right: 16px;
   z-index: 200;
@@ -14392,7 +14402,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-header::after {
   content: ''; position: absolute; bottom: 0; left: 0; right: 0;
   height: 2.5px; pointer-events: none;
-  background: var(--grad-rainbow, linear-gradient(90deg,#38bdf8,#818cf8,#a78bfa,#e8a838,#34d399,#38bdf8));
+  background: var(--grad-rainbow);
   background-size: 200% 100%;
   animation: rainbow-scroll 9s linear infinite;
   opacity: 0.72;
@@ -14428,12 +14438,13 @@ flock-tabs [role="tablist"], .tabs-bar {
   border-color: rgba(255,255,255,0.25);
 }
 
-/* ── Sidebar — dark navy cathedral (matches .veil-side) ──────────────────── */
+/* ── Sidebar — canonical FlockOS dark navy chrome ────────────────────────── */
 .ms-sidebar {
   width: var(--ms-sidebar-w);
   flex-shrink: 0;
-  background: var(--side-bg, linear-gradient(170deg,#0c1445 0%,#1a0e3c 55%,#0a1128 100%)) !important;
-  border-right: 1px solid var(--side-line, rgba(255,255,255,0.08));
+  background: var(--side-bg) !important;
+  border-right: 1px solid var(--side-line);
+  color: var(--side-ink);
   overflow-y: auto; overflow-x: hidden;
   display: flex; flex-direction: column;
   padding: 12px 8px;

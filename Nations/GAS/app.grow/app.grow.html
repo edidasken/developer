@@ -87,13 +87,15 @@
     #gp-topbar {
       display: flex; align-items: center; gap: 12px;
       width: 100%; padding: var(--safe-top, 0px) 20px 0;
-      background: linear-gradient(90deg, #0c1445 0%, #14103a 60%, #0a1128 100%);
+      background: var(--top-bg);
+      border-bottom: 1px solid var(--top-line);
+      color: var(--top-ink);
       position: relative; z-index: 400;
     }
     #gp-topbar::after {
       content: ''; position: absolute; bottom: 0; left: 0; right: 0;
       height: 2.5px; pointer-events: none;
-      background: linear-gradient(90deg, #38bdf8 0%, #818cf8 22%, #a78bfa 40%, #e8a838 58%, #34d399 78%, #38bdf8 100%);
+      background: var(--grad-rainbow);
       background-size: 200% 100%;
       animation: gp-rainbow 9s linear infinite;
       opacity: 0.72;
@@ -148,7 +150,8 @@
 
     /* ── Sidebar wrapper — mobile overlay behaviour ───────────────────────── */
     #gp-sidebar-wrap {
-      background: linear-gradient(170deg, #0c1445 0%, #1a0e3c 55%, #0a1128 100%);
+      background: var(--side-bg);
+      color: var(--side-ink);
       padding: 14px 10px 120px;
       scrollbar-width: thin;
       scrollbar-color: rgba(255,255,255,0.10) transparent;

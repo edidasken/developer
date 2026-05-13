@@ -164,7 +164,7 @@
     .fc-topbar-brand span {
       font-size: 1rem;
       font-weight: 800;
-      color: var(--fc-accent);
+      color: var(--top-ink);
       letter-spacing: -0.02em;
     }
     .fc-topbar-context {
@@ -174,14 +174,14 @@
     .fc-topbar-room {
       font-size: 0.88rem;
       font-weight: 700;
-      color: var(--fc-ink);
+      color: var(--top-ink);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .fc-topbar-room-desc {
       font-size: 0.7rem;
-      color: var(--fc-muted);
+      color: var(--top-ink-muted);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -195,7 +195,7 @@
     .fc-icon-btn {
       background: none;
       border: none;
-      color: var(--fc-muted);
+      color: var(--top-ink-muted);
       cursor: pointer;
       padding: 6px 8px;
       border-radius: 7px;
@@ -204,7 +204,7 @@
       transition: color 0.12s, background 0.12s;
       display: flex; align-items: center; gap: 4px;
     }
-    .fc-icon-btn:hover { color: var(--fc-ink); background: var(--fc-panel-3); }
+    .fc-icon-btn:hover { color: var(--top-ink); background: rgba(255,255,255,0.10); }
     .fc-icon-btn svg { flex-shrink: 0; }
 
     /* ─── Body (sidebar + main) ──────────────────────────────────────── */
@@ -214,12 +214,13 @@
       overflow: hidden;
     }
 
-    /* ─── Sidebar ────────────────────────────────────────────────────── */
+    /* ─── Sidebar — canonical FlockOS dark navy chrome ───────────────── */
     .fc-sidebar {
       width: var(--sidebar-w);
       flex-shrink: 0;
-      background: var(--fc-panel);
-      border-right: 1px solid var(--fc-border);
+      background: var(--side-bg);
+      border-right: 1px solid var(--side-line);
+      color: var(--side-ink);
       display: flex;
       flex-direction: column;
       overflow: hidden;

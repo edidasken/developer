@@ -81,17 +81,19 @@
       height: 100%;
     }
 
-    /* ── Topbar — matches NC dark-navy cathedral header ─────────────── */
+    /* ── Topbar — canonical FlockOS dark navy chrome ─────────────────── */
     #fs-topbar {
       display: flex; align-items: center; gap: 10px;
       padding: 0 18px;
-      background: linear-gradient(90deg, #0c1445 0%, #14103a 60%, #0a1128 100%);
+      background: var(--top-bg);
+      border-bottom: 1px solid var(--top-line);
+      color: var(--top-ink);
       z-index: 200;
       position: relative;
     }
     #fs-topbar::after {
       content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5px;
-      background: var(--grad-rainbow, linear-gradient(90deg,#38bdf8,#818cf8,#a78bfa,#e8a838,#34d399,#38bdf8));
+      background: var(--grad-rainbow);
       background-size: 200% 100%;
       animation: rainbow-scroll 9s linear infinite;
       opacity: 0.72;

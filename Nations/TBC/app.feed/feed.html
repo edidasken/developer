@@ -94,17 +94,19 @@
     }
 
     /* ════════════════════════════════════════════════════
-       TOPBAR
+       TOPBAR — canonical FlockOS dark navy chrome
     ════════════════════════════════════════════════════ */
     #bm-topbar {
       display: flex; align-items: center; gap: 10px;
       padding: 0 18px;
-      background: var(--bg-raised);
+      background: var(--top-bg);
+      border-bottom: 1px solid var(--top-line);
+      color: var(--top-ink);
       z-index: 200; position: relative; flex-shrink: 0;
     }
     #bm-topbar::after {
       content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5px;
-      background: linear-gradient(90deg,#38bdf8,#818cf8,#a78bfa,#e8a838,#34d399,#38bdf8);
+      background: var(--grad-rainbow);
       background-size: 200% 100%;
       animation: bm-rainbow 9s linear infinite;
       opacity: 0.72;
@@ -114,7 +116,7 @@
 
     .bm-logo {
       display: flex; align-items: center; gap: 8px;
-      font: 700 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      font: 700 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--top-ink);
       flex-shrink: 0; margin-right: 4px;
     }
     .bm-logo-icon {
@@ -130,10 +132,10 @@
     #bm-active-title {
       flex: 1; min-width: 0;
       font: 600 0.85rem 'Plus Jakarta Sans', sans-serif;
-      color: var(--bm-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      color: var(--top-ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       transition: color 0.2s;
     }
-    #bm-active-title.has-sermon { color: var(--bm-ink); }
+    #bm-active-title.has-sermon { color: var(--top-ink); }
 
     .bm-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
 
@@ -144,7 +146,7 @@
     }
     .bm-btn--primary { background: var(--bm-accent); color: #080500; }
     .bm-btn--primary:hover { background: #f0b84a; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(232,168,56,0.40); }
-    .bm-btn--ghost { background: rgba(255,255,255,0.07); color: var(--bm-ink); }
+    .bm-btn--ghost { background: rgba(255,255,255,0.07); color: var(--top-ink); }
     .bm-btn--ghost:hover { background: rgba(255,255,255,0.12); }
     .bm-btn--danger { background: rgba(248,113,113,0.13); color: var(--bm-red); }
     .bm-btn--danger:hover { background: rgba(248,113,113,0.23); }
@@ -156,12 +158,12 @@
 
     .bm-user-chip {
       display: flex; align-items: center; gap: 6px;
-      font: 500 0.76rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted);
-      background: rgba(255,255,255,0.05); border: 1px solid var(--bm-border);
+      font: 500 0.76rem 'Plus Jakarta Sans', sans-serif; color: var(--top-ink-muted);
+      background: rgba(255,255,255,0.05); border: 1px solid var(--top-line);
       border-radius: 999px; padding: 3px 10px 3px 4px; cursor: pointer;
       transition: all 0.15s; flex-shrink: 0;
     }
-    .bm-user-chip:hover { background: rgba(255,255,255,0.09); color: var(--bm-ink); }
+    .bm-user-chip:hover { background: rgba(255,255,255,0.09); color: var(--top-ink); }
     .bm-user-avatar {
       width: 22px; height: 22px; border-radius: 50%;
       background: linear-gradient(135deg, var(--bm-accent-dim), rgba(167,139,250,0.25));
