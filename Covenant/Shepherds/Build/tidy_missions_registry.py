@@ -1,1 +1,0 @@
-../../../Iris/Shepherds/Build/tidy_missions_registry.py

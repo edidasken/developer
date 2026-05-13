@@ -27,12 +27,12 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; overflow: hidden; background: #0b0d14; }
+    html, body { height: 100%; overflow: hidden; background: var(--bg); }
 
     /* ── Embed auth overlay ───────────────────────────────────────────────── */
     #embed-auth-overlay {
       position: fixed; inset: 0; z-index: 9999;
-      background: #0b0d14;
+      background: var(--bg);
       display: flex; align-items: center; justify-content: center;
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     }
@@ -40,12 +40,12 @@
 
     .embed-auth-card {
       width: 100%; max-width: 360px;
-      background: #141728;
+      background: var(--bg-raised);
       border: 1px solid rgba(212,175,55,0.28);
       border-radius: 16px;
       padding: 36px 32px 28px;
       display: flex; flex-direction: column; align-items: center; gap: 6px;
-      box-shadow: 0 8px 48px rgba(0,0,0,0.8), 0 0 0 1px rgba(212,175,55,0.06);
+      box-shadow: 0 8px 48px rgba(0,0,0,0.18), 0 0 0 1px rgba(212,175,55,0.06);
       margin: 0 16px;
     }
     .embed-auth-icon {
@@ -53,10 +53,10 @@
     }
     .embed-auth-card h1 {
       font-size: 1.35rem; font-weight: 800;
-      color: #f0f1f8; margin-bottom: 2px;
+      color: var(--ink); margin-bottom: 2px;
     }
     .embed-auth-card p {
-      font-size: 0.8rem; color: rgba(240,241,248,0.5);
+      font-size: 0.8rem; color: var(--ink-muted);
       text-align: center; margin-bottom: 18px; line-height: 1.5;
     }
     .embed-auth-field {
@@ -64,11 +64,11 @@
     }
     .embed-auth-input {
       width: 100%;
-      background: rgba(6,12,31,0.7);
+      background: var(--bg-input);
       border: 1px solid rgba(212,175,55,0.25);
       border-radius: 8px;
       padding: 10px 13px;
-      color: #f0f1f8;
+      color: var(--ink);
       font: 500 0.88rem 'Plus Jakarta Sans', sans-serif;
       outline: none;
       -webkit-appearance: none; appearance: none;
@@ -78,12 +78,12 @@
       border-color: rgba(212,175,55,0.6);
       box-shadow: 0 0 0 3px rgba(212,175,55,0.08);
     }
-    .embed-auth-input::placeholder { color: rgba(240,241,248,0.3); }
+    .embed-auth-input::placeholder { color: var(--ink-faint); }
     .embed-auth-btn {
       width: 100%; padding: 11px 0;
       background: linear-gradient(135deg, #d4af37, #b8962e);
       border: none; border-radius: 9px;
-      color: #0b0d14; font: 700 0.88rem 'Plus Jakarta Sans', sans-serif;
+      color: #1a0f00; font: 700 0.88rem 'Plus Jakarta Sans', sans-serif;
       cursor: pointer; transition: opacity 0.15s, transform 0.1s;
       margin-top: 4px;
     }
@@ -247,24 +247,24 @@
     display:grid;
     grid-template-rows:54px 1fr;
     height:100%;
-    background:#0b0d14;
-    color:#f0f1f8;
+    background:var(--bg);
+    color:var(--ink);
     font-family:'Plus Jakarta Sans',system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;
     overflow:hidden;
   ">
     <header id="fs-topbar" style="
       display:flex;align-items:center;gap:10px;padding:0 18px;
-      background:#0d0f1a;border-bottom:1px solid rgba(167,139,250,0.12);
+      background:var(--top-bg);border-bottom:1px solid var(--top-line);
       z-index:200;position:relative;
     ">
-      <div class="fs-logo" style="display:flex;align-items:center;gap:8px;font:700 0.95rem 'Plus Jakarta Sans',sans-serif;color:#f0f1f8;flex-shrink:0;margin-right:6px;">
+      <div class="fs-logo" style="display:flex;align-items:center;gap:8px;font:700 0.95rem 'Plus Jakarta Sans',sans-serif;color:var(--top-ink);flex-shrink:0;margin-right:6px;">
         <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#a78bfa,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:15px;">🎬</div>
         <span>FlockShow</span>
       </div>
       <div class="fs-tab-bar" id="fs-tabs" style="display:flex;gap:2px;background:rgba(255,255,255,0.05);border-radius:8px;padding:3px;"></div>
       <div id="fs-topbar-right" style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-        <button id="fs-present-btn" disabled style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:8px;font:600 0.78rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none;background:#a78bfa;color:#0b0d14;white-space:nowrap;">▶ Present</button>
+        <button id="fs-present-btn" disabled style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:8px;font:600 0.78rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;border:none;background:var(--gold,#e8a838);color:#0c0a00;white-space:nowrap;">▶ Present</button>
       </div>
     </header>
 
