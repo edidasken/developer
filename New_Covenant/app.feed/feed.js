@@ -1009,6 +1009,59 @@ async function _sendToFlockShow() {
   }
 }
 
+function _doPrint() {
+  const s = _active();
+
+  // Mark prayer sections so CSS hides them from their inline position
+  const prayerEls = [];
+  document.querySelectorAll('.bm-outline-section').forEach(el => {
+    const sel = el.querySelector('.bm-section-type-select');
+    if (sel && sel.value === 'prayer') {
+      el.classList.add('prayer-print-hidden');
+      prayerEls.push(el);
+    }
+  });
+
+  // Collect prayer points: outline prayer sections + delivery prayer prep
+  const items = [];
+
+  if (s) {
+    (s.sections || []).filter(sec => sec.type === 'prayer').forEach(sec => {
+      const title = (sec.title || '').trim();
+      const notes = (sec.notes || '').trim();
+      if (!title && !notes) return;
+      let html = '<div class="bm-pp-item">';
+      if (title) html += `<div class="bm-pp-title">${_e(title)}</div>`;
+      if (notes) html += `<div class="bm-pp-notes">${_e(notes)}</div>`;
+      html += '</div>';
+      items.push(html);
+    });
+  }
+
+  // Also include prayer prep from the Delivery tab
+  const prepEl = document.getElementById('bm-prayer-prep');
+  const prepText = prepEl ? prepEl.value.trim() : '';
+  if (prepText) {
+    items.push(`<div class="bm-pp-item"><div class="bm-pp-title">Pre-Sermon Prayer</div><div class="bm-pp-notes">${_e(prepText)}</div></div>`);
+  }
+
+  // Inject print-only prayer points block
+  let ppEl = null;
+  if (items.length) {
+    ppEl = document.createElement('div');
+    ppEl.id = 'bm-print-prayer-points';
+    ppEl.innerHTML = '<h3>Prayer Points</h3>' + items.join('');
+    const container = document.getElementById('bm-sections-container');
+    if (container) container.after(ppEl);
+  }
+
+  window.print();
+
+  // Clean up
+  prayerEls.forEach(el => el.classList.remove('prayer-print-hidden'));
+  if (ppEl) ppEl.remove();
+}
+
 async function _copyOutline() {  const s = _active();
   if (!s) return;
   const lines = [`${s.title || 'Untitled Sermon'}`, s.passage ? `Key Passage: ${s.passage}` : '', ''];
@@ -1993,7 +2046,7 @@ async function _init() {
 
   // Print / export to PDF
   const printBtn = _qs('bm-print-btn');
-  if (printBtn) printBtn.addEventListener('click', () => window.print());
+  if (printBtn) printBtn.addEventListener('click', _doPrint);
 
   // Filter pills
   document.querySelectorAll('.bm-filter-pill').forEach(btn => {
