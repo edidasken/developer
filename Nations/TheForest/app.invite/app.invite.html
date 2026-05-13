@@ -45,16 +45,20 @@
     }
 
     html, body {
-      height: auto !important;
-      overflow-y: auto !important; /* override new_covenant.css global overflow:hidden */
-      overflow-x: hidden !important;
+      height: auto;
+      min-height: 100%;
+      overflow-x: hidden;
       margin: 0; padding: 0;
       background: #0c1445; /* matches topbar so iOS status bar band is dark */
       color: var(--ink, #1b264f);
       font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
       -webkit-font-smoothing: antialiased;
-      overscroll-behavior-y: contain;
     }
+    /* Let the document (html) be the single scroll container.
+       Don't set overflow on body — that creates a nested scroll
+       context which breaks normal page scrolling on some browsers. */
+    html { overflow-y: auto; }
+    body { overflow-y: visible; }
 
     /* Body bg below the topbar should be the page bg, not topbar dark */
     #inv-main {
