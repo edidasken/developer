@@ -580,6 +580,14 @@ function _renderTab(tab) {
 }
 
 // ── Manuscript ────────────────────────────────────────────────────────────────
+/* Returns true if manuscript is empty or contains only skeleton headers with no real content */
+function _manuscriptIsEmpty(manuscript) {
+  if (!manuscript || !manuscript.trim()) return true;
+  // Strip all == HEADER == lines and whitespace; if nothing real remains, it's skeleton-only
+  const stripped = manuscript.replace(/==\s*[^=]+\s*==/g, '').replace(/\[.*?\]/g, '').trim();
+  return stripped.length < 10;
+}
+
 /* Build a structured draft from outline sections (shared by auto-seed + import btn) */
 function _buildManuscriptFromOutline(s) {
   return (s.sections || []).map(sec => {
@@ -595,8 +603,8 @@ function _renderManuscript() {
   if (!s) return;
   const area = _qs('bm-manuscript-area');
   if (area) {
-    // Auto-seed from outline the first time the manuscript tab is opened
-    if (!s.manuscript && s.sections && s.sections.length) {
+    // Auto-seed whenever the manuscript has no real content but the outline does
+    if (_manuscriptIsEmpty(s.manuscript) && s.sections && s.sections.length) {
       s.manuscript = _buildManuscriptFromOutline(s);
       _queueSave();
     }
@@ -1008,6 +1016,24 @@ function _bindResearch() {
     });
   });
 
+  // Scripture lookup button + Enter key
+  const lookupInput = _qs('bm-lookup-input');
+  const lookupBtn   = _qs('bm-lookup-btn');
+  if (lookupInput) {
+    lookupInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const ref = lookupInput.value.trim();
+        if (ref) _doScriptureLookup(ref);
+      }
+    });
+  }
+  if (lookupBtn) {
+    lookupBtn.addEventListener('click', () => {
+      const ref = (lookupInput ? lookupInput.value.trim() : '');
+      if (ref) _doScriptureLookup(ref);
+    });
+  }
+
   // Lexicon search (simple Strong's lookup using Data/ if loaded)
   const lexInput = _qs('bm-lex-input');
   if (lexInput) {
@@ -1024,20 +1050,35 @@ function _bindResearch() {
 }
 
 // ── Scripture lookup (sidebar) ────────────────────────────────────────────────
-function _doScriptureLookup(rawRef, suppressAdd = false) {
-  // Try to pull from window._bibleData if loaded by GROW
+async function _doScriptureLookup(rawRef, suppressAdd = false) {
   const refEl  = _qs('bm-lookup-ref');
   const textEl = _qs('bm-lookup-text');
   const resEl  = _qs('bm-lookup-result');
   if (!refEl || !textEl || !resEl) return;
 
-  const text = _fetchVerse(rawRef);
   refEl.textContent  = rawRef;
-  textEl.textContent = text || 'Scripture text not available offline. Add passage manually.';
+  textEl.textContent = 'Looking up…';
   resEl.classList.add('visible');
 
+  // Try local data first, fall back to bible-api.com (free, no key, KJV)
+  let text = _fetchVerse(rawRef);
+  if (!text) {
+    try {
+      const encoded = encodeURIComponent(rawRef);
+      const resp = await fetch(`https://bible-api.com/${encoded}?translation=kjv`);
+      if (resp.ok) {
+        const data = await resp.json();
+        text = (data.verses || []).map(v => v.text.trim()).join(' ') || data.text || '';
+        text = text.trim();
+      }
+    } catch (_) {}
+  }
+
+  textEl.textContent = text || 'Verse not found. Check the reference format (e.g. John 3:16).';
+
   const addBtn = _qs('bm-lookup-add-btn');
-  if (addBtn && !suppressAdd) {
+  if (addBtn) {
+    addBtn.style.display = (!suppressAdd && text) ? '' : 'none';
     addBtn.onclick = () => {
       const s = _active();
       if (!s) { _toast('Select a sermon first', 'error'); return; }
@@ -1065,12 +1106,11 @@ function _fetchVerse(ref) {
 // ── Lexicon lookup ────────────────────────────────────────────────────────────
 function _doLexLookup(query) {
   const res = _qs('bm-lex-result');
-  if (!res) return;
-  if (!query) return;
+  if (!res || !query) return;
 
   let entry = null;
 
-  // Try Greek or Hebrew lexicon if loaded via Data/
+  // Try local Strong's data if loaded
   const isGreek  = /^G\d+$/i.test(query);
   const isHebrew = /^H\d+$/i.test(query);
 
@@ -1081,28 +1121,34 @@ function _doLexLookup(query) {
     const num = query.toUpperCase().replace('H','');
     entry = window._strongsHebrew[num] || window._strongsHebrew['H' + num];
   } else if (window._strongsGreek || window._strongsHebrew) {
-    // Text search
     const lq = query.toLowerCase();
     const gk = window._strongsGreek  ? Object.values(window._strongsGreek).find(e => (e.word || '').toLowerCase() === lq || (e.translit || '').toLowerCase() === lq) : null;
     const hb = window._strongsHebrew ? Object.values(window._strongsHebrew).find(e => (e.word || '').toLowerCase() === lq || (e.translit || '').toLowerCase() === lq) : null;
     entry = gk || hb;
   }
 
-  if (!entry) {
-    _qs('bm-lex-word').textContent    = query;
-    _qs('bm-lex-strongs').textContent = '';
-    _qs('bm-lex-translit').textContent= '';
-    _qs('bm-lex-def').textContent     = 'No entry found. Make sure the lexicon data is loaded, or try a Strong\'s number (e.g. G3056 or H1254).';
-    _qs('bm-lex-origin').textContent  = '';
+  if (entry) {
+    _qs('bm-lex-word').textContent    = entry.word        || query;
+    _qs('bm-lex-strongs').textContent = entry.strongs     || '';
+    _qs('bm-lex-translit').textContent= entry.translit    || '';
+    _qs('bm-lex-def').textContent     = entry.definition  || entry.def || '';
+    _qs('bm-lex-origin').textContent  = entry.origin      || '';
     res.classList.add('visible');
     return;
   }
 
-  _qs('bm-lex-word').textContent    = entry.word        || query;
-  _qs('bm-lex-strongs').textContent = entry.strongs     || '';
-  _qs('bm-lex-translit').textContent= entry.translit    || '';
-  _qs('bm-lex-def').textContent     = entry.definition  || entry.def || '';
-  _qs('bm-lex-origin').textContent  = entry.origin      || '';
+  // No local data — show the word and open Bible Hub in new tab
+  const hubUrl = isGreek
+    ? `https://biblehub.com/greek/${query.toUpperCase().replace('G','')}.htm`
+    : isHebrew
+    ? `https://biblehub.com/hebrew/${query.toUpperCase().replace('H','')}.htm`
+    : `https://biblehub.com/search.php?q=${encodeURIComponent(query)}`;
+
+  _qs('bm-lex-word').textContent     = query;
+  _qs('bm-lex-strongs').textContent  = '';
+  _qs('bm-lex-translit').textContent = '';
+  _qs('bm-lex-def').innerHTML        = `Local lexicon data not loaded. <a href="${hubUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent)">Search Bible Hub ↗</a>`;
+  _qs('bm-lex-origin').textContent   = '';
   res.classList.add('visible');
 }
 

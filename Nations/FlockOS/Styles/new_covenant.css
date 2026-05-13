@@ -8926,15 +8926,15 @@ body { font-family: var(--font-ui); -webkit-font-smoothing: antialiased; -moz-os
 html, body {
   height: 100%;
   margin: 0;
-  overflow: hidden;
   overscroll-behavior: none;
-  /* Allow iOS to honor the safe-area inset env() values inside the layout */
   width: 100%;
-  /* Match the page background so the iOS safe-area band at the bottom
-     (home indicator) flows seamlessly with the page — no visible seam
-     when content scrolls or rubber-bands. The topbar paints its own dark
-     over the notch via padding-top: safe-top. */
   background: var(--bg, #f7f8fb);
+}
+
+/* Only lock overflow on pages that use the veil-wrap app shell.
+   Standalone pages (The Invitation, etc.) need normal document scroll. */
+body.veil-app {
+  overflow: hidden;
 }
 
 /* In iOS standalone PWA mode, ensure the same edge-to-edge fill. Dark

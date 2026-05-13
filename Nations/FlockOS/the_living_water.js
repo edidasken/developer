@@ -31,7 +31,6 @@ const PRECACHE_URLS = [
 
   /* ── GROW public PWA ─────────────────────────────────────────────────── */
   'app.grow/app.grow.html',
-  'app.grow/grow-manifest.json',
   'Scripts/grow_public.js',
 
   /* ── Invite standalone PWA ───────────────────────────────────────────── */
