@@ -156,12 +156,14 @@
     .app-btn--stand  { border-color: rgba(168,85,247,0.20); }
     .app-btn--show   { border-color: rgba(239,68,68,0.20);  }
     .app-btn--chat   { border-color: rgba(34,211,238,0.20); }
+    .app-btn--feed   { border-color: rgba(232,168,56,0.20); }
     .app-btn:hover.app-btn--grow   { border-color: rgba(232,168,56,0.50); }
     .app-btn:hover.app-btn--invite { border-color: rgba(61,179,79,0.50);  }
     .app-btn:hover.app-btn--flock  { border-color: rgba(91,141,238,0.50); }
     .app-btn:hover.app-btn--stand  { border-color: rgba(168,85,247,0.50); }
     .app-btn:hover.app-btn--show   { border-color: rgba(239,68,68,0.50);  }
     .app-btn:hover.app-btn--chat   { border-color: rgba(34,211,238,0.50); }
+    .app-btn:hover.app-btn--feed   { border-color: rgba(232,168,56,0.50); }
 
     .app-icon {
       width: 42px; height: 42px;
@@ -183,6 +185,7 @@
     .app-btn--stand  .app-label strong { color: #d8b4fe; }
     .app-btn--show   .app-label strong { color: #fca5a5; }
     .app-btn--chat   .app-label strong { color: #67e8f9; }
+    .app-btn--feed   .app-label strong { color: var(--gold); }
     .app-label span {
       display: block;
       font-size: 0.77rem;
@@ -314,6 +317,17 @@
             <div class="app-label">
               <strong>FlockChat</strong>
               <span>Messaging, prayer chain &amp; announcements</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
+          <a class="app-btn app-btn--feed" href="app.feed/feed.html">
+            <div class="app-icon app-icon--feed" aria-hidden="true" style="background:linear-gradient(135deg,#c48a20,#e8a838);display:flex;align-items:center;justify-content:center;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </div>
+            <div class="app-label">
+              <strong>The Feed</strong>
+              <span>Sermon preparation &amp; manuscript builder</span>
             </div>
             <span class="app-arrow" aria-hidden="true">&#8594;</span>
           </a>

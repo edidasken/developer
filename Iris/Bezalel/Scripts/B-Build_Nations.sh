@@ -551,17 +551,17 @@ else:
         f.write(content)
 PYEOF
 
-  # ── 9f. Patch app.embeds/embed-breadmaker.html — Firebase config ─────
+  # ── 9f. Patch app.embeds/embed-feed.html — Firebase config ─────────
   python3 << 'PYEOF'
 import os, json, re
 
 t        = os.environ['_NC_TARGET']
 fb_raw   = os.environ['_NC_FB_CONFIG']
 gas_only = os.environ.get('_NC_GAS_ONLY', 'false').strip().lower() == 'true'
-path     = t + '/app.embeds/embed-breadmaker.html'
+path     = t + '/app.embeds/embed-feed.html'
 
 if not os.path.exists(path):
-    print('  ✓ app.embeds/embed-breadmaker.html not present — skip Firebase patch')
+    print('  ✓ app.embeds/embed-feed.html not present — skip Firebase patch')
 else:
     with open(path, 'r') as f:
         content = f.read()
@@ -573,7 +573,7 @@ else:
         content = re.sub(r'[ \t]*<script[^>]+gstatic\.com/firebasejs[^>]*></script>\n?', '', content)
         if '<head>' in content:
             content = content.replace('<head>', '<head>\n  <script>window.FLOCK_NO_FIREBASE = true;</script>', 1)
-        print('  ✓ app.embeds/embed-breadmaker.html Firebase stripped (GAS-only build)')
+        print('  ✓ app.embeds/embed-feed.html Firebase stripped (GAS-only build)')
     else:
         try:
             fb_obj = json.loads(fb_raw)
@@ -588,25 +588,25 @@ else:
             content = re.sub(
                 r'window\.FLOCK_FIREBASE_CONFIG\s*=\s*\{[^}]+\};',
                 new_block, content, flags=re.DOTALL)
-            print('  ✓ app.embeds/embed-breadmaker.html Firebase config replaced with church config')
+            print('  ✓ app.embeds/embed-feed.html Firebase config replaced with church config')
         else:
-            print('  ✓ app.embeds/embed-breadmaker.html Firebase config kept as default (shared)')
+            print('  ✓ app.embeds/embed-feed.html Firebase config kept as default (shared)')
 
     with open(path, 'w') as f:
         f.write(content)
 PYEOF
 
-  # ── 9g. Patch app.feed/bread_maker.html — Firebase config ────────────
+  # ── 9g. Patch app.feed/feed.html — Firebase config ─────────────────
   python3 << 'PYEOF'
 import os, json, re
 
 t        = os.environ['_NC_TARGET']
 fb_raw   = os.environ['_NC_FB_CONFIG']
 gas_only = os.environ.get('_NC_GAS_ONLY', 'false').strip().lower() == 'true'
-path     = t + '/app.feed/bread_maker.html'
+path     = t + '/app.feed/feed.html'
 
 if not os.path.exists(path):
-    print('  ✓ app.feed/bread_maker.html not present — skip Firebase patch')
+    print('  ✓ app.feed/feed.html not present — skip Firebase patch')
 else:
     with open(path, 'r') as f:
         content = f.read()
@@ -618,7 +618,7 @@ else:
         content = re.sub(r'[ \t]*<script[^>]+gstatic\.com/firebasejs[^>]*></script>\n?', '', content)
         if '<head>' in content:
             content = content.replace('<head>', '<head>\n  <script>window.FLOCK_NO_FIREBASE = true;</script>', 1)
-        print('  ✓ app.feed/bread_maker.html Firebase stripped (GAS-only build)')
+        print('  ✓ app.feed/feed.html Firebase stripped (GAS-only build)')
     else:
         try:
             fb_obj = json.loads(fb_raw)
@@ -633,9 +633,9 @@ else:
             content = re.sub(
                 r'window\.FLOCK_FIREBASE_CONFIG\s*=\s*\{[^}]+\};',
                 new_block, content, flags=re.DOTALL)
-            print('  ✓ app.feed/bread_maker.html Firebase config replaced with church config')
+            print('  ✓ app.feed/feed.html Firebase config replaced with church config')
         else:
-            print('  ✓ app.feed/bread_maker.html Firebase config kept as default (shared)')
+            print('  ✓ app.feed/feed.html Firebase config kept as default (shared)')
 
     with open(path, 'w') as f:
         f.write(content)

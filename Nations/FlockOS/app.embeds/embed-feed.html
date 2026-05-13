@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>window.FLOCK_NO_FIREBASE = true;</script>
   <meta charset="UTF-8">
   <!-- Resolve all relative resource paths from New_Covenant/ -->
   <base href="https://flock-os.github.io/FlockOS/New_Covenant/">
@@ -10,11 +9,11 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Bread Maker">
+  <meta name="apple-mobile-web-app-title" content="The Feed">
   <meta name="theme-color" content="#060c1f">
-  <meta name="description" content="Bread Maker — Sermon preparation and management for FlockOS. Craft the Word with clarity, depth, and purpose.">
+  <meta name="description" content="The Feed — Sermon preparation and manuscript builder for FlockOS. Craft the Word with clarity, depth, and purpose.">
 
-  <title>Bread Maker — FlockOS</title>
+  <title>The Feed — FlockOS</title>
 
   <!-- PWA manifest -->
   <link rel="manifest" href="app.feed/manifest.json">
@@ -1406,14 +1405,28 @@
 <div id="bm-toasts" aria-live="polite"></div>
 
 <!-- Firebase config — patched per-church by B-Build -->
+<script>
+  window.FLOCK_FIREBASE_CONFIG = {
+    apiKey:            'AIzaSyBA-fkxjABbwIHn0i6MPiXbGwahfJmuJeo',
+    authDomain:        'flockos-notify.firebaseapp.com',
+    projectId:         'flockos-notify',
+    storageBucket:     'flockos-notify.firebasestorage.app',
+    messagingSenderId: '321766738616',
+    appId:             '1:321766738616:web:d2c1c53ad7493fcde4c24d',
+    measurementId:     'G-EFMSZE581W'
+  };
+</script>
+<script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 
 <!-- FlockOS auth (resolved via absolute <base href>) -->
 <script defer src="Scripts/firm_foundation.js"></script>
 <script defer src="Scripts/the_upper_room.js"></script>
 <script defer src="Scripts/the_true_vine.js"></script>
 
-<!-- Bread Maker logic -->
-<script defer src="app.feed/bread_maker.js"></script>
+<!-- The Feed logic -->
+<script defer src="app.feed/feed.js"></script>
 
 </body>
 </html>
