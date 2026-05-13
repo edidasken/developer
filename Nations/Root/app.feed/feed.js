@@ -1255,6 +1255,21 @@ function _fetchVerse(ref) {
 }
 
 // ── Lexicon lookup ────────────────────────────────────────────────────────────
+
+/** Build a BLB MGNT/BDB lexicon URL for a Strong's number */
+function _blbLexUrl(query) {
+  const uq = query.toUpperCase();
+  if (/^G\d+/i.test(uq)) {
+    const num = uq.replace('G','');
+    return `https://www.blueletterbible.org/lexicon/g${num}/nasb95/mgnt/0-1/`;
+  }
+  if (/^H\d+/i.test(uq)) {
+    const num = uq.replace('H','');
+    return `https://www.blueletterbible.org/lexicon/h${num}/nasb95/bdb/0-1/`;
+  }
+  return `https://www.blueletterbible.org/search/search.cfm?Criteria=${encodeURIComponent(query)}&t=NASB95`;
+}
+
 function _doLexLookup(query) {
   const res = _qs('bm-lex-result');
   if (!res || !query) return;
@@ -1278,27 +1293,23 @@ function _doLexLookup(query) {
     entry = gk || hb;
   }
 
+  const blbUrl = _blbLexUrl(query);
+
   if (entry) {
     _qs('bm-lex-word').textContent    = entry.word        || query;
     _qs('bm-lex-strongs').textContent = entry.strongs     || '';
     _qs('bm-lex-translit').textContent= entry.translit    || '';
-    _qs('bm-lex-def').textContent     = entry.definition  || entry.def || '';
+    _qs('bm-lex-def').innerHTML       = `${_e(entry.definition || entry.def || '')} <a href="${blbUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent);font-size:0.78rem;white-space:nowrap">Open in BLB ↗</a>`;
     _qs('bm-lex-origin').textContent  = entry.origin      || '';
     res.classList.add('visible');
     return;
   }
 
-  // No local data — show the word and open Bible Hub in new tab
-  const hubUrl = isGreek
-    ? `https://biblehub.com/greek/${query.toUpperCase().replace('G','')}.htm`
-    : isHebrew
-    ? `https://biblehub.com/hebrew/${query.toUpperCase().replace('H','')}.htm`
-    : `https://biblehub.com/search.php?q=${encodeURIComponent(query)}`;
-
+  // No local data — link directly to BLB MGNT/BDB
   _qs('bm-lex-word').textContent     = query;
   _qs('bm-lex-strongs').textContent  = '';
   _qs('bm-lex-translit').textContent = '';
-  _qs('bm-lex-def').innerHTML        = `Local lexicon data not loaded. <a href="${hubUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent)">Search Bible Hub ↗</a>`;
+  _qs('bm-lex-def').innerHTML        = `<a href="${blbUrl}" target="_blank" rel="noopener" style="color:var(--bm-accent)">Search BLB Lexicon ↗</a>`;
   _qs('bm-lex-origin').textContent   = '';
   res.classList.add('visible');
 }
