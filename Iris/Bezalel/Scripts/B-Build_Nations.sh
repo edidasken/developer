@@ -788,6 +788,31 @@ with open(path, 'w') as f:
 print(f'  ✓ index.html selector → {name}')
 PYEOF
 
+  # ── 13. Patch launcher manifest.json — name / branding ────────────
+  python3 << 'PYEOF'
+import os, json
+
+t    = os.environ['_NC_TARGET']
+name = os.environ['_NC_CHURCH_NAME']
+tc   = os.environ['_NC_THEME_COLOR']
+bc   = os.environ['_NC_BG_COLOR']
+path = t + '/manifest.json'
+
+if not os.path.exists(path):
+    print('  ✓ launcher manifest.json not present — skip')
+else:
+    with open(path, 'r') as f:
+        m = json.load(f)
+    m['name']             = name
+    m['short_name']       = name
+    m['theme_color']      = tc
+    m['background_color'] = bc
+    with open(path, 'w') as f:
+        json.dump(m, f, indent=2)
+        f.write('\n')
+    print(f'  ✓ launcher manifest.json → {name}')
+PYEOF
+
   echo "  ✓ Nations/$FOLDER complete"
   echo ""
 done

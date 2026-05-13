@@ -1,0 +1,27 @@
+{
+  "name": "The Forest",
+  "short_name": "The Forest",
+  "description": "Church management, discipleship, and pastoral care tools. Free forever. 210 countries. 256-bit encrypted.",
+  "start_url": "./index.html",
+  "id": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1a1a2e",
+  "theme_color": "#e8a838",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "Images/NewCovenant.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "prefer_related_applications": false
+}

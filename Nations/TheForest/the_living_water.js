@@ -27,6 +27,7 @@ const PRECACHE_URLS = [
   /* ── Entry points ─────────────────────────────────────────────────────── */
   '',
   'index.html',
+  'manifest.json',
 
   /* ── GROW public PWA ─────────────────────────────────────────────────── */
   'app.grow/app.grow.html',
@@ -42,6 +43,7 @@ const PRECACHE_URLS = [
 
   /* ── Images ───────────────────────────────────────────────────────────── */
   'Images/FlockOS.png',
+  'Images/NewCovenant.png',
   'Images/GrowIcon.png',
   'Images/Invite.png',
 

@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <title>FlockOS</title>
-  <link rel="icon" type="image/png" href="Images/FlockOS.png">
-  <link rel="apple-touch-icon" href="Images/FlockOS.png">
+  <link rel="icon" type="image/png" href="Images/NewCovenant.png">
+  <link rel="apple-touch-icon" href="Images/NewCovenant.png">
+  <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,11 +17,11 @@
   <!-- Open Graph -->
   <meta property="og:title" content="FlockOS">
   <meta property="og:description" content="Complete pastoral care, member management, discipleship, and outreach. Free forever. 210 countries. 256-bit encrypted.">
-  <meta property="og:image" content="Images/FlockOS.png">
+  <meta property="og:image" content="Images/NewCovenant.png">
   <meta property="og:type" content="website">
 
   <!-- Preload critical images so the launcher paints instantly -->
-  <link rel="preload" as="image" href="Images/FlockOS.png">
+  <link rel="preload" as="image" href="Images/NewCovenant.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -388,6 +389,12 @@
       pulling = triggered = false;
     }, { passive: true });
   })();
+
+  // ── PWA: register service worker ──────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./the_living_water.js')
+      .catch(function (err) { console.warn('[SW] registration failed', err); });
+  }
   </script>
 </body>
 </html>
