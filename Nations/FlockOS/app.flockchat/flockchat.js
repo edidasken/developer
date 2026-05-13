@@ -740,7 +740,7 @@
     _toast('Joined #'+ch.name+'!','success');
   }
   async function _leaveChannel(chId,chName){
-    _openConfirmModal('Leave Channel', `Leave #${chName}? You can rejoin at any time.`, 'Leave', async () => {
+    _openConfirmModal('Leave Channel', `Leave #${_e(chName)}? You can rejoin at any time.`, 'Leave', async () => {
       await _db.collection('channels').doc(chId).update({members:firebase.firestore.FieldValue.arrayRemove(_me.uid)});
       _activeId=null; _activeType=null;
       _showWelcome(); _renderChannelList();
@@ -953,7 +953,7 @@
       });
       container.querySelectorAll('.fc-admin-remove-btn').forEach(btn=>{
         btn.addEventListener('click',async()=>{
-          _openConfirmModal('Remove User', `Remove ${btn.dataset.name} from this workspace?`, 'Remove', async () => {
+          _openConfirmModal('Remove User', `Remove ${_e(btn.dataset.name)} from this workspace?`, 'Remove', async () => {
             await _db.collection('users').doc(btn.dataset.uid).delete();
             $('adrow-'+btn.dataset.uid)?.remove();
             _toast(btn.dataset.name+' removed.');
@@ -1019,9 +1019,13 @@
           </div>
         </div>
       </div>`);
-    function _close() { document.getElementById(id)?.remove(); }
+    function _close() { document.getElementById(id)?.remove(); document.removeEventListener('keydown', _esc); }
     document.getElementById(`${id}-ok`).onclick     = () => { _close(); onConfirm(); };
     document.getElementById(`${id}-cancel`).onclick  = _close;
+    // Clicking the backdrop (outside the modal box) dismisses it
+    document.getElementById(id).addEventListener('click', e => { if (e.target.id === id) _close(); });
+    function _esc(e) { if (e.key === 'Escape') { e.preventDefault(); _close(); } }
+    document.addEventListener('keydown', _esc);
   }
 
   /* ═══════════════════════════════════════════════════════════════════

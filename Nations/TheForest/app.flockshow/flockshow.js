@@ -1226,7 +1226,7 @@ async function _loadSongPickerSongs() {
       return;
     }
     // listSongs returns paginated — fetch up to 500 rows
-    const result = await UR.listSongs({ pageSize: 500 });
+    const result = await UR.listSongs({ limit: 500 });
     _spAllSongs = Array.isArray(result) ? result : (result.rows || []);
     _spLoaded = true;
     _renderSongPickerList(_spAllSongs);

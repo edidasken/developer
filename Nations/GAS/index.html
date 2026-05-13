@@ -507,7 +507,12 @@
   async function _doUpdate() {
     var btn = document.getElementById('updateRefreshBtn');
     if (!navigator.onLine) {
-      alert('No internet connection — please connect before updating to ensure all new files are downloaded safely.');
+      // Show the error inline on the banner — no native dialogs
+      var orig = btn ? btn.textContent : '';
+      if (btn) { btn.textContent = 'No internet \u2014 connect first'; btn.disabled = true; }
+      setTimeout(function () {
+        if (btn) { btn.textContent = orig || 'Update now'; btn.disabled = false; }
+      }, 3000);
       return;
     }
     if (btn) { btn.disabled = true; btn.textContent = 'Updating\u2026'; }

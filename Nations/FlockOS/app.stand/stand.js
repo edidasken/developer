@@ -120,10 +120,12 @@ function _openConfirmModal(title, msg, okLabel, onConfirm) {
         </div>
       </div>
     </div>`);
-  function _close() { document.getElementById(id)?.remove(); }
+  function _close() { document.getElementById(id)?.remove(); document.removeEventListener('keydown', _esc); }
   document.getElementById(`${id}-ok`).onclick     = () => { _close(); onConfirm(); };
   document.getElementById(`${id}-cancel`).onclick  = _close;
   document.getElementById(`${id}-bd`).onclick      = _close;
+  function _esc(e) { if (e.key === 'Escape') { e.preventDefault(); _close(); } }
+  document.addEventListener('keydown', _esc);
 }
 
 function _fmtDate(raw) {
@@ -723,7 +725,7 @@ async function _loadAndRenderPlans(main) {
         if (!plan) return;
         _openConfirmModal(
           'Delete Service Plan',
-          `Delete "${plan.serviceType || 'Service Plan'}" on ${_fmtDate(plan.serviceDate)}? This cannot be undone.`,
+          `Delete "${_e(plan.serviceType || 'Service Plan')}" on ${_e(_fmtDate(plan.serviceDate))}? This cannot be undone.`,
           'Delete',
           async () => {
             try {
