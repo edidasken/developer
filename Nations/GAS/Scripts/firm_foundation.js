@@ -35,31 +35,48 @@ const Nehemiah = (() => {
 
   // ── Constants ────────────────────────────────────────────────────────────
 
-  // Resolve paths relative to the site root so redirects work from any page depth.
-  const _paths = (function() {
-    const s = document.querySelector('script[src*="firm_foundation"]');
-    if (!s) return { root: '', pages: '' };
-    const src = s.getAttribute('src');
-    // Strip path to "Scripts/firm_foundation.js" to get base, then point to Pages/
-    const idx = src.indexOf('Scripts/');
-    if (idx < 0) return { root: '', pages: '' };
-    const root = src.substring(0, idx);
-    // e.g. "FlockOS/Scripts/" → "FlockOS/Pages/" (HTML files live in Pages/)
-    return { root, pages: root + 'Pages/' };
-  })();
-  const _base = _paths.pages;
+  // New Covenant is fully separated from the Old Covenant `FlockOS/Pages/`
+  // layout. There is no shared `the_wall.html`. Instead, every app under
+  // `New_Covenant/app.<name>/` provides its own standalone sign-in page at
+  // `app.<name>/index.html` (the "Stand pattern"). The launcher lives at
+  // `New_Covenant/index.html`.
+  //
+  // `LOGIN_PAGE` and `APP_PAGE` are computed per-call from the current URL so
+  // that `guard()` always lands on the correct per-app login screen.
 
-  const LOGIN_PAGE  = _base + 'the_wall.html';
-  const APP_PAGE    = _base + 'the_good_shepherd.html';
-  // _paths.root points to the FlockOS directory; go up one level to deployment root.
-  const LAUNCHER_PAGE = (() => {
-    if (_paths.root) {
-      const rootBase = new URL(_paths.root.endsWith('/') ? _paths.root : (_paths.root + '/'), window.location.href);
-      return new URL('../index.html', rootBase).toString();
+  function _currentAppFolder() {
+    // Returns 'app.flockchat', 'app.feed', etc. when inside an app dir, else ''.
+    var m = location.pathname.match(/\/(app\.[a-z0-9_-]+)(\/|$)/i);
+    return m ? m[1] : '';
+  }
+
+  function _newCovenantBase() {
+    // Absolute URL of the New_Covenant root (or current site root if outside it).
+    var p = location.pathname;
+    var idx = p.indexOf('/New_Covenant/');
+    if (idx >= 0) {
+      return location.origin + p.substring(0, idx + '/New_Covenant/'.length);
     }
-    const pagesBase = new URL('../', window.location.href);
-    return new URL('../index.html', pagesBase).toString();
-  })();
+    // Strip back to last "/" so we land at the deployment root.
+    return location.origin + p.replace(/[^/]*$/, '');
+  }
+
+  function _resolveLoginPage() {
+    var app = _currentAppFolder();
+    var base = _newCovenantBase();
+    return app
+      ? base + app + '/index.html'   // per-app sign-in
+      : base + 'index.html';          // launcher (public)
+  }
+
+  function _resolveAppPage() {
+    var app = _currentAppFolder();
+    var base = _newCovenantBase();
+    return app
+      ? base + app + '/' + app + '.html'   // app.flockchat → app.flockchat.html
+      : base + 'index.html';
+  }
+
   // Public portal (FlockOS.html) — where users land after logout.
   // Portals store their own URL in sessionStorage so we can always return to
   // the correct church portal regardless of the app's script path depth.
@@ -243,7 +260,7 @@ const Nehemiah = (() => {
         try { sessionStorage.setItem('flock_auth_session', JSON.stringify(restored)); } catch (_) {}
         return restored;
       }
-      window.location.replace(LOGIN_PAGE);
+      window.location.replace(_resolveLoginPage());
       return null;
     }
     return session;
@@ -254,11 +271,11 @@ const Nehemiah = (() => {
    */
   function guardLogin() {
     if (_isLocalBypass()) {
-      window.location.replace(APP_PAGE);
+      window.location.replace(_resolveAppPage());
       return;
     }
     if (isAuthenticated()) {
-      window.location.replace(APP_PAGE);
+      window.location.replace(_resolveAppPage());
     }
   }
 
@@ -545,7 +562,7 @@ const Nehemiah = (() => {
 
     // Always honour the full 25 s so the card is readable, then go to launcher
     await new Promise(function(resolve) { setTimeout(resolve, 25000); });
-    window.location.replace(LAUNCHER_PAGE);
+    window.location.replace(_newCovenantBase() + 'index.html');
   }
 
 

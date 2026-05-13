@@ -1294,13 +1294,8 @@ function _showAuthGate(N) {
       <p class="fs-auth-verse">"Praise Him with strings and pipe." — Psalm 150:4</p>
     </div>`;
   document.getElementById('fs-signin-btn')?.addEventListener('click', () => {
-    if (N && typeof N.login === 'function') {
-      const returnUrl = encodeURIComponent(location.href);
-      const base = location.href.replace(/\/app\.flockshow\/app\.flockshow\.html.*$/, '/');
-      location.href = base + 'Scripts/the_priesthood/the_garments.html?return=' + returnUrl;
-    } else {
-      location.reload();
-    }
+    const base = location.href.replace(/\/app\.flockshow\/app\.flockshow\.html.*$/, '/');
+    location.href = base + 'app.flockshow/';
   });
 }
 
@@ -1344,14 +1339,9 @@ async function _boot() {
   const N = window.Nehemiah;
 
   if (typeof N.isAuthenticated === 'function' && !N.isAuthenticated()) {
-    // Redirect directly to the FlockOS login page via Nehemiah.guard()
-    if (typeof N.guard === 'function') {
-      N.guard();
-    } else {
-      const returnUrl = encodeURIComponent(location.href);
-      const base = location.href.replace(/\/app\.flockshow\/app\.flockshow\.html.*$/, '/');
-      location.href = base + 'the_wall.html?return=' + returnUrl;
-    }
+    // Redirect to FlockShow's standalone sign-in page (Stand pattern)
+    const base = location.href.replace(/\/app\.flockshow\/app\.flockshow\.html.*$/, '/');
+    location.replace(base + 'app.flockshow/');
     return;
   }
 

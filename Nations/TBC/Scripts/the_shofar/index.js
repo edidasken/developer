@@ -135,10 +135,12 @@ function msIsAuthError(message) {
 function msRedirectToSecure(reason) {
     var msg = String(reason || 'Session expired. Please sign in again.');
     console.warn('MusicStand auth redirect:', msg);
-    if (typeof Nehemiah !== 'undefined' && typeof Nehemiah.logout === 'function') {
-        Nehemiah.logout();
+    if (typeof Nehemiah !== 'undefined' && typeof Nehemiah.guard === 'function') {
+        // Nehemiah.guard() now resolves to the per-app sign-in page (New Covenant)
+        Nehemiah.guard();
     } else {
-        window.location.href = 'the_wall.html';
+        // Last-ditch fallback — go to the New Covenant launcher
+        window.location.href = '../index.html';
     }
 }
 

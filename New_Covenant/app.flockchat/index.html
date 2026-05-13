@@ -5,16 +5,16 @@
   <!-- Resolve all relative paths from the parent New_Covenant/ directory -->
   <base href="../">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-  <title>FlockShow — Sign In</title>
+  <title>FlockChat — Sign In</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="app.flockshow/manifest.json">
-  <link rel="icon" type="image/png" href="Images/Show.png">
-  <link rel="apple-touch-icon" href="Images/Show.png">
-  <meta name="theme-color" content="#0c1445">
+  <link rel="manifest" href="app.flockchat/manifest.json">
+  <link rel="icon" type="image/png" href="Images/chat.png">
+  <link rel="apple-touch-icon" href="Images/chat.png">
+  <meta name="theme-color" content="#09102e">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="FlockShow">
+  <meta name="apple-mobile-web-app-title" content="FlockChat">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <!-- Fonts -->
@@ -28,13 +28,13 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg-page:   #060c1f;
-      --bg-card:   #0c1445;
+      --bg-page:   #09102e;
+      --bg-card:   #121a3f;
       --border:    rgba(255,255,255,.10);
       --ink:       #f0f1f8;
       --muted:     rgba(240,241,248,.55);
-      --accent:    #e8a838;
-      --accent-dk: #c48a20;
+      --accent:    #38bdf8;
+      --accent-dk: #0284c7;
       --danger:    #f87171;
       --radius:    18px;
     }
@@ -54,9 +54,9 @@
     .bg-glow {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background:
-        radial-gradient(ellipse 80% 50% at 15% 10%,  rgba(232,168,56,.13)  0%, transparent 55%),
-        radial-gradient(ellipse 60% 50% at 85% 85%,  rgba(168,85,247,.15)  0%, transparent 55%),
-        radial-gradient(ellipse 100% 60% at 50% 50%, rgba(26,14,60,.7)     0%, transparent 80%);
+        radial-gradient(ellipse 80% 50% at 15% 10%,  rgba(56,189,248,.13) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 50% at 85% 85%,  rgba(129,140,248,.13) 0%, transparent 55%),
+        radial-gradient(ellipse 100% 60% at 50% 50%, rgba(18,26,63,.7)    0%, transparent 80%);
     }
 
     .card {
@@ -80,7 +80,7 @@
     .brand-icon {
       width: 54px; height: 54px;
       border-radius: 14px;
-      background: linear-gradient(135deg, #ef4444, #f97316);
+      background: linear-gradient(135deg, var(--accent-dk), var(--accent));
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
       box-shadow: 0 4px 12px rgba(0,0,0,.4);
@@ -89,7 +89,6 @@
       font-size: 1.3rem;
       font-weight: 800;
       letter-spacing: -.02em;
-      color: var(--ink);
     }
     .brand-sub {
       font-size: .75rem;
@@ -130,14 +129,14 @@
     }
     input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(232,168,56,.18);
+      box-shadow: 0 0 0 3px rgba(56,189,248,.18);
     }
     input::placeholder { color: rgba(240,241,248,.3); }
 
     .btn-signin {
       width: 100%;
       background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dk) 100%);
-      color: #1a0f00;
+      color: #001022;
       border: none;
       border-radius: 10px;
       font-family: inherit;
@@ -147,9 +146,9 @@
       cursor: pointer;
       margin-top: 8px;
       transition: opacity .15s, transform .1s, box-shadow .15s;
-      box-shadow: 0 4px 20px rgba(232,168,56,.35);
+      box-shadow: 0 4px 20px rgba(56,189,248,.35);
     }
-    .btn-signin:hover  { opacity: .92; box-shadow: 0 6px 24px rgba(232,168,56,.45); }
+    .btn-signin:hover  { opacity: .92; box-shadow: 0 6px 24px rgba(56,189,248,.45); }
     .btn-signin:active { transform: scale(.98); }
     .btn-signin:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
 
@@ -170,8 +169,8 @@
     .spinner {
       display: inline-block;
       width: 15px; height: 15px;
-      border: 2px solid rgba(26,15,0,.3);
-      border-top-color: #1a0f00;
+      border: 2px solid rgba(0,16,34,.3);
+      border-top-color: #001022;
       border-radius: 50%;
       animation: spin .6s linear infinite;
       vertical-align: middle;
@@ -194,13 +193,12 @@
     <div class="brand">
       <div class="brand-icon" aria-hidden="true">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="4" width="20" height="14" rx="2" ry="2"/>
-          <path d="M8 21h8M12 17v4"/>
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
       </div>
       <div>
-        <div class="brand-name">FlockShow</div>
-        <div class="brand-sub">Worship Presentation &amp; Display</div>
+        <div class="brand-name">FlockChat</div>
+        <div class="brand-sub">Church Team Messaging</div>
       </div>
     </div>
 
@@ -208,24 +206,24 @@
 
     <form id="signin-form" autocomplete="on" novalidate>
       <div class="field-group">
-        <label for="fs-email">Email</label>
-        <input type="email" id="fs-email" name="email" placeholder="you@church.com" autocomplete="email" required>
+        <label for="fc-email">Email</label>
+        <input type="email" id="fc-email" name="email" placeholder="you@church.com" autocomplete="email" required>
       </div>
 
       <div class="field-group">
-        <label for="fs-pass">Passcode</label>
-        <input type="password" id="fs-pass" name="password" placeholder="••••••••" autocomplete="current-password" required>
+        <label for="fc-pass">Passcode</label>
+        <input type="password" id="fc-pass" name="password" placeholder="••••••••" autocomplete="current-password" required>
       </div>
 
-      <button type="submit" class="btn-signin" id="fs-submit">Sign In</button>
+      <button type="submit" class="btn-signin" id="fc-submit">Sign In</button>
     </form>
 
-    <div class="error-msg" id="fs-error"></div>
+    <div class="error-msg" id="fc-error"></div>
 
-    <p class="foot-note">"Praise Him with strings and pipe." — Psalm 150:4</p>
+    <p class="foot-note">"How good and pleasant it is when God's people live together in unity!" — Psalm 133:1</p>
   </div>
 
-  <!-- Firebase & auth dependencies (same order as app.flockshow.html) -->
+  <!-- Firebase & auth dependencies (same order as app.flockchat.html) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script>
@@ -236,7 +234,7 @@
 
   <script>
     (function () {
-      var APP_URL = 'app.flockshow/app.flockshow.html';
+      var APP_URL = 'app.flockchat/app.flockchat.html';
 
       function ready(fn) {
         if (document.readyState === 'loading') {
@@ -253,8 +251,8 @@
         }
 
         var form   = document.getElementById('signin-form');
-        var btn    = document.getElementById('fs-submit');
-        var errBox = document.getElementById('fs-error');
+        var btn    = document.getElementById('fc-submit');
+        var errBox = document.getElementById('fc-error');
 
         function showError(msg) {
           errBox.textContent = msg;
@@ -274,8 +272,8 @@
           e.preventDefault();
           clearError();
 
-          var email = document.getElementById('fs-email').value.trim();
-          var pass  = document.getElementById('fs-pass').value;
+          var email = document.getElementById('fc-email').value.trim();
+          var pass  = document.getElementById('fc-pass').value;
 
           if (!email || !pass) {
             showError('Please enter your email and passcode.');

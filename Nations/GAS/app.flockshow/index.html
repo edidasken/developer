@@ -2,10 +2,303 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=app.flockshow.html">
-  <title>FlockShow</title>
+  <!-- Resolve all relative paths from the parent New_Covenant/ directory -->
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <title>FlockShow — Sign In</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="app.flockshow/manifest.json">
+  <link rel="icon" type="image/png" href="Images/Show.png">
+  <link rel="apple-touch-icon" href="Images/Show.png">
+  <meta name="theme-color" content="#0c1445">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="FlockShow">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-page:   #060c1f;
+      --bg-card:   #0c1445;
+      --border:    rgba(255,255,255,.10);
+      --ink:       #f0f1f8;
+      --muted:     rgba(240,241,248,.55);
+      --accent:    #e8a838;
+      --accent-dk: #c48a20;
+      --danger:    #f87171;
+      --radius:    18px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg-page);
+      color: var(--ink);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .bg-glow {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 15% 10%,  rgba(232,168,56,.13)  0%, transparent 55%),
+        radial-gradient(ellipse 60% 50% at 85% 85%,  rgba(168,85,247,.15)  0%, transparent 55%),
+        radial-gradient(ellipse 100% 60% at 50% 50%, rgba(26,14,60,.7)     0%, transparent 80%);
+    }
+
+    .card {
+      position: relative; z-index: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 44px 40px 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.04),
+        0 24px 64px rgba(0,0,0,.55),
+        0 4px 16px rgba(0,0,0,.3);
+    }
+
+    .brand {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 36px;
+    }
+    .brand-icon {
+      width: 54px; height: 54px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,.4);
+    }
+    .brand-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--ink);
+    }
+    .brand-sub {
+      font-size: .75rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .form-title {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 22px;
+    }
+
+    .field-group { margin-bottom: 18px; }
+    label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: .9rem;
+      padding: 12px 15px;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      -webkit-appearance: none;
+    }
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(232,168,56,.18);
+    }
+    input::placeholder { color: rgba(240,241,248,.3); }
+
+    .btn-signin {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dk) 100%);
+      color: #1a0f00;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: .9rem;
+      font-weight: 800;
+      padding: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity .15s, transform .1s, box-shadow .15s;
+      box-shadow: 0 4px 20px rgba(232,168,56,.35);
+    }
+    .btn-signin:hover  { opacity: .92; box-shadow: 0 6px 24px rgba(232,168,56,.45); }
+    .btn-signin:active { transform: scale(.98); }
+    .btn-signin:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+
+    .error-msg {
+      display: none;
+      background: rgba(248,113,113,.08);
+      border: 1px solid rgba(248,113,113,.25);
+      border-radius: 8px;
+      color: var(--danger);
+      font-size: .82rem;
+      padding: 10px 14px;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+    .error-msg.visible { display: block; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block;
+      width: 15px; height: 15px;
+      border: 2px solid rgba(26,15,0,.3);
+      border-top-color: #1a0f00;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    .foot-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: .73rem;
+      margin-top: 24px;
+    }
+  </style>
 </head>
 <body>
-  <script>location.replace('app.flockshow.html');</script>
+
+  <div class="bg-glow"></div>
+
+  <div class="card">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="14" rx="2" ry="2"/>
+          <path d="M8 21h8M12 17v4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">FlockShow</div>
+        <div class="brand-sub">Worship Presentation &amp; Display</div>
+      </div>
+    </div>
+
+    <div class="form-title">Sign in to continue</div>
+
+    <form id="signin-form" autocomplete="on" novalidate>
+      <div class="field-group">
+        <label for="fs-email">Email</label>
+        <input type="email" id="fs-email" name="email" placeholder="you@church.com" autocomplete="email" required>
+      </div>
+
+      <div class="field-group">
+        <label for="fs-pass">Passcode</label>
+        <input type="password" id="fs-pass" name="password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+
+      <button type="submit" class="btn-signin" id="fs-submit">Sign In</button>
+    </form>
+
+    <div class="error-msg" id="fs-error"></div>
+
+    <p class="foot-note">"Praise Him with strings and pipe." — Psalm 150:4</p>
+  </div>
+
+  <!-- Firebase & auth dependencies (same order as app.flockshow.html) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js" defer></script>
+  <script defer src="Scripts/firm_foundation.js"></script>
+  <script defer src="Scripts/the_upper_room.js"></script>
+  <script defer src="Scripts/the_true_vine.js"></script>
+
+  <script>
+    (function () {
+      var APP_URL = 'app.flockshow/app.flockshow.html';
+
+      function ready(fn) {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', fn);
+        } else {
+          fn();
+        }
+      }
+
+      ready(function () {
+        if (typeof Nehemiah !== 'undefined' && Nehemiah.isAuthenticated()) {
+          window.location.replace(APP_URL);
+          return;
+        }
+
+        var form   = document.getElementById('signin-form');
+        var btn    = document.getElementById('fs-submit');
+        var errBox = document.getElementById('fs-error');
+
+        function showError(msg) {
+          errBox.textContent = msg;
+          errBox.classList.add('visible');
+        }
+        function clearError() {
+          errBox.classList.remove('visible');
+        }
+        function setLoading(on) {
+          btn.disabled = on;
+          btn.innerHTML = on
+            ? '<span class="spinner"></span>Signing in…'
+            : 'Sign In';
+        }
+
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          clearError();
+
+          var email = document.getElementById('fs-email').value.trim();
+          var pass  = document.getElementById('fs-pass').value;
+
+          if (!email || !pass) {
+            showError('Please enter your email and passcode.');
+            return;
+          }
+
+          if (typeof Nehemiah === 'undefined') {
+            showError('Auth system not loaded yet. Please refresh and try again.');
+            return;
+          }
+
+          setLoading(true);
+          try {
+            await Nehemiah.login(email, pass);
+            window.location.replace(APP_URL);
+          } catch (err) {
+            setLoading(false);
+            showError(err.message || 'Sign in failed. Check your credentials and try again.');
+          }
+        });
+      });
+    })();
+  </script>
+
 </body>
 </html>
