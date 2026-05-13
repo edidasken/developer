@@ -19,9 +19,14 @@
   <meta property="og:image" content="Images/NewCovenant.png">
   <meta property="og:type" content="website">
 
+  <!-- Preload critical images so the launcher paints instantly -->
+  <link rel="preload" as="image" href="Images/NewCovenant.png">
+  <link rel="preload" as="image" href="Images/GrowIcon.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- Only weights actually used — trimmed from full family for faster load -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Merriweather:ital@1&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,7 +39,7 @@
       --faint:    #3d4f7c;
       --gold:     #e8a838;
       --blue:     #5b8dee;
-      --line:     rgba(255,255,255,0.10);
+      --line:     rgba(255,255,255,0.09);
       --font:     'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       --serif:    'Merriweather', Georgia, serif;
       --safe-top: env(safe-area-inset-top, 0px);
@@ -50,25 +55,17 @@
       overflow-x: hidden;
     }
 
-    /* Subtle radial glow behind everything */
-    body::before {
-      content: '';
-      position: fixed; inset: 0; pointer-events: none; z-index: 0;
-      background:
-        radial-gradient(ellipse 90% 55% at 50% -5%,  rgba(91,141,238,0.16) 0%, transparent 65%),
-        radial-gradient(ellipse 55% 40% at 85% 95%,  rgba(232,168,56,0.09) 0%, transparent 55%);
-    }
+    /* Single cheap gradient — no double radial on every repaint */
+    body { background-image: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(91,141,238,0.14) 0%, transparent 60%); }
 
     /* ── Launcher shell ────────────────────────────────────────────── */
     .launcher {
-      position: relative; z-index: 1;
       min-height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: calc(var(--safe-top) + 2.5rem) 1.25rem calc(var(--safe-bot) + 2rem);
-      gap: 2.5rem;
+      padding: calc(var(--safe-top) + 2rem) 1.25rem calc(var(--safe-bot) + 2rem);
+      gap: 2rem;
     }
 
     /* ── Church identity ───────────────────────────────────────────── */
@@ -76,103 +73,126 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.6rem;
       text-align: center;
     }
     .church-id img {
-      width: 72px; height: 72px;
-      border-radius: 18px;
-      box-shadow: 0 8px 28px rgba(0,0,0,0.40);
+      width: 60px; height: 60px;
+      border-radius: 15px;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.40);
     }
     .church-id h1 {
-      font-size: clamp(1.4rem, 5vw, 2rem);
+      font-size: clamp(1.25rem, 5vw, 1.8rem);
       font-weight: 800;
       letter-spacing: -0.025em;
       color: var(--gold);
       line-height: 1.2;
     }
 
-    /* ── App buttons ───────────────────────────────────────────────── */
+    /* ── App sections ──────────────────────────────────────────────── */
+    .app-sections {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    /* Section label row */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.55rem;
+    }
+    .section-label span {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+    .section-label .section-icon {
+      font-size: 0.78rem;
+      opacity: 0.6;
+    }
+
+    /* Apps list */
     .apps {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      width: 100%;
-      max-width: 400px;
+      gap: 0.65rem;
     }
 
+    /* ── App button ────────────────────────────────────────────────── */
     .app-btn {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      padding: 1.15rem 1.4rem;
+      gap: 0.85rem;
+      padding: 0.9rem 1.1rem;
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 18px;
+      border-radius: 14px;
       text-decoration: none;
       color: var(--ink);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.28);
-      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-      position: relative;
-      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+      transition: transform 0.13s ease, box-shadow 0.13s ease, border-color 0.13s ease;
+      /* GPU-hint so transition uses compositor */
+      will-change: transform;
     }
-    .app-btn::before {
-      content: '';
-      position: absolute; inset: 0; pointer-events: none;
-      background: radial-gradient(ellipse 80% 70% at 20% 50%, var(--btn-glow, transparent), transparent 70%);
-    }
-    .app-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.40); }
-    .app-btn:active { transform: scale(0.98); }
+    .app-btn:hover  { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.36); }
+    .app-btn:active { transform: scale(0.985); box-shadow: none; }
 
-    .app-btn--grow   { --btn-glow: rgba(232,168,56,0.10); border-color: rgba(232,168,56,0.18); }
-    .app-btn--flock  { --btn-glow: rgba(91,141,238,0.10); border-color: rgba(91,141,238,0.18); }
-    .app-btn--invite { --btn-glow: rgba(61,139,79,0.12);  border-color: rgba(61,139,79,0.22); }
-    .app-btn--stand  { --btn-glow: rgba(168,85,247,0.10); border-color: rgba(168,85,247,0.22); }
-    .app-btn--show   { --btn-glow: rgba(239,68,68,0.10);  border-color: rgba(239,68,68,0.22); }
-    .app-btn:hover.app-btn--grow   { border-color: rgba(232,168,56,0.40); }
-    .app-btn:hover.app-btn--flock  { border-color: rgba(91,141,238,0.40); }
-    .app-btn:hover.app-btn--invite { border-color: rgba(61,139,79,0.50); }
+    /* accent border per app */
+    .app-btn--grow   { border-color: rgba(232,168,56,0.20); }
+    .app-btn--invite { border-color: rgba(61,179,79,0.20);  }
+    .app-btn--flock  { border-color: rgba(91,141,238,0.20); }
+    .app-btn--stand  { border-color: rgba(168,85,247,0.20); }
+    .app-btn--show   { border-color: rgba(239,68,68,0.20);  }
+    .app-btn:hover.app-btn--grow   { border-color: rgba(232,168,56,0.50); }
+    .app-btn:hover.app-btn--invite { border-color: rgba(61,179,79,0.50);  }
+    .app-btn:hover.app-btn--flock  { border-color: rgba(91,141,238,0.50); }
     .app-btn:hover.app-btn--stand  { border-color: rgba(168,85,247,0.50); }
-    .app-btn:hover.app-btn--show   { border-color: rgba(239,68,68,0.50); }
+    .app-btn:hover.app-btn--show   { border-color: rgba(239,68,68,0.50);  }
 
     .app-icon {
-      width: 52px; height: 52px;
-      border-radius: 14px;
+      width: 42px; height: 42px;
+      border-radius: 10px;
       object-fit: contain;
       flex-shrink: 0;
-      position: relative; z-index: 1;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.30);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.28);
     }
-    .app-label {
-      flex: 1;
-      position: relative; z-index: 1;
-    }
+    .app-label { flex: 1; }
     .app-label strong {
       display: block;
-      font-size: 1.1rem;
+      font-size: 0.97rem;
       font-weight: 800;
       letter-spacing: -0.01em;
     }
-    .app-btn--grow  .app-label strong { color: var(--gold); }
-    .app-btn--flock .app-label strong { color: #a0beff; }
+    .app-btn--grow   .app-label strong { color: var(--gold); }
     .app-btn--invite .app-label strong { color: #6ee7b7; }
-    .app-btn--stand .app-label strong { color: #d8b4fe; }
+    .app-btn--flock  .app-label strong { color: #a0beff; }
+    .app-btn--stand  .app-label strong { color: #d8b4fe; }
+    .app-btn--show   .app-label strong { color: #fca5a5; }
     .app-label span {
       display: block;
-      font-size: 0.82rem;
+      font-size: 0.77rem;
       color: var(--muted);
-      margin-top: 0.15rem;
+      margin-top: 0.1rem;
     }
     .app-arrow {
-      font-size: 1.2rem;
+      font-size: 1rem;
       color: var(--faint);
-      position: relative; z-index: 1;
-      transition: color 0.15s, transform 0.15s;
+      transition: color 0.13s, transform 0.13s;
+      flex-shrink: 0;
     }
-    .app-btn:hover .app-arrow {
-      color: var(--ink);
-      transform: translateX(3px);
-    }
+    .app-btn:hover .app-arrow { color: var(--ink); transform: translateX(3px); }
 
     /* ── Scripture footer ──────────────────────────────────────────── */
     .verse {
@@ -182,29 +202,29 @@
     .verse p {
       font-family: var(--serif);
       font-style: italic;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--muted);
-      line-height: 1.7;
+      line-height: 1.75;
     }
     .verse cite {
       display: block;
       margin-top: 0.4rem;
       font-family: var(--font);
       font-style: normal;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--gold);
     }
 
-    /* ── Pull-to-Refresh ───────────────────────────────────────────── */
+    /* ── PTR ───────────────────────────────────────────────────────── */
     @media (max-width: 860px) {
       .ptr-indicator {
         display: none; position: fixed; top: calc(var(--safe-top) + 8px);
         left: 50%; transform: translateX(-50%);
         z-index: 9998; background: var(--card); border: 1px solid var(--line);
-        border-radius: 20px; padding: 6px 14px; font-size: 0.75rem; color: var(--muted);
+        border-radius: 20px; padding: 5px 13px; font-size: 0.72rem; color: var(--muted);
         box-shadow: 0 4px 12px rgba(0,0,0,0.28); white-space: nowrap;
       }
       .ptr-indicator.visible { display: block; }
@@ -216,58 +236,80 @@
   <div class="launcher">
 
     <div class="church-id">
-      <img src="Images/NewCovenant.png" alt="FlockOS">
+      <img src="Images/NewCovenant.png" alt="FlockOS" fetchpriority="high">
       <h1>FlockOS</h1>
     </div>
 
-    <nav class="apps" aria-label="Apps">
+    <div class="app-sections">
 
-      <a class="app-btn app-btn--grow" href="app.grow/app.grow.html">
-        <img class="app-icon" src="Images/GrowIcon.png" alt="GROW">
-        <div class="app-label">
-          <strong>GROW</strong>
-          <span>Discipleship &amp; Bible study</span>
+      <!-- ── Public ─────────────────────────────────────────────── -->
+      <div>
+        <div class="section-label">
+          <span class="section-icon">🌐</span>
+          <span>Public</span>
         </div>
-        <span class="app-arrow" aria-hidden="true">&#8594;</span>
-      </a>
+        <nav class="apps" aria-label="Public apps">
 
-      <a class="app-btn app-btn--stand" href="app.stand/">
-        <img class="app-icon" src="Images/stand.png" alt="Music Stand">
-        <div class="app-label">
-          <strong>Music Stand</strong>
-          <span>Songs, setlists &amp; live presenter</span>
+          <a class="app-btn app-btn--grow" href="app.grow/app.grow.html">
+            <img class="app-icon" src="Images/GrowIcon.png" alt="GROW" fetchpriority="high">
+            <div class="app-label">
+              <strong>GROW</strong>
+              <span>Discipleship &amp; Bible study</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
+          <a class="app-btn app-btn--invite" href="app.invite/app.invite.html">
+            <img class="app-icon" src="Images/Invite.png" alt="The Invitation" loading="lazy">
+            <div class="app-label">
+              <strong>The Invitation</strong>
+              <span>Share the hope of Jesus Christ</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
+        </nav>
+      </div>
+
+      <!-- ── Secure ──────────────────────────────────────────────── -->
+      <div>
+        <div class="section-label">
+          <span class="section-icon">🔒</span>
+          <span>Secure</span>
         </div>
-        <span class="app-arrow" aria-hidden="true">&#8594;</span>
-      </a>
+        <nav class="apps" aria-label="Secure apps">
 
-      <a class="app-btn app-btn--invite" href="app.invite/app.invite.html">
-        <img class="app-icon" src="Images/Invite.png" alt="The Invitation">
-        <div class="app-label">
-          <strong>The Invitation</strong>
-          <span>Share the hope of Jesus Christ</span>
-        </div>
-        <span class="app-arrow" aria-hidden="true">&#8594;</span>
-      </a>
+          <a class="app-btn app-btn--flock" href="app.flockos/app.flockos.html">
+            <img class="app-icon" src="Images/NewCovenant.png" alt="FlockOS" loading="lazy">
+            <div class="app-label">
+              <strong>FlockOS</strong>
+              <span>Church management &amp; pastoral care</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
 
-      <a class="app-btn app-btn--flock" href="app.flockos/app.flockos.html">
-        <img class="app-icon" src="Images/NewCovenant.png" alt="FlockOS">
-        <div class="app-label">
-          <strong>FlockOS</strong>
-          <span>Church management &amp; pastoral care</span>
-        </div>
-        <span class="app-arrow" aria-hidden="true">&#8594;</span>
-      </a>
+          <a class="app-btn app-btn--stand" href="app.stand/">
+            <img class="app-icon" src="Images/stand.png" alt="Music Stand" loading="lazy">
+            <div class="app-label">
+              <strong>Music Stand</strong>
+              <span>Songs, setlists &amp; live presenter</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
 
-      <a class="app-btn app-btn--show" href="app.flockshow/app.flockshow.html">
-        <img class="app-icon" src="Images/Show.png" alt="FlockShow">
-        <div class="app-label">
-          <strong>FlockShow</strong>
-          <span>Worship slides &amp; service presentation</span>
-        </div>
-        <span class="app-arrow" aria-hidden="true">&#8594;</span>
-      </a>
+          <a class="app-btn app-btn--show" href="app.flockshow/app.flockshow.html">
+            <img class="app-icon" src="Images/Show.png" alt="FlockShow" loading="lazy">
+            <div class="app-label">
+              <strong>FlockShow</strong>
+              <span>Worship slides &amp; service presentation</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
 
-    </nav>
+        </nav>
+      </div>
+
+    </div>
 
     <footer class="verse">
       <p>"Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit."</p>
