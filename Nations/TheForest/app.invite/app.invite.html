@@ -67,7 +67,7 @@
     /* Let the document (html) be the single scroll container.
        Don't set overflow on body — that creates a nested scroll
        context which breaks normal page scrolling on some browsers. */
-    html { overflow-y: auto; }
+    html { overflow-y: auto; overscroll-behavior-y: none; }
     body { overflow-y: visible; }
 
     /* Body bg below the topbar should be the page bg, not topbar dark */
