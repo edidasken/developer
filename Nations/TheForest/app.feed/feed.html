@@ -402,6 +402,7 @@
     .bm-section-type.scripture  { background: rgba(232,168,56,0.13);  color: var(--bm-accent); }
     .bm-section-type.point      { background: rgba(167,139,250,0.13); color: var(--bm-purple); }
     .bm-section-type.illustration { background: rgba(52,211,153,0.12); color: var(--bm-green); }
+    .bm-section-type.explanation { background: rgba(20,184,166,0.12);  color: #14b8a6; }
     .bm-section-type.application { background: rgba(248,113,113,0.12); color: var(--bm-red);   }
     .bm-section-type.conclusion  { background: rgba(232,168,56,0.20);  color: var(--bm-accent-dk); }
     .bm-section-type.prayer     { background: rgba(167,139,250,0.20); color: var(--bm-purple); }
@@ -493,6 +494,7 @@
     .bm-section-type-select.scripture    { color: var(--bm-accent); }
     .bm-section-type-select.point        { color: #34d399; }
     .bm-section-type-select.illustration { color: #c084fc; }
+    .bm-section-type-select.explanation  { color: #14b8a6; }
     .bm-section-type-select.application  { color: #f97316; }
     .bm-section-type-select.prayer       { color: #f9a8d4; }
     .bm-section-type-select.conclusion   { color: #fbbf24; }
@@ -976,11 +978,11 @@
     .bm-toast--info    { border-color: rgba(56,189,248,0.30); color: var(--bm-blue); }
 
     /* ── Confirm modal ─────────────────────────────────────────────────── */
-    #bm-confirm-modal {
+    #bm-confirm-modal, #bm-input-modal {
       position: fixed; inset: 0; z-index: 8000;
       display: flex; align-items: center; justify-content: center;
     }
-    #bm-confirm-modal[hidden] { display: none !important; }
+    #bm-confirm-modal[hidden], #bm-input-modal[hidden] { display: none !important; }
     .bm-modal-backdrop {
       position: absolute; inset: 0;
       background: var(--modal-dim); backdrop-filter: blur(3px);

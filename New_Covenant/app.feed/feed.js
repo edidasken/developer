@@ -108,10 +108,6 @@ function _makeSermon(title = 'Untitled Sermon') {
     status:       'draft',
     sections:     [
       _makeSection('intro', 'Introduction'),
-      _makeSection('scripture', 'Key Scripture'),
-      _makeSection('point', 'Point 1'),
-      _makeSection('application', 'Application'),
-      _makeSection('conclusion', 'Conclusion'),
     ],
     manuscript:   '',
     researchNotes:'',
