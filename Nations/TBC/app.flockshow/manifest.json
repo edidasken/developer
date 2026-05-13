@@ -1,14 +1,17 @@
 {
-  "name": "Trinity Baptist Church · FlockShow",
+  "name": "Trinity Baptist Church \u00b7 FlockShow",
   "short_name": "FlockShow",
-  "description": "Church presentation and worship display — build and present slides for your service.",
+  "description": "Church presentation and worship display \u2014 build and present slides for your service.",
   "start_url": "./app.flockshow.html",
   "id": "./app.flockshow.html",
   "display": "standalone",
-  "background_color": "#0b0d14",
-  "theme_color": "#0b0d14",
+  "background_color": "#0c1445",
+  "theme_color": "#0c1445",
   "orientation": "landscape-primary",
-  "categories": ["productivity", "utilities"],
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "https://flock-os.github.io/FlockOS/New_Covenant/Images/Show.png",

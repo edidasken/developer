@@ -3,7 +3,7 @@
   "short_name": "FlockOS",
   "description": "Complete church management and pastoral care platform. Google Sheets, Firebase, or fully offline via The Wellspring. 30+ modules. 210 countries. 256-bit encrypted. Free forever.",
   "start_url": "./app.flockos.html",
-  "scope": "./",
+  "scope": "../",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#1a1a2e",

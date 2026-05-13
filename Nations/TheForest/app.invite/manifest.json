@@ -1,14 +1,17 @@
 {
-  "name": "The Forest · The Invitation",
+  "name": "The Forest \u00b7 The Invitation",
   "short_name": "The Invitation",
-  "description": "A hope-filled look at Jesus Christ — His invitations, His identity, and His finished work.",
+  "description": "A hope-filled look at Jesus Christ \u2014 His invitations, His identity, and His finished work.",
   "start_url": "./app.invite.html",
   "id": "./app.invite.html",
   "display": "standalone",
-  "background_color": "#f7f8fb",
-  "theme_color": "#3d8b4f",
+  "background_color": "#0c1445",
+  "theme_color": "#0c1445",
   "orientation": "portrait-primary",
-  "categories": ["lifestyle", "education"],
+  "categories": [
+    "lifestyle",
+    "education"
+  ],
   "icons": [
     {
       "src": "https://flock-os.github.io/FlockOS/New_Covenant/Images/Invite.png",

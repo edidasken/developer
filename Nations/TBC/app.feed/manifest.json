@@ -1,14 +1,17 @@
 {
-  "name": "{{CHURCH_NAME}} · Bread Maker",
+  "name": "{{CHURCH_NAME}} \u00b7 Bread Maker",
   "short_name": "Bread Maker",
-  "description": "Sermon preparation and management — craft the Word with clarity and depth.",
+  "description": "Sermon preparation and management \u2014 craft the Word with clarity and depth.",
   "start_url": "./bread_maker.html",
   "id": "./bread_maker.html",
   "display": "standalone",
-  "background_color": "#060c1f",
-  "theme_color": "#060c1f",
+  "background_color": "#0c1445",
+  "theme_color": "#0c1445",
   "orientation": "any",
-  "categories": ["productivity", "utilities"],
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
   "icons": [
     {
       "src": "https://flock-os.github.io/FlockOS/New_Covenant/Images/FlockOS.png",
