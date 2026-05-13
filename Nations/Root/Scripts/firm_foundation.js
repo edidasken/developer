@@ -51,13 +51,29 @@ const Nehemiah = (() => {
   }
 
   function _newCovenantBase() {
-    // Absolute URL of the New_Covenant root (or current site root if outside it).
+    // Absolute URL of the deployment root that contains the launcher
+    // (New_Covenant/, Nations/<Church>/, or the site root).
+    // Always ends with a trailing '/'.
     var p = location.pathname;
+
+    // 1. Dev / source tree: /…/New_Covenant/…
     var idx = p.indexOf('/New_Covenant/');
     if (idx >= 0) {
       return location.origin + p.substring(0, idx + '/New_Covenant/'.length);
     }
-    // Strip back to last "/" so we land at the deployment root.
+
+    // 2. Production: /…/Nations/<Church>/…
+    var nm = p.match(/^(.*\/Nations\/[^/]+\/)/);
+    if (nm) {
+      return location.origin + nm[1];
+    }
+
+    // 3. Fallback: strip the current app folder (so we don't double it),
+    //    then strip the file segment so we land at the parent dir.
+    var stripped = p.replace(/\/(app\.[a-z0-9_-]+)\/[^/]*$/i, '/');
+    if (stripped !== p) {
+      return location.origin + stripped;
+    }
     return location.origin + p.replace(/[^/]*$/, '');
   }
 
