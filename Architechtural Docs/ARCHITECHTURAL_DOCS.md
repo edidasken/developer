@@ -1,6 +1,6 @@
 # Architechtural Docs/
 
-Created: 2026-05-11
+Created: 2026-05-11 | Last audited: 2026-05-13
 
 ---
 
@@ -58,6 +58,7 @@ Scripts that automate architecture and data tasks. **Do not edit scripts here by
 - `generate_schema_manifest_from_sql.cjs` — generates the schema manifest from SQL
 - `publish_truth_schema_backup.cjs` — publishes schema backup to Architechtural Docs
 - `audit_firestore_against_schema.cjs` — audits live Firestore against the schema
+- `mirror_architecture_to_old_covenant.cjs` — mirrors canonical artifacts from New Covenant → Old Covenant
 
 ### New Covenant/Data/
 Source content files used to seed the app's data layer:

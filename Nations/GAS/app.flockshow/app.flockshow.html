@@ -47,20 +47,24 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── FlockShow design tokens — aliased to NC theme tokens ─────────── */
+    /* ── FlockShow design tokens — aliased to active FlockOS theme (new_covenant.css) ── */
     :root {
-      /* Chrome stays dark navy (presentation app) — pulled from NC chrome palette */
-      --fs-bg:        #060c1f;
-      --fs-panel:     #0c1445;
-      --fs-panel-alt: #1a0e3c;
-      --fs-border:    rgba(255,255,255,0.10);
-      /* Accents from NC palette */
+      /* Surfaces — pulled straight from the active NC theme */
+      --fs-bg:        var(--bg);
+      --fs-panel:     var(--bg-raised);
+      --fs-panel-alt: var(--bg-sunken);
+      --fs-border:    var(--line);
+
+      /* Ink — from active NC theme */
+      --fs-ink:       var(--ink);
+      --fs-muted:     var(--ink-muted);
+
+      /* Accents — gold brand for FlockShow */
       --fs-accent:    var(--gold, #e8a838);
       --fs-accent-dk: #c48a20;
       --fs-accent-dim:rgba(232,168,56,0.13);
-      --fs-ink:       #f0f1f8;
-      --fs-muted:     rgba(240,241,248,0.50);
-      --fs-danger:    var(--danger, #f87171);
+      --fs-danger:    var(--danger, #b22234);
+
       --topbar-h:     54px;
     }
 

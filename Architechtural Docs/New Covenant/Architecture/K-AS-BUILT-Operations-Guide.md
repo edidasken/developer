@@ -1,6 +1,6 @@
 # New Covenant — As-Built Operations Guide
 
-> Last updated: 2026-05-11
+> Last updated: 2026-05-13
 
 ---
 
@@ -15,11 +15,14 @@ Software/
 │   ├── Styles/new_covenant.css All app CSS (New Covenant)
 │   ├── Views/                  49 JS-rendered view modules
 │   ├── Data/                   Bundled content (Strong's, OYB, devotionals, etc.)
+│   ├── app.embeds/             Embeddable iframes (8 embeds incl. launcher, feed, flockchat, flockshow)
+│   ├── app.feed/               The Feed — Sermon Prep & Manuscript Builder
+│   ├── app.flockchat/          FlockChat — church team messaging standalone PWA
 │   ├── app.flockos/            FlockOS authenticated app shell
+│   ├── app.flockshow/          FlockShow — church presentation app
 │   ├── app.grow/               GROW public outreach shell
 │   ├── app.invite/             The Invitation public shell
-│   ├── app.stand/              Music Stand standalone shell
-│   └── app.embeds/             Embeddable iframes
+│   └── app.stand/              Music Stand standalone shell
 │
 ├── Nations/                    BUILD OUTPUT — B-Build rsync target
 │   ├── Root/                   FlockOS default
@@ -62,13 +65,23 @@ bash "Iris/Bezalel/Scripts/B-Build_Nations.sh"
 
 Per church, B-Build:
 1. `rsync`s `New_Covenant/` → `Nations/<Church>/`
-2. Patches `the_true_vine.js` GAS endpoint URLs
+2. Patches `Scripts/the_true_vine.js` GAS endpoint URLs (all 4 gospels)
 3. Patches `the_living_water.js` `CACHE_NAME` (e.g. `flockos-tbc-v1.01`)
-4. Patches Firebase config into app shells (`app.flockos.html`, `app.grow.html`, all `app.embeds/*.html`, `app.invite.html`)
-5. Strips Firebase config for GAS-only builds
-6. Patches `app.flockos/manifest.json` and `app.invite/manifest.json` with church name
-7. Patches `index.html` church selector
-8. Logs a Generations entry to Firestore on success
+4. Patches Firebase config into `app.flockos/app.flockos.html` (step 5)
+5. Patches Firebase config into `app.grow/app.grow.html` (step 6)
+6. Patches Firebase config into `app.embeds/embed-flockos.html` (step 8)
+7. Patches Firebase config into `app.embeds/embed-grow.html` (step 9)
+8. Patches Firebase config into `app.embeds/embed-stand.html` (step 9b)
+9. Patches Firebase config into `app.embeds/embed-flockshow.html` (step 9c)
+10. Patches church name + base URL into `app.embeds/embed-launcher.html` (step 9d)
+11. Patches Firebase config into `app.embeds/embed-flockchat.html` (step 9e)
+12. Patches Firebase config into `app.embeds/embed-feed.html` (step 9f)
+13. Patches Firebase config into `app.feed/feed.html` (step 9g)
+14. Patches Firebase config into `app.invite/app.invite.html` (step 10)
+15. Strips Firebase config for GAS-only builds (all patched files)
+16. Patches `app.flockos/manifest.json`, `app.invite/manifest.json`, `app.flockshow/manifest.json` with church name (steps 4, 11, 11b)
+17. Patches `index.html` church selector (step 12)
+18. Logs a Generations entry to Firestore on success
 
 ### A-Build (Covenant → Covenant/Nations)
 

@@ -51,25 +51,30 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
 
-    /* ─── Design tokens — aliased to NC theme tokens where possible ───── */
+    /* ─── Design tokens — aliased to active FlockOS theme (new_covenant.css) ─── */
     :root {
-      /* Chrome stays dark navy (chat app) — pulled from NC chrome palette */
-      --fc-bg:         #060d24;
-      --fc-panel:      #0c1445;
-      --fc-panel-2:    #111b44;
-      --fc-panel-3:    #1a2660;
-      --fc-border:     rgba(255,255,255,0.09);
-      --fc-border-hi:  rgba(255,255,255,0.15);
-      --fc-accent:     #22d3ee;   /* cyan — chat brand */
+      /* Surfaces — pulled straight from the active NC theme */
+      --fc-bg:         var(--bg);
+      --fc-panel:      var(--bg-raised);
+      --fc-panel-2:    var(--bg-sunken);
+      --fc-panel-3:    var(--bg-hover);
+      --fc-border:     var(--line);
+      --fc-border-hi:  var(--line-strong);
+
+      /* Ink — from active NC theme */
+      --fc-ink:        var(--ink);
+      --fc-muted:      var(--ink-muted);
+      --fc-faint:      var(--ink-faint);
+
+      /* Accents — chat brand cyan, plus shared NC palette colors */
+      --fc-accent:     var(--accent, #38bdf8);
       --fc-accent-dk:  #0ea5e9;
-      --fc-accent-dim: rgba(34,211,238,0.12);
+      --fc-accent-dim: rgba(56,189,248,0.12);
       --fc-gold:       var(--gold, #e8a838);
-      --fc-ink:        #eef1fb;
-      --fc-muted:      #9ba8d0;
-      --fc-faint:      rgba(255,255,255,0.22);
-      --fc-danger:     var(--danger, #f87171);
-      --fc-prayer:     #a78bfa;   /* violet for prayer chain */
-      --fc-announce:   #fbbf24;  /* amber for announcements */
+      --fc-danger:     var(--danger, #b22234);
+      --fc-prayer:     var(--lilac, #a78bfa);
+      --fc-announce:   var(--gold, #e8a838);
+
       --fc-font:       'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       --topbar-h:      52px;
       --sidebar-w:     260px;

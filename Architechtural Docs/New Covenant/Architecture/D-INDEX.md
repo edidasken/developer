@@ -8,6 +8,7 @@ Update flow: New Covenant -> Old Covenant
 
 ## Release Notes
 
+- **2026-05-13:** Full as-built audit completed. Three new standalone app shells documented: `app.feed/` (Sermon Prep & Manuscript Builder), `app.flockchat/` (church team messaging PWA), `app.flockshow/` (church presentation app). Four new embeds documented: `embed-feed.html`, `embed-flockchat.html`, `embed-flockshow.html`, `embed-launcher.html`. B-Build step list in `K-AS-BUILT-Operations-Guide.md` expanded to all 18 patch steps. `N-Automation-README.md` updated with `audit_firestore_against_schema.cjs`. Repo layout tree corrected for all 8 app shells.
 - **2026-04-30:** AI-generated as-built documentation suite complete. Six docs produced via Gemini 2.5 Flash covering scripts, views, data layer, architecture overview, operations runbook, and doc-set index. Automation pipeline (`AI_Doc_Runner/`) added. `Assistants.md` reference doc added.
 - **2026-04-28:** Initial structure and canonicalization of New Covenant architecture tree. All folders and placeholders established. Symlinks and migration plans documented.
 
