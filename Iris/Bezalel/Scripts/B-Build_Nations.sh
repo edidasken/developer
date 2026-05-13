@@ -63,7 +63,7 @@ PREFLIGHT_OK=true
 [ -f "$NEW_COVENANT/app.flockos/app.flockos.html" ] || { echo "  ✗ MISSING: New_Covenant/app.flockos/app.flockos.html (app)"; PREFLIGHT_OK=false; }
 [ -f "$NEW_COVENANT/app.flockos/manifest.json" ] || { echo "  ✗ MISSING: New_Covenant/app.flockos/manifest.json"; PREFLIGHT_OK=false; }
 [ -f "$NEW_COVENANT/app.grow/app.grow.html" ] || { echo "  ✗ MISSING: New_Covenant/app.grow/app.grow.html"; PREFLIGHT_OK=false; }
-[ -f "$NEW_COVENANT/app.grow/grow-manifest.json" ] || { echo "  ✗ MISSING: New_Covenant/app.grow/grow-manifest.json"; PREFLIGHT_OK=false; }
+[ -f "$NEW_COVENANT/app.grow/manifest.json" ] || { echo "  ✗ MISSING: New_Covenant/app.grow/manifest.json"; PREFLIGHT_OK=false; }
 [ -f "$NEW_COVENANT/the_living_water.js" ] || { echo "  ✗ MISSING: New_Covenant/the_living_water.js"; PREFLIGHT_OK=false; }
 [ -f "$NEW_COVENANT/Scripts/the_true_vine.js" ] || { echo "  ✗ MISSING: New_Covenant/Scripts/the_true_vine.js"; PREFLIGHT_OK=false; }
 

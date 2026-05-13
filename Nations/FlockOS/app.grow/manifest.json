@@ -1,16 +1,19 @@
 {
   "name": "GROW by FlockOS",
   "short_name": "GROW",
-  "description": "Free discipleship tools in 210 countries — Bible reading plans, devotionals, Strongs lexicons, apologetics, theology, missions, and more. No account required. Offline-capable.",
+  "description": "Free discipleship tools in 210 countries \u2014 Bible reading plans, devotionals, Strongs lexicons, apologetics, theology, missions, and more. No account required. Offline-capable.",
   "start_url": "./app.grow.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0c1445",
-  "theme_color": "#e8a838",
+  "theme_color": "#0c1445",
   "lang": "en",
   "dir": "ltr",
-  "categories": ["education", "productivity"],
+  "categories": [
+    "education",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "../Images/GrowIcon.png",
@@ -31,22 +34,38 @@
       "short_name": "Reading",
       "description": "Open the one-year Bible reading plan",
       "url": "./app.grow.html#the_gospel_reading",
-      "icons": [{ "src": "../Images/GrowIcon.png", "sizes": "512x512" }]
+      "icons": [
+        {
+          "src": "../Images/GrowIcon.png",
+          "sizes": "512x512"
+        }
+      ]
     },
     {
       "name": "Devotionals",
       "short_name": "Devotionals",
       "description": "Open daily devotionals",
       "url": "./app.grow.html#the_gospel_devotionals",
-      "icons": [{ "src": "../Images/GrowIcon.png", "sizes": "512x512" }]
+      "icons": [
+        {
+          "src": "../Images/GrowIcon.png",
+          "sizes": "512x512"
+        }
+      ]
     },
     {
       "name": "Lexicon",
       "short_name": "Lexicon",
       "description": "Open Strongs Hebrew & Greek lexicon",
       "url": "./app.grow.html#the_gospel_lexicon",
-      "icons": [{ "src": "../Images/GrowIcon.png", "sizes": "512x512" }]
+      "icons": [
+        {
+          "src": "../Images/GrowIcon.png",
+          "sizes": "512x512"
+        }
+      ]
     }
   ],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "id": "./app.grow.html"
 }
