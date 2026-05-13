@@ -1121,13 +1121,157 @@ function _doPrint() {
 
   html += '</div>'; // #bmp-wrap
 
-  // Inject, print, remove
-  const doc = document.createElement('div');
-  doc.id = 'bm-print-document';
-  doc.innerHTML = html;
-  document.body.appendChild(doc);
-  window.print();
-  document.body.removeChild(doc);
+  // ── Open in a standalone window with embedded styles + auto-print ──────────
+  // This pattern works reliably on iOS/iPadOS/Android/desktop because the new
+  // window exposes the browser's native print sheet (which includes "Save to
+  // PDF", "Save to Files", and Share on iOS). The previous in-place approach
+  // (inject-element + window.print() + immediate-remove) failed on tablets
+  // because mobile browsers render print previews asynchronously, so the
+  // injected element was removed before it was captured.
+  _openPrintWindow(s, html);
+}
+
+/* ────────────────────────────────────────────────────────────────────────
+   _openPrintWindow — render sermon in a new tab/window with full styles,
+   visible Print + Close toolbar, and auto-trigger native print sheet.
+   Mobile-friendly: works in iOS Safari, iPad, Android Chrome, desktop, PWA.
+──────────────────────────────────────────────────────────────────────── */
+function _openPrintWindow(s, bodyHtml) {
+  const title = (s.title || 'Sermon').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+
+  // Print styles — extracted from feed.html @media print block, applied
+  // unconditionally inside this standalone document (this entire window
+  // exists for printing/PDF export).
+  const printCss = `
+    @page { margin: 0.7in 0.8in; }
+    html, body { margin: 0; padding: 0; background: #f5f1ea; font-family: 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { padding: 0 24px 32px; max-width: 8.5in; margin: 0 auto; box-sizing: border-box; }
+    #bm-print-document { font-family: 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; }
+    #bmp-wrap { max-width: 100%; }
+    #bmp-header { margin-bottom: 20pt; }
+    #bmp-header-bar { height: 5pt; background: linear-gradient(90deg, #c48a20, #e8a838); border-radius: 2pt; margin-bottom: 14pt; }
+    #bmp-header-body { padding: 0; }
+    #bmp-header-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4pt; }
+    #bmp-series { font: 600 9pt 'Plus Jakarta Sans', sans-serif; color: #c48a20; text-transform: uppercase; letter-spacing: .08em; }
+    #bmp-date { font: 400 9pt 'Plus Jakarta Sans', sans-serif; color: #888; }
+    #bmp-title { font: 700 24pt 'Plus Jakarta Sans', sans-serif; color: #0f0f0f; margin: 0 0 8pt; line-height: 1.15; }
+    #bmp-meta-row { display: flex; gap: 14pt; flex-wrap: wrap; margin-top: 5pt; padding-top: 7pt; border-top: 1.5pt solid #e8a838; }
+    .bmp-meta-chip { font: 500 9pt 'Plus Jakarta Sans', sans-serif; color: #555; }
+    #bmp-sections { display: flex; flex-direction: column; gap: 9pt; }
+    .bmp-section { display: flex; break-inside: avoid; border: 1pt solid #e2ded8; border-radius: 4pt; overflow: hidden; background: #fff; }
+    .bmp-section-accent { width: 4.5pt; flex-shrink: 0; }
+    .bmp-section-content { flex: 1; padding: 8pt 12pt; }
+    .bmp-section-head { display: flex; align-items: baseline; gap: 7pt; margin-bottom: 5pt; flex-wrap: wrap; }
+    .bmp-type-pill { font: 700 6.5pt 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; letter-spacing: .10em; border: 1pt solid; padding: 1.5pt 5pt; border-radius: 3pt; flex-shrink: 0; }
+    .bmp-section-title { font: 600 11.5pt 'Plus Jakarta Sans', sans-serif; color: #111; line-height: 1.3; }
+    .bmp-transition-section { display: flex; align-items: center; gap: 8pt; padding: 5pt 10pt; border: none; border-top: 1pt dashed #ccc; border-bottom: 1pt dashed #ccc; background: transparent !important; }
+    .bmp-transition-section .bmp-section-accent { display: none; }
+    .bmp-verse-block { margin: 5pt 0 5pt; padding: 7pt 10pt 7pt 11pt; background: #fef9ec; border-left: 3pt solid #e8a838; }
+    .bmp-verse-ref { font: 700 9.5pt 'Plus Jakarta Sans', sans-serif; color: #c48a20; margin-bottom: 3pt; }
+    .bmp-verse-text { font: italic 11pt/1.72 Georgia, serif; color: #2c2c2c; }
+    .bmp-notes { font: 10.5pt/1.68 Georgia, serif; color: #2c2c2c; }
+    #bmp-prayer { margin-top: 16pt; padding-top: 13pt; border-top: 2pt solid #7c3aed; }
+    #bmp-prayer-head { display: flex; align-items: center; gap: 7pt; margin-bottom: 10pt; }
+    #bmp-prayer-bar { width: 3.5pt; height: 14pt; background: #7c3aed; border-radius: 2pt; flex-shrink: 0; }
+    #bmp-prayer-label { font: 700 9.5pt 'Plus Jakarta Sans', sans-serif; color: #7c3aed; text-transform: uppercase; letter-spacing: .10em; }
+    .bmp-prayer-item { break-inside: avoid; margin-bottom: 8pt; padding-left: 10pt; border-left: 2pt solid #e9d5ff; }
+    .bmp-prayer-item-title { font: 700 10.5pt 'Plus Jakarta Sans', sans-serif; color: #1a1a1a; margin-bottom: 2pt; }
+    .bmp-prayer-item-notes { font: 10pt/1.6 Georgia, serif; color: #444; }
+
+    /* ── On-screen toolbar (hidden when printing) ─────────────────────── */
+    .pd-toolbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+      padding: 12px 16px; margin: 0 -24px 24px;
+      background: #1a1320; color: #f5e9c8;
+      border-bottom: 2px solid #c48a20;
+      font: 600 0.85rem 'Plus Jakarta Sans', sans-serif;
+      padding-top: calc(12px + env(safe-area-inset-top, 0px));
+    }
+    .pd-toolbar-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }
+    .pd-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.20);
+      background: rgba(255,255,255,0.08); color: #fff;
+      font: 600 0.82rem 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; transition: background .15s; white-space: nowrap;
+    }
+    .pd-btn:hover, .pd-btn:focus { background: rgba(255,255,255,0.18); outline: none; }
+    .pd-btn--primary { background: #c48a20; border-color: #c48a20; color: #1a1320; }
+    .pd-btn--primary:hover { background: #e8a838; border-color: #e8a838; }
+    .pd-hint { font: 400 0.72rem 'Plus Jakarta Sans', sans-serif; color: rgba(245,233,200,0.65); padding: 8px 4px 0; text-align: center; }
+
+    @media print {
+      .pd-toolbar, .pd-hint { display: none !important; }
+      body { padding: 0; max-width: none; background: #fff; }
+    }
+    @media (max-width: 600px) {
+      body { padding: 0 14px 24px; }
+      .pd-toolbar { margin: 0 -14px 16px; padding: 10px 14px; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+      #bmp-title { font-size: 20pt; }
+    }
+  `;
+
+  const fullDoc = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>${title} — Sermon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>${printCss}</style>
+</head>
+<body>
+<div class="pd-toolbar" role="toolbar" aria-label="Sermon export">
+  <span class="pd-toolbar-title">${title}</span>
+  <button type="button" class="pd-btn pd-btn--primary" id="pd-print">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Print / Save PDF
+  </button>
+  <button type="button" class="pd-btn" id="pd-close">Close</button>
+</div>
+<div class="pd-hint">On iPhone / iPad: tap <strong>Print / Save PDF</strong>, then pinch the preview to open the share sheet for AirDrop, Files, Mail, or Messages.</div>
+<div id="bm-print-document">${bodyHtml}</div>
+<script>
+  document.getElementById('pd-print').addEventListener('click', function(){ try { window.print(); } catch(e) { alert('Print failed: ' + e.message); } });
+  document.getElementById('pd-close').addEventListener('click', function(){ try { window.close(); } catch(e) {} });
+  // Auto-trigger print once fonts/layout settle. Wrapped in setTimeout to give
+  // iOS Safari time to render before invoking the native print sheet.
+  window.addEventListener('load', function(){
+    setTimeout(function(){ try { window.focus(); window.print(); } catch(e) {} }, 450);
+  });
+<\/script>
+</body>
+</html>`;
+
+  // Open the new window. Must be invoked synchronously from the user click
+  // handler upstream to avoid pop-up blockers.
+  let win;
+  try { win = window.open('', '_blank'); } catch (e) { win = null; }
+
+  if (!win) {
+    // Fallback: blob URL + anchor click — works when popups are blocked
+    // (some PWAs and embedded browsers).
+    try {
+      const blob = new Blob([fullDoc], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      _toast('Opened sermon in new tab — use Print / Save PDF', 'success');
+    } catch (err) {
+      _toast('Could not open print window. Please allow pop-ups.', 'error');
+    }
+    return;
+  }
+
+  win.document.open();
+  win.document.write(fullDoc);
+  win.document.close();
 }
 
 /* ════════════════════════════════════════════════════════════════════════
