@@ -2317,6 +2317,21 @@ async function _init() {
     });
   }
 
+  // Sermon header accordion toggle (mobile)
+  const headerEl = _qs('bm-sermon-header');
+  const headerToggle = _qs('bm-header-toggle');
+  if (headerEl && headerToggle) {
+    // Default: collapsed on narrow viewports
+    if (window.innerWidth <= 600) {
+      headerEl.classList.add('is-collapsed');
+      headerToggle.setAttribute('aria-expanded', 'false');
+    }
+    headerToggle.addEventListener('click', () => {
+      const collapsed = headerEl.classList.toggle('is-collapsed');
+      headerToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    });
+  }
+
   // Duplicate sermon
   const dupBtn = _qs('bm-duplicate-btn');
   if (dupBtn) dupBtn.addEventListener('click', _duplicateSermon);

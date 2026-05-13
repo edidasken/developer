@@ -329,6 +329,21 @@
 
     .bm-header-actions { display: flex; gap: 7px; flex-shrink: 0; align-items: center; flex-wrap: wrap; }
 
+    /* Title row wrapper (holds title + accordion toggle) */
+    .bm-title-row { display: flex; flex: 2 1 100%; min-width: 180px; gap: 8px; align-items: stretch; }
+    .bm-title-row .bm-title-input { flex: 1; min-width: 0; }
+    .bm-header-toggle {
+      display: none; flex-shrink: 0;
+      width: 36px; align-items: center; justify-content: center;
+      background: var(--bg-input); border: 1px solid var(--bm-border);
+      color: var(--bm-muted); border-radius: 9px; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .bm-header-toggle:hover { color: var(--bm-ink); border-color: var(--bm-border-lit); }
+    .bm-header-toggle svg { transition: transform 0.2s; }
+    #bm-sermon-header.is-collapsed .bm-header-toggle svg { transform: rotate(-90deg); }
+    #bm-sermon-header.is-collapsed .bm-header-collapsible { display: none !important; }
+
     .bm-status-chip {
       display: inline-flex; align-items: center; gap: 5px;
       padding: 3px 10px; border-radius: 999px; font: 600 0.68rem 'Plus Jakarta Sans', sans-serif;
@@ -1215,10 +1230,12 @@
       .bm-user-chip { padding: 2px 6px 2px 3px; }
       .bm-user-chip #bm-user-name { display: none; }
 
-      /* ── Sermon header: stack cleanly ──────────────────────────── */
+      /* ── Sermon header: stack cleanly + accordion toggle ──────── */
       #bm-sermon-header { padding: 10px 12px 8px; gap: 8px; }
       .bm-header-fields { gap: 8px; }
-      .bm-title-input { flex: 1 1 100%; min-width: 0; font-size: 0.92rem; padding: 7px 10px; }
+      .bm-title-row { flex-basis: 100%; }
+      .bm-header-toggle { display: inline-flex; }
+      .bm-title-input { flex: 1; min-width: 0; font-size: 0.92rem; padding: 7px 10px; }
       .bm-meta-input {
         flex: 1 1 calc(50% - 4px); min-width: 0; max-width: none !important;
         padding: 6px 10px; font-size: 0.82rem;
@@ -1346,13 +1363,18 @@
         <!-- Sermon header -->
         <div id="bm-sermon-header">
           <div class="bm-header-fields">
-            <input class="bm-title-input" id="bm-field-title" type="text" placeholder="Sermon title…" autocomplete="off">
-            <input class="bm-meta-input" id="bm-field-series" type="text" placeholder="Series…" autocomplete="off" style="max-width:180px">
-            <input class="bm-meta-input" id="bm-field-date" type="date" style="max-width:160px">
-            <input class="bm-meta-input" id="bm-field-speaker" type="text" placeholder="Speaker…" autocomplete="off" style="max-width:160px">
-            <input class="bm-meta-input" id="bm-field-passage" type="text" placeholder="Key passage…" autocomplete="off" style="max-width:160px">
+            <div class="bm-title-row">
+              <input class="bm-title-input" id="bm-field-title" type="text" placeholder="Sermon title…" autocomplete="off">
+              <button class="bm-header-toggle" id="bm-header-toggle" type="button" aria-label="Toggle sermon details" aria-expanded="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </div>
+            <input class="bm-meta-input bm-header-collapsible" id="bm-field-series" type="text" placeholder="Series…" autocomplete="off" style="max-width:180px">
+            <input class="bm-meta-input bm-header-collapsible" id="bm-field-date" type="date" style="max-width:160px">
+            <input class="bm-meta-input bm-header-collapsible" id="bm-field-speaker" type="text" placeholder="Speaker…" autocomplete="off" style="max-width:160px">
+            <input class="bm-meta-input bm-header-collapsible" id="bm-field-passage" type="text" placeholder="Key passage…" autocomplete="off" style="max-width:160px">
           </div>
-          <div class="bm-header-actions">
+          <div class="bm-header-actions bm-header-collapsible">
             <button class="bm-status-chip draft" id="bm-status-btn" title="Toggle status">
               <span class="bm-status-dot"></span>
               <span id="bm-status-label">Draft</span>
