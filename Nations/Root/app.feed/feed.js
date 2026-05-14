@@ -3018,6 +3018,8 @@ function _openTool(name) {
   else if (name === 'creeds')     { head.textContent = 'Creeds & Confessions';        _renderCreeds(body); }
   else if (name === 'words')      { head.textContent = 'Hebrew & Greek Word Study';   _renderWords(body); }
   else if (name === 'templates')  { head.textContent = 'Sermon Templates';            _renderTemplates(body); }
+  else if (name === 'prayers')    { head.textContent = 'Prayers & Liturgies';         _renderPrayers(body); }
+  else if (name === 'voices')     { head.textContent = 'Voices of the Church';        _renderVoices(body); }
   else { _closeTool(); }
 }
 
@@ -4304,3 +4306,428 @@ function _renderAccordion(body, dataset, prefix, placeholder, answerLabel, scrip
     if (card) card.classList.toggle('is-open');
   });
 }
+
+
+// ─────────────────────────────────────────────────────────────
+// PRAYERS & LITURGIES — historic Christian prayers
+// ─────────────────────────────────────────────────────────────
+const BM_PRAYERS = [
+  // ── THE LORD'S PRAYER ──
+  { cat: 'The Lord\u2019s Prayer', q: 'The Lord\u2019s Prayer (traditional)',
+    a: 'Our Father, who art in heaven, hallowed be thy name. Thy kingdom come, thy will be done, on earth as it is in heaven. Give us this day our daily bread, and forgive us our trespasses, as we forgive those who trespass against us. And lead us not into temptation, but deliver us from evil. For thine is the kingdom, and the power, and the glory, for ever and ever. Amen.',
+    v: [
+      ['Matthew 6:9-13', 'Pray then like this: "Our Father in heaven, hallowed be your name. Your kingdom come, your will be done, on earth as it is in heaven..."'],
+      ['Luke 11:2-4', 'And he said to them, "When you pray, say: \'Father, hallowed be your name. Your kingdom come...\'"'],
+    ]
+  },
+
+  // ── DAILY PRAYER ──
+  { cat: 'Daily Prayer', q: 'Morning Prayer (BCP, condensed)',
+    a: 'O Lord, our heavenly Father, almighty and everlasting God, you have safely brought us to the beginning of this day: defend us in the same with your mighty power; and grant that this day we fall into no sin, neither run into any kind of danger; but that all our doings, being ordered by your governance, may be righteous in your sight; through Jesus Christ our Lord. Amen.',
+    v: [
+      ['Psalm 5:3', 'O LORD, in the morning you hear my voice; in the morning I prepare a sacrifice for you and watch.'],
+      ['Lamentations 3:22-23', 'The steadfast love of the LORD never ceases; his mercies never come to an end; they are new every morning.'],
+    ]
+  },
+  { cat: 'Daily Prayer', q: 'Evening Prayer / Compline',
+    a: 'Be present, O merciful God, and protect us through the hours of this night, so that we who are wearied by the changes and chances of this life may rest in your eternal changelessness; through Jesus Christ our Lord. Amen.\n\nKeep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, Lord Christ; give rest to the weary, bless the dying, soothe the suffering, pity the afflicted, shield the joyous; and all for your love\u2019s sake. Amen.',
+    v: [
+      ['Psalm 4:8', 'In peace I will both lie down and sleep; for you alone, O LORD, make me dwell in safety.'],
+      ['Psalm 121:3-4', 'He will not let your foot be moved; he who keeps you will not slumber. Behold, he who keeps Israel will neither slumber nor sleep.'],
+    ]
+  },
+  { cat: 'Daily Prayer', q: 'Prayer of St. Patrick (excerpt — the Lorica)',
+    a: 'Christ with me, Christ before me, Christ behind me,\nChrist in me, Christ beneath me, Christ above me,\nChrist on my right, Christ on my left,\nChrist when I lie down, Christ when I sit down, Christ when I arise,\nChrist in the heart of every man who thinks of me,\nChrist in the mouth of every man who speaks of me,\nChrist in every eye that sees me,\nChrist in every ear that hears me. Amen.',
+    v: [
+      ['Galatians 2:20', 'I have been crucified with Christ. It is no longer I who live, but Christ who lives in me.'],
+      ['Colossians 3:11', 'But Christ is all, and in all.'],
+    ]
+  },
+  { cat: 'Daily Prayer', q: 'Prayer of St. Francis',
+    a: 'Lord, make me an instrument of your peace.\nWhere there is hatred, let me sow love;\nwhere there is injury, pardon;\nwhere there is doubt, faith;\nwhere there is despair, hope;\nwhere there is darkness, light;\nwhere there is sadness, joy.\n\nO Divine Master, grant that I may not so much seek\nto be consoled, as to console;\nto be understood, as to understand;\nto be loved, as to love.\nFor it is in giving that we receive;\nit is in pardoning that we are pardoned;\nand it is in dying that we are born to eternal life. Amen.',
+    v: [
+      ['Matthew 5:9', 'Blessed are the peacemakers, for they shall be called sons of God.'],
+      ['Romans 12:18', 'If possible, so far as it depends on you, live peaceably with all.'],
+      ['Luke 6:38', 'Give, and it will be given to you.'],
+    ]
+  },
+
+  // ── PASTORAL ──
+  { cat: 'Pastoral Prayer', q: 'Prayer for those who suffer',
+    a: 'Almighty God, whose Son Jesus Christ lived among us as one acquainted with grief: look with mercy on all who suffer in body, mind, or spirit. Comfort them with the knowledge of your love; lift up those who are bowed down; bind up the broken-hearted; and grant that, in the fellowship of his sufferings, they may find the surpassing peace of his presence; through Jesus Christ our Lord. Amen.',
+    v: [
+      ['Psalm 34:18', 'The LORD is near to the brokenhearted and saves the crushed in spirit.'],
+      ['2 Corinthians 1:3-4', 'Blessed be the God and Father of our Lord Jesus Christ, the Father of mercies and God of all comfort, who comforts us in all our affliction.'],
+      ['Isaiah 53:3', 'He was despised and rejected by men, a man of sorrows and acquainted with grief.'],
+    ]
+  },
+  { cat: 'Pastoral Prayer', q: 'Prayer for the sick',
+    a: 'O God, the source of all health: so fill our hearts with faith in your love that, with calm expectancy, we may make room for your power to possess us, and gracious purpose to work in our healing; for the sake of Jesus Christ our Lord. Amen.',
+    v: [
+      ['James 5:14-15', 'Is anyone among you sick? Let him call for the elders of the church, and let them pray over him, anointing him with oil in the name of the Lord. And the prayer of faith will save the one who is sick, and the Lord will raise him up.'],
+      ['Psalm 103:2-3', 'Bless the LORD, O my soul, and forget not all his benefits, who forgives all your iniquity, who heals all your diseases.'],
+    ]
+  },
+  { cat: 'Pastoral Prayer', q: 'Prayer at a time of decision',
+    a: 'O God, by whom the meek are guided in judgment, and light rises up in darkness for the godly: grant us, in all our doubts and uncertainties, the grace to ask what you would have us do; that the spirit of wisdom may save us from all false choices, and that in your light we may see light, and in your straight path may not stumble; through Jesus Christ our Lord. Amen.',
+    v: [
+      ['James 1:5', 'If any of you lacks wisdom, let him ask God, who gives generously to all without reproach, and it will be given him.'],
+      ['Proverbs 3:5-6', 'Trust in the LORD with all your heart, and do not lean on your own understanding. In all your ways acknowledge him, and he will make straight your paths.'],
+    ]
+  },
+  { cat: 'Pastoral Prayer', q: 'Prayer of confession (general)',
+    a: 'Most merciful God, we confess that we have sinned against you in thought, word, and deed, by what we have done, and by what we have left undone. We have not loved you with our whole heart; we have not loved our neighbors as ourselves. We are truly sorry and we humbly repent. For the sake of your Son Jesus Christ, have mercy on us and forgive us; that we may delight in your will, and walk in your ways, to the glory of your Name. Amen.',
+    v: [
+      ['1 John 1:9', 'If we confess our sins, he is faithful and just to forgive us our sins and to cleanse us from all unrighteousness.'],
+      ['Psalm 51:1-2', 'Have mercy on me, O God, according to your steadfast love; according to your abundant mercy blot out my transgressions. Wash me thoroughly from my iniquity, and cleanse me from my sin!'],
+      ['Psalm 32:5', 'I acknowledged my sin to you, and I did not cover my iniquity; I said, "I will confess my transgressions to the LORD," and you forgave the iniquity of my sin.'],
+    ]
+  },
+
+  // ── BENEDICTIONS ──
+  { cat: 'Benedictions', q: 'The Aaronic Blessing',
+    a: 'The LORD bless you and keep you;\nthe LORD make his face to shine upon you and be gracious to you;\nthe LORD lift up his countenance upon you and give you peace. Amen.',
+    v: [
+      ['Numbers 6:24-26', 'The LORD bless you and keep you; the LORD make his face to shine upon you and be gracious to you; the LORD lift up his countenance upon you and give you peace.'],
+    ]
+  },
+  { cat: 'Benedictions', q: 'Pauline Benediction (2 Cor 13:14)',
+    a: 'The grace of the Lord Jesus Christ, and the love of God, and the fellowship of the Holy Spirit be with you all. Amen.',
+    v: [
+      ['2 Corinthians 13:14', 'The grace of the Lord Jesus Christ and the love of God and the fellowship of the Holy Spirit be with you all.'],
+    ]
+  },
+  { cat: 'Benedictions', q: 'The Hebrews Benediction (Heb 13:20-21)',
+    a: 'Now may the God of peace, who brought again from the dead our Lord Jesus, the great Shepherd of the sheep, by the blood of the eternal covenant, equip you with everything good that you may do his will, working in us that which is pleasing in his sight, through Jesus Christ, to whom be glory forever and ever. Amen.',
+    v: [
+      ['Hebrews 13:20-21', 'Now may the God of peace who brought again from the dead our Lord Jesus, the great shepherd of the sheep, by the blood of the eternal covenant, equip you with everything good that you may do his will.'],
+    ]
+  },
+  { cat: 'Benedictions', q: 'The Jude Doxology',
+    a: 'Now to him who is able to keep you from stumbling and to present you blameless before the presence of his glory with great joy, to the only God, our Savior, through Jesus Christ our Lord, be glory, majesty, dominion, and authority, before all time and now and forever. Amen.',
+    v: [
+      ['Jude 1:24-25', 'Now to him who is able to keep you from stumbling and to present you blameless before the presence of his glory with great joy.'],
+    ]
+  },
+  { cat: 'Benedictions', q: 'The Romans Doxology (Rom 11:33-36)',
+    a: 'Oh, the depth of the riches and wisdom and knowledge of God! How unsearchable are his judgments and how inscrutable his ways! For who has known the mind of the Lord, or who has been his counselor? For from him and through him and to him are all things. To him be glory forever. Amen.',
+    v: [
+      ['Romans 11:33-36', 'Oh, the depth of the riches and wisdom and knowledge of God!... For from him and through him and to him are all things. To him be glory forever. Amen.'],
+    ]
+  },
+
+  // ── COMMUNION ──
+  { cat: 'Communion / Eucharist', q: 'Sursum Corda (Lift up your hearts)',
+    a: 'Minister: The Lord be with you.\nPeople: And also with you.\nMinister: Lift up your hearts.\nPeople: We lift them to the Lord.\nMinister: Let us give thanks to the Lord our God.\nPeople: It is right to give him thanks and praise.',
+    v: [
+      ['Lamentations 3:41', 'Let us lift up our hearts and hands to God in heaven.'],
+      ['Psalm 95:1-2', 'Oh come, let us sing to the LORD; let us make a joyful noise to the rock of our salvation! Let us come into his presence with thanksgiving.'],
+    ]
+  },
+  { cat: 'Communion / Eucharist', q: 'Words of Institution',
+    a: 'On the night in which he was betrayed, our Lord Jesus took bread, and when he had given thanks, he broke it, and gave it to his disciples, saying: "Take, eat; this is my body, which is given for you. Do this in remembrance of me."\n\nIn the same way, after supper, he took the cup, and when he had given thanks, he gave it to them, saying: "Drink from this, all of you; this cup is the new covenant in my blood, shed for you and for many for the forgiveness of sins. Do this, as often as you drink it, in remembrance of me."',
+    v: [
+      ['1 Corinthians 11:23-26', 'For I received from the Lord what I also delivered to you, that the Lord Jesus on the night when he was betrayed took bread...'],
+      ['Matthew 26:26-28', 'Now as they were eating, Jesus took bread, and after blessing it broke it and gave it to the disciples, and said, "Take, eat; this is my body."'],
+    ]
+  },
+  { cat: 'Communion / Eucharist', q: 'Agnus Dei (Lamb of God)',
+    a: 'Lamb of God, you take away the sin of the world, have mercy on us.\nLamb of God, you take away the sin of the world, have mercy on us.\nLamb of God, you take away the sin of the world, grant us your peace. Amen.',
+    v: [
+      ['John 1:29', 'The next day he saw Jesus coming toward him, and said, "Behold, the Lamb of God, who takes away the sin of the world!"'],
+      ['Revelation 5:12', 'Worthy is the Lamb who was slain, to receive power and wealth and wisdom and might and honor and glory and blessing!'],
+    ]
+  },
+
+  // ── BAPTISM ──
+  { cat: 'Baptism', q: 'Trinitarian Baptismal Formula',
+    a: '[Name], I baptize you in the name of the Father, and of the Son, and of the Holy Spirit. Amen.',
+    v: [
+      ['Matthew 28:19', 'Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit.'],
+      ['Acts 2:38', 'Repent and be baptized every one of you in the name of Jesus Christ for the forgiveness of your sins.'],
+    ]
+  },
+  { cat: 'Baptism', q: 'Baptismal Vows (renunciation & confession)',
+    a: 'Question: Do you renounce the devil and all his works?\nAnswer: I renounce them.\n\nQuestion: Do you renounce the empty promises and deadly deceits of this world?\nAnswer: I renounce them.\n\nQuestion: Do you renounce the sinful desires of the flesh?\nAnswer: I renounce them.\n\nQuestion: Do you turn to Jesus Christ and accept him as your Savior?\nAnswer: I do.\n\nQuestion: Do you put your whole trust in his grace and love?\nAnswer: I do.\n\nQuestion: Do you promise to follow and obey him as your Lord?\nAnswer: I do.',
+    v: [
+      ['Romans 6:3-4', 'Do you not know that all of us who have been baptized into Christ Jesus were baptized into his death? We were buried therefore with him by baptism into death, in order that, just as Christ was raised from the dead by the glory of the Father, we too might walk in newness of life.'],
+      ['Galatians 3:27', 'For as many of you as were baptized into Christ have put on Christ.'],
+    ]
+  },
+
+  // ── LITURGICAL YEAR (collects) ──
+  { cat: 'Collects (Church Year)', q: 'Collect for Advent 1',
+    a: 'Almighty God, give us grace to cast away the works of darkness and put on the armor of light, now in the time of this mortal life in which your Son Jesus Christ came to visit us in great humility; that on the last day, when he shall come again in his glorious majesty to judge both the living and the dead, we may rise to the life immortal; through him who lives and reigns with you and the Holy Spirit, one God, now and forever. Amen.',
+    v: [
+      ['Romans 13:11-12', 'Besides this you know the time, that the hour has come for you to wake from sleep... let us cast off the works of darkness and put on the armor of light.'],
+    ]
+  },
+  { cat: 'Collects (Church Year)', q: 'Collect for Christmas',
+    a: 'Almighty God, you have given us your only-begotten Son to take our nature upon him, and to be born this day of a pure virgin: grant that we, who have been born again and made your children by adoption and grace, may daily be renewed by your Holy Spirit; through our Lord Jesus Christ, to whom with you and the same Spirit be honor and glory, now and forever. Amen.',
+    v: [
+      ['John 1:14', 'And the Word became flesh and dwelt among us, and we have seen his glory, glory as of the only Son from the Father, full of grace and truth.'],
+      ['Galatians 4:4-5', 'But when the fullness of time had come, God sent forth his Son, born of woman, born under the law, to redeem those who were under the law, so that we might receive adoption as sons.'],
+    ]
+  },
+  { cat: 'Collects (Church Year)', q: 'Collect for Ash Wednesday',
+    a: 'Almighty and everlasting God, you hate nothing you have made and forgive the sins of all who are penitent: create and make in us new and contrite hearts, that we, worthily lamenting our sins and acknowledging our wretchedness, may obtain of you, the God of all mercy, perfect remission and forgiveness; through Jesus Christ our Lord. Amen.',
+    v: [
+      ['Joel 2:12-13', '"Yet even now," declares the LORD, "return to me with all your heart, with fasting, with weeping, and with mourning..."'],
+      ['Psalm 51:17', 'The sacrifices of God are a broken spirit; a broken and contrite heart, O God, you will not despise.'],
+    ]
+  },
+  { cat: 'Collects (Church Year)', q: 'Collect for Good Friday',
+    a: 'Almighty God, we pray you graciously to behold this your family, for whom our Lord Jesus Christ was willing to be betrayed, and given into the hands of sinners, and to suffer death upon the cross; who now lives and reigns with you and the Holy Spirit, one God, for ever and ever. Amen.',
+    v: [
+      ['Isaiah 53:5', 'But he was pierced for our transgressions; he was crushed for our iniquities; upon him was the chastisement that brought us peace, and with his wounds we are healed.'],
+      ['1 Peter 2:24', 'He himself bore our sins in his body on the tree, that we might die to sin and live to righteousness. By his wounds you have been healed.'],
+    ]
+  },
+  { cat: 'Collects (Church Year)', q: 'Collect for Easter Day',
+    a: 'Almighty God, who through your only-begotten Son Jesus Christ overcame death and opened to us the gate of everlasting life: grant that we, who celebrate with joy the day of the Lord\u2019s resurrection, may be raised from the death of sin by your life-giving Spirit; through Jesus Christ our Lord, who lives and reigns with you and the Holy Spirit, one God, now and forever. Amen.',
+    v: [
+      ['1 Corinthians 15:20', 'But in fact Christ has been raised from the dead, the firstfruits of those who have fallen asleep.'],
+      ['Romans 6:4', 'We were buried therefore with him by baptism into death, in order that, just as Christ was raised from the dead... we too might walk in newness of life.'],
+    ]
+  },
+  { cat: 'Collects (Church Year)', q: 'Collect for Pentecost',
+    a: 'O God, who on this day taught the hearts of your faithful people by sending to them the light of your Holy Spirit: grant us by the same Spirit to have a right judgment in all things, and evermore to rejoice in his holy comfort; through the merits of Christ Jesus our Savior, who lives and reigns with you, in the unity of the same Spirit, one God, for ever and ever. Amen.',
+    v: [
+      ['Acts 2:1-4', 'When the day of Pentecost arrived, they were all together in one place. And suddenly there came from heaven a sound like a mighty rushing wind...'],
+      ['John 14:26', 'But the Helper, the Holy Spirit, whom the Father will send in my name, he will teach you all things and bring to your remembrance all that I have said to you.'],
+    ]
+  },
+
+  // ── PRAYERS BEFORE MINISTRY ──
+  { cat: 'Before Ministry', q: 'Prayer before preaching',
+    a: 'Lord Jesus Christ, you are the living Word and the Word made flesh. As I open the Scriptures and stand before your people, may I decrease and you increase. Open my mouth, fill it with your truth, and let nothing of myself stand between your sheep and your voice. Make me faithful to the text, fearless before the faces of men, and tender toward the souls you have redeemed by your blood. May this hour bear fruit that remains, for the glory of your name. Amen.',
+    v: [
+      ['John 3:30', 'He must increase, but I must decrease.'],
+      ['1 Peter 4:11', 'Whoever speaks, as one who speaks oracles of God; whoever serves, as one who serves by the strength that God supplies — in order that in everything God may be glorified through Jesus Christ.'],
+      ['Colossians 1:28-29', 'Him we proclaim, warning everyone and teaching everyone with all wisdom, that we may present everyone mature in Christ.'],
+    ]
+  },
+  { cat: 'Before Ministry', q: 'Prayer before reading Scripture (Illumination)',
+    a: 'Blessed Lord, who caused all holy Scriptures to be written for our learning: grant us so to hear them, read, mark, learn, and inwardly digest them, that, by patience and the comfort of your holy Word, we may embrace and ever hold fast the blessed hope of everlasting life, which you have given us in our Savior Jesus Christ. Amen.\n\n— Thomas Cranmer, BCP 1549',
+    v: [
+      ['Psalm 119:18', 'Open my eyes, that I may behold wondrous things out of your law.'],
+      ['Luke 24:32', 'Did not our hearts burn within us while he talked to us on the road, while he opened to us the Scriptures?'],
+      ['John 16:13', 'When the Spirit of truth comes, he will guide you into all the truth.'],
+    ]
+  },
+];
+
+function _renderPrayers(body) { _renderAccordion(body, BM_PRAYERS, 'bm-pray', 'Search prayers, occasions, or keywords…', 'Prayer', 'Scripture'); }
+
+// ─────────────────────────────────────────────────────────────
+// VOICES OF THE CHURCH — quotes from Fathers, Reformers, Puritans, modern preachers
+// ─────────────────────────────────────────────────────────────
+const BM_VOICES = [
+  // ── EARLY CHURCH FATHERS ──
+  { cat: 'Early Church Fathers', q: 'Augustine of Hippo (354–430)',
+    a: '"You have made us for yourself, O Lord, and our heart is restless until it rests in you." — Confessions, Book 1\n\n"Late have I loved you, beauty so old and so new: late have I loved you. And see, you were within and I was in the external world and sought you there, and in my unlovely state I plunged into those lovely created things which you made." — Confessions, Book 10\n\n"Lord, give me chastity and continence, but not yet." — Confessions, Book 8 (his earlier prayer)\n\n"Love God, and do as you please." — Homilies on 1 John\n\n"Faith is to believe what you do not see; the reward of this faith is to see what you believe." — Sermons',
+    v: [
+      ['Psalm 42:1-2', 'As a deer pants for flowing streams, so pants my soul for you, O God. My soul thirsts for God, for the living God.'],
+      ['Acts 17:27-28', 'That they should seek God, in the hope that they might feel their way toward him and find him. Yet he is actually not far from each one of us.'],
+    ]
+  },
+  { cat: 'Early Church Fathers', q: 'John Chrysostom (c. 347–407)',
+    a: '"Preaching improves me. When I begin to speak, weariness disappears; when I begin to teach, fatigue too disappears." — Homilies\n\n"Prayer is the place of refuge for every worry, a foundation for cheerfulness, a source of constant happiness, a protection against sadness."\n\n"The bee is more honored than other animals, not because it labors, but because it labors for others."\n\n"Pray often, for prayer is a shield to the soul, a sacrifice to God, and a scourge for Satan."',
+    v: [
+      ['1 Thessalonians 5:17', 'Pray without ceasing.'],
+      ['Romans 12:12', 'Rejoice in hope, be patient in tribulation, be constant in prayer.'],
+    ]
+  },
+  { cat: 'Early Church Fathers', q: 'Athanasius of Alexandria (c. 296–373)',
+    a: '"For the Son of God became man, that we might become God." (i.e., partakers of the divine nature; deification, not ontological union) — On the Incarnation, §54\n\n"He was made man that we might be made God; and He manifested Himself by a body that we might receive the idea of the unseen Father."\n\n"You cannot put straight in others what is warped in yourself."',
+    v: [
+      ['John 1:14', 'And the Word became flesh and dwelt among us, and we have seen his glory.'],
+      ['2 Peter 1:4', 'By which he has granted to us his precious and very great promises, so that through them you may become partakers of the divine nature.'],
+    ]
+  },
+  { cat: 'Early Church Fathers', q: 'Irenaeus of Lyons (c. 130–202)',
+    a: '"The glory of God is a human being fully alive; and to be alive consists in beholding God." — Against Heresies, Book 4\n\n"He became what we are that he might make us what he is."\n\n"Where the Spirit of God is, there is the Church, and every grace."',
+    v: [
+      ['John 10:10', 'I came that they may have life and have it abundantly.'],
+      ['1 Corinthians 15:45', 'Thus it is written, "The first man Adam became a living being"; the last Adam became a life-giving spirit.'],
+    ]
+  },
+  { cat: 'Early Church Fathers', q: 'Tertullian (c. 155–220)',
+    a: '"The blood of the martyrs is the seed of the church." — Apologeticus 50\n\n"Christians are made, not born." — Apology\n\n"Hope is patience with the lamp lit."',
+    v: [
+      ['Revelation 12:11', 'And they have conquered him by the blood of the Lamb and by the word of their testimony, for they loved not their lives even unto death.'],
+      ['Acts 8:1', 'And there arose on that day a great persecution against the church in Jerusalem, and they were all scattered throughout the regions of Judea and Samaria.'],
+    ]
+  },
+
+  // ── MEDIEVAL ──
+  { cat: 'Medieval', q: 'Anselm of Canterbury (1033–1109)',
+    a: '"I do not seek to understand in order that I may believe; but I believe in order to understand. For this also I believe — that unless I believed, I should not understand." (credo ut intelligam) — Proslogion\n\n"You have not yet considered the gravity of sin." — Cur Deus Homo\n\n"For thou art that than which nothing greater can be conceived." — Proslogion (the ontological argument, 1078)',
+    v: [
+      ['Isaiah 7:9', 'If you are not firm in faith, you will not be firm at all.'],
+      ['Hebrews 11:6', 'Without faith it is impossible to please him, for whoever would draw near to God must believe that he exists.'],
+    ]
+  },
+  { cat: 'Medieval', q: 'Bernard of Clairvaux (1090–1153)',
+    a: '"You wish me to tell you why and how God should be loved. My answer is that God Himself is the reason He is to be loved." — On Loving God\n\n"Jesus, the very thought of Thee with sweetness fills my breast; but sweeter far Thy face to see, and in Thy presence rest." — attributed (hymn translation)\n\n"There are four degrees of love: love of self for self\u2019s sake; love of God for self\u2019s sake; love of God for God\u2019s sake; love of self for God\u2019s sake." — On Loving God',
+    v: [
+      ['Mark 12:30', 'And you shall love the Lord your God with all your heart and with all your soul and with all your mind and with all your strength.'],
+      ['1 John 4:19', 'We love because he first loved us.'],
+    ]
+  },
+  { cat: 'Medieval', q: 'Thomas Aquinas (1225–1274)',
+    a: '"To one who has faith, no explanation is necessary. To one without faith, no explanation is possible."\n\n"Three things are necessary for the salvation of man: to know what he ought to believe; to know what he ought to desire; and to know what he ought to do."\n\n"Better to illuminate than merely to shine; to deliver to others contemplated truths than merely to contemplate." — on the vocation of the preacher (the Dominican motto: contemplata aliis tradere)',
+    v: [
+      ['Matthew 5:14-16', 'You are the light of the world... Let your light shine before others, so that they may see your good works and give glory to your Father who is in heaven.'],
+      ['1 Peter 3:15', 'Always being prepared to make a defense to anyone who asks you for a reason for the hope that is in you.'],
+    ]
+  },
+
+  // ── REFORMATION ──
+  { cat: 'Reformation', q: 'Martin Luther (1483–1546)',
+    a: '"Here I stand. I can do no other. God help me. Amen." — Diet of Worms, 1521\n\n"A safe stronghold our God is still, a trusty shield and weapon." — A Mighty Fortress\n\n"Pray, and let God worry."\n\n"The Bible is alive, it speaks to me; it has feet, it runs after me; it has hands, it lays hold of me."\n\n"To be a Christian without prayer is no more possible than to be alive without breathing."\n\n"If you preach the Gospel in all aspects with the exception of the issues which deal specifically with your time, you are not preaching the Gospel at all."',
+    v: [
+      ['Romans 1:17', 'For in it the righteousness of God is revealed from faith for faith, as it is written, "The righteous shall live by faith."'],
+      ['Psalm 46:1', 'God is our refuge and strength, a very present help in trouble.'],
+    ]
+  },
+  { cat: 'Reformation', q: 'John Calvin (1509–1564)',
+    a: '"There is not one blade of grass, there is no color in this world that is not intended to make us rejoice." — Sermons on Job\n\n"All wisdom worth having is comprised under two parts — the knowledge of God, and of ourselves." — Institutes 1.1.1\n\n"My heart I offer to you, Lord, promptly and sincerely." (Cor meum tibi offero, Domine, prompte et sincere) — his personal seal\n\n"Wherever we cast our eyes, all things they meet are works of God." — Institutes',
+    v: [
+      ['Psalm 19:1', 'The heavens declare the glory of God, and the sky above proclaims his handiwork.'],
+      ['Proverbs 9:10', 'The fear of the LORD is the beginning of wisdom, and the knowledge of the Holy One is insight.'],
+    ]
+  },
+  { cat: 'Reformation', q: 'John Knox (c. 1514–1572)',
+    a: '"Give me Scotland, or I die!" — attributed prayer\n\n"A man with God is always in the majority."\n\n"You cannot antagonize and influence at the same time."',
+    v: [
+      ['Romans 8:31', 'What then shall we say to these things? If God is for us, who can be against us?'],
+      ['Acts 4:31', 'And when they had prayed, the place in which they were gathered together was shaken, and they were all filled with the Holy Spirit and continued to speak the word of God with boldness.'],
+    ]
+  },
+
+  // ── PURITANS ──
+  { cat: 'Puritans', q: 'John Owen (1616–1683)',
+    a: '"Be killing sin, or it will be killing you." — Mortification of Sin\n\n"There is no death of sin without the death of Christ." — Mortification of Sin\n\n"It is the Holy Ghost that effectually presseth the Word upon the soul, that makes it to be a converting word."\n\n"A minister may fill his pews, his communion roll, the mouths of the public, but what that minister is on his knees in secret before God Almighty, that he is and no more."',
+    v: [
+      ['Romans 8:13', 'For if you live according to the flesh you will die, but if by the Spirit you put to death the deeds of the body, you will live.'],
+      ['Colossians 3:5', 'Put to death therefore what is earthly in you: sexual immorality, impurity, passion, evil desire, and covetousness, which is idolatry.'],
+    ]
+  },
+  { cat: 'Puritans', q: 'Richard Baxter (1615–1691)',
+    a: '"I preached as never sure to preach again, and as a dying man to dying men." — Poetical Fragments\n\n"In necessary things, unity; in doubtful things, liberty; in all things, charity." (often attributed)\n\n"Take heed to yourselves, lest your example contradict your doctrine, and lest you lay such stumbling-blocks before the blind, as may be the occasion of their ruin." — The Reformed Pastor',
+    v: [
+      ['1 Timothy 4:16', 'Keep a close watch on yourself and on the teaching. Persist in this, for by so doing you will save both yourself and your hearers.'],
+      ['Acts 20:28', 'Pay careful attention to yourselves and to all the flock, in which the Holy Spirit has made you overseers, to care for the church of God.'],
+    ]
+  },
+  { cat: 'Puritans', q: 'Thomas Watson (c. 1620–1686)',
+    a: '"The angels above us, and the worms below us, praise God; and shall we be silent?"\n\n"Repentance is a grace of God\u2019s Spirit whereby a sinner is inwardly humbled and visibly reformed." — The Doctrine of Repentance\n\n"Till sin be bitter, Christ will not be sweet."\n\n"A holy life is a voice; it speaks when the tongue is silent, and is either a constant attraction or a perpetual reproof."',
+    v: [
+      ['2 Corinthians 7:10', 'For godly grief produces a repentance that leads to salvation without regret.'],
+      ['Matthew 5:16', 'Let your light shine before others, so that they may see your good works and give glory to your Father who is in heaven.'],
+    ]
+  },
+  { cat: 'Puritans', q: 'John Bunyan (1628–1688)',
+    a: '"You have not lived today until you have done something for someone who can never repay you."\n\n"Prayer is a shield to the soul, a sacrifice to God, and a scourge for Satan."\n\n"In prayer it is better to have a heart without words than words without a heart." — Pilgrim\u2019s Progress\n\n"He who runs from God in the morning will scarcely find him the rest of the day."',
+    v: [
+      ['Hebrews 13:16', 'Do not neglect to do good and to share what you have, for such sacrifices are pleasing to God.'],
+      ['Psalm 5:3', 'O LORD, in the morning you hear my voice; in the morning I prepare a sacrifice for you and watch.'],
+    ]
+  },
+
+  // ── MODERN (18th–20th century) ──
+  { cat: 'Modern', q: 'Jonathan Edwards (1703–1758)',
+    a: '"Resolved, that I will live so as I shall wish I had done when I come to die." — Resolution 17 (age 19)\n\n"Resolved, never to lose one moment of time; but improve it the most profitable way I possibly can." — Resolution 5\n\n"The seeking of the kingdom of God is the chief business of the Christian life."\n\n"All the changes which are wrought in the souls of the godly are wrought in them by means of the Word of God." — Religious Affections',
+    v: [
+      ['Psalm 90:12', 'So teach us to number our days that we may get a heart of wisdom.'],
+      ['Matthew 6:33', 'But seek first the kingdom of God and his righteousness, and all these things will be added to you.'],
+    ]
+  },
+  { cat: 'Modern', q: 'Charles Spurgeon (1834–1892) — "The Prince of Preachers"',
+    a: '"A Bible that\u2019s falling apart usually belongs to someone who isn\u2019t."\n\n"Anxiety does not empty tomorrow of its sorrows, but only empties today of its strength."\n\n"It is not great faith, but true faith, that saves; and the salvation lies not in the faith, but in the Christ in whom faith trusts."\n\n"I have learned to kiss the wave that throws me against the Rock of Ages."\n\n"Discernment is not knowing the difference between right and wrong. It is knowing the difference between right and almost right."\n\n"If sinners be damned, at least let them leap to hell over our dead bodies. And if they perish, let them perish with our arms wrapped about their knees, imploring them to stay."',
+    v: [
+      ['Matthew 6:34', 'Therefore do not be anxious about tomorrow, for tomorrow will be anxious for itself.'],
+      ['1 Corinthians 9:22', 'I have become all things to all people, that by all means I might save some.'],
+    ]
+  },
+  { cat: 'Modern', q: 'D. L. Moody (1837–1899)',
+    a: '"The world has yet to see what God will do with and for and through and in and by the man who is fully consecrated to him." (the line that ignited his ministry)\n\n"Character is what you are in the dark."\n\n"Out of one hundred men, one will read the Bible, the ninety-nine will read the Christian."\n\n"If I could relive my life, I would devote my entire ministry to reaching children for God."',
+    v: [
+      ['Romans 12:1', 'I appeal to you therefore, brothers, by the mercies of God, to present your bodies as a living sacrifice, holy and acceptable to God.'],
+      ['Mark 10:14', 'Let the children come to me; do not hinder them, for to such belongs the kingdom of God.'],
+    ]
+  },
+  { cat: 'Modern', q: 'C. S. Lewis (1898–1963)',
+    a: '"You can\u2019t go back and change the beginning, but you can start where you are and change the ending."\n\n"I believe in Christianity as I believe that the sun has risen — not only because I see it, but because by it I see everything else." — Is Theology Poetry?\n\n"If we find ourselves with a desire that nothing in this world can satisfy, the most probable explanation is that we were made for another world." — Mere Christianity\n\n"Aim at heaven and you will get earth thrown in. Aim at earth and you get neither." — Mere Christianity\n\n"A man can no more diminish God\u2019s glory by refusing to worship him than a lunatic can put out the sun by scribbling the word \'darkness\' on the walls of his cell." — The Problem of Pain\n\n"Either this man was, and is, the Son of God: or else a madman or something worse." — Mere Christianity (the Trilemma)',
+    v: [
+      ['Ecclesiastes 3:11', 'He has made everything beautiful in its time. Also, he has put eternity into man\u2019s heart.'],
+      ['Colossians 3:2', 'Set your minds on things that are above, not on things that are on earth.'],
+    ]
+  },
+  { cat: 'Modern', q: 'A. W. Tozer (1897–1963)',
+    a: '"What comes into our minds when we think about God is the most important thing about us." — The Knowledge of the Holy\n\n"To have found God and still to pursue Him is the soul\u2019s paradox of love." — The Pursuit of God\n\n"If the Holy Spirit was withdrawn from the church today, 95 percent of what we do would go on and no one would know the difference. If the Holy Spirit had been withdrawn from the New Testament church, 95 percent of what they did would stop, and everybody would know the difference."',
+    v: [
+      ['Psalm 27:4', 'One thing have I asked of the LORD, that will I seek after: that I may dwell in the house of the LORD all the days of my life, to gaze upon the beauty of the LORD and to inquire in his temple.'],
+      ['Acts 1:8', 'But you will receive power when the Holy Spirit has come upon you.'],
+    ]
+  },
+  { cat: 'Modern', q: 'Dietrich Bonhoeffer (1906–1945)',
+    a: '"Cheap grace is the deadly enemy of our church. We are fighting today for costly grace." — The Cost of Discipleship\n\n"When Christ calls a man, he bids him come and die." — The Cost of Discipleship\n\n"Silence in the face of evil is itself evil: God will not hold us guiltless. Not to speak is to speak. Not to act is to act."\n\n"The Church is the Church only when it exists for others."\n\n"He who loves his dream of community more than the Christian community itself becomes a destroyer of the latter." — Life Together',
+    v: [
+      ['Luke 9:23', 'And he said to all, "If anyone would come after me, let him deny himself and take up his cross daily and follow me."'],
+      ['Galatians 2:20', 'I have been crucified with Christ. It is no longer I who live, but Christ who lives in me.'],
+    ]
+  },
+  { cat: 'Modern', q: 'Corrie ten Boom (1892–1983)',
+    a: '"There is no pit so deep that God\u2019s love is not deeper still." (often quoted from her sister Betsie at Ravensbrück)\n\n"Worry does not empty tomorrow of its sorrow; it empties today of its strength."\n\n"Forgiveness is to set a prisoner free, and to realize the prisoner was you."\n\n"Never be afraid to trust an unknown future to a known God."',
+    v: [
+      ['Romans 8:38-39', 'For I am sure that neither death nor life... nor anything else in all creation, will be able to separate us from the love of God in Christ Jesus our Lord.'],
+      ['Ephesians 4:32', 'Be kind to one another, tenderhearted, forgiving one another, as God in Christ forgave you.'],
+    ]
+  },
+  { cat: 'Modern', q: 'Elisabeth Elliot (1926–2015)',
+    a: '"He is no fool who gives what he cannot keep to gain what he cannot lose." — quoting her husband Jim Elliot\n\n"God\u2019s training is for now, not for then. His purpose is for this very minute, not for sometime in the future."\n\n"The fact that I am a woman does not make me a different kind of Christian, but the fact that I am a Christian does make me a different kind of woman."\n\n"Don\u2019t dig up in doubt what you planted in faith."',
+    v: [
+      ['Matthew 16:25', 'For whoever would save his life will lose it, but whoever loses his life for my sake will find it.'],
+      ['Philippians 1:21', 'For to me to live is Christ, and to die is gain.'],
+    ]
+  },
+  { cat: 'Modern', q: 'A. W. Pink (1886–1952)',
+    a: '"The Lord is good to all His creatures, but especially to those who are His sons by faith in Christ Jesus."\n\n"Faith is opposite to sight. Where there is sight, there is no need for faith. Faith is the eye of the soul that sees the invisible."\n\n"The Christian life is not a playground; it is a battleground."',
+    v: [
+      ['2 Corinthians 5:7', 'For we walk by faith, not by sight.'],
+      ['Ephesians 6:12', 'For we do not wrestle against flesh and blood, but against the rulers, against the authorities... against the spiritual forces of evil in the heavenly places.'],
+    ]
+  },
+  { cat: 'Modern', q: 'J. I. Packer (1926–2020)',
+    a: '"Knowing God is a matter of personal involvement — mind, will, and feeling. It would not, indeed, be a fully personal relationship otherwise." — Knowing God\n\n"The Christian\u2019s motto should not be \'Let go and let God\' but \'Trust God and get going!\'"\n\n"The popular image of God as a smiling father indulging his children\u2019s every whim is a flat denial of the biblical revelation."',
+    v: [
+      ['John 17:3', 'And this is eternal life, that they know you, the only true God, and Jesus Christ whom you have sent.'],
+      ['Hebrews 12:6', 'For the Lord disciplines the one he loves, and chastises every son whom he receives.'],
+    ]
+  },
+  { cat: 'Modern', q: 'Tim Keller (1950–2023)',
+    a: '"The gospel is this: We are more sinful and flawed in ourselves than we ever dared believe, yet at the very same time we are more loved and accepted in Jesus Christ than we ever dared hope."\n\n"To be loved but not known is comforting but superficial. To be known and not loved is our greatest fear. But to be fully known and truly loved is, well, a lot like being loved by God." — The Meaning of Marriage\n\n"Idolatry is not just a failure to obey God, it is a setting of the whole heart on something besides God." — Counterfeit Gods\n\n"Religion says, \'I obey, therefore I am accepted.\' The gospel says, \'I am accepted, therefore I obey.\'"',
+    v: [
+      ['Romans 5:8', 'But God shows his love for us in that while we were still sinners, Christ died for us.'],
+      ['1 John 5:21', 'Little children, keep yourselves from idols.'],
+    ]
+  },
+  { cat: 'Modern', q: 'Billy Graham (1918–2018)',
+    a: '"The greatest legacy one can pass on to one\u2019s children and grandchildren is not money or other material things accumulated in one\u2019s life, but rather a legacy of character and faith."\n\n"My home is in Heaven. I\u2019m just traveling through this world."\n\n"Someday you will read or hear that Billy Graham is dead. Don\u2019t you believe a word of it. I shall be more alive than I am now."\n\n"The Bible is God\u2019s ‘Love Letter\' to us, telling us not only that He loves us, but showing us what He has done to demonstrate His love."',
+    v: [
+      ['2 Corinthians 5:8', 'We are of good courage, and we would rather be away from the body and at home with the Lord.'],
+      ['Philippians 3:20', 'But our citizenship is in heaven, and from it we await a Savior, the Lord Jesus Christ.'],
+    ]
+  },
+  { cat: 'Modern', q: 'Martyn Lloyd-Jones (1899–1981)',
+    a: '"Have you realized that most of your unhappiness in life is due to the fact that you are listening to yourself instead of talking to yourself?" — Spiritual Depression\n\n"Preaching is theology coming through a man who is on fire."\n\n"The first thing we have to learn about the Holy Spirit is that we cannot use Him; it is He who must use us."\n\n"What is the chief end of preaching? I like to think it is this: It is to give men and women a sense of God and His presence."',
+    v: [
+      ['Psalm 42:5', 'Why are you cast down, O my soul, and why are you in turmoil within me? Hope in God; for I shall again praise him.'],
+      ['Acts 1:8', 'But you will receive power when the Holy Spirit has come upon you.'],
+    ]
+  },
+];
+
+function _renderVoices(body) { _renderAccordion(body, BM_VOICES, 'bm-voice', 'Search by name, era, topic, or keyword…', 'Quotes', 'Scripture'); }
