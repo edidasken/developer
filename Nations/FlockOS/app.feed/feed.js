@@ -2901,6 +2901,15 @@ async function _init() {
   _waitForAuth(async user => {
     _hideAuth(user);
 
+    // Render landing dashboard immediately from local data so the welcome page
+    // is never blocked by Firestore/UpperRoom init or a slow sermons fetch.
+    try {
+      S.sermons = JSON.parse(localStorage.getItem(BM_KEY) || '[]');
+    } catch (_) { S.sermons = []; }
+    try { _renderList(); } catch (e) { console.warn('[TheFeed] _renderList failed:', e); }
+    try { _renderSeries(); } catch (e) { console.warn('[TheFeed] _renderSeries failed:', e); }
+    try { _renderLanding(); } catch (e) { console.warn('[TheFeed] _renderLanding failed:', e); }
+
     // Initialize Firestore (UpperRoom) if the login page didn't already do it.
     // On feed.html, UpperRoom is defined but never init'd unless we do it here.
     if (window.UpperRoom) {
@@ -2915,10 +2924,11 @@ async function _init() {
       } catch (_) {}
     }
 
-    await _load();
-    _renderList();
-    _renderSeries();
-    _renderLanding();
+    // Now hydrate from server (Firestore / GAS) and re-render with fresh data.
+    try { await _load(); } catch (e) { console.warn('[TheFeed] _load failed:', e); }
+    try { _renderList(); } catch (_) {}
+    try { _renderSeries(); } catch (_) {}
+    try { _renderLanding(); } catch (_) {}
   });
 
   // Bindings
