@@ -86,8 +86,8 @@ topbar.innerHTML = /* html */`
     </svg>
   </button>
   <button class="veil-brand" id="gp-home-btn" aria-label="GROW home">
-    <span class="veil-brand-icon" aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#78350f,#d97706);color:#fff;margin-right:8px;vertical-align:middle">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    <span class="veil-brand-icon" aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#78350f,#d97706);color:#fff;margin-right:8px;vertical-align:middle">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
     </span>
     <span class="veil-brand-text">GROW</span>
   </button>
@@ -107,7 +107,7 @@ topbar.innerHTML = /* html */`
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
         <div style="margin-top:8px;">
-          <button id="gp-signup-btn" style="width:100%;padding:10px;border:1.5px solid var(--gold,#e8a838);border-radius:50px;background:transparent;color:var(--gold,#e8a838);font:600 0.84rem var(--font-ui,sans-serif);cursor:pointer;transition:background .15s,color .15s;" onmouseover="this.style.background='var(--gold,#e8a838)';this.style.color='#0c1445'" onmouseout="this.style.background='transparent';this.style.color='var(--gold,#e8a838)'">
+          <button id="gp-signup-btn" style="width:100%;padding:10px;border:1.5px solid var(--gold,#e8a838);border-radius:50px;background:transparent;color:var(--gold,#e8a838);font:600 0.84rem 'Plus Jakarta Sans',system-ui,sans-serif;cursor:pointer;transition:background .15s,color .15s;" onmouseover="this.style.background='var(--gold,#e8a838)';this.style.color='#0c1445'" onmouseout="this.style.background='transparent';this.style.color='var(--gold,#e8a838)'">
             ✉️ Request Access
           </button>
         </div>
