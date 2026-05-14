@@ -2608,34 +2608,110 @@ function _bindLandingStrongs() {
   });
 }
 
+// Normalize a word/Firestore lex entry to a single shape for landing rendering.
+function _landingNormalizeLex(e, fallbackId) {
+  if (!e) return null;
+  return {
+    strongs : e.strongs || e.id || fallbackId || '',
+    lemma   : e.lemma || e.word || '',
+    translit: e.xlit  || e.translit || e.pron || '',
+    def     : e.strongs_def || e.kjv_def || e.definition || e.def || ''
+  };
+}
+
+function _landingRenderLexList(out, items) {
+  if (!items || !items.length) {
+    out.innerHTML = '<div class="bm-land-empty-line">No matches.</div>';
+    return;
+  }
+  out.innerHTML = items.slice(0, 6).map(w => `
+    <div class="bm-land-list-item">
+      <div class="bm-land-list-item-title"><strong>${_e(w.strongs)}</strong>${w.lemma ? ' &middot; ' + _e(w.lemma) : ''}${w.translit ? ' <span style="opacity:0.7">(' + _e(w.translit) + ')</span>' : ''}</div>
+      <div class="bm-land-list-item-meta">${_e((w.def || '').slice(0, 90))}</div>
+    </div>
+  `).join('');
+}
+
+// Search the in-memory Strong's globals (window._strongsGreek / _strongsHebrew)
+// for English word, transliteration, or definition matches. Returns normalized list.
+function _landingSearchInMemory(lq) {
+  const out = [];
+  const buckets = [
+    [window._strongsGreek,  'G'],
+    [window._strongsHebrew, 'H']
+  ];
+  for (const [bucket] of buckets) {
+    if (!bucket) continue;
+    for (const k of Object.keys(bucket)) {
+      const e = bucket[k];
+      if (!e) continue;
+      const word     = (e.word || e.lemma || '').toLowerCase();
+      const translit = (e.translit || e.xlit || '').toLowerCase();
+      const def      = (e.definition || e.def || e.kjv_def || e.strongs_def || '').toLowerCase();
+      if (!word && !translit && !def) continue;
+      let score = 0;
+      if (word === lq || translit === lq) score = 100;
+      else if (word.startsWith(lq) || translit.startsWith(lq)) score = 60;
+      else if (def && new RegExp('\\b' + lq.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&') + '\\b').test(def)) score = 30;
+      if (score) out.push({ score, entry: _landingNormalizeLex(e, (e.strongs || k)) });
+      if (out.length > 200) break;
+    }
+  }
+  out.sort((a, b) => b.score - a.score);
+  return out.map(x => x.entry);
+}
+
 async function _doLandingStrongs(q, out) {
   if (!q) return;
   out.innerHTML = '<div class="bm-land-empty-line">Searching…</div>';
+  const isStrongs = /^[GH]\d+$/i.test(q);
   try {
-    if (typeof _doLexFirestore === 'function') {
-      const r = await _doLexFirestore(q);
-      if (r && r.length) {
-        out.innerHTML = r.slice(0, 4).map(w => `
-          <div class="bm-land-list-item">
-            <div class="bm-land-list-item-title"><strong>${_e(w.strongs || w.id || '')}</strong> &middot; ${_e(w.lemma || w.translit || '')}</div>
-            <div class="bm-land-list-item-meta">${_e((w.kjv_def || w.def || '').slice(0, 60))}</div>
-          </div>
-        `).join('');
-        return;
-      }
-    }
-    // Fallback: direct Firestore lookup if available
-    if (window.firebase && firebase.firestore) {
-      const db = firebase.firestore();
+    // ── Strong's-number lookup ────────────────────────────────────────────
+    if (isStrongs) {
       const id = q.toUpperCase();
-      const doc = await db.collection('words').doc(id).get();
-      if (doc.exists) {
-        const w = doc.data();
-        out.innerHTML = `<div class="bm-land-list-item"><div class="bm-land-list-item-title"><strong>${_e(id)}</strong> &middot; ${_e(w.lemma || '')}</div><div class="bm-land-list-item-meta">${_e((w.kjv_def || '').slice(0, 80))}</div></div>`;
-        return;
+      // In-memory first
+      const num    = id.slice(1);
+      const bucket = id[0] === 'G' ? window._strongsGreek : window._strongsHebrew;
+      const local  = bucket ? (bucket[num] || bucket[id]) : null;
+      if (local) { _landingRenderLexList(out, [_landingNormalizeLex(local, id)]); return; }
+      // Then Firestore by doc id
+      if (window.firebase && firebase.firestore) {
+        try {
+          const doc = await firebase.firestore().collection('words').doc(id).get();
+          if (doc.exists) { _landingRenderLexList(out, [_landingNormalizeLex(doc.data(), id)]); return; }
+        } catch (_) {}
       }
+      out.innerHTML = '<div class="bm-land-empty-line">No matches.</div>';
+      return;
     }
-    out.innerHTML = '<div class="bm-land-empty-line">No matches.</div>';
+
+    // ── Word / transliteration / definition lookup ───────────────────────
+    const lq = q.toLowerCase();
+    const results = [];
+    const seen = new Set();
+    const push = (it) => { if (it && it.strongs && !seen.has(it.strongs)) { seen.add(it.strongs); results.push(it); } };
+
+    // 1. In-memory dictionaries (fast, works offline)
+    for (const it of _landingSearchInMemory(lq)) push(it);
+
+    // 2. Firestore queries: exact lemma, exact xlit, kjv_def prefix
+    if (results.length < 6 && window.firebase && firebase.firestore) {
+      const db = firebase.firestore();
+      try {
+        const queries = [
+          db.collection('words').where('lemma', '==', q).limit(4).get(),
+          db.collection('words').where('xlit',  '==', lq).limit(4).get(),
+          db.collection('words').where('kjv_def', '>=', lq).where('kjv_def', '<=', lq + '\uf8ff').limit(4).get()
+        ];
+        const snaps = await Promise.all(queries.map(p => p.catch(() => null)));
+        for (const snap of snaps) {
+          if (!snap || snap.empty) continue;
+          snap.forEach(doc => push(_landingNormalizeLex(doc.data(), doc.id)));
+        }
+      } catch (_) {}
+    }
+
+    _landingRenderLexList(out, results);
   } catch (_) {
     out.innerHTML = '<div class="bm-land-empty-line">Search unavailable.</div>';
   }
