@@ -27,6 +27,9 @@
   <!-- Only weights actually used — trimmed from full family for faster load -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Merriweather:ital@1&display=swap" rel="stylesheet">
 
+  <!-- Shared app-shell stylesheet — provides .unity-header / .unity-search / .unity-profile classes -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -54,13 +57,14 @@
       overflow: hidden;
       overscroll-behavior: none;
     }
+    body { display: flex; flex-direction: column; }
 
     /* Single cheap gradient — no double radial on every repaint */
     body { background-image: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(91,141,238,0.14) 0%, transparent 60%); }
 
     /* ── Launcher shell ────────────────────────────────────────────── */
     .launcher {
-      height: 100%;
+      flex: 1; min-height: 0;
       overflow-y: auto;
       overflow-x: hidden;
       overscroll-behavior: contain;
@@ -68,7 +72,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: calc(var(--safe-top) + 2rem) 1.25rem calc(var(--safe-bot) + 2rem);
+      padding: 2rem 1.25rem calc(var(--safe-bot) + 2rem);
       gap: 2rem;
     }
 
@@ -301,6 +305,9 @@
     <button class="update-banner-dismiss" id="updateDismissBtn" aria-label="Dismiss" onclick="document.getElementById('updateBanner').hidden=true">&#10005;</button>
   </div>
 
+  <!-- Unity header (mounted by Scripts/the_unity_header.js) — same chrome as every app -->
+  <header class="unity-header" id="launcher-header"></header>
+
   <div class="launcher">
 
     <div class="church-id">
@@ -429,6 +436,49 @@
 
   <!-- Pull-to-Refresh indicator -->
   <div class="ptr-indicator" id="ptrIndicator">&#8635; Release to refresh</div>
+
+  <!-- Unity header mount: same chrome as every app -->
+  <script type="module">
+    import { mountUnityHeader } from './Scripts/the_unity_header.js';
+
+    // Read shared FlockOS auth session (set by Nehemiah / firm_foundation.js after sign-in).
+    let user = null;
+    try {
+      const raw = sessionStorage.getItem('flock_auth_session') || sessionStorage.getItem('flock_auth_profile');
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s && s.email) user = { displayName: s.displayName || s.name || s.email.split('@')[0], email: s.email, photoURL: s.photoURL || '' };
+      }
+    } catch (_) {}
+
+    const CHURCH_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M10 4h4"/><path d="M5 22V11l7-4 7 4v11"/><path d="M9 22v-6h6v6"/></svg>';
+
+    mountUnityHeader(document.getElementById('launcher-header'), {
+      appId:       'launcher',
+      appName:     'FlockOS-GAS',
+      appIconSvg:  CHURCH_ICON,
+      appAccent:   '#e8a838',
+      appAccentDk: '#1e3a8a',
+      homeHref:    './',
+      user,
+      signInHref:  'app.flockos/',
+      onSignOut:   () => {
+        try { sessionStorage.removeItem('flock_auth_session'); } catch (_) {}
+        try { sessionStorage.removeItem('flock_auth_profile'); } catch (_) {}
+        location.reload();
+      },
+      features: [
+        { id: 'open-grow',      label: 'GROW',          hint: 'Discipleship & Bible study',           run: () => location.assign('app.grow/app.grow.html') },
+        { id: 'open-invite',    label: 'The Invitation', hint: 'Share the hope of Jesus Christ',      run: () => location.assign('app.invite/app.invite.html') },
+        { id: 'open-flockos',   label: 'FlockOS',       hint: 'Church management & pastoral care',    run: () => location.assign('app.flockos/app.flockos.html') },
+        { id: 'open-stand',     label: 'Flock Stand',   hint: 'Songs, setlists & live presenter',     run: () => location.assign('app.stand/') },
+        { id: 'open-flockshow', label: 'FlockShow',     hint: 'Worship slides & service presentation', run: () => location.assign('app.flockshow/app.flockshow.html') },
+        { id: 'open-flockchat', label: 'FlockChat',     hint: 'Messaging, prayer chain & announcements', run: () => location.assign('app.flockchat/app.flockchat.html') },
+        { id: 'open-feed',      label: 'FEED',          hint: 'Sermon prep & manuscript builder',     run: () => location.assign('app.feed/') },
+      ],
+    });
+  </script>
+
   <script>
   (function () {
     if (window.innerWidth > 860) return;

@@ -49,6 +49,7 @@ export function mountUnityHeader(host, cfg = {}) {
     onHamburger= null,
     extras     = [],
     avatarSrc  = 'Images/FlockIcon-192.png',
+    signInHref = null,    // public/unauth apps: where to send the avatar click when no user
   } = cfg;
 
   if (Array.isArray(features) && features.length) registerFeatures(appId, features);
@@ -101,7 +102,7 @@ export function mountUnityHeader(host, cfg = {}) {
       openUnitySearch({ appId, appName });
     } else if (act === 'account') {
       e.preventDefault();
-      openUnityProfile({ appId, appName, user, onSignOut });
+      openUnityProfile({ appId, appName, user: cfg.user, onSignOut, signInHref });
     }
   });
 

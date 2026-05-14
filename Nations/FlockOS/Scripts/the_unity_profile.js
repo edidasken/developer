@@ -48,12 +48,15 @@ const ICON_SVG = {
 };
 
 export function openUnityProfile(opts = {}) {
-  const { user = null, onSignOut = null, onAction = null, appName = '' } = opts;
+  const { user = null, onSignOut = null, onAction = null, appName = '', signInHref = null } = opts;
 
-  // Hard guard: no guests in FlockOS. If there is no authenticated user with
-  // an email, refuse to open the profile sheet and re-trigger the sign-in
-  // gate by reloading the page (the app shell will surface the sign-in modal).
+  // No user → public/unauth flow.
+  // If the caller provided signInHref (e.g. GROW launcher, public apps),
+  // simply navigate there — do NOT clear session or reload.
+  // Otherwise hard-guard the authenticated apps: clear stale session and
+  // reload so the app shell re-surfaces the sign-in gate.
   if (!user || !user.email) {
+    if (signInHref) { location.assign(signInHref); return; }
     try { sessionStorage.removeItem('flock_auth_session'); } catch (_) {}
     try { sessionStorage.removeItem('flock_auth_profile'); } catch (_) {}
     location.reload();
