@@ -15209,3 +15209,279 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
 @media (min-width: 861px) {
   .ptr-indicator { display: none !important; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   THE UNITY HEADER — Single shared topbar styles for every NC app
+   "That they all may be one." — John 17:21
+   Mounted by New_Covenant/Scripts/the_unity_header.js
+   Layout: [☰] [name] [...extras] [spacer] [🔍] [⚏] [● avatar gold-glow]
+   ══════════════════════════════════════════════════════════════════════════════ */
+.unity-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: var(--safe-top, 0px) 14px 0;
+  height: calc(56px + var(--safe-top, 0px));
+  background: var(--top-bg, #0c1445);
+  color: var(--top-ink, #fff);
+  border-bottom: 1px solid var(--top-line, rgba(255,255,255,0.08));
+  position: relative; z-index: 200; flex-shrink: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+.unity-header::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5px;
+  background: var(--grad-rainbow, linear-gradient(90deg,#ef4444,#f59e0b,#84cc16,#06b6d4,#8b5cf6,#ef4444));
+  background-size: 200% 100%;
+  animation: unity-rainbow 9s linear infinite;
+  opacity: 0.72; pointer-events: none;
+}
+@keyframes unity-rainbow { from { background-position: 0% 0; } to { background-position: 200% 0; } }
+@media (prefers-reduced-motion: reduce) { .unity-header::after { animation: none; opacity: 0.5; } }
+
+.unity-spacer { flex: 1; min-width: 0; }
+
+/* ── Brand (app name + colored icon) ──────────────────────────────────── */
+.unity-brand {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 6px; border-radius: 8px;
+  text-decoration: none; color: inherit; cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0; min-width: 0;
+}
+.unity-brand:hover { background: rgba(255,255,255,0.06); }
+.unity-brand-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px;
+  color: #fff; flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+}
+.unity-brand-icon svg { width: 18px; height: 18px; }
+.unity-brand-text {
+  font: 700 1.05rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #fff; letter-spacing: -0.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ── Generic action button (hamburger / search / switcher / extras) ──── */
+.unity-action {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; flex-shrink: 0;
+  padding: 0; border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: #fff; cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.unity-action:hover  { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); }
+.unity-action:active { transform: scale(0.94); }
+.unity-action svg    { display: block; }
+
+/* The app-switcher button is normalized to the same shape (override of .nc-switcher-btn defaults) */
+.unity-header .nc-switcher-btn {
+  width: 38px; height: 38px; padding: 0; border-radius: 10px;
+}
+.unity-header .nc-switcher-btn-label { display: none; }
+
+/* ── Gold-glow avatar (opens unified profile sheet) ───────────────────── */
+.unity-avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px; height: 38px; flex-shrink: 0; padding: 0;
+  border-radius: 50%;
+  background: rgba(232,168,56,0.10);
+  border: 2px solid #e8a838;
+  box-shadow: 0 0 12px rgba(232,168,56,0.45), inset 0 0 6px rgba(232,168,56,0.15);
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.1s;
+  overflow: hidden;
+  margin-left: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+.unity-avatar:hover  { box-shadow: 0 0 18px rgba(232,168,56,0.70), inset 0 0 8px rgba(232,168,56,0.25); }
+.unity-avatar:active { transform: scale(0.94); }
+.unity-avatar-img {
+  width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block;
+}
+
+/* ── Mobile responsive ────────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .unity-header { padding: var(--safe-top, 0px) 10px 0; gap: 6px; }
+  .unity-brand-icon { width: 28px; height: 28px; }
+  .unity-brand-text { font-size: 0.98rem; }
+}
+@media (max-width: 540px) {
+  .unity-brand-text { display: none; }
+  .unity-action, .unity-avatar, .unity-header .nc-switcher-btn { width: 36px; height: 36px; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   UNITY SEARCH MODAL
+   ══════════════════════════════════════════════════════════════════════════════ */
+.unity-search-modal {
+  position: fixed; inset: 0; z-index: 99990;
+  display: none;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+.unity-search-modal.is-open { display: block; }
+.unity-search-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(8,12,32,0.55);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.unity-search-card {
+  position: absolute; top: 12vh; left: 50%; transform: translateX(-50%);
+  width: min(560px, calc(100vw - 24px));
+  max-height: 70vh; display: flex; flex-direction: column;
+  background: #111b44; color: #eef1fb;
+  border: 1px solid rgba(255,255,255,0.10); border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+  overflow: hidden;
+}
+.unity-search-input-wrap {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.7);
+}
+.unity-search-input {
+  flex: 1; min-width: 0;
+  background: transparent; border: none; outline: none;
+  color: #fff;
+  font: 500 1rem 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+.unity-search-input::placeholder { color: rgba(255,255,255,0.45); }
+.unity-search-close {
+  background: none; border: none; color: rgba(255,255,255,0.5);
+  font-size: 1.6rem; line-height: 1; cursor: pointer; padding: 0 4px;
+}
+.unity-search-close:hover { color: #fff; }
+.unity-search-results {
+  flex: 1; overflow-y: auto; padding: 8px;
+}
+.unity-search-item {
+  display: block; width: 100%; text-align: left;
+  background: transparent; border: none; color: inherit;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer;
+  font-family: inherit;
+}
+.unity-search-item:hover, .unity-search-item.is-sel {
+  background: rgba(232,168,56,0.14);
+}
+.unity-search-item-label {
+  font: 600 0.92rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #fff;
+}
+.unity-search-item-hint {
+  font: 400 0.78rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.55);
+  margin-top: 2px;
+}
+.unity-search-empty {
+  padding: 30px 16px; text-align: center;
+  color: rgba(255,255,255,0.55);
+  font: 500 0.9rem 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+.unity-search-foot {
+  padding: 10px 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font: 500 0.72rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.5);
+}
+.unity-search-foot kbd {
+  background: rgba(255,255,255,0.10); border-radius: 4px;
+  padding: 1px 5px; margin: 0 3px;
+  font: 600 0.70rem ui-monospace, monospace;
+  color: #fff;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   UNITY PROFILE SHEET (gold-glow avatar dropdown)
+   ══════════════════════════════════════════════════════════════════════════════ */
+.unity-profile-sheet {
+  position: fixed; inset: 0; z-index: 99990;
+  display: none;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+.unity-profile-sheet.is-open { display: block; }
+.unity-pp-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(8,12,32,0.50);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+}
+.unity-pp-card {
+  position: absolute;
+  top: calc(60px + var(--safe-top, 0px));
+  right: 14px;
+  width: min(320px, calc(100vw - 24px));
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  background: #111b44; color: #eef1fb;
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(232,168,56,0.18);
+  padding: 6px;
+}
+.unity-pp-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 6px;
+}
+.unity-pp-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(232,168,56,0.18) center/cover no-repeat;
+  border: 2px solid #e8a838;
+  box-shadow: 0 0 10px rgba(232,168,56,0.40);
+  display: flex; align-items: center; justify-content: center;
+  font: 700 1rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #e8a838; flex-shrink: 0;
+}
+.unity-pp-id { min-width: 0; }
+.unity-pp-name {
+  font: 700 0.95rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.unity-pp-email {
+  font: 500 0.76rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.55);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.unity-pp-list { display: flex; flex-direction: column; gap: 1px; padding: 4px; }
+.unity-pp-divider {
+  height: 1px; background: rgba(255,255,255,0.08); margin: 6px 8px;
+}
+.unity-pp-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 8px;
+  background: transparent; border: none;
+  color: #eef1fb; cursor: pointer;
+  font: 500 0.88rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  text-align: left; width: 100%;
+  transition: background 0.12s, color 0.12s;
+}
+.unity-pp-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+.unity-pp-item-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; color: rgba(255,255,255,0.65); flex-shrink: 0;
+}
+.unity-pp-item-label { flex: 1; }
+.unity-pp-item--danger { color: #f87171; }
+.unity-pp-item--danger .unity-pp-item-icon { color: #f87171; }
+.unity-pp-item--danger:hover { background: rgba(248,113,113,0.12); color: #fca5a5; }
+
+/* Toast (used by unity-profile fallback) */
+.unity-toast {
+  position: fixed; left: 50%; bottom: calc(28px + var(--safe-bot, 0px));
+  transform: translateX(-50%) translateY(20px);
+  background: #1e1b4b; color: #fff;
+  border: 1px solid rgba(232,168,56,0.40);
+  border-radius: 999px;
+  padding: 10px 18px;
+  font: 600 0.82rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.45);
+  opacity: 0; transition: opacity .2s, transform .2s;
+  z-index: 99999; pointer-events: none;
+}
+.unity-toast.is-on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Body lock when modal/sheet open */
+body.unity-modal-open { overflow: hidden; }
