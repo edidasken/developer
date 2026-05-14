@@ -3450,7 +3450,7 @@ function _easterDate(year) {
   return new Date(year, month - 1, day);
 }
 function _addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
-function _fmtDate(d) {
+function _fmtLitDate(d) {
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
@@ -3543,7 +3543,7 @@ function _renderLiturgical(body) {
         const cls = sameDay ? 'is-now' : (isPast ? 'is-past' : '');
         return `
           <div class="bm-litu-row ${cls}">
-            <div class="bm-litu-date">${_e(_fmtDate(ev.date))}, ${ev.date.getFullYear()}</div>
+            <div class="bm-litu-date">${_e(_fmtLitDate(ev.date))}, ${ev.date.getFullYear()}</div>
             <div class="bm-litu-name">${_e(ev.name)}</div>
             <div class="bm-litu-color" style="--c:${ev.color};${ev.color === '#000000' ? 'color:#fff;' : ''}">${_e(ev.season)}</div>
           </div>
