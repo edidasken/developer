@@ -2669,11 +2669,15 @@ function _loadStrongsDicts() {
   if (_strongsLoadPromise) return _strongsLoadPromise;
   _strongsLoadPromise = (async () => {
     try {
-      // feed.html sets <base href="../"> so the document base is the
-      // New_Covenant/ directory; relative paths resolve against that.
+      // Dynamic import() resolves URLs relative to the *script* URL, ignoring
+      // <base href>. feed.html sets <base href="../"> so document.baseURI is
+      // the New_Covenant/ directory — build absolute URLs from it so the
+      // imports land on /New_Covenant/Data/* instead of /app.feed/Data/*.
+      const greekURL  = new URL('Data/strongs-greek.js',  document.baseURI).href;
+      const hebrewURL = new URL('Data/strongs-hebrew.js', document.baseURI).href;
       const [gk, hb] = await Promise.all([
-        import('./Data/strongs-greek.js').catch(() => null),
-        import('./Data/strongs-hebrew.js').catch(() => null)
+        import(greekURL).catch(e => { console.warn('[TheFeed] Greek dict load failed:', e); return null; }),
+        import(hebrewURL).catch(e => { console.warn('[TheFeed] Hebrew dict load failed:', e); return null; })
       ]);
       if (gk && gk.default) window._strongsGreek  = gk.default;
       if (hb && hb.default) window._strongsHebrew = hb.default;
