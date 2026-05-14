@@ -1470,6 +1470,9 @@
   <!-- ── Sidebar scrim (mobile) ────────────────────────────────────────── -->
   <div id="fc-sidebar-scrim" style="display:none; position:fixed; inset:0; background:var(--modal-dim); z-index:290;"></div>
 
+  <!-- ── Unity Footer ────────────────────────────────────────────────── -->
+  <footer id="fc-footer" class="unity-footer"></footer>
+
   <!-- ── Firebase + core scripts ──────────────────────────────────────── -->
   <script>
     window.FLOCK_FIREBASE_CONFIG = window.FLOCK_FIREBASE_CONFIG || null;
@@ -1547,6 +1550,17 @@
     } else {
       mount();
     }
+  </script>
+
+  <!-- Unity footer -->
+  <script type="module">
+    import { mountUnityFooter } from '../Scripts/the_unity_footer.js';
+    
+    mountUnityFooter(document.getElementById('fc-footer'), {
+      appId:       'flockchat',
+      appAccent:   '#06b6d4',
+      appAccentDk: '#0c4a6e',
+    });
   </script>
 
 </body>

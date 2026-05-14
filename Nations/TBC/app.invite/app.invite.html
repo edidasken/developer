@@ -234,6 +234,9 @@
 
   </div><!-- /#inv-shell -->
 
+  <!-- Unity Footer -->
+  <footer id="inv-footer" class="unity-footer"></footer>
+
   <!-- ── SW update banner (outside scroller — fixed positioning) ─── -->
   <div id="inv-sw-banner" role="status" aria-live="polite">
     New version available
@@ -294,6 +297,20 @@
 
     /* Mount interactivity */
     mount(root);
+
+    /* Mount unity footer */
+    import('https://flock-os.github.io/FlockOS/New_Covenant/Scripts/the_unity_footer.js')
+      .then(({ mountUnityFooter }) => {
+        const footer = document.getElementById('inv-footer');
+        if (footer) {
+          mountUnityFooter(footer, {
+            appId:       'invite',
+            appAccent:   '#10b981',
+            appAccentDk: '#065f46',
+          });
+        }
+      })
+      .catch(() => {});
 
     /* ── Topbar share pill ──────────────────────────────────────── */
     document.getElementById('inv-topbar-share')?.addEventListener('click', () => {
