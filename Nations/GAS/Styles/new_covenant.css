@@ -15312,8 +15312,8 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
    UNITY FOOTER — Single shared app-shell footer
    ══════════════════════════════════════════════════════════════════════════════ */
 .unity-footer {
-  display: flex; flex-direction: column; align-items: center; gap: 14px;
-  padding: 16px 14px calc(16px + var(--safe-bottom, 0px));
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 12px 14px calc(12px + var(--safe-bottom, 0px));
   background: var(--foot-bg, #0c1445);
   color: var(--foot-ink, rgba(255,255,255,0.65));
   border-top: 1px solid var(--foot-line, rgba(255,255,255,0.08));
@@ -15375,13 +15375,12 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
   font-size: 0.7rem; font-style: italic; text-transform: uppercase;
   letter-spacing: 0.06em; opacity: 0.6;
   color: rgba(255,255,255,0.5);
-  margin-top: 4px;
 }
 
 @media (max-width: 540px) {
   .unity-footer { 
-    padding: 14px 10px calc(14px + var(--safe-bottom, 0px)); 
-    gap: 12px; font-size: 0.8rem; 
+    padding: 10px 10px calc(10px + var(--safe-bottom, 0px)); 
+    gap: 8px; font-size: 0.8rem; 
   }
   .unity-footer-btn { padding: 7px 12px; font-size: 0.75rem; }
   .unity-footer-btn span { display: none; }

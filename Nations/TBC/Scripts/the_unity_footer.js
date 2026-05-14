@@ -77,12 +77,12 @@ export function mountUnityFooter(host, cfg = {}) {
     <div class="unity-footer-actions">
       ${actionsHtml}
     </div>
+    <div class="unity-footer-motto">Soli Deo Gloria | Built to Be Shared</div>
     <div class="unity-footer-meta">
       <span class="unity-footer-copy">${escapeHtml(copyright)}</span>
       <span class="unity-footer-sep">•</span>
       <span class="unity-footer-version">${escapeHtml(version)}</span>
     </div>
-    <div class="unity-footer-motto">Soli Deo Gloria | Built to Be Shared</div>
   `;
 
   // Click delegation for special actions
