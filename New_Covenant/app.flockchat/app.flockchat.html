@@ -135,37 +135,23 @@
     }
     #fc-app[hidden] { display: none; }
 
-    /* ─── Top bar — canonical FlockOS dark navy chrome ──────────────── */
-    .fc-topbar {
-      height: calc(var(--topbar-h) + var(--safe-top));
-      padding-top: var(--safe-top);
+    /* ─── Top bar (handled by .unity-header in new_covenant.css) ─── */
+    .fc-topbar { z-index: 100; }
+
+    /* ─── Subbar (active room context + per-room actions) ─── */
+    .fc-subbar {
       flex-shrink: 0;
       background: var(--top-bg);
       border-bottom: 1px solid var(--top-line);
       color: var(--top-ink);
-      position: relative;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding-left: 1rem;
-      padding-right: 1rem;
-      z-index: 100;
+      gap: 0.6rem;
+      padding: 7px 1rem;
+      z-index: 99;
     }
-    .fc-topbar::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5px;
-      background: var(--grad-rainbow);
-      background-size: 200% 100%;
-      animation: fc-rainbow 9s linear infinite;
-      opacity: 0.72;
-      pointer-events: none;
-    }
-    @keyframes fc-rainbow { from { background-position: 0% 0; } to { background-position: 200% 0; } }
-    @media (prefers-reduced-motion: reduce) { .fc-topbar::after { animation: none; opacity: 0.5; } }
     .fc-topbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-shrink: 0;
+      display: none;
     }
     .fc-topbar-brand img {
       width: 28px; height: 28px;
@@ -1156,43 +1142,21 @@
   <!-- ── App shell ─────────────────────────────────────────────────────── -->
   <div id="fc-app" hidden>
 
-    <!-- Top bar -->
-    <header class="fc-topbar">
-      <div class="fc-topbar-brand">
-        <a href="./" title="Back to launcher" style="display:flex;align-items:center;opacity:0.75;flex-shrink:0" aria-label="Back to launcher">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-        </a>
-        <button class="fc-icon-btn" id="fc-menu-toggle" title="Toggle sidebar" style="padding:5px 6px" aria-label="Menu">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-            <path d="M3 6h18M3 12h18M3 18h18"/>
-          </svg>
-        </button>
-        <span class="fc-brand-icon" aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#0c4a6e,#06b6d4);color:#fff">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        </span>
-        <span>FlockChat</span>
-      </div>
+    <!-- Unity header (mounted by inline module below) -->
+    <header class="fc-topbar unity-header" id="fc-topbar" role="banner"></header>
 
+    <!-- Subbar: active room context + per-room actions -->
+    <nav class="fc-subbar" id="fc-subbar" aria-label="Active room">
       <div class="fc-topbar-context">
         <div class="fc-topbar-room" id="fc-topbar-room"></div>
         <div class="fc-topbar-room-desc" id="fc-topbar-desc"></div>
       </div>
 
       <div class="fc-topbar-right">
-        <button data-app-switcher data-app-switcher-current="flockchat" title="Switch app"></button>
         <button class="fc-icon-btn" id="fc-search-btn" title="Search (Ctrl+F)" style="display:none">🔍</button>
         <button class="fc-icon-btn" id="fc-admin-menu-btn" title="Admin panel" style="display:none">⚙️ Admin</button>
-        <span id="fc-user-chip" tabindex="0" style="font-size:0.75rem; color:var(--fc-muted); max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;"></span>
-        <button class="fc-icon-btn" id="fc-signout-btn" title="Sign out">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          Sign Out
-        </button>
       </div>
-    </header>
+    </nav>
 
     <!-- Body -->
     <div class="fc-body">
@@ -1519,11 +1483,71 @@
   <script defer src="Scripts/firm_foundation.js"></script>
   <script defer src="Scripts/the_upper_room.js"></script>
 
-  <!-- Cross-app navigation switcher -->
-  <script type="module" src="Scripts/the_app_switcher.js"></script>
-
   <!-- FlockChat app logic -->
   <script defer src="app.flockchat/flockchat.js"></script>
+
+  <!-- Unity header (mounts shared FlockOS chrome) -->
+  <script type="module">
+    import { mountUnityHeader } from '../Scripts/the_unity_header.js';
+
+    let user = null;
+    try {
+      const raw = sessionStorage.getItem('flock_auth_session') || sessionStorage.getItem('flock_auth_profile');
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s && s.email) {
+          user = {
+            displayName: s.displayName || s.name || s.email.split('@')[0],
+            email:       s.email,
+            photoURL:    s.photoURL || '',
+          };
+        }
+      }
+    } catch (_) {}
+
+    const FC_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+
+    function mount() {
+      const host = document.getElementById('fc-topbar');
+      if (!host) return;
+      mountUnityHeader(host, {
+        appId:       'flockchat',
+        appName:     'FlockChat',
+        appIconSvg:  FC_ICON,
+        appAccent:   '#06b6d4',
+        appAccentDk: '#0c4a6e',
+        homeHref:    '../',
+        user,
+        signInHref:  'app.flockchat/',
+        onSignOut: () => {
+          const N = window.Nehemiah;
+          if (N && typeof N.logout === 'function') {
+            if (confirm('Sign out of FlockChat?')) N.logout();
+            return;
+          }
+          if (N && typeof N.signOut === 'function') {
+            if (confirm('Sign out of FlockChat?')) N.signOut();
+            return;
+          }
+          try { sessionStorage.removeItem('flock_auth_session'); } catch (_) {}
+          try { sessionStorage.removeItem('flock_auth_profile'); } catch (_) {}
+          location.replace('app.flockchat/');
+        },
+        onHamburger: () => {
+          const sb = document.getElementById('fc-sidebar');
+          if (sb) sb.classList.toggle('open');
+          const sc = document.getElementById('fc-sidebar-scrim');
+          if (sc) sc.classList.toggle('open', !!sb?.classList.contains('open'));
+        },
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mount, { once: true });
+    } else {
+      mount();
+    }
+  </script>
 
 </body>
 </html>
