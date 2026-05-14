@@ -49,11 +49,22 @@ const ICON_SVG = {
 
 export function openUnityProfile(opts = {}) {
   const { user = null, onSignOut = null, onAction = null, appName = '' } = opts;
+
+  // Hard guard: no guests in FlockOS. If there is no authenticated user with
+  // an email, refuse to open the profile sheet and re-trigger the sign-in
+  // gate by reloading the page (the app shell will surface the sign-in modal).
+  if (!user || !user.email) {
+    try { sessionStorage.removeItem('flock_auth_session'); } catch (_) {}
+    try { sessionStorage.removeItem('flock_auth_profile'); } catch (_) {}
+    location.reload();
+    return;
+  }
+
   ensureSheet();
 
-  const display = user?.displayName || user?.name || (user?.email ? user.email.split('@')[0] : 'Guest');
-  const email   = user?.email || '';
-  const photo   = user?.photoURL || '';
+  const display = user.displayName || user.name || user.email.split('@')[0];
+  const email   = user.email;
+  const photo   = user.photoURL || '';
 
   _sheet.querySelector('.unity-pp-name').textContent = display;
   _sheet.querySelector('.unity-pp-email').textContent = email || `Sign in to ${appName || 'FlockOS'}`;
@@ -107,10 +118,10 @@ function ensureSheet() {
     <div class="unity-pp-backdrop" data-act="close"></div>
     <div class="unity-pp-card" role="menu">
       <header class="unity-pp-header">
-        <div class="unity-pp-avatar" aria-hidden="true">?</div>
+        <div class="unity-pp-avatar" aria-hidden="true"></div>
         <div class="unity-pp-id">
-          <div class="unity-pp-name">Guest</div>
-          <div class="unity-pp-email">Not signed in</div>
+          <div class="unity-pp-name"></div>
+          <div class="unity-pp-email"></div>
         </div>
       </header>
       <div class="unity-pp-list">
