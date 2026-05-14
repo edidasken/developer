@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Resolve all relative resource paths from New_Covenant/ -->
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FlockChat">
+  <meta name="theme-color" content="#06b6d4">
+  <meta name="description" content="FlockChat — church team messaging, prayer chain, and announcements.">
+
+  <title>FlockChat</title>
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="app.flockchat/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="Images/icon-chat.svg">
+  <link rel="apple-touch-icon" href="Images/Chat.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Firebase preconnect -->
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com">
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
+
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+
+  <!-- Shared stylesheet -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <style>
+    /* ─── Reset ──────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+
+    /* ─── Design tokens — aliased to active FlockOS theme (new_covenant.css) ─── */
+    :root {
+      /* Surfaces — pulled straight from the active NC theme */
+      --fc-bg:         var(--bg);
+      --fc-panel:      var(--bg-raised);
+      --fc-panel-2:    var(--bg-sunken);
+      --fc-panel-3:    var(--bg-hover);
+      --fc-border:     var(--line);
+      --fc-border-hi:  var(--line-strong);
+
+      /* Ink — from active NC theme */
+      --fc-ink:        var(--ink);
+      --fc-muted:      var(--ink-muted);
+      --fc-faint:      var(--ink-faint);
+
+      /* Accents — chat brand cyan, plus shared NC palette colors */
+      --fc-accent:     var(--accent, #38bdf8);
+      --fc-accent-dk:  #0ea5e9;
+      --fc-accent-dim: rgba(56,189,248,0.12);
+      --fc-gold:       var(--gold, #e8a838);
+      --fc-danger:     var(--danger, #b22234);
+      --fc-prayer:     var(--lilac, #a78bfa);
+      --fc-announce:   var(--gold, #e8a838);
+
+      --fc-font:       'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --topbar-h:      52px;
+      --sidebar-w:     260px;
+      --safe-top:      env(safe-area-inset-top, 0px);
+      --safe-bot:      env(safe-area-inset-bottom, 0px);
+    }
+
+    body {
+      font-family: var(--fc-font);
+      -webkit-font-smoothing: antialiased;
+      background: var(--fc-bg);
+      color: var(--fc-ink);
+    }
+
+    /* ─── Boot splash ────────────────────────────────────────────────── */
+    #fc-boot {
+      position: fixed; inset: 0;
+      background: var(--fc-bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem;
+      z-index: 9000;
+      transition: opacity 0.3s ease;
+    }
+    #fc-boot.fade-out { opacity: 0; pointer-events: none; }
+    .fc-boot-icon {
+      width: 64px; height: 64px;
+      border-radius: 16px;
+      background: var(--fc-panel-3);
+      border: 1px solid var(--fc-border-hi);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+    }
+    .fc-boot-label {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--fc-accent);
+    }
+    .fc-boot-spinner {
+      width: 28px; height: 28px;
+      border: 2.5px solid var(--fc-border);
+      border-top-color: var(--fc-accent);
+      border-radius: 50%;
+      animation: fc-spin 0.8s linear infinite;
+    }
+    .fc-boot-status {
+      font-size: 0.75rem;
+      color: var(--fc-muted);
+    }
+    @keyframes fc-spin { to { transform: rotate(360deg); } }
+
+    /* ─── App shell ──────────────────────────────────────────────────── */
+    #fc-app {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+    }
+    #fc-app[hidden] { display: none; }
+
+    /* ─── Top bar (handled by .unity-header in new_covenant.css) ─── */
+    .fc-topbar { z-index: 100; }
+
+    /* ─── Subbar (active room context + per-room actions) ─── */
+    .fc-subbar {
+      flex-shrink: 0;
+      background: var(--top-bg);
+      border-bottom: 1px solid var(--top-line);
+      color: var(--top-ink);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 7px 1rem;
+      z-index: 99;
+    }
+    .fc-topbar-brand {
+      display: none;
+    }
+    .fc-topbar-brand img {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      object-fit: contain;
+    }
+    .fc-topbar-brand span {
+      font: 700 1.05rem 'Plus Jakarta Sans', system-ui, sans-serif;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+    .fc-topbar-context {
+      flex: 1;
+      overflow: hidden;
+    }
+    .fc-topbar-room {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--top-ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fc-topbar-room-desc {
+      font-size: 0.7rem;
+      color: var(--top-ink-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fc-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+    .fc-icon-btn {
+      background: none;
+      border: none;
+      color: var(--top-ink-muted);
+      cursor: pointer;
+      padding: 6px 8px;
+      border-radius: 7px;
+      font-size: 0.8rem;
+      font-family: var(--fc-font);
+      transition: color 0.12s, background 0.12s;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .fc-icon-btn:hover { color: var(--top-ink); background: rgba(255,255,255,0.10); }
+    .fc-icon-btn svg { flex-shrink: 0; }
+
+    /* ─── Body (sidebar + main) ──────────────────────────────────────── */
+    .fc-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ─── Sidebar — canonical FlockOS dark navy chrome ───────────────── */
+    .fc-sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: var(--side-bg);
+      border-right: 1px solid var(--side-line);
+      color: var(--side-ink);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.22s ease;
+    }
+
+    /* Tab bar inside sidebar */
+    .fc-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--fc-border);
+      flex-shrink: 0;
+    }
+    .fc-tab {
+      flex: 1;
+      padding: 0.6rem 0;
+      background: none;
+      border: none;
+      color: var(--fc-muted);
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-family: var(--fc-font);
+      border-bottom: 2px solid transparent;
+      transition: color 0.12s, border-color 0.12s;
+    }
+    .fc-tab.active {
+      color: var(--fc-ink);
+    }
+    .fc-tab[data-tab="channels"].active { border-color: var(--fc-accent); }
+    .fc-tab[data-tab="dms"].active      { border-color: var(--fc-accent); }
+    .fc-tab[data-tab="prayer"].active   { border-color: var(--fc-prayer); }
+    .fc-tab[data-tab="announce"].active { border-color: var(--fc-announce); }
+
+    /* Sidebar scrollable list */
+    .fc-sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 0.5rem 0;
+    }
+    .fc-sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .fc-sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .fc-sidebar-scroll::-webkit-scrollbar-thumb { background: var(--fc-border-hi); border-radius: 4px; }
+
+    .fc-sidebar-section {
+      margin-bottom: 0.25rem;
+    }
+    .fc-sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.3rem 0.85rem;
+    }
+    .fc-sidebar-header span {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fc-muted);
+    }
+    .fc-sidebar-add {
+      background: none;
+      border: none;
+      color: var(--fc-muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+      padding: 1px 4px;
+      border-radius: 4px;
+      transition: color 0.1s, background 0.1s;
+    }
+    .fc-sidebar-add:hover { color: var(--fc-ink); background: var(--fc-panel-3); }
+
+    /* Conversation items */
+    .fc-convo-item {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.42rem 0.85rem;
+      cursor: pointer;
+      border-radius: 8px;
+      margin: 0 0.35rem;
+      transition: background 0.1s;
+      overflow: hidden;
+    }
+    .fc-convo-item:hover { background: var(--fc-panel-3); }
+    .fc-convo-item.active { background: var(--fc-accent-dim); }
+    .fc-convo-item.active .fc-convo-name { color: var(--fc-accent); }
+    .fc-convo-icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--fc-panel-3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      color: var(--fc-muted);
+      font-weight: 700;
+    }
+    .fc-convo-icon.channel { border-radius: 6px; }
+    .fc-convo-info {
+      flex: 1;
+      overflow: hidden;
+    }
+    .fc-convo-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--fc-ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fc-convo-snippet {
+      font-size: 0.68rem;
+      color: var(--fc-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+    .fc-unread-badge {
+      background: var(--fc-accent);
+      color: #000;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .fc-unread-dot {
+      font-size: 0.55rem;
+      color: var(--fc-accent);
+      flex-shrink: 0;
+    }
+    .fc-convo-item.has-unread .fc-convo-name { font-weight: 800; color: var(--fc-ink); }
+
+    /* Prayer + announcement items */
+    .fc-prayer-item {
+      padding: 0.65rem 0.85rem;
+      margin: 0 0.35rem 0.25rem;
+      border-radius: 8px;
+      background: var(--fc-panel-2);
+      border: 1px solid var(--fc-border);
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+    }
+    .fc-prayer-item:hover { border-color: var(--fc-prayer); background: var(--fc-panel-3); }
+    .fc-prayer-item.active { border-color: var(--fc-prayer); }
+    .fc-prayer-name { font-size: 0.78rem; font-weight: 700; color: var(--fc-prayer); }
+    .fc-prayer-preview { font-size: 0.7rem; color: var(--fc-muted); margin-top: 2px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .fc-prayer-status {
+      display: inline-block;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: var(--fc-panel-3);
+      color: var(--fc-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .fc-prayer-status.new     { color: var(--fc-prayer); background: rgba(167,139,250,0.12); }
+    .fc-prayer-status.answered { color: #6ee7b7; background: rgba(110,231,183,0.1); }
+
+    /* Announce item */
+    .fc-announce-item {
+      padding: 0.65rem 0.85rem;
+      margin: 0 0.35rem 0.25rem;
+      border-radius: 8px;
+      background: var(--fc-panel-2);
+      border: 1px solid var(--fc-border);
+      cursor: pointer;
+      transition: border-color 0.12s;
+    }
+    .fc-announce-item:hover { border-color: var(--fc-announce); }
+    .fc-announce-item.active { border-color: var(--fc-announce); }
+    .fc-announce-subject { font-size: 0.78rem; font-weight: 700; color: var(--fc-announce); }
+    .fc-announce-preview { font-size: 0.7rem; color: var(--fc-muted); margin-top: 2px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+    .fc-empty {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--fc-muted);
+      font-size: 0.78rem;
+    }
+    .fc-empty .fc-empty-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+    /* ─── Main pane ──────────────────────────────────────────────────── */
+    .fc-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--fc-bg);
+    }
+
+    /* Welcome screen */
+    #fc-welcome {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: var(--fc-muted);
+      text-align: center;
+      padding: 2rem;
+    }
+    #fc-welcome .welcome-icon { font-size: 3rem; }
+    #fc-welcome h2 { font-size: 1.1rem; font-weight: 700; color: var(--fc-ink); }
+    #fc-welcome p { font-size: 0.8rem; max-width: 30ch; line-height: 1.6; }
+
+    /* ─── Message thread ─────────────────────────────────────────────── */
+    #fc-thread {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #fc-thread[hidden] { display: none; }
+
+    /* Thread header */
+    .fc-thread-header {
+      padding: 0.65rem 1.1rem;
+      border-bottom: 1px solid var(--fc-border);
+      background: var(--fc-panel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-shrink: 0;
+    }
+    .fc-thread-title { font-size: 0.9rem; font-weight: 700; color: var(--fc-ink); }
+    .fc-thread-desc  { font-size: 0.72rem; color: var(--fc-muted); margin-top: 1px; }
+    .fc-thread-actions { display: flex; gap: 0.3rem; flex-shrink: 0; }
+
+    /* Message list */
+    .fc-msg-list {
+      flex: 1;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 1rem 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .fc-msg-list::-webkit-scrollbar { width: 5px; }
+    .fc-msg-list::-webkit-scrollbar-track { background: transparent; }
+    .fc-msg-list::-webkit-scrollbar-thumb { background: var(--fc-border-hi); border-radius: 4px; }
+
+    /* Date separator */
+    .fc-date-sep {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0.75rem 0 0.5rem;
+      color: var(--fc-muted);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .fc-date-sep::before, .fc-date-sep::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--fc-border);
+    }
+
+    /* Message bubble */
+    .fc-msg {
+      display: flex;
+      gap: 0.65rem;
+      padding: 0.25rem 0.4rem;
+      border-radius: 8px;
+      transition: background 0.1s;
+    }
+    .fc-msg:hover { background: var(--fc-panel); }
+    .fc-msg.is-mine { flex-direction: row-reverse; }
+    .fc-msg-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--fc-panel-3);
+      border: 1px solid var(--fc-border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--fc-accent);
+      flex-shrink: 0;
+      align-self: flex-end;
+    }
+    .fc-msg.is-mine .fc-msg-avatar { color: var(--fc-gold); }
+    .fc-msg-content { max-width: 72%; }
+    .fc-msg.is-mine .fc-msg-content { align-items: flex-end; display: flex; flex-direction: column; }
+    .fc-msg-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+      margin-bottom: 0.2rem;
+    }
+    .fc-msg.is-mine .fc-msg-meta { flex-direction: row-reverse; }
+    .fc-msg-sender {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--fc-accent);
+    }
+    .fc-msg.is-mine .fc-msg-sender { color: var(--fc-gold); }
+    .fc-msg-time {
+      font-size: 0.62rem;
+      color: var(--fc-muted);
+    }
+    .fc-msg-bubble {
+      background: var(--fc-panel-2);
+      border: 1px solid var(--fc-border);
+      border-radius: 12px 12px 12px 3px;
+      padding: 0.55rem 0.85rem;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--fc-ink);
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .fc-msg.is-mine .fc-msg-bubble {
+      background: var(--fc-accent-dim);
+      border-color: rgba(34,211,238,0.2);
+      border-radius: 12px 12px 3px 12px;
+    }
+    /* Consecutive messages from same sender — collapse avatar */
+    .fc-msg.is-continued { padding-top: 0; }
+    .fc-msg.is-continued .fc-msg-avatar { visibility: hidden; }
+    .fc-msg.is-continued .fc-msg-meta  { display: none; }
+    .fc-msg.is-continued .fc-msg-bubble { border-radius: 4px 12px 12px 3px; }
+    .fc-msg.is-mine.is-continued .fc-msg-bubble { border-radius: 12px 4px 3px 12px; }
+
+    /* ─── Typing indicator ───────────────────────────────────────────── */
+    .fc-typing {
+      padding: 0.3rem 1.1rem;
+      font-size: 0.7rem;
+      color: var(--fc-muted);
+      min-height: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    /* ─── Composer ────────────────────────────────────────────────────── */
+    .fc-composer {
+      flex-shrink: 0;
+      border-top: 1px solid var(--fc-border);
+      background: var(--fc-panel);
+      padding: 0.65rem 1rem calc(var(--safe-bot) + 0.65rem);
+    }
+    .fc-composer-inner {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+      background: var(--fc-panel-3);
+      border: 1px solid var(--fc-border);
+      border-radius: 12px;
+      padding: 0.5rem 0.75rem;
+      transition: border-color 0.15s;
+    }
+    .fc-composer-inner:focus-within {
+      border-color: var(--fc-accent);
+      box-shadow: 0 0 0 2px rgba(34,211,238,0.1);
+    }
+    .fc-composer-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--fc-ink);
+      font-size: 0.9rem;
+      font-family: var(--fc-font);
+      resize: none;
+      max-height: 140px;
+      min-height: 22px;
+      line-height: 1.45;
+    }
+    .fc-composer-input::placeholder { color: var(--fc-muted); }
+    .fc-send-btn {
+      background: var(--fc-accent);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 0.12s, transform 0.1s;
+      flex-shrink: 0;
+    }
+    .fc-send-btn:hover { background: var(--fc-accent-dk); }
+    .fc-send-btn:active { transform: scale(0.93); }
+    .fc-send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .fc-composer-hint {
+      font-size: 0.65rem;
+      color: var(--fc-muted);
+      text-align: right;
+      margin-top: 0.3rem;
+    }
+    /* Read-only composer (announcements for non-admins) */
+    .fc-composer.readonly .fc-composer-inner { opacity: 0.5; pointer-events: none; }
+    .fc-composer.readonly .fc-composer-hint { color: var(--fc-muted); text-align: center; }
+
+    /* ─── Prayer detail panel ────────────────────────────────────────── */
+    #fc-prayer-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #fc-prayer-panel[hidden] { display: none; }
+    .fc-prayer-detail {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem 1.4rem;
+    }
+    .fc-prayer-detail::-webkit-scrollbar { width: 4px; }
+    .fc-prayer-detail::-webkit-scrollbar-thumb { background: var(--fc-border-hi); border-radius: 4px; }
+    .fc-prayer-category {
+      display: inline-block;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fc-prayer);
+      background: rgba(167,139,250,0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+    .fc-prayer-detail h2 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--fc-ink);
+      margin-bottom: 0.5rem;
+    }
+    .fc-prayer-text {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--fc-ink);
+      white-space: pre-wrap;
+      margin-bottom: 1.25rem;
+    }
+    .fc-prayer-meta-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.3rem 0.75rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.77rem;
+    }
+    .fc-prayer-meta-label { color: var(--fc-muted); font-weight: 600; }
+    .fc-prayer-meta-val   { color: var(--fc-ink); }
+    .fc-interactions-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--fc-muted);
+      margin-bottom: 0.65rem;
+    }
+    .fc-interaction-item {
+      background: var(--fc-panel-2);
+      border: 1px solid var(--fc-border);
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.8rem;
+    }
+    .fc-interaction-who { font-size: 0.68rem; color: var(--fc-muted); margin-top: 2px; }
+
+    /* ─── Announcement detail ────────────────────────────────────────── */
+    #fc-announce-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #fc-announce-panel[hidden] { display: none; }
+    .fc-announce-detail {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem 1.4rem;
+    }
+    .fc-announce-label {
+      display: inline-block;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fc-announce);
+      background: rgba(251,191,36,0.1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+    .fc-announce-detail h2 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--fc-ink);
+      margin-bottom: 0.5rem;
+    }
+    .fc-announce-body {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--fc-ink);
+      white-space: pre-wrap;
+    }
+    .fc-announce-detail-meta {
+      font-size: 0.72rem;
+      color: var(--fc-muted);
+      margin-top: 0.85rem;
+    }
+
+    /* ─── Modal overlay ──────────────────────────────────────────────── */
+    .fc-modal-backdrop {
+      position: fixed; inset: 0;
+      background: var(--modal-dim);
+      backdrop-filter: blur(3px);
+      z-index: 800;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    .fc-modal-backdrop[hidden] { display: none; }
+    .fc-modal {
+      background: var(--fc-panel-2);
+      border: 1px solid var(--fc-border-hi);
+      border-radius: 16px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    }
+    .fc-modal h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--fc-ink);
+      margin-bottom: 1rem;
+    }
+    .fc-form-group { margin-bottom: 0.85rem; }
+    .fc-form-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--fc-muted);
+      margin-bottom: 0.3rem;
+    }
+    .fc-form-input, .fc-form-textarea, .fc-form-select {
+      width: 100%;
+      background: var(--fc-panel-3);
+      border: 1px solid var(--fc-border);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      color: var(--fc-ink);
+      font-size: 0.85rem;
+      font-family: var(--fc-font);
+      outline: none;
+      transition: border-color 0.12s;
+    }
+    .fc-form-textarea { resize: vertical; min-height: 90px; }
+    .fc-form-select   { cursor: pointer; }
+    .fc-form-input:focus,
+    .fc-form-textarea:focus,
+    .fc-form-select:focus { border-color: var(--fc-accent); }
+    .fc-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+    }
+    .fc-btn {
+      padding: 0.5rem 1.1rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      font-family: var(--fc-font);
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.12s, background 0.12s;
+    }
+    .fc-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .fc-btn--primary { background: var(--fc-accent); color: #000; }
+    .fc-btn--primary:hover:not(:disabled) { background: var(--fc-accent-dk); }
+    .fc-btn--ghost {
+      background: var(--fc-panel-3);
+      color: var(--fc-ink);
+      border: 1px solid var(--fc-border);
+    }
+    .fc-btn--ghost:hover { background: var(--fc-panel); }
+    .fc-btn--prayer  { background: var(--fc-prayer); color: #fff; }
+    .fc-btn--prayer:hover:not(:disabled)  { background: #7c3aed; }
+    .fc-btn--announce { background: var(--fc-announce); color: #000; }
+    .fc-btn--announce:hover:not(:disabled) { background: #d97706; }
+    .fc-btn--danger { background: var(--fc-danger); color: #fff; }
+    .fc-btn--danger:hover:not(:disabled) { background: #dc2626; }
+
+    /* ─── Toast ──────────────────────────────────────────────────────── */
+    #fc-toasts {
+      position: fixed;
+      bottom: calc(var(--safe-bot) + 1.25rem);
+      right: 1rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 0.4rem;
+      max-width: 320px;
+    }
+    .fc-toast {
+      background: var(--fc-panel-2);
+      border: 1px solid var(--fc-border-hi);
+      border-radius: 10px;
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+      color: var(--fc-ink);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .fc-toast.show { opacity: 1; transform: none; }
+    .fc-toast.error { border-color: var(--fc-danger); color: var(--fc-danger); }
+
+    /* ─── Message rows ────────────────────────────────────────────────── */
+    .fc-msg-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.28rem 1rem;
+      transition: background 0.08s;
+      position: relative;
+    }
+    .fc-msg-row:hover { background: var(--fc-panel); }
+    .fc-msg-row.grouped { padding-top: 0.05rem; }
+    .fc-msg-row.fc-msg-highlight { background: var(--fc-accent-dim) !important; }
+    .fc-msg-row.fc-search-hidden { display: none; }
+    .fc-msg-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--fc-panel-3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 800;
+      flex-shrink: 0; margin-top: 2px;
+      color: var(--fc-muted);
+    }
+    .fc-msg-avatar.hidden { visibility: hidden; }
+    .fc-msg-body { flex: 1; overflow: hidden; }
+    .fc-msg-meta { display: flex; align-items: baseline; gap: 0.4rem; margin-bottom: 2px; }
+    .fc-msg-meta.hidden { display: none; }
+    .fc-msg-author { font-size: 0.82rem; font-weight: 700; color: var(--fc-ink); }
+    .fc-msg-time { font-size: 0.65rem; color: var(--fc-muted); }
+    .fc-msg-text { font-size: 0.85rem; line-height: 1.55; color: var(--fc-ink); word-break: break-word; }
+    .fc-msg-deleted { font-style: italic; color: var(--fc-muted); font-size: 0.82rem; }
+    .fc-msg-edited { font-size: 0.65rem; color: var(--fc-muted); }
+
+    /* Reply quote inside a message */
+    .fc-msg-reply-quote {
+      background: var(--fc-panel-3);
+      border-left: 3px solid var(--fc-accent);
+      border-radius: 0 6px 6px 0;
+      padding: 3px 8px;
+      margin-bottom: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex; gap: 0.4rem;
+    }
+    .fc-msg-reply-author { font-weight: 700; color: var(--fc-accent); }
+    .fc-msg-reply-text   { color: var(--fc-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Message actions (hover reveal) */
+    .fc-msg-actions {
+      position: absolute; right: 0.75rem; top: 0;
+      display: none;
+      align-items: center;
+      gap: 2px;
+      background: var(--fc-panel-2);
+      border: 1px solid var(--fc-border);
+      border-radius: 8px;
+      padding: 2px 4px;
+    }
+    .fc-msg-row:hover .fc-msg-actions { display: flex; }
+    .fc-msg-btn {
+      background: none; border: none;
+      font-size: 0.9rem; cursor: pointer;
+      padding: 3px 5px; border-radius: 5px;
+      color: var(--fc-muted);
+      transition: background 0.1s, color 0.1s;
+    }
+    .fc-msg-btn:hover { background: var(--fc-panel-3); color: var(--fc-ink); }
+
+    /* Emoji reactions */
+    .fc-msg-reactions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .fc-reaction-chip {
+      display: flex; align-items: center; gap: 3px;
+      background: var(--fc-panel-3);
+      border: 1px solid var(--fc-border);
+      border-radius: 20px;
+      padding: 2px 7px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: border-color 0.1s;
+    }
+    .fc-reaction-chip:hover { border-color: var(--fc-accent); }
+    .fc-reaction-chip.reacted { border-color: var(--fc-accent); background: var(--fc-accent-dim); }
+    .fc-reaction-count { font-size: 0.7rem; color: var(--fc-muted); }
+
+    /* Day separator */
+    .fc-day-sep {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-size: 0.68rem; font-weight: 700;
+      color: var(--fc-muted); letter-spacing: 0.04em;
+    }
+    .fc-day-line { flex: 1; height: 1px; background: var(--fc-border); }
+
+    /* Load more btn */
+    .fc-load-more-btn {
+      display: block; margin: 0.5rem auto;
+      background: var(--fc-panel-3);
+      border: 1px solid var(--fc-border);
+      border-radius: 8px;
+      color: var(--fc-muted);
+      font-size: 0.75rem; font-family: var(--fc-font);
+      padding: 4px 14px; cursor: pointer;
+      transition: border-color 0.12s;
+    }
+    .fc-load-more-btn:hover { border-color: var(--fc-accent); color: var(--fc-accent); }
+
+    /* Empty thread */
+    .fc-thread-empty { flex: 1; justify-content: center; }
+    .fc-empty-small { font-size: 0.72rem; color: var(--fc-muted); text-align: center; padding: 0.5rem 1rem; }
+
+    /* Spinner */
+    .fc-spinner { display: flex; justify-content: center; padding: 1.5rem; }
+    .fc-spin {
+      width: 24px; height: 24px;
+      border: 2px solid var(--fc-border);
+      border-top-color: var(--fc-accent);
+      border-radius: 50%;
+      animation: fc-spin 0.7s linear infinite;
+    }
+
+    /* Typing indicator */
+    .fc-typing-dots { display: flex; gap: 3px; align-items: center; }
+    .fc-typing-dots span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--fc-muted);
+      animation: fc-typing-bounce 1.2s ease-in-out infinite;
+    }
+    .fc-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .fc-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes fc-typing-bounce { 0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)} }
+    #fc-typing-indicator {
+      min-height: 1.4rem;
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 2px 1rem;
+      font-size: 0.72rem; color: var(--fc-muted);
+    }
+
+    /* Markdown */
+    .fc-code-block {
+      background: var(--fc-panel-3);
+      border: 1px solid var(--fc-border);
+      border-radius: 6px;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      margin: 4px 0;
+    }
+    .fc-inline-code {
+      background: var(--fc-panel-3);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 0.82em;
+      font-family: monospace;
+    }
+    .fc-blockquote {
+      border-left: 3px solid var(--fc-border-hi);
+      padding-left: 0.6rem;
+      color: var(--fc-muted);
+      margin: 2px 0;
+    }
+    .fc-msg-link { color: var(--fc-accent); text-decoration: none; }
+    .fc-msg-link:hover { text-decoration: underline; }
+    .fc-mention { background: var(--fc-accent-dim); color: var(--fc-accent); border-radius: 3px; padding: 0 3px; }
+    .fc-mention-self { background: rgba(251,191,36,0.12); color: var(--fc-gold); }
+    .fc-mention-channel { background: var(--fc-accent-dim); color: var(--fc-accent); }
+
+    /* Edit textarea */
+    .fc-edit-ta {
+      width: 100%;
+      background: var(--fc-panel-3);
+      border: 1px solid var(--fc-accent);
+      border-radius: 6px;
+      padding: 6px 8px;
+      color: var(--fc-ink);
+      font-family: var(--fc-font);
+      font-size: 0.85rem;
+      resize: vertical;
+      outline: none;
+    }
+    .fc-edit-actions { display: flex; gap: 0.4rem; margin-top: 4px; }
+    .fc-edit-save, .fc-edit-cancel {
+      background: var(--fc-panel-3);
+      border: 1px solid var(--fc-border);
+      border-radius: 6px;
+      color: var(--fc-ink);
+      font-family: var(--fc-font);
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      cursor: pointer;
+    }
+    .fc-edit-save { background: var(--fc-accent); color: #000; border-color: transparent; }
+
+    /* Member rows (details pane) */
+    .fc-member-row {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.35rem 0;
+    }
+    .fc-member-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--fc-panel-3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 800; color: var(--fc-muted);
+      flex-shrink: 0;
+    }
+    .fc-member-name { flex: 1; font-size: 0.8rem; color: var(--fc-ink); }
+    .fc-member-role { font-size: 0.65rem; color: var(--fc-muted); }
+
+    /* Admin rows */
+    .fc-admin-row {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.5rem;
+      border-bottom: 1px solid var(--fc-border);
+    }
+    .fc-admin-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--fc-panel-3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 800; color: var(--fc-muted);
+      flex-shrink: 0;
+    }
+    .fc-admin-info { flex: 1; }
+    .fc-admin-name { font-size: 0.8rem; font-weight: 700; color: var(--fc-ink); }
+    .fc-admin-email { font-size: 0.68rem; color: var(--fc-muted); }
+    .fc-admin-role-sel, .fc-admin-access-sel {
+      background: var(--fc-panel-3);
+      border: 1px solid var(--fc-border);
+      border-radius: 6px;
+      color: var(--fc-ink);
+      font-size: 0.75rem;
+      font-family: var(--fc-font);
+      padding: 3px 6px;
+      cursor: pointer;
+      outline: none;
+    }
+    .fc-admin-remove-btn {
+      background: none; border: none;
+      color: var(--fc-danger);
+      cursor: pointer;
+      padding: 3px 5px;
+      border-radius: 5px;
+      font-size: 0.85rem;
+    }
+    .fc-admin-empty { font-size: 0.78rem; color: var(--fc-muted); text-align: center; padding: 1.5rem; }
+    .fc-admin-tab { background: none !important; }
+    .fc-admin-tab.active { color: var(--fc-accent) !important; background: var(--fc-accent-dim) !important; }
+
+    /* Quick switcher items */
+    .fc-qs-item {
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--fc-ink);
+      transition: background 0.08s;
+    }
+    .fc-qs-item:hover, .fc-qs-item.selected { background: var(--fc-accent-dim); color: var(--fc-accent); }
+    .fc-qs-empty { font-size: 0.78rem; color: var(--fc-muted); text-align: center; padding: 1rem; }
+
+    /* Emoji grid btn */
+    #fc-emoji-grid .fc-emoji-btn {
+      background: none; border: none;
+      font-size: 1.35rem;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      line-height: 1;
+      transition: background 0.08s;
+    }
+    #fc-emoji-grid .fc-emoji-btn:hover { background: var(--fc-panel-3); }
+
+    /* Toast success */
+    .fc-toast.success { border-color: #6ee7b7; color: #6ee7b7; }
+
+    /* fc-topbar-uname */
+    #fc-topbar-uname { font-size: 0.72rem; color: var(--fc-muted); }
+
+    /* ─── Mobile ─────────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      :root { --sidebar-w: 100%; }
+      .fc-sidebar {
+        position: fixed; inset: calc(var(--topbar-h) + var(--safe-top)) 0 0 0;
+        z-index: 300;
+        width: 100%;
+        transform: translateX(-100%);
+      }
+      .fc-sidebar.open { transform: none; }
+      .fc-main { width: 100%; }
+      #fc-sidebar-scrim.open { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Boot splash ───────────────────────────────────────────────────── -->
+  <div id="fc-boot">
+    <div class="fc-boot-icon">💬</div>
+    <div class="fc-boot-label">FlockChat</div>
+    <div class="fc-boot-spinner"></div>
+    <div class="fc-boot-status" id="fc-boot-status">Connecting…</div>
+  </div>
+
+  <!-- ── App shell ─────────────────────────────────────────────────────── -->
+  <div id="fc-app" hidden>
+
+    <!-- Unity header (mounted by inline module below) -->
+    <header class="fc-topbar unity-header" id="fc-topbar" role="banner"></header>
+
+    <!-- Subbar: active room context + per-room actions -->
+    <nav class="fc-subbar" id="fc-subbar" aria-label="Active room">
+      <div class="fc-topbar-context">
+        <div class="fc-topbar-room" id="fc-topbar-room"></div>
+        <div class="fc-topbar-room-desc" id="fc-topbar-desc"></div>
+      </div>
+
+      <div class="fc-topbar-right">
+        <button class="fc-icon-btn" id="fc-search-btn" title="Search (Ctrl+F)" style="display:none">🔍</button>
+        <button class="fc-icon-btn" id="fc-admin-menu-btn" title="Admin panel" style="display:none">⚙️ Admin</button>
+      </div>
+    </nav>
+
+    <!-- Body -->
+    <div class="fc-body">
+
+      <!-- ── Sidebar ─────────────────────────────────────────────────── -->
+      <aside class="fc-sidebar" id="fc-sidebar">
+
+        <!-- Tab bar -->
+        <div class="fc-tabs">
+          <button class="fc-tab active" data-tab="channels" title="Channels">💬</button>
+          <button class="fc-tab" data-tab="dms" title="Direct Messages">📨</button>
+          <button class="fc-tab" data-tab="prayer" title="Prayer Chain">🙏</button>
+          <button class="fc-tab" data-tab="announce" title="Announcements">📢</button>
+        </div>
+
+        <!-- Sidebar search -->
+        <div style="padding:0.45rem 0.65rem; flex-shrink:0;">
+          <input type="search" id="fc-sidebar-search" placeholder="Search channels &amp; DMs…"
+            style="width:100%; background:var(--fc-panel-3); border:1px solid var(--fc-border); border-radius:8px; padding:5px 10px; color:var(--fc-ink); font-size:0.78rem; font-family:var(--fc-font); outline:none;">
+        </div>
+
+        <!-- ── CHANNELS pane ──────────────────────────────────────────── -->
+        <div id="fc-pane-channels" class="fc-sidebar-scroll">
+          <div class="fc-sidebar-section">
+            <div class="fc-sidebar-header">
+              <span>Channels</span>
+              <button class="fc-sidebar-add" id="fc-new-channel-btn" title="New channel" style="display:none">＋</button>
+            </div>
+            <div id="fc-channel-list"></div>
+          </div>
+        </div>
+
+        <!-- ── DMs pane ───────────────────────────────────────────────── -->
+        <div id="fc-pane-dms" class="fc-sidebar-scroll" style="display:none">
+          <div class="fc-sidebar-section">
+            <div class="fc-sidebar-header">
+              <span>Direct Messages</span>
+              <button class="fc-sidebar-add" id="fc-new-dm-btn" title="New DM">＋</button>
+            </div>
+            <div id="fc-dm-list"></div>
+          </div>
+        </div>
+
+        <!-- ── PRAYER tab ─────────────────────────────────────────────── -->
+        <div id="fc-pane-prayer" class="fc-sidebar-scroll" style="display:none">
+          <div style="padding:0.5rem 0.85rem 0.3rem; display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:0.68rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:var(--fc-prayer)">Prayer Requests</span>
+            <button class="fc-btn fc-btn--prayer" id="fc-new-prayer-btn" style="padding:3px 10px; font-size:0.7rem;">＋ New</button>
+          </div>
+          <div id="fc-prayer-list"></div>
+        </div>
+
+        <!-- ── ANNOUNCE tab ───────────────────────────────────────────── -->
+        <div id="fc-pane-announce" class="fc-sidebar-scroll" style="display:none">
+          <div style="padding:0.5rem 0.85rem 0.3rem; display:flex; align-items:center; justify-content:space-between;">
+            <span style="font-size:0.68rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:var(--fc-announce)">Announcements</span>
+            <button class="fc-btn fc-btn--announce" id="fc-new-announce-btn" style="padding:3px 10px; font-size:0.7rem; display:none;">＋ Post</button>
+          </div>
+          <div id="fc-announce-list"></div>
+        </div>
+
+      </aside>
+
+      <!-- ── Main pane ──────────────────────────────────────────────── -->
+      <main class="fc-main">
+
+        <!-- Welcome / empty state -->
+        <div id="fc-welcome">
+          <div class="welcome-icon">💬</div>
+          <h2>Welcome to FlockChat</h2>
+          <p>Select a channel, room, or DM to start a conversation.</p>
+        </div>
+
+        <!-- Chat thread -->
+        <div id="fc-thread" hidden>
+          <!-- Pin strip -->
+          <div id="fc-pin-strip" style="display:none; align-items:center; gap:0.5rem; padding:0.35rem 1rem; background:var(--fc-panel); border-bottom:1px solid var(--fc-border); font-size:0.75rem; color:var(--fc-muted);">
+            <span>📌</span><span id="fc-pin-text" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span><span id="fc-pin-count"></span>
+          </div>
+
+          <!-- Inline search bar -->
+          <div id="fc-search-bar" style="display:none; align-items:center; gap:0.5rem; padding:0.35rem 0.75rem; background:var(--fc-panel); border-bottom:1px solid var(--fc-border);">
+            <input type="search" id="fc-search-input" placeholder="Search messages…" style="flex:1; background:var(--fc-panel-3); border:1px solid var(--fc-border); border-radius:8px; padding:5px 10px; color:var(--fc-ink); font-size:0.8rem; font-family:var(--fc-font); outline:none;">
+            <span id="fc-search-count" style="font-size:0.72rem; color:var(--fc-muted); min-width:60px; text-align:right;"></span>
+            <button class="fc-icon-btn" id="fc-search-close-btn" title="Close search" style="padding:4px 8px;">✕</button>
+          </div>
+
+          <!-- Join banner -->
+          <div id="fc-join-banner" style="display:none; align-items:center; justify-content:center; gap:0.75rem; padding:0.75rem 1rem; background:var(--fc-panel); border-bottom:1px solid var(--fc-border);">
+            <span class="fc-join-text" style="font-size:0.85rem; color:var(--fc-muted);"></span>
+            <button class="fc-btn fc-btn--primary" id="fc-join-btn" style="padding:4px 14px; font-size:0.78rem;">Join Channel</button>
+          </div>
+
+          <div class="fc-msg-list" id="fc-msg-list" role="log" aria-live="polite" aria-label="Messages"></div>
+          <div class="fc-typing" id="fc-typing-indicator"></div>
+
+          <div class="fc-composer" id="fc-composer">
+            <!-- Reply preview bar -->
+            <div id="fc-reply-bar" style="display:none; align-items:center; gap:0.5rem; padding:0.35rem 0.85rem; background:var(--fc-panel-3); border-top:1px solid var(--fc-border); font-size:0.78rem;">
+              <span style="color:var(--fc-accent);">↩</span>
+              <span>Replying to <strong class="fc-reply-author" style="color:var(--fc-ink);"></strong>:</span>
+              <span class="fc-reply-text" style="flex:1; color:var(--fc-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
+              <button class="fc-icon-btn" id="fc-reply-cancel-btn" style="padding:2px 6px; font-size:1rem; line-height:1;">✕</button>
+            </div>
+            <div class="fc-composer-inner">
+              <button class="fc-icon-btn" id="fc-emoji-btn" title="Emoji" style="padding:5px 7px; font-size:1.1rem; color:var(--fc-muted);">😊</button>
+              <textarea class="fc-composer-input" id="fc-composer-input" rows="1"
+                        placeholder="Message…" aria-label="Type a message"></textarea>
+              <button class="fc-send-btn" id="fc-send-btn" disabled title="Send (Enter)" aria-label="Send message">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+              </button>
+            </div>
+            <div class="fc-composer-hint" style="font-size:0.67rem; color:var(--fc-muted); padding:2px 0.85rem 6px; text-align:center;">Enter to send · Shift+Enter for new line · <kbd style="font-size:0.65rem;">Ctrl+K</kbd> quick-switch</div>
+          </div>
+        </div>
+
+        <!-- Prayer detail -->
+        <div id="fc-prayer-panel" hidden>
+          <div class="fc-thread-header">
+            <div>
+              <div class="fc-thread-title" style="color:var(--fc-prayer)">Prayer Request</div>
+            </div>
+            <div class="fc-thread-actions">
+              <button class="fc-btn fc-btn--prayer" id="fc-mark-answered-btn" style="padding:4px 10px; font-size:0.75rem;">Mark Answered</button>
+            </div>
+          </div>
+          <div class="fc-prayer-detail" id="fc-prayer-detail"></div>
+        </div>
+
+        <!-- Announcement detail -->
+        <div id="fc-announce-panel" hidden>
+          <div class="fc-thread-header">
+            <div>
+              <div class="fc-thread-title" style="color:var(--fc-announce)">Announcement</div>
+            </div>
+          </div>
+          <div class="fc-announce-detail" id="fc-announce-detail"></div>
+        </div>
+
+      </main>
+
+    </div>
+
+    <!-- Unity Footer inside app container -->
+    <footer id="fc-footer" class="unity-footer"></footer>
+
+  </div><!-- #fc-app -->
+
+  <!-- ── Toasts ────────────────────────────────────────────────────────── -->
+  <div id="fc-toasts" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ── Modal: New DM ─────────────────────────────────────────────────── -->
+  <div class="fc-modal-backdrop" id="fc-modal-dm" hidden>
+    <div class="fc-modal">
+      <h3>💬 New Direct Message</h3>
+      <div class="fc-form-group">
+        <label class="fc-form-label" for="fc-dm-target-email">Recipient Email</label>
+        <input type="email" class="fc-form-input" id="fc-dm-target-email" placeholder="colleague@church.org" autocomplete="email">
+      </div>
+      <div class="fc-modal-actions">
+        <button class="fc-btn fc-btn--ghost" id="fc-modal-dm-cancel">Cancel</button>
+        <button class="fc-btn fc-btn--primary" id="fc-modal-dm-ok">Start Chat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal: New Channel ────────────────────────────────────────────── -->
+  <div class="fc-modal-backdrop" id="fc-modal-channel" hidden>
+    <div class="fc-modal">
+      <h3># New Channel</h3>
+      <div class="fc-form-group">
+        <label class="fc-form-label" for="fc-new-ch-name">Channel Name</label>
+        <input type="text" class="fc-form-input" id="fc-new-ch-name" placeholder="e.g. worship-team">
+      </div>
+      <div class="fc-form-group">
+        <label class="fc-form-label" for="fc-new-ch-desc">Description (optional)</label>
+        <input type="text" class="fc-form-input" id="fc-new-ch-desc" placeholder="What's this channel about?">
+      </div>
+      <div class="fc-form-group">
+        <label class="fc-form-label" for="fc-new-ch-access">Access</label>
+        <select class="fc-form-select" id="fc-new-ch-access">
+          <option value="public">Public — anyone can join</option>
+          <option value="private">Private — invite only</option>
+          <option value="role-gated">Role-gated — minimum role required</option>
+        </select>
+      </div>
+      <div class="fc-modal-actions">
+        <button class="fc-btn fc-btn--ghost" id="fc-modal-channel-cancel">Cancel</button>
+        <button class="fc-btn fc-btn--primary" id="fc-modal-channel-ok">Create Channel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal: New Prayer Request ────────────────────────────────────── -->
+  <div class="fc-modal-backdrop" id="fc-modal-prayer" hidden>
+    <div class="fc-modal">
+      <h3>🙏 Submit Prayer Request</h3>
+      <div class="fc-form-group">
+        <label class="fc-form-label" for="fc-prayer-submit-name">Your Name</label>
+        <input type="text" class="fc-form-input" id="fc-prayer-submit-name" placeholder="Your name">
+      </div>
+      <div class="fc-form-group">
+        <label class="fc-form-label" for="fc-prayer-submit-text">Prayer Request</label>
+        <textarea class="fc-form-textarea" id="fc-prayer-submit-text" placeholder="Share your prayer request…"></textarea>
+      </div>
+      <div class="fc-form-group">
+        <label class="fc-form-label" for="fc-prayer-submit-category">Category</label>
+        <select class="fc-form-select" id="fc-prayer-submit-category">
+          <option value="">— Select —</option>
+          <option value="Health">Health &amp; Healing</option>
+          <option value="Family">Family</option>
+          <option value="Provision">Provision</option>
+          <option value="Salvation">Salvation</option>
+          <option value="Relationships">Relationships</option>
+          <option value="Guidance">Guidance &amp; Direction</option>
+          <option value="Grief">Grief &amp; Loss</option>
+          <option value="Praise">Praise Report</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="fc-form-group" style="display:flex; align-items:center; gap:0.5rem;">
+        <input type="checkbox" id="fc-prayer-submit-confidential" style="width:15px; height:15px; cursor:pointer;">
+        <label for="fc-prayer-submit-confidential" class="fc-form-label" style="margin:0; cursor:pointer;">Keep confidential (visible to pastors only)</label>
+      </div>
+      <div class="fc-modal-actions">
+        <button class="fc-btn fc-btn--ghost" id="fc-modal-prayer-cancel">Cancel</button>
+        <button class="fc-btn fc-btn--prayer" id="fc-modal-prayer-ok">Submit Request</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal: Post Announcement ─────────────────────────────────────── -->
+  <div class="fc-modal-backdrop" id="fc-modal-announce" hidden>
+    <div class="fc-modal">
+      <h3>📢 Post Announcement</h3>
+      <div class="fc-form-group">
+        <label class="fc-form-label" for="fc-announce-submit-subject">Subject</label>
+        <input type="text" class="fc-form-input" id="fc-announce-submit-subject" placeholder="Announcement subject">
+      </div>
+      <div class="fc-form-group">
+        <label class="fc-form-label" for="fc-announce-submit-body">Message</label>
+        <textarea class="fc-form-textarea" id="fc-announce-submit-body" placeholder="Write your announcement here…" style="min-height:110px;"></textarea>
+      </div>
+      <div class="fc-modal-actions">
+        <button class="fc-btn fc-btn--ghost" id="fc-modal-announce-cancel">Cancel</button>
+        <button class="fc-btn fc-btn--announce" id="fc-modal-announce-ok">Post</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal: Remove Room (unused placeholder) ─────────────────────── -->
+
+  <!-- ── Modal: Admin Panel ───────────────────────────────────────────── -->
+  <div class="fc-modal-backdrop" id="fc-modal-admin" hidden>
+    <div class="fc-modal" style="max-width:560px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem;">
+        <h3 style="margin:0">⚙️ Admin Panel</h3>
+        <button class="fc-icon-btn" id="fc-admin-close-btn">✕</button>
+      </div>
+      <div style="display:flex; gap:0.5rem; margin-bottom:0.85rem; border-bottom:1px solid var(--fc-border); padding-bottom:0.5rem;">
+        <button class="fc-admin-tab active" data-tab="users" style="background:none; border:none; color:var(--fc-muted); font-family:var(--fc-font); font-size:0.8rem; font-weight:700; cursor:pointer; padding:4px 10px; border-radius:6px;">👥 Users</button>
+        <button class="fc-admin-tab" data-tab="channels" style="background:none; border:none; color:var(--fc-muted); font-family:var(--fc-font); font-size:0.8rem; font-weight:700; cursor:pointer; padding:4px 10px; border-radius:6px;"># Channels</button>
+      </div>
+      <div id="fc-admin-tab-users" style="max-height:340px; overflow-y:auto;">
+        <div id="fc-admin-users-list"></div>
+      </div>
+      <div id="fc-admin-tab-channels" style="display:none; max-height:340px; overflow-y:auto;">
+        <div id="fc-admin-channels-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal: Profile ────────────────────────────────────────────────── -->
+  <div class="fc-modal-backdrop" id="fc-modal-profile" hidden>
+    <div class="fc-modal" style="max-width:400px;">
+      <h3>👤 Edit Profile</h3>
+      <div class="fc-form-group">
+        <label class="fc-form-label" for="fc-profile-name">Display Name</label>
+        <input type="text" class="fc-form-input" id="fc-profile-name" placeholder="Your name">
+      </div>
+      <div class="fc-form-group">
+        <label class="fc-form-label">Email</label>
+        <input type="email" class="fc-form-input" id="fc-profile-email" disabled style="opacity:0.5;">
+      </div>
+      <div class="fc-form-group">
+        <label class="fc-form-label">Role</label>
+        <input type="text" class="fc-form-input" id="fc-profile-role" disabled style="opacity:0.5;" placeholder="Set by admin">
+      </div>
+      <div class="fc-modal-actions">
+        <button class="fc-btn fc-btn--ghost" id="fc-profile-cancel-btn">Cancel</button>
+        <button class="fc-btn fc-btn--primary" id="fc-profile-save-btn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Quick switcher (Ctrl+K) ───────────────────────────────────────── -->
+  <div id="fc-quick-switcher" hidden style="position:fixed; inset:0; background:var(--modal-dim); z-index:900; display:flex; align-items:flex-start; justify-content:center; padding-top:80px;">
+    <div style="background:var(--fc-panel-2); border:1px solid var(--fc-border-hi); border-radius:14px; width:100%; max-width:460px; box-shadow:0 24px 60px rgba(0,0,0,0.6); overflow:hidden;">
+      <div style="padding:0.75rem;">
+        <input id="fc-qs-input" type="text" placeholder="Jump to channel or DM…"
+          style="width:100%; background:var(--fc-panel-3); border:1px solid var(--fc-border); border-radius:9px; padding:8px 14px; color:var(--fc-ink); font-size:0.9rem; font-family:var(--fc-font); outline:none;">
+      </div>
+      <div id="fc-qs-list" style="padding:0 0.5rem 0.5rem; max-height:280px; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- ── Emoji picker ───────────────────────────────────────────────────── -->
+  <div id="fc-emoji-picker" style="display:none; position:fixed; z-index:850; background:var(--fc-panel-2); border:1px solid var(--fc-border-hi); border-radius:12px; padding:0.6rem; box-shadow:0 12px 36px rgba(0,0,0,0.5); width:268px;">
+    <div id="fc-emoji-grid" style="display:grid; grid-template-columns:repeat(8,1fr); gap:3px;"></div>
+  </div>
+
+  <!-- ── Sidebar scrim (mobile) ────────────────────────────────────────── -->
+  <div id="fc-sidebar-scrim" style="display:none; position:fixed; inset:0; background:var(--modal-dim); z-index:290;"></div>
+
+  <!-- ── Firebase + core scripts ──────────────────────────────────────── -->
+  <script>
+    window.FLOCK_FIREBASE_CONFIG = window.FLOCK_FIREBASE_CONFIG || null;
+  </script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+  <!-- FlockOS auth gate + UpperRoom comms engine -->
+  <script defer src="Scripts/the_true_vine.js"></script>
+  <script defer src="Scripts/firm_foundation.js"></script>
+  <script defer src="Scripts/the_upper_room.js"></script>
+
+  <!-- FlockChat app logic -->
+  <script defer src="app.flockchat/flockchat.js"></script>
+
+  <!-- Unity header (mounts shared FlockOS chrome) -->
+  <script type="module">
+    import { mountUnityHeader } from '../Scripts/the_unity_header.js';
+
+    let user = null;
+    try {
+      const raw = sessionStorage.getItem('flock_auth_session') || sessionStorage.getItem('flock_auth_profile');
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s && s.email) {
+          user = {
+            displayName: s.displayName || s.name || s.email.split('@')[0],
+            email:       s.email,
+            photoURL:    s.photoURL || '',
+          };
+        }
+      }
+    } catch (_) {}
+
+    const FC_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+
+    function mount() {
+      const host = document.getElementById('fc-topbar');
+      if (!host) return;
+      mountUnityHeader(host, {
+        appId:       'flockchat',
+        appName:     'FlockChat',
+        appIconSvg:  FC_ICON,
+        appAccent:   '#06b6d4',
+        appAccentDk: '#0c4a6e',
+        homeHref:    '../',
+        user,
+        signInHref:  'app.flockchat/',
+        onSignOut: () => {
+          const N = window.Nehemiah;
+          if (N && typeof N.logout === 'function') {
+            if (confirm('Sign out of FlockChat?')) N.logout();
+            return;
+          }
+          if (N && typeof N.signOut === 'function') {
+            if (confirm('Sign out of FlockChat?')) N.signOut();
+            return;
+          }
+          try { sessionStorage.removeItem('flock_auth_session'); } catch (_) {}
+          try { sessionStorage.removeItem('flock_auth_profile'); } catch (_) {}
+          location.replace('app.flockchat/');
+        },
+        onHamburger: () => {
+          const sb = document.getElementById('fc-sidebar');
+          if (sb) sb.classList.toggle('open');
+          const sc = document.getElementById('fc-sidebar-scrim');
+          if (sc) sc.classList.toggle('open', !!sb?.classList.contains('open'));
+        },
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mount, { once: true });
+    } else {
+      mount();
+    }
+  </script>
+
+  <!-- Unity footer -->
+  <script type="module">
+    import { mountUnityFooter } from '../Scripts/the_unity_footer.js';
+    
+    mountUnityFooter(document.getElementById('fc-footer'), {
+      appId:       'flockchat',
+      appAccent:   '#06b6d4',
+      appAccentDk: '#0c4a6e',
+    });
+  </script>
+
+</body>
+</html>
