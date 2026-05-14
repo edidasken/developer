@@ -119,11 +119,13 @@
     .grow-hero-sub   { margin: 0; color: var(--text, #f5f5f7); opacity: .88; font-size: 14px; line-height: 1.55; max-width: 60ch; }
 
     /* ── Topbar (handled by .unity-header in new_covenant.css) ── */
-    #inv-topbar { z-index: 100; }
+    #inv-topbar {
+      position: sticky; top: 0; z-index: 100;
+    }
 
     /* ── Subbar (church attribution + share pill) ── */
     #inv-subbar {
-      position: sticky; top: 0; z-index: 99;
+      position: sticky; top: calc(56px + var(--safe-top, 0px)); z-index: 99;
       background: var(--top-bg);
       color: var(--top-ink);
       padding: 7px 20px;
