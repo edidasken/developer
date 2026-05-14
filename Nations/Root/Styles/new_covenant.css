@@ -8963,6 +8963,16 @@ body.veil-app {
   padding-right: var(--safe-right, 0px);
   position: relative;
 }
+/* Place the four shell children into their named grid areas. Without these,
+   children fall back to grid auto-placement and land in the wrong cells. */
+.veil-wrap > .veil-top,
+.veil-wrap > #the-veil-top   { grid-area: top !important; }
+.veil-wrap > .veil-side,
+.veil-wrap > #the-veil-side  { grid-area: side !important; }
+.veil-wrap > .veil-main,
+.veil-wrap > #the-holy-place { grid-area: main !important; min-width: 0; }
+.veil-wrap > .veil-foot,
+.veil-wrap > #the-veil-foot  { grid-area: foot; }
 
 /* Computed bottom-clearance: footer height + iOS safe-area + 120px breathing
    room so the last card can scroll well up into the viewport. */
