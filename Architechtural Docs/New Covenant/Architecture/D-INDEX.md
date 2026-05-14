@@ -8,6 +8,7 @@ Update flow: New Covenant -> Old Covenant
 
 ## Release Notes
 
+- **2026-05-14 (pass 3):** Third audit pass completed. Fixed CACHE_NAME version references from v1.01 to v1.03 in K-AS-BUILT-Operations-Guide.md. Corrected ChurchRegistry canonical location from `Covenant/Scrolls/ChurchRegistry/` to `Architechtural Docs/New Covenant/Deployment/ChurchRegistry/` throughout. Deleted 37 macOS duplicate files with " 2" suffix from Automation/ directories. Updated To-Do.md to mark Unified Footer as completed (commit 233d2ec9).
 - **2026-05-13 (pass 2):** Second audit pass completed. Added `stand.js` (app.stand/) to `G-AS-BUILT-Script-Module-Inventory.md`. Removed 13 duplicate module rows from G-AS-BUILT (scribes, veil, fold/index, shepherd/index, priesthood/garments first occurrences). Fixed `F-AS-BUILT-Architecture-Overview.md` accuracy: `app.flockchat/` Firebase config note corrected (standalone HTML is not patched by B-Build; only embed-flockchat.html is via step 9e). `O-Automation-Shepherds-README.md` expanded with full 36-script inventory in 5 categories, plus Iris-only milestone scripts.
 - **2026-05-13:** Full as-built audit completed. Three new standalone app shells documented: `app.feed/` (Sermon Prep & Manuscript Builder), `app.flockchat/` (church team messaging PWA), `app.flockshow/` (church presentation app). Four new embeds documented: `embed-feed.html`, `embed-flockchat.html`, `embed-flockshow.html`, `embed-launcher.html`. B-Build step list in `K-AS-BUILT-Operations-Guide.md` expanded to all 18 patch steps. `N-Automation-README.md` updated with `audit_firestore_against_schema.cjs`. Repo layout tree corrected for all 8 app shells.
 - **2026-04-30:** AI-generated as-built documentation suite complete. Six docs produced via Gemini 2.5 Flash covering scripts, views, data layer, architecture overview, operations runbook, and doc-set index. Automation pipeline (`AI_Doc_Runner/`) added. `Assistants.md` reference doc added.
@@ -63,6 +64,7 @@ Update flow: New Covenant -> Old Covenant
 	- [Firestore/](Deployment/Firestore/)
 		- [firestore.indexes.json](Deployment/Firestore/firestore.indexes.json)
 		- [firestore.rules](Deployment/Firestore/firestore.rules)
+		- [README.md](Deployment/Firestore/README.md)
 	- [README.md](Deployment/README.md)
 
 - **Migration/**
@@ -86,10 +88,17 @@ Update flow: New Covenant -> Old Covenant
 		- [flockos-theforest-firebase-adminsdk-fbsvc-1317741aea.json](Secrets/Flock/flockos-theforest-firebase-adminsdk-fbsvc-1317741aea.json)
 		- [flockos-trinity-firebase-adminsdk-fbsvc-c8e8ee9c05.json](Secrets/Flock/flockos-trinity-firebase-adminsdk-fbsvc-c8e8ee9c05.json)
 		- [flockos-truth-firebase-adminsdk-fbsvc-21aa89bf70.json](Secrets/Flock/flockos-truth-firebase-adminsdk-fbsvc-21aa89bf70.json)
+		- [README.md](Secrets/Flock/README.md)
 	- [README.md](Secrets/README.md)
 
 - **Tests/**
 	- [README.md](Tests/README.md)
+
+- **Data/**
+	- [README.md](Data/README.md)
+
+- **Debugging/**
+	- [README.md](Debugging/README.md)
 
 ---
 
