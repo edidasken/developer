@@ -688,6 +688,9 @@ const _spin = document.createElement('style');
 _spin.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
 document.head.appendChild(_spin);
 
+/* ─── Expose prayer/contact modal for footer & external access ──────────── */
+window._openOutreachModal = _openOutreachModal;
+
 /* ─── Service worker registration ───────────────────────────────────────────
    Enables full offline support and PWA install for the GROW app.
    Uses the shared New Covenant SW (the_living_water.js).

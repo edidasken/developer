@@ -15372,9 +15372,8 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
 }
 
 .unity-footer-motto {
-  font-size: 0.7rem; font-style: italic; text-transform: uppercase;
-  letter-spacing: 0.06em; opacity: 0.6;
-  color: rgba(255,255,255,0.5);
+  font-size: 0.7rem; font-weight: 500;
+  color: rgba(255,255,255,0.85);
 }
 
 @media (max-width: 540px) {
@@ -15384,7 +15383,7 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
   }
   .unity-footer-btn { padding: 7px 12px; font-size: 0.75rem; }
   .unity-footer-btn span { display: none; }
-  .unity-footer-motto { font-size: 0.65rem; }
+  .unity-footer-motto { font-size: 0.7rem; }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
