@@ -3,24 +3,24 @@
 # Snapshot.sh — Manual incremental backup of the FlockOS Software repo.
 #
 # Creates a timestamped, fully-browsable copy at:
-#   /Users/greg.granger/Desktop/FlockOS/Storehouse/Snapshot-DD-MM-YYYY HHMMSS/
+#   ~/Library/CloudStorage/GoogleDrive-callgrangers@gmail.com/My Drive/FlockOS Storehouse/Snapshot-DD-MM-YYYY HHMMSS/
 #
 # Uses rsync --link-dest against the previous snapshot, so unchanged files
 # are hardlinked (near-zero extra disk per snapshot) while each snapshot
 # remains a complete, independent copy you can browse or restore from.
 #
 # Usage:
-#   bash Covenant/Testimony/Runbooks/Snapshot.sh           # take a snapshot
-#   bash Covenant/Testimony/Runbooks/Snapshot.sh --dry-run # preview only
-#   bash Covenant/Testimony/Runbooks/Snapshot.sh --list    # list snapshots
-#   bash Covenant/Testimony/Runbooks/Snapshot.sh --prune N # keep newest N
+#   bash Iris/Runbooks/Snapshot.sh           # take a snapshot
+#   bash Iris/Runbooks/Snapshot.sh --dry-run # preview only
+#   bash Iris/Runbooks/Snapshot.sh --list    # list snapshots
+#   bash Iris/Runbooks/Snapshot.sh --prune N # keep newest N
 # ======================================================================
 set -euo pipefail
 
 # ── Resolve repo root (Software/) and Storehouse destination ──────────
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"              # .../FlockOS/Software
-STOREHOUSE="$(cd "$REPO_ROOT/.." && pwd)/Storehouse"      # .../FlockOS/Storehouse
+STOREHOUSE="$HOME/Library/CloudStorage/GoogleDrive-callgrangers@gmail.com/My Drive/FlockOS Storehouse"
 
 # ── Flags ─────────────────────────────────────────────────────────────
 DRY_RUN=false
@@ -119,16 +119,19 @@ EXCLUDES=(
 )
 
 # Find the previous snapshot by mtime (newest existing Snapshot-* directory)
+# Note: Hardlinks (--link-dest) are disabled for Google Drive due to filesystem limitations
 LINK_DEST_ARG=()
 ABS_PREV=""
-if [ -d "$STOREHOUSE" ]; then
+USE_HARDLINKS=false  # Disabled for Google Drive compatibility
+
+if $USE_HARDLINKS && [ -d "$STOREHOUSE" ]; then
   ABS_PREV="$(find "$STOREHOUSE" -maxdepth 1 -type d -name 'Snapshot-*' -print0 2>/dev/null \
     | xargs -0 stat -f '%m %N' 2>/dev/null \
     | sort -nr | head -n 1 | awk '{ $1=""; sub(/^ /, ""); print }')"
-fi
-if [ -n "$ABS_PREV" ] && [ -d "$ABS_PREV" ]; then
-  LINK_DEST_ARG=(--link-dest="$ABS_PREV")
-  echo "Incremental from: $(basename "$ABS_PREV")"
+  if [ -n "$ABS_PREV" ] && [ -d "$ABS_PREV" ]; then
+    LINK_DEST_ARG=(--link-dest="$ABS_PREV")
+    echo "Incremental from: $(basename "$ABS_PREV")"
+  fi
 fi
 
 echo "Snapshot source : $REPO_ROOT"
@@ -161,9 +164,7 @@ fi
     echo "Git HEAD:    $GIT_HEAD"
     echo "Git dirty:   $GIT_DIRTY"
   fi
-  if [ ${#LINK_DEST_ARG[@]+x} ] && [ ${#LINK_DEST_ARG[@]} -gt 0 ]; then
-    echo "Linked from: $(basename "${ABS_PREV:-}")"
-  fi
+  echo "Storage:     Google Drive (hardlinks disabled for cloud compatibility)"
 } > "$DEST/SNAPSHOT.txt"
 
 # Update 'latest' symlink atomically (overwrites any existing link, never duplicates)
@@ -172,5 +173,6 @@ ln -sfn "$(basename "$DEST")" "$LATEST_LINK"
 
 SIZE=$(du -sh "$DEST" 2>/dev/null | awk '{print $1}')
 echo ""
-echo "✓ Snapshot complete: $(basename "$DEST")  ($SIZE on disk including hardlinks)"
+echo "✓ Snapshot complete: $(basename "$DEST")  ($SIZE)"
+echo "  Saved to: Google Drive/FlockOS Storehouse"
 echo "  Latest → $(readlink "$LATEST_LINK")"
