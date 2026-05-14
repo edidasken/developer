@@ -257,6 +257,30 @@
       search.addEventListener('input', () => _filterConversations(search.value));
     }
 
+    // New conversation button
+    const newBtn = $('fc-new-btn');
+    if (newBtn) {
+      newBtn.addEventListener('click', () => _openNewConversationModal());
+    }
+
+    // Modal close
+    const modalClose = $('fc-modal-close');
+    const modalBackdrop = $('fc-new-modal');
+    if (modalClose) {
+      modalClose.addEventListener('click', () => _closeNewConversationModal());
+    }
+    if (modalBackdrop) {
+      modalBackdrop.addEventListener('click', (e) => {
+        if (e.target === modalBackdrop) _closeNewConversationModal();
+      });
+    }
+
+    // User search in modal
+    const userSearch = $('fc-user-search');
+    if (userSearch) {
+      userSearch.addEventListener('input', () => _filterUsers(userSearch.value));
+    }
+
     // Composer input
     const input = $('fc-input');
     const sendBtn = $('fc-send');
@@ -289,6 +313,151 @@
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
   }
+
+  /* ── New Conversation Modal ──────────────────────────────────────────── */
+  let _allUsers = [];
+
+  async function _openNewConversationModal() {
+    const modal = $('fc-new-modal');
+    if (!modal) return;
+
+    // Load users if not already loaded
+    if (_allUsers.length === 0) {
+      await _loadUsers();
+    }
+
+    // Render user list
+    _renderUsers(_allUsers);
+
+    // Show modal
+    modal.removeAttribute('hidden');
+    requestAnimationFrame(() => {
+      modal.classList.add('show');
+    });
+
+    // Focus search
+    const search = $('fc-user-search');
+    if (search) {
+      search.value = '';
+      search.focus();
+    }
+  }
+
+  function _closeNewConversationModal() {
+    const modal = $('fc-new-modal');
+    if (!modal) return;
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.setAttribute('hidden', '');
+    }, 200);
+  }
+
+  async function _loadUsers() {
+    try {
+      const snap = await _db.collection('users').orderBy('displayName').get();
+      _allUsers = [];
+      snap.forEach(doc => {
+        const u = doc.data();
+        u.uid = doc.id;
+        // Don't include self
+        if (u.uid !== _me.uid) {
+          _allUsers.push(u);
+        }
+      });
+    } catch (err) {
+      console.error('[FlockChat] Failed to load users:', err);
+      _toast('Failed to load members', 'error');
+    }
+  }
+
+  function _renderUsers(users) {
+    const list = $('fc-user-list');
+    if (!list) return;
+
+    if (users.length === 0) {
+      list.innerHTML = `
+        <div class="fc-empty">
+          <div class="fc-empty-icon">👥</div>
+          <div class="fc-empty-text">No members found</div>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = users.map(u => {
+      const name = u.displayName || u.email || 'Unknown';
+      const initials = _initials(name);
+      return `
+        <div class="fc-user-item" data-uid="${u.uid}" data-name="${_e(name)}" onclick="window._createDirectMessage('${u.uid}', '${_e(name)}')">
+          <div class="fc-user-avatar">${initials}</div>
+          <div class="fc-user-info">
+            <div class="fc-user-name">${_e(name)}</div>
+            <div class="fc-user-email">${_e(u.email || '')}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function _filterUsers(query) {
+    const q = query.toLowerCase();
+    const filtered = _allUsers.filter(u => {
+      const name = (u.displayName || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      return name.includes(q) || email.includes(q);
+    });
+    _renderUsers(filtered);
+  }
+
+  window._createDirectMessage = async function(otherUid, otherName) {
+    _closeNewConversationModal();
+
+    try {
+      // Check if DM already exists
+      const existingSnap = await _db.collection('conversations')
+        .where('type', '==', 'dm')
+        .where('participants', 'array-contains', _me.uid)
+        .get();
+
+      let existingConv = null;
+      existingSnap.forEach(doc => {
+        const d = doc.data();
+        if (d.participants && d.participants.includes(otherUid)) {
+          existingConv = { id: doc.id, ...d };
+        }
+      });
+
+      if (existingConv) {
+        // Open existing conversation
+        window._openConversation(existingConv.id);
+        return;
+      }
+
+      // Create new DM
+      const docRef = await _db.collection('conversations').add({
+        type: 'dm',
+        name: otherName,
+        icon: _initials(otherName),
+        participants: [_me.uid, otherUid],
+        lastMessage: {
+          text: '',
+          author: '',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        },
+        lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
+        unreadCount: 0,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdBy: _me.uid
+      });
+
+      // Open new conversation
+      window._openConversation(docRef.id);
+      _toast('Conversation created!', 'success');
+    } catch (err) {
+      console.error('[FlockChat] Failed to create DM:', err);
+      _toast('Failed to create conversation', 'error');
+    }
+  };
 
   /* ── Load Conversations ──────────────────────────────────────────────── */
   function _loadConversations() {

@@ -143,12 +143,36 @@
       border-bottom: 1px solid var(--fc-divider);
       background: var(--fc-surface);
     }
+    .fc-list-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
     .fc-list-title {
       font-size: 1.75rem;
       font-weight: 700;
       letter-spacing: -0.025em;
       color: var(--fc-text);
-      margin-bottom: 12px;
+    }
+    .fc-new-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--fc-sent-bg);
+      border: none;
+      color: white;
+      font-size: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.12s, opacity 0.12s;
+      flex-shrink: 0;
+    }
+    .fc-new-btn:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
     }
     .fc-list-search {
       width: 100%;
@@ -663,6 +687,126 @@
       background: #ecfdf5;
       color: #065f46;
     }
+
+    /* ─── New Conversation Modal ─────────────────────────────────────── */
+    .fc-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .fc-modal-backdrop.show {
+      opacity: 1;
+    }
+    .fc-modal {
+      background: var(--fc-surface);
+      border-radius: 14px;
+      box-shadow: var(--fc-shadow-lg);
+      width: 90%;
+      max-width: 480px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.9);
+      transition: transform 0.2s;
+    }
+    .fc-modal-backdrop.show .fc-modal {
+      transform: scale(1);
+    }
+    .fc-modal-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--fc-divider);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .fc-modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--fc-text);
+    }
+    .fc-modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: none;
+      border: none;
+      color: var(--fc-text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s;
+    }
+    .fc-modal-close:hover {
+      background: var(--fc-panel);
+    }
+    .fc-modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .fc-modal-search {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--fc-panel);
+      border: 1px solid transparent;
+      border-radius: 10px;
+      font-family: var(--font);
+      font-size: 0.9375rem;
+      color: var(--fc-text);
+      outline: none;
+      margin-bottom: 16px;
+      transition: border-color 0.15s;
+    }
+    .fc-modal-search:focus {
+      background: var(--fc-surface);
+      border-color: var(--fc-sent-bg);
+    }
+    .fc-user-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .fc-user-item:hover {
+      background: var(--fc-panel);
+    }
+    .fc-user-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .fc-user-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .fc-user-name {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--fc-text);
+    }
+    .fc-user-email {
+      font-size: 0.8125rem;
+      color: var(--fc-text-muted);
+    }
   </style>
 </head>
 <body>
@@ -686,7 +830,10 @@
       <!-- Conversation List -->
       <div class="fc-list-pane">
         <div class="fc-list-header">
-          <h1 class="fc-list-title">Messages</h1>
+          <div class="fc-list-title-row">
+            <h1 class="fc-list-title">Messages</h1>
+            <button class="fc-new-btn" id="fc-new-btn" title="New Conversation">✎</button>
+          </div>
           <input type="text" class="fc-list-search" placeholder="Search conversations..." id="fc-search">
         </div>
         <div class="fc-list-scroll" id="fc-list">
@@ -725,6 +872,20 @@
   <!-- Toast Container -->
   <div id="fc-toasts" aria-live="polite"></div>
 
+  <!-- New Conversation Modal -->
+  <div class="fc-modal-backdrop" id="fc-new-modal" hidden>
+    <div class="fc-modal">
+      <div class="fc-modal-header">
+        <h2 class="fc-modal-title">New Conversation</h2>
+        <button class="fc-modal-close" id="fc-modal-close">&times;</button>
+      </div>
+      <div class="fc-modal-body">
+        <input type="text" class="fc-modal-search" id="fc-user-search" placeholder="Search members...">
+        <div id="fc-user-list"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase Config -->
   <script>
     window.FLOCK_FIREBASE_CONFIG = {
@@ -757,7 +918,8 @@
         appId: 'flockchat',
         appName: 'FlockChat',
         appAccent: '#007aff',
-        appAccentDk: '#0051d5'
+        appAccentDk: '#0051d5',
+        hideHamburger: true  // FlockChat doesn't use sidebar
       });
       
       mountUnityFooter(document.getElementById('fc-footer'), {
