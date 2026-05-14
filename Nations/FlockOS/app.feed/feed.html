@@ -75,6 +75,8 @@
       --bm-faint:      var(--ink-faint);
 
       --topbar-h:      54px;
+      --safe-top:      env(safe-area-inset-top, 0px);
+      --safe-bottom:   env(safe-area-inset-bottom, 0px);
     }
 
     html, body {
@@ -84,13 +86,14 @@
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       overflow: hidden;
+      overscroll-behavior: none;
     }
 
     /* ── Root grid ─────────────────────────────────────────────────────── */
     #bm-root {
       display: grid;
-      grid-template-rows: var(--topbar-h) 1fr;
-      height: 100%;
+      grid-template-rows: calc(var(--topbar-h) + var(--safe-top)) 1fr;
+      height: 100dvh;
     }
 
     /* ════════════════════════════════════════════════════
@@ -98,7 +101,7 @@
     ════════════════════════════════════════════════════ */
     #bm-topbar {
       display: flex; align-items: center; gap: 10px;
-      padding: 0 18px;
+      padding: var(--safe-top) 18px 0;
       background: var(--top-bg);
       border-bottom: 1px solid var(--top-line);
       color: var(--top-ink);
@@ -1381,7 +1384,7 @@
       #bm-body { grid-template-columns: 1fr; }
       #bm-sidebar {
         display: none; position: fixed;
-        top: var(--topbar-h); left: 0; bottom: 0;
+        top: calc(var(--topbar-h) + var(--safe-top)); left: 0; bottom: 0;
         width: min(280px, 85vw); z-index: 300;
         transform: translateX(-100%);
         transition: transform 220ms cubic-bezier(.2,.8,.2,1);

@@ -74,13 +74,14 @@
       height: 100%; background: var(--fs-bg); color: var(--fs-ink);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased; overflow: hidden;
+      overscroll-behavior: none;
     }
 
     /* ── Root grid ─────────────────────────────────────────────────────── */
     #fs-root {
       display: grid;
       grid-template-rows: calc(var(--topbar-h) + var(--safe-top)) 1fr;
-      height: 100%;
+      height: 100dvh;
     }
 
     /* ── Topbar — canonical FlockOS dark navy chrome ─────────────────── */

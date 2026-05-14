@@ -14403,7 +14403,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 [hidden] { display: none !important; }
 
 /* ── App layout ──────────────────────────────────────────────────────────── */
-#ms-app { display: flex; flex-direction: column; height: 100%; }
+#ms-app { display: flex; flex-direction: column; height: 100dvh; }
 #ms-app[hidden] { display: none; }
 .ms-body {
   display: flex; flex: 1; overflow: hidden;

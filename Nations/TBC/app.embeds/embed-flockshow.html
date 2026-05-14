@@ -27,7 +27,8 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; overflow: hidden; background: var(--bg); }
+    html, body { height: 100%; overflow: hidden; background: var(--bg); overscroll-behavior: none; }
+    :root { --safe-top: env(safe-area-inset-top, 0px); --topbar-h: 54px; }
 
     /* ── Embed auth overlay ───────────────────────────────────────────────── */
     #embed-auth-overlay {
@@ -245,8 +246,8 @@
   <!-- ── FlockShow shell (mirrors app.flockshow.html; populated by flockshow.js) ── -->
   <div id="fs-root" style="
     display:grid;
-    grid-template-rows:54px 1fr;
-    height:100%;
+    grid-template-rows:calc(54px + env(safe-area-inset-top, 0px)) 1fr;
+    height:100dvh;
     background:var(--bg);
     color:var(--ink);
     font-family:'Plus Jakarta Sans',system-ui,sans-serif;
@@ -254,7 +255,7 @@
     overflow:hidden;
   ">
     <header id="fs-topbar" style="
-      display:flex;align-items:center;gap:10px;padding:0 18px;
+      display:flex;align-items:center;gap:10px;padding:env(safe-area-inset-top, 0px) 18px 0;
       background:var(--top-bg);border-bottom:1px solid var(--top-line);
       z-index:200;position:relative;
     ">

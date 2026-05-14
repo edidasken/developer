@@ -49,7 +49,7 @@
   <style>
     /* ─── Reset ──────────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; overflow: hidden; }
+    html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 
     /* ─── Design tokens — aliased to active FlockOS theme (new_covenant.css) ─── */
     :root {
@@ -131,15 +131,14 @@
     #fc-app {
       display: flex;
       flex-direction: column;
-      height: 100%;
+      height: 100dvh;
     }
     #fc-app[hidden] { display: none; }
 
     /* ─── Top bar — canonical FlockOS dark navy chrome ──────────────── */
     .fc-topbar {
-      height: var(--topbar-h);
+      height: calc(var(--topbar-h) + var(--safe-top));
       padding-top: var(--safe-top);
-      min-height: calc(var(--topbar-h) + var(--safe-top));
       flex-shrink: 0;
       background: var(--top-bg);
       border-bottom: 1px solid var(--top-line);
@@ -1134,7 +1133,7 @@
     @media (max-width: 640px) {
       :root { --sidebar-w: 100%; }
       .fc-sidebar {
-        position: fixed; inset: var(--topbar-h) 0 0 0;
+        position: fixed; inset: calc(var(--topbar-h) + var(--safe-top)) 0 0 0;
         z-index: 300;
         width: 100%;
         transform: translateX(-100%);

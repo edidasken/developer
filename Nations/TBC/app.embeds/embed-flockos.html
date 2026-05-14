@@ -55,18 +55,22 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    :root { --bg: #f7f8fb; --bg-raised: #ffffff; --ink: #1b264f; --line: #e5e7ef; }
+    :root {
+      --bg: #f7f8fb; --bg-raised: #ffffff; --ink: #1b264f; --line: #e5e7ef;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --topbar-h: 60px;
+    }
 
     html { height: 100%; overflow: hidden; background: var(--bg); }
-    body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); height: 100%; overflow: hidden; }
+    body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); height: 100%; overflow: hidden; overscroll-behavior: none; }
 
     .veil-wrap {
       display: grid;
       grid-template-areas: "top top" "side main";
       grid-template-columns: 256px 1fr;
-      grid-template-rows: 60px 1fr;
-      height: 100%;
-      min-height: 100vh;
+      grid-template-rows: calc(var(--topbar-h) + var(--safe-top)) 1fr;
+      height: 100dvh;
+      min-height: 100dvh;
       position: relative;
     }
     #the-veil-top   { grid-area: top; }
