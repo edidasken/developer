@@ -80,39 +80,22 @@
     /* ── Root grid ─────────────────────────────────────────────────────── */
     #fs-root {
       display: grid;
-      grid-template-rows: calc(var(--topbar-h) + var(--safe-top)) 1fr;
+      grid-template-rows: auto auto 1fr;
       height: 100dvh;
     }
 
-    /* ── Topbar — canonical FlockOS dark navy chrome ─────────────────── */
-    #fs-topbar {
+    /* Subbar (Library/Editor tabs + Present) */
+    #fs-subbar {
       display: flex; align-items: center; gap: 10px;
-      padding: var(--safe-top) 18px 0;
-      min-height: calc(var(--topbar-h) + var(--safe-top));
+      padding: 8px 18px;
       background: var(--top-bg);
       border-bottom: 1px solid var(--top-line);
       color: var(--top-ink);
-      z-index: 200;
-      position: relative;
-    }
-    #fs-topbar::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5px;
-      background: var(--grad-rainbow);
-      background-size: 200% 100%;
-      animation: rainbow-scroll 9s linear infinite;
-      opacity: 0.72;
+      z-index: 199;
     }
 
-    .fs-logo {
-      display: flex; align-items: center; gap: 8px;
-      font: 700 1.05rem 'Plus Jakarta Sans', sans-serif; color: #fff;
-      flex-shrink: 0; margin-right: 6px;
-    }
-    .fs-logo-icon {
-      width: 30px; height: 30px; border-radius: 7px;
-      background: linear-gradient(135deg, var(--fs-accent), var(--fs-accent-dk));
-      display: flex; align-items: center; justify-content: center; font-size: 15px;
-    }
+    /* ── Topbar — canonical FlockOS dark navy chrome ─────────────────── */
+    /* (Topbar styling now handled by .unity-header in new_covenant.css.) */
 
     .fs-tab-bar { display: flex; gap: 2px; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 3px; }
     .fs-tab {
@@ -397,8 +380,7 @@
     @media (max-width: 480px) {
       #fs-library { padding: 18px 16px 60px; }
       .fs-lib-header { gap: 8px; }
-      #fs-topbar { padding: 0 12px; gap: 6px; }
-      .fs-logo span { display: none; }
+      #fs-subbar { padding: 6px 12px; gap: 6px; }
     }
 
     /* ── New Show name modal ────────────────────────────────────────── */
@@ -622,29 +604,20 @@
 
 <div id="fs-root">
 
-  <!-- ── Topbar ──────────────────────────────────────────────────────── -->
-  <header id="fs-topbar">
-    <a class="fs-logo" href="./" title="Back to launcher" style="text-decoration:none;color:inherit">
-      <div class="fs-logo-icon" style="display:inline-flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(135deg,#7f1d1d,#ef4444)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8" fill="currentColor" stroke="none"/></svg>
-      </div>
-      <span>FlockShow</span>
-    </a>
+  <!-- Unity header (mounted by flockshow.js) -->
+  <header class="unity-header" id="fs-topbar" role="banner"></header>
 
+  <!-- Subbar: Library/Editor tabs + Present -->
+  <nav id="fs-subbar" aria-label="FlockShow workspace">
     <div class="fs-tab-bar" id="fs-tabs">
       <button class="fs-tab fs-tab--active" data-tab="library">Library</button>
       <button class="fs-tab" data-tab="editor" id="fs-editor-tab" disabled>Editor</button>
     </div>
 
     <div class="fs-topbar-right" id="fs-topbar-right">
-      <button data-app-switcher data-app-switcher-current="flockshow" title="Switch app"></button>
-      <div class="fs-user-chip" id="fs-user-chip" hidden>
-        <div class="fs-user-avatar" id="fs-user-avatar">?</div>
-        <span id="fs-user-name">Account</span>
-      </div>
       <button class="fs-btn fs-btn--primary" id="fs-present-btn" disabled>▶ Present</button>
     </div>
-  </header>
+  </nav>
 
   <!-- ── Library view ─────────────────────────────────────────────────── -->
   <div id="fs-library">
@@ -898,7 +871,6 @@
 <!-- Flock Stand song library (for "From Flock Stand" picker) -->
 <script defer src="Scripts/the_upper_room.js"></script>
 
-<script type="module" src="Scripts/the_app_switcher.js"></script>
 <script type="module" src="app.flockshow/flockshow.js"></script>
 </body>
 </html>

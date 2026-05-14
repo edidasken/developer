@@ -16,6 +16,8 @@
    ════════════════════════════════════════════════════════════════════════════ */
 
 // ── Constants ─────────────────────────────────────────────────────────────────
+import { mountUnityHeader } from '../Scripts/the_unity_header.js';
+
 const FS_KEY = 'flockshow_shows_v1';
 
 const SLIDE_TYPES = {
@@ -1385,24 +1387,41 @@ function _dismissAuthOverlay() {
 }
 
 function _renderUserChip(N) {
-  const chip   = document.getElementById('fs-user-chip');
-  const avatar = document.getElementById('fs-user-avatar');
-  const name   = document.getElementById('fs-user-name');
-  if (!chip) return;
+  // Mount the unified FlockOS header (replaces legacy fs-topbar markup).
+  const host = document.getElementById('fs-topbar');
+  if (!host) return;
 
   const sess = (N && typeof N.getSession === 'function' ? N.getSession() : null) || {};
-  const displayName = sess.displayName || sess.email || 'Account';
-  const initial = displayName.charAt(0).toUpperCase();
+  const user = sess.email
+    ? {
+        displayName: sess.displayName || sess.name || sess.email.split('@')[0],
+        email:       sess.email,
+        photoURL:    sess.photoURL || '',
+      }
+    : null;
 
-  if (avatar) avatar.textContent = initial;
-  if (name)   name.textContent   = displayName;
-  chip.removeAttribute('hidden');
+  const FS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8" fill="currentColor" stroke="none"/></svg>';
 
-  chip.addEventListener('click', () => {
-    _openConfirmModal('Sign Out', `Sign out of FlockShow? (${displayName})`, 'Sign Out', () => {
-      if (N && typeof N.logout === 'function') N.logout();
-      else location.reload();
-    });
+  mountUnityHeader(host, {
+    appId:       'flockshow',
+    appName:     'FlockShow',
+    appIconSvg:  FS_ICON,
+    appAccent:   '#ef4444',
+    appAccentDk: '#7f1d1d',
+    homeHref:    '../',
+    user,
+    onSignOut: () => {
+      _openConfirmModal('Sign Out', `Sign out of FlockShow?`, 'Sign Out', () => {
+        if (N && typeof N.logout === 'function') N.logout();
+        else location.reload();
+      });
+    },
+    features: [
+      { id: 'fs-tab-library', label: 'Library',    hint: 'View shows',          run: () => { _setView('library'); _renderLibrary(); _renderHeader(); } },
+      { id: 'fs-tab-editor',  label: 'Editor',     hint: 'Edit current show',   run: () => { if (_activeShow()) { _setView('editor'); _renderHeader(); } } },
+      { id: 'fs-new-show',    label: 'New show',   hint: 'Create',              run: () => _newShow?.() },
+      { id: 'fs-present',     label: 'Present',    hint: 'Open projector',      run: () => document.getElementById('fs-present-btn')?.click() },
+    ],
   });
 }
 
@@ -1412,6 +1431,7 @@ async function _boot() {
     await _waitFor(() => typeof window.Nehemiah !== 'undefined');
   } catch (_) {
     // firm_foundation.js didn't load (e.g. local dev) — run ungated
+    _renderUserChip(null);
     await _load(); _wire(); _renderAll();
     return;
   }
