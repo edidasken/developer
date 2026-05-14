@@ -168,11 +168,19 @@ function buttonHTML() {
 }
 
 function popoverHTML(currentId) {
-  // Resolve all app hrefs against the actual launcher (parent of current
-  // page) instead of <base href>, which always points at the master source.
+  // Resolve all app hrefs against the deployment's launcher root (NOT
+  // <base href>, which always points at the master source, and NOT the
+  // current page directory, which would double-up paths when called from
+  // inside an app sub-folder or from the launcher itself).
   let launcherUrl;
-  try { launcherUrl = new URL('../', location.href).href; }
-  catch (_) { launcherUrl = './'; }
+  try {
+    const u = new URL(location.href);
+    let p = u.pathname;
+    p = p.replace(/\/[^/]*\.[^/]+$/, '/');               // strip filename
+    if (!p.endsWith('/')) p += '/';
+    p = p.replace(/\/app\.[^/]+\/.*$/, '/');             // climb out of any app.* folder
+    launcherUrl = u.origin + p;
+  } catch (_) { launcherUrl = './'; }
   const items = NC_APPS.map((app) => {
     const isCurrent = app.id === currentId;
     const tag = isCurrent ? 'div' : 'a';

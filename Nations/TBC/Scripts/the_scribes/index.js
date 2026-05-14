@@ -86,20 +86,33 @@ window.addEventListener('popstate', (e) => {
 wakeHerald({ navigate: go });
 
 /* Register all FlockOS modules (NC_APPS) as palette commands so the search
-   surfaces every app in the suite. Resolved against current page so the
-   right church deployment is reached. */
+   surfaces every app in the suite. Resolves against the deployment's launcher
+   root (NOT the current view URL or <base href>) so links work whether the
+   user is on the launcher, inside a view, or inside a sub-app. */
+function _launcherRoot() {
+  try {
+    const u = new URL(location.href);
+    let p = u.pathname;
+    // Strip any trailing filename ("/index.html", "/feed.html", etc.)
+    p = p.replace(/\/[^/]*\.[^/]+$/, '/');
+    if (!p.endsWith('/')) p += '/';
+    // If we're inside an app sub-folder, climb back to the launcher root.
+    p = p.replace(/\/app\.[^/]+\/.*$/, '/');
+    return u.origin + p;
+  } catch (_) { return location.origin + '/'; }
+}
 try {
+  const root = _launcherRoot();
   (NC_APPS || []).forEach((app) => {
     if (!app || !app.href) return;
+    const target = (() => {
+      try { return new URL(app.href, root).href; }
+      catch (_) { return app.href; }
+    })();
     registerCommand({
       id: 'app:' + app.id,
       label: 'Open ' + app.name + (app.sub ? ' — ' + app.sub : ''),
-      run: () => {
-        try {
-          const target = new URL(app.href, new URL('./', location.href)).href;
-          window.location.href = target;
-        } catch (_) { window.location.href = app.href; }
-      }
+      run: () => { window.location.href = target; },
     });
   });
 } catch (_) { /* graceful */ }
