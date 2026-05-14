@@ -1595,15 +1595,21 @@ function _openInputModal(placeholder, title, okLabel, onConfirm) {
   field.addEventListener('keydown', _key);
 }
 
-// ── Confirm delete ────────────────────────────────────────────────────────────
+// ── Confirm delete (two-step) ────────────────────────────────────────────────
 function _confirmDelete() {
   const s = _active();
   if (!s) return;
-  _qs('bm-modal-h').textContent = 'Delete Sermon?';
-  _qs('bm-modal-p').textContent = `"${s.title || 'Untitled'}" will be permanently deleted. This cannot be undone.`;
-  _qs('bm-confirm-modal').hidden = false;
-  _qs('bm-modal-confirm').onclick = async () => {
-    _qs('bm-confirm-modal').hidden = true;
+  const modal     = _qs('bm-confirm-modal');
+  const headEl    = _qs('bm-modal-h');
+  const bodyEl    = _qs('bm-modal-p');
+  const okBtn     = _qs('bm-modal-confirm');
+  const cancelBtn = _qs('bm-modal-cancel');
+  const backdrop  = _qs('bm-modal-backdrop');
+  const title     = s.title || 'Untitled';
+  const closeModal = () => { modal.hidden = true; };
+
+  const performDelete = async () => {
+    closeModal();
     const item = document.querySelector(`.bm-sermon-item[data-id="${_e(s.id)}"]`);
     if (item) { item.classList.add('removing'); await new Promise(r => setTimeout(r, 220)); }
     await _deleteSermon(s);
@@ -1620,8 +1626,26 @@ function _confirmDelete() {
     _renderLanding();
     _toast('Sermon deleted', 'error');
   };
-  _qs('bm-modal-cancel').onclick = () => { _qs('bm-confirm-modal').hidden = true; };
-  _qs('bm-modal-backdrop').onclick = () => { _qs('bm-confirm-modal').hidden = true; };
+
+  // ── Step 2: final "are you absolutely sure?" prompt ──
+  const showStepTwo = () => {
+    headEl.textContent = 'Are you absolutely sure?';
+    bodyEl.textContent = `This will permanently delete "${title}". There is no undo. Click "Delete Permanently" to confirm.`;
+    okBtn.textContent  = 'Delete Permanently';
+    modal.hidden = false;
+    okBtn.onclick      = performDelete;
+    cancelBtn.onclick  = closeModal;
+    backdrop.onclick   = closeModal;
+  };
+
+  // ── Step 1: initial confirmation ──
+  headEl.textContent = 'Delete Sermon?';
+  bodyEl.textContent = `"${title}" will be permanently deleted. This cannot be undone.`;
+  okBtn.textContent  = 'Delete';
+  modal.hidden = false;
+  okBtn.onclick      = showStepTwo;
+  cancelBtn.onclick  = closeModal;
+  backdrop.onclick   = closeModal;
 }
 
 // ── Header field changes ──────────────────────────────────────────────────────
