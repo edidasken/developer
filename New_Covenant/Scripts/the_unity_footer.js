@@ -49,6 +49,9 @@ export function mountUnityFooter(host, cfg = {}) {
     copyright  = '© 2026 FlockOS',
   } = cfg;
 
+  // Helper to check if a value is an unreplaced template variable
+  const isTemplate = (val) => typeof val === 'string' && val.includes('{{') && val.includes('}}');
+
   host.classList.add('unity-footer');
   host.dataset.app = appId;
 
@@ -60,10 +63,13 @@ export function mountUnityFooter(host, cfg = {}) {
     { id: 'prayer', label: 'Prayer',      icon: ICONS.prayer, href: '#prayer', act: 'open-prayer' },
   ];
 
-  if (phone) {
+  // Only add phone button if phone is provided and not a template variable
+  if (phone && !isTemplate(phone)) {
     actions.push({ id: 'phone', label: 'Call', icon: ICONS.phone, href: `tel:${phone}` });
   }
-  if (mapsUrl) {
+  
+  // Only add map button if mapsUrl is provided and not a template variable
+  if (mapsUrl && !isTemplate(mapsUrl)) {
     actions.push({ id: 'map', label: 'Map', icon: ICONS.map, href: mapsUrl, target: '_blank' });
   }
 
@@ -107,12 +113,13 @@ export function mountUnityFooter(host, cfg = {}) {
       else if (window.UpperRoom && typeof window.UpperRoom.openPrayerChain === 'function') {
         window.UpperRoom.openPrayerChain();
       }
-      else if (prayerHref && prayerHref !== '#prayer') {
-        // Fallback to external URL if configured
+      else if (prayerHref && !isTemplate(prayerHref) && prayerHref !== '#prayer') {
+        // Fallback to external URL if configured and not a template variable
         window.open(prayerHref, '_blank');
       }
       else {
-        console.warn('No prayer request handler available');
+        // No prayer handler available - could show a message or do nothing
+        console.warn('No prayer request handler available. Consider signing in or accessing the Prayer Chain through the GROW app.');
       }
     }
   });
