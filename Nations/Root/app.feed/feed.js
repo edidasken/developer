@@ -2919,6 +2919,7 @@ async function _init() {
   // Strong's quick search + scratchpad
   _bindLandingStrongs();
   _bindLandingScratch();
+  _bindLandingTools();
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
@@ -2926,4 +2927,425 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', _init);
 } else {
   _init();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STUDY TOOLS — Cross-Refs · Topical Index · Quote Library · Liturgical Calendar
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const BM_QUOTE_KEY = 'bm_feed_quotes_v1';
+
+// Curated cross-reference dataset for popular preaching texts.
+// Keyed loosely; lookup matches case-insensitive substring of the canonical key.
+const BM_XREFS = {
+  'john 3:16':       [['Romans 5:8','But God demonstrates his own love for us…'],['1 John 4:9','In this the love of God was made manifest…'],['John 1:14','And the Word became flesh and dwelt among us…'],['Ephesians 2:8','For by grace you have been saved through faith…']],
+  'romans 8:28':     [['Genesis 50:20','You meant evil against me, but God meant it for good…'],['Jeremiah 29:11','For I know the plans I have for you…'],['Ephesians 1:11','Predestined according to the purpose of him who works all things…'],['2 Corinthians 4:17','Light momentary affliction is preparing for us an eternal weight of glory…']],
+  'romans 12:1':     [['1 Corinthians 6:19-20','Your body is a temple of the Holy Spirit…'],['Hebrews 13:15','Let us continually offer up a sacrifice of praise…'],['Philippians 2:17','Even if I am to be poured out as a drink offering…'],['1 Peter 2:5','You yourselves like living stones are being built up as a spiritual house…']],
+  'philippians 4:13':[['2 Corinthians 12:9','My grace is sufficient for you, for my power is made perfect in weakness.'],['Isaiah 40:29','He gives power to the faint…'],['Ephesians 3:16','Strengthened with power through his Spirit in your inner being…'],['Colossians 1:11','Strengthened with all power according to his glorious might…']],
+  'philippians 4:6': [['1 Peter 5:7','Casting all your anxieties on him, because he cares for you.'],['Matthew 6:25-34','Do not be anxious about your life…'],['Psalm 55:22','Cast your burden on the LORD…'],['Isaiah 26:3','You keep him in perfect peace whose mind is stayed on you…']],
+  'matthew 28:18':   [['Acts 1:8','You will receive power when the Holy Spirit has come upon you…'],['Mark 16:15','Go into all the world and proclaim the gospel…'],['Luke 24:47','Repentance for the forgiveness of sins should be proclaimed in his name to all nations…'],['John 20:21','As the Father has sent me, even so I am sending you.']],
+  'matthew 6:33':    [['Psalm 37:4','Delight yourself in the LORD, and he will give you the desires of your heart.'],['1 Kings 3:11-13','Because you have asked this, and have not asked for yourself long life…'],['Proverbs 3:5-6','Trust in the LORD with all your heart…'],['Luke 12:31','Instead, seek his kingdom, and these things will be added to you.']],
+  'psalm 23':        [['John 10:11','I am the good shepherd. The good shepherd lays down his life for the sheep.'],['Ezekiel 34:11-16','I myself will search for my sheep and will seek them out.'],['Isaiah 40:11','He will tend his flock like a shepherd…'],['Revelation 7:17','For the Lamb in the midst of the throne will be their shepherd…']],
+  'psalm 1':         [['Jeremiah 17:7-8','Blessed is the man who trusts in the LORD…'],['Joshua 1:8','This Book of the Law shall not depart from your mouth…'],['Matthew 7:24-27','Everyone then who hears these words of mine and does them…'],['Galatians 6:7-8','Whatever one sows, that will he also reap.']],
+  'genesis 1:1':     [['John 1:1-3','In the beginning was the Word…'],['Colossians 1:16','For by him all things were created…'],['Hebrews 11:3','By faith we understand that the universe was created by the word of God…'],['Psalm 33:6','By the word of the LORD the heavens were made…']],
+  'isaiah 53':       [['1 Peter 2:24','He himself bore our sins in his body on the tree…'],['John 1:29','Behold, the Lamb of God, who takes away the sin of the world!'],['2 Corinthians 5:21','For our sake he made him to be sin who knew no sin…'],['Acts 8:32-35','Beginning with this Scripture he told him the good news about Jesus.']],
+  'ephesians 2:8':   [['Romans 3:24','And are justified by his grace as a gift, through the redemption that is in Christ Jesus.'],['Titus 3:5','He saved us, not because of works done by us in righteousness…'],['Galatians 2:16','A person is not justified by works of the law but through faith in Jesus Christ…'],['Romans 4:5','To the one who does not work but trusts him who justifies the ungodly…']],
+  'galatians 5:22':  [['John 15:5','I am the vine; you are the branches…'],['Romans 8:13','If by the Spirit you put to death the deeds of the body, you will live.'],['Colossians 3:12-14','Put on then, as God\u2019s chosen ones, holy and beloved, compassionate hearts…'],['2 Peter 1:5-7','Make every effort to supplement your faith with virtue…']],
+  'jeremiah 29:11':  [['Romans 8:28','And we know that for those who love God all things work together for good…'],['Proverbs 19:21','Many are the plans in the mind of a man, but it is the purpose of the LORD that will stand.'],['Isaiah 55:8-9','For my thoughts are not your thoughts, neither are your ways my ways…'],['Ephesians 2:10','For we are his workmanship, created in Christ Jesus for good works…']],
+  'proverbs 3:5':    [['Psalm 37:5','Commit your way to the LORD; trust in him, and he will act.'],['Isaiah 55:8-9','For my thoughts are not your thoughts…'],['James 1:5','If any of you lacks wisdom, let him ask God…'],['Jeremiah 17:7','Blessed is the man who trusts in the LORD, whose trust is the LORD.']],
+};
+
+// Topical index: theme → array of [reference, snippet]
+const BM_TOPICS = {
+  'Love':         [['1 Corinthians 13:4-7','Love is patient and kind…'],['1 John 4:7-8','Beloved, let us love one another, for love is from God…'],['John 13:34-35','A new commandment I give to you, that you love one another…'],['Romans 5:8','But God shows his love for us in that while we were still sinners, Christ died for us.']],
+  'Faith':        [['Hebrews 11:1','Now faith is the assurance of things hoped for…'],['Romans 10:17','So faith comes from hearing, and hearing through the word of Christ.'],['Ephesians 2:8-9','For by grace you have been saved through faith…'],['James 2:17','So also faith by itself, if it does not have works, is dead.']],
+  'Hope':         [['Romans 15:13','May the God of hope fill you with all joy and peace in believing…'],['Hebrews 6:19','We have this as a sure and steadfast anchor of the soul…'],['1 Peter 1:3','He has caused us to be born again to a living hope…'],['Lamentations 3:22-23','His mercies never come to an end; they are new every morning.']],
+  'Prayer':       [['Philippians 4:6-7','Do not be anxious about anything…'],['1 Thessalonians 5:16-18','Pray without ceasing.'],['Matthew 6:9-13','Pray then like this: Our Father in heaven…'],['James 5:16','The prayer of a righteous person has great power as it is working.']],
+  'Forgiveness':  [['Ephesians 4:32','Be kind to one another, tenderhearted, forgiving one another…'],['Colossians 3:13','Bearing with one another and, if one has a complaint against another, forgiving each other…'],['Matthew 6:14-15','For if you forgive others their trespasses, your heavenly Father will also forgive you…'],['1 John 1:9','If we confess our sins, he is faithful and just to forgive us our sins…']],
+  'Grace':        [['Ephesians 2:8-9','For by grace you have been saved through faith…'],['2 Corinthians 12:9','My grace is sufficient for you, for my power is made perfect in weakness.'],['Titus 2:11-12','For the grace of God has appeared, bringing salvation for all people…'],['Romans 5:20','Where sin increased, grace abounded all the more.']],
+  'Joy':          [['Nehemiah 8:10','The joy of the LORD is your strength.'],['Psalm 16:11','In your presence there is fullness of joy…'],['John 15:11','These things I have spoken to you, that my joy may be in you, and that your joy may be full.'],['James 1:2-3','Count it all joy, my brothers, when you meet trials of various kinds…']],
+  'Peace':        [['John 14:27','Peace I leave with you; my peace I give to you.'],['Philippians 4:7','And the peace of God, which surpasses all understanding…'],['Isaiah 26:3','You keep him in perfect peace whose mind is stayed on you…'],['Romans 5:1','Therefore, since we have been justified by faith, we have peace with God…']],
+  'Salvation':    [['Romans 10:9','If you confess with your mouth that Jesus is Lord and believe in your heart…'],['Acts 4:12','And there is salvation in no one else…'],['John 3:16','For God so loved the world…'],['Ephesians 1:7','In him we have redemption through his blood…']],
+  'Discipleship': [['Matthew 28:19-20','Go therefore and make disciples of all nations…'],['Luke 9:23','If anyone would come after me, let him deny himself and take up his cross daily…'],['John 13:35','By this all people will know that you are my disciples…'],['2 Timothy 2:2','What you have heard from me… entrust to faithful men…']],
+  'Suffering':    [['Romans 5:3-5','We rejoice in our sufferings, knowing that suffering produces endurance…'],['2 Corinthians 4:17','For this light momentary affliction…'],['1 Peter 4:12-13','Beloved, do not be surprised at the fiery trial…'],['James 1:2-4','Count it all joy, my brothers, when you meet trials…']],
+  'Worship':      [['John 4:24','God is spirit, and those who worship him must worship in spirit and truth.'],['Psalm 95:6','Oh come, let us worship and bow down…'],['Romans 12:1','Present your bodies as a living sacrifice…'],['Hebrews 13:15','Let us continually offer up a sacrifice of praise to God…']],
+  'Wisdom':       [['James 1:5','If any of you lacks wisdom, let him ask God…'],['Proverbs 9:10','The fear of the LORD is the beginning of wisdom…'],['Proverbs 3:5-7','Trust in the LORD with all your heart…'],['1 Corinthians 1:30','Christ Jesus, who became to us wisdom from God…']],
+  'Holiness':     [['1 Peter 1:15-16','But as he who called you is holy, you also be holy in all your conduct…'],['Hebrews 12:14','Strive for peace with everyone, and for the holiness without which no one will see the Lord.'],['Leviticus 19:2','You shall be holy, for I the LORD your God am holy.'],['Romans 12:1-2','Do not be conformed to this world, but be transformed by the renewal of your mind…']],
+  'Generosity':   [['2 Corinthians 9:7','Each one must give as he has decided in his heart…'],['Acts 20:35','It is more blessed to give than to receive.'],['Proverbs 11:25','Whoever brings blessing will be enriched…'],['Luke 6:38','Give, and it will be given to you…']],
+  'Family':       [['Deuteronomy 6:6-7','You shall teach them diligently to your children…'],['Ephesians 6:1-4','Children, obey your parents in the Lord…'],['Joshua 24:15','As for me and my house, we will serve the LORD.'],['Proverbs 22:6','Train up a child in the way he should go…']],
+  'Marriage':     [['Ephesians 5:25-33','Husbands, love your wives, as Christ loved the church…'],['Genesis 2:24','Therefore a man shall leave his father and his mother and hold fast to his wife…'],['1 Corinthians 13','Love is patient and kind…'],['Hebrews 13:4','Let marriage be held in honor among all…']],
+  'Justice':      [['Micah 6:8','He has told you, O man, what is good… to do justice, and to love kindness…'],['Isaiah 1:17','Learn to do good; seek justice, correct oppression…'],['Amos 5:24','But let justice roll down like waters, and righteousness like an ever-flowing stream.'],['Proverbs 21:3','To do righteousness and justice is more acceptable to the LORD than sacrifice.']],
+  'Mission':      [['Matthew 28:18-20','Go therefore and make disciples of all nations…'],['Acts 1:8','You will be my witnesses in Jerusalem and in all Judea…'],['Romans 10:14-15','How then will they call on him in whom they have not believed?'],['Isaiah 6:8','Here I am! Send me.']],
+  'Resurrection': [['1 Corinthians 15:3-8','Christ died for our sins… he was buried, that he was raised on the third day…'],['John 11:25','I am the resurrection and the life.'],['Romans 6:4-5','We were buried therefore with him by baptism into death…'],['Philippians 3:10','That I may know him and the power of his resurrection…']],
+};
+
+function _bibleGatewayUrl(ref) {
+  return 'https://www.biblegateway.com/passage/?search=' + encodeURIComponent(ref) + '&version=ESV';
+}
+
+function _bindLandingTools() {
+  const cards = document.querySelectorAll('.bm-land-tool-card[data-tool]');
+  cards.forEach((card) => {
+    card.addEventListener('click', () => _openTool(card.dataset.tool));
+  });
+  const drawer = _qs('bm-tool-drawer');
+  if (drawer && !drawer.dataset._init) {
+    drawer.dataset._init = '1';
+    drawer.addEventListener('click', (e) => {
+      if (e.target.closest('[data-close]')) _closeTool();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !drawer.hidden) _closeTool();
+    });
+  }
+}
+
+function _openTool(name) {
+  const drawer = _qs('bm-tool-drawer');
+  const eyebrow = _qs('bm-tool-drawer-eyebrow');
+  const head = _qs('bm-tool-drawer-h');
+  const body = _qs('bm-tool-drawer-body');
+  if (!drawer || !head || !body) return;
+  eyebrow.textContent = 'Study Tools';
+  drawer.hidden = false;
+  drawer.setAttribute('aria-hidden', 'false');
+  if      (name === 'cross-ref')  { head.textContent = 'Cross-References';            _renderCrossRef(body); }
+  else if (name === 'topical')    { head.textContent = 'Topical Index';               _renderTopical(body); }
+  else if (name === 'quotes')     { head.textContent = 'Quote & Illustration Library';_renderQuotes(body); }
+  else if (name === 'liturgical') { head.textContent = 'Liturgical Calendar';         _renderLiturgical(body); }
+  else { _closeTool(); }
+}
+
+function _closeTool() {
+  const drawer = _qs('bm-tool-drawer');
+  if (!drawer) return;
+  drawer.hidden = true;
+  drawer.setAttribute('aria-hidden', 'true');
+}
+
+// ── Cross-References ──────────────────────────────────────────────────────────
+function _renderCrossRef(body) {
+  body.innerHTML = `
+    <div class="bm-tool-section-h">Look up parallel passages</div>
+    <input class="bm-tool-input" id="bm-xref-input" type="text"
+           placeholder="e.g., John 3:16, Romans 8:28, Psalm 23"
+           autocomplete="off" spellcheck="false">
+    <div id="bm-xref-results" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <div class="bm-tool-section-h" style="margin-top:6px;">Popular passages</div>
+    <div class="bm-topic-chips" id="bm-xref-suggest"></div>
+  `;
+  const input = body.querySelector('#bm-xref-input');
+  const results = body.querySelector('#bm-xref-results');
+  const suggest = body.querySelector('#bm-xref-suggest');
+  const POPULAR = ['John 3:16','Romans 8:28','Romans 12:1','Philippians 4:13','Psalm 23','Matthew 6:33','Ephesians 2:8','Galatians 5:22','Isaiah 53','Jeremiah 29:11'];
+  suggest.innerHTML = POPULAR.map(r => `<button class="bm-topic-chip" data-q="${_e(r)}">${_e(r)}</button>`).join('');
+  suggest.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => { input.value = b.dataset.q; _xrefRender(input.value, results); input.focus(); });
+  });
+  input.addEventListener('input', () => _xrefRender(input.value, results));
+  _xrefRender('', results);
+  setTimeout(() => input.focus(), 50);
+}
+
+function _xrefRender(query, target) {
+  const q = String(query || '').trim().toLowerCase();
+  if (!q) {
+    target.innerHTML = `<div class="bm-tool-empty">Type a verse reference to see parallel passages.<br>Try a popular passage below.</div>`;
+    return;
+  }
+  // Find best match: exact key, then prefix, then substring
+  const keys = Object.keys(BM_XREFS);
+  let key = keys.find(k => k === q)
+        || keys.find(k => k.startsWith(q))
+        || keys.find(k => q.startsWith(k))
+        || keys.find(k => k.includes(q));
+  if (!key) {
+    target.innerHTML = `
+      <div class="bm-tool-empty">
+        No curated cross-references for that verse yet.<br>
+        <a href="${_bibleGatewayUrl(query)}" target="_blank" rel="noopener"
+           style="color:var(--bm-accent,#e8a838);font-weight:600;">Open "${_e(query)}" on BibleGateway →</a>
+      </div>`;
+    return;
+  }
+  const matched = key.replace(/\b\w/g, c => c.toUpperCase());
+  const rows = BM_XREFS[key];
+  target.innerHTML = `
+    <div class="bm-tool-section-h" style="color:var(--bm-accent,#e8a838);margin-top:0;">Parallels for ${_e(matched)}</div>
+    ${rows.map(([ref, snip]) => `
+      <div class="bm-xref-row">
+        <strong>${_e(ref)}</strong>
+        <span>${_e(snip)}</span>
+        <a href="${_bibleGatewayUrl(ref)}" target="_blank" rel="noopener">Read on BibleGateway →</a>
+      </div>
+    `).join('')}
+  `;
+}
+
+// ── Topical Index ─────────────────────────────────────────────────────────────
+function _renderTopical(body) {
+  const topics = Object.keys(BM_TOPICS).sort();
+  body.innerHTML = `
+    <div class="bm-tool-section-h">Choose a topic</div>
+    <div class="bm-topic-chips" id="bm-topic-chips">
+      ${topics.map(t => `<button class="bm-topic-chip" data-topic="${_e(t)}">${_e(t)}</button>`).join('')}
+    </div>
+    <div id="bm-topic-results" style="display:flex;flex-direction:column;gap:8px;"></div>
+  `;
+  const chips = body.querySelector('#bm-topic-chips');
+  const results = body.querySelector('#bm-topic-results');
+  chips.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      chips.querySelectorAll('button').forEach(x => x.classList.remove('is-active'));
+      b.classList.add('is-active');
+      _topicRender(b.dataset.topic, results);
+    });
+  });
+  // Auto-pick first topic
+  const first = chips.querySelector('button');
+  if (first) { first.classList.add('is-active'); _topicRender(first.dataset.topic, results); }
+}
+
+function _topicRender(topic, target) {
+  const verses = BM_TOPICS[topic] || [];
+  if (!verses.length) { target.innerHTML = `<div class="bm-tool-empty">No verses for "${_e(topic)}" yet.</div>`; return; }
+  target.innerHTML = `
+    <div class="bm-tool-section-h" style="color:var(--bm-accent,#e8a838);">Verses on ${_e(topic)}</div>
+    ${verses.map(([ref, snip]) => `
+      <div class="bm-topic-verse">
+        <strong>${_e(ref)}</strong>
+        <span>${_e(snip)}</span>
+        <a href="${_bibleGatewayUrl(ref)}" target="_blank" rel="noopener">Read on BibleGateway →</a>
+      </div>
+    `).join('')}
+  `;
+}
+
+// ── Quote & Illustration Library ──────────────────────────────────────────────
+function _quotesLoad() {
+  try { return JSON.parse(localStorage.getItem(BM_QUOTE_KEY) || '[]'); }
+  catch (_) { return []; }
+}
+function _quotesSave(list) {
+  try { localStorage.setItem(BM_QUOTE_KEY, JSON.stringify(list)); } catch (_) {}
+}
+
+function _renderQuotes(body) {
+  body.innerHTML = `
+    <div class="bm-tool-section-h">Add a quote or illustration</div>
+    <textarea class="bm-tool-input" id="bm-quote-text" rows="3"
+              placeholder="Paste or type the quote, illustration, or story…"
+              style="resize:vertical;min-height:72px;"></textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <input class="bm-tool-input" id="bm-quote-source" type="text"
+             placeholder="Source (e.g., C.S. Lewis, Mere Christianity)"
+             style="flex:2 1 220px;min-width:160px;">
+      <input class="bm-tool-input" id="bm-quote-tag" type="text"
+             placeholder="Tag (grace, hope…)"
+             style="flex:1 1 140px;min-width:120px;">
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="bm-btn bm-btn--primary bm-btn--sm" id="bm-quote-save">Save quote</button>
+      <span style="color:var(--bm-faint);font:0.74rem 'Plus Jakarta Sans',sans-serif;">Stored in this browser. Sync coming.</span>
+    </div>
+    <div class="bm-tool-section-h" style="margin-top:14px;">Saved (<span id="bm-quote-count">0</span>)</div>
+    <input class="bm-tool-input" id="bm-quote-search" type="text" placeholder="Search saved quotes…">
+    <div id="bm-quote-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+  `;
+  const txt    = body.querySelector('#bm-quote-text');
+  const src    = body.querySelector('#bm-quote-source');
+  const tag    = body.querySelector('#bm-quote-tag');
+  const save   = body.querySelector('#bm-quote-save');
+  const search = body.querySelector('#bm-quote-search');
+  save.addEventListener('click', () => {
+    const t = (txt.value || '').trim();
+    if (!t) { txt.focus(); return; }
+    const list = _quotesLoad();
+    list.unshift({
+      id: 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      text: t,
+      source: (src.value || '').trim(),
+      tag: (tag.value || '').trim(),
+      createdAt: Date.now(),
+    });
+    _quotesSave(list);
+    txt.value = ''; src.value = ''; tag.value = '';
+    _quotesRender(body, search.value);
+    if (typeof _toast === 'function') _toast('Quote saved.', 'success');
+  });
+  search.addEventListener('input', () => _quotesRender(body, search.value));
+  _quotesRender(body, '');
+}
+
+function _quotesRender(body, query) {
+  const list = _quotesLoad();
+  const target = body.querySelector('#bm-quote-list');
+  const count  = body.querySelector('#bm-quote-count');
+  if (count) count.textContent = String(list.length);
+  if (!list.length) {
+    target.innerHTML = `<div class="bm-tool-empty">No quotes saved yet. Add one above to start your library.</div>`;
+    return;
+  }
+  const q = String(query || '').toLowerCase().trim();
+  const filtered = !q ? list : list.filter(it =>
+    (it.text || '').toLowerCase().includes(q) ||
+    (it.source || '').toLowerCase().includes(q) ||
+    (it.tag || '').toLowerCase().includes(q)
+  );
+  if (!filtered.length) { target.innerHTML = `<div class="bm-tool-empty">No matches for "${_e(query)}".</div>`; return; }
+  target.innerHTML = filtered.map(it => `
+    <div class="bm-quote-card" data-id="${_e(it.id)}">
+      <div class="bm-quote-text">${_e(it.text)}</div>
+      <div class="bm-quote-meta">
+        ${it.source ? `<span>— ${_e(it.source)}</span>` : ''}
+        ${it.tag ? `<span class="bm-quote-meta-tag">${_e(it.tag)}</span>` : ''}
+        <span style="margin-left:auto;">${_e(_fmtAgo(it.createdAt))}</span>
+      </div>
+      <div class="bm-quote-actions">
+        <button class="bm-quote-copy" title="Copy quote">Copy</button>
+        <button class="bm-quote-del" title="Delete quote">Delete</button>
+      </div>
+    </div>
+  `).join('');
+  target.querySelectorAll('.bm-quote-card').forEach(card => {
+    const id = card.dataset.id;
+    card.querySelector('.bm-quote-copy').addEventListener('click', () => {
+      const item = _quotesLoad().find(x => x.id === id);
+      if (!item) return;
+      const text = '"' + item.text + '"' + (item.source ? '\n— ' + item.source : '');
+      try { navigator.clipboard.writeText(text); if (typeof _toast === 'function') _toast('Copied.', 'success'); } catch (_) {}
+    });
+    card.querySelector('.bm-quote-del').addEventListener('click', () => {
+      const next = _quotesLoad().filter(x => x.id !== id);
+      _quotesSave(next);
+      _quotesRender(body, body.querySelector('#bm-quote-search').value);
+    });
+  });
+}
+
+// ── Liturgical Calendar ───────────────────────────────────────────────────────
+// Computus (Easter) — Anonymous Gregorian algorithm.
+function _easterDate(year) {
+  const a = year % 19;
+  const b = Math.floor(year / 100), c = year % 100;
+  const d = Math.floor(b / 4), e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4), k = c % 4;
+  const L = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * L) / 451);
+  const month = Math.floor((h + L - 7 * m + 114) / 31);
+  const day   = ((h + L - 7 * m + 114) % 31) + 1;
+  return new Date(year, month - 1, day);
+}
+function _addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function _fmtDate(d) {
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+function _liturgicalEvents(year) {
+  // Fixed feasts
+  const christmas = new Date(year, 11, 25);
+  const epiphany  = new Date(year, 0, 6);
+  // Advent: 4th Sunday before Christmas (always begins on a Sunday)
+  let advent1 = new Date(year, 11, 25);
+  advent1 = _addDays(advent1, -((advent1.getDay() + 21))); // back up to Sun-21d (4 sundays earlier or so)
+  // Cleaner: walk back to the nearest Sunday before Dec 25, then back 3 more weeks
+  const dow = new Date(year, 11, 25).getDay(); // 0=Sun
+  const sundayBefore = _addDays(new Date(year, 11, 25), -(dow === 0 ? 7 : dow));
+  advent1 = _addDays(sundayBefore, -21);
+
+  const easter   = _easterDate(year);
+  const ashWed   = _addDays(easter, -46);
+  const palmSun  = _addDays(easter, -7);
+  const goodFri  = _addDays(easter, -2);
+  const ascension = _addDays(easter, 39);
+  const pentecost = _addDays(easter, 49);
+  const trinity   = _addDays(easter, 56);
+
+  return [
+    { date: epiphany,  name: 'Epiphany',                        season: 'Epiphany',   color: '#16a34a' },
+    { date: ashWed,    name: 'Ash Wednesday',                   season: 'Lent',       color: '#7c3aed' },
+    { date: palmSun,   name: 'Palm Sunday',                     season: 'Holy Week',  color: '#dc2626' },
+    { date: goodFri,   name: 'Good Friday',                     season: 'Holy Week',  color: '#000000' },
+    { date: easter,    name: 'Easter Sunday',                   season: 'Easter',     color: '#facc15' },
+    { date: ascension, name: 'Ascension Day',                   season: 'Easter',     color: '#facc15' },
+    { date: pentecost, name: 'Pentecost',                       season: 'Pentecost',  color: '#dc2626' },
+    { date: trinity,   name: 'Trinity Sunday',                  season: 'Ordinary',   color: '#16a34a' },
+    { date: advent1,   name: 'First Sunday of Advent',          season: 'Advent',     color: '#7c3aed' },
+    { date: christmas, name: 'Christmas Day',                   season: 'Christmas',  color: '#facc15' },
+  ];
+}
+
+function _currentSeason(today) {
+  const y = today.getFullYear();
+  const events = _liturgicalEvents(y).concat(_liturgicalEvents(y - 1)).concat(_liturgicalEvents(y + 1));
+  // Season boundaries (start dates)
+  const e  = (n, yr) => events.find(x => x.name === n && x.date.getFullYear() === yr);
+  const seasons = [];
+  for (const yr of [y - 1, y, y + 1]) {
+    const ev = _liturgicalEvents(yr);
+    const adv = ev.find(x => x.name === 'First Sunday of Advent').date;
+    const xmas = ev.find(x => x.name === 'Christmas Day').date;
+    const epi = ev.find(x => x.name === 'Epiphany').date;
+    const ash = ev.find(x => x.name === 'Ash Wednesday').date;
+    const palm = ev.find(x => x.name === 'Palm Sunday').date;
+    const east = ev.find(x => x.name === 'Easter Sunday').date;
+    const pent = ev.find(x => x.name === 'Pentecost').date;
+    seasons.push({ name: 'Advent',     start: adv,                          color: '#7c3aed' });
+    seasons.push({ name: 'Christmas',  start: xmas,                         color: '#facc15' });
+    seasons.push({ name: 'Epiphany',   start: epi,                          color: '#16a34a' });
+    seasons.push({ name: 'Ordinary Time', start: _addDays(epi, 1),         color: '#16a34a' });
+    seasons.push({ name: 'Lent',       start: ash,                          color: '#7c3aed' });
+    seasons.push({ name: 'Holy Week',  start: palm,                         color: '#dc2626' });
+    seasons.push({ name: 'Easter',     start: east,                         color: '#facc15' });
+    seasons.push({ name: 'Pentecost',  start: pent,                         color: '#dc2626' });
+    seasons.push({ name: 'Ordinary Time', start: _addDays(pent, 1),        color: '#16a34a' });
+  }
+  seasons.sort((a, b) => a.start - b.start);
+  let current = seasons[0];
+  for (const s of seasons) { if (s.start <= today) current = s; else break; }
+  return current;
+}
+
+function _renderLiturgical(body) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const year = today.getFullYear();
+  const cur = _currentSeason(today);
+  // Build event list across this year and next, show all upcoming + recent past
+  const events = _liturgicalEvents(year).concat(_liturgicalEvents(year + 1));
+  events.sort((a, b) => a.date - b.date);
+  const trimmed = events.filter(ev => {
+    const diff = (ev.date - today) / (1000 * 60 * 60 * 24);
+    return diff >= -7 && diff <= 400;
+  });
+  body.innerHTML = `
+    <div class="bm-litu-now">
+      <div class="bm-litu-now-season">${_e(cur.name)}</div>
+      <div class="bm-litu-now-meta">Current liturgical season · ${_e(today.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }))}</div>
+    </div>
+    <div class="bm-tool-section-h" style="margin-top:8px;">Upcoming feasts &amp; holy days</div>
+    <div>
+      ${trimmed.map(ev => {
+        const isPast = ev.date < today;
+        const sameDay = ev.date.toDateString() === today.toDateString();
+        const cls = sameDay ? 'is-now' : (isPast ? 'is-past' : '');
+        return `
+          <div class="bm-litu-row ${cls}">
+            <div class="bm-litu-date">${_e(_fmtDate(ev.date))}, ${ev.date.getFullYear()}</div>
+            <div class="bm-litu-name">${_e(ev.name)}</div>
+            <div class="bm-litu-color" style="--c:${ev.color};${ev.color === '#000000' ? 'color:#fff;' : ''}">${_e(ev.season)}</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+    <div class="bm-tool-section-h" style="margin-top:14px;">Color guide</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+      <span class="bm-litu-color" style="--c:#7c3aed;">Purple · Advent / Lent</span>
+      <span class="bm-litu-color" style="--c:#facc15;color:#1b264f;">Gold/White · Christmas / Easter</span>
+      <span class="bm-litu-color" style="--c:#dc2626;">Red · Pentecost / Holy Week</span>
+      <span class="bm-litu-color" style="--c:#16a34a;">Green · Ordinary Time</span>
+    </div>
+  `;
 }

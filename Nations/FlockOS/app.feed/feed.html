@@ -469,6 +469,16 @@
       background: rgba(167,139,250,0.12); color: #6d52d6;
       border: 1px solid rgba(167,139,250,0.25);
     }
+    .bm-land-pill-open {
+      display: inline-block; font: 600 0.65rem 'Plus Jakarta Sans', sans-serif;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 2px 9px; border-radius: 999px;
+      background: rgba(232,168,56,0.12); color: #b87a13;
+      border: 1px solid rgba(232,168,56,0.30);
+    }
+    .bm-land-tool-card:hover .bm-land-pill-open {
+      background: var(--bm-accent, #e8a838); color: #fff; border-color: var(--bm-accent, #e8a838);
+    }
     .bm-land-scratch {
       width: 100%; min-height: 100px; box-sizing: border-box;
       padding: 10px 12px; border-radius: 10px;
@@ -1450,6 +1460,166 @@
       .bm-icon-btn { width: 24px; height: 24px; }
       .bm-section-body { padding: 10px 12px 12px; }
     }
+
+    /* ── Study Tool Drawer ─────────────────────────────────────────────── */
+    #bm-tool-drawer {
+      position: fixed; inset: 0; z-index: 8500;
+      display: flex; justify-content: flex-end;
+    }
+    #bm-tool-drawer[hidden] { display: none !important; }
+    .bm-tool-drawer-backdrop {
+      position: absolute; inset: 0;
+      background: var(--modal-dim); backdrop-filter: blur(3px);
+      animation: bm-fadeIn 0.18s ease both;
+    }
+    .bm-tool-drawer-panel {
+      position: relative; z-index: 1;
+      width: min(560px, 100vw); height: 100%;
+      background: var(--bm-panel, #ffffff);
+      border-left: 1px solid var(--bm-border-lit, rgba(0,0,0,0.08));
+      box-shadow: -16px 0 48px rgba(0,0,0,0.18);
+      display: flex; flex-direction: column;
+      animation: bm-slideInRight 0.22s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .bm-tool-drawer-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 12px; padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--bm-border, rgba(0,0,0,0.06));
+    }
+    .bm-tool-drawer-eyebrow {
+      font: 600 0.62rem 'Plus Jakarta Sans', sans-serif;
+      text-transform: uppercase; letter-spacing: 0.10em;
+      color: var(--bm-faint); margin-bottom: 4px;
+    }
+    .bm-tool-drawer-h {
+      font: 700 1.20rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-ink); margin: 0;
+    }
+    .bm-tool-drawer-body {
+      flex: 1 1 auto; overflow-y: auto;
+      padding: 18px 20px 28px; display: flex; flex-direction: column; gap: 14px;
+    }
+    @keyframes bm-fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes bm-slideInRight { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* Tool: shared bits */
+    .bm-tool-input {
+      width: 100%; box-sizing: border-box;
+      padding: 9px 12px; border-radius: 9px;
+      border: 1px solid var(--bm-border, rgba(0,0,0,0.10));
+      background: var(--bm-card, #fff); color: var(--bm-ink);
+      font: 0.86rem 'Plus Jakarta Sans', sans-serif;
+    }
+    .bm-tool-input:focus {
+      outline: none; border-color: var(--bm-accent, #e8a838);
+      box-shadow: 0 0 0 3px rgba(232,168,56,0.15);
+    }
+    .bm-tool-section-h {
+      font: 700 0.68rem 'Plus Jakarta Sans', sans-serif;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--bm-faint); margin: 6px 0 2px;
+    }
+    .bm-tool-empty {
+      color: var(--bm-muted); font: 0.82rem 'Plus Jakarta Sans', sans-serif;
+      text-align: center; padding: 22px 8px; line-height: 1.55;
+    }
+    /* Cross-References + Topical: result rows */
+    .bm-xref-row, .bm-topic-verse {
+      padding: 10px 12px; border-radius: 9px;
+      background: var(--bm-card, #fff);
+      border: 1px solid var(--bm-border, rgba(0,0,0,0.06));
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .bm-xref-row strong, .bm-topic-verse strong {
+      color: var(--bm-ink); font: 700 0.84rem 'Plus Jakarta Sans', sans-serif;
+    }
+    .bm-xref-row span, .bm-topic-verse span {
+      color: var(--bm-muted); font: 0.80rem 'Plus Jakarta Sans', sans-serif; line-height: 1.5;
+    }
+    .bm-xref-row a, .bm-topic-verse a {
+      align-self: flex-start; font: 600 0.72rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-accent, #e8a838); text-decoration: none; margin-top: 2px;
+    }
+    .bm-xref-row a:hover, .bm-topic-verse a:hover { text-decoration: underline; }
+    /* Topical: chip cloud */
+    .bm-topic-chips {
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .bm-topic-chip {
+      padding: 5px 12px; border-radius: 999px;
+      border: 1px solid var(--bm-border, rgba(0,0,0,0.10));
+      background: var(--bm-card, #fff); color: var(--bm-ink);
+      font: 600 0.74rem 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer; transition: background .12s, border-color .12s;
+    }
+    .bm-topic-chip:hover { background: rgba(232,168,56,0.10); border-color: rgba(232,168,56,0.4); }
+    .bm-topic-chip.is-active {
+      background: var(--bm-accent, #e8a838); color: #fff; border-color: var(--bm-accent, #e8a838);
+    }
+    /* Quotes: cards + form */
+    .bm-quote-card {
+      padding: 12px 14px; border-radius: 11px;
+      background: var(--bm-card, #fff);
+      border: 1px solid var(--bm-border, rgba(0,0,0,0.06));
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .bm-quote-text {
+      color: var(--bm-ink); font: italic 0.88rem 'Plus Jakarta Sans', serif;
+      line-height: 1.55; white-space: pre-wrap;
+    }
+    .bm-quote-meta {
+      color: var(--bm-faint); font: 600 0.72rem 'Plus Jakarta Sans', sans-serif;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    }
+    .bm-quote-meta-tag {
+      padding: 1px 7px; border-radius: 999px;
+      background: rgba(167,139,250,0.12); color: #6d52d6;
+      border: 1px solid rgba(167,139,250,0.22);
+      font: 600 0.66rem 'Plus Jakarta Sans', sans-serif;
+    }
+    .bm-quote-actions {
+      display: flex; gap: 6px; margin-top: 4px;
+    }
+    .bm-quote-actions button {
+      font: 600 0.72rem 'Plus Jakarta Sans', sans-serif;
+      padding: 4px 9px; border-radius: 7px;
+      border: 1px solid var(--bm-border, rgba(0,0,0,0.10));
+      background: transparent; color: var(--bm-muted); cursor: pointer;
+    }
+    .bm-quote-actions button:hover { color: var(--bm-ink); border-color: var(--bm-accent, #e8a838); }
+    .bm-quote-actions .bm-quote-del:hover { color: var(--bm-red, #f87171); border-color: rgba(248,113,113,0.4); }
+    /* Liturgical */
+    .bm-litu-now {
+      padding: 14px 16px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(232,168,56,0.10), rgba(167,139,250,0.10));
+      border: 1px solid rgba(232,168,56,0.22);
+    }
+    .bm-litu-now-season {
+      font: 800 1.10rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+    }
+    .bm-litu-now-meta {
+      font: 0.78rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); margin-top: 2px;
+    }
+    .bm-litu-row {
+      display: flex; gap: 12px; align-items: baseline;
+      padding: 9px 4px; border-bottom: 1px dashed var(--bm-border, rgba(0,0,0,0.06));
+    }
+    .bm-litu-row:last-child { border-bottom: 0; }
+    .bm-litu-row.is-past { opacity: 0.45; }
+    .bm-litu-row.is-now { background: rgba(232,168,56,0.08); border-radius: 6px; padding: 9px 8px; }
+    .bm-litu-date {
+      flex: 0 0 96px; font: 700 0.78rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-ink); letter-spacing: 0.01em;
+    }
+    .bm-litu-name {
+      flex: 1; font: 0.86rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+    }
+    .bm-litu-color {
+      flex: 0 0 auto; font: 600 0.66rem 'Plus Jakarta Sans', sans-serif;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 2px 8px; border-radius: 999px;
+      background: var(--c, #eee); color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -1712,22 +1882,22 @@
               <div class="bm-land-tool-card" data-tool="cross-ref">
                 <div class="bm-land-tool-h">Cross-References</div>
                 <div class="bm-land-tool-p">Find parallel passages for any verse.</div>
-                <span class="bm-land-pill-soon">Coming online</span>
+                <span class="bm-land-pill-open">Open →</span>
               </div>
               <div class="bm-land-tool-card" data-tool="topical">
                 <div class="bm-land-tool-h">Topical Index</div>
                 <div class="bm-land-tool-p">Jump to verses by theme or topic.</div>
-                <span class="bm-land-pill-soon">Coming online</span>
+                <span class="bm-land-pill-open">Open →</span>
               </div>
               <div class="bm-land-tool-card" data-tool="quotes">
                 <div class="bm-land-tool-h">Quote &amp; Illustration Library</div>
                 <div class="bm-land-tool-p">Save and reuse sermon-ready quotes.</div>
-                <span class="bm-land-pill-soon">Coming online</span>
+                <span class="bm-land-pill-open">Open →</span>
               </div>
               <div class="bm-land-tool-card" data-tool="liturgical">
                 <div class="bm-land-tool-h">Liturgical Calendar</div>
                 <div class="bm-land-tool-p">Plan around the church year.</div>
-                <span class="bm-land-pill-soon">Coming online</span>
+                <span class="bm-land-pill-open">Open →</span>
               </div>
             </div>
           </div>
