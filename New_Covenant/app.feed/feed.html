@@ -99,37 +99,8 @@
     /* ════════════════════════════════════════════════════
        TOPBAR — canonical FlockOS dark navy chrome
     ════════════════════════════════════════════════════ */
-    #bm-topbar {
-      display: flex; align-items: center; gap: 10px;
-      padding: var(--safe-top) 18px 0;
-      background: var(--top-bg);
-      border-bottom: 1px solid var(--top-line);
-      color: var(--top-ink);
-      z-index: 200; position: relative; flex-shrink: 0;
-    }
-    #bm-topbar::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5px;
-      background: var(--grad-rainbow);
-      background-size: 200% 100%;
-      animation: bm-rainbow 9s linear infinite;
-      opacity: 0.72;
-    }
-    @keyframes bm-rainbow { from { background-position: 0% 0; } to { background-position: 200% 0; } }
-    @media (prefers-reduced-motion: reduce) { #bm-topbar::after { animation: none; opacity: 0.5; } }
-
-    .bm-logo {
-      display: flex; align-items: center; gap: 8px;
-      font: 700 1.05rem 'Plus Jakarta Sans', sans-serif; color: #fff;
-      flex-shrink: 0; margin-right: 4px;
-    }
-    .bm-logo-icon {
-      width: 30px; height: 30px; border-radius: 8px;
-      background: linear-gradient(135deg, #c48a20, #e8a838);
-      display: flex; align-items: center; justify-content: center; font-size: 16px;
-      box-shadow: 0 2px 10px rgba(232,168,56,0.40);
-      flex-shrink: 0;
-    }
-    .bm-logo-text { white-space: nowrap; }
+    /* (Topbar styling now handled by .unity-header in new_covenant.css.) */
+    #bm-topbar { z-index: 200; }
 
     /* Sermon title in topbar */
     #bm-active-title {
@@ -1489,17 +1460,12 @@
     @media (max-width: 600px) {
       .bm-btn-label-hide { display: none; }
 
-      /* ── Topbar: tighten on phones ─────────────────────────────── */
-      #bm-topbar { padding: 0 8px; gap: 4px; }
-      .bm-logo { gap: 5px; margin-right: 2px; }
-      .bm-logo-icon { width: 26px; height: 26px; }
-      .bm-logo-text { display: none; }
+      /* ── Subbar: tighten on phones ─────────────────────────────── */
+      #bm-subbar { padding: 5px 8px; gap: 4px; }
       #bm-active-title { font-size: 0.78rem; }
       .bm-topbar-right { gap: 4px; }
       .bm-btn--sm { padding: 5px 7px; }
       .bm-btn--icon { padding: 5px 6px; }
-      .bm-user-chip { padding: 2px 6px 2px 3px; }
-      .bm-user-chip #bm-user-name { display: none; }
 
       /* ── Sermon header: stack cleanly + accordion toggle ──────── */
       #bm-sermon-header { padding: 10px 12px 8px; gap: 8px; }
@@ -1779,22 +1745,16 @@
 <!-- App root (auth handled by app.feed/index.html — feed.js redirects there if unauthenticated) -->
 <div id="bm-root">
 
-  <!-- Topbar -->
-  <header id="bm-topbar">
-    <!-- Hamburger (mobile) -->
-    <button class="bm-btn bm-btn--ghost bm-btn--icon bm-hamburger" id="bm-hamburger" aria-label="Open sidebar" style="display:none">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-    </button>
-    <a class="bm-logo" id="bm-logo" href="./" title="FEED home" style="text-decoration:none;color:inherit">
-      <div class="bm-logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-      <span class="bm-logo-text">FEED</span>
-    </a>
-    <button class="bm-btn bm-btn--ghost bm-btn--icon" id="bm-close-sermon-btn" title="Close sermon (back to FEED)" aria-label="Close sermon" style="display:none;margin-right:6px">
+  <!-- Unity header (mounted by feed.js) -->
+  <header class="unity-header" id="bm-topbar" role="banner"></header>
+
+  <!-- Subbar: active sermon title + per-sermon actions -->
+  <nav id="bm-subbar" aria-label="Active sermon">
+    <button class="bm-btn bm-btn--ghost bm-btn--icon" id="bm-close-sermon-btn" title="Close sermon (back to FEED)" aria-label="Close sermon" style="display:none">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
     <span id="bm-active-title">FEED</span>
-    <div class="bm-topbar-right">
-      <button data-app-switcher data-app-switcher-current="feed" title="Switch app"></button>
+    <div class="bm-topbar-right" style="margin-left:auto">
       <button class="bm-btn bm-btn--ghost bm-btn--sm" id="bm-duplicate-btn" title="Duplicate this sermon" disabled>
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         <span class="bm-btn-label-hide">Duplicate</span>
@@ -1815,12 +1775,8 @@
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Save
       </button>
-      <div class="bm-user-chip" id="bm-user-chip">
-        <div class="bm-user-avatar" id="bm-user-avatar">?</div>
-        <span id="bm-user-name">Account</span>
-      </div>
     </div>
-  </header>
+  </nav>
 
   <!-- Body -->
   <div id="bm-body">
@@ -2596,8 +2552,68 @@
 <script defer src="Scripts/the_true_vine.js"></script>
 
 <!-- The Feed logic -->
-<script type="module" src="Scripts/the_app_switcher.js"></script>
 <script defer src="app.feed/feed.js"></script>
+
+<!-- Unity header (mounts shared FlockOS chrome above feed.js's own UI) -->
+<script type="module">
+  import { mountUnityHeader } from '../Scripts/the_unity_header.js';
+
+  let user = null;
+  try {
+    const raw = sessionStorage.getItem('flock_auth_session') || sessionStorage.getItem('flock_auth_profile');
+    if (raw) {
+      const s = JSON.parse(raw);
+      if (s && s.email) {
+        user = {
+          displayName: s.displayName || s.name || s.email.split('@')[0],
+          email:       s.email,
+          photoURL:    s.photoURL || '',
+        };
+      }
+    }
+  } catch (_) {}
+
+  const FEED_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+
+  const host = document.getElementById('bm-topbar');
+  if (host) {
+    mountUnityHeader(host, {
+      appId:       'feed',
+      appName:     'FEED',
+      appIconSvg:  FEED_ICON,
+      appAccent:   '#e8a838',
+      appAccentDk: '#c48a20',
+      homeHref:    '../',
+      user,
+      signInHref:  'app.feed/',
+      onSignOut: () => {
+        if (window.Nehemiah && typeof window.Nehemiah.signOut === 'function') {
+          if (confirm('Sign out of FEED?')) window.Nehemiah.signOut();
+          return;
+        }
+        try { sessionStorage.removeItem('flock_auth_session'); } catch (_) {}
+        try { sessionStorage.removeItem('flock_auth_profile'); } catch (_) {}
+        location.replace('app.feed/');
+      },
+      onHamburger: () => {
+        const sb = document.getElementById('bm-sidebar');
+        if (sb) sb.classList.toggle('is-open');
+      },
+    });
+
+    // When a sermon is active, intercept the brand click to close the sermon
+    // instead of navigating away (preserves legacy bm-logo behavior).
+    host.addEventListener('click', (e) => {
+      const brand = e.target.closest('.unity-brand');
+      if (!brand) return;
+      const closeBtn = document.getElementById('bm-close-sermon-btn');
+      if (closeBtn && closeBtn.style.display !== 'none') {
+        e.preventDefault();
+        closeBtn.click();
+      }
+    });
+  }
+</script>
 
 </body>
 </html>
