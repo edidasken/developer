@@ -120,7 +120,7 @@
     if (!_db || !_me) return;
     const ref = _db.collection('users').doc(_me.uid);
     const snap = await ref.get();
-    if (!snap.exists()) {
+    if (!snap.exists) {
       await ref.set({
         displayName: _me.displayName || _me.email,
         email: _me.email,
