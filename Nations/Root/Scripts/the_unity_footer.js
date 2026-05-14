@@ -78,7 +78,6 @@ export function mountUnityFooter(host, cfg = {}) {
     <div class="unity-footer-actions">
       ${actionsHtml}
     </div>
-    <div class="unity-footer-motto">FlockOS - Built to be Shared!</div>
   `;
 
   // Click delegation for special actions
