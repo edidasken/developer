@@ -8,6 +8,7 @@ Update flow: New Covenant -> Old Covenant
 
 ## Release Notes
 
+- **2026-05-14 (pass 4):** Fourth audit pass completed. Created `Q-AS-BUILT-App-Dependencies.md` with comprehensive script loading order documentation for all 8 app shells (FlockOS, FEED, FlockChat, FlockShow, FlockStand, GROW, Invite, embed-launcher) and 9 embed files (embed-flockos, embed-stand, embed-feed, embed-flockchat, embed-flockshow, embed-grow, embed-about, embed-launcher). Documents complete dependency chains from Firebase SDKs → auth layer → backend modules → app-specific logic → Unity components. Includes Firebase SDK version table, loading patterns, base href strategies, and dependency graph. Added to Architecture Map in D-INDEX.md.
 - **2026-05-14 (pass 3):** Third audit pass completed. Fixed CACHE_NAME version references from v1.01 to v1.03 in K-AS-BUILT-Operations-Guide.md. Corrected ChurchRegistry canonical location from `Covenant/Scrolls/ChurchRegistry/` to `Architechtural Docs/New Covenant/Deployment/ChurchRegistry/` throughout. Deleted 37 macOS duplicate files with " 2" suffix from Automation/ directories. Updated To-Do.md to mark Unified Footer as completed (commit 233d2ec9).
 - **2026-05-13 (pass 2):** Second audit pass completed. Added `stand.js` (app.stand/) to `G-AS-BUILT-Script-Module-Inventory.md`. Removed 13 duplicate module rows from G-AS-BUILT (scribes, veil, fold/index, shepherd/index, priesthood/garments first occurrences). Fixed `F-AS-BUILT-Architecture-Overview.md` accuracy: `app.flockchat/` Firebase config note corrected (standalone HTML is not patched by B-Build; only embed-flockchat.html is via step 9e). `O-Automation-Shepherds-README.md` expanded with full 36-script inventory in 5 categories, plus Iris-only milestone scripts.
 - **2026-05-13:** Full as-built audit completed. Three new standalone app shells documented: `app.feed/` (Sermon Prep & Manuscript Builder), `app.flockchat/` (church team messaging PWA), `app.flockshow/` (church presentation app). Four new embeds documented: `embed-feed.html`, `embed-flockchat.html`, `embed-flockshow.html`, `embed-launcher.html`. B-Build step list in `K-AS-BUILT-Operations-Guide.md` expanded to all 18 patch steps. `N-Automation-README.md` updated with `audit_firestore_against_schema.cjs`. Repo layout tree corrected for all 8 app shells.
@@ -41,6 +42,7 @@ Update flow: New Covenant -> Old Covenant
 	- [N-Automation-README.md](N-Automation-README.md)
 	- [O-Automation-Shepherds-README.md](O-Automation-Shepherds-README.md)
 	- [P-README.md](P-README.md)
+	- [Q-AS-BUILT-App-Dependencies.md](Q-AS-BUILT-App-Dependencies.md) *(Complete dependency reference)*
 	- [Z-New Covenant Schema.sql](Z-New%20Covenant%20Schema.sql)
 	- [Z-Combined_Schema_Manifest.deployable.json](Z-Combined_Schema_Manifest.deployable.json)
 
