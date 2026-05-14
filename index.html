@@ -75,28 +75,33 @@
     /* ── Identity ──────────────────────────────────────────────────── */
     .church-id {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
-      gap: 0.6rem;
-      text-align: center;
+      gap: 1rem;
+      text-align: left;
     }
     .church-id img {
-      width: 60px; height: 60px;
-      border-radius: 15px;
+      width: 70px; height: 70px;
+      border-radius: 18px;
       box-shadow: 0 6px 22px rgba(0,0,0,0.40);
     }
+    .church-id-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
     .church-id h1 {
-      font-size: clamp(1.25rem, 5vw, 1.8rem);
+      font-size: clamp(1.2rem, 5vw, 1.7rem);
       font-weight: 800;
       letter-spacing: -0.025em;
       color: var(--gold);
       line-height: 1.2;
     }
     .church-id .tagline {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--muted);
       max-width: 32ch;
-      margin-top: 0.15rem;
+      margin-top: 0;
     }
 
     /* ── App sections ──────────────────────────────────────────────── */
@@ -277,9 +282,11 @@
   <div class="launcher">
 
     <div class="church-id">
-      <img src="New_Covenant/Images/FlockIcon-192.png" alt="FlockOS" width="60" height="60" fetchpriority="high">
-      <h1>FlockOS</h1>
-      <p class="tagline">Built to be shared. Free forever.</p>
+      <img src="New_Covenant/Images/FlockIcon-192.png" alt="FlockOS" width="70" height="70" fetchpriority="high">
+      <div class="church-id-text">
+        <h1>FlockOS</h1>
+        <p class="tagline">Built to be shared. Free forever.</p>
+      </div>
     </div>
 
     <div class="app-sections">

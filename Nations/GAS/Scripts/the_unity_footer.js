@@ -5,8 +5,7 @@
    Every New Covenant app mounts this footer. Canonical layout:
      [↑ Back to Top] [🏠 Home] [✉️ Invite] [🙏 Prayer] [📞 Call] [📍 Map]
      ─────────────────────────────────────────────────────────────
-     © 2026 Trinity Baptist Church  •  v1.01
-     Soli Deo Gloria | Built to Be Shared
+     FlockOS - Built to be Shared!
 
    USAGE (any app):
      import { mountUnityFooter } from '../Scripts/the_unity_footer.js';
@@ -18,9 +17,7 @@
        inviteHref:  '../app.invite/',
        prayerHref:  'https://trinity.flock.app/prayer',
        phone:       '+15551234567',
-       mapsUrl:     'https://maps.google.com/?q=123+Main+St',
-       version:     'v1.01',
-       copyright:   '© 2026 Trinity Baptist Church'
+       mapsUrl:     'https://maps.google.com/?q=123+Main+St'
      });
    ══════════════════════════════════════════════════════════════════════════════ */
 
@@ -45,8 +42,6 @@ export function mountUnityFooter(host, cfg = {}) {
     prayerHref = './prayer',
     phone      = '',
     mapsUrl    = '',
-    version    = 'v1.01',
-    copyright  = '© 2026 FlockOS',
   } = cfg;
 
   // Helper to check if a value is an unreplaced template variable
@@ -84,11 +79,6 @@ export function mountUnityFooter(host, cfg = {}) {
       ${actionsHtml}
     </div>
     <div class="unity-footer-motto">FlockOS - Built to be Shared!</div>
-    <div class="unity-footer-meta">
-      <span class="unity-footer-copy">${escapeHtml(copyright)}</span>
-      <span class="unity-footer-sep">•</span>
-      <span class="unity-footer-version">${escapeHtml(version)}</span>
-    </div>
   `;
 
   // Click delegation for special actions
