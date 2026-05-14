@@ -210,30 +210,6 @@
     }
     .app-btn:hover .app-arrow { color: var(--ink); transform: translateX(3px); }
 
-    /* ── Verse footer ──────────────────────────────────────────────── */
-    .verse {
-      text-align: center;
-      max-width: 38ch;
-    }
-    .verse p {
-      font-family: var(--serif);
-      font-style: italic;
-      font-size: 0.85rem;
-      color: var(--muted);
-      line-height: 1.75;
-    }
-    .verse cite {
-      display: block;
-      margin-top: 0.4rem;
-      font-family: var(--font);
-      font-style: normal;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-
     /* ── Update banner ─────────────────────────────────────────────── */
     .update-banner {
       position: fixed; top: calc(var(--safe-top) + 0px); left: 0; right: 0;
@@ -418,15 +394,30 @@
       <p class="install-hint">Add the launcher to your home screen — works on phones, tablets &amp; desktop.</p>
     </div>
 
-    <footer class="verse">
-      <p>"Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit."</p>
-      <cite>Matthew 28:19</cite>
-    </footer>
+    <footer class="unity-footer" id="launcher-footer"></footer>
 
   </div>
 
   <!-- Pull-to-Refresh indicator -->
   <div class="ptr-indicator" id="ptrIndicator">&#8635; Release to refresh</div>
+
+  <!-- Unity footer mount -->
+  <script type="module">
+    import { mountUnityFooter } from 'New_Covenant/Scripts/the_unity_footer.js';
+
+    mountUnityFooter(document.getElementById('launcher-footer'), {
+      appId:       'launcher',
+      appAccent:   '#e8a838',
+      appAccentDk: '#1e3a8a',
+      homeHref:    './',
+      inviteHref:  'New_Covenant/app.invite/app.invite.html',
+      prayerHref:  '{{CHURCH_PRAYER_URL}}',
+      phone:       '{{CHURCH_PHONE}}',
+      mapsUrl:     '{{CHURCH_MAPS_URL}}',
+      version:     'v1.01',
+      copyright:   '© 2026 FlockOS',
+    });
+  </script>
 
   <script>
   (function () {
