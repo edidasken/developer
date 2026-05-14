@@ -196,7 +196,7 @@ The app shell is `New_Covenant/index.html`. All views render into it via `the_ta
 ## 7. Service Worker & Cache Versioning
 
 - File: `New_Covenant/the_living_water.js`
-- Current `CACHE_NAME`: `flockos-new-covenant-v1.03`
+- Current `CACHE_NAME`: `flockos-new-covenant-v1.04`
 - **Do not change `CACHE_NAME` without discussion** — mismatched versions across Nations deployments cause cache staleness in production.
 
 Per-church CACHE_NAME values are patched by B-Build (currently set to v1.01 for all deployments):
@@ -209,7 +209,7 @@ Per-church CACHE_NAME values are patched by B-Build (currently set to v1.01 for 
 | TheForest | `flockos-theforest-v1.01` |
 | GAS | `flockos-gas-v1.01` |
 
-**Note:** The New_Covenant master source is at v1.03, but B-Build patches all church deployments to v1.01 until a coordinated version bump is performed across all deployments.
+**Note:** The New_Covenant master source is at v1.04, but B-Build patches all church deployments to v1.01 until a coordinated version bump is performed across all deployments.
 
 ---
 
