@@ -57,20 +57,25 @@
     console.log('[FlockChat] Booting', VERSION);
     _setBootStatus('Loading…');
     
-    // Wait for Firebase + Nehemiah
-    await _waitFor(() => typeof window.firebase !== 'undefined' && typeof window.Nehemiah !== 'undefined');
+    // Wait for Nehemiah (auth must be checked before proceeding)
+    await _waitFor(() => typeof window.Nehemiah !== 'undefined');
     
-    // Check auth
+    // Check auth FIRST (like FlockStand does)
     const N = window.Nehemiah;
-    if (!N.isAuthenticated()) {
-      N.guard();
+    if (typeof N.isAuthenticated === 'function' && !N.isAuthenticated()) {
+      window.location.replace('app.flockchat/index.html');
       return;
     }
-    _me = N.getSession();
+    
+    // Get session
+    _me = N.getSession ? N.getSession() : null;
     if (!_me) {
-      N.guard();
+      window.location.replace('app.flockchat/index.html');
       return;
     }
+    
+    // Wait for Firebase
+    await _waitFor(() => typeof window.firebase !== 'undefined');
 
     _setBootStatus('Connecting…');
     
