@@ -381,12 +381,42 @@ function _wireHeader() {
   const nameEl = document.getElementById('ms-account-name');
   if (nameEl && S.user) nameEl.textContent = S.user.displayName || 'Account';
 
-  // Account button → sign out
+  // Profile dropdown popover
   const acctBtn = document.getElementById('ms-account-btn');
-  if (acctBtn) {
-    acctBtn.addEventListener('click', () => {
-      _signOutAndRedirect();
+  const pop     = document.getElementById('ms-profile-pop');
+  if (acctBtn && pop) {
+    const ppName  = document.getElementById('ms-pp-name');
+    const ppEmail = document.getElementById('ms-pp-email');
+    if (ppName)  ppName.textContent  = (S.user?.displayName) || 'Account';
+    if (ppEmail) ppEmail.textContent = (S.user?.email) || '';
+
+    const closePop = () => { pop.classList.remove('is-open'); acctBtn.setAttribute('aria-expanded', 'false'); };
+    acctBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = pop.classList.toggle('is-open');
+      acctBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     });
+    document.addEventListener('click', (e) => {
+      if (!pop.contains(e.target) && e.target !== acctBtn && !acctBtn.contains(e.target)) closePop();
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop(); });
+
+    pop.addEventListener('click', (e) => {
+      const item = e.target.closest('[data-pp]');
+      if (!item) return;
+      const action = item.dataset.pp;
+      if (action === 'signout') { e.preventDefault(); closePop(); _signOutAndRedirect(); return; }
+      if (action === 'settings') { e.preventDefault(); closePop(); _navigate('settings'); return; }
+      if (action === 'switch-church') { closePop(); return; /* href handles nav */ }
+      if (action === 'profile') { e.preventDefault(); closePop(); _navigate('settings'); return; }
+      // Stub items (prayer / todo / calendar / journal): show a friendly toast for now
+      e.preventDefault();
+      closePop();
+      try { _toast?.('Coming soon: ' + (item.textContent || '').trim()); } catch (_) {}
+    });
+  } else if (acctBtn) {
+    // Fallback if popover markup missing — preserve old sign-out behavior
+    acctBtn.addEventListener('click', () => { _signOutAndRedirect(); });
   }
 
   // Live button
