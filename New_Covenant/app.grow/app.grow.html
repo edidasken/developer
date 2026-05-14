@@ -232,6 +232,9 @@
     <main id="gp-main" role="main"></main>
   </div>
 
+  <!-- Unity footer -->
+  <footer class="unity-footer" id="grow-footer"></footer>
+
   <!--
     grow_public.js bootstraps the full page:
     sidebar, topbar CTA, hash-based module routing.
@@ -294,6 +297,24 @@
       triggered = false;
     }, { passive: true });
   })();
+  </script>
+
+  <!-- Unity footer mount -->
+  <script type="module">
+    import { mountUnityFooter } from './Scripts/the_unity_footer.js';
+
+    mountUnityFooter(document.getElementById('grow-footer'), {
+      appId:       'grow',
+      appAccent:   '#d97706',
+      appAccentDk: '#78350f',
+      homeHref:    '../',
+      inviteHref:  '../app.invite/app.invite.html',
+      prayerHref:  '{{CHURCH_PRAYER_URL}}',
+      phone:       '{{CHURCH_PHONE}}',
+      mapsUrl:     '{{CHURCH_MAPS_URL}}',
+      version:     'v1.01',
+      copyright:   '© 2026 {{CHURCH_NAME}}',
+    });
   </script>
 </body>
 </html>
