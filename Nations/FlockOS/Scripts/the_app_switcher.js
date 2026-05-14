@@ -168,10 +168,19 @@ function buttonHTML() {
 }
 
 function popoverHTML(currentId) {
+  // Resolve all app hrefs against the actual launcher (parent of current
+  // page) instead of <base href>, which always points at the master source.
+  let launcherUrl;
+  try { launcherUrl = new URL('../', location.href).href; }
+  catch (_) { launcherUrl = './'; }
   const items = NC_APPS.map((app) => {
     const isCurrent = app.id === currentId;
     const tag = isCurrent ? 'div' : 'a';
-    const hrefAttr = isCurrent ? '' : ` href="${app.href}"`;
+    const resolvedHref = (() => {
+      try { return new URL(app.href, launcherUrl).href; }
+      catch (_) { return app.href; }
+    })();
+    const hrefAttr = isCurrent ? '' : ` href="${resolvedHref}"`;
     const cls = `nc-switcher-item${isCurrent ? ' is-current' : ''}`;
     const pill = isCurrent ? '<span class="nc-switcher-current-pill">Current</span>' : '';
     return `
@@ -292,6 +301,21 @@ function autoMount() {
   document.querySelectorAll('[data-app-switcher]').forEach((el) => {
     if (!el.dataset.appSwitcherWired) mountSwitcher(el);
   });
+  fixLauncherLinks();
+}
+
+/* The app HTML files declare <base href="https://.../New_Covenant/"> so
+   relative URLs work everywhere. But that means an `href="./"` "back to
+   launcher" link always points at the master source — not the actual
+   per-church deployment the user is browsing. Rewrite those links to
+   the parent of the current location so they go to the right launcher. */
+function fixLauncherLinks() {
+  try {
+    const launcherUrl = new URL('../', location.href).href;
+    document.querySelectorAll('a[title="Back to launcher"], a[aria-label="Back to launcher"]').forEach((a) => {
+      a.href = launcherUrl;
+    });
+  } catch (_) { /* noop */ }
 }
 
 if (document.readyState === 'loading') {
