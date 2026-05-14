@@ -9049,9 +9049,9 @@ body.veil-app {
   width: 30px; height: 30px; border-radius: 8px; box-shadow: 0 0 0 1px rgba(255,255,255,0.12);
 }
 .veil-brand-text {
-  font: 700 1.15rem var(--font-serif); letter-spacing: -0.01em;
-  background: linear-gradient(135deg, #fff 10%, var(--gold, #e8a838) 90%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  font: 700 1.05rem 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.01em;
+  color: #fff;
 }
 .veil-spacer { flex: 1; }
 .veil-menu   { display: none; }
@@ -9069,20 +9069,19 @@ body.veil-app {
 
 /* Search pill — dark glass on dark topbar */
 .veil-search {
-  flex: 0 1 220px; max-width: 220px; min-width: 0;
+  flex: 1 1 auto; max-width: 420px; min-width: 0;
   display: flex; align-items: center; gap: 8px;
-  padding: 7px 12px;
-  background: rgba(255,255,255,0.07);
-  border: 1.5px solid rgba(255,255,255,0.14);
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
   border-radius: 999px; cursor: pointer;
-  color: rgba(255,255,255,0.52); font: 0.84rem var(--font-ui);
+  color: rgba(255,255,255,0.55); font: 0.86rem 'Plus Jakarta Sans', system-ui, sans-serif;
   transition: border-color 140ms var(--ease), box-shadow 140ms var(--ease), background 140ms var(--ease);
 }
 .veil-search:hover {
-  border-color: var(--gold, #e8a838);
-  background: rgba(255,255,255,0.11);
-  color: rgba(255,255,255,0.80);
-  box-shadow: 0 0 0 3px var(--gold-soft, rgba(232,168,56,0.14));
+  border-color: rgba(255,255,255,0.28);
+  background: rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.85);
 }
 .veil-search svg { flex: none; }
 .veil-search > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }

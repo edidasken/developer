@@ -37,7 +37,7 @@ export function mountCrown(host) {
     <button class="veil-action" data-act="apps" data-app-switcher data-app-switcher-current="flockos" aria-label="Switch app" title="Switch app">${ICON.launcher}</button>
     <button class="veil-action" data-act="open-notifications" aria-label="Notifications">${ICON.bell}</button>
     <button class="veil-avatar" data-act="open-account" aria-label="Account" data-bind="avatar">
-      <img class="veil-avatar-logo" alt="" src="Images/FlockOS.png" onerror="this.style.display='none'">
+      <img class="veil-avatar-logo" alt="" src="Images/FlockIcon-192.png" onerror="this.style.display='none'">
     </button>
   `;
   _paintAvatar(host);
