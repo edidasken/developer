@@ -49,7 +49,7 @@
   <style>
     /* ─── Reset ──────────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { min-height: 100%; overscroll-behavior: none; }
+    html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 
     /* ─── Design tokens — aliased to active FlockOS theme (new_covenant.css) ─── */
     :root {
@@ -1302,6 +1302,9 @@
 
     </div>
 
+    <!-- Unity Footer inside app container -->
+    <footer id="fc-footer" class="unity-footer"></footer>
+
   </div><!-- #fc-app -->
 
   <!-- ── Toasts ────────────────────────────────────────────────────────── -->
@@ -1469,9 +1472,6 @@
 
   <!-- ── Sidebar scrim (mobile) ────────────────────────────────────────── -->
   <div id="fc-sidebar-scrim" style="display:none; position:fixed; inset:0; background:var(--modal-dim); z-index:290;"></div>
-
-  <!-- ── Unity Footer ────────────────────────────────────────────────── -->
-  <footer id="fc-footer" class="unity-footer"></footer>
 
   <!-- ── Firebase + core scripts ──────────────────────────────────────── -->
   <script>
