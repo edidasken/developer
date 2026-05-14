@@ -15266,6 +15266,7 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
   color: #fff; cursor: pointer;
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; /* PWA: prevent double-tap zoom, ensure reliable touch */
 }
 .unity-action:hover  { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.22); }
 .unity-action:active { transform: scale(0.94); }

@@ -1416,6 +1416,9 @@ function _renderUserChip(N) {
         else location.reload();
       });
     },
+    onHamburger: () => {
+      // FlockShow has no sidebar — hamburger hidden via CSS
+    },
     features: [
       { id: 'fs-tab-library', label: 'Library',    hint: 'View shows',          run: () => { _setView('library'); _renderLibrary(); _renderHeader(); } },
       { id: 'fs-tab-editor',  label: 'Editor',     hint: 'Edit current show',   run: () => { if (_activeShow()) { _setView('editor'); _renderHeader(); } } },

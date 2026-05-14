@@ -35,6 +35,7 @@ const ICONS = {
 };
 
 export function mountUnityHeader(host, cfg = {}) {
+  console.log('[UNITY-HEADER-DEBUG] mountUnityHeader called', host, cfg);
   if (!host) return;
   const {
     appId      = 'flockos',
@@ -81,8 +82,8 @@ export function mountUnityHeader(host, cfg = {}) {
   const switcherHost = host.querySelector('[data-app-switcher]');
   if (switcherHost) mountSwitcher(switcherHost, { current: appId });
 
-  // Click delegation
-  host.addEventListener('click', (e) => {
+  // Click delegation (with touch fallback for PWA)
+  function handleAction(e) {
     const btn = e.target.closest('[data-act],[data-extra-idx]');
     if (!btn) return;
 
@@ -94,6 +95,7 @@ export function mountUnityHeader(host, cfg = {}) {
 
     const act = btn.dataset.act;
     if (act === 'menu') {
+      e.preventDefault(); // Prevent double-fire in PWA
       if (typeof onHamburger === 'function') onHamburger();
       else document.body.classList.toggle('unity-side-open');
     } else if (act === 'home') {
@@ -106,7 +108,20 @@ export function mountUnityHeader(host, cfg = {}) {
       if (typeof onAccount === 'function') { onAccount(e); return; }
       openUnityProfile({ appId, appName, user: cfg.user, onSignOut, signInHref });
     }
+  }
+
+  host.addEventListener('click', handleAction);
+  console.log('[UNITY-HEADER-DEBUG] Click listener attached to header');
+  
+  // PWA touch fallback — iOS PWAs sometimes don't convert touches to clicks
+  host.addEventListener('touchend', (e) => {
+    const btn = e.target.closest('[data-act],[data-extra-idx]');
+    if (btn) {
+      e.preventDefault(); // Prevent click from also firing
+      handleAction(e);
+    }
   });
+  console.log('[UNITY-HEADER-DEBUG] Touch listener attached to header');
 
   // ⌘K / Ctrl+K opens search globally for this app
   if (!host.__unityKeydown) {
