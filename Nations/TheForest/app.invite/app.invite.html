@@ -118,41 +118,27 @@
     .grow-hero-title { margin: 0 0 4px; font-size: 26px; font-weight: 700; letter-spacing: -.01em; color: var(--text, #f5f5f7); }
     .grow-hero-sub   { margin: 0; color: var(--text, #f5f5f7); opacity: .88; font-size: 14px; line-height: 1.55; max-width: 60ch; }
 
-    /* ── Minimal topbar — canonical FlockOS dark navy chrome ───────── */
-    #inv-topbar {
-      position: sticky; top: 0; z-index: 100;
+    /* ── Topbar (handled by .unity-header in new_covenant.css) ── */
+    #inv-topbar { z-index: 100; }
+
+    /* ── Subbar (church attribution + share pill) ── */
+    #inv-subbar {
+      position: sticky; top: var(--topbar-h, 52px); z-index: 99;
       background: var(--top-bg);
       color: var(--top-ink);
-      height: calc(52px + var(--safe-top, 0px));
-      padding: var(--safe-top, 0px) 20px 0;
-      display: flex; align-items: center; gap: 14px;
+      padding: 7px 20px;
+      display: flex; align-items: center; gap: 10px;
       border-bottom: 1px solid var(--top-line);
-      box-shadow: 0 2px 12px rgba(12,20,69,.35);
-    }
-    #inv-topbar::after {
-      content: ''; position: absolute; bottom: -2.5px; left: 0; right: 0; height: 2.5px;
-      background: var(--grad-rainbow);
-      background-size: 200% 100%;
-      opacity: 0.72;
-    }
-    .inv-brand-icon {
-      width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
-      background: rgba(61,139,79,.28); border: 1.5px solid rgba(61,139,79,.55);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.15rem;
-    }
-    .inv-brand-name {
-      font: 700 1.05rem 'Plus Jakarta Sans', system-ui, sans-serif;
-      color: #fff; letter-spacing: -.01em;
     }
     .inv-brand-church {
-      font: 500 .78rem 'Plus Jakarta Sans', system-ui, sans-serif;
-      color: rgba(255,255,255,.55); margin-left: 2px;
+      flex: 1; min-width: 0;
+      font: 500 .82rem 'Plus Jakarta Sans', system-ui, sans-serif;
+      color: rgba(255,255,255,.78);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .inv-topbar-right { margin-left: auto; }
     .inv-share-pill {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 7px 14px; border-radius: 999px;
+      padding: 6px 13px; border-radius: 999px;
       background: rgba(61,139,79,.25); border: 1.5px solid rgba(61,139,79,.55);
       color: #6ee7b7; font: 600 .8rem var(--font-ui, sans-serif);
       cursor: pointer; transition: background .18s;
@@ -223,24 +209,17 @@
   <div id="inv-shell">
 
   <!-- ── Topbar ──────────────────────────────────────────────────── -->
-  <header id="inv-topbar" role="banner">
-    <a class="inv-brand-link" href="./" title="Back to launcher" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;flex:1;min-width:0" aria-label="Back to launcher">
-      <div class="inv-brand-icon" style="display:inline-flex;align-items:center;justify-content:center">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="4.5" y1="8.5" x2="19.5" y2="8.5"/></svg>
-      </div>
-      <div style="min-width:0">
-        <div class="inv-brand-name">The Invitation</div>
-        <div class="inv-brand-church" id="inv-church-name"></div>
-      </div>
-    </a>
-    <div class="inv-topbar-right">
-      <button data-app-switcher data-app-switcher-current="invite" title="Switch app"></button>
-      <button class="inv-share-pill" id="inv-topbar-share" aria-label="Share this page">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        Share
-      </button>
-    </div>
-  </header>
+  <!-- Unity header (mounted by inline module below) -->
+  <header id="inv-topbar" class="unity-header" role="banner"></header>
+
+  <!-- Subbar: church attribution + share pill -->
+  <nav id="inv-subbar" aria-label="Invitation actions">
+    <div class="inv-brand-church" id="inv-church-name"></div>
+    <button class="inv-share-pill" id="inv-topbar-share" aria-label="Share this page">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Share
+    </button>
+  </nav>
 
   <!-- ── Content ─────────────────────────────────────────────────── -->
   <main id="inv-main" role="main">
@@ -282,11 +261,27 @@
     window._INVITE_SHARE_URL = location.href.split('?')[0].split('#')[0];
   </script>
 
-  <script type="module" src="https://flock-os.github.io/FlockOS/New_Covenant/Scripts/the_app_switcher.js"></script>
   <script type="module" src="https://flock-os.github.io/FlockOS/New_Covenant/Scripts/the_gospel/the_gospel_invitation.js">
   </script>
   <script type="module">
-    import { render, mount } from 'https://flock-os.github.io/FlockOS/New_Covenant/Scripts/the_gospel/the_gospel_invitation.js';
+    import { mountUnityHeader } from 'https://flock-os.github.io/FlockOS/New_Covenant/Scripts/the_unity_header.js';
+    import { render, mount }    from 'https://flock-os.github.io/FlockOS/New_Covenant/Scripts/the_gospel/the_gospel_invitation.js';
+
+    /* ── Mount unity header (public — no user) ── */
+    const INV_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="4.5" y1="8.5" x2="19.5" y2="8.5"/></svg>';
+    const topbar = document.getElementById('inv-topbar');
+    if (topbar) {
+      mountUnityHeader(topbar, {
+        appId:       'invite',
+        appName:     'The Invitation',
+        appIconSvg:  INV_ICON,
+        appAccent:   '#10b981',
+        appAccentDk: '#065f46',
+        homeHref:    '../',
+        user:        null,
+        signInHref:  '../',
+      });
+    }
 
     const root    = document.getElementById('inv-root');
     const loading = document.getElementById('inv-loading');
