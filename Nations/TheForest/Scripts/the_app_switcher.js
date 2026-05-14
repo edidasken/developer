@@ -201,11 +201,20 @@ function closeSwitcher() {
   _open = null;
   document.removeEventListener('keydown', _onKey, true);
   window.removeEventListener('resize', closeSwitcher);
-  window.removeEventListener('scroll', closeSwitcher, true);
+  window.removeEventListener('scroll', _onScroll, true);
 }
 
 function _onKey(e) {
   if (e.key === 'Escape') { e.stopPropagation(); closeSwitcher(); }
+}
+
+/* Close the popover when the page (or any ancestor) scrolls — but NOT
+   when the user is scrolling inside the popover itself. */
+function _onScroll(e) {
+  if (!_open) return;
+  const t = e.target;
+  if (t === _open.pop || (t && t.nodeType === 1 && _open.pop.contains(t))) return;
+  closeSwitcher();
 }
 
 function openSwitcher(btn, currentId) {
@@ -252,7 +261,7 @@ function openSwitcher(btn, currentId) {
   _open = { backdrop, pop, btn };
   document.addEventListener('keydown', _onKey, true);
   window.addEventListener('resize', closeSwitcher);
-  window.addEventListener('scroll', closeSwitcher, true);
+  window.addEventListener('scroll', _onScroll, true);
 }
 
 /* ─── Public API ───────────────────────────────────────────────────────── */

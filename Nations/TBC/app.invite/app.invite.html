@@ -55,20 +55,26 @@
     }
 
     html, body {
-      height: auto;
-      min-height: 100%;
-      overflow-x: hidden;
+      height: 100%;
       margin: 0; padding: 0;
       background: #0c1445; /* matches topbar so iOS status bar band is dark */
       color: var(--ink, #1b264f);
       font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
       -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      overscroll-behavior: none;
     }
-    /* Let the document (html) be the single scroll container.
-       Don't set overflow on body — that creates a nested scroll
-       context which breaks normal page scrolling on some browsers. */
-    html { overflow-y: auto; overscroll-behavior-y: none; }
-    body { overflow-y: visible; }
+    /* Lock html/body and make #inv-shell the single scroll container.
+       overscroll-behavior: contain on the scroller reliably kills
+       pull-to-refresh on iOS Safari without breaking page scroll. */
+    #inv-shell {
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      background: var(--bg, #f7f8fb);
+    }
 
     /* Body bg below the topbar should be the page bg, not topbar dark */
     #inv-main {
@@ -213,6 +219,9 @@
 </head>
 <body>
 
+  <!-- ── Single scroll container (kills PTR on iOS) ───────────────── -->
+  <div id="inv-shell">
+
   <!-- ── Topbar ──────────────────────────────────────────────────── -->
   <header id="inv-topbar" role="banner">
     <a class="inv-brand-link" href="./" title="Back to launcher" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;flex:1;min-width:0" aria-label="Back to launcher">
@@ -242,7 +251,9 @@
     <div id="inv-root"></div>
   </main>
 
-  <!-- ── SW update banner ────────────────────────────────────────── -->
+  </div><!-- /#inv-shell -->
+
+  <!-- ── SW update banner (outside scroller — fixed positioning) ─── -->
   <div id="inv-sw-banner" role="status" aria-live="polite">
     New version available
     <button id="inv-sw-reload">Refresh</button>
