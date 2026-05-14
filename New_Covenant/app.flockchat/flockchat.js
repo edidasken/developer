@@ -150,6 +150,13 @@
 
     _messaging = firebase.messaging();
 
+    // Check for VAPID key configuration
+    const vapidKey = (typeof window !== 'undefined') ? window.FLOCK_VAPID_KEY : null;
+    if (!vapidKey) {
+      console.log('[FlockChat] FCM VAPID key not configured (window.FLOCK_VAPID_KEY)');
+      return;
+    }
+
     // Request permission
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
@@ -158,9 +165,7 @@
     }
 
     // Get token
-    const token = await _messaging.getToken({
-      vapidKey: 'YOUR_VAPID_KEY_HERE' // TODO: Add your VAPID key
-    });
+    const token = await _messaging.getToken({ vapidKey });
     console.log('[FlockChat] FCM token:', token);
 
     // Save token to user doc
