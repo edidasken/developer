@@ -2661,11 +2661,37 @@ function _landingSearchInMemory(lq) {
   return out.map(x => x.entry);
 }
 
+// Lazy-load the Strong's Greek/Hebrew dictionaries (~3MB total) the first time
+// the landing search is used. Cached on window so subsequent calls are instant.
+let _strongsLoadPromise = null;
+function _loadStrongsDicts() {
+  if (window._strongsGreek && window._strongsHebrew) return Promise.resolve();
+  if (_strongsLoadPromise) return _strongsLoadPromise;
+  _strongsLoadPromise = (async () => {
+    try {
+      // feed.html sets <base href="../"> so the document base is the
+      // New_Covenant/ directory; relative paths resolve against that.
+      const [gk, hb] = await Promise.all([
+        import('./Data/strongs-greek.js').catch(() => null),
+        import('./Data/strongs-hebrew.js').catch(() => null)
+      ]);
+      if (gk && gk.default) window._strongsGreek  = gk.default;
+      if (hb && hb.default) window._strongsHebrew = hb.default;
+    } catch (e) {
+      console.warn('[TheFeed] Strong\'s dictionaries failed to load:', e);
+    }
+  })();
+  return _strongsLoadPromise;
+}
+
 async function _doLandingStrongs(q, out) {
   if (!q) return;
   out.innerHTML = '<div class="bm-land-empty-line">Searching…</div>';
   const isStrongs = /^[GH]\d+$/i.test(q);
   try {
+    // Make sure the dictionaries are loaded before searching.
+    await _loadStrongsDicts();
+
     // ── Strong's-number lookup ────────────────────────────────────────────
     if (isStrongs) {
       const id = q.toUpperCase();
@@ -2691,7 +2717,7 @@ async function _doLandingStrongs(q, out) {
     const seen = new Set();
     const push = (it) => { if (it && it.strongs && !seen.has(it.strongs)) { seen.add(it.strongs); results.push(it); } };
 
-    // 1. In-memory dictionaries (fast, works offline)
+    // 1. In-memory dictionaries (fast, works offline once loaded)
     for (const it of _landingSearchInMemory(lq)) push(it);
 
     // 2. Firestore queries: exact lemma, exact xlit, kjv_def prefix
