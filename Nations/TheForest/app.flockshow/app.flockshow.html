@@ -71,17 +71,17 @@
     }
 
     html, body {
-      height: 100%; background: var(--fs-bg); color: var(--fs-ink);
+      min-height: 100%; background: var(--fs-bg); color: var(--fs-ink);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-      -webkit-font-smoothing: antialiased; overflow: hidden;
+      -webkit-font-smoothing: antialiased;
       overscroll-behavior: none;
     }
 
     /* ── Root grid ─────────────────────────────────────────────────────── */
     #fs-root {
       display: grid;
-      grid-template-rows: auto auto 1fr;
-      height: 100dvh;
+      grid-template-rows: auto auto 1fr auto;
+      min-height: 100dvh;
     }
 
     /* Subbar (Library/Editor tabs + Present) */

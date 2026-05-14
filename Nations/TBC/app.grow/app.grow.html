@@ -71,16 +71,17 @@
     /* ── Shell grid — mirrors .veil-wrap from new_covenant.css ─────────── */
     .gp-wrap {
       display: grid;
-      grid-template-areas: "top top" "side main";
+      grid-template-areas: "top top" "side main" "foot foot";
       grid-template-columns: var(--sidebar-w, 256px) 1fr;
-      grid-template-rows: calc(var(--topbar-h, 60px) + var(--safe-top, 0px)) 1fr;
-      height: 100dvh;
+      grid-template-rows: calc(var(--topbar-h, 60px) + var(--safe-top, 0px)) 1fr auto;
+      min-height: 100dvh;
       position: relative;
     }
     #gp-topbar-wrap  { grid-area: top; }
     #gp-sidebar-wrap { grid-area: side; overflow-y: auto; overflow-x: hidden; }
-    #gp-main         { grid-area: main; overflow-y: auto; overflow-x: hidden; padding: 24px 28px 120px; min-width: 0; }
+    #gp-main         { grid-area: main; overflow-y: auto; overflow-x: hidden; padding: 24px 28px 24px; min-width: 0; }
     #gp-main > *     { max-width: 1200px; margin-left: auto; margin-right: auto; }
+    #grow-footer     { grid-area: foot; }
 
     /* ── Topbar ──────────────────────────────────────────────────────────── */
     #gp-topbar-wrap { grid-area: top; display: flex; }

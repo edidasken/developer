@@ -55,20 +55,19 @@
     }
 
     html, body {
-      height: 100dvh;
+      min-height: 100dvh;
       margin: 0; padding: 0;
       background: #0c1445; /* matches topbar so iOS status bar band is dark */
       color: var(--ink, #1b264f);
       font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
       -webkit-font-smoothing: antialiased;
-      overflow: hidden;
       overscroll-behavior: none;
     }
-    /* Lock html/body and make #inv-shell the single scroll container.
+    /* #inv-shell is the single scroll container.
        overscroll-behavior: contain on the scroller reliably kills
        pull-to-refresh on iOS Safari without breaking page scroll. */
     #inv-shell {
-      height: 100dvh;
+      min-height: 100dvh;
       overflow-y: auto;
       overflow-x: hidden;
       overscroll-behavior: contain;

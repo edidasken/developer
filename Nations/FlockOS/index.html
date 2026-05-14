@@ -71,7 +71,6 @@
       -webkit-overflow-scrolling: touch;
       display: flex;
       flex-direction: column;
-      align-items: center;
       padding: 2rem 1.25rem calc(var(--safe-bot) + 2rem);
       gap: 2rem;
     }
@@ -83,7 +82,9 @@
       align-items: center;
       gap: 1rem;
       text-align: left;
-      align-self: flex-start;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
     }
     .church-id img {
       width: 80px; height: 80px;
@@ -113,6 +114,7 @@
     /* ── App sections ──────────────────────────────────────────────── */
     .app-sections {
       width: 100%;
+      margin: 0 auto;
       max-width: 420px;
       display: flex;
       flex-direction: column;

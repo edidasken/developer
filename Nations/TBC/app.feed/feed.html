@@ -80,20 +80,19 @@
     }
 
     html, body {
-      height: 100%;
+      min-height: 100%;
       background: var(--bm-bg);
       color: var(--bm-ink);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
-      overflow: hidden;
       overscroll-behavior: none;
     }
 
     /* ── Root grid ─────────────────────────────────────────────────────── */
     #bm-root {
       display: grid;
-      grid-template-rows: calc(var(--topbar-h) + var(--safe-top)) 1fr;
-      height: 100dvh;
+      grid-template-rows: calc(var(--topbar-h) + var(--safe-top)) 1fr auto;
+      min-height: 100dvh;
     }
 
     /* ════════════════════════════════════════════════════
