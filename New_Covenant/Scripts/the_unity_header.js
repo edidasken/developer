@@ -47,6 +47,7 @@ export function mountUnityHeader(host, cfg = {}) {
     user       = null,
     onSignOut  = null,
     onHamburger= null,
+    hideHamburger = false,
     extras     = [],
     avatarSrc  = 'Images/FlockIcon-192.png',
     signInHref = null,    // public/unauth apps: where to send the avatar click when no user
@@ -62,8 +63,10 @@ export function mountUnityHeader(host, cfg = {}) {
     `<button class="unity-action unity-extra" data-extra-idx="${i}" aria-label="${(x.aria || '').replace(/"/g, '&quot;')}" title="${(x.title || x.aria || '').replace(/"/g, '&quot;')}">${x.html || ''}</button>`
   ).join('');
 
+  const hamburgerHtml = hideHamburger ? '' : `<button class="unity-action unity-hamburger" data-act="menu" aria-label="Open menu">${ICONS.hamburger}</button>`;
+
   host.innerHTML = `
-    <button class="unity-action unity-hamburger" data-act="menu" aria-label="Open menu">${ICONS.hamburger}</button>
+    ${hamburgerHtml}
     <a class="unity-brand" data-act="home" href="${escapeAttr(homeHref)}" aria-label="${escapeAttr(appName)} home">
       <span class="unity-brand-icon" aria-hidden="true" style="background:linear-gradient(135deg, ${escapeAttr(appAccentDk)}, ${escapeAttr(appAccent)})">${appIconSvg}</span>
       <span class="unity-brand-text">${escapeHtml(appName)}</span>
