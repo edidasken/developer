@@ -217,10 +217,11 @@
 </head>
 <body>
   <div class="gp-wrap">
-    <!-- Topbar -->
-    <header id="gp-topbar-wrap" role="banner">
-      <div id="gp-topbar"></div>
-    </header>
+    <!-- Topbar (unity-header mounted by grow_public.js) -->
+    <header id="gp-topbar-wrap" class="unity-header" role="banner"></header>
+
+    <!-- Bespoke sign-in marketing dropdown — opened by the unity-header avatar via onAccount -->
+    <div id="gp-signin-dropdown" class="gp-signin-dropdown" role="menu" hidden></div>
 
     <!-- Sidebar -->
     <nav id="gp-sidebar-wrap" role="navigation" aria-label="GROW modules">

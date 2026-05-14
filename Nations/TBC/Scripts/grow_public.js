@@ -5,7 +5,7 @@
    ══════════════════════════════════════════════════════════════════════════════ */
 
 import { installScriptureLinks } from './the_scrolls/the_bible_link.js';
-import { mountSwitcher } from './the_app_switcher.js';
+import { mountUnityHeader } from './the_unity_header.js';
 
 /* ─── Module registry ────────────────────────────────────────────────────────
    Only public-safe modules. Excluded: Journal, Analytics, Certificates,
@@ -59,7 +59,7 @@ const NAV = [
 const ALL_MODULES = NAV.flatMap(g => g.items);
 
 /* ─── DOM handles ────────────────────────────────────────────────────────────*/
-const topbar = document.getElementById('gp-topbar');
+const topbar  = document.getElementById('gp-topbar-wrap');
 const sidebar = document.getElementById('gp-sidebar');
 const main    = document.getElementById('gp-main');
 
@@ -76,86 +76,78 @@ function go(name) {
   location.hash = name ? `#${name}` : '';
 }
 
-/* ─── Topbar ─────────────────────────────────────────────────────────────── */
-topbar.innerHTML = /* html */`
-  <button class="pillars-item gp-hamburger" id="gp-menu-btn" aria-label="Open menu" aria-expanded="false" style="width:44px;height:44px;padding:0;display:none;align-items:center;justify-content:center;flex:none;">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-      <line x1="3" y1="6"  x2="21" y2="6"/>
-      <line x1="3" y1="12" x2="21" y2="12"/>
-      <line x1="3" y1="18" x2="21" y2="18"/>
-    </svg>
-  </button>
-  <button class="veil-brand" id="gp-home-btn" aria-label="GROW home">
-    <span class="veil-brand-icon" aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#78350f,#d97706);color:#fff;margin-right:8px;vertical-align:middle">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-    </span>
-    <span class="veil-brand-text">GROW</span>
-  </button>
-  <span class="veil-spacer"></span>
-  <button id="gp-app-switcher" data-app-switcher data-app-switcher-current="grow" title="Switch app" aria-label="Switch app" style="margin-right:8px"></button>
-  <div class="gp-avatar-wrap" style="position:relative;">
-    <button class="veil-avatar" id="gp-signin-btn" aria-label="Sign in to FlockOS" aria-haspopup="true" aria-expanded="false">
-      <img class="veil-avatar-logo" alt="GROW" src="Images/GrowIcon.png" style="border-radius:10px;">
-    </button>
-    <div id="gp-signin-dropdown" class="gp-signin-dropdown" role="menu" hidden>
-      <div class="gp-signin-dropdown-inner">
-        <img src="Images/GrowIcon.png" alt="GROW" width="44" height="44" style="border-radius:12px;display:block;margin:0 auto 10px;">
-        <p class="gp-signin-title">Sign in to FlockOS</p>
-        <p class="gp-signin-sub">Unlock your journal, certificates, fellowship channels, and progress tracking.</p>
-        <a href="index.html" class="gp-cta gp-signin-cta">
-          Sign in
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-        <div style="margin-top:8px;">
-          <button id="gp-signup-btn" style="width:100%;padding:10px;border:1.5px solid var(--gold,#e8a838);border-radius:50px;background:transparent;color:var(--gold,#e8a838);font:600 0.84rem 'Plus Jakarta Sans',system-ui,sans-serif;cursor:pointer;transition:background .15s,color .15s;" onmouseover="this.style.background='var(--gold,#e8a838)';this.style.color='#0c1445'" onmouseout="this.style.background='transparent';this.style.color='var(--gold,#e8a838)'">
-            ✉️ Request Access
-          </button>
-        </div>
-        <p class="gp-signin-foot">Powered by <strong>FlockOS</strong></p>
-      </div>
+/* ─── Bespoke "Sign in to FlockOS" marketing dropdown ────────────────────── */
+const SIGNIN_DROPDOWN_HTML = /* html */`
+  <div class="gp-signin-dropdown-inner">
+    <img src="Images/GrowIcon.png" alt="GROW" width="44" height="44" style="border-radius:12px;display:block;margin:0 auto 10px;">
+    <p class="gp-signin-title">Sign in to FlockOS</p>
+    <p class="gp-signin-sub">Unlock your journal, certificates, fellowship channels, and progress tracking.</p>
+    <a href="index.html" class="gp-cta gp-signin-cta">
+      Sign in
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+    <div style="margin-top:8px;">
+      <button id="gp-signup-btn" style="width:100%;padding:10px;border:1.5px solid var(--gold,#e8a838);border-radius:50px;background:transparent;color:var(--gold,#e8a838);font:600 0.84rem 'Plus Jakarta Sans',system-ui,sans-serif;cursor:pointer;transition:background .15s,color .15s;" onmouseover="this.style.background='var(--gold,#e8a838)';this.style.color='#0c1445'" onmouseout="this.style.background='transparent';this.style.color='var(--gold,#e8a838)'">
+        ✉️ Request Access
+      </button>
     </div>
+    <p class="gp-signin-foot">Powered by <strong>FlockOS</strong></p>
   </div>
 `;
 
-/* ─── Brand home button ─────────────────────────────────────────────────── */
-(function() {
-  const homeBtn = document.getElementById('gp-home-btn');
-  if (homeBtn) homeBtn.addEventListener('click', () => go(''));
-  // Wire cross-app switcher
-  const sw = document.getElementById('gp-app-switcher');
-  if (sw) mountSwitcher(sw, { current: 'grow' });
-})();
+const _signinDropdown = document.getElementById('gp-signin-dropdown');
+if (_signinDropdown) _signinDropdown.innerHTML = SIGNIN_DROPDOWN_HTML;
 
-/* ─── Sign-in dropdown toggle ─────────────────────────────────────────────── */
-function _initSigninDropdown() {
-  const btn      = document.getElementById('gp-signin-btn');
-  const dropdown = document.getElementById('gp-signin-dropdown');
-  if (!btn || !dropdown) return;
-
-  function _open()  { dropdown.hidden = false; btn.setAttribute('aria-expanded','true'); }
-  function _close() { dropdown.hidden = true;  btn.setAttribute('aria-expanded','false'); }
-  function _toggle() { dropdown.hidden ? _open() : _close(); }
-
-  btn.addEventListener('click', (e) => { e.stopPropagation(); _toggle(); });
-
-  /* Close on outside click */
-  document.addEventListener('click', (e) => {
-    if (!dropdown.hidden && !dropdown.contains(e.target) && e.target !== btn) _close();
-  });
-
-  /* Close on Escape */
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') _close(); });
-
-  /* Request Access button */
+function _openSigninDropdown() {
+  if (!_signinDropdown) return;
+  _signinDropdown.hidden = false;
+  // Wire request-access button each open (idempotent — same node)
   const signupBtn = document.getElementById('gp-signup-btn');
-  if (signupBtn) {
+  if (signupBtn && !signupBtn._wired) {
+    signupBtn._wired = true;
     signupBtn.addEventListener('click', () => {
-      _close();
+      _closeSigninDropdown();
       _openOutreachModal('I\'d like to request access to FlockOS.', { name: 'signup', title: 'Request Access' });
     });
   }
 }
-_initSigninDropdown();
+function _closeSigninDropdown() {
+  if (_signinDropdown) _signinDropdown.hidden = true;
+}
+document.addEventListener('click', (e) => {
+  if (_signinDropdown && !_signinDropdown.hidden) {
+    const onAvatar = e.target.closest('.unity-avatar');
+    if (!_signinDropdown.contains(e.target) && !onAvatar) _closeSigninDropdown();
+  }
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') _closeSigninDropdown(); });
+
+/* ─── Unity header (shared chrome across every New Covenant app) ────────── */
+const GROW_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
+
+mountUnityHeader(topbar, {
+  appId:       'grow',
+  appName:     'GROW',
+  appIconSvg:  GROW_ICON,
+  appAccent:   '#d97706',
+  appAccentDk: '#78350f',
+  homeHref:    './',
+  user:        null,                             // GROW is public — no auth at this layer
+  avatarSrc:   'Images/GrowIcon.png',
+  onAccount:   () => {                           // override: open marketing sign-in dropdown
+    if (_signinDropdown && _signinDropdown.hidden) _openSigninDropdown();
+    else _closeSigninDropdown();
+  },
+  onHamburger: () => _toggleSidebar(),
+  features:    ALL_MODULES.map(m => ({
+    id:    `nav-${m.name}`,
+    label: m.title,
+    hint:  'Open module',
+    run:   () => go(m.name),
+  })).concat([
+    { id: 'nav-home', label: 'Home / Overview', hint: 'GROW dashboard', run: () => go('') },
+  ]),
+});
 
 /* ─── Sidebar ────────────────────────────────────────────────────────────── */
 function _sidebarHTML() {
@@ -323,23 +315,13 @@ sidebar.addEventListener('click', (e) => {
   go(btn.dataset.go);
 });
 
-/* ─── Topbar brand link → home ───────────────────────────────────────────── */
-topbar.querySelector('.veil-brand').addEventListener('click', (e) => {
-  e.preventDefault();
-  go('');
-});
-
-/* ─── Mobile hamburger ───────────────────────────────────────────────────── */
-const menuBtn = document.getElementById('gp-menu-btn');
+/* ─── Mobile sidebar toggle (driven by unity-header onHamburger) ─────────── */
 const sidePanel = document.getElementById('gp-sidebar-wrap');
 
 function _toggleSidebar(open) {
   _sidebarOpen = open ?? !_sidebarOpen;
   sidePanel.classList.toggle('gp-sidebar-open', _sidebarOpen);
-  menuBtn.setAttribute('aria-expanded', String(_sidebarOpen));
 }
-
-menuBtn.addEventListener('click', () => _toggleSidebar());
 
 /* Close sidebar when clicking the overlay backdrop */
 sidePanel.addEventListener('click', (e) => {
