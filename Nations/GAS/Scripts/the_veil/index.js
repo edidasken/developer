@@ -37,7 +37,8 @@ export async function dress() {
   document.addEventListener('click', (e) => {
     if (!document.body.classList.contains('veil-side-open')) return;
     const side = document.getElementById('the-veil-side');
-    if (side && !side.contains(e.target) && !e.target.closest('[data-act="toggle-side"]')) {
+    // Don't close if clicking the hamburger button or inside the sidebar
+    if (side && !side.contains(e.target) && !e.target.closest('[data-act="menu"]')) {
       document.body.classList.remove('veil-side-open');
     }
   });
