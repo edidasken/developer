@@ -356,14 +356,22 @@
     try {
       const snap = await _db.collection('users').orderBy('displayName').get();
       _allUsers = [];
+      console.log('[FlockChat] Loading users. Current user UID:', _me.uid);
       snap.forEach(doc => {
         const u = doc.data();
         u.uid = doc.id;
+        console.log('[FlockChat] User doc:', u.uid, u.displayName, u.email);
         // Don't include self
         if (u.uid !== _me.uid) {
           _allUsers.push(u);
         }
       });
+      console.log('[FlockChat] Loaded', _allUsers.length, 'other users (excluding self)');
+      
+      // If database only has current user, show helpful message
+      if (_allUsers.length === 0) {
+        _toast('No other members found. Invite team members to get started!', 'info');
+      }
     } catch (err) {
       console.error('[FlockChat] Failed to load users:', err);
       _toast('Failed to load members', 'error');
@@ -387,12 +395,15 @@
     list.innerHTML = users.map(u => {
       const name = u.displayName || u.email || 'Unknown';
       const initials = _initials(name);
+      const email = u.email || '';
+      // Escape quotes for onclick attribute
+      const safeName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
       return `
-        <div class="fc-user-item" data-uid="${u.uid}" data-name="${_e(name)}" onclick="window._createDirectMessage('${u.uid}', '${_e(name)}')">
+        <div class="fc-user-item" data-uid="${u.uid}" data-name="${_e(name)}" onclick="window._createDirectMessage('${u.uid}', '${safeName}')">
           <div class="fc-user-avatar">${initials}</div>
           <div class="fc-user-info">
             <div class="fc-user-name">${_e(name)}</div>
-            <div class="fc-user-email">${_e(u.email || '')}</div>
+            <div class="fc-user-email">${_e(email)}</div>
           </div>
         </div>
       `;
@@ -412,6 +423,14 @@
   window._createDirectMessage = async function(otherUid, otherName) {
     _closeNewConversationModal();
 
+    console.log('[FlockChat] Creating DM:', { me: _me.uid, other: otherUid, name: otherName });
+
+    // Validate
+    if (!otherUid || otherUid === _me.uid) {
+      _toast('Cannot create conversation with yourself', 'error');
+      return;
+    }
+
     try {
       // Check if DM already exists
       const existingSnap = await _db.collection('conversations')
@@ -428,12 +447,13 @@
       });
 
       if (existingConv) {
-        // Open existing conversation
+        console.log('[FlockChat] Found existing DM:', existingConv.id);
         window._openConversation(existingConv.id);
         return;
       }
 
       // Create new DM
+      console.log('[FlockChat] Creating new DM conversation...');
       const docRef = await _db.collection('conversations').add({
         type: 'dm',
         name: otherName,
@@ -450,12 +470,18 @@
         createdBy: _me.uid
       });
 
+      console.log('[FlockChat] DM created:', docRef.id);
       // Open new conversation
       window._openConversation(docRef.id);
       _toast('Conversation created!', 'success');
     } catch (err) {
       console.error('[FlockChat] Failed to create DM:', err);
-      _toast('Failed to create conversation', 'error');
+      console.error('[FlockChat] Error details:', {
+        code: err.code,
+        message: err.message,
+        stack: err.stack
+      });
+      _toast('Failed to create conversation: ' + (err.message || 'Unknown error'), 'error');
     }
   };
 
