@@ -84,7 +84,9 @@ export function mountUnityHeader(host, cfg = {}) {
 
   // Click delegation (with touch fallback for PWA)
   function handleAction(e) {
+    console.log('[UNITY-HEADER-DEBUG] handleAction called!', e.type);
     const btn = e.target.closest('[data-act],[data-extra-idx]');
+    console.log('[UNITY-HEADER-DEBUG] btn:', btn?.dataset?.act);
     if (!btn) return;
 
     if (btn.dataset.extraIdx != null) {
@@ -94,10 +96,18 @@ export function mountUnityHeader(host, cfg = {}) {
     }
 
     const act = btn.dataset.act;
+    console.log('[UNITY-HEADER-DEBUG] act:', act);
     if (act === 'menu') {
+      console.log('[UNITY-HEADER-DEBUG] MENU - Toggling sidebar!');
       e.preventDefault(); // Prevent double-fire in PWA
-      if (typeof onHamburger === 'function') onHamburger();
-      else document.body.classList.toggle('unity-side-open');
+      if (typeof onHamburger === 'function') {
+        console.log('[UNITY-HEADER-DEBUG] Calling onHamburger');
+        onHamburger();
+      } else {
+        console.log('[UNITY-HEADER-DEBUG] Toggling class');
+        document.body.classList.toggle('veil-side-open');
+      }
+      console.log('[UNITY-HEADER-DEBUG] After toggle:', document.body.classList.contains('veil-side-open'));
     } else if (act === 'home') {
       // Native anchor handles navigation; nothing to do
     } else if (act === 'search') {
