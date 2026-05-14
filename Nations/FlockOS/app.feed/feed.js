@@ -4233,7 +4233,7 @@ function _renderCounseling(body) {
 const BM_CREEDS = [
   // ── EARLY CHURCH ──
   { cat: 'Early Church', q: 'The Apostles\u2019 Creed (c. 2nd–4th century)',
-    a: 'I believe in God, the Father almighty, creator of heaven and earth.\n\nI believe in Jesus Christ, his only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried; he descended to the dead. On the third day he rose again; he ascended into heaven, he is seated at the right hand of the Father, and he will come to judge the living and the dead.\n\nI believe in the Holy Spirit, the holy catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and the life everlasting. Amen.',
+    a: 'I believe in God, the Father almighty, creator of heaven and earth.\n\nI believe in Jesus Christ, his only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried; he descended to the dead. On the third day he rose again; he ascended into heaven, he is seated at the right hand of the Father, and he will come to judge the living and the dead.\n\nI believe in the Holy Spirit, the holy Christian Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and the life everlasting. Amen.',
     v: [
       ['1 Corinthians 15:3-4', 'Christ died for our sins in accordance with the Scriptures, that he was buried, that he was raised on the third day in accordance with the Scriptures.'],
       ['Acts 1:11', 'This Jesus, who was taken up from you into heaven, will come in the same way as you saw him go into heaven.'],
@@ -4241,7 +4241,7 @@ const BM_CREEDS = [
     ]
   },
   { cat: 'Early Church', q: 'The Nicene Creed (325 / 381)',
-    a: 'We believe in one God, the Father almighty, maker of heaven and earth, of all things visible and invisible.\n\nAnd in one Lord Jesus Christ, the only begotten Son of God, begotten of the Father before all worlds; God of God, Light of Light, very God of very God; begotten, not made, being of one substance (homoousios) with the Father, by whom all things were made. Who, for us men and for our salvation, came down from heaven, and was incarnate by the Holy Spirit of the Virgin Mary, and was made man; and was crucified also for us under Pontius Pilate; he suffered and was buried; and the third day he rose again, according to the Scriptures; and ascended into heaven, and sits at the right hand of the Father; and he shall come again, with glory, to judge both the living and the dead; whose kingdom shall have no end.\n\nAnd we believe in the Holy Spirit, the Lord and Giver of Life, who proceeds from the Father (and the Son), who with the Father and the Son together is worshiped and glorified, who spoke by the prophets.\n\nAnd we believe in one holy catholic and apostolic Church. We acknowledge one baptism for the remission of sins. And we look for the resurrection of the dead, and the life of the world to come. Amen.',
+    a: 'We believe in one God, the Father almighty, maker of heaven and earth, of all things visible and invisible.\n\nAnd in one Lord Jesus Christ, the only begotten Son of God, begotten of the Father before all worlds; God of God, Light of Light, very God of very God; begotten, not made, being of one substance (homoousios) with the Father, by whom all things were made. Who, for us men and for our salvation, came down from heaven, and was incarnate by the Holy Spirit of the Virgin Mary, and was made man; and was crucified also for us under Pontius Pilate; he suffered and was buried; and the third day he rose again, according to the Scriptures; and ascended into heaven, and sits at the right hand of the Father; and he shall come again, with glory, to judge both the living and the dead; whose kingdom shall have no end.\n\nAnd we believe in the Holy Spirit, the Lord and Giver of Life, who proceeds from the Father (and the Son), who with the Father and the Son together is worshiped and glorified, who spoke by the prophets.\n\nAnd we believe in one holy Christian and apostolic Church. We acknowledge one baptism for the remission of sins. And we look for the resurrection of the dead, and the life of the world to come. Amen.',
     v: [
       ['John 1:1-3', 'In the beginning was the Word, and the Word was with God, and the Word was God... All things were made through him, and without him was not any thing made that was made.'],
       ['Colossians 1:15-17', 'He is the image of the invisible God, the firstborn of all creation. For by him all things were created... all things were created through him and for him.'],
@@ -4257,7 +4257,7 @@ const BM_CREEDS = [
     ]
   },
   { cat: 'Early Church', q: 'The Athanasian Creed (excerpt)',
-    a: 'Whoever desires to be saved must, above all, hold the catholic faith. And the catholic faith is this: that we worship one God in Trinity, and Trinity in Unity, neither confounding the persons, nor dividing the substance.\n\nFor there is one person of the Father, another of the Son, and another of the Holy Spirit. But the Godhead of the Father, of the Son, and of the Holy Spirit is all one: the glory equal, the majesty coeternal. Such as the Father is, such is the Son, and such is the Holy Spirit. The Father uncreated, the Son uncreated, and the Holy Spirit uncreated... And yet they are not three eternals, but one Eternal... So the Father is God, the Son is God, and the Holy Spirit is God. And yet they are not three Gods, but one God.',
+    a: 'Whoever desires to be saved must, above all, hold the Christian faith. And the Christian faith is this: that we worship one God in Trinity, and Trinity in Unity, neither confounding the persons, nor dividing the substance.\n\nFor there is one person of the Father, another of the Son, and another of the Holy Spirit. But the Godhead of the Father, of the Son, and of the Holy Spirit is all one: the glory equal, the majesty coeternal. Such as the Father is, such is the Son, and such is the Holy Spirit. The Father uncreated, the Son uncreated, and the Holy Spirit uncreated... And yet they are not three eternals, but one Eternal... So the Father is God, the Son is God, and the Holy Spirit is God. And yet they are not three Gods, but one God.',
     v: [
       ['Matthew 28:19', 'Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit.'],
       ['2 Corinthians 13:14', 'The grace of the Lord Jesus Christ and the love of God and the fellowship of the Holy Spirit be with you all.'],
@@ -4686,15 +4686,6 @@ const BM_PRAYERS = [
       ['Colossians 3:11', 'But Christ is all, and in all.'],
     ]
   },
-  { cat: 'Daily Prayer', q: 'Prayer of St. Francis',
-    a: 'Lord, make me an instrument of your peace.\nWhere there is hatred, let me sow love;\nwhere there is injury, pardon;\nwhere there is doubt, faith;\nwhere there is despair, hope;\nwhere there is darkness, light;\nwhere there is sadness, joy.\n\nO Divine Master, grant that I may not so much seek\nto be consoled, as to console;\nto be understood, as to understand;\nto be loved, as to love.\nFor it is in giving that we receive;\nit is in pardoning that we are pardoned;\nand it is in dying that we are born to eternal life. Amen.',
-    v: [
-      ['Matthew 5:9', 'Blessed are the peacemakers, for they shall be called sons of God.'],
-      ['Romans 12:18', 'If possible, so far as it depends on you, live peaceably with all.'],
-      ['Luke 6:38', 'Give, and it will be given to you.'],
-    ]
-  },
-
   // ── PASTORAL ──
   { cat: 'Pastoral Prayer', q: 'Prayer for those who suffer',
     a: 'Almighty God, whose Son Jesus Christ lived among us as one acquainted with grief: look with mercy on all who suffer in body, mind, or spirit. Comfort them with the knowledge of your love; lift up those who are bowed down; bind up the broken-hearted; and grant that, in the fellowship of his sufferings, they may find the surpassing peace of his presence; through Jesus Christ our Lord. Amen.',
