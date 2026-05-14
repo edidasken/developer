@@ -3480,6 +3480,62 @@ function _quotesSave(list) {
   try { localStorage.setItem(BM_QUOTE_KEY, JSON.stringify(list)); } catch (_) {}
 }
 
+// Library cache (Firestore-backed, read-once per page load)
+const _libCache = { quotes: null, illustrations: null, loadingPromise: null };
+
+async function _loadLibrary() {
+  if (_libCache.quotes && _libCache.illustrations) return _libCache;
+  if (_libCache.loadingPromise) return _libCache.loadingPromise;
+  _libCache.loadingPromise = (async () => {
+    try {
+      // Make sure Firestore is wired up via UpperRoom (mirrors the lex pattern).
+      if (window.UpperRoom && typeof window.UpperRoom.waitReady === 'function') {
+        try { await window.UpperRoom.waitReady(); } catch (_) {}
+      }
+      if (typeof firebase === 'undefined' || !firebase.firestore) {
+        _libCache.quotes = []; _libCache.illustrations = [];
+        return _libCache;
+      }
+      const db = firebase.firestore();
+      const [qSnap, iSnap] = await Promise.all([
+        db.collection('quotes').get().catch(e => { console.warn('[TheFeed] quotes load failed:', e); return null; }),
+        db.collection('illustrations').get().catch(e => { console.warn('[TheFeed] illustrations load failed:', e); return null; }),
+      ]);
+      const norm = (snap, kind) => {
+        if (!snap) return [];
+        const out = [];
+        snap.forEach(doc => {
+          const d = doc.data() || {};
+          out.push({
+            id: doc.id,
+            kind,
+            text: d.text || '',
+            source: d.source || (d.author ? d.author : '') || (d.passage ? d.passage : ''),
+            author: d.author || '',
+            title: d.title || '',
+            passage: d.passage || '',
+            book: d.book || '',
+            tags: Array.isArray(d.tags) ? d.tags : (d.tag ? [d.tag] : []),
+            scriptureRefs: Array.isArray(d.scriptureRefs) ? d.scriptureRefs : [],
+            isLibrary: true,
+          });
+        });
+        return out;
+      };
+      _libCache.quotes        = norm(qSnap, 'quote');
+      _libCache.illustrations = norm(iSnap, 'illustration');
+    } catch (e) {
+      console.warn('[TheFeed] library load error:', e);
+      _libCache.quotes = _libCache.quotes || [];
+      _libCache.illustrations = _libCache.illustrations || [];
+    } finally {
+      _libCache.loadingPromise = null;
+    }
+    return _libCache;
+  })();
+  return _libCache.loadingPromise;
+}
+
 function _renderQuotes(body) {
   body.innerHTML = `
     <div class="bm-tool-section-h">Add a quote or illustration</div>
@@ -3496,12 +3552,21 @@ function _renderQuotes(body) {
     </div>
     <div style="display:flex;gap:8px;align-items:center;">
       <button class="bm-btn bm-btn--primary bm-btn--sm" id="bm-quote-save">Save quote</button>
-      <span style="color:var(--bm-faint);font:0.74rem 'Plus Jakarta Sans',sans-serif;">Stored in this browser. Sync coming.</span>
+      <span style="color:var(--bm-faint);font:0.74rem 'Plus Jakarta Sans',sans-serif;">Saved here syncs only to this browser. Library is shared.</span>
     </div>
-    <div class="bm-tool-section-h" style="margin-top:14px;">Saved (<span id="bm-quote-count">0</span>)</div>
-    <input class="bm-tool-input" id="bm-quote-search" type="text" placeholder="Search saved quotes…">
+    <div class="bm-tool-section-h" style="margin-top:14px;display:flex;align-items:center;gap:8px;">
+      <span>Library &amp; Saved (<span id="bm-quote-count">0</span>)</span>
+      <span style="margin-left:auto;display:inline-flex;gap:4px;" id="bm-quote-tabs">
+        <button class="bm-btn bm-btn--sm bm-quote-tab" data-tab="all"   aria-pressed="true">All</button>
+        <button class="bm-btn bm-btn--sm bm-quote-tab" data-tab="mine"  aria-pressed="false">Mine</button>
+        <button class="bm-btn bm-btn--sm bm-quote-tab" data-tab="quote" aria-pressed="false">Quotes</button>
+        <button class="bm-btn bm-btn--sm bm-quote-tab" data-tab="illustration" aria-pressed="false">Illustrations</button>
+      </span>
+    </div>
+    <input class="bm-tool-input" id="bm-quote-search" type="text" placeholder="Search library &amp; saved…">
     <div id="bm-quote-list" style="display:flex;flex-direction:column;gap:8px;"></div>
   `;
+  body.dataset.tab = 'all';
   const txt    = body.querySelector('#bm-quote-text');
   const src    = body.querySelector('#bm-quote-source');
   const tag    = body.querySelector('#bm-quote-tag');
@@ -3524,50 +3589,134 @@ function _renderQuotes(body) {
     if (typeof _toast === 'function') _toast('Quote saved.', 'success');
   });
   search.addEventListener('input', () => _quotesRender(body, search.value));
+  body.querySelectorAll('.bm-quote-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      body.dataset.tab = btn.dataset.tab || 'all';
+      body.querySelectorAll('.bm-quote-tab').forEach(b =>
+        b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+      _quotesRender(body, search.value);
+    });
+  });
   _quotesRender(body, '');
+  // Kick off the async library load; re-render when ready.
+  _loadLibrary().then(() => _quotesRender(body, body.querySelector('#bm-quote-search').value));
 }
 
 function _quotesRender(body, query) {
-  const list = _quotesLoad();
+  const mine = _quotesLoad().map(it => ({
+    id: it.id,
+    kind: 'mine',
+    text: it.text || '',
+    source: it.source || '',
+    author: '',
+    title: '',
+    passage: '',
+    tags: it.tag ? [it.tag] : [],
+    scriptureRefs: [],
+    createdAt: it.createdAt || 0,
+    isMine: true,
+  }));
+  const lib = _libCache;
+  const libQuotes = (lib && Array.isArray(lib.quotes)) ? lib.quotes : [];
+  const libIllus  = (lib && Array.isArray(lib.illustrations)) ? lib.illustrations : [];
+  const tab = body.dataset.tab || 'all';
+  let combined;
+  if (tab === 'mine')         combined = mine;
+  else if (tab === 'quote')   combined = [...mine, ...libQuotes];
+  else if (tab === 'illustration') combined = libIllus;
+  else                        combined = [...mine, ...libQuotes, ...libIllus];
+
   const target = body.querySelector('#bm-quote-list');
   const count  = body.querySelector('#bm-quote-count');
-  if (count) count.textContent = String(list.length);
-  if (!list.length) {
-    target.innerHTML = `<div class="bm-tool-empty">No quotes saved yet. Add one above to start your library.</div>`;
+  if (count) count.textContent = String(combined.length);
+  if (!combined.length) {
+    const msg = (lib && lib.loadingPromise) ? 'Loading library…' :
+      (tab === 'mine' ? 'No quotes saved yet. Add one above to start your library.' :
+                       'No items to show.');
+    target.innerHTML = `<div class="bm-tool-empty">${_e(msg)}</div>`;
     return;
   }
   const q = String(query || '').toLowerCase().trim();
-  const filtered = !q ? list : list.filter(it =>
-    (it.text || '').toLowerCase().includes(q) ||
-    (it.source || '').toLowerCase().includes(q) ||
-    (it.tag || '').toLowerCase().includes(q)
-  );
+  const matches = (it) => {
+    if (!q) return true;
+    return (it.text || '').toLowerCase().includes(q)
+        || (it.source || '').toLowerCase().includes(q)
+        || (it.author || '').toLowerCase().includes(q)
+        || (it.title || '').toLowerCase().includes(q)
+        || (it.passage || '').toLowerCase().includes(q)
+        || (Array.isArray(it.tags) && it.tags.some(t => String(t).toLowerCase().includes(q)))
+        || (Array.isArray(it.scriptureRefs) && it.scriptureRefs.some(r => String(r).toLowerCase().includes(q)));
+  };
+  const filtered = combined.filter(matches);
   if (!filtered.length) { target.innerHTML = `<div class="bm-tool-empty">No matches for "${_e(query)}".</div>`; return; }
-  target.innerHTML = filtered.map(it => `
-    <div class="bm-quote-card" data-id="${_e(it.id)}">
+  target.innerHTML = filtered.map(it => {
+    const isMine = !!it.isMine;
+    const badge = isMine ? '<span class="bm-quote-meta-tag" style="background:#e7f3ff;color:#1366c4;">Mine</span>'
+      : (it.kind === 'illustration'
+          ? '<span class="bm-quote-meta-tag" style="background:#fff2d6;color:#9a6800;">Illustration</span>'
+          : '<span class="bm-quote-meta-tag" style="background:#eef7e8;color:#2d6a1c;">Library</span>');
+    const headLine = it.title ? `<div style="font-weight:600;margin-bottom:4px;">${_e(it.title)}</div>` : '';
+    const sourceLabel = it.source || it.author || it.passage || '';
+    const tagBits = (Array.isArray(it.tags) ? it.tags : []).slice(0, 4)
+      .map(t => `<span class="bm-quote-meta-tag">${_e(t)}</span>`).join('');
+    return `
+    <div class="bm-quote-card" data-id="${_e(it.id)}" data-kind="${_e(isMine ? 'mine' : it.kind)}">
+      ${headLine}
       <div class="bm-quote-text">${_e(it.text)}</div>
       <div class="bm-quote-meta">
-        ${it.source ? `<span>— ${_e(it.source)}</span>` : ''}
-        ${it.tag ? `<span class="bm-quote-meta-tag">${_e(it.tag)}</span>` : ''}
-        <span style="margin-left:auto;">${_e(_fmtAgo(it.createdAt))}</span>
+        ${sourceLabel ? `<span>— ${_e(sourceLabel)}</span>` : ''}
+        ${tagBits}
+        ${badge}
+        ${isMine && it.createdAt ? `<span style="margin-left:auto;">${_e(_fmtAgo(it.createdAt))}</span>` : '<span style="margin-left:auto;"></span>'}
       </div>
       <div class="bm-quote-actions">
-        <button class="bm-quote-copy" title="Copy quote">Copy</button>
-        <button class="bm-quote-del" title="Delete quote">Delete</button>
+        <button class="bm-quote-copy" title="Copy">Copy</button>
+        ${isMine
+          ? '<button class="bm-quote-del" title="Delete">Delete</button>'
+          : '<button class="bm-quote-savemine" title="Save to my list">Save to Mine</button>'}
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
   target.querySelectorAll('.bm-quote-card').forEach(card => {
-    const id = card.dataset.id;
-    card.querySelector('.bm-quote-copy').addEventListener('click', () => {
-      const item = _quotesLoad().find(x => x.id === id);
-      if (!item) return;
-      const text = '"' + item.text + '"' + (item.source ? '\n— ' + item.source : '');
+    const id   = card.dataset.id;
+    const kind = card.dataset.kind;
+    const find = () => {
+      if (kind === 'mine') return mine.find(x => x.id === id);
+      if (kind === 'illustration') return libIllus.find(x => x.id === id);
+      return libQuotes.find(x => x.id === id);
+    };
+    const copyBtn = card.querySelector('.bm-quote-copy');
+    if (copyBtn) copyBtn.addEventListener('click', () => {
+      const item = find(); if (!item) return;
+      const tail = item.source || item.author || item.passage || '';
+      const text = '"' + item.text + '"' + (tail ? '\n— ' + tail : '');
       try { navigator.clipboard.writeText(text); if (typeof _toast === 'function') _toast('Copied.', 'success'); } catch (_) {}
     });
-    card.querySelector('.bm-quote-del').addEventListener('click', () => {
+    const delBtn = card.querySelector('.bm-quote-del');
+    if (delBtn) delBtn.addEventListener('click', () => {
       const next = _quotesLoad().filter(x => x.id !== id);
       _quotesSave(next);
+      _quotesRender(body, body.querySelector('#bm-quote-search').value);
+    });
+    const saveBtn = card.querySelector('.bm-quote-savemine');
+    if (saveBtn) saveBtn.addEventListener('click', () => {
+      const item = find(); if (!item) return;
+      const list = _quotesLoad();
+      // De-dupe by source library id.
+      if (list.some(x => x.fromLibraryId === id)) {
+        if (typeof _toast === 'function') _toast('Already in your list.', 'info');
+        return;
+      }
+      list.unshift({
+        id: 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+        fromLibraryId: id,
+        text: item.text,
+        source: item.source || item.author || item.passage || '',
+        tag: (item.tags && item.tags[0]) || '',
+        createdAt: Date.now(),
+      });
+      _quotesSave(list);
+      if (typeof _toast === 'function') _toast('Saved to your list.', 'success');
       _quotesRender(body, body.querySelector('#bm-quote-search').value);
     });
   });

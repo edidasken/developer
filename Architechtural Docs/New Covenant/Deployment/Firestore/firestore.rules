@@ -1154,6 +1154,17 @@ service cloud.firestore {
         allow read: if isSignedIn();
         allow write: if isSignedIn();
       }
+      // ── FEED Library: curated quotes + illustrations ────────────────
+      // Read: any signed-in user. Write: any signed-in user
+      // (admin/seed scripts and TheTruth gate edits at the app layer).
+      match /quotes/{docId} {
+        allow read: if isSignedIn();
+        allow write: if isSignedIn();
+      }
+      match /illustrations/{docId} {
+        allow read: if isSignedIn();
+        allow write: if isSignedIn();
+      }
 
     // ═══════════════════════════════════════════════════════════════════
     // GLOBAL COLLECTIONS
