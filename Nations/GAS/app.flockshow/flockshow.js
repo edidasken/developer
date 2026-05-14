@@ -1173,7 +1173,7 @@ function _wire() {
   /* ── Import lyrics ── */
   document.getElementById('fs-import-btn')?.addEventListener('click', _importLyrics);
 
-  /* ── From Flock Stand song picker ── */
+  /* ── From FlockStand song picker ── */
   document.getElementById('fs-from-stand-btn')?.addEventListener('click', _openSongPicker);
   document.getElementById('fs-sp-close')?.addEventListener('click', _closeSongPicker);
   document.getElementById('fs-sp-backdrop')?.addEventListener('click', _closeSongPicker);
@@ -1197,7 +1197,7 @@ function _wire() {
   });
 }
 
-// ── Flock Stand song picker ───────────────────────────────────────────────────
+// ── FlockStand song picker ───────────────────────────────────────────────────
 let _spAllSongs = [];   // full list fetched from UpperRoom
 let _spLoaded = false;
 
@@ -1224,7 +1224,7 @@ async function _loadSongPickerSongs() {
   try {
     const UR = window.UpperRoom;
     if (!UR || typeof UR.listSongs !== 'function') {
-      if (statusEl) statusEl.textContent = 'Flock Stand library unavailable.';
+      if (statusEl) statusEl.textContent = 'FlockStand library unavailable.';
       return;
     }
     // listSongs returns paginated — fetch up to 500 rows

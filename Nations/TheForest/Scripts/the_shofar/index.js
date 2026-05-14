@@ -4,7 +4,7 @@
 // ==========================================
 // Renders inside the modal-body-container.
 // Provides: Song CRUD, Arrangement CRUD, setlist assignment,
-// live Flock Stand chord-chart view, and PDF lead-sheet export.
+// live FlockStand chord-chart view, and PDF lead-sheet export.
 //
 // Backend: Songs.gs on FLOCK (via TheVine)
 // Actions:
@@ -26,7 +26,7 @@ const musicStandAppState = {
     currentArrangement: null,
     editorMode: 'create',   // 'create' | 'edit'
     activeTab: 'songs',     // 'songs' | 'stand'
-    standIndex: 0,          // current song index in Flock Stand view
+    standIndex: 0,          // current song index in FlockStand view
     standSemitones: {},     // keyed by setlist item index → semitone offset
     sectionVisibility: {}   // keyed by setlist item index → { secId: bool }
 };
@@ -266,7 +266,7 @@ function msEnsureStyles() {
         '.ms-close-btn { background:none; border:none; color:#6b7280; font-size:1.2rem; cursor:pointer; padding:0 4px; }',
         '.ms-close-btn:hover { color:#111827; }',
 
-        /* Flock Stand full-screen view */
+        /* FlockStand full-screen view */
         '.ms-stand-view { min-height:60vh; }',
         '.ms-stand-header { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.12); margin-bottom:16px; }',
         '.ms-stand-song-title { font-family:Merriweather,serif; font-size:1.8rem; color:#fff; margin:0; }',
@@ -470,13 +470,13 @@ function msRenderShell() {
     container.innerHTML =
         '<div class="ms-app">' +
             '<div class="ms-card" style="text-align:center;">' +
-                '<h2 class="ms-title">Flock Stand</h2>' +
+                '<h2 class="ms-title">FlockStand</h2>' +
                 '<p class="ms-subtitle">Manage your song library, chord charts, and setlists</p>' +
             '</div>' +
 
             '<div class="ms-tabs">' +
                 '<button class="ms-tab-btn ms-active" data-ms-tab="songs">Song Library</button>' +
-                '<button class="ms-tab-btn" data-ms-tab="stand">Flock Stand</button>' +
+                '<button class="ms-tab-btn" data-ms-tab="stand">FlockStand</button>' +
             '</div>' +
 
             '<div id="ms-tab-songs"></div>' +
@@ -1540,7 +1540,7 @@ function msRenderStandTab() {
         return;
     }
 
-    // Render the Flock Stand
+    // Render the FlockStand
     msRenderStandView();
 }
 

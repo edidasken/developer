@@ -2832,7 +2832,7 @@ const Modules = (() => {
       + '<div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;">'
       + _statusBadge(planData.status || 'Draft')
       + '<button onclick="Modules._svcEditPlan()" style="font-size:0.78rem;padding:6px 12px;border:1px solid var(--line);border-radius:7px;background:none;color:var(--ink-muted);cursor:pointer;font-family:inherit;">Edit</button>'
-      + '<button onclick="Modules._musicStandView()" style="font-size:0.78rem;padding:6px 14px;border:none;border-radius:7px;background:var(--accent);color:var(--ink-inverse);cursor:pointer;font-family:inherit;font-weight:600;">&#9835; Flock Stand</button>'
+      + '<button onclick="Modules._musicStandView()" style="font-size:0.78rem;padding:6px 14px;border:none;border-radius:7px;background:var(--accent);color:var(--ink-inverse);cursor:pointer;font-family:inherit;font-weight:600;">&#9835; FlockStand</button>'
       + '</div></div>'
       + (function() {
         var details = [];
@@ -2948,7 +2948,7 @@ const Modules = (() => {
             + '<div style="display:flex;align-items:center;gap:4px;padding:12px 12px 12px 4px;flex-shrink:0;">'
             + (isSong
                 ? '<button onclick="Modules._showSongStand(\'' + _e(String(it.songId||it.id||'')) + '\')" '
-                  + 'title="Flock Stand" '
+                  + 'title="FlockStand" '
                   + 'style="background:none;border:1px solid '+color+'55;border-radius:6px;padding:5px 9px;'
                   + 'cursor:pointer;color:'+color+';font-size:0.82rem;line-height:1;">&#9835;</button>'
                   + '<button onclick="Modules._setlistEdit(\''+rid+'\')" '
@@ -3182,7 +3182,7 @@ const Modules = (() => {
 
   async function _musicStandView(planId) {
     var pid = planId || _svcViewPlanId || _svcActivePlanId;
-    if (!pid) { _toast('Please select a service to open Flock Stand.', 'warn'); return; }
+    if (!pid) { _toast('Please select a service to open FlockStand.', 'warn'); return; }
     try {
       var res     = await TheVine.flock.call('musicStand.get', { planId: pid });
       var setlist = (res && Array.isArray(res.setlist)) ? res.setlist : [];
@@ -3194,7 +3194,7 @@ const Modules = (() => {
     } catch(e) { _toast('Error: ' + e.message, 'danger'); }
   }
 
-  // ── Flock Stand shared state ──────────────────────────────────────────────
+  // ── FlockStand shared state ──────────────────────────────────────────────
   var _standArrs      = [];
   var _standSong      = null;
   var _standSetlist   = [];
@@ -3525,7 +3525,7 @@ const Modules = (() => {
     if (arr) _standRenderSong(_standSong, arr);
   }
 
-  // ── Single-song Flock Stand (from Songs or Arrangements tab) ─────────────
+  // ── Single-song FlockStand (from Songs or Arrangements tab) ─────────────
   async function _showSongStand(songId, arrId) {
     _standBuildOverlay(false);
     const body = document.getElementById('stand-body');
@@ -3547,7 +3547,7 @@ const Modules = (() => {
     }
   }
 
-  // ── Flock Stand control functions ───────────────────────────────────────────
+  // ── FlockStand control functions ───────────────────────────────────────────
   function _standClose() {
     var ov = document.getElementById('fl-stand-overlay');
     if (ov) ov.remove();
@@ -3670,7 +3670,7 @@ const Modules = (() => {
       + (genre  ? '<span>' + _e(genre) + '</span>' : '')
       + (r.ccliNumber ? '<span>CCLI&nbsp;' + _e(r.ccliNumber) + '</span>' : '')
       + '</div></div>'
-      + '<button onclick="event.stopPropagation();Modules._showSongStand(\'' + rid + '\')" title="Open in Flock Stand" '
+      + '<button onclick="event.stopPropagation();Modules._showSongStand(\'' + rid + '\')" title="Open in FlockStand" '
       + 'style="font-size:0.82rem;padding:5px 10px;border:1px solid var(--line);border-radius:6px;background:none;color:var(--ink-muted);cursor:pointer;font-family:inherit;white-space:nowrap;">&#9835; Stand</button>'
       + '<button onclick="event.stopPropagation();Modules.editSong(\'' + rid + '\')" '
       + 'style="font-size:0.72rem;padding:5px 9px;border:1px solid var(--line);border-radius:6px;background:none;color:var(--ink-muted);cursor:pointer;font-family:inherit;">Edit</button>'
@@ -20523,7 +20523,7 @@ const Modules = (() => {
       { icon: '&#128270;',       label: 'Audit Log',         nav: 'audit' },
       { icon: '&#128030;',       label: 'Problems',          nav: 'problems' },
       { icon: '&#128591;',       label: 'Prayers',           nav: 'prayer-admin' },
-      { icon: '&#127925;',       label: 'Flock Stand',       nav: 'service-hub' },
+      { icon: '&#127925;',       label: 'FlockStand',       nav: 'service-hub' },
       { icon: '&#128197;',       label: 'Calendar',          nav: 'calendar' },
       { icon: '&#128100;',       label: 'Directory',         nav: 'directory' },
       { icon: '&#128640;',       label: 'Deploy Guide',      nav: 'deployment-guide' },

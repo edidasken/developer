@@ -41,7 +41,7 @@ export const NC_APPS = [
   { id: 'grow',      name: 'GROW',           sub: 'Discipleship & Bible study',     href: 'app.grow/app.grow.html',         tone: 'gold'   },
   { id: 'invite',    name: 'The Invitation', sub: 'Share the hope of Jesus Christ', href: 'app.invite/app.invite.html',     tone: 'green'  },
   { id: 'flockos',   name: 'FlockOS',        sub: 'Church management',              href: 'app.flockos/app.flockos.html',   tone: 'blue'   },
-  { id: 'stand',     name: 'Flock Stand',    sub: 'Songs, setlists & live',         href: 'app.stand/',                     tone: 'purple' },
+  { id: 'stand',     name: 'FlockStand',    sub: 'Songs, setlists & live',         href: 'app.stand/',                     tone: 'purple' },
   { id: 'flockshow', name: 'FlockShow',      sub: 'Worship slides & service',       href: 'app.flockshow/app.flockshow.html', tone: 'red'  },
   { id: 'flockchat', name: 'FlockChat',      sub: 'Messaging & prayer chain',       href: 'app.flockchat/app.flockchat.html', tone: 'cyan' },
   { id: 'feed',      name: 'FEED',           sub: 'Sermon prep & study tools',      href: 'app.feed/',                      tone: 'gold'   },

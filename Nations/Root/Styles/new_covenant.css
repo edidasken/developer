@@ -8953,9 +8953,9 @@ body.veil-app {
    fully into view with breathing room. */
 .veil-wrap {
   display: grid !important;
-  grid-template-areas: "top top" "side main" !important;
+  grid-template-areas: "top top" "side main" "foot foot" !important;
   grid-template-columns: var(--sidebar-w, 256px) 1fr !important;
-  grid-template-rows: calc(var(--topbar-h, 60px) + var(--safe-top, 0px)) 1fr !important;
+  grid-template-rows: calc(var(--topbar-h, 60px) + var(--safe-top, 0px)) 1fr auto !important;
   height: 100dvh !important;
   min-height: 0 !important;
   background: var(--bg, #f7f8fb);
@@ -8972,7 +8972,7 @@ body.veil-app {
 .veil-wrap > .veil-main,
 .veil-wrap > #the-holy-place { grid-area: main !important; min-width: 0; }
 .veil-wrap > .veil-foot,
-.veil-wrap > #the-veil-foot  { grid-area: foot; }
+.veil-wrap > #the-veil-foot  { grid-area: foot !important; }
 
 /* Computed bottom-clearance: footer height + iOS safe-area + 120px breathing
    room so the last card can scroll well up into the viewport. */
@@ -11212,16 +11212,12 @@ flock-tabs [role="tablist"], .tabs-bar {
 /* ─── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 860px) {
   .veil-wrap {
-    grid-template-areas: "top" "main" !important;
+    grid-template-areas: "top" "main" "foot" !important;
     grid-template-columns: 1fr !important;
+    grid-template-rows: calc(var(--topbar-h, 60px) + var(--safe-top, 0px)) 1fr auto !important;
   }
   #the-veil-side { display: none !important; }
   .veil-menu { display: inline-flex !important; }
-
-  /* Footer is desktop-only chrome — on mobile it just wraps over content
-     and steals real estate. Hide it and give main generous bottom headroom
-     so the last card can scroll well up into the viewport. */
-  .veil-foot { display: none !important; }
   .veil-main, .veil-side {
     padding-bottom: calc(var(--safe-bottom, 0px) + 200px) !important;
   }

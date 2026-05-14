@@ -6,7 +6,7 @@
   <base href="../">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
-  <title>Flock Stand — FlockOS</title>
+  <title>FlockStand — FlockOS</title>
 
   <!-- PWA -->
   <link rel="manifest" href="app.stand/manifest.json">
@@ -15,11 +15,11 @@
   <meta name="theme-color" content="#a855f7">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Flock Stand">
+  <meta name="apple-mobile-web-app-title" content="FlockStand">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <!-- SEO -->
-  <meta name="description" content="FlockOS Flock Stand — the worship team's complete digital music stand. Song library, service plans, live presenter, key transposition, Nashville Number System, chord diagrams, and imports from CCLI SongSelect and Planning Center.">
+  <meta name="description" content="FlockOS FlockStand — the worship team's complete digital music stand. Song library, service plans, live presenter, key transposition, Nashville Number System, chord diagrams, and imports from CCLI SongSelect and Planning Center.">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,7 +44,7 @@
     })();
   </script>
 
-  <!-- App CSS — one source of truth: new_covenant.css (includes all Flock Stand + AG styles) -->
+  <!-- App CSS — one source of truth: new_covenant.css (includes all FlockStand + AG styles) -->
   <link rel="stylesheet" href="Styles/new_covenant.css">
 
   <!-- Flash prevention + base vars -->
@@ -75,7 +75,7 @@
     <!-- Body: sidebar + main -->
     <div class="ms-body">
       <!-- Sidebar nav -->
-      <nav class="ms-sidebar" id="ms-sidebar" aria-label="Flock Stand navigation">
+      <nav class="ms-sidebar" id="ms-sidebar" aria-label="FlockStand navigation">
         <div class="ms-nav-section">
           <button class="ms-nav-item" data-view="dashboard">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -153,6 +153,9 @@
 
     <!-- Sheet/modal host -->
     <div id="ms-sheet-host"></div>
+
+    <!-- Unity footer -->
+    <footer class="unity-footer" id="ms-footer"></footer>
   </div>
 
   <!-- Live presenter overlay (full-screen) -->
@@ -174,12 +177,30 @@
   <script defer src="Scripts/the_upper_room.js"></script>
   <!-- GAS backend adapter (window.TheVine) -->
   <script defer src="Scripts/the_true_vine.js"></script>
-  <!-- Flock Stand chord engine -->
+  <!-- FlockStand chord engine -->
   <script defer src="Scripts/the_shofar/index.js"></script>
 
-  <!-- Flock Stand main module -->
+  <!-- FlockStand main module -->
   <script type="module" src="Scripts/the_app_switcher.js"></script>
   <script type="module" src="app.stand/stand.js"></script>
+
+  <!-- Unity footer mount -->
+  <script type="module">
+    import { mountUnityFooter } from './Scripts/the_unity_footer.js';
+
+    mountUnityFooter(document.getElementById('ms-footer'), {
+      appId:       'stand',
+      appAccent:   '#a855f7',
+      appAccentDk: '#4c1d95',
+      homeHref:    '../',
+      inviteHref:  '../app.invite/app.invite.html',
+      prayerHref:  '{{CHURCH_PRAYER_URL}}',
+      phone:       '{{CHURCH_PHONE}}',
+      mapsUrl:     '{{CHURCH_MAPS_URL}}',
+      version:     'v1.01',
+      copyright:   '© 2026 {{CHURCH_NAME}}',
+    });
+  </script>
 
 </body>
 </html>
