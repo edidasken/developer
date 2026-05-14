@@ -3013,6 +3013,8 @@ function _openTool(name) {
   else if (name === 'topical')    { head.textContent = 'Topical Index';               _renderTopical(body); }
   else if (name === 'quotes')     { head.textContent = 'Quote & Illustration Library';_renderQuotes(body); }
   else if (name === 'liturgical') { head.textContent = 'Liturgical Calendar';         _renderLiturgical(body); }
+  else if (name === 'apologetics'){ head.textContent = 'Apologetics';                 _renderApologetics(body); }
+  else if (name === 'counseling') { head.textContent = 'Biblical Counseling';         _renderCounseling(body); }
   else { _closeTool(); }
 }
 
@@ -3348,4 +3350,530 @@ function _renderLiturgical(body) {
       <span class="bm-litu-color" style="--c:#16a34a;">Green · Ordinary Time</span>
     </div>
   `;
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// APOLOGETICS — common objections, biblical/historical answers
+// ─────────────────────────────────────────────────────────────
+const BM_APOLOGETICS = [
+  // ───── EXISTENCE OF GOD ─────
+  { cat: 'Existence of God', q: 'Does God exist?',
+    a: 'Yes — and the evidence is layered. The universe had a beginning (Kalam cosmological argument), it is finely tuned for life (teleological), it is intelligible to the human mind (a sign of mind behind matter), and humans share an intuition of objective moral law (moral argument). Each line of evidence is consistent with the God revealed in Scripture: eternal, powerful, personal, and good.',
+    v: [
+      ['Romans 1:19-20', 'What can be known about God is plain to them, because God has shown it to them. For his invisible attributes, namely, his eternal power and divine nature, have been clearly perceived ever since the creation of the world.'],
+      ['Psalm 19:1', 'The heavens declare the glory of God, and the sky above proclaims his handiwork.'],
+      ['Hebrews 11:6', 'Without faith it is impossible to please him, for whoever would draw near to God must believe that he exists and that he rewards those who seek him.'],
+    ]
+  },
+  { cat: 'Existence of God', q: 'If God made everything, who made God?',
+    a: 'The argument is not "everything has a cause" but "everything that begins to exist has a cause." God is, by definition, the eternal, uncaused First Cause — not a being inside the universe but the Being on whom the universe depends. Asking "who made God?" is like asking "what is north of the North Pole?" — a category error.',
+    v: [
+      ['Psalm 90:2', 'Before the mountains were brought forth, or ever you had formed the earth and the world, from everlasting to everlasting you are God.'],
+      ['Isaiah 40:28', 'The LORD is the everlasting God, the Creator of the ends of the earth. He does not faint or grow weary; his understanding is unsearchable.'],
+      ['Revelation 1:8', 'I am the Alpha and the Omega, says the Lord God, who is and who was and who is to come, the Almighty.'],
+    ]
+  },
+  { cat: 'Existence of God', q: 'Why does God hide Himself?',
+    a: 'God is not hidden — He has revealed Himself in creation, in conscience, in Scripture, and supremely in the person of Jesus Christ. What looks like hiddenness is often human suppression of what we already know (Rom 1) or God\u2019s mercy giving time for repentance. He promises to be found by all who seek Him with their whole heart.',
+    v: [
+      ['Jeremiah 29:13', 'You will seek me and find me, when you seek me with all your heart.'],
+      ['John 1:18', 'No one has ever seen God; the only God, who is at the Father\u2019s side, he has made him known.'],
+      ['Acts 17:27', 'That they should seek God, in the hope that they might feel their way toward him and find him. Yet he is actually not far from each one of us.'],
+    ]
+  },
+
+  // ───── PROBLEM OF EVIL ─────
+  { cat: 'Problem of Evil', q: 'If God is good and powerful, why is there evil and suffering?',
+    a: 'The Bible never minimizes evil — it confronts it. Evil entered the world through the rebellion of free creatures (Gen 3), not by God\u2019s design. God permits evil for a season but is not its author, and He is bringing it to a final reckoning. The cross is the deepest answer: God Himself entered our suffering and conquered it through resurrection. We may not always know the "why," but we know the "Who."',
+    v: [
+      ['Genesis 50:20', 'As for you, you meant evil against me, but God meant it for good, to bring it about that many people should be kept alive.'],
+      ['Romans 8:28', 'And we know that for those who love God all things work together for good, for those who are called according to his purpose.'],
+      ['Revelation 21:4', 'He will wipe away every tear from their eyes, and death shall be no more, neither shall there be mourning, nor crying, nor pain anymore, for the former things have passed away.'],
+    ]
+  },
+  { cat: 'Problem of Evil', q: 'How can a loving God send anyone to hell?',
+    a: 'God does not "send" people to hell arbitrarily. Hell is the just consequence of persistent rejection of the One who is life itself. God lovingly pursues sinners, sent His Son to die for them, and pleads with them to be reconciled. To refuse Him is to choose separation. As C.S. Lewis put it, "The doors of hell are locked on the inside."',
+    v: [
+      ['2 Peter 3:9', 'The Lord is not slow to fulfill his promise as some count slowness, but is patient toward you, not wishing that any should perish, but that all should reach repentance.'],
+      ['Ezekiel 33:11', 'As I live, declares the Lord GOD, I have no pleasure in the death of the wicked, but that the wicked turn from his way and live.'],
+      ['John 3:36', 'Whoever believes in the Son has eternal life; whoever does not obey the Son shall not see life, but the wrath of God remains on him.'],
+    ]
+  },
+  { cat: 'Problem of Evil', q: 'Why does God allow natural disasters?',
+    a: 'The Bible teaches that creation itself groans under the curse of human sin (Rom 8). Earthquakes, storms, and disease are not signs that God has lost control — they are signs that the world is not what it was made to be, and a foretaste of why it must be remade. God still rules over every storm (Ps 107) and uses creation\u2019s instability to call us back to the Creator.',
+    v: [
+      ['Romans 8:20-22', 'For the creation was subjected to futility... in hope that the creation itself will be set free from its bondage to corruption... For we know that the whole creation has been groaning together in the pains of childbirth until now.'],
+      ['Psalm 46:1-3', 'God is our refuge and strength, a very present help in trouble. Therefore we will not fear though the earth gives way...'],
+      ['Luke 13:4-5', 'Those eighteen on whom the tower in Siloam fell... do you think that they were worse offenders than all the others...? No, I tell you; but unless you repent, you will all likewise perish.'],
+    ]
+  },
+
+  // ───── BIBLE & HISTORY ─────
+  { cat: 'The Bible', q: 'Can we trust the Bible historically?',
+    a: 'The New Testament is the best-attested document of antiquity — over 5,800 Greek manuscripts, with the earliest fragments within a generation of the originals. Archaeology repeatedly confirms biblical persons, places, and customs (the Pilate inscription, the pool of Bethesda, Hezekiah\u2019s tunnel, etc.). The Gospels were written within the lifetime of eyewitnesses who would have refuted falsehood.',
+    v: [
+      ['Luke 1:1-4', 'Inasmuch as many have undertaken to compile a narrative of the things that have been accomplished among us, just as those who from the beginning were eyewitnesses... it seemed good to me also... to write an orderly account... that you may have certainty concerning the things you have been taught.'],
+      ['2 Peter 1:16', 'For we did not follow cleverly devised myths when we made known to you the power and coming of our Lord Jesus Christ, but we were eyewitnesses of his majesty.'],
+      ['1 John 1:1', 'That which was from the beginning, which we have heard, which we have seen with our eyes, which we looked upon and have touched with our hands, concerning the word of life...'],
+    ]
+  },
+  { cat: 'The Bible', q: 'Hasn\u2019t the Bible been changed and corrupted over time?',
+    a: 'No. The manuscript tradition is so vast that variants can be tracked precisely. Of approximately 400,000 textual variants, fewer than 1% affect meaning, and none affects any core Christian doctrine. The Dead Sea Scrolls (c. 100 BC) showed that the Hebrew Old Testament was preserved with stunning accuracy over a thousand years. We can read essentially what the apostles and prophets wrote.',
+    v: [
+      ['Isaiah 40:8', 'The grass withers, the flower fades, but the word of our God will stand forever.'],
+      ['Matthew 5:18', 'For truly, I say to you, until heaven and earth pass away, not an iota, not a dot, will pass from the Law until all is accomplished.'],
+      ['1 Peter 1:25', 'But the word of the Lord remains forever. And this word is the good news that was preached to you.'],
+    ]
+  },
+  { cat: 'The Bible', q: 'Aren\u2019t there contradictions in the Bible?',
+    a: 'Apparent contradictions usually dissolve under careful reading: different perspectives on the same event (like four Gospel accounts), different time frames, summary versus detail, or genre (poetry vs. narrative). The Bible was written by ~40 authors across 1,500 years, three continents, and three languages — and yet tells one coherent story of redemption centered on Christ. That unity is itself remarkable evidence of inspiration.',
+    v: [
+      ['2 Timothy 3:16-17', 'All Scripture is breathed out by God and profitable for teaching, for reproof, for correction, and for training in righteousness, that the man of God may be complete, equipped for every good work.'],
+      ['2 Peter 1:20-21', 'No prophecy of Scripture comes from someone\u2019s own interpretation. For no prophecy was ever produced by the will of man, but men spoke from God as they were carried along by the Holy Spirit.'],
+      ['Psalm 119:160', 'The sum of your word is truth, and every one of your righteous rules endures forever.'],
+    ]
+  },
+
+  // ───── JESUS CHRIST ─────
+  { cat: 'Jesus Christ', q: 'Did Jesus really exist?',
+    a: 'Yes — and not just in Christian sources. Roman historians Tacitus and Suetonius, Jewish historian Josephus, and the Jewish Talmud all reference Jesus of Nazareth. The historical existence of Jesus is one of the most well-attested facts of antiquity. The real question isn\u2019t whether He existed, but who He is.',
+    v: [
+      ['John 1:14', 'And the Word became flesh and dwelt among us, and we have seen his glory, glory as of the only Son from the Father, full of grace and truth.'],
+      ['1 Timothy 3:16', 'Great indeed, we confess, is the mystery of godliness: He was manifested in the flesh, vindicated by the Spirit, seen by angels, proclaimed among the nations, believed on in the world, taken up in glory.'],
+      ['Galatians 4:4', 'But when the fullness of time had come, God sent forth his Son, born of woman, born under the law.'],
+    ]
+  },
+  { cat: 'Jesus Christ', q: 'Is Jesus really God, or just a great teacher?',
+    a: 'Jesus claimed authority belonging only to God: forgiving sins (Mark 2), receiving worship (Matt 14), claiming preexistence (John 8:58 — "before Abraham was, I AM"), and accepting Thomas\u2019s confession "My Lord and my God!" (John 20:28). C.S. Lewis\u2019s trilemma stands: He is either Lord, liar, or lunatic — but the moral grandeur and resurrection rule out the latter two.',
+    v: [
+      ['John 1:1', 'In the beginning was the Word, and the Word was with God, and the Word was God.'],
+      ['Colossians 2:9', 'For in him the whole fullness of deity dwells bodily.'],
+      ['John 10:30', 'I and the Father are one.'],
+    ]
+  },
+  { cat: 'Jesus Christ', q: 'Did Jesus rise from the dead?',
+    a: 'The minimal facts agreed on by virtually all critical scholars: (1) Jesus was crucified and buried, (2) the tomb was found empty, (3) numerous individuals and groups claimed to see Him alive, (4) the disciples were transformed from terrified deserters into bold martyrs, (5) the church exploded in Jerusalem — the very city where the body could be produced. The best explanation: He really rose.',
+    v: [
+      ['1 Corinthians 15:3-6', 'Christ died for our sins in accordance with the Scriptures, that he was buried, that he was raised on the third day in accordance with the Scriptures, and that he appeared to Cephas, then to the twelve. Then he appeared to more than five hundred brothers at one time, most of whom are still alive.'],
+      ['Romans 1:4', 'Declared to be the Son of God in power according to the Spirit of holiness by his resurrection from the dead, Jesus Christ our Lord.'],
+      ['Acts 2:32', 'This Jesus God raised up, and of that we all are witnesses.'],
+    ]
+  },
+
+  // ───── SCIENCE & FAITH ─────
+  { cat: 'Science & Faith', q: 'Hasn\u2019t science disproved God?',
+    a: 'No — science describes how the natural world functions; it cannot, by its method, address whether there is anything beyond the natural. Most founders of modern science (Newton, Kepler, Boyle, Faraday, Maxwell) were devout believers who saw their work as "thinking God\u2019s thoughts after Him." The orderliness of the universe — the very thing that makes science possible — is precisely what biblical theism predicts.',
+    v: [
+      ['Genesis 1:1', 'In the beginning, God created the heavens and the earth.'],
+      ['Colossians 1:16-17', 'For by him all things were created, in heaven and on earth, visible and invisible... all things were created through him and for him. And he is before all things, and in him all things hold together.'],
+      ['Psalm 111:2', 'Great are the works of the LORD, studied by all who delight in them.'],
+    ]
+  },
+  { cat: 'Science & Faith', q: 'What about evolution and Genesis?',
+    a: 'Faithful Christians hold a range of views — young-earth creation, old-earth creation, theistic evolution — but all affirm: God created, humanity is made in His image, and the Fall is real. The Bible is not a science textbook but God\u2019s truthful self-revelation. Where Scripture and a scientific claim seem to conflict, we hold Scripture firmly and our interpretation of both humbly.',
+    v: [
+      ['Genesis 1:27', 'So God created man in his own image, in the image of God he created him; male and female he created them.'],
+      ['Hebrews 11:3', 'By faith we understand that the universe was created by the word of God, so that what is seen was not made out of things that are visible.'],
+      ['Job 38:4', 'Where were you when I laid the foundation of the earth? Tell me, if you have understanding.'],
+    ]
+  },
+
+  // ───── MORALITY & TRUTH ─────
+  { cat: 'Morality & Truth', q: 'Can\u2019t you be moral without God?',
+    a: 'Of course people without faith can act morally — the question is whether morality has any binding force without God. If there is no Lawgiver, "morality" reduces to opinion or social contract. Concepts like human dignity, justice, and inalienable rights make sense only if humans are made in the image of a good God. Atheism can borrow moral capital from Christianity, but it cannot generate it.',
+    v: [
+      ['Romans 2:14-15', 'For when Gentiles, who do not have the law, by nature do what the law requires... they show that the work of the law is written on their hearts.'],
+      ['Micah 6:8', 'He has told you, O man, what is good; and what does the LORD require of you but to do justice, and to love kindness, and to walk humbly with your God?'],
+      ['James 4:12', 'There is only one lawgiver and judge, he who is able to save and to destroy. But who are you to judge your neighbor?'],
+    ]
+  },
+  { cat: 'Morality & Truth', q: 'Isn\u2019t truth relative? Who are you to say Christianity is the only way?',
+    a: 'The claim "all truth is relative" is itself an absolute claim — it self-destructs. Jesus did not present Himself as one path among many; He claimed to be the path (John 14:6). The exclusivity is not Christian arrogance but the nature of reality: if Christ truly rose from the dead, His claims must be reckoned with. Christianity is exclusive in truth and inclusive in invitation — "whosoever will may come."',
+    v: [
+      ['John 14:6', 'I am the way, and the truth, and the life. No one comes to the Father except through me.'],
+      ['Acts 4:12', 'There is salvation in no one else, for there is no other name under heaven given among men by which we must be saved.'],
+      ['Revelation 22:17', 'The Spirit and the Bride say, "Come." And let the one who hears say, "Come." And let the one who is thirsty come; let the one who desires take the water of life without price.'],
+    ]
+  },
+
+  // ───── OTHER RELIGIONS ─────
+  { cat: 'Other Religions', q: 'Aren\u2019t all religions basically the same?',
+    a: 'They are similar in some ethics (be kind, don\u2019t lie, etc.) but radically different in their core claims about God, humanity, salvation, and eternity. Hinduism: many gods or impersonal Brahman; Buddhism: no Creator, escape suffering through detachment; Islam: one God, salvation by works and submission; Christianity: one God in three persons, salvation by grace through a crucified and risen Savior. These cannot all be true.',
+    v: [
+      ['Isaiah 45:5-6', 'I am the LORD, and there is no other, besides me there is no God... that people may know, from the rising of the sun and from the west, that there is none besides me.'],
+      ['1 Corinthians 8:6', 'Yet for us there is one God, the Father, from whom are all things and for whom we exist, and one Lord, Jesus Christ, through whom are all things and through whom we exist.'],
+      ['Ephesians 2:8-9', 'For by grace you have been saved through faith. And this is not your own doing; it is the gift of God, not a result of works, so that no one may boast.'],
+    ]
+  },
+  { cat: 'Other Religions', q: 'What about people who never heard of Jesus?',
+    a: 'God is perfectly just (Gen 18:25) and perfectly good. He judges everyone according to the light they had — through creation, conscience, and Scripture (Rom 1-2). No one will be condemned unjustly. But the Bible never treats this as an excuse for our inaction; instead, it fuels missions: how shall they hear without a preacher? (Rom 10:14). The unreached are God\u2019s concern — and ours.',
+    v: [
+      ['Romans 1:20', 'For his invisible attributes, namely, his eternal power and divine nature, have been clearly perceived... So they are without excuse.'],
+      ['Romans 10:14', 'How then will they call on him in whom they have not believed? And how are they to believe in him of whom they have never heard?'],
+      ['Acts 17:30-31', 'The times of ignorance God overlooked, but now he commands all people everywhere to repent, because he has fixed a day on which he will judge the world in righteousness by a man whom he has appointed.'],
+    ]
+  },
+
+  // ───── MIRACLES ─────
+  { cat: 'Miracles', q: 'Can a thinking person believe in miracles?',
+    a: 'Only if you assume in advance that miracles cannot happen will the evidence for them seem weak. If God exists, miracles are entirely possible — the universe itself is the biggest one. The question is not whether miracles are possible but whether the evidence in a particular case warrants belief. The resurrection of Jesus has the strongest historical evidence of any miracle claim in human history.',
+    v: [
+      ['Jeremiah 32:17', 'Ah, Lord GOD! It is you who have made the heavens and the earth by your great power and by your outstretched arm! Nothing is too hard for you.'],
+      ['Luke 1:37', 'For nothing will be impossible with God.'],
+      ['John 20:30-31', 'Now Jesus did many other signs in the presence of the disciples, which are not written in this book; but these are written so that you may believe that Jesus is the Christ, the Son of God.'],
+    ]
+  },
+];
+
+function _renderApologetics(body) {
+  // group by category
+  const cats = {};
+  BM_APOLOGETICS.forEach((item, i) => {
+    if (!cats[item.cat]) cats[item.cat] = [];
+    cats[item.cat].push({ ...item, _i: i });
+  });
+  const catNames = Object.keys(cats);
+  body.innerHTML = `
+    <input type="text" class="bm-tool-input" id="bm-apol-search" placeholder="Search objections, topics, or keywords…">
+    <div id="bm-apol-list" style="display:flex;flex-direction:column;gap:14px;"></div>
+  `;
+  const list = _qs('bm-apol-list');
+  function paint(query) {
+    const q = (query || '').trim().toLowerCase();
+    let html = '';
+    catNames.forEach(cat => {
+      const items = cats[cat].filter(it => {
+        if (!q) return true;
+        return (it.q + ' ' + it.a + ' ' + it.cat).toLowerCase().includes(q)
+          || it.v.some(([ref, txt]) => (ref + ' ' + txt).toLowerCase().includes(q));
+      });
+      if (!items.length) return;
+      html += `<div><div class="bm-apol-cat">${_e(cat)}</div><div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">`;
+      items.forEach(it => {
+        const versesHtml = it.v.map(([ref, txt]) => `
+          <div class="bm-apol-verse">
+            <strong>${_e(ref)}</strong>
+            <span>${_e(txt)}</span>
+            <a href="${_bibleGatewayUrl(ref)}" target="_blank" rel="noopener">Open on BibleGateway →</a>
+          </div>`).join('');
+        html += `
+          <div class="bm-apol-card" data-idx="${it._i}">
+            <button type="button" class="bm-apol-q" data-toggle="${it._i}">
+              <span>${_e(it.q)}</span>
+              <span class="bm-apol-chev">›</span>
+            </button>
+            <div class="bm-apol-body">
+              <div class="bm-apol-section">Answer</div>
+              <div class="bm-apol-answer">${_e(it.a)}</div>
+              <div class="bm-apol-section">Scripture</div>
+              <div class="bm-apol-verses">${versesHtml}</div>
+            </div>
+          </div>`;
+      });
+      html += `</div></div>`;
+    });
+    if (!html) html = `<div class="bm-tool-empty">No matching objections.</div>`;
+    list.innerHTML = html;
+  }
+  paint('');
+  _qs('bm-apol-search').addEventListener('input', e => paint(e.target.value));
+  list.addEventListener('click', e => {
+    const btn = e.target.closest('[data-toggle]');
+    if (!btn) return;
+    const card = btn.closest('.bm-apol-card');
+    if (card) card.classList.toggle('is-open');
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// BIBLICAL COUNSELING — situations, Scripture, pastoral counsel
+// ─────────────────────────────────────────────────────────────
+const BM_COUNSELING = [
+  // ── ANXIETY / FEAR ──
+  { cat: 'Anxiety & Fear', q: 'Anxiety, worry, panic',
+    a: 'Anxiety is the soul stretched between the present and an imagined future. Scripture does not shame the anxious — it invites them to bring every worry to the Father. Practice three things: (1) Name the fear specifically. (2) Cast it on God in honest prayer (1 Pet 5:7). (3) Replace rumination with thanksgiving and Scripture. Anxiety often fades not when circumstances change but when the soul rests in God\u2019s sovereign goodness.',
+    v: [
+      ['Philippians 4:6-7', 'Do not be anxious about anything, but in everything by prayer and supplication with thanksgiving let your requests be made known to God. And the peace of God, which surpasses all understanding, will guard your hearts and your minds in Christ Jesus.'],
+      ['1 Peter 5:6-7', 'Humble yourselves, therefore, under the mighty hand of God so that at the proper time he may exalt you, casting all your anxieties on him, because he cares for you.'],
+      ['Matthew 6:34', 'Therefore do not be anxious about tomorrow, for tomorrow will be anxious for itself. Sufficient for the day is its own trouble.'],
+      ['Isaiah 41:10', 'Fear not, for I am with you; be not dismayed, for I am your God; I will strengthen you, I will help you, I will uphold you with my righteous right hand.'],
+    ]
+  },
+  { cat: 'Anxiety & Fear', q: 'Fear of the future / making decisions',
+    a: 'Fear of the future often hides a desire for control. The cure is not certainty about tomorrow but trust in the God who holds it. Make decisions prayerfully (James 1:5), in counsel (Prov 15:22), in line with Scripture, and then act — trusting God to redirect if needed (Prov 16:9). A closed door is not a failure; it is His guidance.',
+    v: [
+      ['Proverbs 3:5-6', 'Trust in the LORD with all your heart, and do not lean on your own understanding. In all your ways acknowledge him, and he will make straight your paths.'],
+      ['Jeremiah 29:11', 'For I know the plans I have for you, declares the LORD, plans for welfare and not for evil, to give you a future and a hope.'],
+      ['James 1:5', 'If any of you lacks wisdom, let him ask God, who gives generously to all without reproach, and it will be given him.'],
+    ]
+  },
+
+  // ── DEPRESSION / DISCOURAGEMENT ──
+  { cat: 'Depression & Discouragement', q: 'Depression, hopelessness, despair',
+    a: 'Depression is real and complex — sometimes physical, sometimes circumstantial, sometimes spiritual, often all three. Take it seriously: care for the body (sleep, food, sunlight, exercise), pursue medical help when needed, and tend the soul. Read the Psalms aloud — they give voice to the very griefs you may be feeling. You are not alone; even Elijah, David, and Spurgeon walked this valley. Christ does not despise the bruised reed.',
+    v: [
+      ['Psalm 42:5', 'Why are you cast down, O my soul, and why are you in turmoil within me? Hope in God; for I shall again praise him, my salvation and my God.'],
+      ['Psalm 34:18', 'The LORD is near to the brokenhearted and saves the crushed in spirit.'],
+      ['Isaiah 42:3', 'A bruised reed he will not break, and a faintly burning wick he will not quench.'],
+      ['2 Corinthians 4:8-9', 'We are afflicted in every way, but not crushed; perplexed, but not driven to despair; persecuted, but not forsaken; struck down, but not destroyed.'],
+    ]
+  },
+  { cat: 'Depression & Discouragement', q: 'Suicidal thoughts',
+    a: 'If you or someone you love is in immediate danger, please call emergency services or a suicide hotline now. Then remember: your life is not your own — you were bought with a price (1 Cor 6:19-20). The enemy lies that the world would be better without you; God says you were knit together by Him for purpose (Ps 139). Reach out to a trusted pastor or counselor today. Hope is not extinguished — it is sometimes carried by others until you can carry it again.',
+    v: [
+      ['Psalm 139:13-14', 'For you formed my inward parts; you knitted me together in my mother\u2019s womb. I praise you, for I am fearfully and wonderfully made.'],
+      ['Lamentations 3:21-23', 'But this I call to mind, and therefore I have hope: The steadfast love of the LORD never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.'],
+      ['John 10:10', 'The thief comes only to steal and kill and destroy. I came that they may have life and have it abundantly.'],
+    ]
+  },
+
+  // ── GRIEF & LOSS ──
+  { cat: 'Grief & Loss', q: 'Loss of a loved one',
+    a: 'Grief is the price of love — and Jesus Himself wept at a friend\u2019s grave (John 11:35). Do not rush yourself or others through it. Weep, remember, give thanks. Christians grieve, but not as those without hope: death is real, but it is not the end. The same Christ who raised Lazarus has conquered the grave and will raise all who are His.',
+    v: [
+      ['1 Thessalonians 4:13-14', 'We do not want you to be uninformed, brothers, about those who are asleep, that you may not grieve as others do who have no hope. For since we believe that Jesus died and rose again, even so, through Jesus, God will bring with him those who have fallen asleep.'],
+      ['Psalm 116:15', 'Precious in the sight of the LORD is the death of his saints.'],
+      ['Revelation 21:4', 'He will wipe away every tear from their eyes, and death shall be no more, neither shall there be mourning, nor crying, nor pain anymore.'],
+      ['John 11:25-26', 'I am the resurrection and the life. Whoever believes in me, though he die, yet shall he live, and everyone who lives and believes in me shall never die.'],
+    ]
+  },
+  { cat: 'Grief & Loss', q: 'Miscarriage or loss of a child',
+    a: 'There are no easy words for this grief. Know that your child was known, loved, and counted by God before you ever knew them (Ps 139:13-16). David\u2019s words after losing his infant son comfort us still: "I shall go to him, but he will not return to me" (2 Sam 12:23) — a quiet hope that little ones are safe with Him. Your tears are not weakness; they are love with nowhere else to go.',
+    v: [
+      ['2 Samuel 12:23', 'But now he is dead. Why should I fast? Can I bring him back again? I shall go to him, but he will not return to me.'],
+      ['Matthew 19:14', 'Let the little children come to me and do not hinder them, for to such belongs the kingdom of heaven.'],
+      ['Psalm 34:18', 'The LORD is near to the brokenhearted and saves the crushed in spirit.'],
+    ]
+  },
+
+  // ── MARRIAGE ──
+  { cat: 'Marriage', q: 'Marriage struggles, conflict, distance',
+    a: 'Every marriage is two sinners covenanted together — conflict is normal, contempt is corrosive. Re-anchor on the gospel: husband and wife reflect Christ and the church (Eph 5). Practice the slow disciplines: listen before answering (Jas 1:19), confess specifically and ask forgiveness, pray together daily (even one minute), and seek a wise pastor or biblical counselor early — not as a last resort.',
+    v: [
+      ['Ephesians 5:25', 'Husbands, love your wives, as Christ loved the church and gave himself up for her.'],
+      ['Ephesians 4:32', 'Be kind to one another, tenderhearted, forgiving one another, as God in Christ forgave you.'],
+      ['1 Corinthians 13:4-7', 'Love is patient and kind; love does not envy or boast; it is not arrogant or rude. It does not insist on its own way; it is not irritable or resentful... Love bears all things, believes all things, hopes all things, endures all things.'],
+      ['Colossians 3:13', 'Bearing with one another and, if one has a complaint against another, forgiving each other; as the Lord has forgiven you, so you also must forgive.'],
+    ]
+  },
+  { cat: 'Marriage', q: 'Adultery / unfaithfulness in marriage',
+    a: 'Adultery is a grievous sin — but not unforgivable. For the betrayed: your pain is heard by God, and you have biblical grounds for divorce, though reconciliation is also possible by grace. For the unfaithful: confess fully, end all contact with the third party, accept accountability, and pursue long, patient repentance. Both spouses need a pastor and skilled counsel. Healing is slow but possible — many marriages have come back stronger.',
+    v: [
+      ['Hebrews 13:4', 'Let marriage be held in honor among all, and let the marriage bed be undefiled, for God will judge the sexually immoral and adulterous.'],
+      ['Hosea 3:1', 'Go again, love a woman who is loved by another man and is an adulteress, even as the LORD loves the children of Israel, though they turn to other gods.'],
+      ['1 John 1:9', 'If we confess our sins, he is faithful and just to forgive us our sins and to cleanse us from all unrighteousness.'],
+    ]
+  },
+
+  // ── PARENTING ──
+  { cat: 'Parenting', q: 'Wayward / prodigal child',
+    a: 'A wayward child is one of the deepest griefs a parent can know. Remember: your child\u2019s salvation is ultimately God\u2019s work, not your performance. Repent of any harshness or hypocrisy you can see; keep the door open without endorsing the sin; pray ceaselessly. Like the father in Luke 15, watch the road. Many prodigals have come home — sometimes after years.',
+    v: [
+      ['Luke 15:20', 'And he arose and came to his father. But while he was still a long way off, his father saw him and felt compassion, and ran and embraced him and kissed him.'],
+      ['Proverbs 22:6', 'Train up a child in the way he should go; even when he is old he will not depart from it.'],
+      ['Isaiah 49:25', 'I will contend with those who contend with you, and I will save your children.'],
+    ]
+  },
+  { cat: 'Parenting', q: 'Discipline, frustration, feeling overwhelmed',
+    a: 'Parenting exposes our sin faster than almost anything else — that is grace, not failure. Discipline (in the biblical sense) is not punishment but training, always rooted in love (Heb 12:6). Beware exasperating your children (Eph 6:4); ask forgiveness when you sin against them. The goal is not perfect kids but pointing them to a perfect Savior. Rest is not optional — even Jesus withdrew.',
+    v: [
+      ['Ephesians 6:4', 'Fathers, do not provoke your children to anger, but bring them up in the discipline and instruction of the Lord.'],
+      ['Deuteronomy 6:6-7', 'These words that I command you today shall be on your heart. You shall teach them diligently to your children, and shall talk of them when you sit in your house, and when you walk by the way.'],
+      ['Psalm 127:3', 'Behold, children are a heritage from the LORD, the fruit of the womb a reward.'],
+    ]
+  },
+
+  // ── ANGER ──
+  { cat: 'Anger', q: 'Anger, bitterness, resentment',
+    a: 'Anger itself is not always sin — God Himself is angry at evil — but unrighteous anger destroys (Jas 1:20). Trace your anger to its root: usually a thwarted desire or wounded pride. Confess it specifically, forgive as you have been forgiven, and "do not let the sun go down on your anger" (Eph 4:26). Bitterness is anger that has put down roots; pull it up early.',
+    v: [
+      ['Ephesians 4:26-27', 'Be angry and do not sin; do not let the sun go down on your anger, and give no opportunity to the devil.'],
+      ['James 1:19-20', 'Let every person be quick to hear, slow to speak, slow to anger; for the anger of man does not produce the righteousness of God.'],
+      ['Hebrews 12:15', 'See to it that no one fails to obtain the grace of God; that no "root of bitterness" springs up and causes trouble, and by it many become defiled.'],
+      ['Proverbs 15:1', 'A soft answer turns away wrath, but a harsh word stirs up anger.'],
+    ]
+  },
+
+  // ── ADDICTION ──
+  { cat: 'Addiction', q: 'Addiction (alcohol, drugs, pornography, gambling)',
+    a: 'Addiction is sin enslaving the body, but it is also a disorder of worship — looking to a created thing for what only God can give. Freedom requires honesty, accountability, and the Spirit\u2019s power. Confess to God and to a trusted brother/sister (Jas 5:16). Cut off access — block, delete, change routes. Pursue Christian recovery groups. Replace the false comfort with real ones: prayer, Word, fellowship, service. Relapse is real but not final.',
+    v: [
+      ['1 Corinthians 6:12', 'All things are lawful for me, but not all things are helpful. All things are lawful for me, but I will not be enslaved by anything.'],
+      ['1 Corinthians 10:13', 'No temptation has overtaken you that is not common to man. God is faithful, and he will not let you be tempted beyond your ability, but with the temptation he will also provide the way of escape.'],
+      ['James 5:16', 'Confess your sins to one another and pray for one another, that you may be healed. The prayer of a righteous person has great power.'],
+      ['Galatians 5:1', 'For freedom Christ has set us free; stand firm therefore, and do not submit again to a yoke of slavery.'],
+    ]
+  },
+
+  // ── SEXUAL SIN ──
+  { cat: 'Sexual Sin', q: 'Lust, pornography, sexual immorality',
+    a: 'Sexual sin is serious — Paul says to flee it (1 Cor 6:18), not negotiate. Yet in Christ there is full forgiveness and real freedom. Get specific accountability today (not someday). Remove access. Deal with the deeper hungers — loneliness, escape, identity — by feeding on Christ. Marriage, where applicable, is part of God\u2019s good provision (1 Cor 7:2). You are not your sin; you are God\u2019s child.',
+    v: [
+      ['1 Corinthians 6:18-20', 'Flee from sexual immorality. Every other sin a person commits is outside the body, but the sexually immoral person sins against his own body... You are not your own, for you were bought with a price. So glorify God in your body.'],
+      ['Matthew 5:28', 'But I say to you that everyone who looks at a woman with lustful intent has already committed adultery with her in his heart.'],
+      ['1 Thessalonians 4:3-5', 'For this is the will of God, your sanctification: that you abstain from sexual immorality; that each one of you know how to control his own body in holiness and honor.'],
+      ['Romans 6:14', 'For sin will have no dominion over you, since you are not under law but under grace.'],
+    ]
+  },
+
+  // ── GUILT & SHAME ──
+  { cat: 'Guilt & Shame', q: 'Guilt over past sin / cannot forgive yourself',
+    a: '"Forgiving yourself" can be unhelpful framing — what you actually need is to receive the forgiveness God has already given. If you have repented and trusted Christ, your sin is gone (Ps 103:12), the record is nailed to the cross (Col 2:14), and there is no condemnation (Rom 8:1). Lingering guilt may be the enemy\u2019s accusation rather than the Spirit\u2019s conviction. Preach the gospel to yourself daily.',
+    v: [
+      ['Romans 8:1', 'There is therefore now no condemnation for those who are in Christ Jesus.'],
+      ['Psalm 103:12', 'As far as the east is from the west, so far does he remove our transgressions from us.'],
+      ['1 John 1:9', 'If we confess our sins, he is faithful and just to forgive us our sins and to cleanse us from all unrighteousness.'],
+      ['Isaiah 1:18', 'Though your sins are like scarlet, they shall be as white as snow; though they are red like crimson, they shall become like wool.'],
+    ]
+  },
+  { cat: 'Guilt & Shame', q: 'Shame from past abuse or trauma',
+    a: 'Shame from another\u2019s sin against you is not yours to carry. What was done to you was wrong; God sees, God names it as evil, and God will judge it justly. He is the Father of compassion who heals the broken (Ps 147:3). Healing is rarely instant — seek a trusted Christian counselor, lean on safe community, and let the Word slowly rewrite the lies. You are seen, you are loved, and you are not alone.',
+    v: [
+      ['Psalm 147:3', 'He heals the brokenhearted and binds up their wounds.'],
+      ['Isaiah 61:1-3', 'The Spirit of the Lord GOD is upon me... to bind up the brokenhearted... to comfort all who mourn... to give them a beautiful headdress instead of ashes, the oil of gladness instead of mourning.'],
+      ['2 Corinthians 1:3-4', 'Blessed be the God and Father of our Lord Jesus Christ, the Father of mercies and God of all comfort, who comforts us in all our affliction.'],
+    ]
+  },
+
+  // ── FORGIVENESS ──
+  { cat: 'Forgiveness', q: 'Cannot forgive someone who hurt me',
+    a: 'Forgiveness is not pretending it didn\u2019t happen, excusing the wrong, or instantly restoring trust. It is releasing the right to take revenge and entrusting justice to God (Rom 12:19). It is often a process, not a moment. Forgive because you have been forgiven much (Eph 4:32). Reconciliation requires repentance from the offender and may take time or wisdom; forgiveness is something you can do regardless.',
+    v: [
+      ['Ephesians 4:32', 'Be kind to one another, tenderhearted, forgiving one another, as God in Christ forgave you.'],
+      ['Matthew 6:14-15', 'For if you forgive others their trespasses, your heavenly Father will also forgive you, but if you do not forgive others their trespasses, neither will your Father forgive your trespasses.'],
+      ['Romans 12:19', 'Beloved, never avenge yourselves, but leave it to the wrath of God, for it is written, "Vengeance is mine, I will repay, says the Lord."'],
+    ]
+  },
+
+  // ── FINANCES & WORK ──
+  { cat: 'Finances & Work', q: 'Financial pressure, debt, job loss',
+    a: 'Money troubles touch everything — sleep, marriage, faith. Begin with honest assessment: a written budget, total debt, real income. Cut what you can; ask wise counsel; communicate with creditors. Then bring the burden to God, who has fed every sparrow (Matt 6). Tithing in lean times is faith, not folly — but legalistic guilt is not from God either. Generosity, contentment, and patience are forged here.',
+    v: [
+      ['Matthew 6:31-33', 'Do not be anxious, saying, "What shall we eat?" or "What shall we drink?"... Your heavenly Father knows that you need them all. But seek first the kingdom of God and his righteousness, and all these things will be added to you.'],
+      ['Philippians 4:19', 'And my God will supply every need of yours according to his riches in glory in Christ Jesus.'],
+      ['Hebrews 13:5', 'Keep your life free from love of money, and be content with what you have, for he has said, "I will never leave you nor forsake you."'],
+      ['Proverbs 22:7', 'The rich rules over the poor, and the borrower is the slave of the lender.'],
+    ]
+  },
+
+  // ── LONELINESS ──
+  { cat: 'Loneliness', q: 'Loneliness, isolation, no real friends',
+    a: 'Loneliness is one of the deepest human pains, and it grew sharper after the Fall. Begin with God Himself — He has promised never to leave you (Heb 13:5). Then take small risks toward others: a local church, a small group, serving the lonely (which often heals our own). Friendship, like a garden, is slow. Be the friend you wish you had (Prov 18:24).',
+    v: [
+      ['Hebrews 13:5', 'I will never leave you nor forsake you.'],
+      ['Psalm 68:6', 'God settles the solitary in a home; he leads out the prisoners to prosperity.'],
+      ['Proverbs 18:24', 'A man of many companions may come to ruin, but there is a friend who sticks closer than a brother.'],
+      ['Matthew 28:20', 'Behold, I am with you always, to the end of the age.'],
+    ]
+  },
+
+  // ── DOUBT ──
+  { cat: 'Doubt', q: 'Doubting God / faith struggles',
+    a: 'Doubt is not the opposite of faith — unbelief is. Many of God\u2019s people have wrestled (Job, the Psalms, John the Baptist, Thomas). Bring doubts into the light: name them, study them, talk with a mature believer. Don\u2019t isolate, and don\u2019t pretend. Often doubts are emotional or moral underneath an intellectual surface; deal with both. The Father of the demoniac\u2019s son prayed honestly, "I believe; help my unbelief."',
+    v: [
+      ['Mark 9:24', 'Immediately the father of the child cried out and said, "I believe; help my unbelief!"'],
+      ['Jude 1:22', 'And have mercy on those who doubt.'],
+      ['John 20:27-29', 'Then he said to Thomas, "Put your finger here, and see my hands; and put out your hand, and place it in my side. Do not disbelieve, but believe."... Jesus said to him, "Have you believed because you have seen me? Blessed are those who have not seen and yet have believed."'],
+    ]
+  },
+
+  // ── CHRONIC ILLNESS ──
+  { cat: 'Suffering & Illness', q: 'Chronic pain or illness',
+    a: 'Long suffering is a hard school. God can heal in a moment, but more often He sustains through. Paul prayed three times for his thorn to be removed; God gave grace instead (2 Cor 12:9). That is not consolation prize — it is a deeper gift. Honest lament is welcome (read the Psalms). Receive ordinary means of help: medicine, rest, community. And remember: this body is not your final form (Phil 3:21).',
+    v: [
+      ['2 Corinthians 12:9-10', 'My grace is sufficient for you, for my power is made perfect in weakness... For when I am weak, then I am strong.'],
+      ['2 Corinthians 4:16-17', 'So we do not lose heart. Though our outer self is wasting away, our inner self is being renewed day by day. For this light momentary affliction is preparing for us an eternal weight of glory beyond all comparison.'],
+      ['Romans 8:18', 'For I consider that the sufferings of this present time are not worth comparing with the glory that is to be revealed to us.'],
+    ]
+  },
+
+  // ── SINGLENESS ──
+  { cat: 'Singleness', q: 'Singleness — longing for marriage',
+    a: 'Singleness is not a deficiency, and Scripture calls it a gift (1 Cor 7). Yet the longing for marriage is also good, given by God. Hold both honestly. Don\u2019t put life on pause waiting; live fully now — serve, grow, give, love. Pray for what you long for, and trust God\u2019s timing and wisdom. Many godly singles have found that contentment, not marriage, was the deeper need being met.',
+    v: [
+      ['1 Corinthians 7:7-8', 'I wish that all were as I myself am. But each has his own gift from God, one of one kind and one of another. To the unmarried and the widows I say that it is good for them to remain single, as I am.'],
+      ['Psalm 37:4', 'Delight yourself in the LORD, and he will give you the desires of your heart.'],
+      ['Philippians 4:11-12', 'I have learned, in whatever situation I am, to be content. I know how to be brought low, and I know how to abound. In any and every circumstance, I have learned the secret of facing plenty and hunger, abundance and need.'],
+    ]
+  },
+
+  // ── PURPOSE ──
+  { cat: 'Purpose & Identity', q: 'Identity / who am I in Christ',
+    a: 'Your identity is not what you do, what others say, or what you feel — it is who God says you are. In Christ you are: chosen (Eph 1:4), adopted (Eph 1:5), forgiven (Eph 1:7), sealed with the Spirit (Eph 1:13), a new creation (2 Cor 5:17), a citizen of heaven (Phil 3:20), and a beloved child of the Father (1 John 3:1). Preach this to yourself daily; the world will try to overwrite it hourly.',
+    v: [
+      ['2 Corinthians 5:17', 'Therefore, if anyone is in Christ, he is a new creation. The old has passed away; behold, the new has come.'],
+      ['1 John 3:1', 'See what kind of love the Father has given to us, that we should be called children of God; and so we are.'],
+      ['Galatians 2:20', 'I have been crucified with Christ. It is no longer I who live, but Christ who lives in me.'],
+      ['Ephesians 2:10', 'For we are his workmanship, created in Christ Jesus for good works, which God prepared beforehand, that we should walk in them.'],
+    ]
+  },
+
+  // ── DEATH / DYING ──
+  { cat: 'Death & Eternity', q: 'Facing death — your own or a loved one\u2019s',
+    a: 'For the believer, death is not the end but the door home. To be absent from the body is to be present with the Lord (2 Cor 5:8). Use this season for what matters: reconciliation, blessing, prayer, the giving of love and wisdom. Tell those you love how you love them. Receive ministry; do not always insist on being the strong one. Christ has gone before — He has tasted death so we may pass through with hope.',
+    v: [
+      ['2 Corinthians 5:8', 'We are of good courage, and we would rather be away from the body and at home with the Lord.'],
+      ['Philippians 1:21-23', 'For to me to live is Christ, and to die is gain... My desire is to depart and be with Christ, for that is far better.'],
+      ['Psalm 23:4', 'Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me; your rod and your staff, they comfort me.'],
+      ['1 Corinthians 15:54-57', 'Death is swallowed up in victory. O death, where is your victory? O death, where is your sting?... thanks be to God, who gives us the victory through our Lord Jesus Christ.'],
+    ]
+  },
+];
+
+function _renderCounseling(body) {
+  const cats = {};
+  BM_COUNSELING.forEach((it, i) => { (cats[it.cat] = cats[it.cat] || []).push({ ...it, _i: i }); });
+  const catNames = Object.keys(cats);
+  body.innerHTML = `
+    <input type="text" class="bm-tool-input" id="bm-coun-search" placeholder="Search by issue, situation, or keyword…">
+    <div class="bm-tool-empty" style="margin-top:-2px;">Pastoral counsel for real situations. Always rooted in Scripture; never a substitute for a pastor or licensed counselor.</div>
+    <div id="bm-coun-list" style="display:flex;flex-direction:column;gap:14px;margin-top:6px;"></div>
+  `;
+  const list = _qs('bm-coun-list');
+  function paint(query) {
+    const q = (query || '').trim().toLowerCase();
+    let html = '';
+    catNames.forEach(cat => {
+      const items = cats[cat].filter(it => {
+        if (!q) return true;
+        return (it.q + ' ' + it.a + ' ' + it.cat).toLowerCase().includes(q)
+          || it.v.some(([ref, txt]) => (ref + ' ' + txt).toLowerCase().includes(q));
+      });
+      if (!items.length) return;
+      html += `<div><div class="bm-apol-cat">${_e(cat)}</div><div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">`;
+      items.forEach(it => {
+        const versesHtml = it.v.map(([ref, txt]) => `
+          <div class="bm-apol-verse">
+            <strong>${_e(ref)}</strong>
+            <span>${_e(txt)}</span>
+            <a href="${_bibleGatewayUrl(ref)}" target="_blank" rel="noopener">Open on BibleGateway →</a>
+          </div>`).join('');
+        html += `
+          <div class="bm-apol-card" data-idx="${it._i}">
+            <button type="button" class="bm-apol-q" data-toggle="${it._i}">
+              <span>${_e(it.q)}</span>
+              <span class="bm-apol-chev">›</span>
+            </button>
+            <div class="bm-apol-body">
+              <div class="bm-apol-section">Pastoral counsel</div>
+              <div class="bm-apol-answer">${_e(it.a)}</div>
+              <div class="bm-apol-section">Scripture</div>
+              <div class="bm-apol-verses">${versesHtml}</div>
+            </div>
+          </div>`;
+      });
+      html += `</div></div>`;
+    });
+    if (!html) html = `<div class="bm-tool-empty">No matching topics.</div>`;
+    list.innerHTML = html;
+  }
+  paint('');
+  _qs('bm-coun-search').addEventListener('input', e => paint(e.target.value));
+  list.addEventListener('click', e => {
+    const btn = e.target.closest('[data-toggle]');
+    if (!btn) return;
+    const card = btn.closest('.bm-apol-card');
+    if (card) card.classList.toggle('is-open');
+  });
 }

@@ -1620,6 +1620,63 @@
       padding: 2px 8px; border-radius: 999px;
       background: var(--c, #eee); color: #fff;
     }
+    /* Apologetics + Counseling: collapsible cards */
+    .bm-apol-cat {
+      font: 700 0.70rem 'Plus Jakarta Sans', sans-serif;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--bm-faint); margin: 10px 2px 2px;
+    }
+    .bm-apol-card {
+      border: 1px solid var(--bm-border, rgba(0,0,0,0.08));
+      border-radius: 11px; background: var(--bm-card, #fff);
+      overflow: hidden;
+    }
+    .bm-apol-q {
+      width: 100%; text-align: left; cursor: pointer;
+      padding: 12px 14px; border: 0; background: transparent;
+      font: 700 0.88rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .bm-apol-q:hover { background: rgba(232,168,56,0.06); }
+    .bm-apol-q .bm-apol-chev {
+      flex: none; transition: transform .18s ease;
+      color: var(--bm-faint);
+    }
+    .bm-apol-card.is-open .bm-apol-q .bm-apol-chev { transform: rotate(90deg); color: var(--bm-accent, #e8a838); }
+    .bm-apol-body {
+      display: none;
+      padding: 4px 14px 14px;
+      border-top: 1px solid var(--bm-border, rgba(0,0,0,0.06));
+      flex-direction: column; gap: 10px;
+    }
+    .bm-apol-card.is-open .bm-apol-body { display: flex; }
+    .bm-apol-section {
+      font: 700 0.66rem 'Plus Jakarta Sans', sans-serif;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--bm-accent, #e8a838); margin-top: 6px;
+    }
+    .bm-apol-answer {
+      font: 0.84rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-ink); line-height: 1.55;
+    }
+    .bm-apol-verses { display: flex; flex-direction: column; gap: 6px; }
+    .bm-apol-verse {
+      padding: 8px 10px; border-radius: 8px;
+      background: rgba(232,168,56,0.06);
+      border: 1px solid rgba(232,168,56,0.16);
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .bm-apol-verse strong {
+      font: 700 0.78rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+    }
+    .bm-apol-verse span {
+      font: 0.78rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); line-height: 1.5;
+    }
+    .bm-apol-verse a {
+      align-self: flex-start; font: 600 0.70rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-accent, #e8a838); text-decoration: none; margin-top: 1px;
+    }
+    .bm-apol-verse a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -1897,6 +1954,16 @@
               <div class="bm-land-tool-card" data-tool="liturgical">
                 <div class="bm-land-tool-h">Liturgical Calendar</div>
                 <div class="bm-land-tool-p">Plan around the church year.</div>
+                <span class="bm-land-pill-open">Open →</span>
+              </div>
+              <div class="bm-land-tool-card" data-tool="apologetics">
+                <div class="bm-land-tool-h">Apologetics</div>
+                <div class="bm-land-tool-p">Answers to common objections, with Scripture.</div>
+                <span class="bm-land-pill-open">Open →</span>
+              </div>
+              <div class="bm-land-tool-card" data-tool="counseling">
+                <div class="bm-land-tool-h">Biblical Counseling</div>
+                <div class="bm-land-tool-p">Scripture &amp; pastoral guidance for real situations.</div>
                 <span class="bm-land-pill-open">Open →</span>
               </div>
             </div>
