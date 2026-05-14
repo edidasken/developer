@@ -377,63 +377,52 @@ function _launchApp() {
 
 /* ── Header ───────────────────────────────────────────────────────────────── */
 function _wireHeader() {
-  // Account name
-  const nameEl = document.getElementById('ms-account-name');
-  if (nameEl && S.user) nameEl.textContent = S.user.displayName || 'Account';
+  const host = document.getElementById('ms-header');
+  if (!host) return;
 
-  // Profile dropdown popover
-  const acctBtn = document.getElementById('ms-account-btn');
-  const pop     = document.getElementById('ms-profile-pop');
-  if (acctBtn && pop) {
-    const ppName  = document.getElementById('ms-pp-name');
-    const ppEmail = document.getElementById('ms-pp-email');
-    if (ppName)  ppName.textContent  = (S.user?.displayName) || 'Account';
-    if (ppEmail) ppEmail.textContent = (S.user?.email) || '';
+  // Unity header — shared across all New Covenant apps.
+  const STAND_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+  const LIVE_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>';
+  const SETTINGS_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
 
-    const closePop = () => { pop.classList.remove('is-open'); acctBtn.setAttribute('aria-expanded', 'false'); };
-    acctBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = pop.classList.toggle('is-open');
-      acctBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  import('../Scripts/the_unity_header.js').then(({ mountUnityHeader }) => {
+    const ctrl = mountUnityHeader(host, {
+      appId:       'stand',
+      appName:     'Flock Stand',
+      appIconSvg:  STAND_ICON,
+      appAccent:   '#a855f7',
+      appAccentDk: '#4c1d95',
+      homeHref:    './',
+      user:        S.user || null,
+      onSignOut:   _signOutAndRedirect,
+      onHamburger: () => {
+        const sidebar = document.getElementById('ms-sidebar');
+        if (sidebar) sidebar.classList.toggle('is-open');
+      },
+      extras: [
+        { html: LIVE_ICON,     aria: 'Enter live presenter mode', title: 'Live',     onClick: () => _navigate('live') },
+        { html: SETTINGS_ICON, aria: 'Settings',                  title: 'Settings', onClick: () => _navigate('settings') },
+      ],
+      features: [
+        { id: 'view-dashboard', label: 'Dashboard',     hint: 'Navigate', run: () => _navigate('dashboard') },
+        { id: 'view-songs',     label: 'Songs Library', hint: 'Navigate', run: () => _navigate('songs') },
+        { id: 'view-services',  label: 'Service Plans', hint: 'Navigate', run: () => _navigate('services') },
+        { id: 'view-import',    label: 'Import',        hint: 'Navigate', run: () => _navigate('import') },
+        { id: 'view-settings',  label: 'Settings',      hint: 'Navigate', run: () => _navigate('settings') },
+        { id: 'go-live',        label: 'Go Live',       hint: 'Live presenter', run: () => _navigate('live') },
+      ],
     });
-    document.addEventListener('click', (e) => {
-      if (!pop.contains(e.target) && e.target !== acctBtn && !acctBtn.contains(e.target)) closePop();
-    });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop(); });
+    // Refresh user once Nehemiah resolves (auth gate may complete after _wireHeader runs)
+    setTimeout(() => { try { ctrl?.update?.({ user: S.user || null }); } catch (_) {} }, 1200);
+  }).catch(err => {
+    console.warn('[Stand] Unity header mount failed:', err);
+  });
 
-    pop.addEventListener('click', (e) => {
-      const item = e.target.closest('[data-pp]');
-      if (!item) return;
-      const action = item.dataset.pp;
-      if (action === 'signout') { e.preventDefault(); closePop(); _signOutAndRedirect(); return; }
-      if (action === 'settings') { e.preventDefault(); closePop(); _navigate('settings'); return; }
-      if (action === 'switch-church') { closePop(); return; /* href handles nav */ }
-      if (action === 'profile') { e.preventDefault(); closePop(); _navigate('settings'); return; }
-      // Stub items (prayer / todo / calendar / journal): show a friendly toast for now
-      e.preventDefault();
-      closePop();
-      try { _toast?.('Coming soon: ' + (item.textContent || '').trim()); } catch (_) {}
-    });
-  } else if (acctBtn) {
-    // Fallback if popover markup missing — preserve old sign-out behavior
-    acctBtn.addEventListener('click', () => { _signOutAndRedirect(); });
-  }
-
-  // Live button
-  const liveBtn = document.getElementById('ms-live-btn');
-  if (liveBtn) liveBtn.addEventListener('click', () => _navigate('live'));
-
-  // Settings button
-  const settingsBtn = document.getElementById('ms-settings-btn');
-  if (settingsBtn) settingsBtn.addEventListener('click', () => _navigate('settings'));
-
-  // Mobile menu toggle
-  const menuToggle = document.getElementById('ms-menu-toggle');
+  // Sidebar dismissal on outside click — preserves prior UX
   const sidebar = document.getElementById('ms-sidebar');
-  if (menuToggle && sidebar) {
-    menuToggle.addEventListener('click', () => sidebar.classList.toggle('is-open'));
+  if (sidebar) {
     document.addEventListener('click', (e) => {
-      if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+      if (!sidebar.contains(e.target) && !host.contains(e.target)) {
         sidebar.classList.remove('is-open');
       }
     });
