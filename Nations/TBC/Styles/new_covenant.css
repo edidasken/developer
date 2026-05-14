@@ -15313,6 +15313,86 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
+   UNITY FOOTER — Single shared app-shell footer
+   ══════════════════════════════════════════════════════════════════════════════ */
+.unity-footer {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 16px 14px calc(16px + var(--safe-bottom, 0px));
+  background: var(--foot-bg, #0c1445);
+  color: var(--foot-ink, rgba(255,255,255,0.65));
+  border-top: 1px solid var(--foot-line, rgba(255,255,255,0.08));
+  position: relative; z-index: 100; flex-shrink: 0;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.85rem;
+}
+
+.unity-footer::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
+  background: var(--grad-rainbow, linear-gradient(90deg,#ef4444,#f59e0b,#84cc16,#06b6d4,#8b5cf6,#ef4444));
+  background-size: 200% 100%;
+  animation: unity-rainbow 9s linear infinite;
+  opacity: 0.72; pointer-events: none;
+}
+
+.unity-footer-actions {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 8px;
+}
+
+.unity-footer-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: #fff; text-decoration: none;
+  font-size: 0.8rem; font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.unity-footer-btn:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.22);
+}
+.unity-footer-btn:active { transform: scale(0.96); }
+.unity-footer-btn svg { flex-shrink: 0; }
+
+.unity-footer-meta {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 8px; font-size: 0.75rem; opacity: 0.8;
+}
+
+.unity-footer-sep {
+  color: rgba(255,255,255,0.35);
+}
+
+.unity-footer-version {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  font-size: 0.7rem; font-weight: 600;
+  color: var(--foot-accent, #e8a838);
+}
+
+.unity-footer-motto {
+  font-size: 0.7rem; font-style: italic; text-transform: uppercase;
+  letter-spacing: 0.06em; opacity: 0.6;
+  color: rgba(255,255,255,0.5);
+  margin-top: 4px;
+}
+
+@media (max-width: 540px) {
+  .unity-footer { 
+    padding: 14px 10px calc(14px + var(--safe-bottom, 0px)); 
+    gap: 12px; font-size: 0.8rem; 
+  }
+  .unity-footer-btn { padding: 7px 12px; font-size: 0.75rem; }
+  .unity-footer-btn span { display: none; }
+  .unity-footer-motto { font-size: 0.65rem; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
    UNITY SEARCH MODAL
    ══════════════════════════════════════════════════════════════════════════════ */
 .unity-search-modal {
