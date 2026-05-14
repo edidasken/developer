@@ -44,7 +44,7 @@ export const NC_APPS = [
   { id: 'stand',     name: 'Flock Stand',    sub: 'Songs, setlists & live',         href: 'app.stand/',                     tone: 'purple' },
   { id: 'flockshow', name: 'FlockShow',      sub: 'Worship slides & service',       href: 'app.flockshow/app.flockshow.html', tone: 'red'  },
   { id: 'flockchat', name: 'FlockChat',      sub: 'Messaging & prayer chain',       href: 'app.flockchat/app.flockchat.html', tone: 'cyan' },
-  { id: 'feed',      name: 'The Feed',       sub: 'Sermon prep & manuscript',       href: 'app.feed/',                      tone: 'gold'   },
+  { id: 'feed',      name: 'FEED',           sub: 'Sermon prep & study tools',      href: 'app.feed/',                      tone: 'gold'   },
 ];
 
 /* ─── Styles (injected once) ────────────────────────────────────────────── */

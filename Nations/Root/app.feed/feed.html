@@ -21,11 +21,11 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="The Feed">
+  <meta name="apple-mobile-web-app-title" content="FEED">
   <meta name="theme-color" content="#c48a20">
-  <meta name="description" content="The Feed — Sermon preparation and manuscript builder for FlockOS. Craft the Word with clarity, depth, and purpose.">
+  <meta name="description" content="FEED — Sermon preparation, study tools, and the Word for FlockOS. Craft and prepare with clarity, depth, and purpose.">
 
-  <title>The Feed — FlockOS</title>
+  <title>FEED — FlockOS</title>
 
   <!-- PWA manifest -->
   <link rel="manifest" href="app.feed/manifest.json">
@@ -273,28 +273,218 @@
       background: var(--bm-bg);
     }
 
-    /* ── Empty state ────────────────────────────────────────────────────── */
+    /* ── FEED Landing Page (replaces simple empty state) ───────────────── */
     #bm-empty {
       flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 16px; padding: 40px 24px; text-align: center;
+      gap: 0; padding: 0; overflow-y: auto; overflow-x: hidden;
+      -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+      background: var(--bm-bg);
     }
-    .bm-empty-icon {
-      width: 80px; height: 80px; border-radius: 20px;
-      background: linear-gradient(135deg, rgba(232,168,56,0.15), rgba(167,139,250,0.12));
+    .bm-land {
+      max-width: 1180px; width: 100%; margin: 0 auto;
+      padding: 28px 24px 80px; box-sizing: border-box;
+      display: flex; flex-direction: column; gap: 22px;
+    }
+    .bm-land-hero {
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+      padding: 22px 24px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(232,168,56,0.12), rgba(167,139,250,0.08));
       border: 1px solid rgba(232,168,56,0.20);
-      display: flex; align-items: center; justify-content: center; font-size: 36px;
-      box-shadow: 0 8px 32px rgba(232,168,56,0.12);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.04);
     }
-    .bm-empty-h { font: 700 1.3rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink); }
-    .bm-empty-p { font: 0.88rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted); line-height: 1.55; max-width: 360px; }
-    .bm-empty-verse {
-      font: italic 0.80rem 'Noto Serif', Georgia, serif; color: var(--bm-faint);
-      max-width: 380px; line-height: 1.65; margin-top: 8px;
-      padding: 12px 20px; border-left: 2px solid rgba(232,168,56,0.25);
-      text-align: left;
+    .bm-land-hero-icon {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: linear-gradient(135deg, #e8a838, #c48a20);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 18px rgba(232,168,56,0.30);
+      flex-shrink: 0;
     }
-    .bm-empty-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+    .bm-land-hero-text { flex: 1; min-width: 200px; }
+    .bm-land-hero-h {
+      font: 700 1.45rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      margin: 0 0 4px 0; letter-spacing: -0.01em;
+    }
+    .bm-land-hero-p {
+      font: 0.88rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted);
+      margin: 0; line-height: 1.55;
+    }
+    .bm-land-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .bm-land-grid {
+      display: grid; gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    .bm-land-grid--2 { grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
+    .bm-land-grid--4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+    .bm-land-card {
+      background: var(--bm-card, #ffffff);
+      border: 1px solid var(--bm-border, rgba(0,0,0,0.06));
+      border-radius: 14px; padding: 18px 18px 16px;
+      display: flex; flex-direction: column; gap: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      transition: box-shadow 0.18s ease, transform 0.18s ease;
+      min-width: 0;
+    }
+    .bm-land-card:hover { box-shadow: 0 6px 22px rgba(0,0,0,0.06); }
+    .bm-land-card--span2 { grid-column: span 2; }
+    @media (max-width: 720px) { .bm-land-card--span2 { grid-column: auto; } }
+
+    .bm-land-card-head {
+      display: flex; align-items: center; gap: 10px; min-width: 0;
+    }
+    .bm-land-card-icon {
+      width: 32px; height: 32px; border-radius: 10px;
+      background: linear-gradient(135deg, rgba(232,168,56,0.15), rgba(167,139,250,0.10));
+      display: flex; align-items: center; justify-content: center;
+      color: var(--bm-accent, #e8a838); flex-shrink: 0;
+    }
+    .bm-land-card-h {
+      font: 700 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .bm-land-card-sub {
+      font: 0.75rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .bm-land-card-body {
+      font: 0.85rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted);
+      line-height: 1.55; min-height: 40px;
+    }
+    .bm-land-empty-line {
+      font: italic 0.80rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      padding: 6px 0;
+    }
+    .bm-land-list { display: flex; flex-direction: column; gap: 6px; }
+    .bm-land-list-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 8px; cursor: pointer;
+      background: rgba(0,0,0,0.02); transition: background 0.15s ease;
+      border: 1px solid transparent;
+    }
+    .bm-land-list-item:hover {
+      background: rgba(232,168,56,0.08);
+      border-color: rgba(232,168,56,0.18);
+    }
+    .bm-land-list-item-title {
+      flex: 1; font: 600 0.85rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      min-width: 0;
+    }
+    .bm-land-list-item-meta {
+      font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      flex-shrink: 0;
+    }
+    .bm-land-verse {
+      font: italic 0.92rem 'Noto Serif', Georgia, serif; color: var(--bm-ink);
+      line-height: 1.65; padding: 10px 14px;
+      border-left: 3px solid rgba(232,168,56,0.45);
+      background: rgba(232,168,56,0.04);
+      border-radius: 0 8px 8px 0;
+    }
+    .bm-land-verse-ref {
+      font: 600 0.78rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent, #e8a838);
+      margin-top: 6px; display: block;
+    }
+    .bm-land-mini-input {
+      width: 100%; padding: 9px 12px; box-sizing: border-box;
+      border-radius: 8px; border: 1px solid var(--bm-border, rgba(0,0,0,0.10));
+      background: var(--bm-card, #ffffff); color: var(--bm-ink);
+      font: 0.85rem 'Plus Jakarta Sans', sans-serif;
+    }
+    .bm-land-mini-input:focus {
+      outline: none; border-color: var(--bm-accent, #e8a838);
+      box-shadow: 0 0 0 3px rgba(232,168,56,0.15);
+    }
+    .bm-land-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .bm-land-tag {
+      font: 600 0.74rem 'Plus Jakarta Sans', sans-serif;
+      padding: 5px 10px; border-radius: 999px;
+      background: rgba(232,168,56,0.10); color: var(--bm-ink);
+      border: 1px solid rgba(232,168,56,0.22); cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .bm-land-tag:hover { background: rgba(232,168,56,0.20); }
+    .bm-land-tag-count {
+      color: var(--bm-faint); margin-left: 4px; font-weight: 500;
+    }
+    .bm-land-cta-row {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px;
+    }
+    .bm-land-progress {
+      height: 6px; border-radius: 3px; background: rgba(0,0,0,0.06);
+      overflow: hidden; margin-top: 6px;
+    }
+    .bm-land-progress-bar {
+      height: 100%; background: linear-gradient(90deg, #e8a838, #c48a20);
+      border-radius: 3px; transition: width 0.3s ease;
+    }
+    .bm-land-archive-grid {
+      display: grid; gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      max-height: 320px; overflow-y: auto; padding-right: 4px;
+    }
+    .bm-land-archive-item {
+      padding: 10px 12px; border-radius: 10px;
+      background: rgba(0,0,0,0.02);
+      border: 1px solid var(--bm-border, rgba(0,0,0,0.05));
+      cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease;
+      display: flex; flex-direction: column; gap: 4px; min-width: 0;
+    }
+    .bm-land-archive-item:hover {
+      background: rgba(232,168,56,0.06);
+      border-color: rgba(232,168,56,0.20);
+    }
+    .bm-land-archive-title {
+      font: 600 0.85rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .bm-land-archive-meta {
+      font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      display: flex; gap: 8px; align-items: center;
+    }
+    .bm-land-tool-card {
+      background: var(--bm-card, #ffffff);
+      border: 1px solid var(--bm-border, rgba(0,0,0,0.06));
+      border-radius: 14px; padding: 16px;
+      display: flex; flex-direction: column; gap: 8px;
+      cursor: pointer; transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .bm-land-tool-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(232,168,56,0.10);
+    }
+    .bm-land-tool-h {
+      font: 700 0.92rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+    }
+    .bm-land-tool-p {
+      font: 0.78rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted);
+      line-height: 1.5;
+    }
+    .bm-land-pill-soon {
+      display: inline-block; font: 600 0.65rem 'Plus Jakarta Sans', sans-serif;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 2px 8px; border-radius: 999px;
+      background: rgba(167,139,250,0.12); color: #6d52d6;
+      border: 1px solid rgba(167,139,250,0.25);
+    }
+    .bm-land-scratch {
+      width: 100%; min-height: 100px; box-sizing: border-box;
+      padding: 10px 12px; border-radius: 10px;
+      border: 1px solid var(--bm-border, rgba(0,0,0,0.10));
+      background: var(--bm-card, #ffffff); color: var(--bm-ink);
+      font: 0.86rem 'Plus Jakarta Sans', sans-serif; line-height: 1.55;
+      resize: vertical;
+    }
+    .bm-land-scratch:focus {
+      outline: none; border-color: var(--bm-accent, #e8a838);
+      box-shadow: 0 0 0 3px rgba(232,168,56,0.15);
+    }
+    .bm-land-saved-hint {
+      font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      align-self: flex-end;
+    }
 
     /* ════════════════════════════════════════════════════
        EDITOR AREA
@@ -1273,11 +1463,14 @@
     <button class="bm-btn bm-btn--ghost bm-btn--icon bm-hamburger" id="bm-hamburger" aria-label="Open sidebar" style="display:none">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
-    <a class="bm-logo" href="./" title="Back to launcher" style="text-decoration:none;color:inherit">
+    <a class="bm-logo" id="bm-logo" href="./" title="FEED home" style="text-decoration:none;color:inherit">
       <div class="bm-logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-      <span class="bm-logo-text">The Feed</span>
+      <span class="bm-logo-text">FEED</span>
     </a>
-    <span id="bm-active-title">No sermon selected</span>
+    <button class="bm-btn bm-btn--ghost bm-btn--icon" id="bm-close-sermon-btn" title="Close sermon (back to FEED)" aria-label="Close sermon" style="display:none;margin-right:6px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <span id="bm-active-title">FEED</span>
     <div class="bm-topbar-right">
       <button data-app-switcher data-app-switcher-current="feed" title="Switch app"></button>
       <button class="bm-btn bm-btn--ghost bm-btn--sm" id="bm-duplicate-btn" title="Duplicate this sermon" disabled>
@@ -1347,21 +1540,198 @@
     <!-- ── Main workspace ──────────────────────────────────────────── -->
     <main id="bm-main">
 
-      <!-- Empty state -->
+      <!-- FEED Landing Page (study + sermon prep dashboard) -->
       <div id="bm-empty">
-        <div class="bm-empty-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#e8a838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-        <div class="bm-empty-h">Your Sermon Workshop</div>
-        <div class="bm-empty-p">Create a new sermon or open one you've already started. The Feed gives you everything you need — from outline to manuscript to delivery notes.</div>
-        <div class="bm-empty-verse">"So then faith comes by hearing, and hearing by the word of God." — Romans 10:17</div>
-        <div class="bm-empty-actions">
-          <button class="bm-btn bm-btn--primary" id="bm-empty-new-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            New Sermon
-          </button>
-          <button class="bm-btn bm-btn--ghost" id="bm-empty-browse-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-            Browse Sermons
-          </button>
+        <div class="bm-land">
+
+          <!-- Hero -->
+          <section class="bm-land-hero">
+            <div class="bm-land-hero-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </div>
+            <div class="bm-land-hero-text">
+              <h1 class="bm-land-hero-h" id="bm-land-greeting">Welcome to FEED</h1>
+              <p class="bm-land-hero-p">Study the Word. Prepare your sermons. Plan with depth and clarity.</p>
+            </div>
+            <div class="bm-land-hero-actions">
+              <button class="bm-btn bm-btn--primary" id="bm-empty-new-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Sermon
+              </button>
+              <button class="bm-btn bm-btn--ghost" id="bm-empty-browse-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+                Browse
+              </button>
+            </div>
+          </section>
+
+          <!-- Row: Recent + Upcoming + Verse -->
+          <div class="bm-land-grid">
+            <section class="bm-land-card" id="bm-land-recent-card">
+              <div class="bm-land-card-head">
+                <div class="bm-land-card-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3 4 3 12 11 12"/></svg>
+                </div>
+                <div class="bm-land-card-h">Continue Working</div>
+              </div>
+              <div class="bm-land-list" id="bm-land-recent-list">
+                <div class="bm-land-empty-line">No recent sermons yet.</div>
+              </div>
+            </section>
+
+            <section class="bm-land-card" id="bm-land-upcoming-card">
+              <div class="bm-land-card-head">
+                <div class="bm-land-card-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="bm-land-card-h">Upcoming Service</div>
+              </div>
+              <div class="bm-land-card-body" id="bm-land-upcoming-body">
+                <div class="bm-land-empty-line">Connect a service plan to see your next service. <span class="bm-land-pill-soon">Coming online</span></div>
+              </div>
+            </section>
+
+            <section class="bm-land-card" id="bm-land-votd-card">
+              <div class="bm-land-card-head">
+                <div class="bm-land-card-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                </div>
+                <div class="bm-land-card-h">Verse of the Day</div>
+              </div>
+              <div class="bm-land-card-body" id="bm-land-votd-body">
+                <div class="bm-land-verse" id="bm-land-votd-text">Loading…</div>
+                <span class="bm-land-verse-ref" id="bm-land-votd-ref"></span>
+              </div>
+            </section>
+          </div>
+
+          <!-- Row: Journal + Strong's quick search -->
+          <div class="bm-land-grid bm-land-grid--2">
+            <section class="bm-land-card" id="bm-land-journal-card">
+              <div class="bm-land-card-head">
+                <div class="bm-land-card-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+                </div>
+                <div class="bm-land-card-h">Study Notes & Journal</div>
+              </div>
+              <div class="bm-land-list" id="bm-land-journal-list">
+                <div class="bm-land-empty-line">Your study journal will appear here.</div>
+              </div>
+            </section>
+
+            <section class="bm-land-card" id="bm-land-strongs-card">
+              <div class="bm-land-card-head">
+                <div class="bm-land-card-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                </div>
+                <div class="bm-land-card-h">Strong's Quick Search</div>
+              </div>
+              <input class="bm-land-mini-input" id="bm-land-strongs-input" type="text" placeholder="Search by Strong's # (e.g. G26) or word…" autocomplete="off">
+              <div class="bm-land-card-body" id="bm-land-strongs-result">
+                <div class="bm-land-empty-line">Enter a Strong's number or English word.</div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Topic / theme library -->
+          <section class="bm-land-card" id="bm-land-topics-card">
+            <div class="bm-land-card-head">
+              <div class="bm-land-card-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              </div>
+              <div class="bm-land-card-h">Topics & Themes</div>
+              <span class="bm-land-card-sub">From your sermons</span>
+            </div>
+            <div class="bm-land-tags" id="bm-land-topics-tags">
+              <div class="bm-land-empty-line">Tag your sermons to build a topic library.</div>
+            </div>
+          </section>
+
+          <!-- Past sermons archive (search + grid) -->
+          <section class="bm-land-card bm-land-card--span2" id="bm-land-archive-card">
+            <div class="bm-land-card-head">
+              <div class="bm-land-card-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+              </div>
+              <div class="bm-land-card-h">Past Sermons Archive</div>
+              <span class="bm-land-card-sub" id="bm-land-archive-count">0 sermons</span>
+            </div>
+            <input class="bm-land-mini-input" id="bm-land-archive-search" type="text" placeholder="Search title, series, passage, speaker…" autocomplete="off">
+            <div class="bm-land-archive-grid" id="bm-land-archive-grid">
+              <div class="bm-land-empty-line">No sermons yet.</div>
+            </div>
+          </section>
+
+          <!-- Plan + Prayer (snapshots) -->
+          <div class="bm-land-grid bm-land-grid--2">
+            <section class="bm-land-card" id="bm-land-plan-card">
+              <div class="bm-land-card-head">
+                <div class="bm-land-card-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                </div>
+                <div class="bm-land-card-h">Bible Reading Plan</div>
+                <span class="bm-land-pill-soon">Coming online</span>
+              </div>
+              <div class="bm-land-card-body">
+                <div class="bm-land-empty-line">Track daily readings as you walk through the Word.</div>
+                <div class="bm-land-progress"><div class="bm-land-progress-bar" style="width:0%"></div></div>
+              </div>
+            </section>
+
+            <section class="bm-land-card" id="bm-land-prayer-card">
+              <div class="bm-land-card-head">
+                <div class="bm-land-card-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                </div>
+                <div class="bm-land-card-h">Prayer List</div>
+                <span class="bm-land-pill-soon">Coming online</span>
+              </div>
+              <div class="bm-land-card-body">
+                <div class="bm-land-empty-line">Prayer requests from the church will appear here.</div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Sermon Idea Scratchpad -->
+          <section class="bm-land-card" id="bm-land-scratch-card">
+            <div class="bm-land-card-head">
+              <div class="bm-land-card-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 11.5a2.5 2.5 0 0 1 5 0v0a2.5 2.5 0 0 1-5 0z"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+              </div>
+              <div class="bm-land-card-h">Sermon Ideas & Inspiration</div>
+              <span class="bm-land-card-sub">Saved as you type</span>
+            </div>
+            <textarea class="bm-land-scratch" id="bm-land-scratch" placeholder="Capture a thought, a verse, an outline seed, an illustration…"></textarea>
+            <span class="bm-land-saved-hint" id="bm-land-scratch-hint">&nbsp;</span>
+          </section>
+
+          <!-- Study Tools row -->
+          <div>
+            <div class="bm-land-card-sub" style="margin: 4px 4px 10px;">Study Tools</div>
+            <div class="bm-land-grid bm-land-grid--4">
+              <div class="bm-land-tool-card" data-tool="cross-ref">
+                <div class="bm-land-tool-h">Cross-References</div>
+                <div class="bm-land-tool-p">Find parallel passages for any verse.</div>
+                <span class="bm-land-pill-soon">Coming online</span>
+              </div>
+              <div class="bm-land-tool-card" data-tool="topical">
+                <div class="bm-land-tool-h">Topical Index</div>
+                <div class="bm-land-tool-p">Jump to verses by theme or topic.</div>
+                <span class="bm-land-pill-soon">Coming online</span>
+              </div>
+              <div class="bm-land-tool-card" data-tool="quotes">
+                <div class="bm-land-tool-h">Quote &amp; Illustration Library</div>
+                <div class="bm-land-tool-p">Save and reuse sermon-ready quotes.</div>
+                <span class="bm-land-pill-soon">Coming online</span>
+              </div>
+              <div class="bm-land-tool-card" data-tool="liturgical">
+                <div class="bm-land-tool-h">Liturgical Calendar</div>
+                <div class="bm-land-tool-p">Plan around the church year.</div>
+                <span class="bm-land-pill-soon">Coming online</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 

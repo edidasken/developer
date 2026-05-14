@@ -924,6 +924,10 @@ function _selectSermon(id) {
   const saveBtn = _qs('bm-save-btn');
   if (saveBtn) saveBtn.disabled = false;
 
+  // Show close (X) button when a sermon is open
+  const closeBtn = _qs('bm-close-sermon-btn');
+  if (closeBtn) closeBtn.style.display = '';
+
   // Enable action buttons that require an active sermon
   const dupBtn  = _qs('bm-duplicate-btn');
   const cpyBtn  = _qs('bm-copy-outline-btn');
@@ -1607,10 +1611,13 @@ function _confirmDelete() {
     _qs('bm-empty').hidden  = false;
     _qs('bm-editor').hidden = true;
     const titleEl = _qs('bm-active-title');
-    if (titleEl) { titleEl.textContent = 'No sermon selected'; titleEl.classList.remove('has-sermon'); }
+    if (titleEl) { titleEl.textContent = 'FEED'; titleEl.classList.remove('has-sermon'); }
     const saveBtn = _qs('bm-save-btn');
     if (saveBtn) saveBtn.disabled = true;
+    const closeBtn = _qs('bm-close-sermon-btn');
+    if (closeBtn) closeBtn.style.display = 'none';
     _renderList();
+    _renderLanding();
     _toast('Sermon deleted', 'error');
   };
   _qs('bm-modal-cancel').onclick = () => { _qs('bm-confirm-modal').hidden = true; };
@@ -2349,6 +2356,335 @@ function _hideAuth(user) {
   if (name)   name.textContent   = user.displayName  || user.email || 'User';
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// FEED LANDING PAGE — sermon prep & study dashboard
+// ════════════════════════════════════════════════════════════════════════════
+
+const BM_SCRATCH_KEY = 'bm_feed_scratch_v1';
+
+// Verse-of-the-day rotation (deterministic by day-of-year)
+const _VOTD = [
+  { ref: 'Romans 10:17',     text: 'So then faith comes by hearing, and hearing by the word of God.' },
+  { ref: 'Psalm 119:105',    text: 'Your word is a lamp to my feet and a light to my path.' },
+  { ref: 'Hebrews 4:12',     text: 'For the word of God is living and active, sharper than any two-edged sword…' },
+  { ref: '2 Timothy 3:16',   text: 'All Scripture is breathed out by God and profitable for teaching, for reproof, for correction, and for training in righteousness.' },
+  { ref: 'Isaiah 55:11',     text: 'So shall my word be that goes out from my mouth; it shall not return to me empty…' },
+  { ref: 'Joshua 1:8',       text: 'This Book of the Law shall not depart from your mouth, but you shall meditate on it day and night…' },
+  { ref: 'Matthew 4:4',      text: 'Man shall not live by bread alone, but by every word that comes from the mouth of God.' },
+  { ref: 'John 1:1',         text: 'In the beginning was the Word, and the Word was with God, and the Word was God.' },
+  { ref: 'Psalm 19:7',       text: 'The law of the LORD is perfect, reviving the soul; the testimony of the LORD is sure, making wise the simple.' },
+  { ref: '1 Peter 2:2',      text: 'Like newborn infants, long for the pure spiritual milk, that by it you may grow up into salvation.' },
+  { ref: 'James 1:22',       text: 'But be doers of the word, and not hearers only, deceiving yourselves.' },
+  { ref: 'Colossians 3:16',  text: 'Let the word of Christ dwell in you richly, teaching and admonishing one another in all wisdom…' },
+  { ref: 'Acts 17:11',       text: '…they received the word with all eagerness, examining the Scriptures daily to see if these things were so.' },
+  { ref: 'Psalm 1:2',        text: '…his delight is in the law of the LORD, and on his law he meditates day and night.' }
+];
+
+function _votdToday() {
+  const d = new Date();
+  const start = new Date(d.getFullYear(), 0, 0);
+  const day = Math.floor((d - start) / 86400000);
+  return _VOTD[day % _VOTD.length];
+}
+
+function _firstName() {
+  try {
+    const u = (window.firebase && firebase.auth && firebase.auth().currentUser) || null;
+    const n = (u && (u.displayName || u.email)) || '';
+    return (n.split(/[\s@]/)[0] || '').replace(/^./, c => c.toUpperCase());
+  } catch (_) { return ''; }
+}
+
+function _fmtDate(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function _fmtAgo(ts) {
+  if (!ts) return '';
+  const ms = Date.now() - ts;
+  const min = Math.floor(ms / 60000);
+  if (min < 1)   return 'just now';
+  if (min < 60)  return min + 'm ago';
+  const hr  = Math.floor(min / 60);
+  if (hr  < 24)  return hr  + 'h ago';
+  const day = Math.floor(hr / 24);
+  if (day < 7)   return day + 'd ago';
+  return _fmtDate(ts);
+}
+
+function _renderLanding() {
+  // Greeting
+  const greet = _qs('bm-land-greeting');
+  if (greet) {
+    const fn = _firstName();
+    const hour = new Date().getHours();
+    const part = hour < 12 ? 'Good morning' : (hour < 17 ? 'Good afternoon' : 'Good evening');
+    greet.textContent = fn ? `${part}, ${fn}` : 'Welcome to FEED';
+  }
+
+  // Verse of the Day
+  const v = _votdToday();
+  const vtxt = _qs('bm-land-votd-text');
+  const vref = _qs('bm-land-votd-ref');
+  if (vtxt) vtxt.textContent = '"' + v.text + '"';
+  if (vref) vref.textContent = '— ' + v.ref;
+
+  _renderLandingRecent();
+  _renderLandingTopics();
+  _renderLandingArchive();
+  _renderLandingUpcoming();
+  _renderLandingJournal();
+
+  // Restore scratchpad
+  const scr = _qs('bm-land-scratch');
+  if (scr && !scr.dataset._init) {
+    scr.dataset._init = '1';
+    try { scr.value = localStorage.getItem(BM_SCRATCH_KEY) || ''; } catch (_) {}
+  }
+}
+
+function _renderLandingRecent() {
+  const list = _qs('bm-land-recent-list');
+  if (!list) return;
+  const recent = (S.sermons || [])
+    .slice()
+    .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
+    .slice(0, 5);
+  if (!recent.length) {
+    list.innerHTML = '<div class="bm-land-empty-line">No sermons yet — click <strong>New Sermon</strong> to begin.</div>';
+    return;
+  }
+  list.innerHTML = recent.map(s => `
+    <div class="bm-land-list-item" data-sermon-id="${_e(s.id)}">
+      <div class="bm-land-list-item-title">${_e(s.title || 'Untitled')}</div>
+      <div class="bm-land-list-item-meta">${_e(_fmtAgo(s.updatedAt))}</div>
+    </div>
+  `).join('');
+  list.querySelectorAll('.bm-land-list-item').forEach(el => {
+    el.addEventListener('click', () => _selectSermon(el.dataset.sermonId));
+  });
+}
+
+function _renderLandingTopics() {
+  const wrap = _qs('bm-land-topics-tags');
+  if (!wrap) return;
+  const counts = new Map();
+  (S.sermons || []).forEach(s => {
+    const tags = []
+      .concat(s.tags || [])
+      .concat(s.themes || [])
+      .concat(s.series ? [s.series] : []);
+    tags.forEach(t => {
+      const k = String(t || '').trim();
+      if (!k) return;
+      counts.set(k, (counts.get(k) || 0) + 1);
+    });
+  });
+  if (!counts.size) {
+    wrap.innerHTML = '<div class="bm-land-empty-line">Add tags or a series to a sermon to build a topic library.</div>';
+    return;
+  }
+  const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 24);
+  wrap.innerHTML = sorted.map(([t, n]) => `
+    <button class="bm-land-tag" data-topic="${_e(t)}">${_e(t)}<span class="bm-land-tag-count">${n}</span></button>
+  `).join('');
+  wrap.querySelectorAll('.bm-land-tag').forEach(el => {
+    el.addEventListener('click', () => {
+      const search = _qs('bm-land-archive-search');
+      if (search) { search.value = el.dataset.topic; _renderLandingArchive(); search.focus(); }
+    });
+  });
+}
+
+function _renderLandingArchive() {
+  const grid = _qs('bm-land-archive-grid');
+  const cnt  = _qs('bm-land-archive-count');
+  const inp  = _qs('bm-land-archive-search');
+  if (!grid) return;
+  const q = ((inp && inp.value) || '').trim().toLowerCase();
+  let rows = (S.sermons || []).slice();
+  if (q) {
+    rows = rows.filter(s => {
+      const hay = [s.title, s.series, s.passage, s.speaker, (s.tags || []).join(' '), (s.themes || []).join(' ')]
+        .filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+  }
+  rows.sort((a, b) => (b.date || b.updatedAt || 0) - (a.date || a.updatedAt || 0));
+  if (cnt) cnt.textContent = rows.length + (rows.length === 1 ? ' sermon' : ' sermons');
+  if (!rows.length) {
+    grid.innerHTML = '<div class="bm-land-empty-line">' + (q ? 'No matches.' : 'No sermons yet.') + '</div>';
+    return;
+  }
+  grid.innerHTML = rows.slice(0, 60).map(s => {
+    const meta = [s.series, s.passage, s.date ? _fmtDate(s.date) : ''].filter(Boolean).join(' · ');
+    return `<div class="bm-land-archive-item" data-sermon-id="${_e(s.id)}">
+      <div class="bm-land-archive-title">${_e(s.title || 'Untitled')}</div>
+      <div class="bm-land-archive-meta">${_e(meta || _fmtAgo(s.updatedAt))}</div>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.bm-land-archive-item').forEach(el => {
+    el.addEventListener('click', () => _selectSermon(el.dataset.sermonId));
+  });
+}
+
+async function _renderLandingUpcoming() {
+  const body = _qs('bm-land-upcoming-body');
+  if (!body) return;
+
+  // Try a sermon with a future scheduled date first (uses local sermon list)
+  try {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const upcoming = (S.sermons || [])
+      .map(s => {
+        const t = s.date ? new Date(s.date).getTime() : 0;
+        return t ? { s, t } : null;
+      })
+      .filter(x => x && x.t >= today.getTime())
+      .sort((a, b) => a.t - b.t);
+    if (upcoming.length) {
+      const top = upcoming[0];
+      body.innerHTML = `
+        <div class="bm-land-list-item" data-sermon-id="${_e(top.s.id)}">
+          <div class="bm-land-list-item-title">${_e(top.s.title || 'Untitled')}</div>
+          <div class="bm-land-list-item-meta">${_e(_fmtDate(top.t))}</div>
+        </div>
+      `;
+      const item = body.querySelector('.bm-land-list-item');
+      if (item) item.addEventListener('click', () => _selectSermon(item.dataset.sermonId));
+      return;
+    }
+  } catch (_) {}
+
+  body.innerHTML = '<div class="bm-land-empty-line">No scheduled sermon yet. Set a date on a sermon to see it here.</div>';
+}
+
+async function _renderLandingJournal() {
+  const list = _qs('bm-land-journal-list');
+  if (!list) return;
+  if (!(window.UpperRoom && typeof window.UpperRoom.listJournal === 'function')) {
+    return; // leave default empty line
+  }
+  try {
+    const res = await window.UpperRoom.listJournal({ limit: 5 });
+    const rows = (res && (res.rows || res.items || res)) || [];
+    if (!rows.length) {
+      list.innerHTML = '<div class="bm-land-empty-line">No journal entries yet.</div>';
+      return;
+    }
+    list.innerHTML = rows.slice(0, 5).map(e => {
+      const title = e.title || e.summary || e.text || 'Journal entry';
+      const ts = e.updatedAt || e.createdAt || e.date || 0;
+      return `<div class="bm-land-list-item">
+        <div class="bm-land-list-item-title">${_e(String(title).slice(0, 80))}</div>
+        <div class="bm-land-list-item-meta">${_e(_fmtAgo(typeof ts === 'number' ? ts : new Date(ts).getTime()))}</div>
+      </div>`;
+    }).join('');
+  } catch (_) { /* silent */ }
+}
+
+// ── Strong's quick search on the landing page ────────────────────────────────
+function _bindLandingStrongs() {
+  const input = _qs('bm-land-strongs-input');
+  const out   = _qs('bm-land-strongs-result');
+  if (!input || !out) return;
+  let timer = null;
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    const q = input.value.trim();
+    if (!q) {
+      out.innerHTML = '<div class="bm-land-empty-line">Enter a Strong\'s number or English word.</div>';
+      return;
+    }
+    timer = setTimeout(() => _doLandingStrongs(q, out), 300);
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { clearTimeout(timer); _doLandingStrongs(input.value.trim(), out); }
+  });
+}
+
+async function _doLandingStrongs(q, out) {
+  if (!q) return;
+  out.innerHTML = '<div class="bm-land-empty-line">Searching…</div>';
+  try {
+    if (typeof _doLexFirestore === 'function') {
+      const r = await _doLexFirestore(q);
+      if (r && r.length) {
+        out.innerHTML = r.slice(0, 4).map(w => `
+          <div class="bm-land-list-item">
+            <div class="bm-land-list-item-title"><strong>${_e(w.strongs || w.id || '')}</strong> &middot; ${_e(w.lemma || w.translit || '')}</div>
+            <div class="bm-land-list-item-meta">${_e((w.kjv_def || w.def || '').slice(0, 60))}</div>
+          </div>
+        `).join('');
+        return;
+      }
+    }
+    // Fallback: direct Firestore lookup if available
+    if (window.firebase && firebase.firestore) {
+      const db = firebase.firestore();
+      const id = q.toUpperCase();
+      const doc = await db.collection('words').doc(id).get();
+      if (doc.exists) {
+        const w = doc.data();
+        out.innerHTML = `<div class="bm-land-list-item"><div class="bm-land-list-item-title"><strong>${_e(id)}</strong> &middot; ${_e(w.lemma || '')}</div><div class="bm-land-list-item-meta">${_e((w.kjv_def || '').slice(0, 80))}</div></div>`;
+        return;
+      }
+    }
+    out.innerHTML = '<div class="bm-land-empty-line">No matches.</div>';
+  } catch (_) {
+    out.innerHTML = '<div class="bm-land-empty-line">Search unavailable.</div>';
+  }
+}
+
+// ── Sermon Idea scratchpad (localStorage-backed) ─────────────────────────────
+function _bindLandingScratch() {
+  const t = _qs('bm-land-scratch');
+  const h = _qs('bm-land-scratch-hint');
+  if (!t) return;
+  let timer = null;
+  t.addEventListener('input', () => {
+    clearTimeout(timer);
+    if (h) h.textContent = 'Saving…';
+    timer = setTimeout(() => {
+      try { localStorage.setItem(BM_SCRATCH_KEY, t.value || ''); } catch (_) {}
+      if (h) h.textContent = 'Saved ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }, 400);
+  });
+}
+
+// ── Close sermon → return to landing ─────────────────────────────────────────
+function _closeSermon() {
+  // Save any pending edits first
+  try { if (typeof _saveTimer !== 'undefined') clearTimeout(_saveTimer); } catch (_) {}
+  const cur = _active();
+  if (cur) { try { _saveSermon(cur); } catch (_) {} }
+  S.activeId = null;
+
+  const empty = _qs('bm-empty');
+  const editor = _qs('bm-editor');
+  if (empty)  empty.hidden  = false;
+  if (editor) editor.hidden = true;
+
+  const titleEl = _qs('bm-active-title');
+  if (titleEl) { titleEl.textContent = 'FEED'; titleEl.classList.remove('has-sermon'); }
+
+  // Disable sermon-only buttons
+  ['bm-save-btn','bm-duplicate-btn','bm-copy-outline-btn','bm-send-flockshow-btn','bm-present-btn'].forEach(id => {
+    const el = _qs(id); if (el) el.disabled = true;
+  });
+
+  // Hide close (X) button
+  const closeBtn = _qs('bm-close-sermon-btn');
+  if (closeBtn) closeBtn.style.display = 'none';
+
+  // Refresh list selection state
+  if (typeof _renderList === 'function') _renderList();
+  _renderLanding();
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function _init() {
   // Load prefs
@@ -2381,6 +2717,7 @@ async function _init() {
     await _load();
     _renderList();
     _renderSeries();
+    _renderLanding();
   });
 
   // Bindings
@@ -2555,10 +2892,33 @@ async function _init() {
     userChip.addEventListener('click', () => {
       const N = window.Nehemiah;
       if (N && typeof N.signOut === 'function') {
-        if (confirm('Sign out of The Feed?')) N.signOut();
+        if (confirm('Sign out of FEED?')) N.signOut();
       }
     });
   }
+
+  // ── FEED Landing bindings ─────────────────────────────────────────────
+  const closeBtn = _qs('bm-close-sermon-btn');
+  if (closeBtn) closeBtn.addEventListener('click', _closeSermon);
+
+  // Clicking the logo: if a sermon is open, return to landing instead of navigating
+  const logo = _qs('bm-logo');
+  if (logo) {
+    logo.addEventListener('click', e => {
+      if (S.activeId) {
+        e.preventDefault();
+        _closeSermon();
+      }
+    });
+  }
+
+  // Archive search
+  const archInp = _qs('bm-land-archive-search');
+  if (archInp) archInp.addEventListener('input', () => _renderLandingArchive());
+
+  // Strong's quick search + scratchpad
+  _bindLandingStrongs();
+  _bindLandingScratch();
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
