@@ -14,6 +14,7 @@
 import { parse, build } from './the_path.js';
 import { push, replace as historyReplace, current as historyCurrent } from './the_chronicle.js';
 import { wakeHerald, registerCommand } from './the_herald.js';
+import { NC_APPS } from '../the_app_switcher.js';
 
 const _registry = new Map();   // name -> () => Promise<viewModule>
 const _loaded   = new Map();   // name -> viewModule
@@ -83,5 +84,24 @@ window.addEventListener('popstate', (e) => {
 
 /* ── Boot the command palette once at module load ────────────────────────── */
 wakeHerald({ navigate: go });
+
+/* Register all FlockOS modules (NC_APPS) as palette commands so the search
+   surfaces every app in the suite. Resolved against current page so the
+   right church deployment is reached. */
+try {
+  (NC_APPS || []).forEach((app) => {
+    if (!app || !app.href) return;
+    registerCommand({
+      id: 'app:' + app.id,
+      label: 'Open ' + app.name + (app.sub ? ' — ' + app.sub : ''),
+      run: () => {
+        try {
+          const target = new URL(app.href, new URL('./', location.href)).href;
+          window.location.href = target;
+        } catch (_) { window.location.href = app.href; }
+      }
+    });
+  });
+} catch (_) { /* graceful */ }
 
 export { historyCurrent };

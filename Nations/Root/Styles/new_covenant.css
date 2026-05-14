@@ -9069,12 +9069,13 @@ body.veil-app {
 
 /* Search pill — dark glass on dark topbar */
 .veil-search {
-  flex: 0 1 340px; display: flex; align-items: center; gap: 8px;
-  padding: 7px 14px;
+  flex: 0 1 220px; max-width: 220px; min-width: 0;
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 12px;
   background: rgba(255,255,255,0.07);
   border: 1.5px solid rgba(255,255,255,0.14);
   border-radius: 999px; cursor: pointer;
-  color: rgba(255,255,255,0.52); font: 0.86rem var(--font-ui);
+  color: rgba(255,255,255,0.52); font: 0.84rem var(--font-ui);
   transition: border-color 140ms var(--ease), box-shadow 140ms var(--ease), background 140ms var(--ease);
 }
 .veil-search:hover {
@@ -9084,6 +9085,7 @@ body.veil-app {
   box-shadow: 0 0 0 3px var(--gold-soft, rgba(232,168,56,0.14));
 }
 .veil-search svg { flex: none; }
+.veil-search > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .veil-search kbd {
   margin-left: auto; padding: 2px 7px; border-radius: 5px;
   background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.16);
