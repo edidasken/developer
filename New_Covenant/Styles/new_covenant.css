@@ -8956,7 +8956,7 @@ body.veil-app {
   grid-template-areas: "top top" "side main" !important;
   grid-template-columns: var(--sidebar-w, 256px) 1fr !important;
   grid-template-rows: calc(var(--topbar-h, 60px) + var(--safe-top, 0px)) 1fr !important;
-  height: 100% !important;
+  height: 100dvh !important;
   min-height: 0 !important;
   background: var(--bg, #f7f8fb);
   padding-left: var(--safe-left, 0px);
