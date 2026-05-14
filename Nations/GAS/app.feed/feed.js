@@ -2437,6 +2437,8 @@ function _renderLanding() {
   _renderLandingArchive();
   _renderLandingUpcoming();
   _renderLandingJournal();
+  _renderLandingPlan();
+  _renderLandingPrayers();
 
   // Restore scratchpad
   const scr = _qs('bm-land-scratch');
@@ -2637,6 +2639,205 @@ async function _doLandingStrongs(q, out) {
   } catch (_) {
     out.innerHTML = '<div class="bm-land-empty-line">Search unavailable.</div>';
   }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// BIBLE READING PLAN — chapter-by-chapter walk through the whole Bible
+// ════════════════════════════════════════════════════════════════════════════
+
+const BM_PLAN_KEY = 'bm_feed_plan_v1';
+
+// Canonical 66-book chapter counts (Protestant canon, KJV/standard order)
+const BM_BIBLE_BOOKS = [
+  ['Genesis',50],['Exodus',40],['Leviticus',27],['Numbers',36],['Deuteronomy',34],
+  ['Joshua',24],['Judges',21],['Ruth',4],['1 Samuel',31],['2 Samuel',24],
+  ['1 Kings',22],['2 Kings',25],['1 Chronicles',29],['2 Chronicles',36],['Ezra',10],
+  ['Nehemiah',13],['Esther',10],['Job',42],['Psalms',150],['Proverbs',31],
+  ['Ecclesiastes',12],['Song of Solomon',8],['Isaiah',66],['Jeremiah',52],['Lamentations',5],
+  ['Ezekiel',48],['Daniel',12],['Hosea',14],['Joel',3],['Amos',9],
+  ['Obadiah',1],['Jonah',4],['Micah',7],['Nahum',3],['Habakkuk',3],
+  ['Zephaniah',3],['Haggai',2],['Zechariah',14],['Malachi',4],
+  ['Matthew',28],['Mark',16],['Luke',24],['John',21],['Acts',28],
+  ['Romans',16],['1 Corinthians',16],['2 Corinthians',13],['Galatians',6],['Ephesians',6],
+  ['Philippians',4],['Colossians',4],['1 Thessalonians',5],['2 Thessalonians',3],
+  ['1 Timothy',6],['2 Timothy',4],['Titus',3],['Philemon',1],['Hebrews',13],
+  ['James',5],['1 Peter',5],['2 Peter',3],['1 John',5],['2 John',1],
+  ['3 John',1],['Jude',1],['Revelation',22]
+];
+const BM_BIBLE_TOTAL = BM_BIBLE_BOOKS.reduce((a, b) => a + b[1], 0); // 1189
+
+function _planLoad() {
+  try {
+    const raw = localStorage.getItem(BM_PLAN_KEY);
+    if (!raw) return { done: 0, last: 0 };
+    const p = JSON.parse(raw);
+    return { done: Math.max(0, Math.min(BM_BIBLE_TOTAL, p.done | 0)), last: p.last || 0 };
+  } catch (_) { return { done: 0, last: 0 }; }
+}
+function _planSave(p) {
+  try { localStorage.setItem(BM_PLAN_KEY, JSON.stringify(p)); } catch (_) {}
+}
+function _planRefAt(idx) {
+  // idx is 0-based chapter index across whole Bible
+  let n = idx;
+  for (const [book, count] of BM_BIBLE_BOOKS) {
+    if (n < count) return { book, chapter: n + 1, ref: book + ' ' + (n + 1) };
+    n -= count;
+  }
+  return { book: 'Revelation', chapter: 22, ref: 'Revelation 22' };
+}
+function _renderLandingPlan() {
+  const cur  = _qs('bm-land-plan-current');
+  const bar  = _qs('bm-land-plan-bar');
+  const sub  = _qs('bm-land-plan-sub');
+  const undo = _qs('bm-land-plan-undo-btn');
+  if (!cur || !bar) return;
+  const p = _planLoad();
+  if (p.done >= BM_BIBLE_TOTAL) {
+    cur.textContent = '🎉 You finished the Bible! Tap Undo to revisit, or restart.';
+    bar.style.width = '100%';
+    if (sub) sub.textContent = BM_BIBLE_TOTAL + ' / ' + BM_BIBLE_TOTAL + ' chapters';
+    if (undo) undo.disabled = false;
+    return;
+  }
+  const next = _planRefAt(p.done);
+  cur.innerHTML = '<strong>Today: ' + _e(next.ref) + '</strong>';
+  bar.style.width = ((p.done / BM_BIBLE_TOTAL) * 100).toFixed(2) + '%';
+  if (sub) sub.textContent = p.done + ' / ' + BM_BIBLE_TOTAL + ' chapters · ' + Math.round((p.done / BM_BIBLE_TOTAL) * 100) + '%';
+  if (undo) undo.disabled = (p.done === 0);
+}
+function _bindLandingPlan() {
+  const doneBtn = _qs('bm-land-plan-done-btn');
+  const undoBtn = _qs('bm-land-plan-undo-btn');
+  const lookBtn = _qs('bm-land-plan-lookup-btn');
+  if (doneBtn) {
+    doneBtn.addEventListener('click', () => {
+      const p = _planLoad();
+      if (p.done >= BM_BIBLE_TOTAL) return;
+      const ref = _planRefAt(p.done).ref;
+      p.done += 1;
+      p.last = Date.now();
+      _planSave(p);
+      _renderLandingPlan();
+      if (typeof _toast === 'function') _toast('Marked complete: ' + ref, 'success');
+    });
+  }
+  if (undoBtn) {
+    undoBtn.addEventListener('click', () => {
+      const p = _planLoad();
+      if (p.done === 0) return;
+      p.done -= 1;
+      _planSave(p);
+      _renderLandingPlan();
+    });
+  }
+  if (lookBtn) {
+    lookBtn.addEventListener('click', () => {
+      const p = _planLoad();
+      const ref = _planRefAt(Math.min(p.done, BM_BIBLE_TOTAL - 1)).ref;
+      // Switch to research tab and run scripture lookup
+      const inp = _qs('bm-lookup-input');
+      if (inp) {
+        inp.value = ref;
+        if (typeof _renderTab === 'function') _renderTab('research');
+        if (typeof _doScriptureLookup === 'function') _doScriptureLookup(ref);
+      } else if (typeof _toast === 'function') {
+        _toast('Today: ' + ref, 'info');
+      }
+    });
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// PRAYER LIST — personal, localStorage-backed
+// ════════════════════════════════════════════════════════════════════════════
+
+const BM_PRAYER_KEY = 'bm_feed_prayers_v1';
+
+function _prayersLoad() {
+  try {
+    const raw = localStorage.getItem(BM_PRAYER_KEY);
+    return raw ? (JSON.parse(raw) || []) : [];
+  } catch (_) { return []; }
+}
+function _prayersSave(arr) {
+  try { localStorage.setItem(BM_PRAYER_KEY, JSON.stringify(arr || [])); } catch (_) {}
+}
+function _renderLandingPrayers() {
+  const list = _qs('bm-land-prayer-list');
+  const cnt  = _qs('bm-land-prayer-count');
+  if (!list) return;
+  const all = _prayersLoad();
+  // Active first, answered after
+  const sorted = all.slice().sort((a, b) => {
+    if (!!a.answered !== !!b.answered) return a.answered ? 1 : -1;
+    return (b.createdAt || 0) - (a.createdAt || 0);
+  });
+  const active = all.filter(p => !p.answered).length;
+  if (cnt) cnt.textContent = active + (active === 1 ? ' active' : ' active');
+  if (!sorted.length) {
+    list.innerHTML = '<div class="bm-land-empty-line">No active prayers. Add one above.</div>';
+    return;
+  }
+  list.innerHTML = sorted.map(p => {
+    const when = _fmtAgo(p.createdAt || 0);
+    const meta = p.answered
+      ? 'Answered ' + (p.answeredAt ? _fmtAgo(p.answeredAt) : '')
+      : 'Added ' + when;
+    return '<div class="bm-land-prayer-item' + (p.answered ? ' is-answered' : '') + '" data-id="' + _e(p.id) + '">'
+      + '<div style="flex:1;min-width:0">'
+      +   '<div class="bm-land-prayer-text">' + _e(p.text || '') + '</div>'
+      +   '<div class="bm-land-prayer-meta">' + _e(meta) + '</div>'
+      + '</div>'
+      + '<div class="bm-land-prayer-actions">'
+      +   '<button class="bm-land-prayer-icon is-answer" data-act="toggle" title="' + (p.answered ? 'Mark active' : 'Mark answered') + '" aria-label="Toggle answered">'
+      +     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+      +   '</button>'
+      +   '<button class="bm-land-prayer-icon is-delete" data-act="delete" title="Delete" aria-label="Delete">'
+      +     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+      +   '</button>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+  list.querySelectorAll('.bm-land-prayer-item').forEach(el => {
+    const id = el.dataset.id;
+    el.querySelectorAll('button[data-act]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const arr = _prayersLoad();
+        const i = arr.findIndex(x => x.id === id);
+        if (i < 0) return;
+        if (btn.dataset.act === 'toggle') {
+          arr[i].answered = !arr[i].answered;
+          arr[i].answeredAt = arr[i].answered ? Date.now() : 0;
+        } else if (btn.dataset.act === 'delete') {
+          arr.splice(i, 1);
+        }
+        _prayersSave(arr);
+        _renderLandingPrayers();
+      });
+    });
+  });
+}
+function _bindLandingPrayers() {
+  const form = _qs('bm-land-prayer-form');
+  const inp  = _qs('bm-land-prayer-input');
+  if (!form || !inp) return;
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const text = (inp.value || '').trim();
+    if (!text) return;
+    const arr = _prayersLoad();
+    arr.unshift({
+      id: 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      text: text.slice(0, 280),
+      createdAt: Date.now(),
+      answered: false,
+      answeredAt: 0
+    });
+    _prayersSave(arr);
+    inp.value = '';
+    _renderLandingPrayers();
+  });
 }
 
 // ── Sermon Idea scratchpad (localStorage-backed) ─────────────────────────────
@@ -2920,6 +3121,8 @@ async function _init() {
   _bindLandingStrongs();
   _bindLandingScratch();
   _bindLandingTools();
+  _bindLandingPlan();
+  _bindLandingPrayers();
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────

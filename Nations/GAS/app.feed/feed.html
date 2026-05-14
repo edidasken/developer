@@ -423,6 +423,73 @@
       height: 100%; background: linear-gradient(90deg, #e8a838, #c48a20);
       border-radius: 3px; transition: width 0.3s ease;
     }
+    /* ── Bible Reading Plan ───────────────────────────────────────────── */
+    .bm-land-plan-current {
+      font: 600 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      padding: 4px 0 2px;
+    }
+    .bm-land-plan-actions {
+      display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;
+    }
+    .bm-land-plan-btn {
+      padding: 6px 12px; border-radius: 8px; cursor: pointer;
+      font: 600 0.78rem 'Plus Jakarta Sans', sans-serif;
+      background: rgba(0,0,0,0.04); color: var(--bm-ink);
+      border: 1px solid var(--bm-border, rgba(0,0,0,0.08));
+      transition: background 0.14s, border-color 0.14s, transform 0.08s;
+    }
+    .bm-land-plan-btn:hover { background: rgba(232,168,56,0.08); border-color: rgba(232,168,56,0.30); }
+    .bm-land-plan-btn:active { transform: scale(0.97); }
+    .bm-land-plan-btn--primary {
+      background: var(--bm-accent, #e8a838); color: #fff;
+      border-color: var(--bm-accent, #e8a838);
+    }
+    .bm-land-plan-btn--primary:hover { background: #c48a20; border-color: #c48a20; }
+    .bm-land-plan-btn--ghost { background: transparent; color: var(--bm-muted); }
+    .bm-land-plan-btn--ghost:hover { color: var(--bm-ink); background: rgba(0,0,0,0.04); }
+
+    /* ── Prayer List ──────────────────────────────────────────────────── */
+    .bm-land-prayer-form {
+      display: flex; gap: 6px; margin-bottom: 10px;
+    }
+    .bm-land-prayer-form .bm-land-mini-input { flex: 1; margin: 0; }
+    .bm-land-prayer-list {
+      display: flex; flex-direction: column; gap: 6px;
+      max-height: 240px; overflow-y: auto; padding-right: 2px;
+    }
+    .bm-land-prayer-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 8px 10px; border-radius: 9px;
+      background: rgba(0,0,0,0.02);
+      border: 1px solid var(--bm-border, rgba(0,0,0,0.06));
+      transition: background 0.12s;
+    }
+    .bm-land-prayer-item:hover { background: rgba(232,168,56,0.05); }
+    .bm-land-prayer-item.is-answered {
+      opacity: 0.55;
+      background: rgba(34,197,94,0.06); border-color: rgba(34,197,94,0.18);
+    }
+    .bm-land-prayer-item.is-answered .bm-land-prayer-text {
+      text-decoration: line-through; color: var(--bm-muted);
+    }
+    .bm-land-prayer-text {
+      flex: 1; font: 0.84rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-ink); line-height: 1.4; word-break: break-word; min-width: 0;
+    }
+    .bm-land-prayer-meta {
+      font: 0.68rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      margin-top: 2px;
+    }
+    .bm-land-prayer-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .bm-land-prayer-icon {
+      background: transparent; border: 0; cursor: pointer;
+      padding: 4px; border-radius: 6px; color: var(--bm-muted);
+      transition: color 0.12s, background 0.12s;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .bm-land-prayer-icon:hover { color: var(--bm-ink); background: rgba(0,0,0,0.05); }
+    .bm-land-prayer-icon.is-answer:hover { color: #22c55e; }
+    .bm-land-prayer-icon.is-delete:hover { color: #ef4444; }
     .bm-land-archive-grid {
       display: grid; gap: 10px;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -1817,7 +1884,7 @@
                 <div class="bm-land-card-h">Upcoming Service</div>
               </div>
               <div class="bm-land-card-body" id="bm-land-upcoming-body">
-                <div class="bm-land-empty-line">Connect a service plan to see your next service. <span class="bm-land-pill-soon">Coming online</span></div>
+                <div class="bm-land-empty-line">No scheduled sermon yet. Set a date on a sermon to see it here.</div>
               </div>
             </section>
 
@@ -1900,11 +1967,16 @@
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
                 </div>
                 <div class="bm-land-card-h">Bible Reading Plan</div>
-                <span class="bm-land-pill-soon">Coming online</span>
+                <span class="bm-land-card-sub" id="bm-land-plan-sub">Walk through the Word</span>
               </div>
               <div class="bm-land-card-body">
-                <div class="bm-land-empty-line">Track daily readings as you walk through the Word.</div>
-                <div class="bm-land-progress"><div class="bm-land-progress-bar" style="width:0%"></div></div>
+                <div class="bm-land-plan-current" id="bm-land-plan-current">Loading…</div>
+                <div class="bm-land-progress"><div class="bm-land-progress-bar" id="bm-land-plan-bar" style="width:0%"></div></div>
+                <div class="bm-land-plan-actions">
+                  <button class="bm-land-plan-btn bm-land-plan-btn--primary" id="bm-land-plan-done-btn" type="button">Mark Read ✓</button>
+                  <button class="bm-land-plan-btn" id="bm-land-plan-lookup-btn" type="button" title="Open this passage in Scripture lookup">Look up</button>
+                  <button class="bm-land-plan-btn bm-land-plan-btn--ghost" id="bm-land-plan-undo-btn" type="button" title="Undo last reading">Undo</button>
+                </div>
               </div>
             </section>
 
@@ -1914,10 +1986,16 @@
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 </div>
                 <div class="bm-land-card-h">Prayer List</div>
-                <span class="bm-land-pill-soon">Coming online</span>
+                <span class="bm-land-card-sub" id="bm-land-prayer-count">0 active</span>
               </div>
               <div class="bm-land-card-body">
-                <div class="bm-land-empty-line">Prayer requests from the church will appear here.</div>
+                <form class="bm-land-prayer-form" id="bm-land-prayer-form" autocomplete="off">
+                  <input class="bm-land-mini-input" id="bm-land-prayer-input" type="text" placeholder="Add a prayer request…" maxlength="280">
+                  <button class="bm-land-plan-btn bm-land-plan-btn--primary" type="submit">Add</button>
+                </form>
+                <div class="bm-land-prayer-list" id="bm-land-prayer-list">
+                  <div class="bm-land-empty-line">No active prayers. Add one above.</div>
+                </div>
               </div>
             </section>
           </div>
