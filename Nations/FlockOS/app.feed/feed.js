@@ -3015,6 +3015,9 @@ function _openTool(name) {
   else if (name === 'liturgical') { head.textContent = 'Liturgical Calendar';         _renderLiturgical(body); }
   else if (name === 'apologetics'){ head.textContent = 'Apologetics';                 _renderApologetics(body); }
   else if (name === 'counseling') { head.textContent = 'Biblical Counseling';         _renderCounseling(body); }
+  else if (name === 'creeds')     { head.textContent = 'Creeds & Confessions';        _renderCreeds(body); }
+  else if (name === 'words')      { head.textContent = 'Hebrew & Greek Word Study';   _renderWords(body); }
+  else if (name === 'templates')  { head.textContent = 'Sermon Templates';            _renderTemplates(body); }
   else { _closeTool(); }
 }
 
@@ -3870,6 +3873,430 @@ function _renderCounseling(body) {
   }
   paint('');
   _qs('bm-coun-search').addEventListener('input', e => paint(e.target.value));
+  list.addEventListener('click', e => {
+    const btn = e.target.closest('[data-toggle]');
+    if (!btn) return;
+    const card = btn.closest('.bm-apol-card');
+    if (card) card.classList.toggle('is-open');
+  });
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// CREEDS & CONFESSIONS — historic Christian statements
+// ─────────────────────────────────────────────────────────────
+const BM_CREEDS = [
+  // ── EARLY CHURCH ──
+  { cat: 'Early Church', q: 'The Apostles\u2019 Creed (c. 2nd–4th century)',
+    a: 'I believe in God, the Father almighty, creator of heaven and earth.\n\nI believe in Jesus Christ, his only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died, and was buried; he descended to the dead. On the third day he rose again; he ascended into heaven, he is seated at the right hand of the Father, and he will come to judge the living and the dead.\n\nI believe in the Holy Spirit, the holy catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and the life everlasting. Amen.',
+    v: [
+      ['1 Corinthians 15:3-4', 'Christ died for our sins in accordance with the Scriptures, that he was buried, that he was raised on the third day in accordance with the Scriptures.'],
+      ['Acts 1:11', 'This Jesus, who was taken up from you into heaven, will come in the same way as you saw him go into heaven.'],
+      ['1 Timothy 3:16', 'Great indeed, we confess, is the mystery of godliness: He was manifested in the flesh, vindicated by the Spirit, seen by angels, proclaimed among the nations, believed on in the world, taken up in glory.'],
+    ]
+  },
+  { cat: 'Early Church', q: 'The Nicene Creed (325 / 381)',
+    a: 'We believe in one God, the Father almighty, maker of heaven and earth, of all things visible and invisible.\n\nAnd in one Lord Jesus Christ, the only begotten Son of God, begotten of the Father before all worlds; God of God, Light of Light, very God of very God; begotten, not made, being of one substance (homoousios) with the Father, by whom all things were made. Who, for us men and for our salvation, came down from heaven, and was incarnate by the Holy Spirit of the Virgin Mary, and was made man; and was crucified also for us under Pontius Pilate; he suffered and was buried; and the third day he rose again, according to the Scriptures; and ascended into heaven, and sits at the right hand of the Father; and he shall come again, with glory, to judge both the living and the dead; whose kingdom shall have no end.\n\nAnd we believe in the Holy Spirit, the Lord and Giver of Life, who proceeds from the Father (and the Son), who with the Father and the Son together is worshiped and glorified, who spoke by the prophets.\n\nAnd we believe in one holy catholic and apostolic Church. We acknowledge one baptism for the remission of sins. And we look for the resurrection of the dead, and the life of the world to come. Amen.',
+    v: [
+      ['John 1:1-3', 'In the beginning was the Word, and the Word was with God, and the Word was God... All things were made through him, and without him was not any thing made that was made.'],
+      ['Colossians 1:15-17', 'He is the image of the invisible God, the firstborn of all creation. For by him all things were created... all things were created through him and for him.'],
+      ['Hebrews 1:3', 'He is the radiance of the glory of God and the exact imprint of his nature.'],
+    ]
+  },
+  { cat: 'Early Church', q: 'The Chalcedonian Definition (451)',
+    a: 'We confess one and the same Son, our Lord Jesus Christ, the same perfect in Godhead and also perfect in manhood; truly God and truly man, of a reasonable soul and body; consubstantial with the Father according to the Godhead, and consubstantial with us according to the manhood; in all things like unto us, without sin... to be acknowledged in two natures, inconfusedly, unchangeably, indivisibly, inseparably; the distinction of natures being by no means taken away by the union, but rather the property of each nature being preserved, and concurring in one Person and one Subsistence, not parted or divided into two persons, but one and the same Son, and only begotten God, the Word, the Lord Jesus Christ.',
+    v: [
+      ['John 1:14', 'And the Word became flesh and dwelt among us, and we have seen his glory, glory as of the only Son from the Father, full of grace and truth.'],
+      ['Philippians 2:6-7', 'Who, though he was in the form of God, did not count equality with God a thing to be grasped, but emptied himself, by taking the form of a servant, being born in the likeness of men.'],
+      ['Hebrews 4:15', 'For we do not have a high priest who is unable to sympathize with our weaknesses, but one who in every respect has been tempted as we are, yet without sin.'],
+    ]
+  },
+  { cat: 'Early Church', q: 'The Athanasian Creed (excerpt)',
+    a: 'Whoever desires to be saved must, above all, hold the catholic faith. And the catholic faith is this: that we worship one God in Trinity, and Trinity in Unity, neither confounding the persons, nor dividing the substance.\n\nFor there is one person of the Father, another of the Son, and another of the Holy Spirit. But the Godhead of the Father, of the Son, and of the Holy Spirit is all one: the glory equal, the majesty coeternal. Such as the Father is, such is the Son, and such is the Holy Spirit. The Father uncreated, the Son uncreated, and the Holy Spirit uncreated... And yet they are not three eternals, but one Eternal... So the Father is God, the Son is God, and the Holy Spirit is God. And yet they are not three Gods, but one God.',
+    v: [
+      ['Matthew 28:19', 'Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit.'],
+      ['2 Corinthians 13:14', 'The grace of the Lord Jesus Christ and the love of God and the fellowship of the Holy Spirit be with you all.'],
+      ['Deuteronomy 6:4', 'Hear, O Israel: The LORD our God, the LORD is one.'],
+    ]
+  },
+
+  // ── REFORMATION ──
+  { cat: 'Reformation', q: 'The Five Solas of the Reformation',
+    a: 'Sola Scriptura — Scripture alone is the supreme authority for faith and life.\n\nSola Fide — We are justified by faith alone, not by works.\n\nSola Gratia — Salvation is by grace alone, the unmerited favor of God.\n\nSolus Christus — Christ alone is our mediator, sacrifice, and Lord.\n\nSoli Deo Gloria — All of life is to be lived for the glory of God alone.',
+    v: [
+      ['2 Timothy 3:16-17', 'All Scripture is breathed out by God and profitable for teaching, for reproof, for correction, and for training in righteousness.'],
+      ['Ephesians 2:8-9', 'For by grace you have been saved through faith. And this is not your own doing; it is the gift of God, not a result of works, so that no one may boast.'],
+      ['1 Timothy 2:5', 'For there is one God, and there is one mediator between God and men, the man Christ Jesus.'],
+      ['1 Corinthians 10:31', 'So, whether you eat or drink, or whatever you do, do all to the glory of God.'],
+    ]
+  },
+  { cat: 'Reformation', q: 'Heidelberg Catechism — Q&A 1 (1563)',
+    a: 'Q. What is your only comfort in life and in death?\n\nA. That I am not my own, but belong with body and soul, both in life and in death, to my faithful Savior Jesus Christ. He has fully paid for all my sins with his precious blood, and has set me free from all the power of the devil. He also preserves me in such a way that without the will of my heavenly Father not a hair can fall from my head; indeed, all things must work together for my salvation. Therefore, by his Holy Spirit he also assures me of eternal life and makes me heartily willing and ready from now on to live for him.',
+    v: [
+      ['1 Corinthians 6:19-20', 'You are not your own, for you were bought with a price. So glorify God in your body.'],
+      ['Romans 14:7-8', 'For none of us lives to himself, and none of us dies to himself. For if we live, we live to the Lord, and if we die, we die to the Lord. So then, whether we live or whether we die, we are the Lord\u2019s.'],
+      ['Matthew 10:29-30', 'Are not two sparrows sold for a penny? And not one of them will fall to the ground apart from your Father. But even the hairs of your head are all numbered.'],
+      ['Romans 8:28', 'And we know that for those who love God all things work together for good, for those who are called according to his purpose.'],
+    ]
+  },
+  { cat: 'Reformation', q: 'Westminster Shorter Catechism — Q&A 1 (1647)',
+    a: 'Q. What is the chief end of man?\n\nA. Man\u2019s chief end is to glorify God, and to enjoy him forever.\n\nThis single sentence has shaped Reformed and evangelical piety for nearly four centuries. We were not made primarily for self-fulfillment, success, or even moral achievement — but for God Himself: His glory, and the joyful knowledge of Him that lasts forever.',
+    v: [
+      ['1 Corinthians 10:31', 'So, whether you eat or drink, or whatever you do, do all to the glory of God.'],
+      ['Psalm 73:25-26', 'Whom have I in heaven but you? And there is nothing on earth that I desire besides you. My flesh and my heart may fail, but God is the strength of my heart and my portion forever.'],
+      ['John 17:3', 'And this is eternal life, that they know you, the only true God, and Jesus Christ whom you have sent.'],
+    ]
+  },
+  { cat: 'Reformation', q: 'Augsburg Confession — Article IV: Justification (1530)',
+    a: 'Our churches teach that men cannot be justified before God by their own powers, merits, or works. But they are justified freely on account of Christ, through faith, when they believe that they are received into favor and that their sins are forgiven on account of Christ, who by his death made satisfaction for our sins. This faith God imputes for righteousness in his sight (Rom. 3 and 4).\n\nThis is the article on which the church stands or falls (articulus stantis et cadentis ecclesiae) — Luther\u2019s line — because it touches the very heart of the gospel: salvation is by grace alone, through faith alone, on account of Christ alone.',
+    v: [
+      ['Romans 3:23-24', 'For all have sinned and fall short of the glory of God, and are justified by his grace as a gift, through the redemption that is in Christ Jesus.'],
+      ['Romans 4:5', 'And to the one who does not work but believes in him who justifies the ungodly, his faith is counted as righteousness.'],
+      ['Galatians 2:16', 'A person is not justified by works of the law but through faith in Jesus Christ.'],
+    ]
+  },
+  { cat: 'Reformation', q: 'Belgic Confession — Article 1: The Only God (1561)',
+    a: 'We all believe in our hearts and confess with our mouths that there is one only simple and spiritual Being, which we call God; and that he is eternal, incomprehensible, invisible, immutable, infinite, almighty, perfectly wise, just, good, and the overflowing fountain of all good.',
+    v: [
+      ['Deuteronomy 6:4', 'Hear, O Israel: The LORD our God, the LORD is one.'],
+      ['1 Timothy 1:17', 'To the King of the ages, immortal, invisible, the only God, be honor and glory forever and ever. Amen.'],
+      ['James 1:17', 'Every good gift and every perfect gift is from above, coming down from the Father of lights with whom there is no variation or shadow due to change.'],
+    ]
+  },
+
+  // ── MODERN ──
+  { cat: 'Modern', q: 'The Lausanne Covenant (1974) — excerpt on Evangelism',
+    a: 'To evangelize is to spread the good news that Jesus Christ died for our sins and was raised from the dead according to the Scriptures, and that as the reigning Lord he now offers the forgiveness of sins and the liberating gifts of the Spirit to all who repent and believe. Our Christian presence in the world is indispensable to evangelism, and so is that kind of dialogue whose purpose is to listen sensitively in order to understand. But evangelism itself is the proclamation of the historical, biblical Christ as Saviour and Lord, with a view to persuading people to come to him personally and so be reconciled to God.',
+    v: [
+      ['Matthew 28:19-20', 'Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit, teaching them to observe all that I have commanded you.'],
+      ['Romans 10:14-15', 'How then will they call on him in whom they have not believed? And how are they to believe in him of whom they have never heard? And how are they to hear without someone preaching?'],
+      ['2 Corinthians 5:18-20', 'God... gave us the ministry of reconciliation... Therefore, we are ambassadors for Christ, God making his appeal through us.'],
+    ]
+  },
+  { cat: 'Modern', q: 'The Chicago Statement on Biblical Inerrancy (1978) — Short Statement',
+    a: '1. God, who is Himself Truth and speaks truth only, has inspired Holy Scripture in order thereby to reveal Himself to lost mankind through Jesus Christ as Creator and Lord, Redeemer and Judge. Holy Scripture is God\u2019s witness to Himself.\n\n2. Holy Scripture, being God\u2019s own Word, written by men prepared and superintended by His Spirit, is of infallible divine authority in all matters upon which it touches.\n\n3. The Holy Spirit, its divine Author, both authenticates it to us by His inward witness and opens our minds to understand its meaning.\n\n4. Being wholly and verbally God-given, Scripture is without error or fault in all its teaching.\n\n5. The authority of Scripture is inescapably impaired if this total divine inerrancy is in any way limited or disregarded.',
+    v: [
+      ['2 Timothy 3:16', 'All Scripture is breathed out by God and profitable for teaching, for reproof, for correction, and for training in righteousness.'],
+      ['2 Peter 1:20-21', 'No prophecy of Scripture comes from someone\u2019s own interpretation. For no prophecy was ever produced by the will of man, but men spoke from God as they were carried along by the Holy Spirit.'],
+      ['Psalm 119:160', 'The sum of your word is truth, and every one of your righteous rules endures forever.'],
+    ]
+  },
+];
+
+function _renderCreeds(body) { _renderAccordion(body, BM_CREEDS, 'bm-creed', 'Search creeds, doctrines, or keywords…', 'Text', 'Scripture'); }
+
+// ─────────────────────────────────────────────────────────────
+// HEBREW & GREEK — key biblical words in the original languages
+// ─────────────────────────────────────────────────────────────
+const BM_WORDS = [
+  // ── HEBREW ──
+  { cat: 'Hebrew', q: 'חֶסֶד · chesed — steadfast covenant love',
+    a: 'Pronounced KHEH-sed. Used 245+ times in the OT. Often translated "lovingkindness," "steadfast love," "mercy," or "faithful love." It denotes loyal, covenant-keeping love that endures even when undeserved — God\u2019s commitment to His people that does not let go. The defining word for Yahweh\u2019s character (Exod 34:6).',
+    v: [
+      ['Exodus 34:6', 'The LORD passed before him and proclaimed, "The LORD, the LORD, a God merciful and gracious, slow to anger, and abounding in steadfast love (chesed) and faithfulness."'],
+      ['Lamentations 3:22-23', 'The steadfast love (chesed) of the LORD never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.'],
+      ['Psalm 136', 'Give thanks to the LORD, for he is good, for his steadfast love (chesed) endures forever. (Refrain repeated in all 26 verses.)'],
+    ]
+  },
+  { cat: 'Hebrew', q: 'שָׁלוֹם · shalom — wholeness, peace, flourishing',
+    a: 'Far more than the absence of conflict. Shalom is the complete well-being of a thing as it was meant to be — physical, relational, social, spiritual. When God promises shalom, He promises that things will be put right, restored, made whole. Cornelius Plantinga: "the way things ought to be."',
+    v: [
+      ['Numbers 6:24-26', 'The LORD bless you and keep you; the LORD make his face to shine upon you and be gracious to you; the LORD lift up his countenance upon you and give you peace (shalom).'],
+      ['Isaiah 9:6', 'For to us a child is born... and his name shall be called Wonderful Counselor, Mighty God, Everlasting Father, Prince of Peace (Sar Shalom).'],
+      ['Isaiah 53:5', 'Upon him was the chastisement that brought us peace (shalom), and with his wounds we are healed.'],
+    ]
+  },
+  { cat: 'Hebrew', q: 'רוּחַ · ruach — spirit, breath, wind',
+    a: 'Pronounced ROO-akh. The same word covers wind, breath, and spirit — including the Spirit of God. The Spirit hovers (rachaph) over the waters in Gen 1:2; God breathes ruach into Adam in Gen 2:7. The OT often blurs the boundary between physical breath and spiritual life because both come from God.',
+    v: [
+      ['Genesis 1:2', 'The earth was without form and void, and darkness was over the face of the deep. And the Spirit (Ruach) of God was hovering over the face of the waters.'],
+      ['Ezekiel 37:9-10', 'Then he said to me, "Prophesy to the breath; prophesy, son of man, and say to the breath (ruach)... come from the four winds, O breath, and breathe on these slain, that they may live."'],
+      ['Psalm 51:10-11', 'Create in me a clean heart, O God, and renew a right spirit (ruach) within me. Cast me not away from your presence, and take not your Holy Spirit (Ruach Qadosh) from me.'],
+    ]
+  },
+  { cat: 'Hebrew', q: 'קָדוֹשׁ · qadosh — holy, set apart',
+    a: 'The root meaning is "set apart, separate." When applied to God it points to His utter otherness — morally pure, transcendent, distinct from all creation. When applied to His people, places, or objects, it means devoted to God for His use. The only attribute of God repeated three times in Scripture: "Holy, holy, holy" (Isa 6:3; Rev 4:8).',
+    v: [
+      ['Isaiah 6:3', 'And one called to another and said, "Holy, holy, holy (qadosh, qadosh, qadosh) is the LORD of hosts; the whole earth is full of his glory!"'],
+      ['Leviticus 11:44', 'For I am the LORD your God. Consecrate yourselves therefore, and be holy (qadosh), for I am holy.'],
+      ['Exodus 15:11', 'Who is like you, O LORD, among the gods? Who is like you, majestic in holiness (qodesh), awesome in glorious deeds, doing wonders?'],
+    ]
+  },
+  { cat: 'Hebrew', q: 'צֶדֶק · tzedek / tzedakah — righteousness, justice',
+    a: 'Closely paired with mishpat ("justice"). Tzedek is right behavior measured by God\u2019s character; tzedakah is righteousness expressed in active, just dealing — including generous care for the vulnerable. In later Hebrew, tzedakah came to mean almsgiving, because to be righteous is to share with the poor.',
+    v: [
+      ['Micah 6:8', 'He has told you, O man, what is good; and what does the LORD require of you but to do justice (mishpat), and to love kindness (chesed), and to walk humbly with your God?'],
+      ['Genesis 15:6', 'And he believed the LORD, and he counted it to him as righteousness (tzedakah).'],
+      ['Isaiah 1:17', 'Learn to do good; seek justice (mishpat), correct oppression; bring justice to the fatherless, plead the widow\u2019s cause.'],
+    ]
+  },
+  { cat: 'Hebrew', q: 'הִנֵּנִי · hineni — Here I am',
+    a: 'Literally "Behold me." The covenant response of availability before God. Spoken by Abraham at the binding of Isaac (Gen 22:1, 11), by Moses at the burning bush (Exod 3:4), by Samuel as a boy (1 Sam 3:4), and by Isaiah at his commissioning (Isa 6:8). It is the posture of a servant ready for whatever the Master commands.',
+    v: [
+      ['Genesis 22:1', 'After these things God tested Abraham and said to him, "Abraham!" And he said, "Here I am (hineni)."'],
+      ['Isaiah 6:8', 'And I heard the voice of the Lord saying, "Whom shall I send, and who will go for us?" Then I said, "Here I am (hineni)! Send me."'],
+      ['1 Samuel 3:4', 'Then the LORD called Samuel, and he said, "Here I am (hineni)!"'],
+    ]
+  },
+  { cat: 'Hebrew', q: 'נֶפֶשׁ · nephesh — soul, life, being',
+    a: 'Often translated "soul," but it does not mean a disembodied spirit (as in Greek thought). Nephesh refers to the whole living person — body and inner life together. "Living nephesh" (Gen 2:7) describes Adam as a living being. The OT does not split a human into parts; you are a nephesh.',
+    v: [
+      ['Genesis 2:7', 'Then the LORD God formed the man of dust from the ground and breathed into his nostrils the breath of life, and the man became a living creature (nephesh chayyah).'],
+      ['Psalm 103:1-2', 'Bless the LORD, O my soul (nephesh), and all that is within me, bless his holy name! Bless the LORD, O my soul, and forget not all his benefits.'],
+      ['Deuteronomy 6:5', 'You shall love the LORD your God with all your heart and with all your soul (nephesh) and with all your might.'],
+    ]
+  },
+  { cat: 'Hebrew', q: 'יְהוָה · YHWH — the covenant name of God',
+    a: 'The personal name God revealed to Moses at the burning bush (Exod 3:14-15). Probably pronounced "Yahweh." Connected to the Hebrew verb "to be" — "I AM WHO I AM." Out of reverence, Jews traditionally read "Adonai" (Lord) when YHWH appears, which is why most English Bibles render it "LORD" in small caps. It identifies God as the self-existent, covenant-keeping One.',
+    v: [
+      ['Exodus 3:14-15', 'God said to Moses, "I AM WHO I AM... Say this to the people of Israel: \'The LORD (YHWH), the God of your fathers... has sent me to you.\' This is my name forever, and thus I am to be remembered throughout all generations."'],
+      ['Exodus 6:2-3', 'God spoke to Moses and said to him, "I am the LORD (YHWH). I appeared to Abraham, to Isaac, and to Jacob, as God Almighty (El Shaddai), but by my name the LORD I did not make myself known to them."'],
+      ['John 8:58', 'Jesus said to them, "Truly, truly, I say to you, before Abraham was, I am."'],
+    ]
+  },
+
+  // ── GREEK ──
+  { cat: 'Greek', q: 'ἀγάπη · agape — self-giving love',
+    a: 'The dominant NT word for love. Distinguished from eros (romantic) and philia (friendship), agape is willed, sacrificial, self-giving love that seeks the good of the other regardless of return. It is the love by which God loves us (John 3:16) and which He pours into our hearts by the Spirit (Rom 5:5). The verb form (agapao) describes both God\u2019s love and Christ\u2019s love for the Father.',
+    v: [
+      ['John 3:16', 'For God so loved (egapesen — from agapao) the world, that he gave his only Son.'],
+      ['1 Corinthians 13:4-7', 'Love (agape) is patient and kind; love does not envy or boast; it is not arrogant or rude... Love bears all things, believes all things, hopes all things, endures all things.'],
+      ['1 John 4:8-10', 'Anyone who does not love does not know God, because God is love (agape). In this the love of God was made manifest among us, that God sent his only Son into the world, so that we might live through him.'],
+    ]
+  },
+  { cat: 'Greek', q: 'λόγος · logos — word, reason, discourse',
+    a: 'In Greek philosophy, the rational principle ordering the universe. John takes the term and applies it to Jesus: the eternal Word who was with God and who was God, through whom all things were made (John 1:1-3). This is one of the highest Christological statements in Scripture — Jesus is the divine self-expression, the rational meaning of all reality.',
+    v: [
+      ['John 1:1-3', 'In the beginning was the Word (Logos), and the Word was with God, and the Word was God. He was in the beginning with God. All things were made through him, and without him was not any thing made that was made.'],
+      ['John 1:14', 'And the Word (Logos) became flesh and dwelt among us, and we have seen his glory, glory as of the only Son from the Father, full of grace and truth.'],
+      ['Hebrews 4:12', 'For the word (logos) of God is living and active, sharper than any two-edged sword, piercing to the division of soul and of spirit.'],
+    ]
+  },
+  { cat: 'Greek', q: 'χάρις · charis — grace, unmerited favor',
+    a: 'Used 155+ times in the NT. The defining word of the gospel: God\u2019s undeserved kindness shown to sinners. Not merely an attribute but a power — grace teaches, trains, abounds, reigns. It is the opposite of debt or wages (Rom 4:4); it cannot be earned and can only be received. Eucharisteo ("give thanks") shares the same root.',
+    v: [
+      ['Ephesians 2:8-9', 'For by grace (charis) you have been saved through faith. And this is not your own doing; it is the gift of God, not a result of works, so that no one may boast.'],
+      ['2 Corinthians 12:9', 'But he said to me, "My grace (charis) is sufficient for you, for my power is made perfect in weakness."'],
+      ['Titus 2:11-12', 'For the grace (charis) of God has appeared, bringing salvation for all people, training us to renounce ungodliness and worldly passions.'],
+    ]
+  },
+  { cat: 'Greek', q: 'πίστις · pistis — faith, trust, faithfulness',
+    a: 'More than mere belief — pistis is trust, reliance, faithfulness. It carries the idea of personal commitment, not just intellectual assent. The same word can mean "faith" (our trust in God) or "faithfulness" (God\u2019s reliability), depending on context. The "righteous shall live by pistis" (Hab 2:4 / Rom 1:17) is the verse that opened Luther\u2019s eyes.',
+    v: [
+      ['Hebrews 11:1', 'Now faith (pistis) is the assurance of things hoped for, the conviction of things not seen.'],
+      ['Romans 1:17', 'For in it the righteousness of God is revealed from faith (pistis) for faith, as it is written, "The righteous shall live by faith."'],
+      ['Galatians 2:20', 'I have been crucified with Christ. It is no longer I who live, but Christ who lives in me. And the life I now live in the flesh I live by faith (pistis) in the Son of God.'],
+    ]
+  },
+  { cat: 'Greek', q: 'μετάνοια · metanoia — repentance, change of mind',
+    a: 'Literally "after-mind" or "change of mind." Far deeper than feeling sorry: a radical reorientation of heart, mind, and direction — turning from sin and self toward God. This is the first word of Jesus\u2019s public preaching (Matt 4:17) and the first word of the church\u2019s on Pentecost (Acts 2:38). Without it, there is no entrance to the kingdom.',
+    v: [
+      ['Matthew 4:17', 'From that time Jesus began to preach, saying, "Repent (metanoeite), for the kingdom of heaven is at hand."'],
+      ['Acts 2:38', 'And Peter said to them, "Repent (metanoesate) and be baptized every one of you in the name of Jesus Christ for the forgiveness of your sins."'],
+      ['2 Corinthians 7:10', 'For godly grief produces a repentance (metanoia) that leads to salvation without regret, whereas worldly grief produces death.'],
+    ]
+  },
+  { cat: 'Greek', q: 'ἐκκλησία · ekklesia — church, assembly',
+    a: 'Literally "the called-out ones" (ek = out + kaleo = call). In secular Greek it referred to a citizens\u2019 assembly. In the NT it becomes the gathered people of God — both the local congregation and the universal church. The church is not a building but the community Jesus is building (Matt 16:18).',
+    v: [
+      ['Matthew 16:18', 'And I tell you, you are Peter, and on this rock I will build my church (ekklesia), and the gates of hell shall not prevail against it.'],
+      ['Acts 2:42', 'And they devoted themselves to the apostles\u2019 teaching and the fellowship, to the breaking of bread and the prayers.'],
+      ['Ephesians 5:25', 'Husbands, love your wives, as Christ loved the church (ekklesia) and gave himself up for her.'],
+    ]
+  },
+  { cat: 'Greek', q: 'κοινωνία · koinonia — fellowship, partnership, sharing',
+    a: 'Often translated "fellowship," but richer than that — koinonia is shared life, common participation, partnership. The early Christians had koinonia in the apostles\u2019 teaching, in the breaking of bread, and in financial sharing (Acts 2:42-45). It is the bond of communal life created by the Spirit.',
+    v: [
+      ['Acts 2:42', 'And they devoted themselves to the apostles\u2019 teaching and the fellowship (koinonia), to the breaking of bread and the prayers.'],
+      ['1 John 1:3', 'That which we have seen and heard we proclaim also to you, so that you too may have fellowship (koinonia) with us; and indeed our fellowship is with the Father and with his Son Jesus Christ.'],
+      ['Philippians 1:5', 'Because of your partnership (koinonia) in the gospel from the first day until now.'],
+    ]
+  },
+  { cat: 'Greek', q: 'δικαιοσύνη · dikaiosyne — righteousness, justice',
+    a: 'The standing of being right before God. Can mean the righteousness God requires (Matt 6:33) or the righteousness God gives in Christ (Rom 3:21-22). Paul\u2019s great theme: a righteousness from God by faith, apart from law-keeping, credited to all who trust in Jesus.',
+    v: [
+      ['Romans 3:21-22', 'But now the righteousness (dikaiosyne) of God has been manifested apart from the law... the righteousness of God through faith in Jesus Christ for all who believe.'],
+      ['2 Corinthians 5:21', 'For our sake he made him to be sin who knew no sin, so that in him we might become the righteousness (dikaiosyne) of God.'],
+      ['Matthew 5:6', 'Blessed are those who hunger and thirst for righteousness (dikaiosyne), for they shall be satisfied.'],
+    ]
+  },
+  { cat: 'Greek', q: 'σωτηρία · soteria — salvation, deliverance',
+    a: 'Means rescue, deliverance, preservation, healing. Used both for spiritual salvation and for physical deliverance/healing (Mark 5:34 — "your faith has saved/healed you"). NT salvation has past, present, and future tenses: we have been saved (from sin\u2019s penalty), are being saved (from sin\u2019s power), and will be saved (from sin\u2019s presence).',
+    v: [
+      ['Romans 1:16', 'For I am not ashamed of the gospel, for it is the power of God for salvation (soterian) to everyone who believes, to the Jew first and also to the Greek.'],
+      ['Acts 4:12', 'And there is salvation (soteria) in no one else, for there is no other name under heaven given among men by which we must be saved.'],
+      ['Hebrews 5:9', 'And being made perfect, he became the source of eternal salvation (soterias) to all who obey him.'],
+    ]
+  },
+  { cat: 'Greek', q: 'παρουσία · parousia — coming, arrival, presence',
+    a: 'Used for the return of Christ at the end of the age. In the Greco-Roman world, parousia denoted the official visit of a king or emperor — a fitting word for the King\u2019s return in glory. The NT longing is "Maranatha" — "Our Lord, come!"',
+    v: [
+      ['Matthew 24:27', 'For as the lightning comes from the east and shines as far as the west, so will be the coming (parousia) of the Son of Man.'],
+      ['1 Thessalonians 4:15-16', 'For this we declare to you by a word from the Lord, that we who are alive, who are left until the coming (parousia) of the Lord, will not precede those who have fallen asleep.'],
+      ['2 Peter 3:12', 'Waiting for and hastening the coming of the day of God.'],
+    ]
+  },
+  { cat: 'Greek', q: 'κένωσις · kenosis — self-emptying',
+    a: 'From the verb kenoo, "to empty." Used in Phil 2:7 to describe how Christ "emptied himself" in the incarnation — not surrendering His deity but veiling His glory and taking the form of a servant. The pattern of kenosis is the pattern for all Christian discipleship: downward, sacrificial, humble.',
+    v: [
+      ['Philippians 2:6-8', 'Who, though he was in the form of God... emptied himself (heauton ekenosen), by taking the form of a servant, being born in the likeness of men. And being found in human form, he humbled himself by becoming obedient to the point of death, even death on a cross.'],
+      ['2 Corinthians 8:9', 'For you know the grace of our Lord Jesus Christ, that though he was rich, yet for your sake he became poor, so that you by his poverty might become rich.'],
+      ['Mark 10:45', 'For even the Son of Man came not to be served but to serve, and to give his life as a ransom for many.'],
+    ]
+  },
+  { cat: 'Greek', q: 'δόξα · doxa — glory, honor, splendor',
+    a: 'In the Septuagint, doxa translates the Hebrew kavod ("weight, heaviness") — God\u2019s manifest weight, splendor, the visible radiance of His invisible greatness. We were made to behold and reflect His doxa; sin is "falling short" of it (Rom 3:23). Doxology = "doxa-word" = a speech of glory.',
+    v: [
+      ['Romans 3:23', 'For all have sinned and fall short of the glory (doxa) of God.'],
+      ['John 1:14', 'And the Word became flesh and dwelt among us, and we have seen his glory (doxa), glory as of the only Son from the Father, full of grace and truth.'],
+      ['2 Corinthians 3:18', 'And we all, with unveiled face, beholding the glory (doxa) of the Lord, are being transformed into the same image from one degree of glory to another.'],
+    ]
+  },
+];
+
+function _renderWords(body) { _renderAccordion(body, BM_WORDS, 'bm-word', 'Search Hebrew/Greek words, meanings, or English keywords…', 'Meaning & nuance', 'Scripture'); }
+
+// ─────────────────────────────────────────────────────────────
+// SERMON TEMPLATES — proven preaching structures
+// ─────────────────────────────────────────────────────────────
+const BM_TEMPLATES = [
+  { cat: 'Expository', q: 'Verse-by-Verse Expository',
+    a: 'Walk the congregation through a passage line by line, explaining the original meaning and pressing it into the present.\n\nStructure:\n1. INTRODUCTION — Hook + read the passage + state the big idea.\n2. CONTEXT — Where does this fit in the book? Who wrote, to whom, why?\n3. TEXT — Work through the passage in 2–4 natural divisions, observing what it says, explaining what it means, applying it.\n4. APPLICATION — Specific, concrete steps for hearers (head, heart, hands).\n5. CONCLUSION — Re-state the big idea and call for response.\n\nStrengths: deepens trust in Scripture, prevents hobby-horse preaching, models how to read the Bible.',
+    v: [
+      ['Nehemiah 8:8', 'They read from the book, from the Law of God, clearly, and they gave the sense, so that the people understood the reading.'],
+      ['2 Timothy 4:2', 'Preach the word; be ready in season and out of season; reprove, rebuke, and exhort, with complete patience and teaching.'],
+      ['Acts 20:27', 'For I did not shrink from declaring to you the whole counsel of God.'],
+    ]
+  },
+  { cat: 'Expository', q: 'Christ-Centered / Redemptive-Historical',
+    a: 'Show how the passage fits into the unfolding storyline of redemption that climaxes in Christ. Avoid moralism ("be like David") and ask: what does this text reveal about the Redeemer and the gospel of grace?\n\nStructure:\n1. THE TEXT IN ITS CONTEXT — What is going on here?\n2. THE TEXT IN THE STORY — Where does it fit in creation–fall–redemption–restoration?\n3. THE TEXT TO CHRIST — How does this point to, prepare for, or unfold who Christ is and what He has done?\n4. THE TEXT TO US — How does the gospel here change us today?\n\nGuard rail: every sermon ends at the cross and the empty tomb, not at moral effort.',
+    v: [
+      ['Luke 24:27', 'And beginning with Moses and all the Prophets, he interpreted to them in all the Scriptures the things concerning himself.'],
+      ['John 5:39', 'You search the Scriptures because you think that in them you have eternal life; and it is they that bear witness about me.'],
+      ['1 Corinthians 2:2', 'For I decided to know nothing among you except Jesus Christ and him crucified.'],
+    ]
+  },
+  { cat: 'Topical', q: 'Topical Sermon (Scripture-driven)',
+    a: 'Address a single topic (anxiety, marriage, money, suffering) by gathering and exegeting a small set of key passages — never proof-texting.\n\nStructure:\n1. INTRODUCTION — Why this topic matters, today, here.\n2. WHAT THE BIBLE SAYS — 2–4 anchor passages, each opened briefly in context.\n3. WHAT IT MEANS — Synthesize into a clear biblical teaching.\n4. WHAT IT LOOKS LIKE — Concrete application across age/life-stage.\n5. CONCLUSION — Press home one big call to response.\n\nDanger to avoid: stringing verses together out of context to prove a pre-formed point. Let the texts shape the message.',
+    v: [
+      ['2 Timothy 3:16-17', 'All Scripture is breathed out by God and profitable for teaching, for reproof, for correction, and for training in righteousness, that the man of God may be complete, equipped for every good work.'],
+      ['Acts 17:11', 'Now these Jews were more noble than those in Thessalonica; they received the word with all eagerness, examining the Scriptures daily to see if these things were so.'],
+      ['Titus 2:1', 'But as for you, teach what accords with sound doctrine.'],
+    ]
+  },
+  { cat: 'Topical', q: 'Three-Point Sermon (Classic)',
+    a: 'A timeless structure that helps hearers remember and apply.\n\nStructure:\n1. INTRODUCTION + Big Idea in one sentence.\n2. POINT 1 — Statement, explanation, illustration, application.\n3. POINT 2 — Statement, explanation, illustration, application.\n4. POINT 3 — Statement, explanation, illustration, application.\n5. CONCLUSION — Restate big idea + call to response.\n\nMake the three points parallel (alliteration, repeated structure) — they should feel like one sermon, not three. Each point should be a window into the same truth, not a different truth.',
+    v: [
+      ['Ecclesiastes 4:12', 'A threefold cord is not quickly broken.'],
+      ['Matthew 7:24', 'Everyone then who hears these words of mine and does them will be like a wise man who built his house on the rock.'],
+      ['1 Corinthians 14:9', 'So with yourselves, if with your tongue you utter speech that is not intelligible, how will anyone know what is said? For you will be speaking into the air.'],
+    ]
+  },
+  { cat: 'Narrative', q: 'Narrative Sermon (Story-driven)',
+    a: 'Best for biblical narratives (David, Ruth, the prodigal son, the woman at the well). Tell the story, then turn it on the hearer.\n\nStructure:\n1. SET THE SCENE — Cultural and historical setting.\n2. TRACE THE STORY — Walk through the narrative with vivid detail; let the tension build.\n3. THE TURN — The moment of revelation: who God is, what He does, what changes.\n4. CONNECT TO US — Where are you in this story? Where is Christ?\n5. CALL — One clear response.\n\nUse character voices, sensory detail, and tension. Let the text\u2019s genre shape your delivery.',
+    v: [
+      ['Luke 8:1', 'Soon afterward he went on through cities and villages, proclaiming and bringing the good news of the kingdom of God.'],
+      ['Mark 4:33-34', 'With many such parables he spoke the word to them, as they were able to hear it. He did not speak to them without a parable.'],
+      ['Hebrews 11', '(The hall of faith — narrative theology in action.)'],
+    ]
+  },
+  { cat: 'Inductive', q: 'Problem–Solution',
+    a: 'Surface a real problem the hearers feel, then bring Scripture\u2019s answer.\n\nStructure:\n1. THE PROBLEM — Name the felt need with empathy and specificity (no straw-men).\n2. THE WRONG ANSWERS — Briefly examine the world\u2019s common solutions and where they fall short.\n3. THE BIBLICAL ANSWER — Open the text, show God\u2019s diagnosis and remedy.\n4. THE GOSPEL ROOT — Connect the answer to Christ and the gospel.\n5. THE RESPONSE — Specific steps of obedience.\n\nGreat for outreach services and felt-need topics. Risk: turning the sermon into life-coaching with a verse on top. Stay anchored in the text.',
+    v: [
+      ['John 4:13-14', 'Jesus said to her, "Everyone who drinks of this water will be thirsty again, but whoever drinks of the water that I will give him will never be thirsty again."'],
+      ['Matthew 11:28', 'Come to me, all who labor and are heavy laden, and I will give you rest.'],
+      ['Isaiah 55:1-2', '"Come, everyone who thirsts, come to the waters... Why do you spend your money for that which is not bread, and your labor for that which does not satisfy?"'],
+    ]
+  },
+  { cat: 'Inductive', q: 'Hook–Book–Look–Took (HBLT)',
+    a: 'A teaching framework popularized by Lawrence Richards and used widely in Bible teaching.\n\nStructure:\n1. HOOK — Capture attention; raise the question; create the felt need.\n2. BOOK — Open the Word; explain what the text says, in context.\n3. LOOK — Help them see how the text addresses real life; bridge ancient to modern.\n4. TOOK — Concrete take-away; what will they do this week because of this truth?\n\nClean, memorable, and especially helpful for teaching teams and small groups. Each section should be roughly proportional but Book is the heart.',
+    v: [
+      ['James 1:22', 'But be doers of the word, and not hearers only, deceiving yourselves.'],
+      ['Matthew 7:24-25', 'Everyone then who hears these words of mine and does them will be like a wise man who built his house on the rock.'],
+      ['Ezra 7:10', 'For Ezra had set his heart to study the Law of the LORD, and to do it and to teach his statutes and rules in Israel.'],
+    ]
+  },
+  { cat: 'Inductive', q: 'Big Idea Preaching (Haddon Robinson)',
+    a: 'Every sermon should have ONE big idea — a single sentence that captures the message of the text and the message of the sermon. Everything supports the big idea.\n\nProcess:\n1. EXEGETICAL IDEA — In one sentence, what is this passage about? (Subject + complement)\n2. HOMILETICAL IDEA — Restate the same truth in a memorable, contemporary sentence.\n3. PURPOSE — What do I want hearers to know, feel, do?\n4. STRUCTURE — What outline best carries this idea to these hearers?\n5. INTRODUCTION & CONCLUSION — Both serve the big idea.\n\nIf you cannot say it in one sentence, you do not yet know your sermon.',
+    v: [
+      ['Proverbs 25:11', 'A word fitly spoken is like apples of gold in a setting of silver.'],
+      ['1 Corinthians 14:8', 'And if the bugle gives an indistinct sound, who will get ready for battle?'],
+      ['Matthew 5:37', 'Let what you say be simply "Yes" or "No"; anything more than this comes from evil.'],
+    ]
+  },
+  { cat: 'Special', q: 'Funeral Sermon',
+    a: 'Honor the deceased; comfort the grieving; preach the gospel honestly and tenderly.\n\nStructure:\n1. WELCOME & PRAYER — Brief, warm.\n2. SCRIPTURE READING — Psalm 23, John 14, Rom 8:35-39, 1 Cor 15, or Rev 21 are classics.\n3. TRIBUTE — Honor the person honestly; share specific memories.\n4. TEACHING — Open the text; speak about life, death, and eternity through the lens of the resurrection.\n5. GOSPEL CALL — The grave is open today; do not assume your hearers are ready.\n6. PRAYER & BENEDICTION — Lead the family in committing their loved one and their grief to Christ.\n\nLength: typically 15–20 minutes. Avoid extravagant claims about the eternal state of the deceased; trust God and speak with hope and humility.',
+    v: [
+      ['1 Thessalonians 4:13-14', 'We do not want you to be uninformed, brothers, about those who are asleep, that you may not grieve as others do who have no hope.'],
+      ['John 11:25-26', 'I am the resurrection and the life. Whoever believes in me, though he die, yet shall he live.'],
+      ['Revelation 14:13', 'Blessed are the dead who die in the Lord from now on. "Blessed indeed," says the Spirit, "that they may rest from their labors, for their deeds follow them!"'],
+    ]
+  },
+  { cat: 'Special', q: 'Wedding Homily',
+    a: 'Brief (8–12 minutes), pastoral, gospel-saturated.\n\nStructure:\n1. WELCOME & WHY WE GATHER — Marriage is a covenant before God.\n2. WORD OF SCRIPTURE — Eph 5, 1 Cor 13, or a passage chosen by the couple.\n3. CHARGE TO THE COUPLE — Specific, kind, biblical: love, sacrifice, forgive, persevere.\n4. THE GREATER MARRIAGE — Point to Christ and the church; this marriage is a sign.\n5. CHARGE TO THE CONGREGATION — Family and friends, support this covenant.\n6. PRAYER OF BLESSING.\n\nKeep the focus on God\u2019s design, not on roast or celebrity-speech humor. The bride and groom will remember the gospel you preach over them.',
+    v: [
+      ['Genesis 2:24', 'Therefore a man shall leave his father and his mother and hold fast to his wife, and they shall become one flesh.'],
+      ['Ephesians 5:31-32', '"Therefore a man shall leave his father and mother and hold fast to his wife, and the two shall become one flesh." This mystery is profound, and I am saying that it refers to Christ and the church.'],
+      ['1 Corinthians 13:4-7', 'Love is patient and kind... Love bears all things, believes all things, hopes all things, endures all things.'],
+    ]
+  },
+];
+
+function _renderTemplates(body) { _renderAccordion(body, BM_TEMPLATES, 'bm-tmpl', 'Search by structure, occasion, or keyword…', 'Structure', 'Scripture'); }
+
+// ─────────────────────────────────────────────────────────────
+// Shared accordion renderer (Creeds / Words / Templates)
+// ─────────────────────────────────────────────────────────────
+function _renderAccordion(body, dataset, prefix, placeholder, answerLabel, scriptureLabel) {
+  const cats = {};
+  dataset.forEach((it, i) => { (cats[it.cat] = cats[it.cat] || []).push({ ...it, _i: i }); });
+  const catNames = Object.keys(cats);
+  body.innerHTML = `
+    <input type="text" class="bm-tool-input" id="${prefix}-search" placeholder="${_e(placeholder)}">
+    <div id="${prefix}-list" style="display:flex;flex-direction:column;gap:14px;margin-top:6px;"></div>
+  `;
+  const list = _qs(prefix + '-list');
+  function paint(query) {
+    const q = (query || '').trim().toLowerCase();
+    let html = '';
+    catNames.forEach(cat => {
+      const items = cats[cat].filter(it => {
+        if (!q) return true;
+        return (it.q + ' ' + it.a + ' ' + it.cat).toLowerCase().includes(q)
+          || it.v.some(([ref, txt]) => (ref + ' ' + txt).toLowerCase().includes(q));
+      });
+      if (!items.length) return;
+      html += `<div><div class="bm-apol-cat">${_e(cat)}</div><div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">`;
+      items.forEach(it => {
+        const versesHtml = it.v.map(([ref, txt]) => `
+          <div class="bm-apol-verse">
+            <strong>${_e(ref)}</strong>
+            <span>${_e(txt)}</span>
+            <a href="${_bibleGatewayUrl(ref)}" target="_blank" rel="noopener">Open on BibleGateway →</a>
+          </div>`).join('');
+        // preserve newlines in answer text
+        const answerHtml = _e(it.a).replace(/\n/g, '<br>');
+        html += `
+          <div class="bm-apol-card" data-idx="${it._i}">
+            <button type="button" class="bm-apol-q" data-toggle="${it._i}">
+              <span>${_e(it.q)}</span>
+              <span class="bm-apol-chev">›</span>
+            </button>
+            <div class="bm-apol-body">
+              <div class="bm-apol-section">${_e(answerLabel)}</div>
+              <div class="bm-apol-answer">${answerHtml}</div>
+              <div class="bm-apol-section">${_e(scriptureLabel)}</div>
+              <div class="bm-apol-verses">${versesHtml}</div>
+            </div>
+          </div>`;
+      });
+      html += `</div></div>`;
+    });
+    if (!html) html = `<div class="bm-tool-empty">No matches.</div>`;
+    list.innerHTML = html;
+  }
+  paint('');
+  _qs(prefix + '-search').addEventListener('input', e => paint(e.target.value));
   list.addEventListener('click', e => {
     const btn = e.target.closest('[data-toggle]');
     if (!btn) return;
