@@ -4866,66 +4866,6 @@ function _renderPrayers(body) { _renderAccordion(body, BM_PRAYERS, 'bm-pray', 'S
 // VOICES OF THE CHURCH — quotes from Fathers, Reformers, Puritans, modern preachers
 // ─────────────────────────────────────────────────────────────
 const BM_VOICES = [
-  // ── EARLY CHURCH FATHERS ──
-  { cat: 'Early Church Fathers', q: 'Augustine of Hippo (354–430)',
-    a: '"You have made us for yourself, O Lord, and our heart is restless until it rests in you." — Confessions, Book 1\n\n"Late have I loved you, beauty so old and so new: late have I loved you. And see, you were within and I was in the external world and sought you there, and in my unlovely state I plunged into those lovely created things which you made." — Confessions, Book 10\n\n"Lord, give me chastity and continence, but not yet." — Confessions, Book 8 (his earlier prayer)\n\n"Love God, and do as you please." — Homilies on 1 John\n\n"Faith is to believe what you do not see; the reward of this faith is to see what you believe." — Sermons',
-    v: [
-      ['Psalm 42:1-2', 'As a deer pants for flowing streams, so pants my soul for you, O God. My soul thirsts for God, for the living God.'],
-      ['Acts 17:27-28', 'That they should seek God, in the hope that they might feel their way toward him and find him. Yet he is actually not far from each one of us.'],
-    ]
-  },
-  { cat: 'Early Church Fathers', q: 'John Chrysostom (c. 347–407)',
-    a: '"Preaching improves me. When I begin to speak, weariness disappears; when I begin to teach, fatigue too disappears." — Homilies\n\n"Prayer is the place of refuge for every worry, a foundation for cheerfulness, a source of constant happiness, a protection against sadness."\n\n"The bee is more honored than other animals, not because it labors, but because it labors for others."\n\n"Pray often, for prayer is a shield to the soul, a sacrifice to God, and a scourge for Satan."',
-    v: [
-      ['1 Thessalonians 5:17', 'Pray without ceasing.'],
-      ['Romans 12:12', 'Rejoice in hope, be patient in tribulation, be constant in prayer.'],
-    ]
-  },
-  { cat: 'Early Church Fathers', q: 'Athanasius of Alexandria (c. 296–373)',
-    a: '"For the Son of God became man, that we might become God." (i.e., partakers of the divine nature; deification, not ontological union) — On the Incarnation, §54\n\n"He was made man that we might be made God; and He manifested Himself by a body that we might receive the idea of the unseen Father."\n\n"You cannot put straight in others what is warped in yourself."',
-    v: [
-      ['John 1:14', 'And the Word became flesh and dwelt among us, and we have seen his glory.'],
-      ['2 Peter 1:4', 'By which he has granted to us his precious and very great promises, so that through them you may become partakers of the divine nature.'],
-    ]
-  },
-  { cat: 'Early Church Fathers', q: 'Irenaeus of Lyons (c. 130–202)',
-    a: '"The glory of God is a human being fully alive; and to be alive consists in beholding God." — Against Heresies, Book 4\n\n"He became what we are that he might make us what he is."\n\n"Where the Spirit of God is, there is the Church, and every grace."',
-    v: [
-      ['John 10:10', 'I came that they may have life and have it abundantly.'],
-      ['1 Corinthians 15:45', 'Thus it is written, "The first man Adam became a living being"; the last Adam became a life-giving spirit.'],
-    ]
-  },
-  { cat: 'Early Church Fathers', q: 'Tertullian (c. 155–220)',
-    a: '"The blood of the martyrs is the seed of the church." — Apologeticus 50\n\n"Christians are made, not born." — Apology\n\n"Hope is patience with the lamp lit."',
-    v: [
-      ['Revelation 12:11', 'And they have conquered him by the blood of the Lamb and by the word of their testimony, for they loved not their lives even unto death.'],
-      ['Acts 8:1', 'And there arose on that day a great persecution against the church in Jerusalem, and they were all scattered throughout the regions of Judea and Samaria.'],
-    ]
-  },
-
-  // ── MEDIEVAL ──
-  { cat: 'Medieval', q: 'Anselm of Canterbury (1033–1109)',
-    a: '"I do not seek to understand in order that I may believe; but I believe in order to understand. For this also I believe — that unless I believed, I should not understand." (credo ut intelligam) — Proslogion\n\n"You have not yet considered the gravity of sin." — Cur Deus Homo\n\n"For thou art that than which nothing greater can be conceived." — Proslogion (the ontological argument, 1078)',
-    v: [
-      ['Isaiah 7:9', 'If you are not firm in faith, you will not be firm at all.'],
-      ['Hebrews 11:6', 'Without faith it is impossible to please him, for whoever would draw near to God must believe that he exists.'],
-    ]
-  },
-  { cat: 'Medieval', q: 'Bernard of Clairvaux (1090–1153)',
-    a: '"You wish me to tell you why and how God should be loved. My answer is that God Himself is the reason He is to be loved." — On Loving God\n\n"Jesus, the very thought of Thee with sweetness fills my breast; but sweeter far Thy face to see, and in Thy presence rest." — attributed (hymn translation)\n\n"There are four degrees of love: love of self for self\u2019s sake; love of God for self\u2019s sake; love of God for God\u2019s sake; love of self for God\u2019s sake." — On Loving God',
-    v: [
-      ['Mark 12:30', 'And you shall love the Lord your God with all your heart and with all your soul and with all your mind and with all your strength.'],
-      ['1 John 4:19', 'We love because he first loved us.'],
-    ]
-  },
-  { cat: 'Medieval', q: 'Thomas Aquinas (1225–1274)',
-    a: '"To one who has faith, no explanation is necessary. To one without faith, no explanation is possible."\n\n"Three things are necessary for the salvation of man: to know what he ought to believe; to know what he ought to desire; and to know what he ought to do."\n\n"Better to illuminate than merely to shine; to deliver to others contemplated truths than merely to contemplate." — on the vocation of the preacher (the Dominican motto: contemplata aliis tradere)',
-    v: [
-      ['Matthew 5:14-16', 'You are the light of the world... Let your light shine before others, so that they may see your good works and give glory to your Father who is in heaven.'],
-      ['1 Peter 3:15', 'Always being prepared to make a defense to anyone who asks you for a reason for the hope that is in you.'],
-    ]
-  },
-
   // ── REFORMATION ──
   { cat: 'Reformation', q: 'Martin Luther (1483–1546)',
     a: '"Here I stand. I can do no other. God help me. Amen." — Diet of Worms, 1521\n\n"A safe stronghold our God is still, a trusty shield and weapon." — A Mighty Fortress\n\n"Pray, and let God worry."\n\n"The Bible is alive, it speaks to me; it has feet, it runs after me; it has hands, it lays hold of me."\n\n"To be a Christian without prayer is no more possible than to be alive without breathing."\n\n"If you preach the Gospel in all aspects with the exception of the issues which deal specifically with your time, you are not preaching the Gospel at all."',
@@ -5069,6 +5009,36 @@ const BM_VOICES = [
     v: [
       ['Psalm 42:5', 'Why are you cast down, O my soul, and why are you in turmoil within me? Hope in God; for I shall again praise him.'],
       ['Acts 1:8', 'But you will receive power when the Holy Spirit has come upon you.'],
+    ]
+  },
+
+  // ── CONTEMPORARY ──
+  { cat: 'Contemporary', q: 'John MacArthur (b. 1939)',
+    a: '"The highest, most noble pursuit of life is the knowledge of God."\n\n"Faithfulness in the small things is what God uses to display His glory through us."\n\n"The Bible is not a book of human ideas about God, but a book of God\'s ideas about human beings."\n\n"You have no greater priority than to know God."\n\n"The pulpit is the Throne for the Word of God."',
+    v: [
+      ['2 Timothy 4:2', 'Preach the word; be ready in season and out of season; reprove, rebuke, and exhort, with complete patience and teaching.'],
+      ['Philippians 3:8', 'I count everything as loss because of the surpassing worth of knowing Christ Jesus my Lord.'],
+    ]
+  },
+  { cat: 'Contemporary', q: 'Greg Laurie (b. 1952)',
+    a: '"God\'s plan for your life far exceeds the circumstances of your day."\n\n"The proof that you are a Christian is that you live like a Christian."\n\n"You can\'t change the past, but you can change the future."\n\n"If God has called you to be a witness, do not stoop to be a king."\n\n"The greatest evidence of the existence of God is those who know Him."',
+    v: [
+      ['Acts 1:8', 'But you will receive power when the Holy Spirit has come upon you, and you will be my witnesses in Jerusalem and in all Judea and Samaria, and to the end of the earth.'],
+      ['Mark 16:15', 'Go into all the world and proclaim the gospel to the whole creation.'],
+    ]
+  },
+  { cat: 'Contemporary', q: 'Chuck Smith (1927–2013)',
+    a: '"The Bible is meant to be bread for daily use, not cake for special occasions."\n\n"God always gives His best to those who leave the choice with Him."\n\n"Let\'s just teach the Word of God simply, all the way through, from cover to cover." — on Calvary Chapel\'s verse-by-verse method\n\n"The Holy Spirit will never lead you contrary to the Word of God."\n\n"When God closes a door, He always opens a window."',
+    v: [
+      ['2 Timothy 3:16-17', 'All Scripture is breathed out by God and profitable for teaching, for reproof, for correction, and for training in righteousness.'],
+      ['Acts 20:27', 'For I did not shrink from declaring to you the whole counsel of God.'],
+    ]
+  },
+  { cat: 'Contemporary', q: 'Paul Washer (b. 1961)',
+    a: '"A real Christian is someone whose love for God is greater than their love for themselves and for the things of this world."\n\n"It is the greatest of all impertinences for any man to lay claim to a saving knowledge of God who hates his brother."\n\n"You cannot pursue holiness apart from the Word of God. It will not happen."\n\n"The greatest heresy in the American evangelical and Protestant church is that if you pray and ask Jesus Christ to come into your heart, He will definitely come in."\n\n"Brethren, we must preach the doctrines; we must emphasize the doctrines; we must go back to the doctrines. I fear that the new generation does not know the doctrines as our forefathers knew them."',
+    v: [
+      ['Matthew 7:21-23', 'Not everyone who says to me, "Lord, Lord," will enter the kingdom of heaven, but the one who does the will of my Father who is in heaven.'],
+      ['1 John 2:3-4', 'And by this we know that we have come to know him, if we keep his commandments.'],
     ]
   },
 ];
