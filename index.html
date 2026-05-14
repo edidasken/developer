@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <title>FlockOS — Church Technology, Built to Be Shared</title>
-  <link rel="icon" type="image/png" href="New_Covenant/Images/NewCovenant.png">
-  <link rel="apple-touch-icon" href="New_Covenant/Images/NewCovenant.png">
+  <title>FlockOS — Built to Be Shared</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="New_Covenant/Images/FlockIcon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="New_Covenant/Images/FlockIcon-512.png">
+  <link rel="apple-touch-icon" href="New_Covenant/Images/FlockIcon-512.png">
+  <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,360 +16,511 @@
   <meta name="description" content="FlockOS — complete church management and GROW discipleship tools. Free forever. 210 countries. Built to be shared.">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="FlockOS — Church Technology, Built to Be Shared">
+  <meta property="og:title" content="FlockOS — Built to Be Shared">
   <meta property="og:description" content="Complete pastoral care, member management, discipleship, and outreach. Free forever. 210 countries. 256-bit encrypted.">
-  <meta property="og:image" content="New_Covenant/Images/NewCovenant.png">
+  <meta property="og:image" content="New_Covenant/Images/FlockIcon-512.png">
   <meta property="og:type" content="website">
+
+  <!-- Preload critical images so the launcher paints instantly -->
+  <link rel="preload" as="image" href="New_Covenant/Images/FlockIcon-192.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Merriweather:ital@1&display=swap" rel="stylesheet">
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:          #09102e;
-      --bg-raised:   #111b44;
-      --bg-card:     #141f4e;
-      --ink:         #eef1fb;
-      --ink-muted:   #9ba8d0;
-      --ink-faint:   #5a6894;
-      --gold:        #e8a838;
-      --gold-soft:   rgba(232,168,56,0.14);
-      --accent:      #5b8dee;
-      --accent-soft: rgba(91,141,238,0.14);
-      --line:        rgba(255,255,255,0.08);
-      --line-strong: rgba(255,255,255,0.14);
-      --shadow-md:   0 6px 24px rgba(0,0,0,0.32);
-      --shadow-lg:   0 12px 40px rgba(0,0,0,0.44);
-      --font:        'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      --font-serif:  'Merriweather', Georgia, serif;
-      --radius:      20px;
+      --bg:       #09102e;
+      --card:     #111b44;
+      --ink:      #eef1fb;
+      --muted:    #9ba8d0;
+      --faint:    #3d4f7c;
+      --gold:     #e8a838;
+      --blue:     #5b8dee;
+      --line:     rgba(255,255,255,0.09);
+      --font:     'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --serif:    'Merriweather', Georgia, serif;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bot: env(safe-area-inset-bottom, 0px);
     }
 
     html, body {
       height: 100%;
       font-family: var(--font);
-      font-size: 16px;
-      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       background: var(--bg);
       color: var(--ink);
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(91,141,238,0.18) 0%, transparent 70%),
-        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(232,168,56,0.10) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .page {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 3rem 1.25rem 4rem;
-      gap: 3rem;
-    }
-
-    /* Hero */
-    .hero {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 1rem;
-      max-width: 640px;
-    }
-
-    .hero h1 {
-      font-size: clamp(2rem, 5vw, 2.9rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.2;
-      color: var(--ink);
-      white-space: nowrap;
-    }
-
-    .hero h1 em {
-      font-style: normal;
-      color: var(--gold);
-    }
-
-    .hero p {
-      font-size: 1.08rem;
-      color: var(--ink-muted);
-      max-width: 52ch;
-      line-height: 1.7;
-    }
-
-    .hero-badges {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-top: 0.25rem;
-    }
-
-    .badge {
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 0.3rem 0.75rem;
-      border-radius: 999px;
-      border: 1px solid var(--line-strong);
-      color: var(--ink-muted);
-      background: rgba(255,255,255,0.04);
-    }
-
-    /* Product cards */
-    .products {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      width: 100%;
-      max-width: 740px;
-    }
-
-    .product-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 1.1rem;
-      padding: 2.2rem 1.75rem 2rem;
-      background: var(--bg-card);
-      border: 1px solid var(--line-strong);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-md);
-      text-decoration: none;
-      color: inherit;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-      position: relative;
       overflow: hidden;
-      min-height: 360px;
+      overscroll-behavior: none;
     }
 
-    .product-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 70% 50% at 50% 0%, var(--card-glow, rgba(91,141,238,0.10)), transparent 70%);
-      pointer-events: none;
-    }
+    body { background-image: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(91,141,238,0.14) 0%, transparent 60%); }
 
-    .product-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--card-accent, var(--accent));
-    }
-
-    .product-card--flockos { --card-glow: rgba(91,141,238,0.12); --card-accent: var(--accent); }
-    .product-card--grow    { --card-glow: rgba(232,168,56,0.12);  --card-accent: var(--gold); }
-    .product-card--invite  { --card-glow: rgba(61,139,79,0.12);   --card-accent: #3d8b4f; }
-
-    .product-logo {
-      width: 96px;
-      height: 96px;
-      border-radius: 24px;
-      object-fit: contain;
-      box-shadow: var(--shadow-md);
-      position: relative;
-      z-index: 1;
-    }
-
-    .product-name {
-      font-size: 1.5rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      position: relative;
-      z-index: 1;
-    }
-
-    .product-card--flockos .product-name { color: #a0beff; }
-    .product-card--grow    .product-name { color: var(--gold); }
-    .product-card--invite  .product-name { color: #6ee7b7; }
-
-    .product-desc {
-      font-size: 0.97rem;
-      color: var(--ink-muted);
-      line-height: 1.6;
-      max-width: 30ch;
-      position: relative;
-      z-index: 1;
-      flex: 1;
-    }
-
-    .product-cta {
-      display: inline-flex;
+    /* ── Launcher shell ────────────────────────────────────────────── */
+    .launcher {
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 0.4rem;
-      font-size: 0.88rem;
+      padding: calc(var(--safe-top) + 2rem) 1.25rem calc(var(--safe-bot) + 2rem);
+      gap: 2rem;
+    }
+
+    /* ── Identity ──────────────────────────────────────────────────── */
+    .church-id {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      text-align: center;
+    }
+    .church-id img {
+      width: 60px; height: 60px;
+      border-radius: 15px;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.40);
+    }
+    .church-id h1 {
+      font-size: clamp(1.25rem, 5vw, 1.8rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--gold);
+      line-height: 1.2;
+    }
+    .church-id .tagline {
+      font-size: 0.85rem;
+      color: var(--muted);
+      max-width: 32ch;
+      margin-top: 0.15rem;
+    }
+
+    /* ── App sections ──────────────────────────────────────────────── */
+    .app-sections {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.55rem;
+    }
+    .section-label span {
+      font-size: 0.68rem;
       font-weight: 700;
-      letter-spacing: 0.03em;
-      padding: 0.55rem 1.3rem;
-      border-radius: 999px;
-      border: 1px solid var(--card-accent, var(--accent));
-      color: var(--card-accent, var(--accent));
-      background: transparent;
-      transition: background 0.15s, color 0.15s;
-      position: relative;
-      z-index: 1;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+    .section-label .section-icon { font-size: 0.78rem; opacity: 0.6; }
+
+    .apps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
     }
 
-    .product-card:hover .product-cta {
-      background: var(--card-accent, var(--accent));
-      color: #fff;
+    /* ── App button ────────────────────────────────────────────────── */
+    .app-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.9rem 1.1rem;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      text-decoration: none;
+      color: var(--ink);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+      transition: transform 0.13s ease, box-shadow 0.13s ease, border-color 0.13s ease;
+      will-change: transform;
     }
+    .app-btn:hover  { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.36); }
+    .app-btn:active { transform: scale(0.985); box-shadow: none; }
 
-    /* Footer verse */
+    .app-btn--grow   { border-color: rgba(232,168,56,0.20); }
+    .app-btn--invite { border-color: rgba(61,179,79,0.20);  }
+    .app-btn--flock  { border-color: rgba(91,141,238,0.20); }
+    .app-btn--stand  { border-color: rgba(168,85,247,0.20); }
+    .app-btn--show   { border-color: rgba(239,68,68,0.20);  }
+    .app-btn--chat   { border-color: rgba(34,211,238,0.20); }
+    .app-btn--feed   { border-color: rgba(232,168,56,0.20); }
+    .app-btn:hover.app-btn--grow   { border-color: rgba(232,168,56,0.50); }
+    .app-btn:hover.app-btn--invite { border-color: rgba(61,179,79,0.50);  }
+    .app-btn:hover.app-btn--flock  { border-color: rgba(91,141,238,0.50); }
+    .app-btn:hover.app-btn--stand  { border-color: rgba(168,85,247,0.50); }
+    .app-btn:hover.app-btn--show   { border-color: rgba(239,68,68,0.50);  }
+    .app-btn:hover.app-btn--chat   { border-color: rgba(34,211,238,0.50); }
+    .app-btn:hover.app-btn--feed   { border-color: rgba(232,168,56,0.50); }
+
+    .app-icon {
+      width: 42px; height: 42px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.28);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .app-icon--grow   { background: linear-gradient(135deg,#78350f,#d97706); }
+    .app-icon--invite { background: linear-gradient(135deg,#14532d,#22c55e); }
+    .app-icon--flock  { background: linear-gradient(135deg,#1e3a8a,#3b82f6); }
+    .app-icon--stand  { background: linear-gradient(135deg,#4c1d95,#a855f7); }
+    .app-icon--chat   { background: linear-gradient(135deg,#0c4a6e,#06b6d4); }
+    .app-icon--show   { background: linear-gradient(135deg,#7f1d1d,#ef4444); }
+    .app-icon--feed   { background: linear-gradient(135deg,#c48a20,#e8a838); }
+    .app-label { flex: 1; }
+    .app-label strong {
+      display: block;
+      font-size: 0.97rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .app-btn--grow   .app-label strong { color: var(--gold); }
+    .app-btn--invite .app-label strong { color: #6ee7b7; }
+    .app-btn--flock  .app-label strong { color: #a0beff; }
+    .app-btn--stand  .app-label strong { color: #d8b4fe; }
+    .app-btn--show   .app-label strong { color: #fca5a5; }
+    .app-btn--chat   .app-label strong { color: #67e8f9; }
+    .app-btn--feed   .app-label strong { color: var(--gold); }
+    .app-label span {
+      display: block;
+      font-size: 0.77rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+    .app-arrow {
+      font-size: 1rem;
+      color: var(--faint);
+      transition: color 0.13s, transform 0.13s;
+      flex-shrink: 0;
+    }
+    .app-btn:hover .app-arrow { color: var(--ink); transform: translateX(3px); }
+
+    /* ── Verse footer ──────────────────────────────────────────────── */
     .verse {
       text-align: center;
-      max-width: 52ch;
+      max-width: 38ch;
     }
-
     .verse p {
-      font-family: var(--font-serif);
+      font-family: var(--serif);
       font-style: italic;
-      font-size: 1rem;
-      color: var(--ink-faint);
-      line-height: 1.7;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.75;
     }
-
     .verse cite {
       display: block;
       margin-top: 0.4rem;
       font-family: var(--font);
       font-style: normal;
-      font-size: 0.82rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--gold);
     }
 
-    .verse small {
-      display: block;
-      margin-top: 0.9rem;
-      font-size: 0.8rem;
-      color: var(--ink-faint);
+    /* ── Update banner ─────────────────────────────────────────────── */
+    .update-banner {
+      position: fixed; top: calc(var(--safe-top) + 0px); left: 0; right: 0;
+      z-index: 9990; background: #1e2d6e; border-bottom: 1px solid rgba(91,141,238,0.35);
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 16px; font-size: 0.82rem; color: #d0d9f8;
+    }
+    .update-banner[hidden] { display: none !important; }
+    .update-banner svg { flex-shrink: 0; opacity: 0.75; }
+    .update-banner-text { flex: 1; font-weight: 500; }
+    .update-banner-refresh {
+      padding: 5px 13px; border-radius: 8px;
+      background: var(--blue); color: #fff; border: none;
+      font: 600 0.8rem var(--font); cursor: pointer; flex-shrink: 0;
+    }
+    .update-banner-refresh:disabled { opacity: 0.55; cursor: not-allowed; }
+    .update-banner-dismiss {
+      padding: 4px 6px; border: none; background: none;
+      color: var(--muted); cursor: pointer; font-size: 1.1rem; flex-shrink: 0;
+      line-height: 1;
     }
 
-    /* Top header bar */
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      width: 100%;
-      background: rgba(9,16,46,0.82);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--line-strong);
-      padding: env(safe-area-inset-top, 0px) 1.5rem 0;
-      height: calc(60px + env(safe-area-inset-top, 0px));
-      display: flex;
-      align-items: flex-end;
+    /* ── Install button ────────────────────────────────────────────── */
+    .install-btn-wrap {
+      width: 100%; max-width: 420px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .install-btn {
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      padding: 13px 20px; border-radius: 14px; cursor: pointer;
+      border: 1px dashed rgba(232,168,56,0.45);
+      background: rgba(232,168,56,0.07); color: var(--gold);
+      font: 700 0.9rem var(--font); text-decoration: none;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .install-btn:hover { background: rgba(232,168,56,0.14); border-color: rgba(232,168,56,0.65); }
+    .install-hint {
+      text-align: center; font-size: 0.73rem; color: var(--faint);
+      line-height: 1.4; padding: 0 8px;
     }
 
-    .site-header-inner {
-      max-width: 1080px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-    }
-
-    .site-header img {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-    }
-
-    .site-header-name {
-      font-size: 1.1rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--gold);
-    }
-
-    .site-header-tagline {
-      font-size: 0.82rem;
-      color: var(--ink-faint);
-      margin-left: 0.25rem;
-    }
-
-    @media (max-width: 600px) {
-      .page { padding: 2rem 1rem 3rem; gap: 2.25rem; }
-      .product-logo { width: 80px; height: 80px; }
-      .site-header-tagline { display: none; }
+    /* ── PTR ───────────────────────────────────────────────────────── */
+    @media (max-width: 860px) {
+      .ptr-indicator {
+        display: none; position: fixed; top: calc(var(--safe-top) + 8px);
+        left: 50%; transform: translateX(-50%);
+        z-index: 9998; background: var(--card); border: 1px solid var(--line);
+        border-radius: 20px; padding: 5px 13px; font-size: 0.72rem; color: var(--muted);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.28); white-space: nowrap;
+      }
+      .ptr-indicator.visible { display: block; }
     }
   </style>
 </head>
 <body>
 
-  <nav class="site-header" role="banner">
-    <div class="site-header-inner">
-      <img src="New_Covenant/Images/NewCovenant.png" alt="FlockOS">
-      <span class="site-header-name">FlockOS</span>
+  <!-- App Update Available banner — hidden until SW detects a new version -->
+  <div class="update-banner" id="updateBanner" hidden>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+    <span class="update-banner-text">Launcher update available</span>
+    <button class="update-banner-refresh" id="updateRefreshBtn" onclick="_doUpdate()">Update now</button>
+    <button class="update-banner-dismiss" id="updateDismissBtn" aria-label="Dismiss" onclick="document.getElementById('updateBanner').hidden=true">&#10005;</button>
+  </div>
+
+  <div class="launcher">
+
+    <div class="church-id">
+      <img src="New_Covenant/Images/FlockIcon-192.png" alt="FlockOS" width="60" height="60" fetchpriority="high">
+      <h1>FlockOS</h1>
+      <p class="tagline">Built to be shared. Free forever.</p>
     </div>
-  </nav>
 
-  <div class="page">
+    <div class="app-sections">
 
-    <header class="hero">
-      <h1>Built <em>to be shared.</em></h1>
-      <p>Complete pastoral care, discipleship, and outreach tools. Google Sheets, Firebase, or fully offline. Free forever.</p>
-      <div class="hero-badges">
-        <span class="badge">210 Countries</span>
-        <span class="badge">256-bit Encrypted</span>
-        <span class="badge">Offline-Capable</span>
-        <span class="badge">Free Forever</span>
+      <!-- ── Public ─────────────────────────────────────────────── -->
+      <div>
+        <div class="section-label">
+          <span class="section-icon">🌐</span>
+          <span>Public</span>
+        </div>
+        <nav class="apps" aria-label="Public apps">
+
+          <a class="app-btn app-btn--grow" href="Nations/Root/app.grow/app.grow.html">
+            <div class="app-icon app-icon--grow" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <div class="app-label">
+              <strong>GROW</strong>
+              <span>Discipleship &amp; Bible study</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
+          <a class="app-btn app-btn--invite" href="Nations/Root/app.invite/app.invite.html">
+            <div class="app-icon app-icon--invite" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="4.5" y1="8.5" x2="19.5" y2="8.5"/></svg>
+            </div>
+            <div class="app-label">
+              <strong>The Invitation</strong>
+              <span>Share the hope of Jesus Christ</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
+        </nav>
       </div>
-    </header>
 
-    <section class="products" aria-label="Products">
+      <!-- ── Secure ──────────────────────────────────────────────── -->
+      <div>
+        <div class="section-label">
+          <span class="section-icon">🔒</span>
+          <span>Secure</span>
+        </div>
+        <nav class="apps" aria-label="Secure apps">
 
-      <a class="product-card product-card--flockos" href="Nations/Root/">
-        <img class="product-logo" src="New_Covenant/Images/NewCovenant.png" alt="FlockOS">
-        <div class="product-name">FlockOS</div>
-        <p class="product-desc">Church management, member care, discipleship, and pastoral tools — all in one.</p>
-        <span class="product-cta">Open FlockOS &#8594;</span>
-      </a>
+          <a class="app-btn app-btn--flock" href="Nations/Root/app.flockos/app.flockos.html">
+            <div class="app-icon app-icon--flock" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+            </div>
+            <div class="app-label">
+              <strong>FlockOS</strong>
+              <span>Church management &amp; pastoral care</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
 
-      <a class="product-card product-card--grow" href="Nations/Root/app.grow/app.grow.html">
-        <img class="product-logo" src="New_Covenant/Images/GrowIcon.png" alt="GROW">
-        <div class="product-name">GROW</div>
-        <p class="product-desc">Daily devotionals, reading plans, and discipleship content. Open to everyone.</p>
-        <span class="product-cta">Open GROW &#8594;</span>
-      </a>
+          <a class="app-btn app-btn--stand" href="Nations/Root/app.stand/">
+            <div class="app-icon app-icon--stand" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </div>
+            <div class="app-label">
+              <strong>Flock Stand</strong>
+              <span>Songs, setlists &amp; live presenter</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
 
-      <a class="product-card product-card--invite" href="Nations/Root/app.invite/app.invite.html">
-        <img class="product-logo" src="New_Covenant/Images/Invite.png" alt="The Invitation">
-        <div class="product-name">The Invitation</div>
-        <p class="product-desc">A hope-filled look at Jesus Christ — His invitations, His identity, and His finished work.</p>
-        <span class="product-cta">Open The Invitation &#8594;</span>
-      </a>
+          <a class="app-btn app-btn--show" href="Nations/Root/app.flockshow/app.flockshow.html">
+            <div class="app-icon app-icon--show" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8" fill="white" stroke="none"/></svg>
+            </div>
+            <div class="app-label">
+              <strong>FlockShow</strong>
+              <span>Worship slides &amp; service presentation</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
 
-    </section>
+          <a class="app-btn app-btn--chat" href="Nations/Root/app.flockchat/app.flockchat.html">
+            <div class="app-icon app-icon--chat" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="app-label">
+              <strong>FlockChat</strong>
+              <span>Messaging, prayer chain &amp; announcements</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
+          <a class="app-btn app-btn--feed" href="Nations/Root/app.feed/">
+            <div class="app-icon app-icon--feed" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </div>
+            <div class="app-label">
+              <strong>FEED</strong>
+              <span>Sermon preparation &amp; manuscript builder</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
+        </nav>
+      </div>
+
+    </div>
+
+    <!-- Install button — shown only when PWA install is available -->
+    <div class="install-btn-wrap" id="installBtnWrap" hidden>
+      <button class="install-btn" id="installBtn" onclick="_doInstall()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Install FlockOS
+      </button>
+      <p class="install-hint">Add the launcher to your home screen — works on phones, tablets &amp; desktop.</p>
+    </div>
 
     <footer class="verse">
       <p>"Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit."</p>
       <cite>Matthew 28:19</cite>
-      <small>Soli Deo Gloria &mdash; FlockOS &mdash; Built to Be Shared</small>
     </footer>
 
   </div>
 
+  <!-- Pull-to-Refresh indicator -->
+  <div class="ptr-indicator" id="ptrIndicator">&#8635; Release to refresh</div>
+
+  <script>
+  (function () {
+    if (window.innerWidth > 860) return;
+    var ptr = document.getElementById('ptrIndicator');
+    if (!ptr) return;
+    var startY = 0, pulling = false, triggered = false;
+
+    document.addEventListener('touchstart', function (e) {
+      if ((window.scrollY || document.documentElement.scrollTop) > 5) return;
+      startY = e.touches[0].clientY; pulling = true; triggered = false;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function (e) {
+      if (!pulling) return;
+      if (e.touches[0].clientY - startY > 60) { triggered = true; ptr.classList.add('visible'); }
+      else if (!triggered) { ptr.classList.remove('visible'); }
+    }, { passive: true });
+
+    document.addEventListener('touchend', function () {
+      if (triggered) { ptr.textContent = 'Refreshing\u2026'; setTimeout(function () { location.reload(); }, 300); }
+      else { ptr.classList.remove('visible'); }
+      pulling = triggered = false;
+    }, { passive: true });
+  })();
+
+  // ── PWA: install prompt capture ────────────────────────────────────
+  var _installPrompt = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    _installPrompt = e;
+    document.getElementById('installBtnWrap').hidden = false;
+  });
+  window.addEventListener('appinstalled', function () {
+    document.getElementById('installBtnWrap').hidden = true;
+    _installPrompt = null;
+  });
+  async function _doInstall() {
+    if (!_installPrompt) return;
+    _installPrompt.prompt();
+    var outcome = await _installPrompt.userChoice;
+    if (outcome.outcome === 'accepted') {
+      document.getElementById('installBtnWrap').hidden = true;
+      _installPrompt = null;
+    }
+  }
+
+  // ── PWA: SW registration + update detection ────────────────────────
+  var _swReg = null;
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js', { scope: './', updateViaCache: 'none' }).then(function (reg) {
+      _swReg = reg;
+      if (reg.waiting && navigator.serviceWorker.controller) { _showUpdateBanner(); }
+      reg.addEventListener('updatefound', function () {
+        var installing = reg.installing;
+        if (!installing) return;
+        installing.addEventListener('statechange', function () {
+          if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+            _showUpdateBanner();
+          }
+        });
+      });
+      reg.update().catch(function () {});
+    }).catch(function (err) { console.warn('[SW] registration failed', err); });
+
+    var _reloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (!_reloading) { _reloading = true; location.reload(); }
+    });
+  }
+
+  function _showUpdateBanner() {
+    document.getElementById('updateBanner').hidden = false;
+  }
+
+  async function _doUpdate() {
+    var btn = document.getElementById('updateRefreshBtn');
+    if (!navigator.onLine) {
+      var orig = btn ? btn.textContent : '';
+      if (btn) { btn.textContent = 'No internet \u2014 connect first'; btn.disabled = true; }
+      setTimeout(function () {
+        if (btn) { btn.textContent = orig || 'Update now'; btn.disabled = false; }
+      }, 3000);
+      return;
+    }
+    document.getElementById('updateBanner').hidden = true;
+    var reg = _swReg || (await navigator.serviceWorker.getRegistration('./'));
+    if (reg && reg.waiting) {
+      reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+    } else {
+      if (reg) { await reg.update().catch(function () {}); }
+      location.reload();
+    }
+  }
+  </script>
 </body>
 </html>
