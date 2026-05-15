@@ -15389,10 +15389,10 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
   font-size: 0.85rem;
 }
 
-/* PWA mode: use only safe-area for bottom padding, no extra base padding */
+/* PWA mode: NO bottom padding at all */
 @media (display-mode: standalone) {
   .unity-footer {
-    padding-bottom: var(--safe-bottom, 0px);
+    padding-bottom: 0;
   }
 }
 
@@ -15460,10 +15460,10 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
   .unity-footer-motto { font-size: 0.7rem; }
 }
 
-/* PWA mode on mobile: use only safe-area for bottom padding */
+/* PWA mode on mobile: NO bottom padding */
 @media (max-width: 540px) and (display-mode: standalone) {
   .unity-footer {
-    padding-bottom: var(--safe-bottom, 0px);
+    padding-bottom: 0;
   }
 }
 
