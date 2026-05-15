@@ -15396,10 +15396,23 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
 }
 
 /* PWA mode: extend the footer's navy background into the iOS safe-area-inset-bottom
-   band so there is NO white strip below the footer where the home indicator lives. */
+   band so there is NO white strip below the footer where the home indicator lives.
+   Two-layer approach for robustness:
+   1) padding-bottom on the footer itself (paints navy below the buttons)
+   2) a fixed-position navy bar pinned to the viewport bottom as a backstop, in
+      case a parent container clips overflow before the safe-area zone is reached. */
 @media (display-mode: standalone) {
   .unity-footer {
     padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+  .unity-footer::after {
+    content: '';
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: env(safe-area-inset-bottom, 0px);
+    background: var(--foot-bg, #0c1445);
+    z-index: 99;
+    pointer-events: none;
   }
 }
 
