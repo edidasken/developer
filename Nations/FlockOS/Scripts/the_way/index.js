@@ -1400,10 +1400,10 @@
       var appQuiz = [];
       try {
         var liveQuiz = (typeof TheTruth !== 'undefined') ? TheTruth.liveBundle('quiz') : null;
-        if (liveQuiz) {
+        if (liveQuiz && liveQuiz.length) {
           appQuiz = liveQuiz;
         } else {
-          var qmod = await import('../Data/quiz.js');
+          var qmod = await import('../../Data/quiz.js');
           appQuiz = qmod.default || [];
         }
       } catch (_) {}
@@ -2244,12 +2244,37 @@
     _panel(_spinner());
     try {
       var words = [];
+      // 1. Try live bundle (admin-synced cache)
       try {
-        if (typeof TheVine !== 'undefined' && TheVine.app && TheVine.app.words) {
-          var res = await _withTimeout(TheVine.app.words());
-          words = _rows(res);
-        }
+        var liveWords = (typeof TheTruth !== 'undefined') ? TheTruth.liveBundle('words') : null;
+        if (liveWords && liveWords.length) words = liveWords;
       } catch (_) {}
+      // 2. Try TheVine API
+      if (!words.length) {
+        try {
+          if (typeof TheVine !== 'undefined' && TheVine.app && TheVine.app.words) {
+            var res = await _withTimeout(TheVine.app.words());
+            words = _rows(res);
+          }
+        } catch (_) {}
+      }
+      // 3. Fall back to Strong's concordance static data
+      if (!words.length) {
+        try {
+          var gMod = await import('../../Data/strongs-greek.js');
+          var hMod = await import('../../Data/strongs-hebrew.js');
+          var GREEK = gMod.default || {};
+          var HEBREW = hMod.default || {};
+          for (var gid in GREEK) {
+            var ge = GREEK[gid];
+            words.push({ id: gid, 'Strong\'s': gid, English: (ge.kjv_def || '').split(',')[0].trim(), KJVRenderings: ge.kjv_def || '', Original: ge.lemma || '', Transliteration: ge.translit || '', Pronunciation: '', Testament: 'New', Definition: ge.strongs_def ? ge.strongs_def.trim() : '', Etymology: ge.derivation || '', 'Usage Count': '0', Verses: '', Theme: '' });
+          }
+          for (var hid in HEBREW) {
+            var he = HEBREW[hid];
+            words.push({ id: hid, 'Strong\'s': hid, English: (he.kjv_def || '').split(',')[0].trim(), KJVRenderings: he.kjv_def || '', Original: he.lemma || '', Transliteration: he.xlit || '', Pronunciation: he.pron || '', Testament: 'Old', Definition: he.strongs_def ? he.strongs_def.trim() : '', Etymology: he.derivation || '', 'Usage Count': '0', Verses: '', Theme: '' });
+          }
+        } catch (_) {}
+      }
 
       if (!words.length) {
         _panel(_empty('\u0391', 'Lexicon Coming Soon', 'Greek and Hebrew word studies will appear here.'));
@@ -3092,10 +3117,10 @@
       // Check live bundle (written by TheTruth after Firestore edits) first.
       var live = (typeof TheTruth !== 'undefined') ? TheTruth.liveBundle('counseling') : null;
       var allDocs;
-      if (live) {
+      if (live && live.length) {
         allDocs = live;
       } else {
-        var mod  = await import('../Data/counseling.js');
+        var mod  = await import('../../Data/counseling.js');
         allDocs = mod.default || [];
       }
 

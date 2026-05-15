@@ -116,6 +116,26 @@ async function _load(root) {
     console.error('[gospel/counseling] static bundle failed:', e);
   }
 
+  // Fallback: try UpperRoom (authenticated FlockOS context)
+  if (!_stubs.length && typeof UpperRoom !== 'undefined' && typeof UpperRoom.listAppContent === 'function') {
+    try {
+      const rows = await UpperRoom.listAppContent('counseling');
+      (rows || []).forEach((d) => {
+        const id = d._id || d.id || d.topicId;
+        if (!id) return;
+        _cache[id] = d;
+        _stubs.push({
+          id,
+          title: d.title || d.Title || id,
+          icon:  d.icon  || d.Icon  || '🌿',
+          color: _safeColor(d.color || d.Color || accent),
+        });
+      });
+    } catch (e) {
+      console.error('[gospel/counseling] UpperRoom fallback failed:', e);
+    }
+  }
+
   if (!_stubs.length) {
     grid.innerHTML = emptyState({ icon: '💚', title: 'Counseling resources coming soon', body: 'Biblical counseling wisdom and protocols will appear here.' });
     return;
