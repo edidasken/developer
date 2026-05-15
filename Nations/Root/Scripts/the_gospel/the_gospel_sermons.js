@@ -70,12 +70,13 @@ async function _load(root) {
 }
 
 function _card(s) {
-  const title  = esc(s.title || s.Title || 'Untitled Sermon');
-  const date   = s.date ? new Date(s.date.seconds ? s.date.seconds * 1000 : s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-  const preacher = esc(s.preacherName || s['Preacher Name'] || s.preacher || '');
-  const series = esc(s.seriesName || s['Series Name'] || '');
-  const scripture = esc(s.scriptureRefs || s['Scripture Refs'] || '');
-  const summary = esc(snip(s.summary || s.Summary || '', 160));
+  const title    = esc(s.title || 'Untitled Sermon');
+  const rawDate  = s.deliveredDate || s.date;
+  const date     = rawDate ? new Date(rawDate.seconds ? rawDate.seconds * 1000 : rawDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+  const preacher = esc(s.preacher || s.speaker || '');
+  const series   = esc(s.seriesName || s.series || '');
+  const scripture = esc(s.scripture || s.scriptureRef || '');
+  const summary  = esc(snip(s.notes || '', 160));
   const searchText = [title, preacher, series, scripture, summary].join(' ').toLowerCase();
 
   return /* html */`
@@ -89,7 +90,6 @@ function _card(s) {
         ${preacher ? `<p style="font-size:.8rem;color:var(--ink-muted);margin:0 0 6px;">${preacher}</p>` : ''}
         ${scripture ? `<p style="font-size:.78rem;color:var(--accent);font-weight:600;margin:0 0 8px;">${scripture}</p>` : ''}
         ${summary ? `<p class="grow-card-desc">${summary}</p>` : ''}
-        ${s.fileUrl || s['File URL'] ? `<a href="${esc(s.fileUrl || s['File URL'])}" target="_blank" rel="noopener noreferrer" class="grow-btn grow-btn--ghost" style="margin-top:10px;display:inline-block;font-size:.8rem;">▶ Listen</a>` : ''}
       </div>
     </article>
   `;

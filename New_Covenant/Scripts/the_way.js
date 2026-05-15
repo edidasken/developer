@@ -2297,9 +2297,9 @@ const TheWay = (() => {
         letters[ch].push(r);
       });
 
-      // Cache for clicks
+      // Cache for clicks — key by Strong's number (unique) with English as fallback
       _twLexRows = {};
-      sorted.forEach(function(r) { if (r['English']) _twLexRows[r['English'].trim()] = r; });
+      sorted.forEach(function(r) { var key = (r["Strong's"] || r['English'] || '').trim(); if (key) _twLexRows[key] = r; });
 
       var html = '';
 
@@ -2348,7 +2348,7 @@ const TheWay = (() => {
           var isNT = (r['Testament'] || '') === 'New';
           var testKey = isNT ? 'nt' : 'ot';
           var searchText = (eng + ' ' + strongs + ' ' + original + ' ' + (r['Transliteration'] || '') + ' ' + (r['Definition'] || '')).toLowerCase();
-          html += '<div class="gene-item" data-search="' + _e(searchText) + '" data-testament="' + testKey + '" data-letter="' + letter + '" data-idx="' + _e(eng) + '" onclick="TheWay._twLexSelect(this.dataset.idx)">';
+          html += '<div class="gene-item" data-search="' + _e(searchText) + '" data-testament="' + testKey + '" data-letter="' + letter + '" data-idx="' + _e(r["Strong's"] || eng) + '" onclick="TheWay._twLexSelect(this.dataset.idx)">';
           html += '<div class="gene-item-name">' + _e(eng) + '</div>';
           html += '<div class="gene-item-title" style="display:flex;align-items:center;gap:6px;">';
           if (original) html += '<span style="font-family:\'Noto Sans\',\'Noto Sans Hebrew\',serif;' + (isNT ? '' : 'direction:rtl;') + '">' + _e(original) + '</span>';
@@ -2373,7 +2373,7 @@ const TheWay = (() => {
 
       // Auto-select G5547 (Christos) if present, otherwise first word
       var autoWord = sorted.find(function(r) { return (r["Strong's"] || '').trim() === 'G5547'; }) || sorted[0];
-      if (autoWord) _twLexSelect(autoWord['English']);
+      if (autoWord) _twLexSelect(autoWord["Strong's"] || autoWord['English']);
 
     } catch (e) {
       _panel(_errHtml(e.message));
