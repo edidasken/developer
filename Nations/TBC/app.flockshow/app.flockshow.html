@@ -810,8 +810,7 @@
     </div><!-- /.fs-editor-body -->
   </div><!-- /#fs-editor -->
 
-  <!-- Unity footer (inside grid as 4th row so it sits at bottom of viewport) -->
-  <footer class="unity-footer" id="flockshow-footer"></footer>
+
 
 </div><!-- /#fs-root -->
 
@@ -883,22 +882,5 @@
 
 <script type="module" src="app.flockshow/flockshow.js"></script>
 
-<!-- Unity footer mount -->
-<script type="module">
-  import { mountUnityFooter } from './Scripts/the_unity_footer.js';
-
-  mountUnityFooter(document.getElementById('flockshow-footer'), {
-    appId:       'flockshow',
-    appAccent:   '#ef4444',
-    appAccentDk: '#7f1d1d',
-    homeHref:    './',
-    inviteHref:  'app.invite/app.invite.html',
-    prayerHref:  '{{CHURCH_PRAYER_URL}}',
-    phone:       '{{CHURCH_PHONE}}',
-    mapsUrl:     '{{CHURCH_MAPS_URL}}',
-    version:     'v1.04',
-    copyright:   '© 2026 {{CHURCH_NAME}}',
-  });
-</script>
 </body>
 </html>

@@ -2520,8 +2520,7 @@
 
   </div><!-- /bm-body -->
 
-  <!-- Unity footer -->
-  <footer class="unity-footer" id="feed-footer"></footer>
+
 
 </div><!-- /bm-root -->
 
@@ -2657,21 +2656,6 @@
   }
 </script>
 
-<!-- Unity footer mount -->
-<script type="module">
-  import { mountUnityFooter } from './Scripts/the_unity_footer.js';
-
-  mountUnityFooter(document.getElementById('feed-footer'), {
-    appId:       'feed',
-    appAccent:   '#e8a838',
-    appAccentDk: '#c48a20',
-    homeHref:    './',
-    inviteHref:  'app.invite/app.invite.html',
-    prayerHref:  '{{CHURCH_PRAYER_URL}}',
-    phone:       '{{CHURCH_PHONE}}',
-    mapsUrl:     '{{CHURCH_MAPS_URL}}',
-  });
-</script>
 
 </body>
 </html>

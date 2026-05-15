@@ -437,8 +437,7 @@
 
   </div>
 
-  <!-- Unity footer (full-width, outside .launcher container) -->
-  <footer class="unity-footer" id="launcher-footer"></footer>
+
 
   <!-- Pull-to-Refresh indicator -->
   <div class="ptr-indicator" id="ptrIndicator">&#8635; Release to refresh</div>
@@ -485,23 +484,7 @@
     });
   </script>
 
-  <!-- Unity footer mount -->
-  <script type="module">
-    import { mountUnityFooter } from './Scripts/the_unity_footer.js';
 
-    mountUnityFooter(document.getElementById('launcher-footer'), {
-      appId:       'launcher',
-      appAccent:   '#e8a838',
-      appAccentDk: '#1e3a8a',
-      homeHref:    './',
-      inviteHref:  'app.invite/app.invite.html',
-      prayerHref:  '{{CHURCH_PRAYER_URL}}',
-      phone:       '{{CHURCH_PHONE}}',
-      mapsUrl:     '{{CHURCH_MAPS_URL}}',
-      version:     'v1.04',
-      copyright:   '© 2026 FlockOS-GAS',
-    });
-  </script>
 
   <script>
   (function () {

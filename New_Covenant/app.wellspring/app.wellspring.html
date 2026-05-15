@@ -710,8 +710,8 @@
     </div>
   </div>
 
-  <!-- Unity footer -->
-  <footer class="unity-footer" id="ws-footer"></footer>
+  <!-- Unity footer removed -->
+
 
   <!-- ── Firebase SDK (for Firestore export feature) ────────────────────── -->
   <script>
@@ -734,7 +734,6 @@
   <!-- App logic -->
   <script type="module">
     import { mountUnityHeader } from './Scripts/the_unity_header.js';
-    import { mountUnityFooter } from './Scripts/the_unity_footer.js';
 
     // Module scripts are deferred, so DOM is likely already loaded
     if (document.readyState === 'loading') {
@@ -762,16 +761,6 @@
           location.reload();
         },
       });
-
-      mountUnityFooter(document.getElementById('ws-footer'), {
-        appId: 'wellspring',
-        appAccent: '#22c55e',
-        appAccentDk: '#16a34a',
-        homeHref: '../index.html',
-        inviteHref: '../app.invite/',
-        prayerHref: '#prayer',
-      });
-
       // Wait for TheWellspring to be available
       const ws = await waitForWellspring();
       if (!ws) {

@@ -863,8 +863,8 @@
 
     </div>
 
-    <!-- Unity Footer -->
-    <footer id="fc-footer" class="unity-footer"></footer>
+    <!-- Unity Footer removed -->
+
 
   </div>
 
@@ -910,7 +910,6 @@
   <!-- Unity header -->
   <script type="module">
     import { mountUnityHeader } from './Scripts/the_unity_header.js';
-    import { mountUnityFooter } from './Scripts/the_unity_footer.js';
     
     window.addEventListener('load', () => {
       mountUnityHeader(document.getElementById('fc-topbar'), {
@@ -920,17 +919,6 @@
         appAccent: '#007aff',
         appAccentDk: '#0051d5',
         hideHamburger: true  // FlockChat doesn't use sidebar
-      });
-      
-      mountUnityFooter(document.getElementById('fc-footer'), {
-        appId: 'flockchat',
-        appAccent: '#007aff',
-        appAccentDk: '#0051d5',
-        homeHref:    './',
-        inviteHref:  'app.invite/app.invite.html',
-        prayerUrl: '{{CHURCH_PRAYER_URL}}',
-        phone: '{{CHURCH_PHONE}}',
-        mapsUrl: '{{CHURCH_MAPS_URL}}'
       });
     });
   </script>
