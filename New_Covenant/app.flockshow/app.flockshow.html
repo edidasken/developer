@@ -72,12 +72,14 @@
 
     html, body {
       height: 100dvh; margin: 0; padding: 0;
-      background: var(--fs-bg); color: var(--fs-ink);
+      color: var(--fs-ink);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       overflow: hidden;
       overscroll-behavior: none;
     }
+    /* html stays dark navy (from new_covenant.css) so iOS safe-area matches footer */
+    body { background: var(--fs-bg); }
 
     /* ── Root grid ─────────────────────────────────────────────────────── */
     #fs-root {

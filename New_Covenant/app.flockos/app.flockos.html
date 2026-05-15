@@ -127,11 +127,9 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     /* Core NC tokens (--bg, --bg-raised, --ink, --line) live in new_covenant.css */
-    /* html/body share the page background so the iOS PWA safe-area at the
-       bottom (home indicator) flows seamlessly with the page — no visible
-       seam between content and the safe-area band. The topbar paints its
-       own dark over the notch via padding-top: safe-top. */
-    html { height: 100dvh; overflow: hidden; background: var(--bg); }
+    /* html stays dark navy (from new_covenant.css) so iOS safe-area band shows footer-matching navy.
+       Body keeps the active app background. */
+    html { height: 100dvh; overflow: hidden; }
     body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); height: 100dvh; overflow: hidden; overscroll-behavior: none; }
     /* Shell grid (.veil-wrap), responsive collapse, and .ptr-indicator now
        live in new_covenant.css — single source of truth. */

@@ -81,13 +81,14 @@
 
     html, body {
       height: 100dvh;
-      background: var(--bm-bg);
       color: var(--bm-ink);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       overflow: hidden;
       overscroll-behavior: none;
     }
+    /* html stays dark navy (from new_covenant.css) so iOS safe-area matches footer */
+    body { background: var(--bm-bg); }
 
     body {
       display: flex;

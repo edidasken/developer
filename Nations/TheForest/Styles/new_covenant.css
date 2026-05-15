@@ -26,6 +26,9 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  /* Dark navy backstop so iOS PWA safe-area band always shows footer-matching navy
+     (instead of white) regardless of app body background. */
+  background: #0c1445;
 }
 
 body {
