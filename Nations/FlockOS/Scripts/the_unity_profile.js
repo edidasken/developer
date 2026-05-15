@@ -121,7 +121,7 @@ function ensureSheet() {
 
   _sheet.innerHTML = `
     <div class="unity-pp-backdrop" data-act="close"></div>
-    <div class="unity-pp-card" role="menu">
+    <div class="unity-pp-card">
 
       <!-- ── main view ───────────────────────────────────────────────── -->
       <div class="unity-pp-view" data-view="main">
@@ -262,15 +262,21 @@ function _renderProfileView() {
   // Live photo preview
   const photoInput = view.querySelector('#pp-photo');
   const nameInput  = view.querySelector('#pp-name');
-  nameInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); view.querySelector('#pp-save').click(); }
-  });
   const preview    = view.querySelector('#pp-photo-preview');
-  photoInput.addEventListener('input', () => {
+
+  const updatePreview = () => {
     const url = photoInput.value.trim();
     preview.innerHTML = url
       ? `<img src="${_ea(url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'">`
       : `<span style="font-size:2rem;font-weight:700;color:#e8a838">${_e((nameInput.value || display)[0] || '?').toUpperCase()}</span>`;
+  };
+
+  nameInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); view.querySelector('#pp-save').click(); }
+  });
+  nameInput.addEventListener('input', () => { if (!photoInput.value.trim()) updatePreview(); });
+  photoInput.addEventListener('input', () => {
+    updatePreview();
   });
 
   view.querySelector('#pp-save').onclick = () => {
@@ -291,6 +297,7 @@ function _persistProfile(displayName, photoURL) {
       if (!raw) return;
       const s = JSON.parse(raw);
       s.displayName = displayName;
+      s.name        = displayName; // keep both fields in sync
       s.photoURL    = photoURL;
       sessionStorage.setItem(key, JSON.stringify(s));
     } catch (_) {}
@@ -510,22 +517,22 @@ function _renderJournalView() {
       requestAnimationFrame(() => view.querySelector('#pp-j-body')?.focus());
 
     } else if (mode === 'read') {
-      const e = entries[readIdx];
-      if (!e) { mode = 'list'; render(); return; }
+      const entry = entries[readIdx];
+      if (!entry) { mode = 'list'; render(); return; }
       view.innerHTML = `
         <div class="unity-sv-header">
           <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
-          <span class="unity-sv-title unity-sv-title--sm">${_e(e.title || 'Entry')}</span>
+          <span class="unity-sv-title unity-sv-title--sm">${_e(entry.title || 'Entry')}</span>
           <button class="unity-sv-header-action unity-sv-header-action--danger" id="pp-j-del" aria-label="Delete entry" title="Delete entry">${IC.trash}</button>
         </div>
         <div class="unity-sv-body unity-sv-body--list">
-          <p class="unity-sv-journal-date">${fmt(e.created)}</p>
-          <p class="unity-sv-journal-body">${_e(e.body).replace(/\n/g, '<br>')}</p>
+          <p class="unity-sv-journal-date">${fmt(entry.created)}</p>
+          <p class="unity-sv-journal-body">${_e(entry.body).replace(/\n/g, '<br>')}</p>
         </div>
       `;
       view.querySelector('[data-pp-back]').onclick = () => { mode = 'list'; render(); };
       view.querySelector('#pp-j-del').onclick      = () => {
-        const e = load(); e.splice(readIdx, 1); save(e);
+        const all = load(); all.splice(readIdx, 1); save(all);
         mode = 'list'; render();
       };
     }
@@ -651,13 +658,14 @@ function _renderCalendarView() {
     // ── Wire interactions ──────────────────────────────────────────────────────
     view.querySelector('[data-pp-back]').onclick = () => _showView('main');
 
+    const isCurrentMonth = () => viewYear === today.getFullYear() && viewMonth === today.getMonth();
     view.querySelector('[data-cal-prev]').onclick = () => {
       viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
-      selDate = null; addMode = false; render();
+      selDate = isCurrentMonth() ? todayKey : null; addMode = false; render();
     };
     view.querySelector('[data-cal-next]').onclick = () => {
       viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
-      selDate = null; addMode = false; render();
+      selDate = isCurrentMonth() ? todayKey : null; addMode = false; render();
     };
 
     view.querySelectorAll('[data-cal-day]').forEach(btn => {
