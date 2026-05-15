@@ -9,8 +9,6 @@
    Requirements on the host page (already true for every NC app):
      • window.FLOCK_FIREBASE_CONFIG  (set inline in the page <head>)
      • Firebase v10 compat SDK loaded (firebase-app-compat + firestore-compat)
-
-   The unity footer lazy-loads this module when the cross button is pressed.
    ══════════════════════════════════════════════════════════════════════════════ */
 
 const _OUTREACH_FB_CONFIG = (typeof window !== 'undefined' && typeof window.FLOCK_FIREBASE_CONFIG === 'object' && window.FLOCK_FIREBASE_CONFIG)
@@ -304,7 +302,7 @@ export function openPrayerModal(prefillSummary, ctx) {
   setTimeout(() => document.getElementById('gp-pr-fn')?.focus(), 80);
 }
 
-/* Expose globally so non-module callers (legacy GROW hooks, unity footer) can find it. */
+/* Expose globally so non-module callers (legacy GROW hooks) can find it. */
 if (typeof window !== 'undefined') {
   window._openOutreachModal = openPrayerModal;
   window.openPrayerRequest  = openPrayerModal;

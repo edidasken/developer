@@ -8932,8 +8932,7 @@ html, body {
   overscroll-behavior: none;
   width: 100%;
 }
-/* Body gets the app theme background; html stays navy (#0c1445, set above)
-   so the iOS PWA safe-area band below the unity footer matches the footer. */
+/* Body gets the app theme background. */
 body {
   background: var(--bg, #f7f8fb);
 }
@@ -8943,11 +8942,6 @@ body {
 body.veil-app {
   overflow: hidden;
 }
-
-/* In iOS standalone PWA mode, the unity footer extends its own navy background
-   into the safe-area-inset-bottom band (see .unity-footer rules), so we do NOT
-   force html background here — that would clobber per-page <html> backgrounds
-   on login screens etc. */
 
 /* ─── Shell layout ──────────────────────────────────────────────────────────── */
 /* Footer is overlaid (position:absolute) instead of taking its own grid row,
