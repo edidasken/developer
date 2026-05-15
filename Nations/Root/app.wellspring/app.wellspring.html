@@ -684,10 +684,7 @@
         }
       });
 
-      // Import file
-      const fileInput = document.getElementById('ws-file-input');
-      const loading = document.getElementById('ws-import-loading');
-      fileInput.addE (JSON format)
+      // Import JSON file
       const fileInput = document.getElementById('ws-file-input');
       const loading = document.getElementById('ws-import-loading');
       fileInput.addEventListener('change', async (e) => {
@@ -703,18 +700,22 @@
           
           // Load into Wellspring
           const result = await ws.loadJSON(data);
-          ly!\n\n${result.tabs.length} tables, ${result.totalRows.toLocaleString()} rows`);
+          
+          loading.classList.remove('active');
+          fileInput.value = ''; // Reset input
+          await refreshStatus();
+          alert(`Database imported successfully!\n\n${result.tabs.length} tables, ${result.totalRows.toLocaleString()} rows`);
         } catch (err) {
           loading.classList.remove('active');
+          fileInput.value = ''; // Reset input
           alert('Import failed: ' + err.message);
-        } as JSON
+        }
+      });
+
+      // Export as JSON
       document.getElementById('ws-export-btn').addEventListener('click', async () => {
         try {
-          const fileName = await ws.exportJSON
-      // Export
-      document.getElementById('ws-export-btn').addEventListener('click', async () => {
-        try {
-          const fileName = await ws.exportDB();
+          const fileName = await ws.exportJSON();
           alert('Database exported successfully as ' + fileName);
         } catch (err) {
           alert('Export failed: ' + err.message);
