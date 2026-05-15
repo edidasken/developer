@@ -14346,15 +14346,16 @@ flock-tabs [role="tablist"], .tabs-bar {
   --ms-safe-top:    var(--safe-top, env(safe-area-inset-top, 0px));
   --ms-safe-bot:    var(--safe-bottom, env(safe-area-inset-bottom, 0px));
 
-  /* Visual tokens — bridged from NC palette */
+  /* Visual tokens — FlockStand uses higher contrast than the NC default
+     palette because its main views are dense, text-heavy worship tooling. */
   --ms-bg:          var(--bg, #f7f8fb);
   --ms-bg-raised:   var(--bg-raised, #fff);
   --ms-bg-card:     var(--bg-raised, #fff);
   --ms-bg-card-hi:  var(--bg, #f7f8fb);
-  --ms-ink:         var(--ink, #111827);
-  --ms-ink-muted:   var(--ink-muted, #6b7280);
-  --ms-ink-faint:   var(--ink-faint, #9ca3af);
-  --ms-line:        var(--line, rgba(0,0,0,0.09));
+  --ms-ink:         #0b1220;                 /* darker than NC default for max readability */
+  --ms-ink-muted:   #334155;                 /* slate-700 — was light gray, now WCAG-AA on cream */
+  --ms-ink-faint:   #475569;                 /* slate-600 — still readable */
+  --ms-line:        rgba(15,23,42,0.18);     /* stronger card/divider lines */
   --ms-gold:        var(--gold, #e8a838);
   --ms-gold-soft:   var(--gold-soft, rgba(232,168,56,0.15));
   --ms-gold-glow:   var(--gold-glow, rgba(232,168,56,0.32));
