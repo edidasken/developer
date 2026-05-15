@@ -66,13 +66,14 @@
     /* ── Launcher shell ────────────────────────────────────────────── */
     .launcher {
       flex: 1; min-height: 0;
+      height: 0; /* forces bounded height so overflow-y scroll works on mobile */
       overflow-y: auto;
       overflow-x: hidden;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
       display: flex;
       flex-direction: column;
-      padding: 2rem 1.25rem calc(var(--safe-bot) + 50px);
+      padding: 2rem 1.25rem calc(var(--safe-bot) + 120px);
       gap: 2rem;
     }
 
