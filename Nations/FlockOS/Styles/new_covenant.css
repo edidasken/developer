@@ -15022,9 +15022,18 @@ flock-tabs [role="tablist"], .tabs-bar {
     box-shadow: 4px 0 40px rgba(0,0,0,.6);
   }
   .ms-bottom-nav  { display: flex; }
-  .ms-body        { padding-top: calc(var(--ms-header-h) + var(--ms-safe-top)); padding-bottom: var(--ms-bnav-h); }
+  .ms-body        { padding-top: calc(var(--ms-header-h) + var(--ms-safe-top)); padding-bottom: 0; }
+  .ms-main        {
+    background:
+      linear-gradient(180deg,
+        var(--side-0, #0c1445) 0,
+        var(--bg, #f7f8fb) 60px,
+        var(--bg, #f7f8fb) calc(100% - 80px),
+        var(--side-0, #0c1445) 100%);
+  }
   .ms-menu-toggle { display: flex; }
-  .ms-view        { padding: 12px 16px 16px; }
+  .ms-view        { padding: 12px 16px 0; }
+  .ms-view > :last-child { margin-bottom: calc(var(--ms-bnav-h) + 16px); }
   .ms-editor-layout { grid-template-columns: 1fr; }
   .ms-page-hero   { flex-direction: column; margin-bottom: 16px; padding-bottom: 14px; }
   .ms-page-hero-text h1 { margin-top: 0; }
