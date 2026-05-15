@@ -606,12 +606,83 @@
         <div class="ws-card-body">
           <div class="ws-info">
             <div class="ws-info-title">Encrypted Credential Storage</div>
-            Set up a PIN to securely store your FlockOS credentials offline. This allows you to sign in
-            without an internet connection using 256-bit AES-GCM encryption.
+            Store your FlockOS session offline with a PIN. Uses 256-bit AES-GCM encryption.
+            Your PIN never leaves this device.
           </div>
-          <p style="font-size: 0.85rem; color: var(--ws-ink-muted); margin-top: 0.5rem; font-style: italic;">
-            Vault features coming soon — setup PIN, unlock, and secure offline authentication.
-          </p>
+
+          <!-- Vault Status -->
+          <div id="ws-vault-status" style="margin-top: 1rem;">
+            <div class="ws-info-row">
+              <div class="ws-info-label">Vault Status</div>
+              <div id="ws-vault-status-badge">Checking...</div>
+            </div>
+          </div>
+
+          <!-- Setup Form (shown when no vault exists) -->
+          <div id="ws-vault-setup" style="display: none; margin-top: 1rem;">
+            <div class="ws-info" style="margin-bottom: 1rem;">
+              <div class="ws-info-title">Create Vault</div>
+              You are currently signed in. Set a 6+ digit PIN to save your session for offline access.
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <input 
+                type="password" 
+                id="ws-vault-pin" 
+                placeholder="Enter PIN (6+ digits)" 
+                style="padding: 0.75rem; border: 1px solid var(--color-line, #e2e8f0); border-radius: 12px; font-family: inherit; font-size: 0.9rem;"
+                aria-label="Vault PIN"
+              >
+              <input 
+                type="password" 
+                id="ws-vault-pin-confirm" 
+                placeholder="Confirm PIN" 
+                style="padding: 0.75rem; border: 1px solid var(--color-line, #e2e8f0); border-radius: 12px; font-family: inherit; font-size: 0.9rem;"
+                aria-label="Confirm PIN"
+              >
+              <button class="ws-btn ws-btn--primary ws-btn--full" id="ws-vault-setup-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                Create Vault
+              </button>
+            </div>
+          </div>
+
+          <!-- Unlock Form (shown when vault exists and user not signed in) -->
+          <div id="ws-vault-unlock" style="display: none; margin-top: 1rem;">
+            <div class="ws-info" style="margin-bottom: 1rem;">
+              <div class="ws-info-title">Unlock Vault</div>
+              Enter your PIN to restore your offline session.
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+              <input 
+                type="password" 
+                id="ws-vault-unlock-pin" 
+                placeholder="Enter PIN" 
+                style="flex: 1; padding: 0.75rem; border: 1px solid var(--color-line, #e2e8f0); border-radius: 12px; font-family: inherit; font-size: 0.9rem;"
+                aria-label="Unlock PIN"
+              >
+              <button class="ws-btn ws-btn--primary" id="ws-vault-unlock-btn" style="flex-shrink: 0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 9 0"/>
+                </svg>
+                Unlock
+              </button>
+            </div>
+          </div>
+
+          <!-- Destroy (shown when vault exists) -->
+          <div id="ws-vault-destroy" style="display: none; margin-top: 1rem;">
+            <button class="ws-btn ws-btn--danger ws-btn--full" id="ws-vault-destroy-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              Destroy Vault
+            </button>
+          </div>
         </div>
       </div>
 
@@ -710,6 +781,7 @@
 
       // Initialize UI
       await refreshStatus();
+      await refreshVaultStatus();
       wireEvents();
     }
 
@@ -775,6 +847,54 @@
         }
       } catch (err) {
         console.error('[Wellspring App] Status check failed:', err);
+      }
+    }
+
+    async function refreshVaultStatus() {
+      const ws = window.TheWellspring;
+      if (!ws) return;
+
+      try {
+        const vaultExists = await ws.vault.exists();
+        const user = getFlockUser();
+        const hasActiveSession = !!user;
+
+        const statusBadge = document.getElementById('ws-vault-status-badge');
+        const setupForm = document.getElementById('ws-vault-setup');
+        const unlockForm = document.getElementById('ws-vault-unlock');
+        const destroyBtn = document.getElementById('ws-vault-destroy');
+
+        if (vaultExists) {
+          if (hasActiveSession) {
+            // Vault exists, user signed in
+            statusBadge.innerHTML = '<span class="ws-badge ws-badge--active"><span>●</span><span>Active</span></span>';
+            setupForm.style.display = 'none';
+            unlockForm.style.display = 'none';
+            destroyBtn.style.display = 'block';
+          } else {
+            // Vault exists, user NOT signed in → show unlock
+            statusBadge.innerHTML = '<span class="ws-badge ws-badge--inactive"><span>●</span><span>Locked</span></span>';
+            setupForm.style.display = 'none';
+            unlockForm.style.display = 'block';
+            destroyBtn.style.display = 'block';
+          }
+        } else {
+          if (hasActiveSession) {
+            // No vault, user signed in → show setup
+            statusBadge.innerHTML = '<span class="ws-badge ws-badge--inactive"><span>●</span><span>Not Created</span></span>';
+            setupForm.style.display = 'block';
+            unlockForm.style.display = 'none';
+            destroyBtn.style.display = 'none';
+          } else {
+            // No vault, no session → can't do anything
+            statusBadge.textContent = 'Not available';
+            setupForm.style.display = 'none';
+            unlockForm.style.display = 'none';
+            destroyBtn.style.display = 'none';
+          }
+        }
+      } catch (err) {
+        console.error('[Wellspring App] Vault status check failed:', err);
       }
     }
 
@@ -918,6 +1038,85 @@
           firestoreLoading.classList.remove('active');
           firestoreBtn.disabled = false;
           alert('Firestore export failed: ' + err.message);
+        }
+      });
+
+      // Vault: Setup
+      document.getElementById('ws-vault-setup-btn').addEventListener('click', async () => {
+        const pin = document.getElementById('ws-vault-pin').value;
+        const pinConfirm = document.getElementById('ws-vault-pin-confirm').value;
+
+        if (!pin || pin.length < 6) {
+          alert('PIN must be at least 6 characters');
+          return;
+        }
+        if (pin !== pinConfirm) {
+          alert('PINs do not match');
+          return;
+        }
+
+        // Get current session from sessionStorage
+        const user = getFlockUser();
+        if (!user) {
+          alert('No active session found. Please sign in first.');
+          return;
+        }
+
+        try {
+          const sessionData = {
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            createdAt: new Date().toISOString(),
+          };
+
+          await ws.vault.setup(pin, sessionData);
+          
+          document.getElementById('ws-vault-pin').value = '';
+          document.getElementById('ws-vault-pin-confirm').value = '';
+          
+          await refreshVaultStatus();
+          alert('Vault created successfully!\n\nYour session is now saved offline. Use your PIN to unlock when offline.');
+        } catch (err) {
+          alert('Vault setup failed: ' + err.message);
+        }
+      });
+
+      // Vault: Unlock
+      document.getElementById('ws-vault-unlock-btn').addEventListener('click', async () => {
+        const pin = document.getElementById('ws-vault-unlock-pin').value;
+
+        if (!pin) {
+          alert('Enter your PIN');
+          return;
+        }
+
+        try {
+          const session = await ws.vault.unlock(pin);
+          
+          // Store unlocked session in sessionStorage
+          sessionStorage.setItem('flock_auth_session', JSON.stringify(session));
+          
+          document.getElementById('ws-vault-unlock-pin').value = '';
+          
+          await refreshVaultStatus();
+          alert(`Welcome back, ${session.displayName || session.email}!\n\nYour offline session is now active.`);
+        } catch (err) {
+          alert('Unlock failed: ' + err.message);
+          document.getElementById('ws-vault-unlock-pin').value = '';
+        }
+      });
+
+      // Vault: Destroy
+      document.getElementById('ws-vault-destroy-btn').addEventListener('click', async () => {
+        if (!confirm('Destroy your offline vault?\n\nThis will permanently delete your encrypted credentials. You will need to sign in online and set up a new vault.')) return;
+
+        try {
+          await ws.vault.destroy();
+          await refreshVaultStatus();
+          alert('Vault destroyed successfully.');
+        } catch (err) {
+          alert('Vault destroy failed: ' + err.message);
         }
       });
 
