@@ -74,7 +74,7 @@
       grid-template-areas: "top top" "side main" "foot foot";
       grid-template-columns: var(--sidebar-w, 256px) 1fr;
       grid-template-rows: calc(var(--topbar-h, 60px) + var(--safe-top, 0px)) 1fr auto;
-      min-height: 100dvh;
+      height: 100dvh;
       position: relative;
     }
     #gp-topbar-wrap  { grid-area: top; }
@@ -179,7 +179,7 @@
     @media (max-width: 860px) {
       .gp-wrap {
         grid-template-columns: 1fr;
-        grid-template-areas: "top" "main";
+        grid-template-areas: "top" "main" "foot";
       }
       #gp-sidebar-wrap {
         display: none;
