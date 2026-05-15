@@ -64,20 +64,30 @@
       overflow: hidden;
       overscroll-behavior: none;
     }
-    /* #inv-shell is the single scroll container.
-       overscroll-behavior: contain on the scroller reliably kills
-       pull-to-refresh on iOS Safari without breaking page scroll. */
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* #inv-shell contains header, nav, and scrolling main content */
     #inv-shell {
-      height: 100dvh;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg, #f7f8fb);
+      overflow: hidden;
+    }
+
+    /* Main content area is the scroll container */
+    #inv-main {
+      flex: 1;
+      min-height: 0;
       overflow-y: auto;
       overflow-x: hidden;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
-      background: var(--bg, #f7f8fb);
-    }
-
-    /* Body bg below the topbar should be the page bg, not topbar dark */
-    #inv-main {
       background: var(--bg, #f7f8fb);
     }
 
@@ -232,10 +242,10 @@
     <div id="inv-root"></div>
   </main>
 
-  <!-- Unity Footer (inside scroll container so it's reachable) -->
-  <footer id="inv-footer" class="unity-footer"></footer>
-
   </div><!-- /#inv-shell -->
+
+  <!-- Unity Footer (sticky at bottom of viewport) -->
+  <footer id="inv-footer" class="unity-footer"></footer>
 
   <!-- ── SW update banner (outside scroller — fixed positioning) ─── -->
   <div id="inv-sw-banner" role="status" aria-live="polite">
