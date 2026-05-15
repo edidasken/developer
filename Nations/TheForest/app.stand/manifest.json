@@ -30,9 +30,9 @@
       "purpose": "maskable"
     },
     {
-      "src": "../Images/stand.png",
+      "src": "../Images/icon-stand.svg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any"
     }
   ],

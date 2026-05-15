@@ -151,6 +151,50 @@ const TheWellspring = (() => {
   }
 
 
+  // ── JSON Parser (Native — no external deps!) ────────────────────────────
+
+  /**
+   * Load a JSON database directly into IndexedDB.
+   * Expected format: { "TableName": [ {row1}, {row2}, ... ], ... }
+   * @param {Object} data - Parsed JSON object with table names as keys
+   * @returns {Promise<{ tabs: string[], rowCounts: Object, totalRows: number }>}
+   */
+  async function loadJSON(data) {
+    await _openDB();
+
+    // Clear existing data
+    const existingKeys = await _allKeys(STORE_NAME);
+    for (const key of existingKeys) await _del(STORE_NAME, key);
+
+    const tabs = Object.keys(data);
+    const rowCounts = {};
+    let totalRows = 0;
+
+    for (const tabName of tabs) {
+      const rows = data[tabName];
+      if (!Array.isArray(rows)) {
+        throw new Error(`Invalid data format for table "${tabName}" — expected an array`);
+      }
+      await _put(STORE_NAME, tabName, rows);
+      rowCounts[tabName] = rows.length;
+      totalRows += rows.length;
+    }
+
+    // Store metadata
+    await _put(META_STORE, META_KEY, {
+      loadedAt: new Date().toISOString(),
+      fileName: 'database.json',
+      fileSize: JSON.stringify(data).length,
+      tabCount: tabs.length,
+      totalRows: totalRows,
+      tabs: tabs,
+      rowCounts: rowCounts,
+    });
+
+    return { tabs, rowCounts, totalRows };
+  }
+
+
   // ── Data Access ──────────────────────────────────────────────────────────
 
   /**
@@ -545,6 +589,116 @@ const TheWellspring = (() => {
   }
 
 
+  /**
+   * Export the entire local database as JSON (much faster & smaller than Excel).
+   * @returns {Promise<string>} the downloaded file name
+   */
+  async function exportJSON() {
+    await _openDB();
+    const meta = await _get(META_STORE, META_KEY);
+    if (!meta || !meta.tabs) throw new Error('No local data loaded. Import a database file first.');
+
+    // Build JSON object: { "TableName": [...rows], ... }
+    const data = {};
+    for (const tabName of meta.tabs) {
+      data[tabName] = await getTab(tabName);
+    }
+
+    // Download as file
+    const fileName = 'FlockOS_Database_' + new Date().toISOString().slice(0, 10) + '.json';
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return fileName;
+  }
+
+
+  // ── Export from Firestore ────────────────────────────────────────────────
+
+  /**
+   * Export all Firestore data to JSON and download as file.
+   * Requires firebase/firestore to be loaded and initialized.
+   * @param {object} firestore - initialized Firestore instance (from firebase.firestore())
+   * @param {array} collections - array of collection names to export (e.g. ['Members', 'Books'])
+   * @returns {Promise<string>} fileName
+   */
+  async function exportFromFirestore(firestore, collections) {
+    if (!firestore || typeof firestore.collection !== 'function') {
+      throw new Error('Invalid Firestore instance. Pass firebase.firestore().');
+    }
+    if (!Array.isArray(collections) || collections.length === 0) {
+      throw new Error('Provide an array of collection names to export.');
+    }
+
+    const data = {};
+    let totalDocs = 0;
+
+    for (const collectionName of collections) {
+      const snapshot = await firestore.collection(collectionName).get();
+      const rows = [];
+      snapshot.forEach(doc => {
+        rows.push({ id: doc.id, ...doc.data() });
+      });
+      data[collectionName] = rows;
+      totalDocs += rows.length;
+    }
+
+    // Download as file
+    const fileName = 'FlockOS_Firestore_' + new Date().toISOString().slice(0, 10) + '.json';
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    return { fileName, collections: collections.length, totalDocs };
+  }
+
+
+  // ── Import from URL ──────────────────────────────────────────────────────
+
+  /**
+   * Load JSON database from a URL (Google Drive, direct JSON URL, etc.).
+   * Automatically converts Google Drive sharing links to direct download URLs.
+   * @param {string} url - URL to JSON file
+   * @returns {Promise<{ tabs: string[], rowCounts: Object, totalRows: number }>}
+   */
+  async function loadFromURL(url) {
+    if (!url || typeof url !== 'string') throw new Error('Provide a valid URL');
+
+    // Convert Google Drive sharing links to direct download
+    // Format: https://drive.google.com/file/d/FILE_ID/view → https://drive.google.com/uc?export=download&id=FILE_ID
+    let fetchURL = url;
+    const gdriveMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (gdriveMatch) {
+      fetchURL = `https://drive.google.com/uc?export=download&id=${gdriveMatch[1]}`;
+    }
+
+    // Fetch JSON
+    const response = await fetch(fetchURL);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch JSON from URL: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    // Load into IndexedDB using existing loadJSON function
+    return await loadJSON(data);
+  }
+
+
   // ── Status ───────────────────────────────────────────────────────────────
 
   async function status() {
@@ -604,8 +758,12 @@ const TheWellspring = (() => {
     resolve,
 
     // Data import/export
-    load,
-    exportDB,
+    load,               // Excel (.xlsx/.xls) — requires SheetJS
+    loadJSON,           // JSON (native, faster, no deps)
+    loadFromURL,        // JSON from URL (Google Drive, direct link)
+    exportDB,           // Export as Excel
+    exportJSON,         // Export as JSON (recommended)
+    exportFromFirestore, // Export Firestore → JSON file
 
     // Data access (for direct use if needed)
     getTab,
@@ -744,3 +902,8 @@ const TheWellspring = (() => {
   }
 
 })();
+
+// Expose to global scope for non-module scripts
+if (typeof window !== 'undefined') {
+  window.TheWellspring = TheWellspring;
+}

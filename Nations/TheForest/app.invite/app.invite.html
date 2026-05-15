@@ -21,7 +21,7 @@
 
   <!-- Icons -->
   <link rel="icon" type="image/svg+xml" href="Images/icon-invite.svg">
-  <link rel="apple-touch-icon" href="Images/Invite.png">
+  <link rel="apple-touch-icon" href="Images/icon-invite.svg">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -231,11 +231,11 @@
     </div>
     <div id="inv-root"></div>
   </main>
-!-- Unity Footer -->
+
+  <!-- Unity Footer (inside scroll container so it's reachable) -->
   <footer id="inv-footer" class="unity-footer"></footer>
 
-  </div><!-- /#inv-shell --
-  <footer id="inv-footer" class="unity-footer"></footer>
+  </div><!-- /#inv-shell -->
 
   <!-- ── SW update banner (outside scroller — fixed positioning) ─── -->
   <div id="inv-sw-banner" role="status" aria-live="polite">
@@ -282,9 +282,9 @@
         appIconSvg:  INV_ICON,
         appAccent:   '#10b981',
         appAccentDk: '#065f46',
-        homeHref:    '../',
+        homeHref:    './',
         user:        null,
-        signInHref:  '../',
+        signInHref:  './',
       });
     }
 
@@ -307,6 +307,8 @@
             appId:       'invite',
             appAccent:   '#10b981',
             appAccentDk: '#065f46',
+            homeHref:    './',
+            inviteHref:  'app.invite/app.invite.html',
           });
         }
       })

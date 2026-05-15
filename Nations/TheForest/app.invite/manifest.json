@@ -29,9 +29,9 @@
       "purpose": "maskable"
     },
     {
-      "src": "../Images/Invite.png",
+      "src": "../Images/icon-invite.svg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any"
     }
   ],

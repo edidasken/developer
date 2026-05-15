@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- base: resolves all relative resource paths from the parent New_Covenant/ folder -->
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <title>The Wellspring — Offline Data</title>
+
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="app.wellspring/manifest.json">
+
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="Images/icon-wellspring.svg">
+  <link rel="apple-touch-icon" href="Images/FlockIcon-512.webp">
+
+  <!-- PWA meta -->
+  <meta name="theme-color" content="#22c55e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Wellspring">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- SEO -->
+  <meta name="description" content="The Wellspring — FlockOS offline data engine. Run entirely from local Excel files with no internet connection required.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Shared stylesheet -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ws-navy-bg:    #09102e;
+      --ws-navy-card:  #111b44;
+      --ws-gold:       #e8a838;
+      --ws-blue:       #5b8dee;
+    }
+
+    html, body {
+      height: 100dvh;
+      font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    body { 
+      display: flex; 
+      flex-direction: column;
+    }
+
+    /* ── Main scroll container ──────────────────────────────────── */
+    .ws-shell {
+      flex: 1; min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: calc(env(safe-area-inset-top, 0px) + 1.5rem) 1.25rem calc(env(safe-area-inset-bottom, 0px) + 4rem);
+    }
+
+    .ws-container {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* ── Hero ───────────────────────────────────────────────────── */
+    .ws-hero {
+      text-align: center;
+      padding: 3rem 2rem;
+      background: var(--ws-navy-bg);
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .ws-hero-icon {
+      font-size: 4rem;
+      margin-bottom: 0.75rem;
+      filter: drop-shadow(0 4px 16px rgba(91,141,238,0.4));
+    }
+    .ws-hero h1 {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--ws-gold);
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.02em;
+      text-shadow: 0 2px 12px rgba(232,168,56,0.3);
+    }
+    .ws-hero p {
+      font-size: 0.95rem;
+      color: rgba(238,241,251,0.75);
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .ws-hero-verse {
+      margin-top: 1.2rem;
+      font-style: italic;
+      font-size: 0.87rem;
+      color: var(--ws-blue);
+      opacity: 0.9;
+    }
+
+    /* ── Cards ──────────────────────────────────────────────────── */
+    .ws-card {
+      background: white;
+      border: 1px solid var(--color-line, #e2e8f0);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .ws-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--color-line, #e2e8f0);
+    }
+    .ws-card-icon {
+      font-size: 1.5rem;
+      opacity: 0.7;
+    }
+    .ws-card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--color-ink, #1e293b);
+      flex: 1;
+    }
+    .ws-card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* ── Status ─────────────────────────────────────────────────── */
+    .ws-status {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .ws-status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.65rem 0;
+    }
+    .ws-status-label {
+      font-size: 0.9rem;
+      color: var(--color-ink-muted, #64748b);
+      font-weight: 500;
+    }
+    .ws-status-value {
+      font-size: 0.9rem;
+      color: var(--color-ink, #1e293b);
+      font-weight: 600;
+    }
+    .ws-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .ws-badge--active {
+      background: rgba(232,168,56,0.18);
+      color: var(--ws-gold);
+      box-shadow: 0 0 12px rgba(232,168,56,0.25);
+    }
+    .ws-badge--inactive {
+      background: rgba(100,116,139,0.15);
+      color: #64748b;
+    }
+    .ws-badge--loaded {
+      background: rgba(91,141,238,0.18);
+      color: var(--ws-blue);
+      box-shadow: 0 0 10px rgba(91,141,238,0.2);
+    }
+
+    /* ── Buttons ────────────────────────────────────────────────── */
+    .ws-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+    .ws-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .ws-btn--primary {
+      background: linear-gradient(135deg, var(--ws-gold), #d89528);
+      color: #09102e;
+      box-shadow: 0 2px 12px rgba(232,168,56,0.35);
+    }
+    .ws-btn--primary:hover:not(:disabled) {
+      box-shadow: 0 4px 18px rgba(232,168,56,0.5);
+      transform: translateY(-1px);
+    }
+    .ws-btn--secondary {
+      background: white;
+      color: var(--color-ink, #1e293b);
+      border: 1px solid var(--color-line, #e2e8f0);
+    }
+    .ws-btn--secondary:hover:not(:disabled) {
+      border-color: var(--ws-blue);
+      background: rgba(91,141,238,0.05);
+    }
+    .ws-btn--danger {
+      background: rgba(239,68,68,0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239,68,68,0.3);
+    }
+    .ws-btn--danger:hover:not(:disabled) {
+      background: rgba(239,68,68,0.25);
+      border-color: rgba(239,68,68,0.5);
+    }
+    .ws-btn--full {
+      width: 100%;
+    }
+
+    /* ── Toggle Switch ──────────────────────────────────────────── */
+    .ws-toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: rgba(91,141,238,0.08);
+      border-radius: 12px;
+      border: 1px solid var(--ws-line);
+    }
+    .ws-toggle-label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-ink, #1e293b);
+    }
+    .ws-toggle {
+      position: relative;
+      width: 50px;
+      height: 28px;
+      background: #cbd5e1;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .ws-toggle.active {
+      background: linear-gradient(135deg, var(--ws-gold), #d89528);
+      box-shadow: 0 0 16px rgba(232,168,56,0.4);
+    }
+    .ws-toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+    .ws-toggle.active::after {
+      transform: translateX(22px);
+    }
+
+    /* ── File input ─────────────────────────────────────────────── */
+    .ws-file-input {
+      position: relative;
+    }
+    .ws-file-input input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    .ws-file-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border: 2px dashed var(--color-line, #e2e8f0);
+      border-radius: 12px;
+      background: rgba(91,141,238,0.02);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-ink-muted, #64748b);
+    }
+    .ws-file-label:hover {
+      border-color: var(--ws-gold);
+      background: rgba(232,168,56,0.12);
+      color: var(--ws-gold);
+    }
+
+    /* ── Info box ───────────────────────────────────────────────── */
+    .ws-info {
+      background: rgba(91,141,238,0.06);
+      border: 1px solid rgba(91,141,238,0.15);
+      border-radius: 12px;
+      padding: 1rem;
+      font-size: 0.87rem;
+      line-height: 1.6;
+      color: var(--color-ink, #1e293b);
+    }
+    .ws-info-title {
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      color: var(--ws-blue);
+    }
+
+    /* ── Loading ────────────────────────────────────────────────── */
+    .ws-loading {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+      color: var(--color-ink-muted, #64748b);
+    }
+    .ws-loading.active {
+      display: block;
+    }
+    .ws-spinner {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e2e8f0;
+      border-top-color: var(--ws-gold);
+      border-radius: 50%;
+      animation: ws-spin 0.8s linear infinite;
+    }
+    @keyframes ws-spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Responsive ─────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .ws-hero h1 { font-size: 1.5rem; }
+      .ws-card { padding: 1.25rem; }
+      .ws-status-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Unity header (mounted by script below) -->
+  <header class="unity-header" id="ws-header"></header>
+
+  <div class="ws-shell">
+    <div class="ws-container">
+
+      <!-- Hero -->
+      <div class="ws-hero">
+        <div class="ws-hero-icon">💧</div>
+        <h1>The Wellspring</h1>
+        <p>
+          Run FlockOS entirely offline from a single local JSON database. No internet connection required.
+          Your data stays on your device, encrypted and private.
+        </p>
+        <div class="ws-hero-verse">
+          <em>"Whoever drinks the water I give them will never thirst." — John 4:14</em>
+        </div>
+      </div>
+
+      <!-- Why Card -->
+      <div class="ws-card">
+        <div class="ws-card-header">
+          <span class="ws-card-icon">💡</span>
+          <h2>Why The Wellspring?</h2>
+        </div>
+        <div class="ws-card-body">
+          <p style="font-size: 0.95rem; line-height: 1.7; margin-bottom: 1rem;">
+            FlockOS was built to serve churches in <strong>210 countries</strong> — including regions with 
+            unreliable internet, censored networks, or no connectivity at all. The gospel doesn't stop at 
+            the edge of a cellular tower.
+          </p>
+          <p style="font-size: 0.95rem; line-height: 1.7; margin-bottom: 1rem;">
+            The Wellspring enables <strong>100% offline operation</strong>. Your entire database — members, 
+            families, sermons, prayer requests, everything — lives locally in your browser as a simple JSON file. 
+            No cloud required. No subscription fees. No tracking. No third-party access.
+          </p>
+          <div class="ws-info" style="margin-top: 1.25rem;">
+            <div class="ws-info-title">Built for Freedom & Privacy</div>
+            <ul style="margin-top: 0.5rem; padding-left: 1.25rem; line-height: 1.7;">
+              <li style="margin-bottom: 0.5rem;"><strong>Zero external dependencies:</strong> Native browser IndexedDB, no libraries, no bloat</li>
+              <li style="margin-bottom: 0.5rem;"><strong>Device-only storage:</strong> Your data never leaves your machine unless you export it</li>
+              <li style="margin-bottom: 0.5rem;"><strong>JSON format:</strong> Human-readable, portable, lightweight, and future-proof</li>
+              <li style="margin-bottom: 0.5rem;"><strong>Persecution-resistant:</strong> No cloud trail, no server logs, no API keys to compromise</li>
+              <li><strong>Free forever:</strong> No hosting costs, no vendor lock-in, no surprise shutdowns</li>
+            </ul>
+          </div>
+          <p style="font-size: 1.05rem; line-height: 1.75; margin-top: 1.5rem; padding: 1.25rem 1.5rem; color: var(--color-ink, #1e293b); font-style: italic; border-left: 4px solid var(--ws-gold); background: rgba(232,168,56,0.04); border-radius: 0 12px 12px 0;">
+            "The wind blows wherever it pleases. You hear its sound, but you cannot tell where it comes from 
+            or where it is going. So it is with everyone born of the Spirit." — John 3:8
+            <br><br>
+            The church must be able to operate independently, quietly, and resiliently — even when the internet 
+            goes dark. The Wellspring was built for that reality.
+          </p>
+        </div>
+      </div>
+
+      <!-- Status Card -->
+      <div class="ws-card">
+        <div class="ws-card-header">
+          <span class="ws-card-icon">📊</span>
+          <h2>Status</h2>
+        </div>
+        <div class="ws-card-body">
+          <div class="ws-status">
+            <div class="ws-status-row">
+              <span class="ws-status-label">Offline Mode</span>
+              <span class="ws-status-value" id="ws-status-mode">
+                <span class="ws-badge ws-badge--inactive">
+                  <span>●</span>
+                  <span>Inactive</span>
+                </span>
+              </span>
+            </div>
+            <div class="ws-status-row">
+              <span class="ws-status-label">Database</span>
+              <span class="ws-status-value" id="ws-status-db">Not loaded</span>
+            </div>
+            <div class="ws-status-row" id="ws-status-file-row" style="display: none;">
+              <span class="ws-status-label">File</span>
+              <span class="ws-status-value" id="ws-status-file"></span>
+            </div>
+            <div class="ws-status-row" id="ws-status-tabs-row" style="display: none;">
+              <span class="ws-status-label">Tables</span>
+              <span class="ws-status-value" id="ws-status-tabs"></span>
+            </div>
+            <div class="ws-status-row" id="ws-status-rows-row" style="display: none;">
+              <span class="ws-status-label">Total Rows</span>
+              <span class="ws-status-value" id="ws-status-rows"></span>
+            </div>
+          </div>
+
+          <div class="ws-toggle-row">
+            <span class="ws-toggle-label">Enable Offline Mode</span>
+            <div class="ws-toggle" id="ws-toggle-mode" role="switch" tabindex="0" aria-label="Toggle offline mode"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Import Card -->
+      <div class="ws-card">
+        <div class="ws-card-header">
+          <span class="ws-card-icon">📥</span>
+          <h2>Import Database</h2>
+        </div>
+        <div class="ws-card-body">
+          <div class="ws-info">
+            <div class="ws-info-title">How it works</div>
+            Select your FlockOS database JSON file. It will be stored locally in your browser's IndexedDB
+            and made available to all FlockOS apps on this device. No data leaves your device.
+          </div>
+
+          <div class="ws-file-input">
+            <input type="file" id="ws-file-input" accept=".json" aria-label="Select database file">
+            <div class="ws-file-label">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Choose JSON File
+            </div>
+          </div>
+
+          <div class="ws-loading" id="ws-import-loading">
+            <div class="ws-spinner"></div>
+            <p style="margin-top: 1rem;">Importing database...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Import from URL Card -->
+      <div class="ws-card">
+        <div class="ws-card-header">
+          <span class="ws-card-icon">🔗</span>
+          <h2>Import from URL</h2>
+        </div>
+        <div class="ws-card-body">
+          <div class="ws-info">
+            <div class="ws-info-title">Load from Google Drive or direct link</div>
+            Paste a Google Drive sharing link or direct JSON URL. The database will be fetched and loaded into IndexedDB.
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+            <input 
+              type="url" 
+              id="ws-url-input" 
+              placeholder="https://drive.google.com/file/d/..." 
+              style="flex: 1; padding: 0.75rem; border: 1px solid var(--color-line, #e2e8f0); border-radius: 12px; font-family: inherit; font-size: 0.9rem;"
+              aria-label="Database URL"
+            >
+            <button class="ws-btn ws-btn--primary" id="ws-url-import-btn" style="flex-shrink: 0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Import
+            </button>
+          </div>
+
+          <div class="ws-loading" id="ws-url-loading">
+            <div class="ws-spinner"></div>
+            <p style="margin-top: 1rem;">Fetching database...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export from Firestore Card -->
+      <div class="ws-card">
+        <div class="ws-card-header">
+          <span class="ws-card-icon">🔥</span>
+          <h2>Export from Firestore</h2>
+        </div>
+        <div class="ws-card-body">
+          <div class="ws-info">
+            <div class="ws-info-title">Download your Firestore database</div>
+            Export all collections from your active Firestore database to a JSON file.
+            Requires an active FlockOS session with Firestore configured.
+          </div>
+
+          <button class="ws-btn ws-btn--primary ws-btn--full" id="ws-firestore-export-btn" style="margin-top: 1rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export from Firestore
+          </button>
+
+          <div class="ws-loading" id="ws-firestore-loading">
+            <div class="ws-spinner"></div>
+            <p style="margin-top: 1rem;">Exporting from Firestore...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Card -->
+      <div class="ws-card">
+        <div class="ws-card-header">
+          <span class="ws-card-icon">📤</span>
+          <h2>Export Database</h2>
+        </div>
+        <div class="ws-card-body">
+          <p style="font-size: 0.9rem; color: var(--ws-ink-muted); margin-bottom: 1rem;">
+            Download your local database as a JSON file. This creates a backup of all data currently stored offline.
+          </p>
+          <button class="ws-btn ws-btn--secondary ws-btn--full" id="ws-export-btn" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export as JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- Vault Card -->
+      <div class="ws-card">
+        <div class="ws-card-header">
+          <span class="ws-card-icon">🔐</span>
+          <h2>Offline Vault</h2>
+        </div>
+        <div class="ws-card-body">
+          <div class="ws-info">
+            <div class="ws-info-title">Encrypted Credential Storage</div>
+            Store your FlockOS session offline with a PIN. Uses 256-bit AES-GCM encryption.
+            Your PIN never leaves this device.
+          </div>
+
+          <!-- Vault Status -->
+          <div id="ws-vault-status" style="margin-top: 1rem;">
+            <div class="ws-info-row">
+              <div class="ws-info-label">Vault Status</div>
+              <div id="ws-vault-status-badge">Checking...</div>
+            </div>
+          </div>
+
+          <!-- Setup Form (shown when no vault exists) -->
+          <div id="ws-vault-setup" style="display: none; margin-top: 1rem;">
+            <div class="ws-info" style="margin-bottom: 1rem;">
+              <div class="ws-info-title">Create Vault</div>
+              You are currently signed in. Set a 6+ digit PIN to save your session for offline access.
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <input 
+                type="password" 
+                id="ws-vault-pin" 
+                placeholder="Enter PIN (6+ digits)" 
+                style="padding: 0.75rem; border: 1px solid var(--color-line, #e2e8f0); border-radius: 12px; font-family: inherit; font-size: 0.9rem;"
+                aria-label="Vault PIN"
+              >
+              <input 
+                type="password" 
+                id="ws-vault-pin-confirm" 
+                placeholder="Confirm PIN" 
+                style="padding: 0.75rem; border: 1px solid var(--color-line, #e2e8f0); border-radius: 12px; font-family: inherit; font-size: 0.9rem;"
+                aria-label="Confirm PIN"
+              >
+              <button class="ws-btn ws-btn--primary ws-btn--full" id="ws-vault-setup-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                Create Vault
+              </button>
+            </div>
+          </div>
+
+          <!-- Unlock Form (shown when vault exists and user not signed in) -->
+          <div id="ws-vault-unlock" style="display: none; margin-top: 1rem;">
+            <div class="ws-info" style="margin-bottom: 1rem;">
+              <div class="ws-info-title">Unlock Vault</div>
+              Enter your PIN to restore your offline session.
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+              <input 
+                type="password" 
+                id="ws-vault-unlock-pin" 
+                placeholder="Enter PIN" 
+                style="flex: 1; padding: 0.75rem; border: 1px solid var(--color-line, #e2e8f0); border-radius: 12px; font-family: inherit; font-size: 0.9rem;"
+                aria-label="Unlock PIN"
+              >
+              <button class="ws-btn ws-btn--primary" id="ws-vault-unlock-btn" style="flex-shrink: 0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 9 0"/>
+                </svg>
+                Unlock
+              </button>
+            </div>
+          </div>
+
+          <!-- Destroy (shown when vault exists) -->
+          <div id="ws-vault-destroy" style="display: none; margin-top: 1rem;">
+            <button class="ws-btn ws-btn--danger ws-btn--full" id="ws-vault-destroy-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              Destroy Vault
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="ws-card">
+        <div class="ws-card-header">
+          <span class="ws-card-icon">⚠️</span>
+          <h2>Danger Zone</h2>
+        </div>
+        <div class="ws-card-body">
+          <p style="font-size: 0.9rem; color: var(--ws-ink-muted); margin-bottom: 1rem;">
+            This will permanently delete all offline data from this device. This action cannot be undone.
+            You'll need to re-import your database to use offline mode again.
+          </p>
+          <button class="ws-btn ws-btn--danger ws-btn--full" id="ws-clear-btn" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+            Clear All Offline Data
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Unity footer -->
+  <footer class="unity-footer" id="ws-footer"></footer>
+
+  <!-- ── Firebase SDK (for Firestore export feature) ────────────────────── -->
+  <script>
+    window.FLOCK_FIREBASE_CONFIG = {
+      apiKey:            'AIzaSyBA-fkxjABbwIHn0i6MPiXbGwahfJmuJeo',
+      authDomain:        'flockos-notify.firebaseapp.com',
+      projectId:         'flockos-notify',
+      storageBucket:     'flockos-notify.firebasestorage.app',
+      messagingSenderId: '321766738616',
+      appId:             '1:321766738616:web:d2c1c53ad7493fcde4c24d',
+    };
+  </script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+  <!-- The Wellspring offline engine (no external deps needed for JSON!) -->
+  <script defer src="Scripts/the_wellspring.js"></script>
+
+  <!-- App logic -->
+  <script type="module">
+    import { mountUnityHeader } from './Scripts/the_unity_header.js';
+    import { mountUnityFooter } from './Scripts/the_unity_footer.js';
+
+    // Module scripts are deferred, so DOM is likely already loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => setTimeout(init, 100));
+    } else {
+      // DOM already loaded, run init immediately
+      setTimeout(init, 100);
+    }
+
+    async function init() {
+      // Mount unity header & footer
+      const user = getFlockUser();
+      
+      mountUnityHeader(document.getElementById('ws-header'), {
+        appId: 'wellspring',
+        appName: 'The Wellspring',
+        appIconSvg: '💧',
+        appAccent: '#22c55e',
+        appAccentDk: '#16a34a',
+        homeHref: './app.wellspring.html',
+        user,
+        signInHref: '../app.flockos/',
+        onSignOut: () => {
+          try { sessionStorage.clear(); } catch (_) {}
+          location.reload();
+        },
+      });
+
+      mountUnityFooter(document.getElementById('ws-footer'), {
+        appId: 'wellspring',
+        appAccent: '#22c55e',
+        appAccentDk: '#16a34a',
+        homeHref: '../index.html',
+        inviteHref: '../app.invite/',
+        prayerHref: '#prayer',
+      });
+
+      // Wait for TheWellspring to be available
+      const ws = await waitForWellspring();
+      if (!ws) {
+        alert('The Wellspring library failed to load. Please refresh the page.');
+        return;
+      }
+
+      // Initialize UI
+      await refreshStatus();
+      await refreshVaultStatus();
+      wireEvents();
+    }
+
+    function waitForWellspring() {
+      return new Promise((resolve) => {
+        if (window.TheWellspring) return resolve(window.TheWellspring);
+        let attempts = 0;
+        const interval = setInterval(() => {
+          attempts++;
+          if (window.TheWellspring) {
+            clearInterval(interval);
+            resolve(window.TheWellspring);
+          } else if (attempts > 50) {
+            clearInterval(interval);
+            resolve(null);
+          }
+        }, 100);
+      });
+    }
+
+    async function refreshStatus() {
+      const ws = window.TheWellspring;
+      if (!ws) return;
+
+      try {
+        const status = await ws.status();
+        
+        // Mode
+        const modeEl = document.getElementById('ws-status-mode');
+        if (status.active) {
+          modeEl.innerHTML = '<span class="ws-badge ws-badge--active"><span>●</span><span>Active</span></span>';
+        } else {
+          modeEl.innerHTML = '<span class="ws-badge ws-badge--inactive"><span>●</span><span>Inactive</span></span>';
+        }
+
+        // Toggle
+        const toggle = document.getElementById('ws-toggle-mode');
+        if (status.active) {
+          toggle.classList.add('active');
+        } else {
+          toggle.classList.remove('active');
+        }
+
+        // Database
+        const dbEl = document.getElementById('ws-status-db');
+        if (status.loaded) {
+          dbEl.innerHTML = '<span class="ws-badge ws-badge--loaded">Loaded</span>';
+          document.getElementById('ws-status-file-row').style.display = 'flex';
+          document.getElementById('ws-status-tabs-row').style.display = 'flex';
+          document.getElementById('ws-status-rows-row').style.display = 'flex';
+          document.getElementById('ws-status-file').textContent = status.fileName || 'Unknown';
+          document.getElementById('ws-status-tabs').textContent = status.tabCount || 0;
+          document.getElementById('ws-status-rows').textContent = (status.totalRows || 0).toLocaleString();
+          document.getElementById('ws-export-btn').disabled = false;
+          document.getElementById('ws-clear-btn').disabled = false;
+        } else {
+          dbEl.textContent = 'Not loaded';
+          document.getElementById('ws-status-file-row').style.display = 'none';
+          document.getElementById('ws-status-tabs-row').style.display = 'none';
+          document.getElementById('ws-status-rows-row').style.display = 'none';
+          document.getElementById('ws-export-btn').disabled = true;
+          document.getElementById('ws-clear-btn').disabled = true;
+        }
+      } catch (err) {
+        console.error('[Wellspring App] Status check failed:', err);
+      }
+    }
+
+    async function refreshVaultStatus() {
+      const ws = window.TheWellspring;
+      if (!ws) return;
+
+      try {
+        const vaultExists = await ws.vault.exists();
+        const user = getFlockUser();
+        const hasActiveSession = !!user;
+
+        const statusBadge = document.getElementById('ws-vault-status-badge');
+        const setupForm = document.getElementById('ws-vault-setup');
+        const unlockForm = document.getElementById('ws-vault-unlock');
+        const destroyBtn = document.getElementById('ws-vault-destroy');
+
+        if (vaultExists) {
+          if (hasActiveSession) {
+            // Vault exists, user signed in
+            statusBadge.innerHTML = '<span class="ws-badge ws-badge--active"><span>●</span><span>Active</span></span>';
+            setupForm.style.display = 'none';
+            unlockForm.style.display = 'none';
+            destroyBtn.style.display = 'block';
+          } else {
+            // Vault exists, user NOT signed in → show unlock
+            statusBadge.innerHTML = '<span class="ws-badge ws-badge--inactive"><span>●</span><span>Locked</span></span>';
+            setupForm.style.display = 'none';
+            unlockForm.style.display = 'block';
+            destroyBtn.style.display = 'block';
+          }
+        } else {
+          if (hasActiveSession) {
+            // No vault, user signed in → show setup
+            statusBadge.innerHTML = '<span class="ws-badge ws-badge--inactive"><span>●</span><span>Not Created</span></span>';
+            setupForm.style.display = 'block';
+            unlockForm.style.display = 'none';
+            destroyBtn.style.display = 'none';
+          } else {
+            // No vault, no session → can't do anything
+            statusBadge.textContent = 'Not available';
+            setupForm.style.display = 'none';
+            unlockForm.style.display = 'none';
+            destroyBtn.style.display = 'none';
+          }
+        }
+      } catch (err) {
+        console.error('[Wellspring App] Vault status check failed:', err);
+      }
+    }
+
+    function wireEvents() {
+      const ws = window.TheWellspring;
+      if (!ws) return;
+
+      // Toggle mode
+      const toggle = document.getElementById('ws-toggle-mode');
+      toggle.addEventListener('click', async () => {
+        try {
+          if (ws.isActive()) {
+            ws.disable();
+          } else {
+            await ws.enable();
+          }
+          await refreshStatus();
+        } catch (err) {
+          alert('Failed to toggle offline mode: ' + err.message);
+        }
+      });
+
+      // Import JSON file
+      const fileInput = document.getElementById('ws-file-input');
+      const loading = document.getElementById('ws-import-loading');
+      fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+          loading.classList.add('active');
+          
+          // Read JSON file
+          const text = await file.text();
+          const data = JSON.parse(text);
+          
+          // Load into Wellspring
+          const result = await ws.loadJSON(data);
+          
+          loading.classList.remove('active');
+          fileInput.value = ''; // Reset input
+          await refreshStatus();
+          alert(`Database imported successfully!\n\n${result.tabs.length} tables, ${result.totalRows.toLocaleString()} rows`);
+        } catch (err) {
+          loading.classList.remove('active');
+          fileInput.value = ''; // Reset input
+          alert('Import failed: ' + err.message);
+        }
+      });
+
+      // Export as JSON
+      document.getElementById('ws-export-btn').addEventListener('click', async () => {
+        try {
+          const fileName = await ws.exportJSON();
+          alert('Database exported successfully as ' + fileName);
+        } catch (err) {
+          alert('Export failed: ' + err.message);
+        }
+      });
+
+      // Import from URL
+      const urlInput = document.getElementById('ws-url-input');
+      const urlBtn = document.getElementById('ws-url-import-btn');
+      const urlLoading = document.getElementById('ws-url-loading');
+      urlBtn.addEventListener('click', async () => {
+        const url = urlInput.value.trim();
+        if (!url) {
+          alert('Please enter a URL');
+          return;
+        }
+
+        try {
+          urlLoading.classList.add('active');
+          urlBtn.disabled = true;
+
+          const result = await ws.loadFromURL(url);
+
+          urlLoading.classList.remove('active');
+          urlBtn.disabled = false;
+          urlInput.value = ''; // Clear input
+          await refreshStatus();
+          alert(`Database imported from URL successfully!\n\n${result.tabs.length} tables, ${result.totalRows.toLocaleString()} rows`);
+        } catch (err) {
+          urlLoading.classList.remove('active');
+          urlBtn.disabled = false;
+          alert('URL import failed: ' + err.message + '\n\nMake sure the URL is publicly accessible and returns valid JSON.');
+        }
+      });
+
+      // Export from Firestore
+      const firestoreBtn = document.getElementById('ws-firestore-export-btn');
+      const firestoreLoading = document.getElementById('ws-firestore-loading');
+      firestoreBtn.addEventListener('click', async () => {
+        // Check if Firebase SDK is loaded
+        if (typeof firebase === 'undefined' || typeof firebase.firestore !== 'function') {
+          alert('Firebase SDK is not loaded yet. Please wait a moment and try again.\n\nIf this error persists, refresh the page.');
+          return;
+        }
+
+        // Initialize Firebase if not already initialized
+        if (!firebase.apps || firebase.apps.length === 0) {
+          if (!window.FLOCK_FIREBASE_CONFIG) {
+            alert('Firebase configuration is missing. Cannot export from Firestore.');
+            return;
+          }
+          try {
+            firebase.initializeApp(window.FLOCK_FIREBASE_CONFIG);
+          } catch (err) {
+            console.error('[Wellspring] Firebase init failed:', err);
+            alert('Failed to initialize Firebase: ' + err.message);
+            return;
+          }
+        }
+
+        // Get Firestore instance
+        const db = firebase.firestore();
+
+        // Prompt for collection names
+        const collectionsInput = prompt(
+          'Enter collection names to export (comma-separated):\n\nExample: Members,Families,Books,Messages,Events,Requests',
+          'Members,Families,Books,Messages,Events,Requests'
+        );
+        if (!collectionsInput) return;
+
+        const collections = collectionsInput.split(',').map(s => s.trim()).filter(Boolean);
+        if (collections.length === 0) {
+          alert('No collections specified');
+          return;
+        }
+
+        try {
+          firestoreLoading.classList.add('active');
+          firestoreBtn.disabled = true;
+
+          const result = await ws.exportFromFirestore(db, collections);
+
+          firestoreLoading.classList.remove('active');
+          firestoreBtn.disabled = false;
+          alert(`Firestore export complete!\n\nFile: ${result.fileName}\nCollections: ${result.collections}\nTotal documents: ${result.totalDocs.toLocaleString()}`);
+        } catch (err) {
+          firestoreLoading.classList.remove('active');
+          firestoreBtn.disabled = false;
+          alert('Firestore export failed: ' + err.message);
+        }
+      });
+
+      // Vault: Setup
+      document.getElementById('ws-vault-setup-btn').addEventListener('click', async () => {
+        const pin = document.getElementById('ws-vault-pin').value;
+        const pinConfirm = document.getElementById('ws-vault-pin-confirm').value;
+
+        if (!pin || pin.length < 6) {
+          alert('PIN must be at least 6 characters');
+          return;
+        }
+        if (pin !== pinConfirm) {
+          alert('PINs do not match');
+          return;
+        }
+
+        // Get current session from sessionStorage
+        const user = getFlockUser();
+        if (!user) {
+          alert('No active session found. Please sign in first.');
+          return;
+        }
+
+        try {
+          const sessionData = {
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            createdAt: new Date().toISOString(),
+          };
+
+          await ws.vault.setup(pin, sessionData);
+          
+          document.getElementById('ws-vault-pin').value = '';
+          document.getElementById('ws-vault-pin-confirm').value = '';
+          
+          await refreshVaultStatus();
+          alert('Vault created successfully!\n\nYour session is now saved offline. Use your PIN to unlock when offline.');
+        } catch (err) {
+          alert('Vault setup failed: ' + err.message);
+        }
+      });
+
+      // Vault: Unlock
+      document.getElementById('ws-vault-unlock-btn').addEventListener('click', async () => {
+        const pin = document.getElementById('ws-vault-unlock-pin').value;
+
+        if (!pin) {
+          alert('Enter your PIN');
+          return;
+        }
+
+        try {
+          const session = await ws.vault.unlock(pin);
+          
+          // Store unlocked session in sessionStorage
+          sessionStorage.setItem('flock_auth_session', JSON.stringify(session));
+          
+          document.getElementById('ws-vault-unlock-pin').value = '';
+          
+          await refreshVaultStatus();
+          alert(`Welcome back, ${session.displayName || session.email}!\n\nYour offline session is now active.`);
+        } catch (err) {
+          alert('Unlock failed: ' + err.message);
+          document.getElementById('ws-vault-unlock-pin').value = '';
+        }
+      });
+
+      // Vault: Destroy
+      document.getElementById('ws-vault-destroy-btn').addEventListener('click', async () => {
+        if (!confirm('Destroy your offline vault?\n\nThis will permanently delete your encrypted credentials. You will need to sign in online and set up a new vault.')) return;
+
+        try {
+          await ws.vault.destroy();
+          await refreshVaultStatus();
+          alert('Vault destroyed successfully.');
+        } catch (err) {
+          alert('Vault destroy failed: ' + err.message);
+        }
+      });
+
+      // Clear all
+      document.getElementById('ws-clear-btn').addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to delete ALL offline data? This cannot be undone.')) return;
+        if (!confirm('This will permanently delete your local database. Continue?')) return;
+        
+        try {
+          await ws.clearAll();
+          ws.disable();
+          await refreshStatus();
+          alert('All offline data has been cleared.');
+        } catch (err) {
+          alert('Clear failed: ' + err.message);
+        }
+      });
+    }
+
+    function getFlockUser() {
+      try {
+        const raw = sessionStorage.getItem('flock_auth_session') || sessionStorage.getItem('flock_auth_profile');
+        if (!raw) return null;
+        const s = JSON.parse(raw);
+        if (!s?.email) return null;
+        return {
+          displayName: s.displayName || s.name || s.email.split('@')[0],
+          email: s.email,
+          photoURL: s.photoURL || '',
+        };
+      } catch (_) {
+        return null;
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -41,10 +41,16 @@ const PRECACHE_URLS = [
   'Styles/new_covenant.css', /* american_garments merged in — one CSS file */
 
   /* ── Images ───────────────────────────────────────────────────────────── */
-  'Images/FlockOS.png',
+  'Images/FlockIcon.png',
+  'Images/FlockIcon-512.webp',
   'Images/NewCovenant.png',
-  'Images/GrowIcon.png',
-  'Images/Invite.png',
+  'Images/icon-flockos.svg',
+  'Images/icon-grow.svg',
+  'Images/icon-invite.svg',
+  'Images/icon-chat.svg',
+  'Images/icon-feed.svg',
+  'Images/icon-show.svg',
+  'Images/icon-stand.svg',
 
   /* ── Boot scripts ─────────────────────────────────────────────────────── */
   'Scripts/the_ark.js',
@@ -369,8 +375,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body:    data.body,
-      icon:    '/Images/FlockOS.png',
-      badge:   '/Images/FlockOS.png',
+      icon:    '/Images/FlockIcon-512.webp',
+      badge:   '/Images/FlockIcon-512.webp',
       data:    data,
       vibrate: [150, 60, 150],
       tag:     data.tag || 'flockos',

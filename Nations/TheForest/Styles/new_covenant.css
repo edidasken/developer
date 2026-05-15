@@ -14346,15 +14346,16 @@ flock-tabs [role="tablist"], .tabs-bar {
   --ms-safe-top:    var(--safe-top, env(safe-area-inset-top, 0px));
   --ms-safe-bot:    var(--safe-bottom, env(safe-area-inset-bottom, 0px));
 
-  /* Visual tokens — bridged from NC palette */
+  /* Visual tokens — FlockStand uses higher contrast than the NC default
+     palette because its main views are dense, text-heavy worship tooling. */
   --ms-bg:          var(--bg, #f7f8fb);
   --ms-bg-raised:   var(--bg-raised, #fff);
   --ms-bg-card:     var(--bg-raised, #fff);
   --ms-bg-card-hi:  var(--bg, #f7f8fb);
-  --ms-ink:         var(--ink, #111827);
-  --ms-ink-muted:   var(--ink-muted, #6b7280);
-  --ms-ink-faint:   var(--ink-faint, #9ca3af);
-  --ms-line:        var(--line, rgba(0,0,0,0.09));
+  --ms-ink:         #0b1220;                 /* darker than NC default for max readability */
+  --ms-ink-muted:   #334155;                 /* slate-700 — was light gray, now WCAG-AA on cream */
+  --ms-ink-faint:   #475569;                 /* slate-600 — still readable */
+  --ms-line:        rgba(15,23,42,0.18);     /* stronger card/divider lines */
   --ms-gold:        var(--gold, #e8a838);
   --ms-gold-soft:   var(--gold-soft, rgba(232,168,56,0.15));
   --ms-gold-glow:   var(--gold-glow, rgba(232,168,56,0.32));
@@ -14638,6 +14639,67 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-card-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
 .ms-card-meta  { font-size: .8rem; color: var(--ms-ink-muted); display: flex; gap: 10px; flex-wrap: wrap; }
 .ms-card-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: .7rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+
+/* ── FlockStand hero ─────────────────────────────────────────────────────── */
+.ms-hero {
+  padding: 38px 28px 30px !important;
+  background: linear-gradient(180deg, #fffaf0 0%, #fffefb 60%, #fffaf0 100%);
+  border: 1px solid var(--ms-gold-glow, #e7d59a) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 8px 22px -16px rgba(168,85,247,.18);
+  margin-bottom: 22px;
+}
+.ms-hero::before {
+  content: "";
+  position: absolute; left: 0; right: 0; top: 0; height: 3px;
+  background: linear-gradient(90deg, #a855f7 0%, #ec4899 50%, #f59e0b 100%);
+  opacity: .85;
+}
+.ms-hero-glyph {
+  font-size: 2rem; line-height: 1; margin-bottom: 8px;
+  display: inline-block;
+  filter: drop-shadow(0 2px 6px rgba(168,85,247,.25));
+}
+.ms-hero-title {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-size: clamp(1.9rem, 3.6vw, 2.6rem) !important;
+  font-weight: 800; letter-spacing: -.015em;
+  background: linear-gradient(90deg, #1f1147 0%, #4c1d95 55%, #a855f7 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  margin: 0 0 10px;
+}
+.ms-hero-verse {
+  font-style: italic;
+  font-size: .92rem;
+  color: var(--ms-ink-muted);
+  max-width: 640px; margin: 4px auto 14px;
+  line-height: 1.55;
+}
+.ms-hero-ref {
+  font-style: normal; font-weight: 700;
+  color: #a855f7; letter-spacing: .02em;
+  margin-left: 4px;
+}
+.ms-hero-lede {
+  font-size: 1.02rem !important;
+  color: var(--ms-ink) !important;
+  max-width: 680px; margin: 0 auto 18px;
+  line-height: 1.55;
+}
+.ms-hero-pillars {
+  display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 6px 12px; font-size: .82rem; color: var(--ms-ink-muted);
+  padding: 8px 18px; border-radius: 999px;
+  background: rgba(168,85,247,.06);
+  border: 1px solid rgba(168,85,247,.15);
+}
+.ms-hero-pillars strong { color: #4c1d95; font-weight: 700; margin-right: 2px; }
+.ms-hero-dot { color: #a855f7; opacity: .55; }
+@media (max-width: 540px) {
+  .ms-hero { padding: 28px 18px 22px !important; }
+  .ms-hero-pillars { font-size: .76rem; padding: 8px 14px; }
+  .ms-hero-dot { display: none; }
+  .ms-hero-pillars > span { flex-basis: 100%; text-align: center; }
+}
 
 /* ── Song grid / list ────────────────────────────────────────────────────── */
 .ms-songs-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
@@ -14960,11 +15022,16 @@ flock-tabs [role="tablist"], .tabs-bar {
     box-shadow: 4px 0 40px rgba(0,0,0,.6);
   }
   .ms-bottom-nav  { display: flex; }
-  .ms-body        { padding-top: calc(var(--ms-header-h) + var(--ms-safe-top)); padding-bottom: var(--ms-bnav-h); }
+  .ms-body        { padding-top: 0; padding-bottom: 0; }
+  .ms-main        { background: var(--ms-bg); }
   .ms-menu-toggle { display: flex; }
-  .ms-view        { padding: 16px; }
+  .ms-view        {
+    padding: calc(var(--ms-header-h) + var(--ms-safe-top) + 12px) 16px calc(var(--ms-bnav-h) + 12px);
+    max-width: none;
+  }
   .ms-editor-layout { grid-template-columns: 1fr; }
-  .ms-page-hero   { flex-direction: column; }
+  .ms-page-hero   { flex-direction: column; margin-bottom: 16px; padding-bottom: 12px; }
+  .ms-page-hero-text h1 { margin-top: 0; }
   .ms-page-hero-actions { width: 100%; }
   .ms-stats-grid  { grid-template-columns: repeat(2,1fr); }
   #ms-live-btn > span { display: none; }
@@ -15305,7 +15372,6 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
   .unity-brand-text { font-size: 0.98rem; }
 }
 @media (max-width: 540px) {
-  .unity-brand-text { display: none; }
   .unity-action, .unity-avatar, .unity-header .nc-switcher-btn { width: 36px; height: 36px; }
 }
 
