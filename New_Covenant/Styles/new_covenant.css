@@ -26,9 +26,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
-  /* Dark navy backstop so iOS PWA safe-area band always shows footer-matching navy
-     (instead of white) regardless of app body background. */
-  background: #0c1445;
+  background: transparent;
 }
 
 body {
@@ -15379,114 +15377,6 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
 }
 @media (max-width: 540px) {
   .unity-action, .unity-avatar, .unity-header .nc-switcher-btn { width: 36px; height: 36px; }
-}
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   UNITY FOOTER — Single shared app-shell footer
-   ══════════════════════════════════════════════════════════════════════════════ */
-.unity-footer {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  padding: 10px 12px 10px;
-  background: var(--foot-bg, #0c1445);
-  color: var(--foot-ink, rgba(255,255,255,0.65));
-  border-top: 1px solid var(--foot-line, rgba(255,255,255,0.08));
-  position: relative; z-index: 100; flex-shrink: 0;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-size: 0.85rem;
-}
-
-/* PWA mode: extend the footer's navy background into the iOS safe-area-inset-bottom
-   band so there is NO white strip below the footer where the home indicator lives.
-   Two-layer approach for robustness:
-   1) padding-bottom on the footer itself (paints navy below the buttons)
-   2) a fixed-position navy bar pinned to the viewport bottom as a backstop, in
-      case a parent container clips overflow before the safe-area zone is reached. */
-@media (display-mode: standalone) {
-  .unity-footer {
-    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-  }
-  .unity-footer::after {
-    content: '';
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    height: env(safe-area-inset-bottom, 0px);
-    background: var(--foot-bg, #0c1445);
-    z-index: 99;
-    pointer-events: none;
-  }
-}
-
-.unity-footer::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
-  background: var(--grad-rainbow, linear-gradient(90deg,#ef4444,#f59e0b,#84cc16,#06b6d4,#8b5cf6,#ef4444));
-  background-size: 200% 100%;
-  animation: unity-rainbow 9s linear infinite;
-  opacity: 0.72; pointer-events: none;
-}
-
-.unity-footer-actions {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-  gap: 8px;
-}
-
-.unity-footer-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  padding: 11px 18px; min-height: 44px; border-radius: 12px;
-  background: rgba(255,255,255,0.14);
-  border: 1px solid rgba(255,255,255,0.32);
-  color: #fff; text-decoration: none;
-  font-size: 0.9rem; font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 2px 6px rgba(0,0,0,0.25);
-  transition: background 0.15s, border-color 0.15s, transform 0.1s;
-  -webkit-tap-highlight-color: transparent;
-}
-.unity-footer-btn:hover {
-  background: rgba(255,255,255,0.22);
-  border-color: rgba(255,255,255,0.45);
-}
-.unity-footer-btn:active { transform: scale(0.96); }
-.unity-footer-btn svg { flex-shrink: 0; width: 18px; height: 18px; }
-
-.unity-footer-meta {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-  gap: 8px; font-size: 0.75rem; opacity: 0.8;
-}
-
-.unity-footer-sep {
-  color: rgba(255,255,255,0.35);
-}
-
-.unity-footer-version {
-  display: inline-flex; align-items: center;
-  padding: 3px 10px; border-radius: 12px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.10);
-  font-size: 0.7rem; font-weight: 600;
-  color: var(--foot-accent, #e8a838);
-}
-
-.unity-footer-motto {
-  font-size: 0.7rem; font-weight: 500;
-  color: rgba(255,255,255,0.85);
-}
-
-@media (max-width: 540px) {
-  .unity-footer { 
-    padding: 8px 10px 8px; 
-    gap: 6px; font-size: 0.8rem; 
-  }
-  .unity-footer-btn { padding: 9px 13px; font-size: 0.82rem; min-height: 44px; }
-  .unity-footer-btn svg { width: 20px; height: 20px; }
-  .unity-footer-btn span { display: none; }
-  .unity-footer-motto { font-size: 0.7rem; }
-}
-
-/* PWA mode on mobile: extend footer navy into safe-area-inset-bottom band */
-@media (max-width: 540px) and (display-mode: standalone) {
-  .unity-footer {
-    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-  }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
