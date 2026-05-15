@@ -15372,7 +15372,6 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
   .unity-brand-text { font-size: 0.98rem; }
 }
 @media (max-width: 540px) {
-  .unity-brand-text { display: none; }
   .unity-action, .unity-avatar, .unity-header .nc-switcher-btn { width: 36px; height: 36px; }
 }
 
