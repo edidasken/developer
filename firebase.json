@@ -3,9 +3,6 @@
     "site": "flockos-comms",
     "public": "flockchat-public",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "predeploy": [
-      "mkdir -p flockchat-public/FlockChat/Images flockchat-public/Styles && cp Covenant/Courts/TheFellowship/FlockChat.html flockchat-public/ && cp Covenant/Courts/TheFellowship/FlockChat/the_word.js flockchat-public/FlockChat/ && cp Covenant/Foundations/SharedVessels/styles/american_garments.css flockchat-public/Styles/ && cp Covenant/Courts/TheFellowship/FlockChat/manifest.json flockchat-public/FlockChat/ && cp Covenant/Courts/TheFellowship/FlockChat/Images/FlockChat_AppIcon.png flockchat-public/FlockChat/Images/ && cp Covenant/Courts/TheFellowship/FlockChat/firebase-messaging-sw.js flockchat-public/"
-    ],
     "rewrites": [
       { "source": "**", "destination": "/FlockChat.html" }
     ]
