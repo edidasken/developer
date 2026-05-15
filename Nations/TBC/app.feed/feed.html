@@ -101,6 +101,16 @@
     /* (Topbar styling now handled by .unity-header in new_covenant.css.) */
     #bm-topbar { z-index: 200; }
 
+    /* Subbar — dark-chrome strip beneath unity-header (matches topbar palette) */
+    #bm-subbar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px;
+      background: var(--top-bg);
+      color: var(--top-ink);
+      border-bottom: 1px solid var(--top-line);
+      z-index: 199;
+    }
+
     /* Sermon title in topbar */
     #bm-active-title {
       flex: 1; min-width: 0;
@@ -2558,7 +2568,7 @@
 
 <!-- Unity header (mounts shared FlockOS chrome above feed.js's own UI) -->
 <script type="module">
-  import { mountUnityHeader } from '../Scripts/the_unity_header.js';
+  import { mountUnityHeader } from './Scripts/the_unity_header.js';
 
   let user = null;
   try {
