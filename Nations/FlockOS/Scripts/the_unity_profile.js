@@ -11,7 +11,7 @@
      settings — Push-notification toggle, app version info
      todo     — Personal To-Do list (localStorage, keyed by email)
      journal  — Personal Journal entries (localStorage, keyed by email)
-     calendar — Personal Calendar stub (Turn 3)
+     calendar — Personal Calendar (monthly grid, events, localStorage)
    ══════════════════════════════════════════════════════════════════════════════ */
 
 let _sheet      = null;   // single DOM node, persists for the page lifetime
@@ -82,17 +82,22 @@ export function closeUnityProfile() {
 // ── View engine ────────────────────────────────────────────────────────────────
 
 function _showView(name) {
+  const animClass = name === 'main' ? 'pp-view-back' : 'pp-view-in';
   _activeView = name;
+  _sheet.querySelector('.unity-pp-card').scrollTop = 0;
   _sheet.querySelectorAll('.unity-pp-view').forEach(v => {
     const active = v.dataset.view === name;
     v.hidden = !active;
     if (active) {
-      v.classList.remove('pp-view-in');
+      v.classList.remove('pp-view-in', 'pp-view-back');
       void v.offsetWidth; // force reflow to restart animation
-      v.classList.add('pp-view-in');
+      v.classList.add(animClass);
     }
   });
-  if (name !== 'main') _renderSubView(name);
+  if (name !== 'main') {
+    _renderSubView(name);
+    requestAnimationFrame(() => _sheet.querySelector(`[data-view="${name}"] .unity-sv-back`)?.focus());
+  }
 }
 
 function _renderSubView(name) {
@@ -257,6 +262,9 @@ function _renderProfileView() {
   // Live photo preview
   const photoInput = view.querySelector('#pp-photo');
   const nameInput  = view.querySelector('#pp-name');
+  nameInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); view.querySelector('#pp-save').click(); }
+  });
   const preview    = view.querySelector('#pp-photo-preview');
   photoInput.addEventListener('input', () => {
     const url = photoInput.value.trim();
@@ -543,9 +551,16 @@ function _renderCalendarView() {
   const today     = new Date();
   const todayKey  = toKey(today.getFullYear(), today.getMonth(), today.getDate());
 
+  // 12-hour time formatter for display
+  const fmtTime = t => {
+    if (!t) return '';
+    const [h, m] = t.split(':').map(Number);
+    return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
+  };
+
   let viewYear  = today.getFullYear();
   let viewMonth = today.getMonth();  // 0-based
-  let selDate   = null;              // 'YYYY-MM-DD' | null
+  let selDate   = todayKey;          // auto-select today on open
   let addMode   = false;
 
   const render = () => {
@@ -621,7 +636,7 @@ function _renderCalendarView() {
               ${selEvents.length
                 ? selEvents.map(ev => `
                     <li class="unity-cal-event-item">
-                      ${ev.time ? `<span class="unity-cal-event-time">${_e(ev.time)}</span>` : ''}
+                      ${ev.time ? `<span class="unity-cal-event-time">${_e(fmtTime(ev.time))}</span>` : ''}
                       <span class="unity-cal-event-title">${_e(ev.title)}</span>
                       <button class="unity-sv-task-del" data-cal-del="${ev.id}" aria-label="Delete event">${IC.trash}</button>
                     </li>`).join('')

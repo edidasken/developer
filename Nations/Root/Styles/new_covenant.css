@@ -15552,10 +15552,15 @@ body.unity-modal-open { overflow: hidden; }
    All .unity-sv-* classes are scoped to sub-views inside the profile panel.
    ══════════════════════════════════════════════════════════════════════════════ */
 
-/* View enter animation */
-.pp-view-in { animation: pp-view-in 0.18s ease both; }
+/* View enter/back animations */
+.pp-view-in   { animation: pp-view-in   0.18s ease both; }
+.pp-view-back { animation: pp-view-back 0.18s ease both; }
 @keyframes pp-view-in {
-  from { opacity: 0; transform: translateX(10px); }
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes pp-view-back {
+  from { opacity: 0; transform: translateX(-12px); }
   to   { opacity: 1; transform: none; }
 }
 
