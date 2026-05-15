@@ -77,12 +77,16 @@ export function closeUnityProfile() {
   if (!_sheet) return;
   _sheet.classList.remove('is-open');
   document.body.classList.remove('unity-modal-open');
+  _activeView = 'main';
 }
 
 // ── View engine ────────────────────────────────────────────────────────────────
 
 function _showView(name) {
-  const animClass = name === 'main' ? 'pp-view-back' : 'pp-view-in';
+  // Slide from left only when navigating Back inside an already-open panel.
+  // When the panel opens fresh, is-open hasn't been added yet → slide from right.
+  const panelOpen = _sheet.classList.contains('is-open');
+  const animClass = (panelOpen && name === 'main') ? 'pp-view-back' : 'pp-view-in';
   _activeView = name;
   _sheet.querySelector('.unity-pp-card').scrollTop = 0;
   _sheet.querySelectorAll('.unity-pp-view').forEach(v => {
@@ -309,6 +313,7 @@ function _persistProfile(displayName, photoURL) {
 function _renderSettingsView() {
   const view         = _sheet.querySelector('[data-view="settings"]');
   const notifUnavail = typeof Notification === 'undefined';
+  const notifDenied  = !notifUnavail && Notification.permission === 'denied';
   const notifGranted = !notifUnavail && Notification.permission === 'granted';
 
   view.innerHTML = `
@@ -323,11 +328,15 @@ function _renderSettingsView() {
           <span class="unity-sv-toggle-icon">${IC.bell}</span>
           <div>
             <div class="unity-sv-toggle-title">Push Notifications</div>
-            <div class="unity-sv-toggle-sub">${notifUnavail ? 'Not supported in this browser' : 'Allow FlockOS to send alerts'}</div>
+            <div class="unity-sv-toggle-sub">${
+              notifUnavail ? 'Not supported in this browser'
+              : notifDenied  ? 'Blocked — open browser settings to allow'
+              : 'Allow FlockOS to send alerts'
+            }</div>
           </div>
         </div>
         <label class="unity-sv-toggle" aria-label="Toggle push notifications">
-          <input type="checkbox" id="pp-notif-toggle"${notifGranted ? ' checked' : ''}${notifUnavail ? ' disabled' : ''}>
+          <input type="checkbox" id="pp-notif-toggle"${notifGranted ? ' checked' : ''}${(notifUnavail || notifDenied) ? ' disabled' : ''}>
           <span class="unity-sv-toggle-track"></span>
         </label>
       </div>
@@ -349,7 +358,7 @@ function _renderSettingsView() {
 
   view.querySelector('[data-pp-back]').onclick = () => _showView('main');
 
-  if (!notifUnavail) {
+  if (!notifUnavail && !notifDenied) {
     const toggle = view.querySelector('#pp-notif-toggle');
     toggle.addEventListener('change', async () => {
       if (toggle.checked) {
