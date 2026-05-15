@@ -9,9 +9,9 @@
      main     — top-level menu (always the root)
      profile  — My Profile: edit display name & photo URL, view email
      settings — Push-notification toggle, app version info
-     todo     — Personal To-Do list (localStorage, keyed by email)
-     journal  — Personal Journal entries (localStorage, keyed by email)
-     calendar — Personal Calendar (monthly grid, events, localStorage)
+     todo     — Personal To-Do list (Firestore via UpperRoom)
+     journal  — Personal Journal entries (Firestore via UpperRoom)
+     calendar — Personal Calendar (monthly grid, events, Firestore via UpperRoom)
    ══════════════════════════════════════════════════════════════════════════════ */
 
 let _sheet      = null;   // single DOM node, persists for the page lifetime
@@ -594,8 +594,8 @@ async function _renderJournalView() {
 }
 
 // ── Personal Calendar ─────────────────────────────────────────────────────────
-// Events stored in localStorage as:
-//   { id: number, date: 'YYYY-MM-DD', title: string, time: string, created: number }
+// Events loaded from Firestore via UpperRoom.listCalendarEvents().
+// Fields mapped: Title → title, StartDateTime → date + time.
 
 async function _renderCalendarView() {
   const view = _sheet.querySelector('[data-view="calendar"]');
