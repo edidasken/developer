@@ -11,7 +11,7 @@
      settings — Push-notification toggle, app version info
      todo     — Personal To-Do list (localStorage, keyed by email)
      journal  — Personal Journal entries (localStorage, keyed by email)
-     calendar — Personal Calendar stub (Turn 3)
+     calendar — Personal Calendar (monthly grid, events, localStorage)
    ══════════════════════════════════════════════════════════════════════════════ */
 
 let _sheet      = null;   // single DOM node, persists for the page lifetime
@@ -77,22 +77,31 @@ export function closeUnityProfile() {
   if (!_sheet) return;
   _sheet.classList.remove('is-open');
   document.body.classList.remove('unity-modal-open');
+  _activeView = 'main';
 }
 
 // ── View engine ────────────────────────────────────────────────────────────────
 
 function _showView(name) {
+  // Slide from left only when navigating Back inside an already-open panel.
+  // When the panel opens fresh, is-open hasn't been added yet → slide from right.
+  const panelOpen = _sheet.classList.contains('is-open');
+  const animClass = (panelOpen && name === 'main') ? 'pp-view-back' : 'pp-view-in';
   _activeView = name;
+  _sheet.querySelector('.unity-pp-card').scrollTop = 0;
   _sheet.querySelectorAll('.unity-pp-view').forEach(v => {
     const active = v.dataset.view === name;
     v.hidden = !active;
     if (active) {
-      v.classList.remove('pp-view-in');
+      v.classList.remove('pp-view-in', 'pp-view-back');
       void v.offsetWidth; // force reflow to restart animation
-      v.classList.add('pp-view-in');
+      v.classList.add(animClass);
     }
   });
-  if (name !== 'main') _renderSubView(name);
+  if (name !== 'main') {
+    _renderSubView(name);
+    requestAnimationFrame(() => _sheet.querySelector(`[data-view="${name}"] .unity-sv-back`)?.focus());
+  }
 }
 
 function _renderSubView(name) {
@@ -116,7 +125,7 @@ function ensureSheet() {
 
   _sheet.innerHTML = `
     <div class="unity-pp-backdrop" data-act="close"></div>
-    <div class="unity-pp-card" role="menu">
+    <div class="unity-pp-card">
 
       <!-- ── main view ───────────────────────────────────────────────── -->
       <div class="unity-pp-view" data-view="main">
@@ -174,7 +183,7 @@ function _populateMainHeader() {
   const display = user.displayName || user.name || user.email.split('@')[0];
   const photo   = user.photoURL || '';
   const av = _sheet.querySelector('.unity-pp-avatar');
-  if (photo) { av.style.backgroundImage = `url(${photo})`; av.textContent = ''; }
+  if (photo) { av.style.backgroundImage = `url("${photo.replace(/"/g, '%22')}")`;  av.textContent = ''; }
   else        { av.style.backgroundImage = ''; av.textContent = (display[0] || '?').toUpperCase(); }
   _sheet.querySelector('.unity-pp-name').textContent  = display;
   _sheet.querySelector('.unity-pp-email').textContent = user.email;
@@ -258,11 +267,20 @@ function _renderProfileView() {
   const photoInput = view.querySelector('#pp-photo');
   const nameInput  = view.querySelector('#pp-name');
   const preview    = view.querySelector('#pp-photo-preview');
-  photoInput.addEventListener('input', () => {
+
+  const updatePreview = () => {
     const url = photoInput.value.trim();
     preview.innerHTML = url
       ? `<img src="${_ea(url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.style.display='none'">`
       : `<span style="font-size:2rem;font-weight:700;color:#e8a838">${_e((nameInput.value || display)[0] || '?').toUpperCase()}</span>`;
+  };
+
+  nameInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); view.querySelector('#pp-save').click(); }
+  });
+  nameInput.addEventListener('input', () => { if (!photoInput.value.trim()) updatePreview(); });
+  photoInput.addEventListener('input', () => {
+    updatePreview();
   });
 
   view.querySelector('#pp-save').onclick = () => {
@@ -283,6 +301,7 @@ function _persistProfile(displayName, photoURL) {
       if (!raw) return;
       const s = JSON.parse(raw);
       s.displayName = displayName;
+      s.name        = displayName; // keep both fields in sync
       s.photoURL    = photoURL;
       sessionStorage.setItem(key, JSON.stringify(s));
     } catch (_) {}
@@ -294,6 +313,7 @@ function _persistProfile(displayName, photoURL) {
 function _renderSettingsView() {
   const view         = _sheet.querySelector('[data-view="settings"]');
   const notifUnavail = typeof Notification === 'undefined';
+  const notifDenied  = !notifUnavail && Notification.permission === 'denied';
   const notifGranted = !notifUnavail && Notification.permission === 'granted';
 
   view.innerHTML = `
@@ -308,11 +328,15 @@ function _renderSettingsView() {
           <span class="unity-sv-toggle-icon">${IC.bell}</span>
           <div>
             <div class="unity-sv-toggle-title">Push Notifications</div>
-            <div class="unity-sv-toggle-sub">${notifUnavail ? 'Not supported in this browser' : 'Allow FlockOS to send alerts'}</div>
+            <div class="unity-sv-toggle-sub">${
+              notifUnavail ? 'Not supported in this browser'
+              : notifDenied  ? 'Blocked — open browser settings to allow'
+              : 'Allow FlockOS to send alerts'
+            }</div>
           </div>
         </div>
         <label class="unity-sv-toggle" aria-label="Toggle push notifications">
-          <input type="checkbox" id="pp-notif-toggle"${notifGranted ? ' checked' : ''}${notifUnavail ? ' disabled' : ''}>
+          <input type="checkbox" id="pp-notif-toggle"${notifGranted ? ' checked' : ''}${(notifUnavail || notifDenied) ? ' disabled' : ''}>
           <span class="unity-sv-toggle-track"></span>
         </label>
       </div>
@@ -334,7 +358,7 @@ function _renderSettingsView() {
 
   view.querySelector('[data-pp-back]').onclick = () => _showView('main');
 
-  if (!notifUnavail) {
+  if (!notifUnavail && !notifDenied) {
     const toggle = view.querySelector('#pp-notif-toggle');
     toggle.addEventListener('change', async () => {
       if (toggle.checked) {
@@ -468,7 +492,9 @@ function _renderJournalView() {
       view.querySelector('#pp-j-new').onclick      = () => { mode = 'new'; render(); };
       view.querySelectorAll('[data-read]').forEach(li => {
         li.onclick = () => { readIdx = +li.dataset.read; mode = 'read'; render(); };
-        li.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') li.click(); });
+        li.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); li.click(); }
+        });
       });
 
     } else if (mode === 'new') {
@@ -499,25 +525,29 @@ function _renderJournalView() {
         save(e);
         mode = 'list'; render(); _toast('Entry saved.');
       };
+      // Escape in either new-entry input returns to list (not main menu) and preserves draft
+      const escToList = e => { if (e.key === 'Escape') { e.stopPropagation(); mode = 'list'; render(); } };
+      view.querySelector('#pp-j-title')?.addEventListener('keydown', escToList);
+      view.querySelector('#pp-j-body')?.addEventListener('keydown', escToList);
       requestAnimationFrame(() => view.querySelector('#pp-j-body')?.focus());
 
     } else if (mode === 'read') {
-      const e = entries[readIdx];
-      if (!e) { mode = 'list'; render(); return; }
+      const entry = entries[readIdx];
+      if (!entry) { mode = 'list'; render(); return; }
       view.innerHTML = `
         <div class="unity-sv-header">
           <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
-          <span class="unity-sv-title unity-sv-title--sm">${_e(e.title || 'Entry')}</span>
+          <span class="unity-sv-title unity-sv-title--sm">${_e(entry.title || 'Entry')}</span>
           <button class="unity-sv-header-action unity-sv-header-action--danger" id="pp-j-del" aria-label="Delete entry" title="Delete entry">${IC.trash}</button>
         </div>
         <div class="unity-sv-body unity-sv-body--list">
-          <p class="unity-sv-journal-date">${fmt(e.created)}</p>
-          <p class="unity-sv-journal-body">${_e(e.body).replace(/\n/g, '<br>')}</p>
+          <p class="unity-sv-journal-date">${fmt(entry.created)}</p>
+          <p class="unity-sv-journal-body">${_e(entry.body).replace(/\n/g, '<br>')}</p>
         </div>
       `;
       view.querySelector('[data-pp-back]').onclick = () => { mode = 'list'; render(); };
       view.querySelector('#pp-j-del').onclick      = () => {
-        const e = load(); e.splice(readIdx, 1); save(e);
+        const all = load(); all.splice(readIdx, 1); save(all);
         mode = 'list'; render();
       };
     }
@@ -526,23 +556,178 @@ function _renderJournalView() {
   render();
 }
 
-// ── Personal Calendar (stub — Turn 3) ─────────────────────────────────────────
+// ── Personal Calendar ─────────────────────────────────────────────────────────
+// Events stored in localStorage as:
+//   { id: number, date: 'YYYY-MM-DD', title: string, time: string, created: number }
 
 function _renderCalendarView() {
-  const view   = _sheet.querySelector('[data-view="calendar"]');
-  const now    = new Date();
-  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  view.innerHTML = `
-    <div class="unity-sv-header">
-      <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
-      <span class="unity-sv-title">Calendar</span>
-    </div>
-    <div class="unity-sv-body unity-sv-body--center">
-      <div class="unity-sv-cal-month">${months[now.getMonth()]} ${now.getFullYear()}</div>
-      <p class="unity-sv-coming">Personal Calendar coming<br>in the next update.</p>
-    </div>
-  `;
-  view.querySelector('[data-pp-back]').onclick = () => _showView('main');
+  const view = _sheet.querySelector('[data-view="calendar"]');
+  const key  = `unity_cal_${_opts.user?.email || 'anon'}`;
+  const load = () => { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } };
+  const save = ev => localStorage.setItem(key, JSON.stringify(ev));
+
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const toKey  = (y, m, d) => `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
+  const today     = new Date();
+  const todayKey  = toKey(today.getFullYear(), today.getMonth(), today.getDate());
+
+  // 12-hour time formatter for display
+  const fmtTime = t => {
+    if (!t) return '';
+    const [h, m] = t.split(':').map(Number);
+    return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
+  };
+
+  let viewYear  = today.getFullYear();
+  let viewMonth = today.getMonth();  // 0-based
+  let selDate   = todayKey;          // auto-select today on open
+  let addMode   = false;
+
+  const render = () => {
+    const events      = load();
+    const byDate      = {};
+    events.forEach(e => { (byDate[e.date] ||= []).push(e); });
+
+    // Build grid cells
+    const firstDow    = new Date(viewYear, viewMonth, 1).getDay();        // 0–6
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const daysInPrev  = new Date(viewYear, viewMonth, 0).getDate();
+    const totalCells  = Math.ceil((firstDow + daysInMonth) / 7) * 7;
+
+    const cells = [];
+    for (let i = firstDow - 1; i >= 0; i--)              cells.push({ day: daysInPrev - i, other: true });
+    for (let d = 1; d <= daysInMonth; d++)                cells.push({ day: d,              other: false });
+    for (let d = 1; cells.length < totalCells; d++)       cells.push({ day: d,              other: true });
+
+    // Selected-day data
+    const selEvents = selDate ? (byDate[selDate] || []).slice().sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99')) : [];
+    const selLabel  = selDate ? (() => {
+      const [y, mo, d] = selDate.split('-').map(Number);
+      return new Date(y, mo - 1, d).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    })() : null;
+
+    view.innerHTML = `
+      <div class="unity-sv-header">
+        <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
+        <span class="unity-sv-title">Calendar</span>
+      </div>
+      <div class="unity-sv-body unity-sv-body--cal">
+
+        <div class="unity-cal-nav">
+          <button class="unity-cal-nav-btn" data-cal-prev aria-label="Previous month">${IC.back}</button>
+          <span class="unity-cal-month-label">${MONTHS[viewMonth]} ${viewYear}</span>
+          <button class="unity-cal-nav-btn" data-cal-next aria-label="Next month">${IC.chevron}</button>
+        </div>
+
+        <div class="unity-cal-grid">
+          ${DAYS.map(d => `<div class="unity-cal-dow">${d}</div>`).join('')}
+          ${cells.map(c => {
+            if (c.other) return `<div class="unity-cal-day other" aria-hidden="true"><span class="unity-cal-day-num">${c.day}</span></div>`;
+            const dk        = toKey(viewYear, viewMonth, c.day);
+            const hasEvents = (byDate[dk]?.length || 0) > 0;
+            const isToday   = dk === todayKey;
+            const isSel     = dk === selDate;
+            return `<button
+              class="unity-cal-day${isToday ? ' today' : ''}${isSel ? ' selected' : ''}"
+              data-cal-day="${dk}"
+              aria-label="${c.day}${isToday ? ', today' : ''}${hasEvents ? ', has events' : ''}"
+              aria-pressed="${isSel}"
+            ><span class="unity-cal-day-num">${c.day}</span>${hasEvents ? '<span class="unity-cal-dot" aria-hidden="true"></span>' : ''}</button>`;
+          }).join('')}
+        </div>
+
+        ${selDate ? `
+          <div class="unity-cal-detail">
+            <div class="unity-cal-detail-header">
+              <span class="unity-cal-detail-label">${_e(selLabel)}</span>
+              <button class="unity-sv-header-action" id="pp-cal-add-btn" aria-label="Add event" title="Add event">${IC.plus}</button>
+            </div>
+            ${addMode ? `
+              <div class="unity-cal-add-form">
+                <input class="unity-sv-input" id="pp-cal-title" type="text" placeholder="Event title…" maxlength="80" autocomplete="off">
+                <div class="unity-cal-add-row">
+                  <input class="unity-sv-input unity-sv-input--time" id="pp-cal-time" type="time">
+                  <button class="unity-sv-btn unity-sv-btn--primary unity-sv-btn--sm" id="pp-cal-save">Add</button>
+                  <button class="unity-sv-btn unity-sv-btn--ghost unity-sv-btn--sm" id="pp-cal-cancel">Cancel</button>
+                </div>
+              </div>
+            ` : ''}
+            <ul class="unity-cal-event-list">
+              ${selEvents.length
+                ? selEvents.map(ev => `
+                    <li class="unity-cal-event-item">
+                      ${ev.time ? `<span class="unity-cal-event-time">${_e(fmtTime(ev.time))}</span>` : ''}
+                      <span class="unity-cal-event-title">${_e(ev.title)}</span>
+                      <button class="unity-sv-task-del" data-cal-del="${ev.id}" aria-label="Delete event">${IC.trash}</button>
+                    </li>`).join('')
+                : `<li class="unity-sv-empty" style="padding:10px 0">No events — tap + to add one.</li>`}
+            </ul>
+          </div>
+        ` : `<p class="unity-cal-tap-hint">Tap a day to view or add events.</p>`}
+
+      </div>
+    `;
+
+    // ── Wire interactions ──────────────────────────────────────────────────────
+    view.querySelector('[data-pp-back]').onclick = () => _showView('main');
+
+    const isCurrentMonth = () => viewYear === today.getFullYear() && viewMonth === today.getMonth();
+    view.querySelector('[data-cal-prev]').onclick = () => {
+      viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+      selDate = isCurrentMonth() ? todayKey : null; addMode = false; render();
+    };
+    view.querySelector('[data-cal-next]').onclick = () => {
+      viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+      selDate = isCurrentMonth() ? todayKey : null; addMode = false; render();
+    };
+
+    view.querySelectorAll('[data-cal-day]').forEach(btn => {
+      btn.onclick = () => {
+        selDate  = btn.dataset.calDay;
+        addMode  = false;
+        render();
+        requestAnimationFrame(() =>
+          view.querySelector('.unity-cal-detail')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        );
+      };
+    });
+
+    view.querySelector('#pp-cal-add-btn')?.addEventListener('click', () => {
+      addMode = !addMode; render();
+      requestAnimationFrame(() => view.querySelector('#pp-cal-title')?.focus());
+    });
+
+    const doSave = () => {
+      const title = view.querySelector('#pp-cal-title')?.value.trim();
+      if (!title) { _toast('Enter an event title.'); return; }
+      const time  = view.querySelector('#pp-cal-time')?.value || '';
+      const evts  = load();
+      const now  = Date.now();
+      evts.push({ id: now, date: selDate, title, time, created: now });
+      save(evts); addMode = false; render();
+    };
+    view.querySelector('#pp-cal-save')?.addEventListener('click', doSave);
+    view.querySelector('#pp-cal-cancel')?.addEventListener('click', () => { addMode = false; render(); });
+    view.querySelector('#pp-cal-title')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter')  { e.preventDefault(); doSave(); }
+      if (e.key === 'Escape') { e.stopPropagation(); addMode = false; render(); }
+    });
+    view.querySelector('#pp-cal-time')?.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { e.stopPropagation(); addMode = false; render(); }
+    });
+
+    view.querySelectorAll('[data-cal-del]').forEach(btn => {
+      btn.onclick = () => {
+        const evts = load();
+        const idx  = evts.findIndex(ev => ev.id === +btn.dataset.calDel);
+        if (idx > -1) { evts.splice(idx, 1); save(evts); render(); }
+      };
+    });
+  };
+
+  render();
 }
 
 // ── Utilities ──────────────────────────────────────────────────────────────────
@@ -553,6 +738,8 @@ function _e(s) {
 function _ea(s) { return _e(s); }
 
 function _toast(msg) {
+  // Dismiss any existing toast immediately so messages don't stack
+  document.querySelectorAll('.unity-toast').forEach(old => old.remove());
   const t = document.createElement('div');
   t.className = 'unity-toast';
   t.textContent = msg;

@@ -15552,10 +15552,15 @@ body.unity-modal-open { overflow: hidden; }
    All .unity-sv-* classes are scoped to sub-views inside the profile panel.
    ══════════════════════════════════════════════════════════════════════════════ */
 
-/* View enter animation */
-.pp-view-in { animation: pp-view-in 0.18s ease both; }
+/* View enter/back animations */
+.pp-view-in   { animation: pp-view-in   0.18s ease both; }
+.pp-view-back { animation: pp-view-back 0.18s ease both; }
 @keyframes pp-view-in {
-  from { opacity: 0; transform: translateX(10px); }
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes pp-view-back {
+  from { opacity: 0; transform: translateX(-12px); }
   to   { opacity: 1; transform: none; }
 }
 
@@ -15794,7 +15799,7 @@ body.unity-modal-open { overflow: hidden; }
   align-items: center; flex-shrink: 0;
 }
 
-/* Empty state + calendar stub */
+/* Empty state + coming-soon */
 .unity-sv-empty {
   font: 400 0.84rem 'Plus Jakarta Sans', system-ui, sans-serif;
   color: rgba(255,255,255,0.30); text-align: center;
@@ -15804,7 +15809,107 @@ body.unity-modal-open { overflow: hidden; }
   font: 400 0.86rem 'Plus Jakarta Sans', system-ui, sans-serif;
   color: rgba(255,255,255,0.32); line-height: 1.65; margin: 0;
 }
-.unity-sv-cal-month {
-  font: 600 1rem 'Plus Jakarta Sans', system-ui, sans-serif;
-  color: rgba(255,255,255,0.55); margin-bottom: 10px;
+
+/* ── Personal Calendar ────────────────────────────────────────────────────── */
+.unity-sv-body--cal { padding: 10px 10px 14px; gap: 10px; }
+
+.unity-cal-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2px;
+}
+.unity-cal-nav-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: transparent; border: none;
+  color: rgba(255,255,255,0.55); cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.unity-cal-nav-btn:hover { background: rgba(255,255,255,0.10); color: #fff; }
+.unity-cal-month-label {
+  font: 600 0.92rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #fff;
+}
+
+/* 7-column calendar grid */
+.unity-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+.unity-cal-dow {
+  font: 600 0.65rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.30); text-align: center;
+  padding: 4px 0 6px; text-transform: uppercase;
+}
+.unity-cal-day {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; padding: 6px 2px; border-radius: 7px;
+  background: transparent; border: none; cursor: pointer;
+  transition: background 0.12s; min-height: 36px;
+}
+.unity-cal-day:hover { background: rgba(255,255,255,0.08); }
+.unity-cal-day.other {
+  opacity: 0.18; pointer-events: none; cursor: default;
+}
+.unity-cal-day-num {
+  font: 500 0.84rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #eef1fb; line-height: 1;
+}
+.unity-cal-day.today .unity-cal-day-num {
+  background: rgba(232,168,56,0.22); color: #e8a838; font-weight: 700;
+  border-radius: 50%; width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+}
+.unity-cal-day.selected { background: rgba(232,168,56,0.18); }
+.unity-cal-day.selected .unity-cal-day-num { color: #e8a838; font-weight: 700; }
+.unity-cal-dot {
+  width: 4px; height: 4px; border-radius: 50%; background: #e8a838; display: block;
+}
+
+/* Day detail */
+.unity-cal-detail {
+  border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.unity-cal-detail-header {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.unity-cal-detail-label {
+  font: 600 0.80rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.55);
+}
+
+/* Add-event form */
+.unity-cal-add-form {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.10);
+}
+.unity-cal-add-row { display: flex; gap: 8px; align-items: center; }
+.unity-sv-input--time { width: auto; flex-shrink: 0; color-scheme: dark; }
+.unity-sv-btn--sm { padding: 7px 12px; font-size: 0.80rem !important; border-radius: 8px; width: auto; }
+.unity-sv-btn--ghost {
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.60);
+}
+.unity-sv-btn--ghost:hover { background: rgba(255,255,255,0.14); color: #fff; }
+
+/* Event list */
+.unity-cal-event-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.unity-cal-event-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 8px;
+  background: rgba(255,255,255,0.04); transition: background 0.10s;
+}
+.unity-cal-event-item:hover { background: rgba(255,255,255,0.08); }
+.unity-cal-event-item:hover .unity-sv-task-del { opacity: 1; }
+.unity-cal-event-time {
+  font: 600 0.74rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #e8a838; flex-shrink: 0; min-width: 38px;
+}
+.unity-cal-event-title {
+  flex: 1; font: 500 0.86rem 'Plus Jakarta Sans', system-ui, sans-serif; color: #eef1fb;
+  word-break: break-word;
+}
+.unity-cal-tap-hint {
+  font: 400 0.80rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.25); text-align: center; padding: 6px 0; margin: 0;
 }

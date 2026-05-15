@@ -1527,7 +1527,7 @@ async function _copyOutline() {  const s = _active();
   (s.sections || []).forEach((sec, i) => {
     lines.push(`${i + 1}. [${sec.type.toUpperCase()}] ${sec.title || ''}`);
     if (sec.type === 'scripture' && sec.scriptureRef) {
-      lines.push(`   ${sec.scriptureRef}${sec.scripture ? ': ' + sec.scripture.slice(0, 100) : ''}`);
+      lines.push(`   ${sec.scriptureRef}${sec.scripture ? ': ' + sec.scripture : ''}`);
     }
     if ((sec.notes || '').trim()) lines.push(`   ${sec.notes.trim()}`);
     lines.push('');
