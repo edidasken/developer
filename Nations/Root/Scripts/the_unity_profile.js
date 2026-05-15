@@ -492,7 +492,9 @@ function _renderJournalView() {
       view.querySelector('#pp-j-new').onclick      = () => { mode = 'new'; render(); };
       view.querySelectorAll('[data-read]').forEach(li => {
         li.onclick = () => { readIdx = +li.dataset.read; mode = 'read'; render(); };
-        li.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') li.click(); });
+        li.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); li.click(); }
+        });
       });
 
     } else if (mode === 'new') {
@@ -706,7 +708,7 @@ function _renderCalendarView() {
     view.querySelector('#pp-cal-cancel')?.addEventListener('click', () => { addMode = false; render(); });
     view.querySelector('#pp-cal-title')?.addEventListener('keydown', e => {
       if (e.key === 'Enter')  { e.preventDefault(); doSave(); }
-      if (e.key === 'Escape') { addMode = false; render(); }
+      if (e.key === 'Escape') { e.stopPropagation(); addMode = false; render(); }
     });
 
     view.querySelectorAll('[data-cal-del]').forEach(btn => {
