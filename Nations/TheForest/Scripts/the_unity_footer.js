@@ -92,9 +92,9 @@ export function mountUnityFooter(host, cfg = {}) {
     }
     else if (act === 'open-prayer') {
       e.preventDefault();
-      // Try to open prayer request modal (available in GROW public, Upper Room, etc.)
+      // Try in-page handlers first (GROW public, Upper Room, etc.)
       if (typeof window._openOutreachModal === 'function') {
-        window._openOutreachModal('', { name: 'prayer', title: 'Prayer Request' });
+        window._openOutreachModal('', { name: 'prayer', title: 'Prayer Request', source: 'UnityFooter' });
       }
       else if (typeof window.openPrayerRequest === 'function') {
         window.openPrayerRequest();
@@ -102,13 +102,19 @@ export function mountUnityFooter(host, cfg = {}) {
       else if (window.UpperRoom && typeof window.UpperRoom.openPrayerChain === 'function') {
         window.UpperRoom.openPrayerChain();
       }
-      else if (prayerHref && !isTemplate(prayerHref) && prayerHref !== '#prayer') {
-        // Fallback to external URL if configured and not a template variable
-        window.open(prayerHref, '_blank');
-      }
       else {
-        // No prayer handler available - could show a message or do nothing
-        console.warn('No prayer request handler available. Consider signing in or accessing the Prayer Chain through the GROW app.');
+        // Lazy-load the shared prayer modal module (works on every NC app
+        // because they all set window.FLOCK_FIREBASE_CONFIG and load the
+        // Firebase compat SDK). Falls back to external href if even that fails.
+        import('https://flock-os.github.io/FlockOS/New_Covenant/Scripts/the_prayer_modal.js')
+          .then(m => m.openPrayerModal('', { name: 'prayer', title: 'Prayer Request', source: 'UnityFooter' }))
+          .catch(() => {
+            if (prayerHref && !isTemplate(prayerHref) && prayerHref !== '#prayer') {
+              window.open(prayerHref, '_blank');
+            } else {
+              console.warn('Prayer modal failed to load.');
+            }
+          });
       }
     }
   });
