@@ -80,19 +80,27 @@
     }
 
     html, body {
-      min-height: 100%;
+      height: 100dvh;
       background: var(--bm-bg);
       color: var(--bm-ink);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
+      overflow: hidden;
       overscroll-behavior: none;
     }
 
-    /* ── Root grid ─────────────────────────────────────────────────────── */
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Root container ────────────────────────────────────────────────── */
     #bm-root {
+      flex: 1;
+      min-height: 0;
       display: grid;
-      grid-template-rows: calc(var(--topbar-h) + var(--safe-top)) 1fr auto;
-      min-height: 100dvh;
+      grid-template-rows: auto auto 1fr;
+      overflow: hidden;
     }
 
     /* ════════════════════════════════════════════════════
@@ -103,18 +111,19 @@
 
     /* Subbar — dark-chrome strip beneath unity-header (matches topbar palette) */
     #bm-subbar {
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 14px;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
       background: var(--top-bg);
       color: var(--top-ink);
       border-bottom: 1px solid var(--top-line);
       z-index: 199;
+      flex-shrink: 0;
     }
 
-    /* Sermon title in topbar */
+    /* Sermon title in subbar */
     #bm-active-title {
       flex: 1; min-width: 0;
-      font: 600 0.85rem 'Plus Jakarta Sans', sans-serif;
+      font: 600 0.82rem 'Plus Jakarta Sans', sans-serif;
       color: var(--top-ink-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       transition: color 0.2s;
     }
@@ -124,7 +133,7 @@
 
     .bm-btn {
       display: inline-flex; align-items: center; gap: 5px;
-      padding: 6px 13px; border-radius: 8px; font: 600 0.78rem 'Plus Jakarta Sans', sans-serif;
+      padding: 5px 11px; border-radius: 8px; font: 600 0.76rem 'Plus Jakarta Sans', sans-serif;
       cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
     }
     .bm-btn--primary { background: var(--bm-accent); color: #080500; }
@@ -136,8 +145,8 @@
     .bm-btn--success { background: rgba(52,211,153,0.13); color: var(--bm-green); }
     .bm-btn--success:hover { background: rgba(52,211,153,0.22); }
     .bm-btn:disabled { opacity: 0.32; pointer-events: none; }
-    .bm-btn--sm { padding: 4px 10px; font-size: 0.73rem; }
-    .bm-btn--icon { padding: 6px 8px; }
+    .bm-btn--sm { padding: 4px 9px; font-size: 0.71rem; }
+    .bm-btn--icon { padding: 5px 7px; }
 
     .bm-user-chip {
       display: flex; align-items: center; gap: 6px;
@@ -1470,11 +1479,11 @@
       .bm-btn-label-hide { display: none; }
 
       /* ── Subbar: tighten on phones ─────────────────────────────── */
-      #bm-subbar { padding: 5px 8px; gap: 4px; }
-      #bm-active-title { font-size: 0.78rem; }
-      .bm-topbar-right { gap: 4px; }
-      .bm-btn--sm { padding: 5px 7px; }
-      .bm-btn--icon { padding: 5px 6px; }
+      #bm-subbar { padding: 4px 6px; gap: 3px; }
+      #bm-active-title { font-size: 0.75rem; }
+      .bm-topbar-right { gap: 3px; }
+      .bm-btn--sm { padding: 4px 6px; }
+      .bm-btn--icon { padding: 4px 5px; }
 
       /* ── Sermon header: stack cleanly + accordion toggle ──────── */
       #bm-sermon-header { padding: 10px 12px 8px; gap: 8px; }
@@ -2491,6 +2500,10 @@
     </main>
 
   </div><!-- /bm-body -->
+
+  <!-- Unity footer -->
+  <footer class="unity-footer" id="feed-footer"></footer>
+
 </div><!-- /bm-root -->
 
 <!-- Confirm modal -->
@@ -2535,9 +2548,7 @@
     <div class="bm-tool-drawer-body" id="bm-tool-drawer-body"><!-- filled by JS --></div>
   </aside>
 </div>
-
-<!-- Unity footer -->
-<footer class="unity-footer" id="feed-footer"></footer>
+</div>
 
 <!-- Toasts -->
 <div id="bm-toasts" aria-live="polite"></div>
