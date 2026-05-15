@@ -525,6 +525,10 @@ function _renderJournalView() {
         save(e);
         mode = 'list'; render(); _toast('Entry saved.');
       };
+      // Escape in either new-entry input returns to list (not main menu) and preserves draft
+      const escToList = e => { if (e.key === 'Escape') { e.stopPropagation(); mode = 'list'; render(); } };
+      view.querySelector('#pp-j-title')?.addEventListener('keydown', escToList);
+      view.querySelector('#pp-j-body')?.addEventListener('keydown', escToList);
       requestAnimationFrame(() => view.querySelector('#pp-j-body')?.focus());
 
     } else if (mode === 'read') {
@@ -708,6 +712,9 @@ function _renderCalendarView() {
     view.querySelector('#pp-cal-cancel')?.addEventListener('click', () => { addMode = false; render(); });
     view.querySelector('#pp-cal-title')?.addEventListener('keydown', e => {
       if (e.key === 'Enter')  { e.preventDefault(); doSave(); }
+      if (e.key === 'Escape') { e.stopPropagation(); addMode = false; render(); }
+    });
+    view.querySelector('#pp-cal-time')?.addEventListener('keydown', e => {
       if (e.key === 'Escape') { e.stopPropagation(); addMode = false; render(); }
     });
 
