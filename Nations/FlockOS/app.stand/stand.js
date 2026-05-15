@@ -711,7 +711,6 @@ async function _loadAndRenderPlans(main) {
             ${!songs.length ? '<div style="font-size:.78rem;color:var(--ms-ink-faint);padding:4px 0">No songs yet — tap to add</div>' : ''}
           </div>
           ${(() => { const sr = p.sermonId && S.sermons.find(s => s.id === p.sermonId); return sr ? `<div style="font-size:.75rem;color:var(--ms-ink-muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--ms-line);">📖 ${_e(sr.title||'Sermon')}${sr.passage ? ' · ' + _e(sr.passage) : ''}</div>` : ''; })()}
-          </div>
           <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
             <button class="ms-btn ms-btn--ghost ms-btn--sm svc-edit-btn" data-plan-id="${_e(p.id)}">Edit</button>
             <button class="ms-btn ms-btn--ghost ms-btn--sm svc-live-btn" data-plan-id="${_e(p.id)}" style="color:var(--ms-rose);">▶ Live</button>
