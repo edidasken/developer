@@ -131,7 +131,7 @@ mountUnityHeader(topbar, {
   appIconSvg:  GROW_ICON,
   appAccent:   '#d97706',
   appAccentDk: '#78350f',
-  homeHref:    './',
+  homeHref:    'app.grow/',
   user:        null,                             // GROW is public — no auth at this layer
   avatarSrc:   'Images/icon-grow.svg',
   onAccount:   () => {                           // override: open marketing sign-in dropdown

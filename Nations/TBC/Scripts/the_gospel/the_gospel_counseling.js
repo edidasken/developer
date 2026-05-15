@@ -153,15 +153,24 @@ async function _load(root) {
 
 function _card(s) {
   const safeTitle = esc(s.title);
+  const item      = _cache[s.id] || {};
+  const rawDef    = (item.Definition || item.definition || '').trim();
+  const teaser    = rawDef ? esc(rawDef.length > 92 ? rawDef.substring(0, 90) + '\u2026' : rawDef) : '';
+  const chevSvg   = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
   return /* html */`
     <div class="grow-card grow-card--counsel coun-card"
          data-id="${esc(s.id)}"
          data-search="${safeTitle.toLowerCase()}"
          style="--grow-accent:${esc(s.color)}; cursor:pointer;">
       <div class="coun-card-head">
-        <div class="grow-counsel-icon">${esc(s.icon)}</div>
-        <h3 class="grow-card-title">${safeTitle}</h3>
-        <span class="coun-card-chevron">▼</span>
+        <div class="coun-icon-badge" style="background:color-mix(in srgb,${esc(s.color)} 12%,transparent);">
+          <span class="coun-icon-emoji" aria-hidden="true">${esc(s.icon)}</span>
+        </div>
+        <div class="coun-card-meta-col">
+          <h3 class="grow-card-title">${safeTitle}</h3>
+          ${teaser ? `<p class="coun-card-teaser">${teaser}</p>` : ''}
+        </div>
+        <span class="coun-card-chevron" aria-hidden="true">${chevSvg}</span>
       </div>
       <div class="coun-card-body"></div>
     </div>
@@ -170,25 +179,22 @@ function _card(s) {
 
 async function _toggle(cardEl, id) {
   const body = cardEl.querySelector('.coun-card-body');
-  const chev = cardEl.querySelector('.coun-card-chevron');
   if (!body) return;
-  if (body.style.display !== 'none') {
+
+  if (cardEl.classList.contains('is-open')) {
     body.style.display = 'none';
     cardEl.classList.remove('is-open');
-    if (chev) chev.textContent = '▼';
     return;
   }
+
   // Close any other open card first (so only one is full-width at a time)
   cardEl.parentElement.querySelectorAll('.coun-card.is-open').forEach((other) => {
     if (other === cardEl) return;
     other.classList.remove('is-open');
     const ob = other.querySelector('.coun-card-body');
-    const oc = other.querySelector('.coun-card-chevron');
     if (ob) ob.style.display = 'none';
-    if (oc) oc.textContent = '▼';
   });
   cardEl.classList.add('is-open');
-  if (chev) chev.textContent = '▲';
   body.style.display = 'block';
 
   if (!_cache[id]) {

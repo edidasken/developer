@@ -271,6 +271,7 @@
     /* Share URL = this page itself (so the recipient opens the same standalone invite) */
     window._INVITE_SHARE_URL = location.href.split('?')[0].split('#')[0];
   </script>
+  <script defer src="Scripts/the_upper_room.js"></script>
 
   <script type="module" src="https://flock-os.github.io/FlockOS/New_Covenant/Scripts/the_gospel/the_gospel_invitation.js">
   </script>
@@ -288,7 +289,7 @@
         appIconSvg:  INV_ICON,
         appAccent:   '#10b981',
         appAccentDk: '#065f46',
-        homeHref:    './',
+        homeHref:    'app.invite/',
         user:        null,
         signInHref:  './',
       });

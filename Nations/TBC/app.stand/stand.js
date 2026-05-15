@@ -392,7 +392,7 @@ function _wireHeader() {
       appIconSvg:  STAND_ICON,
       appAccent:   '#a855f7',
       appAccentDk: '#4c1d95',
-      homeHref:    './',
+      homeHref:    'app.stand/',
       user:        S.user || null,
       onSignOut:   _signOutAndRedirect,
       onHamburger: () => {
