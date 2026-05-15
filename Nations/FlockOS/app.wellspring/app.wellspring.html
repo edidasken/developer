@@ -48,17 +48,32 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --ws-navy-bg:    #09102e;
+      --ws-navy-card:  #111b44;
+      --ws-gold:       #e8a838;
+      --ws-blue:       #5b8dee;
+      --ws-ink-light:  #eef1fb;
+      --ws-ink-muted:  #9ba8d0;
+      --ws-ink-faint:  #3d4f7c;
+      --ws-line:       rgba(255,255,255,0.09);
+    }
+
     html, body {
       height: 100dvh;
       font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
       -webkit-font-smoothing: antialiased;
-      background: var(--bg, #f7f8fb);
-      color: var(--ink, #1b264f);
+      background: var(--ws-navy-bg);
+      color: var(--ws-ink-light);
       overflow: hidden;
       overscroll-behavior: none;
     }
 
-    body { display: flex; flex-direction: column; }
+    body { 
+      display: flex; 
+      flex-direction: column;
+      background-image: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(91,141,238,0.14) 0%, transparent 60%);
+    }
 
     /* ── Main scroll container ──────────────────────────────────── */
     .ws-shell {
@@ -81,43 +96,46 @@
     /* ── Hero ───────────────────────────────────────────────────── */
     .ws-hero {
       text-align: center;
-      padding: 2rem 1rem;
-      background: linear-gradient(135deg, rgba(34,197,94,0.08), transparent);
+      padding: 2.5rem 1.5rem;
+      background: linear-gradient(135deg, rgba(232,168,56,0.12), rgba(91,141,238,0.08));
       border-radius: 20px;
-      border: 1px solid var(--line, #e5e7ef);
+      border: 1px solid var(--ws-line);
+      box-shadow: 0 0 30px rgba(232,168,56,0.15);
     }
     .ws-hero-icon {
-      font-size: 3.5rem;
+      font-size: 4rem;
       margin-bottom: 0.75rem;
-      filter: drop-shadow(0 4px 12px rgba(34,197,94,0.25));
+      filter: drop-shadow(0 4px 16px rgba(232,168,56,0.4));
     }
     .ws-hero h1 {
-      font-size: 1.8rem;
+      font-size: 1.9rem;
       font-weight: 800;
-      color: var(--ink, #1b264f);
-      margin-bottom: 0.5rem;
+      color: var(--ws-gold);
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.02em;
     }
     .ws-hero p {
       font-size: 0.95rem;
-      color: var(--ink-muted, #7a7f96);
-      max-width: 520px;
+      color: var(--ws-ink-muted);
+      max-width: 540px;
       margin: 0 auto;
-      line-height: 1.5;
+      line-height: 1.6;
     }
     .ws-hero-verse {
-      margin-top: 1rem;
+      margin-top: 1.2rem;
       font-style: italic;
-      font-size: 0.85rem;
-      color: var(--ink-muted, #7a7f96);
+      font-size: 0.87rem;
+      color: var(--ws-blue);
+      opacity: 0.9;
     }
 
     /* ── Cards ──────────────────────────────────────────────────── */
     .ws-card {
-      background: var(--bg-raised, #ffffff);
-      border: 1px solid var(--line, #e5e7ef);
+      background: var(--ws-navy-card);
+      border: 1px solid var(--ws-line);
       border-radius: 16px;
       padding: 1.5rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
     .ws-card-header {
       display: flex;
@@ -125,16 +143,16 @@
       gap: 0.75rem;
       margin-bottom: 1.25rem;
       padding-bottom: 1rem;
-      border-bottom: 1px solid var(--line, #e5e7ef);
+      border-bottom: 1px solid var(--ws-line);
     }
     .ws-card-icon {
       font-size: 1.5rem;
-      opacity: 0.8;
+      opacity: 0.85;
     }
     .ws-card h2 {
       font-size: 1.1rem;
       font-weight: 700;
-      color: var(--ink, #1b264f);
+      color: var(--ws-ink-light);
       flex: 1;
     }
     .ws-card-body {
@@ -157,12 +175,12 @@
     }
     .ws-status-label {
       font-size: 0.9rem;
-      color: var(--ink-muted, #7a7f96);
+      color: var(--ws-ink-muted);
       font-weight: 500;
     }
     .ws-status-value {
       font-size: 0.9rem;
-      color: var(--ink, #1b264f);
+      color: var(--ws-ink-light);
       font-weight: 600;
     }
     .ws-badge {
@@ -175,16 +193,18 @@
       font-weight: 600;
     }
     .ws-badge--active {
-      background: rgba(34,197,94,0.12);
-      color: #15803d;
+      background: rgba(232,168,56,0.18);
+      color: var(--ws-gold);
+      box-shadow: 0 0 12px rgba(232,168,56,0.25);
     }
     .ws-badge--inactive {
-      background: rgba(100,116,139,0.12);
-      color: #475569;
+      background: rgba(100,116,139,0.15);
+      color: var(--ws-ink-muted);
     }
     .ws-badge--loaded {
-      background: rgba(59,130,246,0.12);
-      color: #1e40af;
+      background: rgba(91,141,238,0.18);
+      color: var(--ws-blue);
+      box-shadow: 0 0 10px rgba(91,141,238,0.2);
     }
 
     /* ── Buttons ────────────────────────────────────────────────── */
@@ -204,35 +224,35 @@
       text-decoration: none;
     }
     .ws-btn:disabled {
-      opacity: 0.5;
+      opacity: 0.4;
       cursor: not-allowed;
     }
     .ws-btn--primary {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: white;
-      box-shadow: 0 2px 8px rgba(34,197,94,0.25);
+      background: linear-gradient(135deg, var(--ws-gold), #d89528);
+      color: #09102e;
+      box-shadow: 0 2px 12px rgba(232,168,56,0.35);
     }
     .ws-btn--primary:hover:not(:disabled) {
-      box-shadow: 0 4px 14px rgba(34,197,94,0.35);
+      box-shadow: 0 4px 18px rgba(232,168,56,0.5);
       transform: translateY(-1px);
     }
     .ws-btn--secondary {
-      background: var(--bg-raised, #ffffff);
-      color: var(--ink, #1b264f);
-      border: 1px solid var(--line, #e5e7ef);
+      background: var(--ws-navy-card);
+      color: var(--ws-ink-light);
+      border: 1px solid var(--ws-line);
     }
     .ws-btn--secondary:hover:not(:disabled) {
-      border-color: var(--ink-muted, #7a7f96);
-      background: var(--bg, #f7f8fb);
+      border-color: var(--ws-blue);
+      background: rgba(91,141,238,0.1);
     }
     .ws-btn--danger {
-      background: rgba(239,68,68,0.1);
-      color: #dc2626;
-      border: 1px solid rgba(239,68,68,0.2);
+      background: rgba(239,68,68,0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239,68,68,0.3);
     }
     .ws-btn--danger:hover:not(:disabled) {
-      background: rgba(239,68,68,0.15);
-      border-color: rgba(239,68,68,0.4);
+      background: rgba(239,68,68,0.25);
+      border-color: rgba(239,68,68,0.5);
     }
     .ws-btn--full {
       width: 100%;
@@ -244,25 +264,27 @@
       justify-content: space-between;
       align-items: center;
       padding: 1rem;
-      background: var(--bg, #f7f8fb);
+      background: rgba(91,141,238,0.08);
       border-radius: 12px;
+      border: 1px solid var(--ws-line);
     }
     .ws-toggle-label {
       font-size: 0.95rem;
       font-weight: 600;
-      color: var(--ink, #1b264f);
+      color: var(--ws-ink-light);
     }
     .ws-toggle {
       position: relative;
       width: 50px;
       height: 28px;
-      background: var(--line, #cbd5e1);
+      background: var(--ws-ink-faint);
       border-radius: 14px;
       cursor: pointer;
       transition: background 0.2s;
     }
     .ws-toggle.active {
-      background: #22c55e;
+      background: linear-gradient(135deg, var(--ws-gold), #d89528);
+      box-shadow: 0 0 16px rgba(232,168,56,0.4);
     }
     .ws-toggle::after {
       content: '';
@@ -274,7 +296,7 @@
       background: white;
       border-radius: 50%;
       transition: transform 0.2s;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
     }
     .ws-toggle.active::after {
       transform: translateX(22px);
@@ -297,35 +319,35 @@
       justify-content: center;
       gap: 0.5rem;
       padding: 0.75rem 1.25rem;
-      border: 2px dashed var(--line, #cbd5e1);
+      border: 2px dashed var(--ws-line);
       border-radius: 12px;
-      background: var(--bg, #f7f8fb);
+      background: rgba(91,141,238,0.05);
       cursor: pointer;
       transition: all 0.15s;
       font-size: 0.9rem;
       font-weight: 600;
-      color: var(--ink-muted, #7a7f96);
+      color: var(--ws-ink-muted);
     }
     .ws-file-label:hover {
-      border-color: #22c55e;
-      background: rgba(34,197,94,0.04);
-      color: #16a34a;
+      border-color: var(--ws-gold);
+      background: rgba(232,168,56,0.12);
+      color: var(--ws-gold);
     }
 
     /* ── Info box ───────────────────────────────────────────────── */
     .ws-info {
-      background: rgba(59,130,246,0.08);
-      border: 1px solid rgba(59,130,246,0.2);
+      background: rgba(91,141,238,0.12);
+      border: 1px solid rgba(91,141,238,0.25);
       border-radius: 12px;
       padding: 1rem;
       font-size: 0.87rem;
       line-height: 1.6;
-      color: var(--ink, #1b264f);
+      color: var(--ws-ink-light);
     }
     .ws-info-title {
       font-weight: 700;
       margin-bottom: 0.35rem;
-      color: #1e40af;
+      color: var(--ws-blue);
     }
 
     /* ── Loading ────────────────────────────────────────────────── */
@@ -333,7 +355,7 @@
       display: none;
       text-align: center;
       padding: 2rem;
-      color: var(--ink-muted, #7a7f96);
+      color: var(--ws-ink-muted);
     }
     .ws-loading.active {
       display: block;
@@ -342,8 +364,8 @@
       display: inline-block;
       width: 32px;
       height: 32px;
-      border: 3px solid var(--line, #e5e7ef);
-      border-top-color: #22c55e;
+      border: 3px solid var(--ws-line);
+      border-top-color: var(--ws-gold);
       border-radius: 50%;
       animation: ws-spin 0.8s linear infinite;
     }
@@ -376,7 +398,7 @@
         <div class="ws-hero-icon">💧</div>
         <h1>The Wellspring</h1>
         <p>
-          Run FlockOS entirely offline from a single local Excel file. No internet connection required.
+          Run FlockOS entirely offline from a single local JSON database. No internet connection required.
           Your data stays on your device, encrypted and private.
         </p>
         <div class="ws-hero-verse">
@@ -465,7 +487,7 @@
           <h2>Export Database</h2>
         </div>
         <div class="ws-card-body">
-          <p style="font-size: 0.9rem; color: var(--ink-muted); margin-bottom: 1rem;">
+          <p style="font-size: 0.9rem; color: var(--ws-ink-muted); margin-bottom: 1rem;">
             Download your local database as a JSON file. This creates a backup of all data currently stored offline.
           </p>
           <button class="ws-btn ws-btn--secondary ws-btn--full" id="ws-export-btn" disabled>
@@ -491,7 +513,7 @@
             Set up a PIN to securely store your FlockOS credentials offline. This allows you to sign in
             without an internet connection using 256-bit AES-GCM encryption.
           </div>
-          <p style="font-size: 0.85rem; color: var(--ink-muted); margin-top: 0.5rem; font-style: italic;">
+          <p style="font-size: 0.85rem; color: var(--ws-ink-muted); margin-top: 0.5rem; font-style: italic;">
             Vault features coming soon — setup PIN, unlock, and secure offline authentication.
           </p>
         </div>
@@ -504,7 +526,7 @@
           <h2>Danger Zone</h2>
         </div>
         <div class="ws-card-body">
-          <p style="font-size: 0.9rem; color: var(--ink-muted); margin-bottom: 1rem;">
+          <p style="font-size: 0.9rem; color: var(--ws-ink-muted); margin-bottom: 1rem;">
             This will permanently delete all offline data from this device. This action cannot be undone.
             You'll need to re-import your database to use offline mode again.
           </p>
