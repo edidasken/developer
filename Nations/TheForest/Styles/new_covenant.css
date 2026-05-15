@@ -8933,6 +8933,10 @@ html, body {
   margin: 0;
   overscroll-behavior: none;
   width: 100%;
+}
+/* Body gets the app theme background; html stays navy (#0c1445, set above)
+   so the iOS PWA safe-area band below the unity footer matches the footer. */
+body {
   background: var(--bg, #f7f8fb);
 }
 
@@ -8942,10 +8946,12 @@ body.veil-app {
   overflow: hidden;
 }
 
-/* In iOS standalone PWA mode, ensure the same edge-to-edge fill. Dark
-   themes will override --bg and the safe-area band follows automatically. */
+/* In iOS standalone PWA mode, body keeps the app theme background but html
+   MUST stay navy (#0c1445) so the safe-area band below the unity footer
+   matches the footer instead of flashing white. */
 @media all and (display-mode: standalone) {
-  html, body { background: var(--bg, #f7f8fb); }
+  html { background: #0c1445 !important; }
+  body { background: var(--bg, #f7f8fb); }
 }
 
 /* ─── Shell layout ──────────────────────────────────────────────────────────── */
