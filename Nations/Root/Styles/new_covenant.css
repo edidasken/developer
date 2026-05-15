@@ -15546,3 +15546,265 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
 
 /* Body lock when modal/sheet open */
 body.unity-modal-open { overflow: hidden; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   UNITY PROFILE — Sub-view system
+   All .unity-sv-* classes are scoped to sub-views inside the profile panel.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* View enter animation */
+.pp-view-in { animation: pp-view-in 0.18s ease both; }
+@keyframes pp-view-in {
+  from { opacity: 0; transform: translateX(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Sub-view header bar */
+.unity-sv-header {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 10px 8px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  min-height: 48px;
+}
+.unity-sv-back {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: transparent; border: none;
+  color: rgba(255,255,255,0.65); cursor: pointer;
+  flex-shrink: 0; transition: background 0.12s, color 0.12s;
+}
+.unity-sv-back:hover { background: rgba(255,255,255,0.10); color: #fff; }
+.unity-sv-title {
+  flex: 1; min-width: 0;
+  font: 600 0.92rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.unity-sv-title--sm { font-size: 0.84rem; }
+.unity-sv-header-action {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px;
+  background: transparent; border: none;
+  color: rgba(255,255,255,0.55); cursor: pointer; flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+}
+.unity-sv-header-action:hover { background: rgba(255,255,255,0.10); color: #fff; }
+.unity-sv-header-action--danger { color: #f87171; }
+.unity-sv-header-action--danger:hover { background: rgba(248,113,113,0.15); color: #fca5a5; }
+
+/* Sub-view body */
+.unity-sv-body {
+  padding: 14px 12px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.unity-sv-body--center { align-items: center; padding-top: 28px; text-align: center; }
+.unity-sv-body--list   { padding: 0; gap: 0; }
+
+/* Avatar preview (My Profile) */
+.unity-sv-avatar-wrap { display: flex; justify-content: center; padding: 10px 0 4px; }
+.unity-sv-avatar-lg {
+  width: 76px; height: 76px; border-radius: 50%;
+  background: rgba(232,168,56,0.15);
+  border: 2px solid #e8a838;
+  box-shadow: 0 0 18px rgba(232,168,56,0.35);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; flex-shrink: 0;
+}
+
+/* Form fields */
+.unity-sv-field { display: flex; flex-direction: column; gap: 5px; }
+.unity-sv-label {
+  font: 600 0.72rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.unity-sv-optional {
+  text-transform: none; letter-spacing: 0; font-weight: 400; opacity: 0.75;
+}
+.unity-sv-field-hint {
+  font: 400 0.72rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.30);
+}
+.unity-sv-input {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; color: #fff;
+  font: 500 0.88rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  padding: 9px 12px; outline: none;
+  transition: border-color 0.15s;
+  width: 100%; box-sizing: border-box;
+}
+.unity-sv-input:focus { border-color: rgba(232,168,56,0.55); }
+.unity-sv-input::placeholder { color: rgba(255,255,255,0.28); }
+.unity-sv-input--readonly { opacity: 0.50; cursor: not-allowed; }
+.unity-sv-input--grow { flex: 1; width: auto; }
+.unity-sv-textarea {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; color: #fff;
+  font: 500 0.88rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  padding: 9px 12px; outline: none; resize: vertical;
+  min-height: 110px; width: 100%; box-sizing: border-box;
+  transition: border-color 0.15s;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+.unity-sv-textarea:focus { border-color: rgba(232,168,56,0.55); }
+.unity-sv-textarea::placeholder { color: rgba(255,255,255,0.28); }
+
+/* Buttons */
+.unity-sv-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 10px 16px; border-radius: 10px; border: none; cursor: pointer;
+  font: 600 0.88rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  transition: opacity 0.15s, transform 0.10s; flex-shrink: 0;
+}
+.unity-sv-btn:active { transform: scale(0.97); }
+.unity-sv-btn--primary {
+  background: linear-gradient(135deg, #e8a838, #c97d1a);
+  color: #fff; width: 100%;
+}
+.unity-sv-btn--primary:hover { opacity: 0.90; }
+.unity-sv-btn--icon {
+  background: rgba(232,168,56,0.16); color: #e8a838;
+  padding: 9px 11px;
+}
+.unity-sv-btn--icon:hover { background: rgba(232,168,56,0.30); }
+
+/* Add-row (To-Do) */
+.unity-sv-add-row { display: flex; gap: 8px; align-items: center; }
+
+/* Settings: section labels */
+.unity-sv-section-label {
+  font: 600 0.70rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.38);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 0 2px;
+}
+/* Settings: toggle row */
+.unity-sv-toggle-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; padding: 12px 14px;
+}
+.unity-sv-toggle-info {
+  display: flex; align-items: flex-start; gap: 10px;
+  color: rgba(255,255,255,0.55);
+}
+.unity-sv-toggle-icon { flex-shrink: 0; margin-top: 1px; }
+.unity-sv-toggle-title { font: 500 0.88rem 'Plus Jakarta Sans', system-ui, sans-serif; color: #eef1fb; }
+.unity-sv-toggle-sub   { font: 400 0.74rem 'Plus Jakarta Sans', system-ui, sans-serif; color: rgba(255,255,255,0.42); margin-top: 2px; }
+/* CSS toggle switch */
+.unity-sv-toggle { position: relative; flex-shrink: 0; }
+.unity-sv-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.unity-sv-toggle-track {
+  display: block; width: 42px; height: 24px;
+  background: rgba(255,255,255,0.18); border-radius: 12px; cursor: pointer;
+  transition: background 0.20s; position: relative;
+}
+.unity-sv-toggle-track::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.30); transition: transform 0.20s;
+}
+.unity-sv-toggle input:checked + .unity-sv-toggle-track { background: #22c55e; }
+.unity-sv-toggle input:checked + .unity-sv-toggle-track::after { transform: translateX(18px); }
+.unity-sv-toggle input:disabled + .unity-sv-toggle-track { opacity: 0.38; cursor: not-allowed; }
+/* Settings: info rows */
+.unity-sv-info-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 12px; background: rgba(255,255,255,0.04); border-radius: 8px;
+  font: 500 0.86rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.65);
+}
+.unity-sv-info-val { color: rgba(255,255,255,0.38); font-weight: 400; }
+
+/* To-Do: task list */
+.unity-sv-task-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 1px;
+}
+.unity-sv-task {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 8px 8px 4px; border-radius: 8px;
+  transition: background 0.10s;
+}
+.unity-sv-task:hover { background: rgba(255,255,255,0.05); }
+.unity-sv-task.is-done .unity-sv-task-text { text-decoration: line-through; opacity: 0.40; }
+.unity-sv-task-check {
+  background: none; border: none; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.45); padding: 3px; border-radius: 4px;
+  transition: color 0.12s;
+}
+.unity-sv-task-check:hover { color: #e8a838; }
+.unity-sv-task.is-done .unity-sv-task-check { color: #22c55e; }
+.unity-sv-task-text {
+  flex: 1; font: 500 0.88rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #eef1fb; word-break: break-word;
+}
+.unity-sv-task-del {
+  background: none; border: none; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.20); padding: 3px; border-radius: 4px;
+  opacity: 0; transition: opacity 0.15s, color 0.12s;
+}
+.unity-sv-task:hover .unity-sv-task-del { opacity: 1; }
+.unity-sv-task-del:hover { color: #f87171; }
+.unity-sv-task-group-label {
+  font: 600 0.70rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.28); text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 10px 6px 4px; list-style: none;
+}
+
+/* Journal: entry list */
+.unity-sv-journal-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column;
+}
+.unity-sv-journal-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 14px; cursor: pointer;
+  transition: background 0.10s; border-radius: 0;
+}
+.unity-sv-journal-item:hover { background: rgba(255,255,255,0.06); }
+.unity-sv-journal-item:first-child { border-radius: 0 0 0 0; }
+.unity-sv-journal-item-inner { flex: 1; min-width: 0; }
+.unity-sv-journal-chevron { color: rgba(255,255,255,0.25); flex-shrink: 0; display: flex; }
+.unity-sv-journal-title {
+  font: 500 0.88rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #eef1fb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.unity-sv-journal-meta {
+  font: 400 0.74rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.38); margin-top: 2px;
+}
+.unity-sv-journal-date {
+  font: 500 0.75rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.38); margin: 0 0 10px; padding: 12px 14px 0;
+}
+.unity-sv-journal-body {
+  font: 400 0.88rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #eef1fb; line-height: 1.68; margin: 0;
+  padding: 0 14px 14px; white-space: pre-wrap;
+}
+
+/* Main menu: chevron on items with subviews */
+.unity-pp-item-chevron {
+  color: rgba(255,255,255,0.22); display: inline-flex;
+  align-items: center; flex-shrink: 0;
+}
+
+/* Empty state + calendar stub */
+.unity-sv-empty {
+  font: 400 0.84rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.30); text-align: center;
+  padding: 22px 0; list-style: none;
+}
+.unity-sv-coming {
+  font: 400 0.86rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.32); line-height: 1.65; margin: 0;
+}
+.unity-sv-cal-month {
+  font: 600 1rem 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: rgba(255,255,255,0.55); margin-bottom: 10px;
+}
