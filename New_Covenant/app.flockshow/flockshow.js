@@ -1366,7 +1366,7 @@ function _showAuthGate(N) {
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:var(--fs-bg);display:flex;align-items:center;justify-content:center;';
   overlay.innerHTML = `
     <div class="fs-auth-card">
-      <img class="fs-auth-icon" src="Images/Show.png" alt="FlockShow">
+      <img class="fs-auth-icon" src="Images/icon-show.svg" alt="FlockShow">
       <h1>FlockShow</h1>
       <p>Sign in with your FlockOS account to access worship presentations.</p>
       <button class="fs-btn fs-btn--primary" id="fs-signin-btn" style="width:100%;justify-content:center;padding:10px 0;font-size:0.88rem;">

@@ -22,9 +22,9 @@
       "purpose": "any"
     },
     {
-      "src": "../Images/Wellspring.png",
+      "src": "../Images/FlockIcon-512.webp",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/webp",
       "purpose": "any"
     }
   ]

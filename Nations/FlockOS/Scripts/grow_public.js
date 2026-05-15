@@ -79,7 +79,7 @@ function go(name) {
 /* ─── Bespoke "Sign in to FlockOS" marketing dropdown ────────────────────── */
 const SIGNIN_DROPDOWN_HTML = /* html */`
   <div class="gp-signin-dropdown-inner">
-    <img src="Images/GrowIcon.png" alt="GROW" width="44" height="44" style="border-radius:12px;display:block;margin:0 auto 10px;">
+    <img src="Images/icon-grow.svg" alt="GROW" width="44" height="44" style="border-radius:12px;display:block;margin:0 auto 10px;">
     <p class="gp-signin-title">Sign in to FlockOS</p>
     <p class="gp-signin-sub">Unlock your journal, certificates, fellowship channels, and progress tracking.</p>
     <a href="index.html" class="gp-cta gp-signin-cta">
@@ -133,7 +133,7 @@ mountUnityHeader(topbar, {
   appAccentDk: '#78350f',
   homeHref:    './',
   user:        null,                             // GROW is public — no auth at this layer
-  avatarSrc:   'Images/GrowIcon.png',
+  avatarSrc:   'Images/icon-grow.svg',
   onAccount:   () => {                           // override: open marketing sign-in dropdown
     if (_signinDropdown && _signinDropdown.hidden) _openSigninDropdown();
     else _closeSigninDropdown();
@@ -172,7 +172,7 @@ function _sidebarHTML() {
     <div style="margin-top:auto;padding:24px 14px 8px;border-top:1px solid rgba(255,255,255,0.07);text-align:center;">
       <a href="index.html" target="_self"
          style="color:rgba(255,255,255,0.32);font:0.72rem var(--font-ui);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;">
-        <img src="Images/FlockOS.png" alt="" width="14" height="14" style="border-radius:3px;opacity:0.5;">
+        <img src="Images/icon-flockos.svg" alt="" width="14" height="14" style="border-radius:3px;opacity:0.5;">
         Powered by FlockOS
       </a>
     </div>

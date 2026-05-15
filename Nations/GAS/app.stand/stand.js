@@ -317,7 +317,7 @@ function _renderAuthGate(N) {
   overlay.removeAttribute('hidden'); overlay.style.display = ''
   overlay.innerHTML = `
     <div class="ms-auth-card">
-      <img src="Images/stand.png" alt="FlockStand">
+      <img src="Images/icon-stand.svg" alt="FlockStand">
       <h1>FlockStand</h1>
       <p>Sign in with your FlockOS account to access the worship team music stand.</p>
       <button class="ms-btn ms-btn--primary" id="ms-signin-btn" style="margin-bottom:12px;">Sign In to FlockOS</button>

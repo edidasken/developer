@@ -28,9 +28,9 @@
       "purpose": "maskable"
     },
     {
-      "src": "../Images/GrowIcon.png",
+      "src": "../Images/icon-grow.svg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any"
     }
   ],
