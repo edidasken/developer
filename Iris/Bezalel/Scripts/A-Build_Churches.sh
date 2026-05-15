@@ -649,4 +649,38 @@ if $DEPLOY_COMMS; then
       done
     fi
   fi
+
+  # ── Deploy Firestore rules to each church project ─────────────────────
+  echo ""
+  echo "Deploying Firestore rules to church projects…"
+  _RULES_FILE="$WORKSPACE_ROOT/Architechtural Docs/New Covenant/Deployment/Firestore/firestore.rules"
+  _CHURCH_CFG="$WORKSPACE_ROOT/church-firestore.json"
+  if [ ! -f "$_RULES_FILE" ]; then
+    echo "  ✗ MISSING: Deployment/Firestore/firestore.rules — skipping rules deploy"
+  else
+    RULES_PROJECTS=()
+    for _cfg in "$CONFIGS_DIR"/*.json; do
+      [[ "$(basename "$_cfg")" == "ChurchTemplate.json" ]] && continue
+      [[ "$(basename "$_cfg")" == "Master-API.json" ]] && continue
+      _proj=$(jq -r '.firebaseProjectId // empty' "$_cfg")
+      [ -z "$_proj" ] && continue
+      RULES_PROJECTS+=("$_proj")
+    done
+
+    if [ ${#RULES_PROJECTS[@]} -eq 0 ]; then
+      echo "  ⚠ No firebaseProjectId found in ChurchRegistry — skipping rules deploy"
+    else
+      for _proj in "${RULES_PROJECTS[@]}"; do
+        if $DRY_RUN; then
+          echo "  [dry-run] Would run: firebase deploy --only firestore:rules --config church-firestore.json --project $_proj"
+        else
+          echo "  → Deploying rules to ${_proj}…"
+          (
+            cd "$WORKSPACE_ROOT"
+            firebase deploy --only firestore:rules --config church-firestore.json --project "$_proj" 2>&1
+          ) && echo "  ✓ Rules deployed to $_proj" || echo "  ✗ Rules deploy failed for $_proj (check firebase CLI auth)"
+        fi
+      done
+    fi
+  fi
 fi
