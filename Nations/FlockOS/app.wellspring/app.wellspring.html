@@ -53,18 +53,12 @@
       --ws-navy-card:  #111b44;
       --ws-gold:       #e8a838;
       --ws-blue:       #5b8dee;
-      --ws-ink-light:  #eef1fb;
-      --ws-ink-muted:  #9ba8d0;
-      --ws-ink-faint:  #3d4f7c;
-      --ws-line:       rgba(255,255,255,0.09);
     }
 
     html, body {
       height: 100dvh;
       font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
       -webkit-font-smoothing: antialiased;
-      background: var(--ws-navy-bg);
-      color: var(--ws-ink-light);
       overflow: hidden;
       overscroll-behavior: none;
     }
@@ -72,7 +66,6 @@
     body { 
       display: flex; 
       flex-direction: column;
-      background-image: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(91,141,238,0.14) 0%, transparent 60%);
     }
 
     /* ── Main scroll container ──────────────────────────────────── */
@@ -96,16 +89,15 @@
     /* ── Hero ───────────────────────────────────────────────────── */
     .ws-hero {
       text-align: center;
-      padding: 2.5rem 1.5rem;
-      background: linear-gradient(135deg, rgba(232,168,56,0.12), rgba(91,141,238,0.08));
+      padding: 3rem 2rem;
+      background: var(--ws-navy-bg);
       border-radius: 20px;
-      border: 1px solid var(--ws-line);
-      box-shadow: 0 0 30px rgba(232,168,56,0.15);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
     .ws-hero-icon {
       font-size: 4rem;
       margin-bottom: 0.75rem;
-      filter: drop-shadow(0 4px 16px rgba(232,168,56,0.4));
+      filter: drop-shadow(0 4px 16px rgba(91,141,238,0.4));
     }
     .ws-hero h1 {
       font-size: 1.9rem;
@@ -113,10 +105,11 @@
       color: var(--ws-gold);
       margin-bottom: 0.6rem;
       letter-spacing: -0.02em;
+      text-shadow: 0 2px 12px rgba(232,168,56,0.3);
     }
     .ws-hero p {
       font-size: 0.95rem;
-      color: var(--ws-ink-muted);
+      color: rgba(238,241,251,0.75);
       max-width: 540px;
       margin: 0 auto;
       line-height: 1.6;
@@ -131,11 +124,11 @@
 
     /* ── Cards ──────────────────────────────────────────────────── */
     .ws-card {
-      background: var(--ws-navy-card);
-      border: 1px solid var(--ws-line);
+      background: white;
+      border: 1px solid var(--color-line, #e2e8f0);
       border-radius: 16px;
       padding: 1.5rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     .ws-card-header {
       display: flex;
@@ -143,16 +136,16 @@
       gap: 0.75rem;
       margin-bottom: 1.25rem;
       padding-bottom: 1rem;
-      border-bottom: 1px solid var(--ws-line);
+      border-bottom: 1px solid var(--color-line, #e2e8f0);
     }
     .ws-card-icon {
       font-size: 1.5rem;
-      opacity: 0.85;
+      opacity: 0.7;
     }
     .ws-card h2 {
       font-size: 1.1rem;
       font-weight: 700;
-      color: var(--ws-ink-light);
+      color: var(--color-ink, #1e293b);
       flex: 1;
     }
     .ws-card-body {
@@ -175,12 +168,12 @@
     }
     .ws-status-label {
       font-size: 0.9rem;
-      color: var(--ws-ink-muted);
+      color: var(--color-ink-muted, #64748b);
       font-weight: 500;
     }
     .ws-status-value {
       font-size: 0.9rem;
-      color: var(--ws-ink-light);
+      color: var(--color-ink, #1e293b);
       font-weight: 600;
     }
     .ws-badge {
@@ -199,7 +192,7 @@
     }
     .ws-badge--inactive {
       background: rgba(100,116,139,0.15);
-      color: var(--ws-ink-muted);
+      color: #64748b;
     }
     .ws-badge--loaded {
       background: rgba(91,141,238,0.18);
@@ -237,13 +230,13 @@
       transform: translateY(-1px);
     }
     .ws-btn--secondary {
-      background: var(--ws-navy-card);
-      color: var(--ws-ink-light);
-      border: 1px solid var(--ws-line);
+      background: white;
+      color: var(--color-ink, #1e293b);
+      border: 1px solid var(--color-line, #e2e8f0);
     }
     .ws-btn--secondary:hover:not(:disabled) {
       border-color: var(--ws-blue);
-      background: rgba(91,141,238,0.1);
+      background: rgba(91,141,238,0.05);
     }
     .ws-btn--danger {
       background: rgba(239,68,68,0.15);
@@ -271,13 +264,13 @@
     .ws-toggle-label {
       font-size: 0.95rem;
       font-weight: 600;
-      color: var(--ws-ink-light);
+      color: var(--color-ink, #1e293b);
     }
     .ws-toggle {
       position: relative;
       width: 50px;
       height: 28px;
-      background: var(--ws-ink-faint);
+      background: #cbd5e1;
       border-radius: 14px;
       cursor: pointer;
       transition: background 0.2s;
@@ -319,14 +312,14 @@
       justify-content: center;
       gap: 0.5rem;
       padding: 0.75rem 1.25rem;
-      border: 2px dashed var(--ws-line);
+      border: 2px dashed var(--color-line, #e2e8f0);
       border-radius: 12px;
-      background: rgba(91,141,238,0.05);
+      background: rgba(91,141,238,0.02);
       cursor: pointer;
       transition: all 0.15s;
       font-size: 0.9rem;
       font-weight: 600;
-      color: var(--ws-ink-muted);
+      color: var(--color-ink-muted, #64748b);
     }
     .ws-file-label:hover {
       border-color: var(--ws-gold);
@@ -336,13 +329,13 @@
 
     /* ── Info box ───────────────────────────────────────────────── */
     .ws-info {
-      background: rgba(91,141,238,0.12);
-      border: 1px solid rgba(91,141,238,0.25);
+      background: rgba(91,141,238,0.06);
+      border: 1px solid rgba(91,141,238,0.15);
       border-radius: 12px;
       padding: 1rem;
       font-size: 0.87rem;
       line-height: 1.6;
-      color: var(--ws-ink-light);
+      color: var(--color-ink, #1e293b);
     }
     .ws-info-title {
       font-weight: 700;
@@ -355,7 +348,7 @@
       display: none;
       text-align: center;
       padding: 2rem;
-      color: var(--ws-ink-muted);
+      color: var(--color-ink-muted, #64748b);
     }
     .ws-loading.active {
       display: block;
@@ -364,7 +357,7 @@
       display: inline-block;
       width: 32px;
       height: 32px;
-      border: 3px solid var(--ws-line);
+      border: 3px solid #e2e8f0;
       border-top-color: var(--ws-gold);
       border-radius: 50%;
       animation: ws-spin 0.8s linear infinite;
@@ -572,7 +565,7 @@
         appIconSvg: '💧',
         appAccent: '#22c55e',
         appAccentDk: '#16a34a',
-        homeHref: '../',
+        homeHref: './app.wellspring.html',
         user,
         signInHref: '../app.flockos/',
         onSignOut: () => {
