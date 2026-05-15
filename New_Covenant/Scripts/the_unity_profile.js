@@ -183,7 +183,7 @@ function _populateMainHeader() {
   const display = user.displayName || user.name || user.email.split('@')[0];
   const photo   = user.photoURL || '';
   const av = _sheet.querySelector('.unity-pp-avatar');
-  if (photo) { av.style.backgroundImage = `url(${photo})`; av.textContent = ''; }
+  if (photo) { av.style.backgroundImage = `url("${photo.replace(/"/g, '%22')}")`;  av.textContent = ''; }
   else        { av.style.backgroundImage = ''; av.textContent = (display[0] || '?').toUpperCase(); }
   _sheet.querySelector('.unity-pp-name').textContent  = display;
   _sheet.querySelector('.unity-pp-email').textContent = user.email;
@@ -698,7 +698,8 @@ function _renderCalendarView() {
       if (!title) { _toast('Enter an event title.'); return; }
       const time  = view.querySelector('#pp-cal-time')?.value || '';
       const evts  = load();
-      evts.push({ id: Date.now(), date: selDate, title, time, created: Date.now() });
+      const now  = Date.now();
+      evts.push({ id: now, date: selDate, title, time, created: now });
       save(evts); addMode = false; render();
     };
     view.querySelector('#pp-cal-save')?.addEventListener('click', doSave);
@@ -728,6 +729,8 @@ function _e(s) {
 function _ea(s) { return _e(s); }
 
 function _toast(msg) {
+  // Dismiss any existing toast immediately so messages don't stack
+  document.querySelectorAll('.unity-toast').forEach(old => old.remove());
   const t = document.createElement('div');
   t.className = 'unity-toast';
   t.textContent = msg;
