@@ -15380,13 +15380,20 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
    ══════════════════════════════════════════════════════════════════════════════ */
 .unity-footer {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
-  padding: 10px 12px max(10px, var(--safe-bottom, 0px));
+  padding: 10px 12px 10px;
   background: var(--foot-bg, #0c1445);
   color: var(--foot-ink, rgba(255,255,255,0.65));
   border-top: 1px solid var(--foot-line, rgba(255,255,255,0.08));
   position: relative; z-index: 100; flex-shrink: 0;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   font-size: 0.85rem;
+}
+
+/* PWA mode: use only safe-area for bottom padding, no extra base padding */
+@media (display-mode: standalone) {
+  .unity-footer {
+    padding-bottom: var(--safe-bottom, 0px);
+  }
 }
 
 .unity-footer::before {
@@ -15445,12 +15452,19 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
 
 @media (max-width: 540px) {
   .unity-footer { 
-    padding: 8px 10px max(8px, var(--safe-bottom, 0px)); 
+    padding: 8px 10px 8px; 
     gap: 6px; font-size: 0.8rem; 
   }
   .unity-footer-btn { padding: 6px 11px; font-size: 0.75rem; }
   .unity-footer-btn span { display: none; }
   .unity-footer-motto { font-size: 0.7rem; }
+}
+
+/* PWA mode on mobile: use only safe-area for bottom padding */
+@media (max-width: 540px) and (display-mode: standalone) {
+  .unity-footer {
+    padding-bottom: var(--safe-bottom, 0px);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════════
