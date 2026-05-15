@@ -875,6 +875,22 @@
       padding: 10px 16px; background: #1a1320; color: #fff;
       border-bottom: 2px solid #c48a20;
     }
+    /* Bottom toolbar variant: controls live at the bottom of the screen so
+       they are reachable with one thumb on mobile (matches FlockStand pattern). */
+    .bm-present-toolbar--bottom {
+      border-bottom: none;
+      border-top: 2px solid #c48a20;
+      justify-content: center; flex-wrap: wrap;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    }
+    /* Slim top title strip when controls are at the bottom. */
+    .bm-present-titlebar {
+      flex-shrink: 0; display: flex; align-items: center; gap: 10px;
+      padding: 8px 16px;
+      padding-top: calc(8px + env(safe-area-inset-top, 0px));
+      background: #1a1320; color: #fff;
+      border-bottom: 2px solid #c48a20;
+    }
     .bm-present-toolbar-title {
       flex: 1; min-width: 0;
       font: 600 0.95rem 'Plus Jakarta Sans', sans-serif;
@@ -883,13 +899,13 @@
     }
     .bm-present-btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-      padding: 6px 11px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.18);
       background: rgba(255,255,255,0.07); color: #fff;
-      font: 600 0.78rem 'Plus Jakarta Sans', sans-serif;
+      font: 600 0.85rem 'Plus Jakarta Sans', sans-serif; min-height: 40px;
       cursor: pointer; transition: all 0.13s; flex-shrink: 0;
     }
     .bm-present-btn:hover { background: rgba(255,255,255,0.16); }
-    .bm-present-btn--icon { width: 32px; height: 32px; padding: 0; }
+    .bm-present-btn--icon { width: 40px; height: 40px; padding: 0; }
     .bm-present-btn--exit { background: rgba(248,113,113,0.18); border-color: rgba(248,113,113,0.35); color: #fecaca; }
     .bm-present-btn--exit:hover { background: rgba(248,113,113,0.30); color: #fff; }
     .bm-present-fontsize {
@@ -898,8 +914,8 @@
       flex-shrink: 0;
     }
     .bm-present-fontsize button {
-      width: 30px; height: 30px; background: rgba(255,255,255,0.05); border: none;
-      color: #fff; cursor: pointer; font-weight: 700;
+      width: 40px; height: 40px; background: rgba(255,255,255,0.05); border: none;
+      color: #fff; cursor: pointer; font-weight: 700; font-size: 0.95rem;
       display: flex; align-items: center; justify-content: center;
     }
     .bm-present-fontsize button:hover { background: rgba(255,255,255,0.16); }
@@ -962,12 +978,14 @@
 
     /* Mobile responsive for present mode */
     @media (max-width: 700px) {
+      .bm-present-titlebar { padding: 6px 12px; padding-top: calc(6px + env(safe-area-inset-top, 0px)); gap: 8px; }
       .bm-present-toolbar { padding: 8px 10px; gap: 6px; }
-      .bm-present-toolbar-title { font-size: 0.82rem; }
-      .bm-present-btn { padding: 5px 8px; font-size: 0.72rem; }
-      .bm-present-btn--icon { width: 30px; height: 30px; }
-      .bm-present-fontsize button { width: 28px; height: 28px; }
-      .bm-present-scroll { padding: 18px 14px 60px; }
+      .bm-present-toolbar--bottom { padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+      .bm-present-toolbar-title { font-size: 0.85rem; }
+      .bm-present-btn { padding: 8px 12px; font-size: 0.82rem; min-height: 42px; }
+      .bm-present-btn--icon { width: 42px; height: 42px; }
+      .bm-present-fontsize button { width: 42px; height: 42px; font-size: 0.95rem; }
+      .bm-present-scroll { padding: 18px 14px 28px; }
       #bm-present-overlay #bmp-title { font-size: 1.6em; }
       #bm-present-overlay #bmp-section-content { padding: 12px 14px; }
       #bm-present-overlay .bmp-section-content { padding: 12px 14px; }

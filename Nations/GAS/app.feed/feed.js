@@ -1467,19 +1467,21 @@ function _doPresent() {
   const overlay = document.createElement('div');
   overlay.id = 'bm-present-overlay';
   overlay.innerHTML = `
-    <div class="bm-present-toolbar">
+    <div class="bm-present-titlebar">
       <span class="bm-present-wake-dot is-off" id="bm-present-wake-dot" title="Screen wake status"></span>
       <span class="bm-present-toolbar-title">${_e(s.title || 'Untitled Sermon')}</span>
+    </div>
+    <div class="bm-present-scroll" id="bm-present-scroll"></div>
+    <div class="bm-present-toolbar bm-present-toolbar--bottom">
       <div class="bm-present-fontsize" title="Adjust text size">
         <button type="button" id="bm-present-font-down" aria-label="Decrease text size">A−</button>
         <button type="button" id="bm-present-font-up" aria-label="Increase text size">A+</button>
       </div>
       <button type="button" class="bm-present-btn bm-present-btn--icon" id="bm-present-fs-btn" title="Toggle fullscreen" aria-label="Toggle fullscreen">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V3h6M21 9V3h-6M3 15v6h6M21 15v6h-6"/></svg>
       </button>
       <button type="button" class="bm-present-btn bm-present-btn--exit" id="bm-present-exit-btn" title="Exit presentation (Esc)">Exit</button>
     </div>
-    <div class="bm-present-scroll" id="bm-present-scroll"></div>
   `;
   document.body.appendChild(overlay);
 
