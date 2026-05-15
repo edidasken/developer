@@ -71,9 +71,11 @@
     }
 
     html, body {
-      min-height: 100%; background: var(--fs-bg); color: var(--fs-ink);
+      height: 100dvh; margin: 0; padding: 0;
+      background: var(--fs-bg); color: var(--fs-ink);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
+      overflow: hidden;
       overscroll-behavior: none;
     }
 
@@ -81,7 +83,8 @@
     #fs-root {
       display: grid;
       grid-template-rows: auto auto 1fr auto;
-      min-height: 100dvh;
+      height: 100dvh;
+      overflow: hidden;
     }
 
     /* Subbar (Library/Editor tabs + Present) */
