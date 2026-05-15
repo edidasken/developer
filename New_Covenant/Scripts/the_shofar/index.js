@@ -469,9 +469,18 @@ function msRenderShell() {
     if (!container) { console.error('MusicStand: no container found'); return; }
     container.innerHTML =
         '<div class="ms-app">' +
-            '<div class="ms-card" style="text-align:center;">' +
-                '<h2 class="ms-title">FlockStand</h2>' +
-                '<p class="ms-subtitle">Manage your song library, chord charts, and setlists</p>' +
+            '<div class="ms-card ms-hero" style="text-align:center;position:relative;overflow:hidden;">' +
+                '<div class="ms-hero-glyph" aria-hidden="true">🎵</div>' +
+                '<h2 class="ms-title ms-hero-title">FlockStand</h2>' +
+                '<p class="ms-hero-verse">"Sing to the Lord a new song; sing to the Lord, all the earth."<span class="ms-hero-ref"> — Psalm 96:1</span></p>' +
+                '<p class="ms-subtitle ms-hero-lede">The worship team\'s digital music stand — built for the moment a song carries the room into the presence of God.</p>' +
+                '<div class="ms-hero-pillars" aria-hidden="true">' +
+                    '<span><strong>Library.</strong> Every song, every key.</span>' +
+                    '<span class="ms-hero-dot">•</span>' +
+                    '<span><strong>Plan.</strong> Setlists that flow.</span>' +
+                    '<span class="ms-hero-dot">•</span>' +
+                    '<span><strong>Lead.</strong> Charts that follow your hands.</span>' +
+                '</div>' +
             '</div>' +
 
             '<div class="ms-tabs">' +
