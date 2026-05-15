@@ -155,6 +155,115 @@
       gap: 0.65rem;
     }
 
+    /* ── Sign-in modal ─────────────────────────────────────────────── */
+    .signin-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 9000;
+      align-items: flex-start; justify-content: center;
+      padding: 60px 16px 40px;
+      background: rgba(9,16,46,0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      overflow-y: auto;
+    }
+    .signin-overlay.is-open { display: flex; }
+
+    .signin-sheet {
+      background: linear-gradient(160deg,#111b44 0%,#0c1445 60%,#0a1035 100%);
+      border: 1px solid rgba(232,168,56,0.20);
+      border-radius: 20px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(232,168,56,0.08);
+      width: 100%; max-width: 400px;
+      padding: 28px 28px 24px;
+      position: relative;
+    }
+
+    .signin-close {
+      position: absolute; top: 14px; right: 14px;
+      background: rgba(255,255,255,0.06); border: none;
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--muted); font-size: 1rem;
+      transition: background 0.15s, color 0.15s;
+    }
+    .signin-close:hover { background: rgba(255,255,255,0.12); color: var(--ink); }
+
+    .signin-logo {
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 6px;
+      width: 48px; height: 48px; border-radius: 12px;
+      background: linear-gradient(135deg,#1e3a8a,#e8a838);
+    }
+    .signin-logo svg { width: 24px; height: 24px; }
+
+    .signin-title {
+      text-align: center;
+      font-size: 1.25rem; font-weight: 700; color: var(--ink);
+      margin: 0 0 4px;
+    }
+    .signin-sub {
+      text-align: center;
+      font-size: 0.78rem; color: var(--muted);
+      margin: 0 0 22px;
+    }
+
+    .signin-field {
+      display: flex; flex-direction: column; gap: 5px;
+      margin-bottom: 14px;
+    }
+    .signin-field label {
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .signin-field input {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 10px 13px; font-size: 0.93rem;
+      color: var(--ink); outline: none;
+      font-family: var(--font);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .signin-field input:focus {
+      border-color: rgba(232,168,56,0.55);
+      background: rgba(255,255,255,0.09);
+    }
+    .signin-field input::placeholder { color: var(--muted); opacity: 0.6; }
+
+    .signin-error {
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.35);
+      border-radius: 9px;
+      color: #fca5a5; font-size: 0.82rem;
+      padding: 8px 11px; margin-bottom: 14px;
+    }
+
+    .signin-btn {
+      width: 100%; padding: 11px;
+      background: linear-gradient(135deg,#e8a838,#d4922a);
+      border: none; border-radius: 11px;
+      font-size: 0.95rem; font-weight: 700;
+      color: #0c1445; cursor: pointer;
+      transition: filter 0.15s, transform 0.12s;
+      font-family: var(--font);
+    }
+    .signin-btn:hover:not(:disabled) { filter: brightness(1.08); }
+    .signin-btn:active:not(:disabled) { transform: scale(0.98); }
+    .signin-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .signin-forgot {
+      text-align: center; margin-top: 14px;
+    }
+    .signin-forgot button {
+      background: none; border: none;
+      color: var(--muted); font-size: 0.8rem;
+      cursor: pointer; text-decoration: underline;
+      font-family: var(--font);
+      transition: color 0.15s;
+    }
+    .signin-forgot button:hover { color: var(--gold); }
+
     /* ── App button ────────────────────────────────────────────────── */
     .app-btn {
       display: flex;
@@ -440,12 +549,46 @@
 
 
 
+  <!-- Sign-in modal — shown inline when no session exists -->
+  <div class="signin-overlay" id="launcherSigninOverlay" role="dialog" aria-modal="true" aria-label="Sign in to FlockOS">
+    <div class="signin-sheet">
+      <button class="signin-close" id="launcherSigninClose" aria-label="Close sign-in">&times;</button>
+      <div class="signin-logo" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v4M10 4h4"/><path d="M5 22V11l7-4 7 4v11"/><path d="M9 22v-6h6v6"/>
+        </svg>
+      </div>
+      <h2 class="signin-title">Welcome Back</h2>
+      <p class="signin-sub">Sign in to access your account</p>
+      <form id="launcherSigninForm" novalidate>
+        <div class="signin-field">
+          <label for="launcherSigninEmail">Email</label>
+          <input type="email" id="launcherSigninEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+        <div class="signin-field">
+          <label for="launcherSigninPasscode">Passcode</label>
+          <input type="password" id="launcherSigninPasscode" name="passcode" placeholder="Your passcode" autocomplete="current-password" required>
+        </div>
+        <div class="signin-error" id="launcherSigninError" hidden></div>
+        <button type="submit" class="signin-btn" id="launcherSigninBtn">Sign In</button>
+      </form>
+      <div class="signin-forgot">
+        <button type="button" id="launcherForgotBtn">Forgot passcode?</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Pull-to-Refresh indicator -->
   <div class="ptr-indicator" id="ptrIndicator">&#8635; Release to refresh</div>
+
+  <!-- Auth globals — loaded before the module script so window.Nehemiah is available -->
+  <script src="Scripts/the_true_vine.js"></script>
+  <script src="Scripts/firm_foundation.js"></script>
 
   <!-- Unity header mount: same chrome as every app -->
   <script type="module">
     import { mountUnityHeader } from './Scripts/the_unity_header.js';
+    import { openUnityProfile } from './Scripts/the_unity_profile.js';
 
     // Read shared FlockOS auth session (set by Nehemiah / firm_foundation.js after sign-in).
     let user = null;
@@ -457,9 +600,24 @@
       }
     } catch (_) {}
 
+    function _readUser() {
+      try {
+        const raw = sessionStorage.getItem('flock_auth_session') || sessionStorage.getItem('flock_auth_profile');
+        if (!raw) return null;
+        const s = JSON.parse(raw);
+        return (s && s.email) ? { displayName: s.displayName || s.name || s.email.split('@')[0], email: s.email, photoURL: s.photoURL || '' } : null;
+      } catch (_) { return null; }
+    }
+
+    function _signOut() {
+      try { sessionStorage.removeItem('flock_auth_session'); } catch (_) {}
+      try { sessionStorage.removeItem('flock_auth_profile'); } catch (_) {}
+      location.reload();
+    }
+
     const CHURCH_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M10 4h4"/><path d="M5 22V11l7-4 7 4v11"/><path d="M9 22v-6h6v6"/></svg>';
 
-    mountUnityHeader(document.getElementById('launcher-header'), {
+    const headerCtrl = mountUnityHeader(document.getElementById('launcher-header'), {
       appId:       'launcher',
       appName:     'The Forest',
       appIconSvg:  CHURCH_ICON,
@@ -467,12 +625,14 @@
       appAccentDk: '#1e3a8a',
       homeHref:    './',
       user,
-      signInHref:  'app.flockos/',
-      onSignOut:   () => {
-        try { sessionStorage.removeItem('flock_auth_session'); } catch (_) {}
-        try { sessionStorage.removeItem('flock_auth_profile'); } catch (_) {}
-        location.reload();
+      onAccount:   () => {
+        if (user) {
+          openUnityProfile({ appId: 'launcher', appName: 'The Forest', user, onSignOut: _signOut });
+        } else {
+          _openSignInModal();
+        }
       },
+      onSignOut: _signOut,
       features: [
         { id: 'open-grow',      label: 'GROW',          hint: 'Discipleship & Bible study',           run: () => location.assign('app.grow/app.grow.html') },
         { id: 'open-invite',    label: 'The Invitation', hint: 'Share the hope of Jesus Christ',      run: () => location.assign('app.invite/app.invite.html') },
@@ -482,6 +642,96 @@
         { id: 'open-flockchat', label: 'FlockChat',     hint: 'Messaging, prayer chain & announcements', run: () => location.assign('app.flockchat/app.flockchat.html') },
         { id: 'open-feed',      label: 'FEED',          hint: 'Sermon prep & manuscript builder',     run: () => location.assign('app.feed/') },
       ],
+    });
+
+    // ── Sign-in modal wiring ─────────────────────────────────────────────
+
+    function _openSignInModal() {
+      const overlay = document.getElementById('launcherSigninOverlay');
+      if (!overlay) return;
+      overlay.classList.add('is-open');
+      document.getElementById('launcherSigninEmail')?.focus();
+    }
+
+    function _closeSignInModal() {
+      const overlay = document.getElementById('launcherSigninOverlay');
+      if (overlay) overlay.classList.remove('is-open');
+      const err = document.getElementById('launcherSigninError');
+      if (err) { err.hidden = true; err.textContent = ''; }
+    }
+
+    // Close on X button
+    document.getElementById('launcherSigninClose')?.addEventListener('click', _closeSignInModal);
+
+    // Close on backdrop click
+    document.getElementById('launcherSigninOverlay')?.addEventListener('click', e => {
+      if (e.target === e.currentTarget) _closeSignInModal();
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        const overlay = document.getElementById('launcherSigninOverlay');
+        if (overlay?.classList.contains('is-open')) { e.stopPropagation(); _closeSignInModal(); }
+      }
+    });
+
+    // Forgot passcode
+    document.getElementById('launcherForgotBtn')?.addEventListener('click', () => {
+      const email = document.getElementById('launcherSigninEmail')?.value.trim() || '';
+      const N = window.Nehemiah;
+      if (!N || typeof N.forgotPassword !== 'function') {
+        alert('Reset is not available right now. Please try again later.');
+        return;
+      }
+      if (!email) { alert('Enter your email address first, then click "Forgot passcode?".'); return; }
+      N.forgotPassword(email)
+        .then(() => alert('Password reset instructions have been sent to ' + email + '.'))
+        .catch(err => alert('Could not send reset: ' + (err.message || 'Unknown error')));
+    });
+
+    // Sign-in form submit
+    document.getElementById('launcherSigninForm')?.addEventListener('submit', async e => {
+      e.preventDefault();
+      const emailEl   = document.getElementById('launcherSigninEmail');
+      const passcodeEl= document.getElementById('launcherSigninPasscode');
+      const btn       = document.getElementById('launcherSigninBtn');
+      const errEl     = document.getElementById('launcherSigninError');
+      const email     = emailEl?.value.trim() || '';
+      const passcode  = passcodeEl?.value || '';
+
+      if (!email || !passcode) return;
+
+      const N = window.Nehemiah;
+      if (!N || typeof N.login !== 'function') {
+        errEl.textContent = 'Auth module is not ready. Please refresh the page.';
+        errEl.hidden = false;
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Signing in\u2026';
+      errEl.hidden = true;
+
+      try {
+        await N.login(email, passcode);
+
+        // Update local user state from freshly-written sessionStorage
+        user = _readUser();
+        headerCtrl?.update?.({ user });
+
+        _closeSignInModal();
+
+        // Open Unity Profile immediately to welcome the user
+        if (user) {
+          openUnityProfile({ appId: 'launcher', appName: 'The Forest', user, onSignOut: _signOut });
+        }
+      } catch (err) {
+        errEl.textContent = err.message || 'Sign-in failed. Please check your email and passcode.';
+        errEl.hidden = false;
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
     });
   </script>
 
