@@ -15022,21 +15022,15 @@ flock-tabs [role="tablist"], .tabs-bar {
     box-shadow: 4px 0 40px rgba(0,0,0,.6);
   }
   .ms-bottom-nav  { display: flex; }
-  .ms-body        { padding-top: calc(var(--ms-header-h) + var(--ms-safe-top)); padding-bottom: 0; }
-  .ms-main        { display: flex; flex-direction: column; }
+  .ms-body        { padding-top: 0; padding-bottom: 0; }
+  .ms-main        { background: var(--ms-bg); }
   .ms-menu-toggle { display: flex; }
   .ms-view        {
-    padding: 12px 16px calc(var(--ms-bnav-h) + 12px);
-    flex: 1; min-height: 0;
-    display: flex; flex-direction: column; gap: 14px;
+    padding: calc(var(--ms-header-h) + var(--ms-safe-top) + 12px) 16px calc(var(--ms-bnav-h) + 12px);
     max-width: none;
   }
-  .ms-view > #db-cols,
-  .ms-view > .ms-songs-grid,
-  .ms-view > .ms-services-list,
-  .ms-view > .ms-import-source-grid { flex: 1; }
   .ms-editor-layout { grid-template-columns: 1fr; }
-  .ms-page-hero   { flex-direction: column; margin-bottom: 0; padding-bottom: 12px; }
+  .ms-page-hero   { flex-direction: column; margin-bottom: 16px; padding-bottom: 12px; }
   .ms-page-hero-text h1 { margin-top: 0; }
   .ms-page-hero-actions { width: 100%; }
   .ms-stats-grid  { grid-template-columns: repeat(2,1fr); }
