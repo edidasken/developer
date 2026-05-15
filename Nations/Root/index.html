@@ -174,20 +174,22 @@
     .app-btn:active { transform: scale(0.985); box-shadow: none; }
 
     /* accent border per app */
-    .app-btn--grow   { border-color: rgba(232,168,56,0.20); }
-    .app-btn--invite { border-color: rgba(61,179,79,0.20);  }
-    .app-btn--flock  { border-color: rgba(91,141,238,0.20); }
-    .app-btn--stand  { border-color: rgba(168,85,247,0.20); }
-    .app-btn--show   { border-color: rgba(239,68,68,0.20);  }
-    .app-btn--chat   { border-color: rgba(34,211,238,0.20); }
-    .app-btn--feed   { border-color: rgba(232,168,56,0.20); }
-    .app-btn:hover.app-btn--grow   { border-color: rgba(232,168,56,0.50); }
-    .app-btn:hover.app-btn--invite { border-color: rgba(61,179,79,0.50);  }
-    .app-btn:hover.app-btn--flock  { border-color: rgba(91,141,238,0.50); }
-    .app-btn:hover.app-btn--stand  { border-color: rgba(168,85,247,0.50); }
-    .app-btn:hover.app-btn--show   { border-color: rgba(239,68,68,0.50);  }
-    .app-btn:hover.app-btn--chat   { border-color: rgba(34,211,238,0.50); }
-    .app-btn:hover.app-btn--feed   { border-color: rgba(232,168,56,0.50); }
+    .app-btn--grow       { border-color: rgba(232,168,56,0.20); }
+    .app-btn--invite     { border-color: rgba(61,179,79,0.20);  }
+    .app-btn--flock      { border-color: rgba(91,141,238,0.20); }
+    .app-btn--stand      { border-color: rgba(168,85,247,0.20); }
+    .app-btn--show       { border-color: rgba(239,68,68,0.20);  }
+    .app-btn--chat       { border-color: rgba(34,211,238,0.20); }
+    .app-btn--feed       { border-color: rgba(232,168,56,0.20); }
+    .app-btn--wellspring { border-color: rgba(34,197,94,0.20);  }
+    .app-btn:hover.app-btn--grow       { border-color: rgba(232,168,56,0.50); }
+    .app-btn:hover.app-btn--invite     { border-color: rgba(61,179,79,0.50);  }
+    .app-btn:hover.app-btn--flock      { border-color: rgba(91,141,238,0.50); }
+    .app-btn:hover.app-btn--stand      { border-color: rgba(168,85,247,0.50); }
+    .app-btn:hover.app-btn--show       { border-color: rgba(239,68,68,0.50);  }
+    .app-btn:hover.app-btn--chat       { border-color: rgba(34,211,238,0.50); }
+    .app-btn:hover.app-btn--feed       { border-color: rgba(232,168,56,0.50); }
+    .app-btn:hover.app-btn--wellspring { border-color: rgba(34,197,94,0.50);  }
 
     .app-icon {
       width: 42px; height: 42px;
@@ -196,13 +198,14 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.28);
       display: flex; align-items: center; justify-content: center;
     }
-    .app-icon--grow   { background: linear-gradient(135deg,#78350f,#d97706); }
-    .app-icon--invite { background: linear-gradient(135deg,#14532d,#22c55e); }
-    .app-icon--flock  { background: linear-gradient(135deg,#1e3a8a,#3b82f6); }
-    .app-icon--stand  { background: linear-gradient(135deg,#4c1d95,#a855f7); }
-    .app-icon--chat   { background: linear-gradient(135deg,#0c4a6e,#06b6d4); }
-    .app-icon--show   { background: linear-gradient(135deg,#7f1d1d,#ef4444); }
-    .app-icon--feed   { background: linear-gradient(135deg,#c48a20,#e8a838); }
+    .app-icon--grow       { background: linear-gradient(135deg,#78350f,#d97706); }
+    .app-icon--invite     { background: linear-gradient(135deg,#14532d,#22c55e); }
+    .app-icon--flock      { background: linear-gradient(135deg,#1e3a8a,#3b82f6); }
+    .app-icon--stand      { background: linear-gradient(135deg,#4c1d95,#a855f7); }
+    .app-icon--chat       { background: linear-gradient(135deg,#0c4a6e,#06b6d4); }
+    .app-icon--show       { background: linear-gradient(135deg,#7f1d1d,#ef4444); }
+    .app-icon--feed       { background: linear-gradient(135deg,#c48a20,#e8a838); }
+    .app-icon--wellspring { background: linear-gradient(135deg,#15803d,#22c55e); }
     .app-label { flex: 1; }
     .app-label strong {
       display: block;
@@ -210,13 +213,14 @@
       font-weight: 800;
       letter-spacing: -0.01em;
     }
-    .app-btn--grow   .app-label strong { color: var(--gold); }
-    .app-btn--invite .app-label strong { color: #6ee7b7; }
-    .app-btn--flock  .app-label strong { color: #a0beff; }
-    .app-btn--stand  .app-label strong { color: #d8b4fe; }
-    .app-btn--show   .app-label strong { color: #fca5a5; }
-    .app-btn--chat   .app-label strong { color: #67e8f9; }
-    .app-btn--feed   .app-label strong { color: var(--gold); }
+    .app-btn--grow       .app-label strong { color: var(--gold); }
+    .app-btn--invite     .app-label strong { color: #6ee7b7; }
+    .app-btn--flock      .app-label strong { color: #a0beff; }
+    .app-btn--stand      .app-label strong { color: #d8b4fe; }
+    .app-btn--show       .app-label strong { color: #fca5a5; }
+    .app-btn--chat       .app-label strong { color: #67e8f9; }
+    .app-btn--feed       .app-label strong { color: var(--gold); }
+    .app-btn--wellspring .app-label strong { color: #86efac; }
     .app-label span {
       display: block;
       font-size: 0.77rem;
@@ -402,6 +406,17 @@
             <div class="app-label">
               <strong>FEED</strong>
               <span>Sermon preparation &amp; manuscript builder</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
+          <a class="app-btn app-btn--wellspring" href="app.wellspring/app.wellspring.html">
+            <div class="app-icon app-icon--wellspring" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            </div>
+            <div class="app-label">
+              <strong>The Wellspring</strong>
+              <span>Offline data &amp; local database</span>
             </div>
             <span class="app-arrow" aria-hidden="true">&#8594;</span>
           </a>

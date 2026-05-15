@@ -151,6 +151,50 @@ const TheWellspring = (() => {
   }
 
 
+  // ── JSON Parser (Native — no external deps!) ────────────────────────────
+
+  /**
+   * Load a JSON database directly into IndexedDB.
+   * Expected format: { "TableName": [ {row1}, {row2}, ... ], ... }
+   * @param {Object} data - Parsed JSON object with table names as keys
+   * @returns {Promise<{ tabs: string[], rowCounts: Object, totalRows: number }>}
+   */
+  async function loadJSON(data) {
+    await _openDB();
+
+    // Clear existing data
+    const existingKeys = await _allKeys(STORE_NAME);
+    for (const key of existingKeys) await _del(STORE_NAME, key);
+
+    const tabs = Object.keys(data);
+    const rowCounts = {};
+    let totalRows = 0;
+
+    for (const tabName of tabs) {
+      const rows = data[tabName];
+      if (!Array.isArray(rows)) {
+        throw new Error(`Invalid data format for table "${tabName}" — expected an array`);
+      }
+      await _put(STORE_NAME, tabName, rows);
+      rowCounts[tabName] = rows.length;
+      totalRows += rows.length;
+    }
+
+    // Store metadata
+    await _put(META_STORE, META_KEY, {
+      loadedAt: new Date().toISOString(),
+      fileName: 'database.json',
+      fileSize: JSON.stringify(data).length,
+      tabCount: tabs.length,
+      totalRows: totalRows,
+      tabs: tabs,
+      rowCounts: rowCounts,
+    });
+
+    return { tabs, rowCounts, totalRows };
+  }
+
+
   // ── Data Access ──────────────────────────────────────────────────────────
 
   /**
@@ -545,6 +589,34 @@ const TheWellspring = (() => {
   }
 
 
+  /**
+   * Export the entire local database as JSON (much faster & smaller than Excel).
+   * @returns {Promise<string>} the downloaded file name
+   */
+  async function exportJSON() {
+    await _openDB();
+    const meta = await _get(META_STORE, META_KEY);
+    if (!meta || !meta.tabs) throw new Error('No local data loaded. Import a database file first.');
+
+    // Build JSON object: { "TableName": [...rows], ... }
+    const data = {};
+    for (const tabName of meta.tabs) {
+      data[tabName] = await getTab(tabName);
+    }
+
+    // Download as file
+    const fileName = 'FlockOS_Database_' + new Date().toISOString().slice(0, 10) + '.json';
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+    return fileName;
+  }
+
+
   // ── Status ───────────────────────────────────────────────────────────────
 
   async function status() {
@@ -604,8 +676,10 @@ const TheWellspring = (() => {
     resolve,
 
     // Data import/export
-    load,
-    exportDB,
+    load,          // Excel (.xlsx/.xls) — requires SheetJS
+    loadJSON,      // JSON (native, faster, no deps)
+    exportDB,      // Export as Excel
+    exportJSON,    // Export as JSON (recommended)
 
     // Data access (for direct use if needed)
     getTab,
@@ -744,3 +818,8 @@ const TheWellspring = (() => {
   }
 
 })();
+
+// Expose to global scope for non-module scripts
+if (typeof window !== 'undefined') {
+  window.TheWellspring = TheWellspring;
+}
