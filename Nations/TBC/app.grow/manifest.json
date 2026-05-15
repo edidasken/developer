@@ -7,7 +7,7 @@
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0c1445",
-  "theme_color": "#0c1445",
+  "theme_color": "#d97706",
   "lang": "en",
   "dir": "ltr",
   "categories": [
@@ -42,8 +42,8 @@
       "url": "./app.grow.html#the_gospel_reading",
       "icons": [
         {
-          "src": "../Images/GrowIcon.png",
-          "sizes": "512x512"
+          "src": "../Images/icon-grow.svg",
+          "sizes": "any"
         }
       ]
     },
@@ -54,8 +54,8 @@
       "url": "./app.grow.html#the_gospel_devotionals",
       "icons": [
         {
-          "src": "../Images/GrowIcon.png",
-          "sizes": "512x512"
+          "src": "../Images/icon-grow.svg",
+          "sizes": "any"
         }
       ]
     },
@@ -66,8 +66,8 @@
       "url": "./app.grow.html#the_gospel_lexicon",
       "icons": [
         {
-          "src": "../Images/GrowIcon.png",
-          "sizes": "512x512"
+          "src": "../Images/icon-grow.svg",
+          "sizes": "any"
         }
       ]
     }
