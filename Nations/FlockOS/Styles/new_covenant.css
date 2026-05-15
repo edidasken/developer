@@ -10068,7 +10068,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 /* Member grid */
 .fold-grid {
   display: grid; gap: 14px;
-  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  grid-template-columns: 1fr;
 }
 .fold-card {
   display: flex; align-items: center; gap: 16px;
@@ -10112,9 +10112,8 @@ flock-tabs [role="tablist"], .tabs-bar {
 /* Contact action buttons on fold cards */
 .fold-card-actions {
   display: flex; gap: 4px; align-items: center; flex: none;
-  margin-right: 4px; opacity: 0; transition: opacity 150ms var(--ease);
+  margin-right: 4px;
 }
-.fold-card:hover .fold-card-actions { opacity: 1; }
 .fold-card-actions .flock-icon-btn--sm {
   color: var(--ink-muted, #7a7f96); text-decoration: none;
 }
