@@ -15024,9 +15024,10 @@ flock-tabs [role="tablist"], .tabs-bar {
   .ms-bottom-nav  { display: flex; }
   .ms-body        { padding-top: calc(var(--ms-header-h) + var(--ms-safe-top)); padding-bottom: var(--ms-bnav-h); }
   .ms-menu-toggle { display: flex; }
-  .ms-view        { padding: 16px; }
+  .ms-view        { padding: 12px 16px 16px; }
   .ms-editor-layout { grid-template-columns: 1fr; }
-  .ms-page-hero   { flex-direction: column; }
+  .ms-page-hero   { flex-direction: column; margin-bottom: 16px; padding-bottom: 14px; }
+  .ms-page-hero-text h1 { margin-top: 0; }
   .ms-page-hero-actions { width: 100%; }
   .ms-stats-grid  { grid-template-columns: repeat(2,1fr); }
   #ms-live-btn > span { display: none; }
