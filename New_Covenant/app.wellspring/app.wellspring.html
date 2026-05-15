@@ -510,6 +510,72 @@
         </div>
       </div>
 
+      <!-- Import from URL Card -->
+      <div class="ws-card">
+        <div class="ws-card-header">
+          <span class="ws-card-icon">🔗</span>
+          <h2>Import from URL</h2>
+        </div>
+        <div class="ws-card-body">
+          <div class="ws-info">
+            <div class="ws-info-title">Load from Google Drive or direct link</div>
+            Paste a Google Drive sharing link or direct JSON URL. The database will be fetched and loaded into IndexedDB.
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+            <input 
+              type="url" 
+              id="ws-url-input" 
+              placeholder="https://drive.google.com/file/d/..." 
+              style="flex: 1; padding: 0.75rem; border: 1px solid var(--color-line, #e2e8f0); border-radius: 12px; font-family: inherit; font-size: 0.9rem;"
+              aria-label="Database URL"
+            >
+            <button class="ws-btn ws-btn--primary" id="ws-url-import-btn" style="flex-shrink: 0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Import
+            </button>
+          </div>
+
+          <div class="ws-loading" id="ws-url-loading">
+            <div class="ws-spinner"></div>
+            <p style="margin-top: 1rem;">Fetching database...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export from Firestore Card -->
+      <div class="ws-card">
+        <div class="ws-card-header">
+          <span class="ws-card-icon">🔥</span>
+          <h2>Export from Firestore</h2>
+        </div>
+        <div class="ws-card-body">
+          <div class="ws-info">
+            <div class="ws-info-title">Download your Firestore database</div>
+            Export all collections from your active Firestore database to a JSON file.
+            Requires an active FlockOS session with Firestore configured.
+          </div>
+
+          <button class="ws-btn ws-btn--primary ws-btn--full" id="ws-firestore-export-btn" style="margin-top: 1rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export from Firestore
+          </button>
+
+          <div class="ws-loading" id="ws-firestore-loading">
+            <div class="ws-spinner"></div>
+            <p style="margin-top: 1rem;">Exporting from Firestore...</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Export Card -->
       <div class="ws-card">
         <div class="ws-card-header">
@@ -751,6 +817,77 @@
           alert('Database exported successfully as ' + fileName);
         } catch (err) {
           alert('Export failed: ' + err.message);
+        }
+      });
+
+      // Import from URL
+      const urlInput = document.getElementById('ws-url-input');
+      const urlBtn = document.getElementById('ws-url-import-btn');
+      const urlLoading = document.getElementById('ws-url-loading');
+      urlBtn.addEventListener('click', async () => {
+        const url = urlInput.value.trim();
+        if (!url) {
+          alert('Please enter a URL');
+          return;
+        }
+
+        try {
+          urlLoading.classList.add('active');
+          urlBtn.disabled = true;
+
+          const result = await ws.loadFromURL(url);
+
+          urlLoading.classList.remove('active');
+          urlBtn.disabled = false;
+          urlInput.value = ''; // Clear input
+          await refreshStatus();
+          alert(`Database imported from URL successfully!\n\n${result.tabs.length} tables, ${result.totalRows.toLocaleString()} rows`);
+        } catch (err) {
+          urlLoading.classList.remove('active');
+          urlBtn.disabled = false;
+          alert('URL import failed: ' + err.message + '\n\nMake sure the URL is publicly accessible and returns valid JSON.');
+        }
+      });
+
+      // Export from Firestore
+      const firestoreBtn = document.getElementById('ws-firestore-export-btn');
+      const firestoreLoading = document.getElementById('ws-firestore-loading');
+      firestoreBtn.addEventListener('click', async () => {
+        // Check if Firebase/Firestore is available
+        if (typeof firebase === 'undefined' || !firebase.firestore) {
+          alert('Firebase/Firestore is not loaded. Make sure you have an active FlockOS session.');
+          return;
+        }
+
+        // Get Firestore instance
+        const db = firebase.firestore();
+
+        // Prompt for collection names
+        const collectionsInput = prompt(
+          'Enter collection names to export (comma-separated):\n\nExample: Members,Families,Books,Messages,Events,Requests',
+          'Members,Families,Books,Messages,Events,Requests'
+        );
+        if (!collectionsInput) return;
+
+        const collections = collectionsInput.split(',').map(s => s.trim()).filter(Boolean);
+        if (collections.length === 0) {
+          alert('No collections specified');
+          return;
+        }
+
+        try {
+          firestoreLoading.classList.add('active');
+          firestoreBtn.disabled = true;
+
+          const result = await ws.exportFromFirestore(db, collections);
+
+          firestoreLoading.classList.remove('active');
+          firestoreBtn.disabled = false;
+          alert(`Firestore export complete!\n\nFile: ${result.fileName}\nCollections: ${result.collections}\nTotal documents: ${result.totalDocs.toLocaleString()}`);
+        } catch (err) {
+          firestoreLoading.classList.remove('active');
+          firestoreBtn.disabled = false;
+          alert('Firestore export failed: ' + err.message);
         }
       });
 
