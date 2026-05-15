@@ -526,23 +526,166 @@ function _renderJournalView() {
   render();
 }
 
-// ── Personal Calendar (stub — Turn 3) ─────────────────────────────────────────
+// ── Personal Calendar ─────────────────────────────────────────────────────────
+// Events stored in localStorage as:
+//   { id: number, date: 'YYYY-MM-DD', title: string, time: string, created: number }
 
 function _renderCalendarView() {
-  const view   = _sheet.querySelector('[data-view="calendar"]');
-  const now    = new Date();
-  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  view.innerHTML = `
-    <div class="unity-sv-header">
-      <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
-      <span class="unity-sv-title">Calendar</span>
-    </div>
-    <div class="unity-sv-body unity-sv-body--center">
-      <div class="unity-sv-cal-month">${months[now.getMonth()]} ${now.getFullYear()}</div>
-      <p class="unity-sv-coming">Personal Calendar coming<br>in the next update.</p>
-    </div>
-  `;
-  view.querySelector('[data-pp-back]').onclick = () => _showView('main');
+  const view = _sheet.querySelector('[data-view="calendar"]');
+  const key  = `unity_cal_${_opts.user?.email || 'anon'}`;
+  const load = () => { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } };
+  const save = ev => localStorage.setItem(key, JSON.stringify(ev));
+
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const toKey  = (y, m, d) => `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
+  const today     = new Date();
+  const todayKey  = toKey(today.getFullYear(), today.getMonth(), today.getDate());
+
+  let viewYear  = today.getFullYear();
+  let viewMonth = today.getMonth();  // 0-based
+  let selDate   = null;              // 'YYYY-MM-DD' | null
+  let addMode   = false;
+
+  const render = () => {
+    const events      = load();
+    const byDate      = {};
+    events.forEach(e => { (byDate[e.date] ||= []).push(e); });
+
+    // Build grid cells
+    const firstDow    = new Date(viewYear, viewMonth, 1).getDay();        // 0–6
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const daysInPrev  = new Date(viewYear, viewMonth, 0).getDate();
+    const totalCells  = Math.ceil((firstDow + daysInMonth) / 7) * 7;
+
+    const cells = [];
+    for (let i = firstDow - 1; i >= 0; i--)              cells.push({ day: daysInPrev - i, other: true });
+    for (let d = 1; d <= daysInMonth; d++)                cells.push({ day: d,              other: false });
+    for (let d = 1; cells.length < totalCells; d++)       cells.push({ day: d,              other: true });
+
+    // Selected-day data
+    const selEvents = selDate ? (byDate[selDate] || []).slice().sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99')) : [];
+    const selLabel  = selDate ? (() => {
+      const [y, mo, d] = selDate.split('-').map(Number);
+      return new Date(y, mo - 1, d).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    })() : null;
+
+    view.innerHTML = `
+      <div class="unity-sv-header">
+        <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
+        <span class="unity-sv-title">Calendar</span>
+      </div>
+      <div class="unity-sv-body unity-sv-body--cal">
+
+        <div class="unity-cal-nav">
+          <button class="unity-cal-nav-btn" data-cal-prev aria-label="Previous month">${IC.back}</button>
+          <span class="unity-cal-month-label">${MONTHS[viewMonth]} ${viewYear}</span>
+          <button class="unity-cal-nav-btn" data-cal-next aria-label="Next month">${IC.chevron}</button>
+        </div>
+
+        <div class="unity-cal-grid">
+          ${DAYS.map(d => `<div class="unity-cal-dow">${d}</div>`).join('')}
+          ${cells.map(c => {
+            if (c.other) return `<div class="unity-cal-day other" aria-hidden="true"><span class="unity-cal-day-num">${c.day}</span></div>`;
+            const dk        = toKey(viewYear, viewMonth, c.day);
+            const hasEvents = (byDate[dk]?.length || 0) > 0;
+            const isToday   = dk === todayKey;
+            const isSel     = dk === selDate;
+            return `<button
+              class="unity-cal-day${isToday ? ' today' : ''}${isSel ? ' selected' : ''}"
+              data-cal-day="${dk}"
+              aria-label="${c.day}${isToday ? ', today' : ''}${hasEvents ? ', has events' : ''}"
+              aria-pressed="${isSel}"
+            ><span class="unity-cal-day-num">${c.day}</span>${hasEvents ? '<span class="unity-cal-dot" aria-hidden="true"></span>' : ''}</button>`;
+          }).join('')}
+        </div>
+
+        ${selDate ? `
+          <div class="unity-cal-detail">
+            <div class="unity-cal-detail-header">
+              <span class="unity-cal-detail-label">${_e(selLabel)}</span>
+              <button class="unity-sv-header-action" id="pp-cal-add-btn" aria-label="Add event" title="Add event">${IC.plus}</button>
+            </div>
+            ${addMode ? `
+              <div class="unity-cal-add-form">
+                <input class="unity-sv-input" id="pp-cal-title" type="text" placeholder="Event title…" maxlength="80" autocomplete="off">
+                <div class="unity-cal-add-row">
+                  <input class="unity-sv-input unity-sv-input--time" id="pp-cal-time" type="time">
+                  <button class="unity-sv-btn unity-sv-btn--primary unity-sv-btn--sm" id="pp-cal-save">Add</button>
+                  <button class="unity-sv-btn unity-sv-btn--ghost unity-sv-btn--sm" id="pp-cal-cancel">Cancel</button>
+                </div>
+              </div>
+            ` : ''}
+            <ul class="unity-cal-event-list">
+              ${selEvents.length
+                ? selEvents.map(ev => `
+                    <li class="unity-cal-event-item">
+                      ${ev.time ? `<span class="unity-cal-event-time">${_e(ev.time)}</span>` : ''}
+                      <span class="unity-cal-event-title">${_e(ev.title)}</span>
+                      <button class="unity-sv-task-del" data-cal-del="${ev.id}" aria-label="Delete event">${IC.trash}</button>
+                    </li>`).join('')
+                : `<li class="unity-sv-empty" style="padding:10px 0">No events — tap + to add one.</li>`}
+            </ul>
+          </div>
+        ` : `<p class="unity-cal-tap-hint">Tap a day to view or add events.</p>`}
+
+      </div>
+    `;
+
+    // ── Wire interactions ──────────────────────────────────────────────────────
+    view.querySelector('[data-pp-back]').onclick = () => _showView('main');
+
+    view.querySelector('[data-cal-prev]').onclick = () => {
+      viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+      selDate = null; addMode = false; render();
+    };
+    view.querySelector('[data-cal-next]').onclick = () => {
+      viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+      selDate = null; addMode = false; render();
+    };
+
+    view.querySelectorAll('[data-cal-day]').forEach(btn => {
+      btn.onclick = () => {
+        selDate  = btn.dataset.calDay;
+        addMode  = false;
+        render();
+        requestAnimationFrame(() =>
+          view.querySelector('.unity-cal-detail')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        );
+      };
+    });
+
+    view.querySelector('#pp-cal-add-btn')?.addEventListener('click', () => {
+      addMode = !addMode; render();
+      requestAnimationFrame(() => view.querySelector('#pp-cal-title')?.focus());
+    });
+
+    const doSave = () => {
+      const title = view.querySelector('#pp-cal-title')?.value.trim();
+      if (!title) { _toast('Enter an event title.'); return; }
+      const time  = view.querySelector('#pp-cal-time')?.value || '';
+      const evts  = load();
+      evts.push({ id: Date.now(), date: selDate, title, time, created: Date.now() });
+      save(evts); addMode = false; render();
+    };
+    view.querySelector('#pp-cal-save')?.addEventListener('click', doSave);
+    view.querySelector('#pp-cal-cancel')?.addEventListener('click', () => { addMode = false; render(); });
+    view.querySelector('#pp-cal-title')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter')  { e.preventDefault(); doSave(); }
+      if (e.key === 'Escape') { addMode = false; render(); }
+    });
+
+    view.querySelectorAll('[data-cal-del]').forEach(btn => {
+      btn.onclick = () => {
+        const evts = load();
+        const idx  = evts.findIndex(ev => ev.id === +btn.dataset.calDel);
+        if (idx > -1) { evts.splice(idx, 1); save(evts); render(); }
+      };
+    });
+  };
+
+  render();
 }
 
 // ── Utilities ──────────────────────────────────────────────────────────────────
