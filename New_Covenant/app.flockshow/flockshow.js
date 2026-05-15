@@ -330,10 +330,10 @@ function _renderLibrary() {
     grid.innerHTML = `
       <div class="fs-empty">
         <div class="fs-empty-icon">🎬</div>
-        <div style="font:600 1rem 'Plus Jakarta Sans',sans-serif;color:rgba(240,241,248,0.7)">
+        <div style="font:600 1rem 'Plus Jakarta Sans',sans-serif;color:var(--fs-ink)">
           ${q ? 'No shows match your search' : 'No shows yet'}
         </div>
-        <div style="font:0.82rem 'Plus Jakarta Sans',sans-serif">
+        <div style="font:0.82rem 'Plus Jakarta Sans',sans-serif;color:var(--fs-muted)">
           ${q ? 'Try a different search term' : 'Click "New Show" to create your first presentation'}
         </div>
       </div>`;
@@ -344,7 +344,7 @@ function _renderLibrary() {
     const pips = show.slides.slice(0, 10).map(sl =>
       `<div class="fs-slide-pip" style="background:${_e(_slideBg(sl))}"></div>`).join('');
     const overflow = show.slides.length > 10
-      ? `<div class="fs-slide-pip" style="background:rgba(255,255,255,0.08);font-size:0.42rem;color:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center">+${show.slides.length - 10}</div>`
+      ? `<div class="fs-slide-pip" style="background:var(--bg-overlay,rgba(0,0,0,0.06));font-size:0.42rem;color:var(--fs-muted);display:flex;align-items:center;justify-content:center">+${show.slides.length - 10}</div>`
       : '';
     return `
       <div class="fs-show-card" data-show-id="${_e(show.id)}">
@@ -1372,7 +1372,7 @@ function _showAuthGate(N) {
       <button class="fs-btn fs-btn--primary" id="fs-signin-btn" style="width:100%;justify-content:center;padding:10px 0;font-size:0.88rem;">
         Sign In to FlockOS
       </button>
-      <p style="font-size:.75rem;color:rgba(240,241,248,0.35)">Access is limited to authenticated FlockOS users.</p>
+      <p style="font-size:.75rem;color:var(--ink-faint)">Access is limited to authenticated FlockOS users.</p>
       <p class="fs-auth-verse">"Praise Him with strings and pipe." — Psalm 150:4</p>
     </div>`;
   document.getElementById('fs-signin-btn')?.addEventListener('click', () => {
@@ -1408,7 +1408,7 @@ function _renderUserChip(N) {
     appIconSvg:  FS_ICON,
     appAccent:   '#ef4444',
     appAccentDk: '#7f1d1d',
-    homeHref:    '../',
+    homeHref:    './',
     user,
     onSignOut: () => {
       _openConfirmModal('Sign Out', `Sign out of FlockShow?`, 'Sign Out', () => {
