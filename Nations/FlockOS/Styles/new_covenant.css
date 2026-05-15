@@ -9012,7 +9012,7 @@ body.veil-app {
   padding: var(--safe-top, 0px) 20px 0;
   /* Canonical FlockOS dark navy chrome — single source of truth */
   background: var(--top-bg);
-  border-bottom: 1px solid var(--top-line);
+  border-bottom: none;
   color: var(--top-ink);
   position: relative;
   z-index: 400;
@@ -15283,7 +15283,7 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
   height: calc(56px + var(--safe-top, 0px));
   background: var(--top-bg, #0c1445);
   color: var(--top-ink, #fff);
-  border-bottom: 1px solid var(--top-line, rgba(255,255,255,0.08));
+  border-bottom: none;
   position: relative; z-index: 200; flex-shrink: 0;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
