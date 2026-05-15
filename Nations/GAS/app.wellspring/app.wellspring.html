@@ -642,6 +642,21 @@
   <!-- Unity footer -->
   <footer class="unity-footer" id="ws-footer"></footer>
 
+  <!-- ── Firebase SDK (for Firestore export feature) ────────────────────── -->
+  <script>
+    window.FLOCK_FIREBASE_CONFIG = {
+      apiKey:            'AIzaSyC4R1obnMI7wczl_CJM-1CqvqW9rVgjJqE',
+      authDomain:        'flockos-notify.firebaseapp.com',
+      projectId:         'flockos-notify',
+      storageBucket:     'flockos-notify.firebasestorage.app',
+      messagingSenderId: '535345699316',
+      appId:             '1:535345699316:web:c9c50ce9a93cbc0ce0e63c',
+    };
+  </script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
   <!-- The Wellspring offline engine (no external deps needed for JSON!) -->
   <script defer src="Scripts/the_wellspring.js"></script>
 
@@ -853,10 +868,25 @@
       const firestoreBtn = document.getElementById('ws-firestore-export-btn');
       const firestoreLoading = document.getElementById('ws-firestore-loading');
       firestoreBtn.addEventListener('click', async () => {
-        // Check if Firebase/Firestore is available
-        if (typeof firebase === 'undefined' || !firebase.firestore) {
-          alert('Firebase/Firestore is not loaded. Make sure you have an active FlockOS session.');
+        // Check if Firebase SDK is loaded
+        if (typeof firebase === 'undefined' || typeof firebase.firestore !== 'function') {
+          alert('Firebase SDK is not loaded yet. Please wait a moment and try again.\n\nIf this error persists, refresh the page.');
           return;
+        }
+
+        // Initialize Firebase if not already initialized
+        if (!firebase.apps || firebase.apps.length === 0) {
+          if (!window.FLOCK_FIREBASE_CONFIG) {
+            alert('Firebase configuration is missing. Cannot export from Firestore.');
+            return;
+          }
+          try {
+            firebase.initializeApp(window.FLOCK_FIREBASE_CONFIG);
+          } catch (err) {
+            console.error('[Wellspring] Firebase init failed:', err);
+            alert('Failed to initialize Firebase: ' + err.message);
+            return;
+          }
         }
 
         // Get Firestore instance
