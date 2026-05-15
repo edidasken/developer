@@ -758,6 +758,40 @@ function _deploymentsTab(churches) {
   </div>
 </div>
 
+<div class="bz-card" style="background:var(--bg-raised);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:14px;">
+  <div style="font-size:0.9rem;font-weight:700;color:var(--ink);margin-bottom:10px;">🔒 Firestore Rules Deploy</div>
+  <p style="font-size:0.82rem;color:var(--ink-muted);line-height:1.55;margin:0 0 12px;">
+    Rules auto-deploy on every BCP (<code style="font-family:monospace;background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:3px;">--deploy-comms</code>) using
+    <code style="font-family:monospace;background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:3px;">Deployment/Firestore/firestore.rules</code> as the master.
+    To deploy rules to all projects at once, run the standalone script. To deploy a single church project manually, copy the command below.
+    <br><br>
+    <strong>Standalone (all projects):</strong>
+  </p>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+    <code id="bz-rules-all-cmd" style="flex:1;background:var(--bg-sunken);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:0.75rem;font-family:monospace;color:var(--ink);white-space:nowrap;overflow-x:auto;">bash "Iris/Bezalel/Scripts/Z-Deploy_Firestore_Rules.sh"</code>
+    <button class="bz-rules-copy btn btn-outline" data-target="bz-rules-all-cmd" style="font-size:0.75rem;padding:5px 10px;white-space:nowrap;">📋 Copy</button>
+  </div>
+  <div style="font-size:0.78rem;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Per Church Project</div>
+  <div style="display:grid;gap:8px;" id="bz-rules-list">
+    ${list.filter(c => c.firebaseProject).map(c => `
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:0.78rem;font-weight:600;color:var(--ink);min-width:140px;">${_e(c.name)}</span>
+      <code id="bz-rules-cmd-${_e(c.id)}" style="flex:1;background:var(--bg-sunken);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:0.75rem;font-family:monospace;color:var(--ink);white-space:nowrap;overflow-x:auto;">firebase deploy --only firestore:rules --config church-firestore.json --project ${_e(c.firebaseProject)}</code>
+      <button class="bz-rules-copy btn btn-outline" data-target="bz-rules-cmd-${_e(c.id)}" style="font-size:0.75rem;padding:5px 10px;white-space:nowrap;">📋 Copy</button>
+    </div>`).join('')}
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;padding-top:10px;border-top:1px solid var(--line);">
+      <span style="font-size:0.78rem;font-weight:600;color:var(--ink);min-width:140px;">FlockChat (comms)</span>
+      <code id="bz-rules-cmd-comms" style="flex:1;background:var(--bg-sunken);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:0.75rem;font-family:monospace;color:var(--ink);white-space:nowrap;overflow-x:auto;">bash "Iris/Bezalel/Scripts/Z-Deploy_Firestore_Rules.sh" --project flockos-comms</code>
+      <button class="bz-rules-copy btn btn-outline" data-target="bz-rules-cmd-comms" style="font-size:0.75rem;padding:5px 10px;white-space:nowrap;">📋 Copy</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:0.78rem;font-weight:600;color:var(--ink);min-width:140px;">Truth (content DB)</span>
+      <code id="bz-rules-cmd-truth" style="flex:1;background:var(--bg-sunken);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:0.75rem;font-family:monospace;color:var(--ink);white-space:nowrap;overflow-x:auto;">bash "Iris/Bezalel/Scripts/Z-Deploy_Firestore_Rules.sh" --project flockos-truth</code>
+      <button class="bz-rules-copy btn btn-outline" data-target="bz-rules-cmd-truth" style="font-size:0.75rem;padding:5px 10px;white-space:nowrap;">📋 Copy</button>
+    </div>
+  </div>
+</div>
+
 <!-- Inline edit sheet (hidden by default) -->
 <div id="bz-church-sheet" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(10,14,33,0.55);backdrop-filter:blur(6px);align-items:flex-start;justify-content:center;padding:40px 12px 80px;overflow-y:auto;">
   <div style="background:var(--bg-raised);border:1px solid var(--line);border-radius:16px;padding:24px;max-width:520px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,0.45);">
@@ -881,6 +915,40 @@ function _wireDeployments(root) {
         </div>`).join('');
       // Re-wire copy buttons
       idxList.querySelectorAll('.bz-idx-copy').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const el = root.querySelector(`#${btn.dataset.target}`);
+          const text = el?.textContent?.trim() || '';
+          try {
+            await navigator.clipboard.writeText(text);
+            btn.textContent = '✓ Copied!';
+            setTimeout(() => { btn.textContent = '📋 Copy'; }, 2500);
+          } catch (_) { btn.textContent = 'Select & copy'; }
+        });
+      });
+    }
+
+    const rulesList = root.querySelector('#bz-rules-list');
+    if (rulesList) {
+      const churchRows = _churches.filter(c => c.firebaseProject).map(c => `
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:0.78rem;font-weight:600;color:var(--ink);min-width:140px;">${_e(c.name)}</span>
+          <code id="bz-rules-cmd-${_e(c.id)}" style="flex:1;background:var(--bg-sunken);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:0.75rem;font-family:monospace;color:var(--ink);white-space:nowrap;overflow-x:auto;">firebase deploy --only firestore:rules --config church-firestore.json --project ${_e(c.firebaseProject)}</code>
+          <button class="bz-rules-copy btn btn-outline" data-target="bz-rules-cmd-${_e(c.id)}" style="font-size:0.75rem;padding:5px 10px;white-space:nowrap;">📋 Copy</button>
+        </div>`).join('');
+      const staticRows = `
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;padding-top:10px;border-top:1px solid var(--line);">
+          <span style="font-size:0.78rem;font-weight:600;color:var(--ink);min-width:140px;">FlockChat (comms)</span>
+          <code id="bz-rules-cmd-comms" style="flex:1;background:var(--bg-sunken);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:0.75rem;font-family:monospace;color:var(--ink);white-space:nowrap;overflow-x:auto;">bash "Iris/Bezalel/Scripts/Z-Deploy_Firestore_Rules.sh" --project flockos-comms</code>
+          <button class="bz-rules-copy btn btn-outline" data-target="bz-rules-cmd-comms" style="font-size:0.75rem;padding:5px 10px;white-space:nowrap;">📋 Copy</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:0.78rem;font-weight:600;color:var(--ink);min-width:140px;">Truth (content DB)</span>
+          <code id="bz-rules-cmd-truth" style="flex:1;background:var(--bg-sunken);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:0.75rem;font-family:monospace;color:var(--ink);white-space:nowrap;overflow-x:auto;">bash "Iris/Bezalel/Scripts/Z-Deploy_Firestore_Rules.sh" --project flockos-truth</code>
+          <button class="bz-rules-copy btn btn-outline" data-target="bz-rules-cmd-truth" style="font-size:0.75rem;padding:5px 10px;white-space:nowrap;">📋 Copy</button>
+        </div>`;
+      rulesList.innerHTML = churchRows + staticRows;
+      // Re-wire copy buttons
+      rulesList.querySelectorAll('.bz-rules-copy').forEach(btn => {
         btn.addEventListener('click', async () => {
           const el = root.querySelector(`#${btn.dataset.target}`);
           const text = el?.textContent?.trim() || '';

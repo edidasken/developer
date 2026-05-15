@@ -9,9 +9,9 @@
      main     — top-level menu (always the root)
      profile  — My Profile: edit display name & photo URL, view email
      settings — Push-notification toggle, app version info
-     todo     — Personal To-Do list (localStorage, keyed by email)
-     journal  — Personal Journal entries (localStorage, keyed by email)
-     calendar — Personal Calendar (monthly grid, events, localStorage)
+     todo     — Personal To-Do list (Firestore via UpperRoom)
+     journal  — Personal Journal entries (Firestore via UpperRoom)
+     calendar — Personal Calendar (monthly grid, events, Firestore via UpperRoom)
    ══════════════════════════════════════════════════════════════════════════════ */
 
 let _sheet      = null;   // single DOM node, persists for the page lifetime
@@ -24,7 +24,7 @@ const ITEMS = [
   { id: 'settings',      label: 'Settings',          icon: 'gear',   subview: 'settings' },
   { id: 'switch-church', label: 'Switch Church',     icon: 'church', href: '../'         },
   { divider: true },
-  { id: 'prayer',        label: 'Prayer Requests',   icon: 'pray',   href: '../app.stand/' },
+  { id: 'prayer',        label: 'Prayer Requests',   icon: 'pray',   subview: 'prayer'     },
   { id: 'todo',          label: 'To-Do',             icon: 'check',  subview: 'todo'     },
   { id: 'calendar',      label: 'Personal Calendar', icon: 'cal',    subview: 'calendar' },
   { id: 'journal',       label: 'Journal Logs',      icon: 'book',   subview: 'journal'  },
@@ -110,6 +110,7 @@ function _renderSubView(name) {
   else if (name === 'todo')     _renderTodoView();
   else if (name === 'journal')  _renderJournalView();
   else if (name === 'calendar') _renderCalendarView();
+  else if (name === 'prayer')   _renderPrayerView();
 }
 
 // ── Shell construction ─────────────────────────────────────────────────────────
@@ -154,6 +155,7 @@ function ensureSheet() {
       <div class="unity-pp-view" data-view="todo"     hidden></div>
       <div class="unity-pp-view" data-view="journal"  hidden></div>
       <div class="unity-pp-view" data-view="calendar" hidden></div>
+      <div class="unity-pp-view" data-view="prayer"   hidden></div>
 
     </div>
   `;
@@ -378,95 +380,112 @@ function _renderSettingsView() {
 
 // ── To-Do sub-view ─────────────────────────────────────────────────────────────
 
-function _renderTodoView() {
+async function _renderTodoView() {
   const view = _sheet.querySelector('[data-view="todo"]');
-  const key  = `unity_todo_${_opts.user?.email || 'anon'}`;
-  const load = () => { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } };
-  const save = t  => localStorage.setItem(key, JSON.stringify(t));
+  const ur   = (typeof UpperRoom !== 'undefined') ? UpperRoom : null;
+  let   tasks = [];
 
-  const render = () => {
-    const tasks = load();
-    const open  = tasks.filter(t => !t.done);
-    const done  = tasks.filter(t =>  t.done);
+  const renderList = () => {
+    const open = tasks.filter(t => t.status !== 'Done' && t.status !== 'Archived');
+    const done = tasks.filter(t => t.status === 'Done');
 
-    const taskRow = (t, realIdx) => `
-      <li class="unity-sv-task${t.done ? ' is-done' : ''}">
-        <button class="unity-sv-task-check" data-check="${realIdx}" aria-label="${t.done ? 'Mark incomplete' : 'Mark complete'}">${t.done ? IC.checkFill : IC.checkEmpty}</button>
-        <span class="unity-sv-task-text">${_e(t.text)}</span>
-        <button class="unity-sv-task-del" data-del="${realIdx}" aria-label="Delete task">${IC.trash}</button>
+    const taskRow = t => `
+      <li class="unity-sv-task${t.status === 'Done' ? ' is-done' : ''}">
+        <button class="unity-sv-task-check" data-check="${_e(t.id)}" aria-label="${t.status === 'Done' ? 'Mark incomplete' : 'Mark complete'}">${t.status === 'Done' ? IC.checkFill : IC.checkEmpty}</button>
+        <span class="unity-sv-task-text">${_e(t.title || '')}</span>
+        <button class="unity-sv-task-del" data-del="${_e(t.id)}" aria-label="Delete task">${IC.trash}</button>
       </li>`;
 
-    view.innerHTML = `
-      <div class="unity-sv-header">
-        <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
-        <span class="unity-sv-title">To-Do</span>
-      </div>
-      <div class="unity-sv-body">
-        <div class="unity-sv-add-row">
-          <input class="unity-sv-input unity-sv-input--grow" id="pp-todo-input" type="text" placeholder="Add a task…" maxlength="120" autocomplete="off">
-          <button class="unity-sv-btn unity-sv-btn--icon" id="pp-todo-add" aria-label="Add task">${IC.plus}</button>
-        </div>
-        <ul class="unity-sv-task-list">
-          ${open.map(t => taskRow(t, tasks.indexOf(t))).join('')}
-          ${tasks.length === 0 ? '<li class="unity-sv-empty">No tasks yet — add one above.</li>' : ''}
-          ${done.length > 0 ? `<li class="unity-sv-task-group-label">Completed (${done.length})</li>${done.map(t => taskRow(t, tasks.indexOf(t))).join('')}` : ''}
-        </ul>
-      </div>
-    `;
+    const ul = view.querySelector('.unity-sv-task-list');
+    if (!ul) return;
+    ul.innerHTML =
+      open.map(taskRow).join('') +
+      (tasks.length === 0 ? '<li class="unity-sv-empty">No tasks yet — add one above.</li>' : '') +
+      (done.length > 0 ? `<li class="unity-sv-task-group-label">Completed (${done.length})</li>${done.map(taskRow).join('')}` : '');
 
-    view.querySelector('[data-pp-back]').onclick = () => _showView('main');
-
-    const input  = view.querySelector('#pp-todo-input');
-    const addBtn = view.querySelector('#pp-todo-add');
-    const doAdd  = () => {
-      const text = input.value.trim();
-      if (!text) return;
-      const t = load();
-      t.push({ text, done: false, created: Date.now() });
-      save(t);
-      input.value = '';
-      render();
-      view.querySelector('#pp-todo-input')?.focus();
-    };
-    addBtn.onclick = doAdd;
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') doAdd(); });
-
-    view.querySelectorAll('[data-check]').forEach(btn => {
-      btn.onclick = () => {
-        const t = load();
-        t[+btn.dataset.check].done = !t[+btn.dataset.check].done;
-        save(t); render();
+    ul.querySelectorAll('[data-check]').forEach(btn => {
+      btn.onclick = async () => {
+        const id = btn.dataset.check;
+        const t  = tasks.find(t => t.id === id);
+        if (!t) return;
+        const wasDone = (t.status === 'Done');
+        t.status = wasDone ? 'Not Started' : 'Done';
+        renderList();
+        if (ur) try { wasDone ? await ur.updateTodo(id, { status: 'Not Started' }) : await ur.completeTodo(id); } catch (_) {}
       };
     });
-    view.querySelectorAll('[data-del]').forEach(btn => {
-      btn.onclick = () => {
-        const t = load();
-        t.splice(+btn.dataset.del, 1);
-        save(t); render();
+    ul.querySelectorAll('[data-del]').forEach(btn => {
+      btn.onclick = async () => {
+        const id = btn.dataset.del;
+        tasks = tasks.filter(t => t.id !== id);
+        renderList();
+        if (ur) try { await ur.deleteTodo(id); } catch (_) {}
       };
     });
   };
 
-  render();
+  view.innerHTML = `
+    <div class="unity-sv-header">
+      <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
+      <span class="unity-sv-title">To-Do</span>
+    </div>
+    <div class="unity-sv-body">
+      <div class="unity-sv-add-row">
+        <input class="unity-sv-input unity-sv-input--grow" id="pp-todo-input" type="text" placeholder="Add a task…" maxlength="120" autocomplete="off">
+        <button class="unity-sv-btn unity-sv-btn--icon" id="pp-todo-add" aria-label="Add task">${IC.plus}</button>
+      </div>
+      <ul class="unity-sv-task-list"><li class="unity-sv-empty">Loading…</li></ul>
+    </div>
+  `;
+
+  view.querySelector('[data-pp-back]').onclick = () => _showView('main');
+
+  const input  = view.querySelector('#pp-todo-input');
+  const addBtn = view.querySelector('#pp-todo-add');
+  const doAdd  = async () => {
+    const text = input.value.trim();
+    if (!text) return;
+    addBtn.disabled = true;
+    try {
+      let id = String(Date.now());
+      if (ur) id = await ur.createTodo({ title: text });
+      tasks.unshift({ id, title: text, status: 'Not Started' });
+      input.value = '';
+      renderList();
+      view.querySelector('#pp-todo-input')?.focus();
+    } catch (_) { _toast('Could not add task.'); }
+    addBtn.disabled = false;
+  };
+  addBtn.onclick = doAdd;
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') doAdd(); });
+
+  // Load from Firestore
+  try {
+    tasks = ur
+      ? (await ur.myTodos().catch(() => [])).filter(t => t.status !== 'Archived')
+      : [];
+  } catch (_) { tasks = []; }
+
+  renderList();
 }
 
 // ── Journal sub-view ───────────────────────────────────────────────────────────
 
-function _renderJournalView() {
+async function _renderJournalView() {
   const view = _sheet.querySelector('[data-view="journal"]');
-  const key  = `unity_journal_${_opts.user?.email || 'anon'}`;
-  const load = () => { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } };
-  const save = e  => localStorage.setItem(key, JSON.stringify(e));
-  const fmt  = ts => new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const ur   = (typeof UpperRoom !== 'undefined') ? UpperRoom : null;
+  const fmt  = ts => {
+    if (!ts) return '';
+    const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
 
+  let entries = [];
   let mode    = 'list';
   let readIdx = -1;
 
   const render = () => {
-    const entries = load();
-
     if (mode === 'list') {
-      const sorted = entries.map((e, i) => ({ ...e, _i: i })).reverse();
       view.innerHTML = `
         <div class="unity-sv-header">
           <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
@@ -475,12 +494,12 @@ function _renderJournalView() {
         </div>
         <div class="unity-sv-body unity-sv-body--list">
           <ul class="unity-sv-journal-list">
-            ${sorted.length
-              ? sorted.map(e => `
-                  <li class="unity-sv-journal-item" data-read="${e._i}" role="button" tabindex="0">
+            ${entries.length
+              ? entries.map((e, i) => `
+                  <li class="unity-sv-journal-item" data-read="${i}" role="button" tabindex="0">
                     <div class="unity-sv-journal-item-inner">
                       <div class="unity-sv-journal-title">${_e(e.title || 'Untitled')}</div>
-                      <div class="unity-sv-journal-meta">${fmt(e.created)}</div>
+                      <div class="unity-sv-journal-meta">${fmt(e.createdAt || e.created)}</div>
                     </div>
                     <span class="unity-sv-journal-chevron" aria-hidden="true">${IC.chevron}</span>
                   </li>`).join('')
@@ -516,16 +535,19 @@ function _renderJournalView() {
         </div>
       `;
       view.querySelector('[data-pp-back]').onclick = () => { mode = 'list'; render(); };
-      view.querySelector('#pp-j-save').onclick     = () => {
+      view.querySelector('#pp-j-save').onclick = async () => {
         const title = view.querySelector('#pp-j-title').value.trim();
         const body  = view.querySelector('#pp-j-body').value.trim();
         if (!body) { _toast('Write something first.'); return; }
-        const e = load();
-        e.push({ title, body, created: Date.now() });
-        save(e);
-        mode = 'list'; render(); _toast('Entry saved.');
+        const btn = view.querySelector('#pp-j-save');
+        btn.disabled = true; btn.textContent = 'Saving…';
+        try {
+          let id = String(Date.now());
+          if (ur) { const res = await ur.createJournal({ title, body }); id = res.id || id; }
+          entries.unshift({ id, title, body, createdAt: null });
+          mode = 'list'; render(); _toast('Entry saved.');
+        } catch (_) { _toast('Could not save entry.'); btn.disabled = false; btn.textContent = 'Save Entry'; }
       };
-      // Escape in either new-entry input returns to list (not main menu) and preserves draft
       const escToList = e => { if (e.key === 'Escape') { e.stopPropagation(); mode = 'list'; render(); } };
       view.querySelector('#pp-j-title')?.addEventListener('keydown', escToList);
       view.querySelector('#pp-j-body')?.addEventListener('keydown', escToList);
@@ -541,69 +563,81 @@ function _renderJournalView() {
           <button class="unity-sv-header-action unity-sv-header-action--danger" id="pp-j-del" aria-label="Delete entry" title="Delete entry">${IC.trash}</button>
         </div>
         <div class="unity-sv-body unity-sv-body--list">
-          <p class="unity-sv-journal-date">${fmt(entry.created)}</p>
+          <p class="unity-sv-journal-date">${fmt(entry.createdAt || entry.created)}</p>
           <p class="unity-sv-journal-body">${_e(entry.body).replace(/\n/g, '<br>')}</p>
         </div>
       `;
       view.querySelector('[data-pp-back]').onclick = () => { mode = 'list'; render(); };
-      view.querySelector('#pp-j-del').onclick      = () => {
-        const all = load(); all.splice(readIdx, 1); save(all);
+      view.querySelector('#pp-j-del').onclick = async () => {
+        if (ur && entry.id) try { await ur.deleteJournal({ id: entry.id }); } catch (_) {}
+        entries.splice(readIdx, 1);
         mode = 'list'; render();
       };
     }
   };
 
+  // Loading skeleton
+  view.innerHTML = `
+    <div class="unity-sv-header">
+      <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
+      <span class="unity-sv-title">Journal</span>
+    </div>
+    <div class="unity-sv-body"><p class="unity-sv-empty">Loading…</p></div>
+  `;
+  view.querySelector('[data-pp-back]').onclick = () => _showView('main');
+
+  try {
+    entries = ur ? await ur.listJournal().catch(() => []) : [];
+  } catch (_) { entries = []; }
+
   render();
 }
 
 // ── Personal Calendar ─────────────────────────────────────────────────────────
-// Events stored in localStorage as:
-//   { id: number, date: 'YYYY-MM-DD', title: string, time: string, created: number }
+// Events loaded from Firestore via UpperRoom.listCalendarEvents().
+// Fields mapped: Title → title, StartDateTime → date + time.
 
-function _renderCalendarView() {
+async function _renderCalendarView() {
   const view = _sheet.querySelector('[data-view="calendar"]');
-  const key  = `unity_cal_${_opts.user?.email || 'anon'}`;
-  const load = () => { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } };
-  const save = ev => localStorage.setItem(key, JSON.stringify(ev));
+  const ur   = (typeof UpperRoom !== 'undefined') ? UpperRoom : null;
 
   const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
   const toKey  = (y, m, d) => `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 
-  const today     = new Date();
-  const todayKey  = toKey(today.getFullYear(), today.getMonth(), today.getDate());
+  const today    = new Date();
+  const todayKey = toKey(today.getFullYear(), today.getMonth(), today.getDate());
 
-  // 12-hour time formatter for display
   const fmtTime = t => {
     if (!t) return '';
     const [h, m] = t.split(':').map(Number);
     return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`;
   };
 
+  let events    = [];  // { id, title, date: 'YYYY-MM-DD', time: 'HH:MM' | '' }
   let viewYear  = today.getFullYear();
-  let viewMonth = today.getMonth();  // 0-based
-  let selDate   = todayKey;          // auto-select today on open
+  let viewMonth = today.getMonth();
+  let selDate   = todayKey;
   let addMode   = false;
 
   const render = () => {
-    const events      = load();
-    const byDate      = {};
+    const byDate = {};
     events.forEach(e => { (byDate[e.date] ||= []).push(e); });
 
-    // Build grid cells
-    const firstDow    = new Date(viewYear, viewMonth, 1).getDay();        // 0–6
+    const firstDow    = new Date(viewYear, viewMonth, 1).getDay();
     const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
     const daysInPrev  = new Date(viewYear, viewMonth, 0).getDate();
     const totalCells  = Math.ceil((firstDow + daysInMonth) / 7) * 7;
 
     const cells = [];
-    for (let i = firstDow - 1; i >= 0; i--)              cells.push({ day: daysInPrev - i, other: true });
-    for (let d = 1; d <= daysInMonth; d++)                cells.push({ day: d,              other: false });
-    for (let d = 1; cells.length < totalCells; d++)       cells.push({ day: d,              other: true });
+    for (let i = firstDow - 1; i >= 0; i--)        cells.push({ day: daysInPrev - i, other: true });
+    for (let d = 1; d <= daysInMonth; d++)          cells.push({ day: d, other: false });
+    for (let d = 1; cells.length < totalCells; d++) cells.push({ day: d, other: true });
 
-    // Selected-day data
-    const selEvents = selDate ? (byDate[selDate] || []).slice().sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99')) : [];
-    const selLabel  = selDate ? (() => {
+    const selEvents = selDate
+      ? (byDate[selDate] || []).slice().sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'))
+      : [];
+    const selLabel = selDate ? (() => {
       const [y, mo, d] = selDate.split('-').map(Number);
       return new Date(y, mo - 1, d).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
     })() : null;
@@ -614,13 +648,11 @@ function _renderCalendarView() {
         <span class="unity-sv-title">Calendar</span>
       </div>
       <div class="unity-sv-body unity-sv-body--cal">
-
         <div class="unity-cal-nav">
           <button class="unity-cal-nav-btn" data-cal-prev aria-label="Previous month">${IC.back}</button>
           <span class="unity-cal-month-label">${MONTHS[viewMonth]} ${viewYear}</span>
           <button class="unity-cal-nav-btn" data-cal-next aria-label="Next month">${IC.chevron}</button>
         </div>
-
         <div class="unity-cal-grid">
           ${DAYS.map(d => `<div class="unity-cal-dow">${d}</div>`).join('')}
           ${cells.map(c => {
@@ -629,15 +661,9 @@ function _renderCalendarView() {
             const hasEvents = (byDate[dk]?.length || 0) > 0;
             const isToday   = dk === todayKey;
             const isSel     = dk === selDate;
-            return `<button
-              class="unity-cal-day${isToday ? ' today' : ''}${isSel ? ' selected' : ''}"
-              data-cal-day="${dk}"
-              aria-label="${c.day}${isToday ? ', today' : ''}${hasEvents ? ', has events' : ''}"
-              aria-pressed="${isSel}"
-            ><span class="unity-cal-day-num">${c.day}</span>${hasEvents ? '<span class="unity-cal-dot" aria-hidden="true"></span>' : ''}</button>`;
+            return `<button class="unity-cal-day${isToday ? ' today' : ''}${isSel ? ' selected' : ''}" data-cal-day="${dk}" aria-label="${c.day}${isToday ? ', today' : ''}${hasEvents ? ', has events' : ''}" aria-pressed="${isSel}"><span class="unity-cal-day-num">${c.day}</span>${hasEvents ? '<span class="unity-cal-dot" aria-hidden="true"></span>' : ''}</button>`;
           }).join('')}
         </div>
-
         ${selDate ? `
           <div class="unity-cal-detail">
             <div class="unity-cal-detail-header">
@@ -660,17 +686,15 @@ function _renderCalendarView() {
                     <li class="unity-cal-event-item">
                       ${ev.time ? `<span class="unity-cal-event-time">${_e(fmtTime(ev.time))}</span>` : ''}
                       <span class="unity-cal-event-title">${_e(ev.title)}</span>
-                      <button class="unity-sv-task-del" data-cal-del="${ev.id}" aria-label="Delete event">${IC.trash}</button>
+                      <button class="unity-sv-task-del" data-cal-del="${_e(ev.id)}" aria-label="Delete event">${IC.trash}</button>
                     </li>`).join('')
                 : `<li class="unity-sv-empty" style="padding:10px 0">No events — tap + to add one.</li>`}
             </ul>
           </div>
         ` : `<p class="unity-cal-tap-hint">Tap a day to view or add events.</p>`}
-
       </div>
     `;
 
-    // ── Wire interactions ──────────────────────────────────────────────────────
     view.querySelector('[data-pp-back]').onclick = () => _showView('main');
 
     const isCurrentMonth = () => viewYear === today.getFullYear() && viewMonth === today.getMonth();
@@ -685,9 +709,7 @@ function _renderCalendarView() {
 
     view.querySelectorAll('[data-cal-day]').forEach(btn => {
       btn.onclick = () => {
-        selDate  = btn.dataset.calDay;
-        addMode  = false;
-        render();
+        selDate = btn.dataset.calDay; addMode = false; render();
         requestAnimationFrame(() =>
           view.querySelector('.unity-cal-detail')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
         );
@@ -699,14 +721,21 @@ function _renderCalendarView() {
       requestAnimationFrame(() => view.querySelector('#pp-cal-title')?.focus());
     });
 
-    const doSave = () => {
+    const doSave = async () => {
       const title = view.querySelector('#pp-cal-title')?.value.trim();
       if (!title) { _toast('Enter an event title.'); return; }
-      const time  = view.querySelector('#pp-cal-time')?.value || '';
-      const evts  = load();
-      const now  = Date.now();
-      evts.push({ id: now, date: selDate, title, time, created: now });
-      save(evts); addMode = false; render();
+      const time   = view.querySelector('#pp-cal-time')?.value || '';
+      const startDT = selDate + (time ? 'T' + time : '');
+      const tempId  = String(Date.now());
+      events.push({ id: tempId, title, date: selDate, time });
+      addMode = false; render();
+      if (ur) {
+        try {
+          const id = await ur.createCalendarEvent({ Title: title, StartDateTime: startDT, EndDateTime: startDT, IsAllDay: !time });
+          const ev = events.find(e => e.id === tempId);
+          if (ev) ev.id = id;
+        } catch (_) {}
+      }
     };
     view.querySelector('#pp-cal-save')?.addEventListener('click', doSave);
     view.querySelector('#pp-cal-cancel')?.addEventListener('click', () => { addMode = false; render(); });
@@ -719,13 +748,148 @@ function _renderCalendarView() {
     });
 
     view.querySelectorAll('[data-cal-del]').forEach(btn => {
-      btn.onclick = () => {
-        const evts = load();
-        const idx  = evts.findIndex(ev => ev.id === +btn.dataset.calDel);
-        if (idx > -1) { evts.splice(idx, 1); save(evts); render(); }
+      btn.onclick = async () => {
+        const id = btn.dataset.calDel;
+        events = events.filter(e => e.id !== id);
+        render();
+        if (ur) try { await ur.deleteCalendarEvent(id); } catch (_) {}
       };
     });
   };
+
+  // Loading skeleton
+  view.innerHTML = `
+    <div class="unity-sv-header">
+      <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
+      <span class="unity-sv-title">Calendar</span>
+    </div>
+    <div class="unity-sv-body"><p class="unity-sv-empty">Loading…</p></div>
+  `;
+  view.querySelector('[data-pp-back]').onclick = () => _showView('main');
+
+  // Load from Firestore
+  try {
+    const raw = ur ? await ur.listCalendarEvents().catch(() => []) : [];
+    events = raw.map(ev => {
+      const sd = ev.StartDateTime || '';
+      return {
+        id:    ev.id || ev.EventID || String(Date.now()),
+        title: ev.Title || ev.title || '',
+        date:  sd.substring(0, 10),
+        time:  sd.includes('T') ? sd.substring(11, 16) : (ev.time || ''),
+      };
+    }).filter(ev => ev.date);
+  } catch (_) { events = []; }
+
+  render();
+}
+
+// ── Prayer Requests sub-view ────────────────────────────────────────────────────
+
+async function _renderPrayerView() {
+  const view = _sheet.querySelector('[data-view="prayer"]');
+  const ur   = (typeof UpperRoom !== 'undefined') ? UpperRoom : null;
+  const fmt  = ts => {
+    if (!ts) return '';
+    const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+  const statusChip = s => {
+    const map = { New: ['#6366f1','#ede9fe'], Answered: ['#059669','#d1fae5'], 'In Progress': ['#d97706','#fef3c7'], Closed: ['#6b7280','#f3f4f6'], Archived: ['#6b7280','#f3f4f6'] };
+    const [fg, bg] = map[s] || ['#6366f1','#ede9fe'];
+    return `<span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:0.7rem;font-weight:600;background:${bg};color:${fg};">${_e(s || 'New')}</span>`;
+  };
+
+  let reqs = [];
+  let mode = 'list'; // 'list' | 'new'
+
+  const render = () => {
+    if (mode === 'list') {
+      view.innerHTML = `
+        <div class="unity-sv-header">
+          <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
+          <span class="unity-sv-title">Prayer Requests</span>
+          <button class="unity-sv-header-action" id="pp-pr-new" aria-label="New request" title="New request">${IC.plus}</button>
+        </div>
+        <div class="unity-sv-body unity-sv-body--list">
+          <ul class="unity-sv-journal-list">
+            ${reqs.length
+              ? reqs.map(r => `
+                  <li class="unity-sv-journal-item" style="display:block;padding:10px 14px;cursor:default;">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+                      <p style="margin:0;font-size:0.88rem;line-height:1.5;flex:1;">${_e(r.prayerText || '')}</p>
+                      ${statusChip(r.status)}
+                    </div>
+                    ${(r.category || r.submittedAt) ? `<div style="margin-top:4px;font-size:0.75rem;color:var(--ink-muted);">${r.category ? _e(r.category) + (r.submittedAt ? ' · ' : '') : ''}${fmt(r.submittedAt)}</div>` : ''}
+                  </li>`).join('')
+              : '<li class="unity-sv-empty">No prayer requests yet.</li>'}
+          </ul>
+        </div>
+      `;
+      view.querySelector('[data-pp-back]').onclick = () => _showView('main');
+      view.querySelector('#pp-pr-new').onclick     = () => { mode = 'new'; render(); };
+
+    } else if (mode === 'new') {
+      view.innerHTML = `
+        <div class="unity-sv-header">
+          <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
+          <span class="unity-sv-title">New Request</span>
+        </div>
+        <div class="unity-sv-body">
+          <div class="unity-sv-field">
+            <label class="unity-sv-label" for="pp-pr-text">Your Prayer Request</label>
+            <textarea class="unity-sv-textarea" id="pp-pr-text" placeholder="Share your request…" rows="6"></textarea>
+          </div>
+          <div class="unity-sv-field">
+            <label class="unity-sv-label" for="pp-pr-cat">Category <span class="unity-sv-optional">(optional)</span></label>
+            <select class="unity-sv-input" id="pp-pr-cat" style="appearance:auto;">
+              <option value="">— Select —</option>
+              <option>Health</option><option>Family</option><option>Financial</option>
+              <option>Relationships</option><option>Spiritual</option><option>Work</option><option>Other</option>
+            </select>
+          </div>
+          <button class="unity-sv-btn unity-sv-btn--primary" id="pp-pr-save">Submit Request</button>
+        </div>
+      `;
+      view.querySelector('[data-pp-back]').onclick = () => { mode = 'list'; render(); };
+      view.querySelector('#pp-pr-save').onclick    = async () => {
+        const text = view.querySelector('#pp-pr-text').value.trim();
+        if (!text) { _toast('Please enter your prayer request.'); return; }
+        const cat = view.querySelector('#pp-pr-cat').value;
+        const btn = view.querySelector('#pp-pr-save');
+        btn.disabled = true; btn.textContent = 'Submitting…';
+        try {
+          const user    = _opts.user || {};
+          const display = user.displayName || user.name || (user.email || '').split('@')[0] || 'Anonymous';
+          if (ur) {
+            const id = await ur.createPrayer({ prayerText: text, category: cat, submitterName: display });
+            reqs.unshift({ id, prayerText: text, category: cat, status: 'New', submittedAt: null });
+          } else {
+            reqs.unshift({ id: String(Date.now()), prayerText: text, category: cat, status: 'New', submittedAt: null });
+          }
+          _toast('Prayer request submitted.');
+          mode = 'list'; render();
+        } catch (_) { _toast('Could not submit — please try again.'); btn.disabled = false; btn.textContent = 'Submit Request'; }
+      };
+      const escToList = e => { if (e.key === 'Escape') { e.stopPropagation(); mode = 'list'; render(); } };
+      view.querySelector('#pp-pr-text')?.addEventListener('keydown', escToList);
+      requestAnimationFrame(() => view.querySelector('#pp-pr-text')?.focus());
+    }
+  };
+
+  // Loading skeleton
+  view.innerHTML = `
+    <div class="unity-sv-header">
+      <button class="unity-sv-back" data-pp-back aria-label="Back">${IC.back}</button>
+      <span class="unity-sv-title">Prayer Requests</span>
+    </div>
+    <div class="unity-sv-body"><p class="unity-sv-empty">Loading…</p></div>
+  `;
+  view.querySelector('[data-pp-back]').onclick = () => _showView('main');
+
+  try {
+    reqs = ur ? await ur.listPrayers().catch(() => []) : [];
+  } catch (_) { reqs = []; }
 
   render();
 }

@@ -90,12 +90,13 @@ async function _loadGenerations(root) {
   if (!V) { tlEl.innerHTML = errMsg('Milestones backend not loaded.'); return; }
   const MX = buildAdapter('flock.milestones', V);
 
+  const MILESTONE_LIMIT = 100;
   try {
-    const res  = await MX.list({ limit: 100 });
+    const res  = await MX.list({ limit: MILESTONE_LIMIT });
     const rows = _rows(res);
 
     if (!rows.length) {
-      tlEl.innerHTML = errMsg('No church milestones recorded yet. Click “Add Milestone” to begin the story.');
+      tlEl.innerHTML = errMsg('No church milestones recorded yet. Click "Add Milestone" to begin the story.');
       _updateGenStats(root, []);
       return;
     }
@@ -107,7 +108,7 @@ async function _loadGenerations(root) {
     };
     const sorted = [...rows].sort((a, b) => _msDate(b) - _msDate(a));
 
-    _updateGenStats(root, sorted);
+    _updateGenStats(root, sorted, sorted.length >= MILESTONE_LIMIT);
 
     tlEl.innerHTML = sorted.map(m => {
       const d = _msDate(m);
@@ -149,7 +150,7 @@ async function _loadGenerations(root) {
   }
 }
 
-function _updateGenStats(root, rows) {
+function _updateGenStats(root, rows, atLimit = false) {
   const set = (key, val) => {
     const el = root.querySelector(`[data-stat="${key}"]`);
     if (el) el.textContent = String(val);
@@ -158,7 +159,7 @@ function _updateGenStats(root, rows) {
   const years = rows.map(m => m.year || (m.date ? new Date(m.date).getFullYear() : 0)).filter(Boolean);
   const earliest = Math.min(...years);
   set('years', earliest ? (CURRENT_YEAR - earliest) : '—');
-  set('milestones', rows.length);
+  set('milestones', atLimit ? `${rows.length}+` : rows.length);
   set('leadership', rows.filter(m => (m.category || m.type || '').toLowerCase() === 'leadership').length);
   set('missions',   rows.filter(m => (m.category || m.type || '').toLowerCase() === 'missions').length);
 }

@@ -14,6 +14,7 @@ import * as Library      from '../../Scripts/the_gospel/the_gospel_library.js';
 import * as Devotionals  from '../../Scripts/the_gospel/the_gospel_devotionals.js';
 import * as Apologetics  from '../../Scripts/the_gospel/the_gospel_apologetics.js';
 import * as Counseling   from '../../Scripts/the_gospel/the_gospel_counseling.js';
+import * as Sermons      from '../../Scripts/the_gospel/the_gospel_sermons.js';
 import * as Heart        from '../../Scripts/the_gospel/the_gospel_heart.js';
 import * as Mirror       from '../../Scripts/the_gospel/the_gospel_mirror.js';
 import * as Genealogy    from '../../Scripts/the_gospel/the_gospel_genealogy.js';
@@ -34,6 +35,11 @@ const SECTIONS = [
     title:   'Study & Discipleship',
     blurb:   'Go deep — courses, doctrine, words, and lives.',
     modules: [Courses, Quizzes, Theology, TeachingPlans, Lexicon, Library, Apologetics, Counseling, Genealogy],
+  },
+  {
+    title:   'From the Pulpit',
+    blurb:   'Sermons preached by your shepherd.',
+    modules: [Sermons],
   },
   {
     title:   'Your Walk',
