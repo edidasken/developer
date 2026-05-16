@@ -424,11 +424,25 @@ exports.songSelectSearch = onCall({
       waitUntil: 'networkidle2',
       timeout: 30000
     });
+    
+    console.log('Search page URL:', page.url());
 
-    // Extract search results
+    // Extract search results with debugging
     const results = await page.evaluate(() => {
       const songs = [];
       const items = document.querySelectorAll('.song-result');
+      
+      console.log('Found song-result items:', items.length);
+      
+      // If no .song-result, try to find what elements exist
+      if (items.length === 0) {
+        const allSongLinks = document.querySelectorAll('a[href*="/songs/"]');
+        console.log('Found song links:', allSongLinks.length);
+        
+        // Try alternative selectors
+        const songCards = document.querySelectorAll('.song-card, .song-item, [class*="song"]');
+        console.log('Found song-related elements:', songCards.length);
+      }
       
       items.forEach((item) => {
         const titleEl = item.querySelector('.song-title');
@@ -449,6 +463,32 @@ exports.songSelectSearch = onCall({
       
       return songs;
     });
+    
+    // Debug: capture page structure if no results
+    if (results.length === 0) {
+      const pageDebug = await page.evaluate(() => {
+        const songLinks = Array.from(document.querySelectorAll('a[href*="/songs/"]')).slice(0, 5).map(a => ({
+          text: a.textContent?.trim(),
+          href: a.href
+        }));
+        const headings = Array.from(document.querySelectorAll('h1, h2, h3')).slice(0, 5).map(h => h.textContent?.trim());
+        const bodyText = document.body?.textContent?.substring(0, 500);
+        return {songLinks, headings, bodyText};
+      });
+      console.log('No results found. Page debug:', JSON.stringify(pageDebug, null, 2));
+      
+      // Return debug info in the response
+      return {
+        ok: true,
+        results: [],
+        count: 0,
+        debug: {
+          searchUrl: page.url(),
+          query: query,
+          ...pageDebug
+        }
+      };
+    }
 
     return {
       ok: true,

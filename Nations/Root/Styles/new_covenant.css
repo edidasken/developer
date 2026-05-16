@@ -14356,15 +14356,18 @@ flock-tabs [role="tablist"], .tabs-bar {
   --ms-safe-top:    var(--safe-top, env(safe-area-inset-top, 0px));
   --ms-safe-bot:    var(--safe-bottom, env(safe-area-inset-bottom, 0px));
 
-  /* Visual tokens — FlockStand navy palette with white/gold text */
-  --ms-bg:          #1a1d2e;                 /* dark navy background */
-  --ms-bg-raised:   #1a1d2e;                 /* dark navy cards */
-  --ms-bg-card:     #1a1d2e;                 /* dark navy cards */
-  --ms-bg-card-hi:  #151827;                 /* darker navy for contrast */
-  --ms-ink:         #ffffff;                 /* white text */
-  --ms-ink-muted:   rgba(255,255,255,0.65); /* dimmed white */
-  --ms-ink-faint:   rgba(255,255,255,0.45); /* faint white */
-  --ms-line:        rgba(255,255,255,0.1);  /* subtle borders */
+  /* Visual tokens — FlockStand: cream page bg, NAVY cards with white/gold text */
+  --ms-bg:          var(--bg, #faf9f6);                                          /* page bg = cream */
+  --ms-bg-raised:   linear-gradient(135deg, #0f1735 0%, #1b264f 100%);           /* navy gradient for sheets/modals */
+  --ms-bg-card:     linear-gradient(135deg, #0f1735 0%, #1b264f 100%);           /* navy gradient for cards */
+  --ms-bg-card-hi:  linear-gradient(135deg, #14204a 0%, #243068 100%);           /* slightly lighter navy hover */
+  --ms-ink:         #0b1220;                                                      /* dark ink on cream page */
+  --ms-ink-muted:   #334155;                                                      /* slate-700 on cream */
+  --ms-ink-faint:   #475569;                                                      /* slate-600 on cream */
+  --ms-line:        rgba(15,23,42,0.18);                                          /* page-level border */
+  --ms-card-ink:    #ffffff;                                                      /* white text on navy cards */
+  --ms-card-ink-muted: rgba(255,255,255,0.78);                                    /* dimmed white */
+  --ms-card-line:   rgba(255,255,255,0.10);                                       /* subtle border on navy cards */
   --ms-gold:        var(--gold, #e8a838);
   --ms-gold-soft:   var(--gold-soft, rgba(232,168,56,0.15));
   --ms-gold-glow:   var(--gold-glow, rgba(232,168,56,0.32));
@@ -14399,6 +14402,88 @@ flock-tabs [role="tablist"], .tabs-bar {
   --sc-pre-chorus:#0284c7;
   --sc-tag:       #d97706;
   --sc-default:   #6b7280;
+}
+
+/* ── Navy card text & border (cards are navy gradient on cream page) ─────
+   Cards listed here render with navy gradient background, so text inside
+   needs to be white. Setting `color` on the card lets descendants inherit
+   automatically. Borders, gold accents, muted text and form controls get
+   targeted overrides below. */
+.ms-card,
+.ms-song-card,
+.ms-song-row,
+.ms-service-card,
+.ms-setlist-item,
+.ms-song-pick-btn,
+.ms-capo-panel,
+.ms-metro,
+.ms-import-result,
+.ms-content-preview,
+.ms-auth-card,
+.ms-stat-card,
+.ms-sheet,
+.ms-modal {
+  color: var(--ms-card-ink, #fff);
+  border-color: var(--ms-card-line, rgba(255,255,255,0.10));
+}
+/* Gold accents inside navy cards */
+.ms-card .ms-stat-value,
+.ms-stat-card .ms-stat-value,
+.ms-card [data-accent="gold"],
+.ms-song-card [data-accent="gold"],
+.ms-service-card [data-accent="gold"] {
+  color: var(--ms-gold, #e8a838);
+}
+/* Muted text inside cards — readable on navy */
+.ms-card .ms-muted, .ms-card .ms-text-muted, .ms-card .ms-text-faint,
+.ms-song-card .ms-muted, .ms-service-card .ms-muted,
+.ms-stat-card .ms-stat-label, .ms-stat-card .ms-stat-sub,
+.ms-setlist-item .ms-muted, .ms-auth-card .ms-muted {
+  color: var(--ms-card-ink-muted, rgba(255,255,255,0.78));
+}
+/* Ghost buttons inside navy cards switch to inverse palette */
+.ms-card .ms-btn--ghost,
+.ms-song-card .ms-btn--ghost,
+.ms-service-card .ms-btn--ghost,
+.ms-auth-card .ms-btn--ghost,
+.ms-stat-card .ms-btn--ghost,
+.ms-sheet .ms-btn--ghost,
+.ms-modal .ms-btn--ghost,
+.ms-import-result .ms-btn--ghost,
+.ms-dash-action .ms-btn--ghost,
+[id^="ss-"].ms-btn--ghost,
+[class*="ss-"] .ms-btn--ghost {
+  color: #fff;
+  border-color: rgba(255,255,255,0.25);
+  background: transparent;
+}
+.ms-card .ms-btn--ghost:hover,
+.ms-song-card .ms-btn--ghost:hover,
+.ms-service-card .ms-btn--ghost:hover,
+.ms-auth-card .ms-btn--ghost:hover,
+.ms-stat-card .ms-btn--ghost:hover,
+.ms-sheet .ms-btn--ghost:hover,
+.ms-modal .ms-btn--ghost:hover,
+.ms-import-result .ms-btn--ghost:hover,
+.ms-dash-action .ms-btn--ghost:hover,
+[id^="ss-"].ms-btn--ghost:hover,
+[class*="ss-"] .ms-btn--ghost:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border-color: rgba(255,255,255,0.35);
+}
+/* Inputs inside navy cards keep readable light background */
+.ms-card input:not([type="checkbox"]):not([type="radio"]),
+.ms-card textarea, .ms-card select,
+.ms-sheet input:not([type="checkbox"]):not([type="radio"]),
+.ms-sheet textarea, .ms-sheet select,
+.ms-modal input:not([type="checkbox"]):not([type="radio"]),
+.ms-modal textarea, .ms-modal select,
+.ms-auth-card input:not([type="checkbox"]):not([type="radio"]),
+.ms-auth-card textarea, .ms-auth-card select {
+  color: #0b1220;
+  background: #f8f8f8;
+  border-color: rgba(255,255,255,0.20);
 }
 
 /* ── Reset for stand pages ───────────────────────────────────────────────── */
@@ -14890,7 +14975,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-input:focus, .ms-select:focus, .ms-textarea:focus { border-color: var(--ms-gold-glow); }
 .ms-select    { cursor: pointer; }
 .ms-textarea  { resize: vertical; min-height: 100px; }
-.ms-content-editor { font-family: var(--ms-mono); font-size: .87rem; min-height: 400px; tab-size: 2; line-height: 1.7; resize: vertical; background: var(--ms-bg-card-hi); }
+.ms-content-editor { font-family: var(--ms-mono); font-size: .87rem; min-height: 400px; tab-size: 2; line-height: 1.7; resize: vertical; background: #f8f8f8; }
 .ms-content-preview { min-height: 300px; padding: 18px; background: var(--ms-bg-card); border: 1px solid var(--ms-line); border-radius: var(--ms-r-md); overflow-y: auto; }
 .ms-row       { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
 .ms-row .ms-field { flex: 1; min-width: 120px; }

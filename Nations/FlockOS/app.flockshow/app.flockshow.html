@@ -47,17 +47,20 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── FlockShow design tokens — navy palette with white/gold text ── */
+    /* ── FlockShow design tokens — cream page edges, NAVY panels w/ white/gold text ──
+       Note: virtually every FlockShow surface (topbar, library, editor, modals)
+       is rendered inside a navy panel, so --fs-ink and --fs-muted are panel-level
+       (white-ish) tokens. --fs-bg is the cream page background showing at edges. */
     :root {
-      /* Surfaces — dark navy for all panels/cards */
-      --fs-bg:        #1a1d2e;
-      --fs-panel:     #1a1d2e;
-      --fs-panel-alt: #151827;
-      --fs-border:    rgba(255,255,255,0.1);
+      /* Surfaces — page edges cream, panels/cards navy gradient */
+      --fs-bg:        var(--bg, #faf9f6);                                    /* page edges = cream */
+      --fs-panel:     linear-gradient(135deg, #0f1735 0%, #1b264f 100%);     /* navy gradient panels */
+      --fs-panel-alt: linear-gradient(135deg, #14204a 0%, #243068 100%);     /* slightly lighter navy */
+      --fs-border:    rgba(255,255,255,0.10);                                /* subtle border on navy */
 
-      /* Ink — white and light gray for text */
-      --fs-ink:       #ffffff;
-      --fs-muted:     rgba(255,255,255,0.65);
+      /* Ink — panels are navy so default text is white */
+      --fs-ink:       #ffffff;                                               /* white on navy panels */
+      --fs-muted:     rgba(255,255,255,0.65);                                /* dimmed white on panels */
 
       /* Accents — gold brand for FlockShow */
       --fs-accent:    #e8a838;
