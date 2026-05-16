@@ -14408,20 +14408,24 @@ flock-tabs [role="tablist"], .tabs-bar {
 #ms-auth-overlay, #ms-auth-overlay * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 
-/* ── App layout ──────────────────────────────────────────────────────────── */
-#ms-app { display: flex; flex-direction: column; height: 100dvh; }
+/* ── App layout — grid (header row + body row), header in normal flow.
+   Modeled after FlockShow's #fs-root grid: no fixed header, no clearance
+   padding, no cream-strip leakage. ─────────────────────────────────────── */
+#ms-app {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100dvh;
+  overflow: hidden;
+}
 #ms-app[hidden] { display: none; }
 .ms-body {
-  display: flex; flex: 1; overflow: hidden;
-  /* Header-clearance lives on the children (.ms-sidebar, .ms-main) so their
-     own backgrounds tile up to the top of the viewport behind the fixed
-     header — no cream gap can show through. */
+  display: flex; min-height: 0; overflow: hidden;
+  /* Header is a static grid row above us — no clearance padding needed. */
 }
 
-/* ── Header — canonical FlockOS dark navy chrome ─────────────────────────── */
+/* ── Header — canonical FlockOS dark navy chrome (in flow, not fixed) ───── */
 .ms-header {
-  position: fixed;
-  top: 0; left: 0; right: 0;
+  position: relative;
   height: calc(var(--ms-header-h) + var(--ms-safe-top));
   padding-top: var(--ms-safe-top);
   background: var(--top-bg);
