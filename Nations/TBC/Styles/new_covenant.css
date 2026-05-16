@@ -14986,13 +14986,32 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-import-tab.is-active { color: var(--ms-gold); border-bottom-color: var(--ms-gold); }
 .ms-import-panel { display: none; }
 .ms-import-panel.is-active { display: block; }
-.ms-import-source-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 12px; margin-bottom: 24px; }
-.ms-import-source { background: var(--ms-bg-card); border: 1px solid var(--ms-line); border-radius: var(--ms-r-lg); padding: 16px 18px; cursor: pointer; transition: all .2s; text-align: left; width: 100%; font-family: inherit; color: inherit; }
-.ms-import-source:hover { border-color: var(--ms-gold-glow); background: var(--ms-bg-card-hi); }
-.ms-import-source.is-selected { border-color: var(--ms-gold); background: var(--ms-gold-soft); }
-.ms-import-source-icon { font-size: 1.8rem; margin-bottom: 8px; }
-.ms-import-source-name { font-weight: 700; font-size: .9rem; }
-.ms-import-source-desc { font-size: .75rem; color: var(--ms-ink-muted); margin-top: 4px; }
+.ms-import-source-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap: 10px; margin-bottom: 24px; }
+.ms-import-source { 
+  background: linear-gradient(135deg, var(--dash-navy-1, #0f1735) 0%, var(--dash-navy-2, #1b264f) 100%);
+  border: 1px solid rgba(255,255,255,0.08); 
+  border-radius: var(--ms-r-lg); 
+  padding: 14px 16px; 
+  cursor: pointer; 
+  transition: all .18s var(--ms-ease); 
+  text-align: left; 
+  width: 100%; 
+  font-family: inherit; 
+  color: #fff;
+  box-shadow: 0 12px 28px -22px rgba(15,23,53,0.55);
+}
+.ms-import-source:hover { 
+  border-color: rgba(232,168,56,0.45);
+  background: linear-gradient(135deg, #131c3e 0%, #21305f 100%);
+  transform: translateY(-1px);
+}
+.ms-import-source.is-selected { 
+  border-color: var(--dash-gold, #e8a838);
+  box-shadow: 0 0 0 2px rgba(232,168,56,0.25), 0 12px 28px -22px rgba(15,23,53,0.55);
+}
+.ms-import-source-icon { font-size: 1.5rem; margin-bottom: 6px; }
+.ms-import-source-name { font-weight: 700; font-size: .85rem; color: #fff; }
+.ms-import-source-desc { font-size: .72rem; color: rgba(255,255,255,0.65); margin-top: 4px; line-height: 1.3; }
 .ms-import-result       { padding: 14px 16px; border-radius: var(--ms-r-md); background: var(--ms-bg-card); border: 1px solid var(--ms-line); margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
 .ms-import-result-title { font-weight: 600; flex: 1; }
 .ms-import-result-meta  { font-size: .78rem; color: var(--ms-ink-muted); }

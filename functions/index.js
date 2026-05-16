@@ -54,6 +54,36 @@ async function loginToSongSelect(page, email, password) {
     console.warn('Redirected away from signin page to:', currentUrl);
   }
   
+  // Check if we need to click a "Sign In" button to reveal the login form
+  try {
+    const signInButtonExists = await page.evaluate(() => {
+      const buttons = Array.from(document.querySelectorAll('button, a'));
+      return buttons.some(btn => 
+        btn.textContent?.trim() === 'Sign In' &&
+        !btn.className?.includes('round-icon-button')
+      );
+    });
+    
+    if (signInButtonExists) {
+      console.log('Found "Sign In" button, clicking to reveal login form');
+      await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('button, a'));
+        const signInBtn = buttons.find(btn => 
+          btn.textContent?.trim() === 'Sign In' &&
+          !btn.className?.includes('round-icon-button')
+        );
+        if (signInBtn) {
+          signInBtn.click();
+        }
+      });
+      // Wait for login form to appear
+      await page.waitForTimeout(2000);
+      console.log('Clicked Sign In button, waiting for login form');
+    }
+  } catch (signInError) {
+    console.log('No Sign In button found or error clicking:', signInError.message);
+  }
+  
   // Handle cookie consent dialog if present
   try {
     // Try to find and click the "Allow all" button
