@@ -165,6 +165,7 @@ async function loginToSongSelect(page, email, password) {
     '#EmailAddress',
     'input[type="email"]',
     'input[name="email"]',
+    'input[name="EmailAddress"]',
     'input[name="username"]',
     'input[placeholder*="email" i]',
     'input[placeholder*="username" i]'
@@ -172,10 +173,12 @@ async function loginToSongSelect(page, email, password) {
   
   for (const selector of possibleEmailSelectors) {
     try {
-      await page.waitForSelector(selector, {visible: true, timeout: 3000});
-      emailSelector = selector;
-      console.log('Found email field with selector:', selector);
-      break;
+      const exists = await page.$(selector);
+      if (exists) {
+        emailSelector = selector;
+        console.log('Found email field with selector:', selector);
+        break;
+      }
     } catch (e) {
       // Try next selector
     }
@@ -233,15 +236,18 @@ async function loginToSongSelect(page, email, password) {
   const possiblePasswordSelectors = [
     '#Password',
     'input[type="password"]',
-    'input[name="password"]'
+    'input[name="password"]',
+    'input[name="Password"]'
   ];
   
   for (const selector of possiblePasswordSelectors) {
     try {
-      await page.waitForSelector(selector, {visible: true, timeout: 1000});
-      passwordSelector = selector;
-      console.log('Found password field with selector:', selector);
-      break;
+      const exists = await page.$(selector);
+      if (exists) {
+        passwordSelector = selector;
+        console.log('Found password field with selector:', selector);
+        break;
+      }
     } catch (e) {
       // Try next selector
     }

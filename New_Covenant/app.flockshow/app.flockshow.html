@@ -47,23 +47,23 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── FlockShow design tokens — aliased to active FlockOS theme (new_covenant.css) ── */
+    /* ── FlockShow design tokens — navy palette with white/gold text ── */
     :root {
-      /* Surfaces — pulled straight from the active NC theme */
-      --fs-bg:        var(--bg);
-      --fs-panel:     var(--bg-raised);
-      --fs-panel-alt: var(--bg-sunken);
-      --fs-border:    var(--line);
+      /* Surfaces — dark navy for all panels/cards */
+      --fs-bg:        #1a1d2e;
+      --fs-panel:     #1a1d2e;
+      --fs-panel-alt: #151827;
+      --fs-border:    rgba(255,255,255,0.1);
 
-      /* Ink — from active NC theme */
-      --fs-ink:       var(--ink);
-      --fs-muted:     var(--ink-muted);
+      /* Ink — white and light gray for text */
+      --fs-ink:       #ffffff;
+      --fs-muted:     rgba(255,255,255,0.65);
 
       /* Accents — gold brand for FlockShow */
-      --fs-accent:    var(--gold, #e8a838);
+      --fs-accent:    #e8a838;
       --fs-accent-dk: #c48a20;
       --fs-accent-dim:rgba(232,168,56,0.13);
-      --fs-danger:    var(--danger, #b22234);
+      --fs-danger:    #ef4444;
 
       --topbar-h:     54px;
       --safe-top:     env(safe-area-inset-top, 0px);
