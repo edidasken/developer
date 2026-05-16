@@ -971,49 +971,300 @@ function _duplicateSermon() {
 }
 
 // ── Send to FlockShow ─────────────────────────────────────────────────────────
+//
+// Builds a fully-formed FlockShow presentation from the sermon and
+// either CREATES a new presentation in Firestore or UPDATES the
+// existing one (linked by `sermon._showId` written back on first send).
+//
+// Slide auto-generation rules — chosen to give the pastor a deck that
+// is "ready to GO" straight from the outline:
+//
+//   • Title slide (announce)        — title + speaker
+//   • Series/date slide (announce)  — only if series or date is set
+//   • For each section, in order:
+//        – Section TITLE slide (announce) using the section heading
+//        – SCRIPTURE sections → one slide per verse (split by line/verse-num)
+//                              with the reference set on every slide
+//        – All other sections → notes are split into slide-sized chunks:
+//             1. split on blank lines (paragraphs)
+//             2. any paragraph > SLIDE_CHAR_TARGET is re-split on sentence
+//                boundaries, packing sentences until the slide is full
+//        – The section title is also written into slide.notes so the
+//          pastor sees it in the projector stage-notes corner
+//   • Altar call slide (announce) — last, only if filled
+//
+// The TRANSITION type is intentionally rendered as a stage-note-only
+// slide (blank screen, projector shows nothing, but pastor still sees
+// the transition cue in stage notes).
+//
+const SLIDE_CHAR_TARGET = 260;   // soft max chars per content slide
+const SLIDE_CHAR_HARD   = 360;   // hard max — never exceed this on one slide
+
+// Map FEED section type → FlockShow slide type
+const _FEED_TO_SHOW_TYPE = {
+  intro:        'lyrics',
+  scripture:    'scripture',
+  point:        'lyrics',
+  illustration: 'lyrics',
+  explanation:  'lyrics',
+  application:  'lyrics',
+  prayer:       'announce',
+  conclusion:   'announce',
+  transition:   'blank',
+};
+
+// Generate a stable-ish unique id without bringing in a uuid lib
+function _showSlideId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+// Build a single FlockShow-shaped slide
+function _mkShowSlide(type, text, opts) {
+  opts = opts || {};
+  return {
+    id:        _showSlideId(),
+    type:      type || 'lyrics',
+    text:      String(text || ''),
+    reference: opts.reference || '',
+    bgColor:   '',
+    textColor: '',
+    notes:     opts.notes || '',
+    fontSize:  0,
+  };
+}
+
+// Split a long block of prose into slide-sized chunks.  Splits first on
+// paragraph boundaries (blank lines); paragraphs that are still too long
+// are re-split on sentence boundaries, with sentences packed onto the
+// same slide until SLIDE_CHAR_TARGET is reached.
+function _chunkProseToSlides(text, targetLen) {
+  targetLen = targetLen || SLIDE_CHAR_TARGET;
+  const out = [];
+  if (!text || !String(text).trim()) return out;
+
+  const paragraphs = String(text)
+    .replace(/\r\n/g, '\n')
+    .split(/\n{2,}/)
+    .map(p => p.trim())
+    .filter(Boolean);
+
+  paragraphs.forEach(para => {
+    if (para.length <= targetLen) { out.push(para); return; }
+
+    // Long paragraph — split on sentence boundaries.  Keeps the
+    // punctuation attached to the sentence so it doesn't read awkwardly.
+    const sentences = para.match(/[^.!?]+[.!?]+[")'\]]*\s*|[^.!?]+$/g) || [para];
+    let bucket = '';
+    sentences.forEach(raw => {
+      const s = raw.trim();
+      if (!s) return;
+      // If this single sentence alone is huge, hard-wrap it
+      if (s.length > SLIDE_CHAR_HARD) {
+        if (bucket) { out.push(bucket.trim()); bucket = ''; }
+        for (let i = 0; i < s.length; i += SLIDE_CHAR_HARD) {
+          out.push(s.slice(i, i + SLIDE_CHAR_HARD).trim());
+        }
+        return;
+      }
+      // Pack until we exceed target
+      if (bucket && (bucket.length + 1 + s.length) > targetLen) {
+        out.push(bucket.trim());
+        bucket = s;
+      } else {
+        bucket = bucket ? (bucket + ' ' + s) : s;
+      }
+    });
+    if (bucket.trim()) out.push(bucket.trim());
+  });
+
+  return out;
+}
+
+// Split scripture text (often multiple verses) into one slide per verse.
+// Accepts both "1 In the beginning... 2 And the earth was..." and
+// line-separated forms.  Always tags every slide with the reference.
+function _scriptureToSlides(verseText, ref) {
+  if (!verseText || !String(verseText).trim()) {
+    // Reference only — single slide with just the citation
+    if (ref) return [_mkShowSlide('scripture', '', { reference: ref })];
+    return [];
+  }
+  let text = String(verseText).replace(/\r\n/g, '\n').trim();
+
+  // Form 1: numbered prose like "1 In the beginning 2 And the earth..."
+  // Insert a newline before every standalone verse number.
+  let verses;
+  if (/\s\d+\s+\S/.test(text) || /^\d+\s+/.test(text)) {
+    const split = text.split(/\s(?=\d+\s+[A-Z“"‘'])/);
+    verses = split.map(v => v.trim()).filter(Boolean);
+  } else {
+    // Form 2: line-separated (one verse per line)
+    verses = text.split(/\n+/).map(v => v.trim()).filter(Boolean);
+  }
+
+  if (verses.length <= 1) {
+    // Couldn't split — chunk the prose instead, but keep type=scripture
+    const chunks = _chunkProseToSlides(text);
+    return chunks.map(c => _mkShowSlide('scripture', c, { reference: ref }));
+  }
+  return verses.map(v => _mkShowSlide('scripture', v, { reference: ref }));
+}
+
+// Build the FULL FlockShow show object from a sermon
+function _buildShowFromSermon(s) {
+  const slides = [];
+
+  // 1. Title slide
+  const titleLines = [s.title || 'Untitled Sermon'];
+  if (s.speaker) titleLines.push(s.speaker);
+  slides.push(_mkShowSlide('announce', titleLines.join('\n')));
+
+  // 2. Series + date slide (optional)
+  const dateStr = s.date
+    ? new Date(s.date + 'T00:00:00').toLocaleDateString('en-US',
+        { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    : '';
+  if (s.series || dateStr) {
+    const subParts = [s.series, dateStr].filter(Boolean);
+    slides.push(_mkShowSlide('announce', subParts.join('\n')));
+  }
+
+  // 3. Top-level passage
+  if (s.passage) {
+    slides.push(_mkShowSlide('scripture', '', { reference: s.passage }));
+  }
+
+  // 4. Walk every section in order
+  (s.sections || []).forEach((sec, idx) => {
+    const showType = _FEED_TO_SHOW_TYPE[sec.type] || 'lyrics';
+    const heading  = (sec.title || _sectionTitle(sec.type) || '').trim();
+    const notes    = (sec.notes || '').trim();
+
+    // Section TITLE slide (gives the pastor a visual breath between blocks)
+    if (heading) {
+      slides.push(_mkShowSlide('announce', heading, {
+        notes: `Section ${idx + 1} of ${s.sections.length}`,
+      }));
+    }
+
+    if (sec.type === 'scripture') {
+      const ref = (sec.scriptureRef || heading || '').trim();
+      const verses = _scriptureToSlides(sec.scripture || notes, ref);
+      verses.forEach(v => { v.notes = heading || ref || ''; slides.push(v); });
+      return;
+    }
+
+    if (sec.type === 'transition') {
+      // Blank screen + the transition text as stage notes only
+      if (notes) {
+        slides.push(_mkShowSlide('blank', '', { notes: `[Transition] ${notes}` }));
+      }
+      return;
+    }
+
+    if (!notes) return;   // heading was already emitted; nothing more to show
+
+    // Auto-break long notes into slide-sized chunks
+    const chunks = _chunkProseToSlides(notes);
+    chunks.forEach((chunk, i) => {
+      slides.push(_mkShowSlide(showType, chunk, {
+        notes: chunks.length > 1
+          ? `${heading} (${i + 1}/${chunks.length})`
+          : heading,
+      }));
+    });
+  });
+
+  // 5. Altar call
+  if (s.altarCall && s.altarCall.trim()) {
+    const altarChunks = _chunkProseToSlides(s.altarCall.trim());
+    altarChunks.forEach((chunk, i) => {
+      slides.push(_mkShowSlide('announce', chunk, {
+        notes: altarChunks.length > 1
+          ? `Altar Call (${i + 1}/${altarChunks.length})`
+          : 'Altar Call',
+      }));
+    });
+  }
+
+  return {
+    name:        s.title || 'Untitled Sermon',
+    slides,
+    sermonId:    s.id,
+    serviceDate: s.date || '',
+    theme:       { bg: '', tc: '' },
+  };
+}
+
+// Locate an existing presentation in Firestore previously created from
+// THIS sermon.  Preferred path: sermon._showId.  Fallback: scan recent
+// presentations for one whose `sermonId` field matches.
+async function _findExistingShowForSermon(s, UR) {
+  if (s._showId) {
+    try {
+      const existing = await UR.getPresentation(s._showId);
+      if (existing && existing.id) return existing;
+    } catch (_) { /* show was deleted on FlockShow side; fall through to create */ }
+  }
+  // Scan most recent 100 presentations as a fallback
+  try {
+    const res = await UR.listPresentations({ limit: 100 });
+    const rows = Array.isArray(res) ? res : (res.results || res.rows || []);
+    const match = rows.find(r => r.sermonId === s.id);
+    return match || null;
+  } catch (_) {
+    return null;
+  }
+}
+
 async function _sendToFlockShow() {
   const s = _active();
   if (!s) return;
-  const slides = [];
 
-  // Title slide
-  slides.push({ type: 'announce', text: (s.title || 'Untitled Sermon') + (s.speaker ? '\n' + s.speaker : '') });
-
-  // Passage slide if top-level passage field is set
-  if (s.passage) {
-    slides.push({ type: 'scripture', text: s.passage, ref: s.passage });
+  const show = _buildShowFromSermon(s);
+  if (!show.slides.length) {
+    _toast('No slideable content in this sermon', 'error');
+    return;
   }
-
-  // One slide per section — scripture sections become scripture slides, points become lyrics
-  (s.sections || []).forEach(sec => {
-    if (sec.type === 'scripture' && (sec.scriptureRef || sec.scripture)) {
-      slides.push({ type: 'scripture', ref: sec.scriptureRef || '', text: sec.scripture || sec.notes || '' });
-    } else if (sec.type === 'point' || sec.type === 'intro' || sec.type === 'application') {
-      slides.push({ type: 'lyrics', text: sec.title || sec.type, notes: sec.notes || '' });
-    }
-    // Other types (illustration, transition, prayer, conclusion) are skipped — they are prep material
-  });
-
-  // Altar call slide if present
-  if (s.altarCall && s.altarCall.trim()) {
-    slides.push({ type: 'announce', text: s.altarCall.trim() });
-  }
-
-  if (!slides.length) { _toast('No slideable content in this sermon', 'error'); return; }
 
   const btn = _qs('bm-send-flockshow-btn');
+  const restoreBtn = () => {
+    if (!btn) return;
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span class="bm-btn-label-hide">FlockShow</span>';
+  };
   if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
   try {
     const UR = window.UpperRoom;
     if (!UR || !UR.isReady()) throw new Error('FlockShow backend not available');
-    await UR.createPresentation({ name: s.title || 'Untitled Sermon', slides, sermonId: s.id, serviceDate: s.date || '' });
-    _toast('Sent to FlockShow ✓ — open FlockShow to view', 'success');
+
+    const existing = await _findExistingShowForSermon(s, UR);
+    if (existing) {
+      await UR.updatePresentation({
+        id:          existing.id,
+        name:        show.name,
+        slides:      show.slides,
+        sermonId:    show.sermonId,
+        serviceDate: show.serviceDate,
+        theme:       existing.theme || show.theme, // preserve any theme edits
+      });
+      s._showId = existing.id;
+      _toast(`Updated FlockShow ✓ (${show.slides.length} slides)`, 'success');
+    } else {
+      const res = await UR.createPresentation(show);
+      if (res && res.id) s._showId = res.id;
+      _toast(`Sent to FlockShow ✓ (${show.slides.length} slides)`, 'success');
+    }
+    _lsSync();
+    _queueSave();
   } catch (err) {
     _toast('FlockShow send failed: ' + err.message, 'error');
   } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span class="bm-btn-label-hide">FlockShow</span>'; }
+    restoreBtn();
   }
 }
+
 
 function _doPrint() {
   const s = _active();

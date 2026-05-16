@@ -401,7 +401,6 @@ function _renderSlideList() {
   if (!list) return;
   const show = _activeShow();
 
-  const show = _activeShow();
   // Remove old slide items, keep the add-slide wrapper
   list.querySelectorAll('.fs-slide-item').forEach(el => el.remove());
 
@@ -926,6 +925,195 @@ function _importShow() {
   input.click();
 }
 
+// ── ProPresenter import (.pro6 XML, .pro4 XML, .txt plain text) ──────────────
+//
+//   .pro6 / .pro4  → XML.  Each <RVDisplaySlide> contains
+//                    <RVTextElement> with <NSString rvXMLIvarName="RTFData">
+//                    holding base64-encoded RTF.  We base64-decode then strip
+//                    RTF control words to get plain slide text.
+//
+//   .pro   (v7)    → binary Protobuf.  We tell the user to export as text
+//                    or .pro6 from ProPresenter 7 (heuristic binary scraping
+//                    produces garbage and is not worth the weight).
+//
+//   .txt           → plain text.  Blank-line separators become new slides.
+//                    Lines beginning with "[Verse]", "[Chorus]" etc are treated
+//                    as section breaks.
+//
+function _stripRTF(rtf) {
+  if (!rtf) return '';
+  let s = String(rtf);
+  // Decode \'XX hex escapes (Latin-1)
+  s = s.replace(/\\'([0-9a-fA-F]{2})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
+  // Decode \uNNNN? unicode escapes
+  s = s.replace(/\\u(-?\d+)\??/g, (_, n) => {
+    let cp = parseInt(n, 10);
+    if (cp < 0) cp = 65536 + cp;
+    return String.fromCharCode(cp);
+  });
+  // Drop RTF binary/font/colour groups entirely
+  s = s.replace(/\{\\\*?[^{}]*\}/g, '');
+  // Convert RTF paragraph / line breaks
+  s = s.replace(/\\par[d]?\b/g, '\n').replace(/\\line\b/g, '\n').replace(/\\tab\b/g, '\t');
+  // Remove remaining RTF control words like \fs24 \cf2 \b0
+  s = s.replace(/\\[a-zA-Z]+-?\d*\s?/g, '');
+  // Remove stray braces
+  s = s.replace(/[{}]/g, '');
+  // Collapse 3+ blank lines to 2 (stanza separator)
+  s = s.replace(/\n{3,}/g, '\n\n');
+  return s.trim();
+}
+
+function _b64Decode(b64) {
+  try {
+    const bin = atob(String(b64).replace(/\s+/g, ''));
+    // Decode as UTF-8 (RTF data may include unicode escapes)
+    return bin;
+  } catch (_) { return ''; }
+}
+
+function _parseProPresenterXML(xmlText, fallbackName) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xmlText, 'application/xml');
+  const parseErr = doc.querySelector('parsererror');
+  if (parseErr) throw new Error('Invalid ProPresenter XML');
+
+  const root = doc.documentElement;
+  if (!/RVPresentationDocument/i.test(root.nodeName)) {
+    throw new Error('Not a ProPresenter document (root: ' + root.nodeName + ')');
+  }
+
+  const docName = root.getAttribute('CCLISongTitle')
+                || root.getAttribute('CCLIDisplayName')
+                || root.getAttribute('docType')
+                || fallbackName || 'ProPresenter Import';
+
+  const slides = [];
+  // Walk every <RVDisplaySlide> (whether inside a group or standalone)
+  const slideEls = doc.querySelectorAll('RVDisplaySlide');
+  slideEls.forEach(slEl => {
+    const label = slEl.getAttribute('label') || '';
+    // Each slide can carry multiple text elements — concat them with blank lines
+    const textEls = slEl.querySelectorAll('RVTextElement');
+    const textParts = [];
+    textEls.forEach(tEl => {
+      // RTFData lives in <NSString rvXMLIvarName="RTFData">…</NSString>
+      const rtfNode = tEl.querySelector('NSString[rvXMLIvarName="RTFData"]')
+                   || tEl.querySelector('NSString');
+      if (rtfNode) {
+        const decoded = _b64Decode(rtfNode.textContent || '');
+        const plain   = _stripRTF(decoded);
+        if (plain) textParts.push(plain);
+      }
+      // PlainText fallback (some .pro4 use this)
+      const ptNode = tEl.querySelector('NSString[rvXMLIvarName="PlainText"]');
+      if (!rtfNode && ptNode) {
+        const plain = (ptNode.textContent || '').trim();
+        if (plain) textParts.push(plain);
+      }
+    });
+    const text = textParts.join('\n\n').trim();
+    if (text || label) {
+      slides.push(_makeSlide('lyrics', text || label));
+    }
+  });
+
+  if (!slides.length) {
+    // Some files put the text only in slide labels
+    slideEls.forEach(slEl => {
+      const label = slEl.getAttribute('label') || '';
+      if (label.trim()) slides.push(_makeSlide('lyrics', label.trim()));
+    });
+  }
+
+  if (!slides.length) throw new Error('No slides found in ProPresenter file');
+
+  return { name: docName, slides };
+}
+
+function _parseProPresenterText(txt, fallbackName) {
+  // Plain-text ProPresenter export — lines like "[Verse 1]" mark section breaks.
+  const sections = [];
+  let current = [];
+  String(txt).split(/\r?\n/).forEach(line => {
+    if (/^\s*\[[^\]]+\]\s*$/.test(line)) {
+      if (current.length) { sections.push(current.join('\n').trim()); current = []; }
+    } else {
+      current.push(line);
+    }
+  });
+  if (current.length) sections.push(current.join('\n').trim());
+
+  // Also split each section by 2+ blank lines (extra granularity)
+  const chunks = [];
+  sections.filter(Boolean).forEach(s => {
+    s.split(/\n{2,}/).map(c => c.trim()).filter(Boolean).forEach(c => chunks.push(c));
+  });
+
+  if (!chunks.length) throw new Error('No text content found');
+
+  return {
+    name:   fallbackName || 'ProPresenter Import',
+    slides: chunks.map(c => _makeSlide('lyrics', c)),
+  };
+}
+
+async function _importProPresenter() {
+  const input = document.createElement('input');
+  input.type   = 'file';
+  input.accept = '.pro6,.pro4,.pro,.txt,application/xml,text/plain';
+  input.multiple = true;
+  input.addEventListener('change', async () => {
+    const files = Array.from(input.files || []);
+    if (!files.length) return;
+
+    let imported = 0, failed = 0, skipped = 0;
+    const failures = [];
+
+    for (const file of files) {
+      const base = file.name.replace(/\.(pro6?|pro4|txt)$/i, '');
+      try {
+        if (/\.pro$/i.test(file.name)) {
+          // ProPresenter 7 binary protobuf — not supported
+          skipped++;
+          failures.push(`${file.name} — ProPresenter 7 .pro is binary. Re-save as .pro6 or export as text.`);
+          continue;
+        }
+        const text = await file.text();
+        let parsed;
+        if (/^<\?xml|<RVPresentationDocument/i.test(text.trim())) {
+          parsed = _parseProPresenterXML(text, base);
+        } else {
+          parsed = _parseProPresenterText(text, base);
+        }
+        const show = _makeShow(parsed.name);
+        // Replace the auto-created first slide (an "announce" of the show name)
+        // with the imported slides
+        show.slides = parsed.slides;
+        show.slides.forEach(sl => { sl.id = _uid(); });
+        _st.shows.unshift(show);
+        _save(show);
+        imported++;
+      } catch (err) {
+        failed++;
+        failures.push(`${file.name} — ${err.message || err}`);
+        console.warn('[FlockShow] ProPresenter import failed for', file.name, err);
+      }
+    }
+
+    _renderLibrary();
+
+    const parts = [];
+    if (imported) parts.push(`Imported ${imported} show${imported === 1 ? '' : 's'}.`);
+    if (skipped)  parts.push(`${skipped} skipped.`);
+    if (failed)   parts.push(`${failed} failed.`);
+    let msg = parts.join('  ');
+    if (failures.length) msg += '\n\n' + failures.join('\n');
+    if (failures.length || !imported) alert(msg || 'Nothing imported.');
+  });
+  input.click();
+}
+
 // ── Present mode ──────────────────────────────────────────────────────────────
 function _togglePresent() {
   // Stop if already live
@@ -1268,6 +1456,7 @@ function _wire() {
   /* ── Export / Import ── */
   document.getElementById('fs-export-show-btn')?.addEventListener('click', _exportShow);
   document.getElementById('fs-import-show-btn')?.addEventListener('click', _importShow);
+  document.getElementById('fs-import-pro-btn') ?.addEventListener('click', _importProPresenter);
 
   /* ── Import lyrics ── */
   document.getElementById('fs-import-btn')?.addEventListener('click', _importLyrics);
@@ -1277,6 +1466,12 @@ function _wire() {
   document.getElementById('fs-sp-close')?.addEventListener('click', _closeSongPicker);
   document.getElementById('fs-sp-backdrop')?.addEventListener('click', _closeSongPicker);
   document.getElementById('fs-sp-search')?.addEventListener('input', _filterSongPicker);
+
+  /* ── From Sermon picker ── */
+  document.getElementById('fs-from-sermon-btn')?.addEventListener('click', _openSermonPicker);
+  document.getElementById('fs-serm-close')?.addEventListener('click', _closeSermonPicker);
+  document.getElementById('fs-serm-backdrop')?.addEventListener('click', _closeSermonPicker);
+  document.getElementById('fs-serm-search')?.addEventListener('input', _filterSermonPicker);
 
   /* ── Present button ── */
   document.getElementById('fs-present-btn')?.addEventListener('click', _togglePresent);
@@ -1464,6 +1659,163 @@ async function _importSongFromStand(song) {
     if (statusEl) statusEl.textContent = `Imported "${songTitle}" (${count} slide${count === 1 ? '' : 's'})`;
   } catch (err) {
     console.error('FlockShow: song import failed', err);
+    if (statusEl) statusEl.textContent = `Import failed: ${err.message || 'Please try again.'}`;
+  }
+}
+
+// ── Sermon picker (FlockOS sermons → FlockShow auto-slide generation) ────────
+let _sermAllSermons = [];
+let _sermLoaded = false;
+
+function _openSermonPicker() {
+  const picker = document.getElementById('fs-sermon-picker');
+  if (!picker) return;
+  picker.hidden = false;
+  document.getElementById('fs-serm-search').value = '';
+  _filterSermonPicker();
+  document.getElementById('fs-serm-search').focus();
+  if (!_sermLoaded) _loadSermonPickerSermons();
+}
+
+function _closeSermonPicker() {
+  const picker = document.getElementById('fs-sermon-picker');
+  if (picker) picker.hidden = true;
+}
+
+async function _loadSermonPickerSermons() {
+  const statusEl = document.getElementById('fs-serm-status');
+  const listEl = document.getElementById('fs-serm-list');
+  if (statusEl) statusEl.textContent = 'Loading sermons…';
+  if (listEl) listEl.innerHTML = '';
+  try {
+    const UR = window.UpperRoom;
+    if (!UR || typeof UR.listSermons !== 'function') {
+      if (statusEl) statusEl.textContent = 'Sermon library unavailable.';
+      return;
+    }
+    const result = await UR.listSermons({ limit: 500 });
+    _sermAllSermons = Array.isArray(result) ? result : (result.results || result.rows || []);
+    _sermLoaded = true;
+    _renderSermonPickerList(_sermAllSermons);
+    if (statusEl) statusEl.textContent = `${_sermAllSermons.length} sermon${_sermAllSermons.length === 1 ? '' : 's'} in library`;
+  } catch (err) {
+    console.error('FlockShow: sermon picker load failed', err);
+    if (statusEl) statusEl.textContent = 'Could not load sermons. Are you signed in?';
+  }
+}
+
+function _filterSermonPicker() {
+  const q = (document.getElementById('fs-serm-search')?.value || '').trim().toLowerCase();
+  const filtered = q ? _sermAllSermons.filter(s =>
+    (s.title || '').toLowerCase().includes(q) ||
+    (s.preacher || s.speaker || '').toLowerCase().includes(q) ||
+    (s.scripture || s.passage || '').toLowerCase().includes(q) ||
+    (s.seriesName || s.series || '').toLowerCase().includes(q)
+  ) : _sermAllSermons;
+  _renderSermonPickerList(filtered);
+  const statusEl = document.getElementById('fs-serm-status');
+  if (statusEl && _sermLoaded) {
+    statusEl.textContent = q
+      ? `${filtered.length} result${filtered.length === 1 ? '' : 's'}`
+      : `${_sermAllSermons.length} sermon${_sermAllSermons.length === 1 ? '' : 's'} in library`;
+  }
+}
+
+function _renderSermonPickerList(sermons) {
+  const listEl = document.getElementById('fs-serm-list');
+  if (!listEl) return;
+  if (!sermons.length) {
+    listEl.innerHTML = '<div style="padding:24px;text-align:center;color:var(--fs-muted);font-size:0.83rem;">' +
+      (_sermLoaded ? 'No sermons match.' : 'Loading…') + '</div>';
+    return;
+  }
+  listEl.innerHTML = sermons.map(s => {
+    const preacher = s.preacher || s.speaker || '';
+    const scripture = s.scripture || s.passage || '';
+    const date = s.date ? new Date(s.date.seconds ? s.date.seconds * 1000 : s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    const meta = [preacher, scripture, date].filter(Boolean).join(' · ');
+    return `<div class="fs-sp-item" data-sermon-id="${s.id}" role="button" tabindex="0">
+      <div class="fs-sp-item-title">${_spEscape(s.title || 'Untitled Sermon')}</div>
+      ${meta ? `<div class="fs-sp-item-meta">${_spEscape(meta)}</div>` : ''}
+    </div>`;
+  }).join('');
+  listEl.querySelectorAll('.fs-sp-item').forEach(el => {
+    const id = el.dataset.sermonId;
+    const sermon = sermons.find(s => s.id === id);
+    if (!sermon) return;
+    el.addEventListener('click', () => _importSermonAsSlides(sermon));
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') _importSermonAsSlides(sermon); });
+  });
+}
+
+async function _importSermonAsSlides(sermon) {
+  const statusEl = document.getElementById('fs-serm-status');
+  if (statusEl) statusEl.textContent = `Generating slides for "${sermon.title}"…`;
+
+  try {
+    const show = _activeShow();
+    if (!show) { _closeSermonPicker(); return; }
+
+    const slides = [];
+    const title = sermon.title || 'Untitled Sermon';
+    const scripture = sermon.scripture || sermon.passage || '';
+    const preacher = sermon.preacher || sermon.speaker || '';
+
+    // 1. Title slide (announcement type)
+    slides.push(_makeSlide('announce', title + (preacher ? `\n\n${preacher}` : '')));
+
+    // 2. Scripture reference slide (scripture type) if available
+    if (scripture) {
+      slides.push(_makeSlide('scripture', scripture));
+    }
+
+    // 3. Main points (from sections if available, or notes)
+    const UR = window.UpperRoom;
+    if (UR && typeof UR.getSermon === 'function') {
+      try {
+        const full = await UR.getSermon(sermon.id);
+        // If sermon has structured sections (from FEED app)
+        if (Array.isArray(full.sections) && full.sections.length) {
+          full.sections.forEach(sec => {
+            if (sec.type === 'intro' || sec.type === 'conclusion' || sec.type === 'point') {
+              const text = [sec.heading || '', sec.content || ''].filter(Boolean).join('\n\n');
+              if (text.trim()) slides.push(_makeSlide('lyrics', text.trim()));
+            }
+          });
+        }
+        // Fallback: use notes field if no sections
+        else if (full.notes && full.notes.trim()) {
+          const stanzas = full.notes.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
+          stanzas.forEach(text => slides.push(_makeSlide('lyrics', text)));
+        }
+      } catch (_) { /* fall through to basic sermon data */ }
+    }
+
+    // Fallback: if no slides generated yet, use basic notes
+    if (slides.length === 1 && sermon.notes && sermon.notes.trim()) {
+      const stanzas = sermon.notes.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
+      stanzas.forEach(text => slides.push(_makeSlide('lyrics', text)));
+    }
+
+    // If still only title slide, add a blank content slide
+    if (slides.length === 1) {
+      slides.push(_makeSlide('lyrics', '(Add sermon content here)'));
+    }
+
+    // Insert slides after current active slide
+    show.slides.splice(_st.activeSlide + 1, 0, ...slides);
+    _st.activeSlide += 1;
+
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _renderProps();
+    _pushToPresent();
+    _closeSermonPicker();
+
+    if (statusEl) statusEl.textContent = `Generated ${slides.length} slide${slides.length === 1 ? '' : 's'} from "${title}"`;
+  } catch (err) {
+    console.error('FlockShow: sermon import failed', err);
     if (statusEl) statusEl.textContent = `Import failed: ${err.message || 'Please try again.'}`;
   }
 }
