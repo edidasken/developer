@@ -14415,11 +14415,13 @@ flock-tabs [role="tablist"], .tabs-bar {
   display: flex; flex: 1; overflow: hidden;
   padding-top: calc(var(--ms-header-h) + var(--ms-safe-top));
   /* Paint the gap above sidebar navy and above main page-bg so the cream
-     padding strip below the header disappears visually. */
+     padding strip below the header disappears visually. NOTE: --side-bg is
+     itself a gradient, so we can't reference it here — must use a solid
+     navy that matches the sidebar's top-left endpoint (#0c1445). */
   background: linear-gradient(
     to right,
-    var(--side-bg) 0,
-    var(--side-bg) var(--ms-sidebar-w),
+    #0c1445 0,
+    #0c1445 var(--ms-sidebar-w),
     var(--ms-bg) var(--ms-sidebar-w),
     var(--ms-bg) 100%
   );
