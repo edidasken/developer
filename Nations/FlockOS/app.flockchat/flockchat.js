@@ -74,18 +74,35 @@
       return;
     }
     
-    // Wait for Firebase
-    await _waitFor(() => typeof window.firebase !== 'undefined');
+    // Wait for Firebase + UpperRoom (Firebase Auth wrapper)
+    await _waitFor(() => typeof window.firebase !== 'undefined' && typeof window.UpperRoom !== 'undefined');
 
     _setBootStatus('Connecting…');
-    
-    // Init Firestore
+
+    // Authenticate to Firebase via UpperRoom (custom token from GAS).
+    // Firestore rules require request.auth != null — without this every
+    // read fails with "Missing or insufficient permissions."
+    try {
+      await window.UpperRoom.init(window.FLOCK_FIREBASE_CONFIG);
+      await window.UpperRoom.authenticate();
+    } catch (err) {
+      _setBootStatus('Sign-in failed. Please refresh.');
+      throw err;
+    }
+
+    // Init Firestore (after auth so reads succeed)
     try {
       _db = firebase.firestore();
     } catch (err) {
       _setBootStatus('Failed to connect. Please refresh.');
       throw err;
     }
+
+    // Prefer Firebase Auth uid for Firestore writes (matches request.auth.uid)
+    try {
+      const fbUser = firebase.auth().currentUser;
+      if (fbUser && fbUser.uid) _me.uid = fbUser.uid;
+    } catch (_) {}
 
     // Init FCM (push notifications)
     _initFCM().catch(err => console.warn('[FlockChat] FCM init failed:', err));
