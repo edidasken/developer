@@ -537,7 +537,7 @@ async function _loadDashboardData(main) {
     if (_fb()) {
       [plans, songs] = await Promise.all([
         UpperRoom.listServicePlans ? UpperRoom.listServicePlans() : Promise.resolve([]),
-        UpperRoom.listSongs ? UpperRoom.listSongs() : Promise.resolve([]),
+        UpperRoom.listSongs ? UpperRoom.listSongs({ limit: 1000 }) : Promise.resolve([]),
       ]);
       S.plans = plans || [];
       S.songs = songs || [];
