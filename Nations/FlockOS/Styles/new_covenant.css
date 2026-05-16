@@ -14551,8 +14551,10 @@ flock-tabs [role="tablist"], .tabs-bar {
   overflow-y: auto; overflow-x: hidden;
   display: flex; flex-direction: column;
   /* Top padding clears the fixed header so nav items aren't hidden under it.
-     Sidebar bg tiles up to viewport top behind the header — kills cream gap. */
-  padding: calc(var(--ms-header-h) + var(--ms-safe-top) + 12px) 8px 12px;
+     Sidebar bg tiles up to viewport top behind the header — kills cream gap.
+     No extra margin above the first nav item so it sits flush below the
+     rainbow stripe, matching the dashboard hero card. */
+  padding: calc(var(--ms-header-h) + var(--ms-safe-top)) 8px 12px;
   gap: 4px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.10) transparent;
