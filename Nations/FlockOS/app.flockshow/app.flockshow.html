@@ -295,7 +295,7 @@
     .fs-add-type-menu {
       position: absolute; bottom: calc(100% + 4px); left: 4px; right: 4px;
       background: var(--bg-raised); border: 1px solid var(--fs-border); border-radius: 10px;
-      overflow: hidden; z-index: 50; box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+      overflow: hidden; z-index: 300; box-shadow: 0 8px 28px rgba(0,0,0,0.22);
     }
     .fs-add-type-item {
       padding: 9px 13px; font: 0.80rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink);
@@ -553,6 +553,16 @@
     .fs-swatch:hover { transform: scale(1.15); border-color: rgba(255,255,255,0.35); }
     .fs-swatch.fs-swatch--active { border-color: var(--fs-accent); box-shadow: 0 0 0 3px var(--fs-accent-dim); }
 
+    /* ── Show theme section ─────────────────────────────────────────── */
+    .fs-show-theme-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px; border-radius: 8px;
+      background: var(--bg-input); border: 1px solid var(--line); min-height: 36px;
+    }
+    .fs-theme-chip { width: 22px; height: 22px; border-radius: 5px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.12); }
+    .fs-show-theme-label { font: 0.72rem 'Plus Jakarta Sans',sans-serif; color: var(--fs-muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fs-theme-action-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+
     /* ── Bible picker section ───────────────────────────────────────── */
     .fs-bible-row { display: flex; gap: 6px; margin-bottom: 5px; }
     .fs-bible-select {
@@ -773,16 +783,20 @@
         </div>
 
         <div class="fs-prop-section">
-          <div class="fs-prop-label">Background Theme</div>
-          <div class="fs-theme-swatches" id="fs-theme-swatches">
-            <button class="fs-swatch" data-bg="" data-tc="" title="Default (by type)" style="background:linear-gradient(135deg,#0b0d14 50%,#1a0e3c)"></button>
-            <button class="fs-swatch" data-bg="#000000" data-tc="#ffffff" title="Pure Black" style="background:#000"></button>
-            <button class="fs-swatch" data-bg="#0d1a2b" data-tc="#e8d5a3" title="Night Sky" style="background:#0d1a2b"></button>
-            <button class="fs-swatch" data-bg="#0a1a0f" data-tc="#86efac" title="Forest" style="background:#0a1a0f"></button>
-            <button class="fs-swatch" data-bg="#1a0e0e" data-tc="#fca5a5" title="Deep Red" style="background:#1a0e0e"></button>
-            <button class="fs-swatch" data-bg="#0a0a1e" data-tc="#c4b5fd" title="Deep Purple" style="background:#0a0a1e"></button>
-            <button class="fs-swatch" data-bg="#1a1200" data-tc="#fde68a" title="Amber" style="background:#1a1200"></button>
-            <button class="fs-swatch" data-bg="#0d1a2b" data-tc="#7dd3fc" title="Ocean" style="background:linear-gradient(135deg,#0d1a2b,#082030)"></button>
+          <div class="fs-prop-label">Background Preset</div>
+          <div class="fs-theme-swatches" id="fs-theme-swatches"></div>
+        </div>
+
+        <div class="fs-prop-section" id="fs-show-theme-section">
+          <div class="fs-prop-label">Show Theme <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.62rem;opacity:0.65">— default for all slides</span></div>
+          <div class="fs-show-theme-bar">
+            <div class="fs-theme-chip" id="fs-show-theme-chip" style="background:#0b0d14"></div>
+            <span class="fs-show-theme-label" id="fs-show-theme-label">None set</span>
+            <button class="fs-color-reset" id="fs-clear-show-theme-btn">Clear</button>
+          </div>
+          <div class="fs-theme-action-row">
+            <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-set-show-theme-btn">⭐ Set from Slide</button>
+            <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-apply-all-btn">Apply to All Slides</button>
           </div>
         </div>
 

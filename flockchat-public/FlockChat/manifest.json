@@ -1,0 +1,19 @@
+{
+  "name": "FlockChat",
+  "short_name": "FlockChat",
+  "description": "Church Messaging — FlockOS Communications Platform",
+  "start_url": "https://flockos-comms.web.app/",
+  "scope": "https://flockos-comms.web.app/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "./Images/FlockChat_AppIcon.png",
+      "sizes": "192x192 512x512 1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

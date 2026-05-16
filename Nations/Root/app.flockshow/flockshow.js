@@ -27,6 +27,28 @@ const SLIDE_TYPES = {
   blank:     { bg: '#000000', text: '#ffffff',  label: 'Blank',        icon: '⬛' },
 };
 
+// ── Gradient / colour presets ─────────────────────────────────────────────────
+const GRADIENTS = [
+  { label: 'Default',      bg: '',                                                tc: '' },
+  { label: 'Pure Black',   bg: '#000000',                                         tc: '#ffffff' },
+  { label: 'Deep Navy',    bg: '#0b0d14',                                         tc: '#f0f1f8' },
+  { label: 'Midnight',     bg: 'linear-gradient(135deg,#0b0d14,#1a0e3c)',         tc: '#e8d5fc' },
+  { label: 'Ocean',        bg: 'linear-gradient(135deg,#0d1a2b,#0a2040)',         tc: '#7dd3fc' },
+  { label: 'Deep Sea',     bg: 'linear-gradient(180deg,#060a14,#0d2040)',         tc: '#bfdbfe' },
+  { label: 'Forest',       bg: 'linear-gradient(135deg,#0a1a0f,#0d2a15)',         tc: '#86efac' },
+  { label: 'Emerald',      bg: 'linear-gradient(135deg,#001a0a,#002a10)',         tc: '#6ee7b7' },
+  { label: 'Holy Fire',    bg: 'linear-gradient(135deg,#1a0500,#3d1200)',         tc: '#fbbf24' },
+  { label: 'Amber',        bg: 'linear-gradient(135deg,#1a1200,#2d1f00)',         tc: '#fde68a' },
+  { label: 'Crimson',      bg: 'linear-gradient(135deg,#1a0e0e,#2d0808)',         tc: '#fca5a5' },
+  { label: 'Deep Purple',  bg: 'linear-gradient(135deg,#0a0a1e,#1e0a3c)',         tc: '#c4b5fd' },
+  { label: 'Royal',        bg: 'linear-gradient(135deg,#0a0040,#1a0060)',         tc: '#a5b4fc' },
+  { label: 'Dawn',         bg: 'linear-gradient(135deg,#1a0e1a,#2d0b35)',         tc: '#f9a8d4' },
+  { label: 'Night Sky',    bg: 'linear-gradient(180deg,#0d1a2b,#060a12)',         tc: '#bfdbfe' },
+  { label: 'Teal',         bg: 'linear-gradient(135deg,#001a1a,#003333)',         tc: '#5eead4' },
+  { label: 'Dusk',         bg: 'linear-gradient(180deg,#0a0a1a,#1a0a0a)',         tc: '#fdba74' },
+  { label: 'Slate',        bg: 'linear-gradient(135deg,#0f1215,#1a2030)',         tc: '#cbd5e1' },
+];
+
 // ── State ─────────────────────────────────────────────────────────────────────
 const _st = {
   view:         'library',  // 'library' | 'editor'
@@ -88,12 +110,23 @@ function _lsSync() {
 
 // Load all shows: Firestore → GAS → localStorage
 async function _load() {
+  // Render localStorage immediately for zero-wait UX
+  try {
+    const cached = JSON.parse(localStorage.getItem(FS_KEY) || '[]');
+    if (cached.length) {
+      _st.shows = cached;
+      if (_st.view === 'library') _renderLibrary();
+    }
+  } catch (_) {}
+
+  // Firestore — update in background
   if (_fsFB()) {
     try {
       const result = await window.UpperRoom.listPresentations({ limit: 200 });
       const rows = Array.isArray(result) ? result : (result.results || result.rows || []);
       _st.shows = rows.map(r => { r._fsId = r.id; return r; });
       _lsSync();
+      if (_st.view === 'library') _renderLibrary();
       return;
     } catch (e) {
       console.warn('[FlockShow] Firestore load failed, trying GAS:', e);
@@ -104,11 +137,10 @@ async function _load() {
   if (gasData && Array.isArray(gasData.rows)) {
     _st.shows = gasData.rows.map(r => { r._gasId = r.id; return r; });
     _lsSync();
+    if (_st.view === 'library') _renderLibrary();
     return;
   }
-  // localStorage last resort
-  try { _st.shows = JSON.parse(localStorage.getItem(FS_KEY) || '[]'); }
-  catch (_) { _st.shows = []; }
+  // localStorage already rendered above — nothing more to do
 }
 
 // Sync a single show to Firestore/GAS/localStorage (fire-and-forget safe)
@@ -165,6 +197,7 @@ function _makeShow(name = 'New Show') {
     id:        _uid(),
     name,
     slides:    [_makeSlide('announce', name)],
+    theme:     { bg: '', tc: '' },
     createdAt: now,
     updatedAt: now,
   };
@@ -185,8 +218,8 @@ function _save(show) {
 function _touch(show) { show.updatedAt = Date.now(); _save(show); }
 
 // ── Slide appearance ──────────────────────────────────────────────────────────
-function _slideBg(sl)   { return sl.bgColor   || SLIDE_TYPES[sl.type]?.bg   || '#000'; }
-function _slideCol(sl)  { return sl.textColor || SLIDE_TYPES[sl.type]?.text || '#fff'; }
+function _slideBg(sl, show)  { return sl.bgColor   || show?.theme?.bg || SLIDE_TYPES[sl.type]?.bg   || '#000'; }
+function _slideCol(sl, show) { return sl.textColor || show?.theme?.tc || SLIDE_TYPES[sl.type]?.text || '#fff'; }
 
 function _slideFontSize(sl) {
   if (sl.fontSize && sl.fontSize > 0) return sl.fontSize + 'px';
@@ -203,8 +236,8 @@ function _slideFontSize(sl) {
 function _buildPresentDoc(show, idx) {
   const sl     = show.slides[idx];
   if (!sl) return '';
-  const bg     = _slideBg(sl);
-  const col    = _slideCol(sl);
+  const bg     = _slideBg(sl, show);
+  const col    = _slideCol(sl, show);
   const fs     = _slideFontSize(sl);
   const body   = sl.type === 'blank' ? '' : _esc(sl.text || '');
   const refHtml = (sl.type === 'scripture' && sl.reference)
@@ -342,7 +375,7 @@ function _renderLibrary() {
 
   grid.innerHTML = shows.map(show => {
     const pips = show.slides.slice(0, 10).map(sl =>
-      `<div class="fs-slide-pip" style="background:${_e(_slideBg(sl))}"></div>`).join('');
+      `<div class="fs-slide-pip" style="background:${_e(_slideBg(sl, show))}"></div>`).join('');
     const overflow = show.slides.length > 10
       ? `<div class="fs-slide-pip" style="background:var(--bg-overlay,rgba(0,0,0,0.06));font-size:0.42rem;color:var(--fs-muted);display:flex;align-items:center;justify-content:center">+${show.slides.length - 10}</div>`
       : '';
@@ -368,6 +401,7 @@ function _renderSlideList() {
   if (!list) return;
   const show = _activeShow();
 
+  const show = _activeShow();
   // Remove old slide items, keep the add-slide wrapper
   list.querySelectorAll('.fs-slide-item').forEach(el => el.remove());
 
@@ -380,8 +414,8 @@ function _renderSlideList() {
     div.dataset.slideIdx = i;
     div.innerHTML = `
       <div class="fs-slide-num">${i + 1}</div>
-      <div class="fs-slide-thumb" style="background:${_e(_slideBg(sl))}">
-        <div class="fs-slide-thumb-text" style="color:${_e(_slideCol(sl))}">${_e((sl.text || '').slice(0, 80))}</div>
+      <div class="fs-slide-thumb" style="background:${_e(_slideBg(sl, show))}">
+        <div class="fs-slide-thumb-text" style="color:${_e(_slideCol(sl, show))}">${_e((sl.text || '').slice(0, 80))}</div>
         <div class="fs-type-chip">${_e(SLIDE_TYPES[sl.type]?.icon || '')}</div>
       </div>`;
     fragment.appendChild(div);
@@ -410,8 +444,8 @@ function _renderPreview() {
     return;
   }
 
-  canvas.style.background = _slideBg(sl);
-  textEl.style.color      = _slideCol(sl);
+  canvas.style.background = _slideBg(sl, show);
+  textEl.style.color      = _slideCol(sl, show);
   textEl.style.fontSize   = _slideFontSize(sl);
   textEl.textContent      = sl.type === 'blank' ? '' : (sl.text || '');
 
@@ -457,8 +491,9 @@ function _renderProps() {
   // Background color
   const bgInput = document.getElementById('fs-prop-bg');
   const bgLabel = document.getElementById('fs-prop-bg-label');
-  if (bgInput) bgInput.value = sl.bgColor || SLIDE_TYPES[sl.type]?.bg || '#000000';
-  if (bgLabel) bgLabel.textContent = sl.bgColor || 'Default';
+  const _isBgGrad = sl.bgColor && sl.bgColor.includes('gradient');
+  if (bgInput) bgInput.value = _isBgGrad ? (SLIDE_TYPES[sl.type]?.bg || '#000000') : (sl.bgColor || SLIDE_TYPES[sl.type]?.bg || '#000000');
+  if (bgLabel) bgLabel.textContent = _isBgGrad ? (GRADIENTS.find(g => g.bg === sl.bgColor)?.label || 'Gradient') : (sl.bgColor || 'Default');
 
   // Text color
   const tcInput = document.getElementById('fs-prop-tc');
@@ -490,6 +525,9 @@ function _renderProps() {
   document.querySelectorAll('.fs-swatch').forEach(sw => {
     sw.classList.toggle('fs-swatch--active', sw.dataset.bg === activeBg);
   });
+
+  // Show theme bar
+  _renderShowTheme();
 
   // Editor bar
   const titleEl   = document.getElementById('fs-show-title');
@@ -927,6 +965,67 @@ function _togglePresent() {
   _renderPreview();
 }
 
+// ── Gradient swatches (JS-generated from GRADIENTS array) ────────────────────
+function _initSwatches() {
+  const container = document.getElementById('fs-theme-swatches');
+  if (!container) return;
+  container.innerHTML = GRADIENTS.map(g => {
+    const visual = g.bg.includes('gradient') ? g.bg : (g.bg || 'linear-gradient(135deg,#0b0d14 50%,#1a0e3c)');
+    return `<button class="fs-swatch" data-bg="${_e(g.bg)}" data-tc="${_e(g.tc)}" title="${_e(g.label)}" style="background:${visual}"></button>`;
+  }).join('');
+}
+
+// ── Show theme controls ───────────────────────────────────────────────────────
+function _renderShowTheme() {
+  const show  = _activeShow();
+  const chip  = document.getElementById('fs-show-theme-chip');
+  const label = document.getElementById('fs-show-theme-label');
+  if (!chip || !label) return;
+  const bg = show?.theme?.bg || '';
+  const isGrad = bg.includes('gradient');
+  chip.style.background = bg || '#0b0d14';
+  const gradName = isGrad ? (GRADIENTS.find(g => g.bg === bg)?.label || 'Custom gradient') : '';
+  label.textContent = bg ? (gradName || bg) : 'None — using type defaults';
+}
+
+function _setShowTheme() {
+  const show = _activeShow();
+  const sl   = _activeSlide();
+  if (!show || !sl) return;
+  if (!show.theme) show.theme = {};
+  show.theme.bg = sl.bgColor || '';
+  show.theme.tc = sl.textColor || '';
+  _touch(show);
+  _renderShowTheme();
+}
+
+function _clearShowTheme() {
+  const show = _activeShow();
+  if (!show) return;
+  show.theme = { bg: '', tc: '' };
+  _touch(show);
+  _renderShowTheme();
+  _renderSlideList();
+  _renderPreview();
+}
+
+function _applyThemeToAll() {
+  const show = _activeShow();
+  const sl   = _activeSlide();
+  if (!show || !sl) return;
+  if (!show.theme) show.theme = {};
+  show.theme.bg = sl.bgColor || '';
+  show.theme.tc = sl.textColor || '';
+  // Clear per-slide overrides so all slides inherit the show theme
+  show.slides.forEach(s => { s.bgColor = ''; s.textColor = ''; });
+  _touch(show);
+  _renderShowTheme();
+  _renderSlideList();
+  _renderPreview();
+  _renderProps();
+  _pushToPresent();
+}
+
 // ── Event wiring ──────────────────────────────────────────────────────────────
 function _wire() {
 
@@ -1182,6 +1281,14 @@ function _wire() {
   /* ── Present button ── */
   document.getElementById('fs-present-btn')?.addEventListener('click', _togglePresent);
 
+  /* ── Show theme controls ── */
+  document.getElementById('fs-set-show-theme-btn')?.addEventListener('click', _setShowTheme);
+  document.getElementById('fs-apply-all-btn')?.addEventListener('click', _applyThemeToAll);
+  document.getElementById('fs-clear-show-theme-btn')?.addEventListener('click', _clearShowTheme);
+
+  /* ── Build gradient swatches ── */
+  _initSwatches();
+
   /* ── Keyboard shortcuts in editor ── */
   document.addEventListener('keydown', e => {
     if (_st.view !== 'editor') return;
@@ -1309,42 +1416,55 @@ async function _importSongFromStand(song) {
 
   try {
     const UR = window.UpperRoom;
-    let chordProText = '';
+    let chordProText = song.chordSheet || '';
     let songTitle = song.title || 'Untitled';
 
     if (UR && typeof UR.getSongWithArrangements === 'function') {
-      const full = await UR.getSongWithArrangements(song.id);
-      songTitle = full.title || songTitle;
-      // Prefer first arrangement's lyricsWithChords, fall back to song.chordSheet
-      const arr = (full.arrangements || [])[0];
-      chordProText = (arr && arr.lyricsWithChords) || full.chordSheet || '';
-    } else {
-      chordProText = song.chordSheet || '';
+      try {
+        const full = await UR.getSongWithArrangements(song.id);
+        songTitle = full.title || songTitle;
+        const arr = (full.arrangements || [])[0];
+        chordProText = (arr && arr.lyricsWithChords) || full.chordSheet || chordProText;
+      } catch (innerErr) {
+        console.warn('[FlockShow] getSongWithArrangements failed, trying getSong:', innerErr);
+        if (UR && typeof UR.getSong === 'function') {
+          try {
+            const partial = await UR.getSong(song.id);
+            songTitle = partial.title || songTitle;
+            chordProText = partial.chordSheet || chordProText;
+          } catch (_) { /* use song data from picker list */ }
+        }
+      }
     }
 
     const stripped = _stripChordPro(chordProText);
-    const stanzas = _splitStanzas(stripped);
-
-    const show = _activeShow();
+    const stanzas  = _splitStanzas(stripped);
+    const show     = _activeShow();
     if (!show) { _closeSongPicker(); return; }
 
-    // Insert stanzas as slides after the current active slide
     if (stanzas.length) {
       const newSlides = stanzas.map(t => _makeSlide('lyrics', t));
       show.slides.splice(_st.activeSlide + 1, 0, ...newSlides);
       _st.activeSlide += 1;
-      _touch(show);
-      _renderSlideList();
-      _renderPreview();
-      _renderProps();
-      _pushToPresent();
+    } else {
+      // No lyrics found — create one title slide rather than failing silently
+      const titleSlide = _makeSlide('lyrics', songTitle);
+      show.slides.splice(_st.activeSlide + 1, 0, titleSlide);
+      _st.activeSlide += 1;
     }
 
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _renderProps();
+    _pushToPresent();
     _closeSongPicker();
-    if (statusEl) statusEl.textContent = `Imported "${songTitle}" (${stanzas.length} slide${stanzas.length === 1 ? '' : 's'})`;
+
+    const count = stanzas.length || 1;
+    if (statusEl) statusEl.textContent = `Imported "${songTitle}" (${count} slide${count === 1 ? '' : 's'})`;
   } catch (err) {
     console.error('FlockShow: song import failed', err);
-    if (statusEl) statusEl.textContent = 'Import failed. Please try again.';
+    if (statusEl) statusEl.textContent = `Import failed: ${err.message || 'Please try again.'}`;
   }
 }
 

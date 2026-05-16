@@ -51,7 +51,6 @@ Covenant/Courts/TheTabernacle/Tools/Flock Secrets/
 
 # ── Firebase CLI artifacts ───────────────────────────────────────────────
 .firebase/
-flockchat-public/
 
 # ── Node / build artifacts (future-proofing) ─────────────────────────────
 node_modules/
