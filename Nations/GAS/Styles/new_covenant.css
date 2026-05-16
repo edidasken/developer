@@ -14356,16 +14356,15 @@ flock-tabs [role="tablist"], .tabs-bar {
   --ms-safe-top:    var(--safe-top, env(safe-area-inset-top, 0px));
   --ms-safe-bot:    var(--safe-bottom, env(safe-area-inset-bottom, 0px));
 
-  /* Visual tokens — FlockStand uses higher contrast than the NC default
-     palette because its main views are dense, text-heavy worship tooling. */
-  --ms-bg:          var(--bg, #f7f8fb);
-  --ms-bg-raised:   var(--bg-raised, #fff);
-  --ms-bg-card:     var(--bg-raised, #fff);
-  --ms-bg-card-hi:  var(--bg, #f7f8fb);
-  --ms-ink:         #0b1220;                 /* darker than NC default for max readability */
-  --ms-ink-muted:   #334155;                 /* slate-700 — was light gray, now WCAG-AA on cream */
-  --ms-ink-faint:   #475569;                 /* slate-600 — still readable */
-  --ms-line:        rgba(15,23,42,0.18);     /* stronger card/divider lines */
+  /* Visual tokens — FlockStand navy palette with white/gold text */
+  --ms-bg:          #1a1d2e;                 /* dark navy background */
+  --ms-bg-raised:   #1a1d2e;                 /* dark navy cards */
+  --ms-bg-card:     #1a1d2e;                 /* dark navy cards */
+  --ms-bg-card-hi:  #151827;                 /* darker navy for contrast */
+  --ms-ink:         #ffffff;                 /* white text */
+  --ms-ink-muted:   rgba(255,255,255,0.65); /* dimmed white */
+  --ms-ink-faint:   rgba(255,255,255,0.45); /* faint white */
+  --ms-line:        rgba(255,255,255,0.1);  /* subtle borders */
   --ms-gold:        var(--gold, #e8a838);
   --ms-gold-soft:   var(--gold-soft, rgba(232,168,56,0.15));
   --ms-gold-glow:   var(--gold-glow, rgba(232,168,56,0.32));
@@ -14891,7 +14890,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-input:focus, .ms-select:focus, .ms-textarea:focus { border-color: var(--ms-gold-glow); }
 .ms-select    { cursor: pointer; }
 .ms-textarea  { resize: vertical; min-height: 100px; }
-.ms-content-editor { font-family: var(--ms-mono); font-size: .87rem; min-height: 400px; tab-size: 2; line-height: 1.7; resize: vertical; background: #f8f8f8; }
+.ms-content-editor { font-family: var(--ms-mono); font-size: .87rem; min-height: 400px; tab-size: 2; line-height: 1.7; resize: vertical; background: var(--ms-bg-card-hi); }
 .ms-content-preview { min-height: 300px; padding: 18px; background: var(--ms-bg-card); border: 1px solid var(--ms-line); border-radius: var(--ms-r-md); overflow-y: auto; }
 .ms-row       { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
 .ms-row .ms-field { flex: 1; min-width: 120px; }
