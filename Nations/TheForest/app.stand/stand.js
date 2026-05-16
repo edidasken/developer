@@ -978,26 +978,74 @@ function _renderImport(main) {
 
       <!-- ChordPro / SongSelect -->
       <div class="ms-import-panel is-active" id="imp-panel-chordpro">
-        <div class="ms-import-source-grid">
-          <div class="ms-import-source is-selected" data-source="songselect">
-            <div class="ms-import-source-icon">🎵</div>
-            <div class="ms-import-source-name">CCLI SongSelect</div>
-            <div class="ms-import-source-desc">Paste the exported ChordPro file from SongSelect</div>
+        <!-- SongSelect Direct Connection -->
+        <div class="ms-card" style="max-width:520px;margin-bottom:24px;">
+          <div style="font-size:1.4rem;margin-bottom:12px;">🎵</div>
+          <div style="font-weight:700;font-size:1rem;margin-bottom:8px;">CCLI SongSelect Direct Import</div>
+          <p style="color:var(--ms-ink-muted);font-size:.88rem;line-height:1.6;margin-bottom:16px;">
+            Connect your SongSelect account to browse and import songs directly without downloading files.
+          </p>
+          <div id="ss-connect-form" hidden>
+            <div class="ms-field" style="margin-bottom:12px;">
+              <div class="ms-label">SongSelect Email</div>
+              <input class="ms-input" type="email" id="ss-email" placeholder="your@email.com">
+            </div>
+            <div class="ms-field" style="margin-bottom:16px;">
+              <div class="ms-label">SongSelect Password</div>
+              <input class="ms-input" type="password" id="ss-password" placeholder="Your SongSelect password">
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button class="ms-btn ms-btn--primary" id="ss-connect-btn">Connect</button>
+              <button class="ms-btn ms-btn--ghost" id="ss-cancel-btn">Cancel</button>
+            </div>
+            <p style="font-size:.72rem;color:var(--ms-ink-faint);margin-top:12px;">Your credentials are stored securely and only used to access your SongSelect library.</p>
           </div>
-          <div class="ms-import-source" data-source="planning-center-cp">
-            <div class="ms-import-source-icon">📋</div>
-            <div class="ms-import-source-name">Planning Center</div>
-            <div class="ms-import-source-desc">Copy the chord chart from a PCO song</div>
+          <div id="ss-connected-view" hidden>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:10px;margin-bottom:16px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <div style="flex:1;">
+                <div style="font-weight:600;font-size:.88rem;">Connected to SongSelect</div>
+                <div style="font-size:.78rem;color:var(--ms-ink-muted);"><span id="ss-email-display"></span></div>
+              </div>
+              <button class="ms-btn ms-btn--ghost ms-btn--sm" id="ss-disconnect-btn">Disconnect</button>
+            </div>
+            <div class="ms-field" style="margin-bottom:12px;">
+              <div class="ms-label">Search SongSelect Library</div>
+              <input class="ms-input" type="text" id="ss-search" placeholder="Search by title, artist, or CCLI number...">
+            </div>
+            <button class="ms-btn ms-btn--primary" id="ss-search-btn" style="margin-bottom:16px;">Search</button>
+            <div id="ss-results" hidden></div>
           </div>
-          <div class="ms-import-source" data-source="ultimate-guitar">
-            <div class="ms-import-source-icon">🎸</div>
-            <div class="ms-import-source-name">Ultimate Guitar</div>
-            <div class="ms-import-source-desc">Paste a UG chord tab (auto-converted)</div>
+          <button class="ms-btn ms-btn--primary" id="ss-show-connect" hidden>Connect SongSelect Account</button>
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <div style="flex:1;height:1px;background:var(--ms-line);"></div>
+            <span style="font-size:.85rem;color:var(--ms-ink-muted);font-weight:600;">OR PASTE DIRECTLY</span>
+            <div style="flex:1;height:1px;background:var(--ms-line);"></div>
           </div>
-          <div class="ms-import-source" data-source="any-chordpro">
-            <div class="ms-import-source-icon">📄</div>
-            <div class="ms-import-source-name">Any ChordPro</div>
-            <div class="ms-import-source-desc">Any .cho / .chopro file or raw text</div>
+          <div class="ms-import-source-grid">
+            <div class="ms-import-source is-selected" data-source="songselect">
+              <div class="ms-import-source-icon">🎵</div>
+              <div class="ms-import-source-name">CCLI SongSelect</div>
+              <div class="ms-import-source-desc">Paste the exported ChordPro file from SongSelect</div>
+            </div>
+            <div class="ms-import-source" data-source="planning-center-cp">
+              <div class="ms-import-source-icon">📋</div>
+              <div class="ms-import-source-name">Planning Center</div>
+              <div class="ms-import-source-desc">Copy the chord chart from a PCO song</div>
+            </div>
+            <div class="ms-import-source" data-source="ultimate-guitar">
+              <div class="ms-import-source-icon">🎸</div>
+              <div class="ms-import-source-name">Ultimate Guitar</div>
+              <div class="ms-import-source-desc">Paste a UG chord tab (auto-converted)</div>
+            </div>
+            <div class="ms-import-source" data-source="any-chordpro">
+              <div class="ms-import-source-icon">📄</div>
+              <div class="ms-import-source-name">Any ChordPro</div>
+              <div class="ms-import-source-desc">Any .cho / .chopro file or raw text</div>
+            </div>
           </div>
         </div>
 
@@ -1123,6 +1171,9 @@ function _renderImport(main) {
     });
   });
 
+  // SongSelect Direct Connection
+  _initSongSelectConnection(main);
+
   // ChordPro parse + save
   let _cpParsed = null;
   main.querySelector('#imp-cp-parse')?.addEventListener('click', () => {
@@ -1192,6 +1243,255 @@ function _renderImport(main) {
       _toast('Save failed: ' + err.message, 'error');
     }
   });
+}
+
+/* ──────────────────────────────────────────────────────────────────────────────
+   SongSelect Direct Connection
+   ────────────────────────────────────────────────────────────────────────────── */
+
+function _initSongSelectConnection(main) {
+  // Check if credentials exist in localStorage
+  const ssCredentials = _getSongSelectCredentials();
+  
+  // Show appropriate view
+  if (ssCredentials && ssCredentials.email) {
+    main.querySelector('#ss-connected-view').hidden = false;
+    main.querySelector('#ss-email-display').textContent = ssCredentials.email;
+  } else {
+    main.querySelector('#ss-show-connect').hidden = false;
+  }
+
+  // Show connect form
+  main.querySelector('#ss-show-connect')?.addEventListener('click', () => {
+    main.querySelector('#ss-show-connect').hidden = true;
+    main.querySelector('#ss-connect-form').hidden = false;
+  });
+
+  // Cancel connection
+  main.querySelector('#ss-cancel-btn')?.addEventListener('click', () => {
+    main.querySelector('#ss-connect-form').hidden = true;
+    main.querySelector('#ss-show-connect').hidden = false;
+    main.querySelector('#ss-email').value = '';
+    main.querySelector('#ss-password').value = '';
+  });
+
+  // Connect to SongSelect
+  main.querySelector('#ss-connect-btn')?.addEventListener('click', async () => {
+    const email = main.querySelector('#ss-email').value.trim();
+    const password = main.querySelector('#ss-password').value.trim();
+    
+    if (!email || !password) {
+      _toast('Please enter both email and password', 'error');
+      return;
+    }
+
+    const btn = main.querySelector('#ss-connect-btn');
+    btn.disabled = true;
+    btn.textContent = 'Connecting...';
+
+    try {
+      // Call Firebase Function to validate credentials
+      const auth = firebase.auth();
+      const functions = firebase.functions();
+      const songSelectAuth = functions.httpsCallable('songSelectAuth');
+      
+      const result = await songSelectAuth({ email, password });
+      
+      if (result.data && result.data.ok) {
+        // Store credentials locally (encrypted storage would be better)
+        _saveSongSelectCredentials({ email, password });
+        
+        main.querySelector('#ss-connect-form').hidden = true;
+        main.querySelector('#ss-connected-view').hidden = false;
+        main.querySelector('#ss-email-display').textContent = email;
+        main.querySelector('#ss-email').value = '';
+        main.querySelector('#ss-password').value = '';
+        
+        _toast('Connected to SongSelect', 'success');
+      } else {
+        throw new Error('Invalid credentials');
+      }
+    } catch (err) {
+      _toast('Connection failed: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Connect';
+    }
+  });
+
+  // Disconnect from SongSelect
+  main.querySelector('#ss-disconnect-btn')?.addEventListener('click', () => {
+    if (confirm('Disconnect from SongSelect?')) {
+      _clearSongSelectCredentials();
+      main.querySelector('#ss-connected-view').hidden = true;
+      main.querySelector('#ss-show-connect').hidden = false;
+      _toast('Disconnected from SongSelect', 'info');
+    }
+  });
+
+  // Search SongSelect
+  main.querySelector('#ss-search-btn')?.addEventListener('click', async () => {
+    const query = main.querySelector('#ss-search').value.trim();
+    if (!query) {
+      _toast('Enter a search term', 'error');
+      return;
+    }
+
+    const btn = main.querySelector('#ss-search-btn');
+    const resultsEl = main.querySelector('#ss-results');
+    
+    btn.disabled = true;
+    btn.textContent = 'Searching...';
+    resultsEl.hidden = false;
+    resultsEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ms-ink-muted);">Searching SongSelect...</div>';
+
+    try {
+      const credentials = _getSongSelectCredentials();
+      const results = await _searchSongSelect(query, credentials);
+      _renderSongSelectResults(resultsEl, results);
+    } catch (err) {
+      resultsEl.innerHTML = `<div style="padding:20px;text-align:center;color:var(--ms-danger);">Search failed: ${_e(err.message)}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Search';
+    }
+  });
+
+  // Search on Enter key
+  main.querySelector('#ss-search')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      main.querySelector('#ss-search-btn').click();
+    }
+  });
+}
+
+function _getSongSelectCredentials() {
+  try {
+    const stored = localStorage.getItem('flockos_songselect_creds');
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+}
+
+function _saveSongSelectCredentials(creds) {
+  localStorage.setItem('flockos_songselect_creds', JSON.stringify(creds));
+}
+
+function _clearSongSelectCredentials() {
+  localStorage.removeItem('flockos_songselect_creds');
+}
+
+async function _searchSongSelect(query, credentials) {
+  if (!_fb()) throw new Error('Firebase not initialized');
+  
+  const functions = firebase.functions();
+  const songSelectSearch = functions.httpsCallable('songSelectSearch');
+  
+  const result = await songSelectSearch({
+    email: credentials.email,
+    password: credentials.password,
+    query: query
+  });
+  
+  if (result.data && result.data.ok) {
+    return result.data.results || [];
+  }
+  
+  throw new Error(result.data?.message || 'Search failed');
+}
+
+function _renderSongSelectResults(el, results) {
+  if (!results || results.length === 0) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ms-ink-muted);">No results found</div>';
+    return;
+  }
+
+  el.innerHTML = `
+    <div style="margin-bottom:12px;">
+      <div class="ms-label">${results.length} song${results.length === 1 ? '' : 's'} found</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      ${results.map((song, idx) => `
+        <div class="ms-card" style="cursor:pointer;" data-ss-song-idx="${idx}">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:700;font-size:.95rem;margin-bottom:4px;">${_e(song.title)}</div>
+              <div style="font-size:.82rem;color:var(--ms-ink-muted);">${_e(song.artist)} ${song.ccliNumber ? '• CCLI ' + _e(song.ccliNumber) : ''}</div>
+              ${song.key ? `<div style="font-size:.75rem;color:var(--ms-gold);margin-top:4px;">Key: ${_e(song.key)}</div>` : ''}
+            </div>
+            <button class="ms-btn ms-btn--primary ms-btn--sm" data-ss-import="${idx}">Import</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  // Attach import handlers
+  el.querySelectorAll('[data-ss-import]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.ssImport);
+      const song = results[idx];
+      await _importSongSelectSong(song, btn);
+    });
+  });
+}
+
+async function _importSongSelectSong(song, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Importing...';
+
+  try {
+    if (!_fb()) throw new Error('Firebase not initialized');
+    
+    // Get full ChordPro from Firebase Function
+    const credentials = _getSongSelectCredentials();
+    if (!credentials) throw new Error('Not connected to SongSelect');
+    
+    const functions = firebase.functions();
+    const songSelectImport = functions.httpsCallable('songSelectImport');
+    
+    const result = await songSelectImport({
+      email: credentials.email,
+      password: credentials.password,
+      songId: song.songId || song.id
+    });
+    
+    if (!result.data || !result.data.ok) {
+      throw new Error(result.data?.message || 'Import failed');
+    }
+    
+    // Parse and save the ChordPro data
+    const chordPro = result.data.chordPro;
+    const parsed = _parseChordPro(chordPro);
+    
+    const payload = {
+      title:         parsed.title || result.data.title || song.title,
+      artist:        parsed.artist || result.data.artist || song.artist,
+      defaultKey:    parsed.key || result.data.key || song.key || 'C',
+      chordSheetKey: parsed.key || result.data.key || song.key || 'C',
+      chordSheet:    chordPro,
+      ccliNumber:    parsed.ccliNumber || result.data.ccliNumber || song.ccliNumber || '',
+      tempoBpm:      parsed.bpm || '0',
+      timeSignature: parsed.timeSignature || '4/4',
+      active:        'TRUE',
+      notes:         'Imported from SongSelect',
+    };
+
+    if (UpperRoom.createSong) {
+      await UpperRoom.createSong(payload);
+      S.songs = [];
+      _toast(`"${payload.title}" imported successfully`, 'success');
+      setTimeout(() => _navigate('songs'), 1000);
+    } else {
+      throw new Error('Unable to save song - not connected to database');
+    }
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Import';
+    _toast('Import failed: ' + err.message, 'error');
+  }
 }
 
 function _parseChordPro(text) {

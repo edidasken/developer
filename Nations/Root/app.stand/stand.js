@@ -963,11 +963,11 @@ function _setlistItemHtml(s, i) {
 function _renderImport(main) {
   main.innerHTML = `
     <div class="ms-view">
-      <div class="ms-page-hero">
-        <div class="ms-page-hero-text">
-          <h1>Import Songs</h1>
-          <p>Bring songs in from CCLI SongSelect, Planning Center, or paste raw ChordPro.</p>
-        </div>
+      <!-- Navy card header matching FlockStand dashboard theme -->
+      <div class="pray-liturgy-card" style="margin-bottom:24px;">
+        <div style="font-size:1.4rem;margin-bottom:12px;">📥</div>
+        <div class="pray-liturgy-title">Import Songs</div>
+        <div class="pray-liturgy-verse">Bring songs in from CCLI SongSelect, Planning Center, or paste raw ChordPro.</div>
       </div>
 
       <div class="ms-import-tabs" id="imp-tabs">
