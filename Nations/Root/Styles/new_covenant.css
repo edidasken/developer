@@ -14982,6 +14982,13 @@ flock-tabs [role="tablist"], .tabs-bar {
    Scoped to `.ms-dash` so it only affects the home dashboard view, leaving
    the Service Plans grid (which reuses .ms-service-card) untouched. */
 .ms-dash { --dash-navy-1: #0f1735; --dash-navy-2: #1b264f; --dash-gold: var(--ms-gold,#e8a838); }
+/* Dashboard butts directly against the header — kill the .ms-view top padding
+   so the hero card sits flush below the rainbow stripe. (.ms-main still clears
+   the fixed header itself, so content isn't hidden.) Side + bottom padding kept.
+   Desktop only — at <=860px, .ms-view owns the header clearance, so we leave it. */
+@media (min-width: 861px) {
+  .ms-view.ms-dash { padding-top: 0; }
+}
 
 /* Hero card */
 .ms-dash-hero {
