@@ -1278,6 +1278,12 @@ function _wire() {
   document.getElementById('fs-sp-backdrop')?.addEventListener('click', _closeSongPicker);
   document.getElementById('fs-sp-search')?.addEventListener('input', _filterSongPicker);
 
+  /* ── From Sermon picker ── */
+  document.getElementById('fs-from-sermon-btn')?.addEventListener('click', _openSermonPicker);
+  document.getElementById('fs-serm-close')?.addEventListener('click', _closeSermonPicker);
+  document.getElementById('fs-serm-backdrop')?.addEventListener('click', _closeSermonPicker);
+  document.getElementById('fs-serm-search')?.addEventListener('input', _filterSermonPicker);
+
   /* ── Present button ── */
   document.getElementById('fs-present-btn')?.addEventListener('click', _togglePresent);
 
@@ -1464,6 +1470,163 @@ async function _importSongFromStand(song) {
     if (statusEl) statusEl.textContent = `Imported "${songTitle}" (${count} slide${count === 1 ? '' : 's'})`;
   } catch (err) {
     console.error('FlockShow: song import failed', err);
+    if (statusEl) statusEl.textContent = `Import failed: ${err.message || 'Please try again.'}`;
+  }
+}
+
+// ── Sermon picker (FlockOS sermons → FlockShow auto-slide generation) ────────
+let _sermAllSermons = [];
+let _sermLoaded = false;
+
+function _openSermonPicker() {
+  const picker = document.getElementById('fs-sermon-picker');
+  if (!picker) return;
+  picker.hidden = false;
+  document.getElementById('fs-serm-search').value = '';
+  _filterSermonPicker();
+  document.getElementById('fs-serm-search').focus();
+  if (!_sermLoaded) _loadSermonPickerSermons();
+}
+
+function _closeSermonPicker() {
+  const picker = document.getElementById('fs-sermon-picker');
+  if (picker) picker.hidden = true;
+}
+
+async function _loadSermonPickerSermons() {
+  const statusEl = document.getElementById('fs-serm-status');
+  const listEl = document.getElementById('fs-serm-list');
+  if (statusEl) statusEl.textContent = 'Loading sermons…';
+  if (listEl) listEl.innerHTML = '';
+  try {
+    const UR = window.UpperRoom;
+    if (!UR || typeof UR.listSermons !== 'function') {
+      if (statusEl) statusEl.textContent = 'Sermon library unavailable.';
+      return;
+    }
+    const result = await UR.listSermons({ limit: 500 });
+    _sermAllSermons = Array.isArray(result) ? result : (result.results || result.rows || []);
+    _sermLoaded = true;
+    _renderSermonPickerList(_sermAllSermons);
+    if (statusEl) statusEl.textContent = `${_sermAllSermons.length} sermon${_sermAllSermons.length === 1 ? '' : 's'} in library`;
+  } catch (err) {
+    console.error('FlockShow: sermon picker load failed', err);
+    if (statusEl) statusEl.textContent = 'Could not load sermons. Are you signed in?';
+  }
+}
+
+function _filterSermonPicker() {
+  const q = (document.getElementById('fs-serm-search')?.value || '').trim().toLowerCase();
+  const filtered = q ? _sermAllSermons.filter(s =>
+    (s.title || '').toLowerCase().includes(q) ||
+    (s.preacher || s.speaker || '').toLowerCase().includes(q) ||
+    (s.scripture || s.passage || '').toLowerCase().includes(q) ||
+    (s.seriesName || s.series || '').toLowerCase().includes(q)
+  ) : _sermAllSermons;
+  _renderSermonPickerList(filtered);
+  const statusEl = document.getElementById('fs-serm-status');
+  if (statusEl && _sermLoaded) {
+    statusEl.textContent = q
+      ? `${filtered.length} result${filtered.length === 1 ? '' : 's'}`
+      : `${_sermAllSermons.length} sermon${_sermAllSermons.length === 1 ? '' : 's'} in library`;
+  }
+}
+
+function _renderSermonPickerList(sermons) {
+  const listEl = document.getElementById('fs-serm-list');
+  if (!listEl) return;
+  if (!sermons.length) {
+    listEl.innerHTML = '<div style="padding:24px;text-align:center;color:var(--fs-muted);font-size:0.83rem;">' +
+      (_sermLoaded ? 'No sermons match.' : 'Loading…') + '</div>';
+    return;
+  }
+  listEl.innerHTML = sermons.map(s => {
+    const preacher = s.preacher || s.speaker || '';
+    const scripture = s.scripture || s.passage || '';
+    const date = s.date ? new Date(s.date.seconds ? s.date.seconds * 1000 : s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    const meta = [preacher, scripture, date].filter(Boolean).join(' · ');
+    return `<div class="fs-sp-item" data-sermon-id="${s.id}" role="button" tabindex="0">
+      <div class="fs-sp-item-title">${_spEscape(s.title || 'Untitled Sermon')}</div>
+      ${meta ? `<div class="fs-sp-item-meta">${_spEscape(meta)}</div>` : ''}
+    </div>`;
+  }).join('');
+  listEl.querySelectorAll('.fs-sp-item').forEach(el => {
+    const id = el.dataset.sermonId;
+    const sermon = sermons.find(s => s.id === id);
+    if (!sermon) return;
+    el.addEventListener('click', () => _importSermonAsSlides(sermon));
+    el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') _importSermonAsSlides(sermon); });
+  });
+}
+
+async function _importSermonAsSlides(sermon) {
+  const statusEl = document.getElementById('fs-serm-status');
+  if (statusEl) statusEl.textContent = `Generating slides for "${sermon.title}"…`;
+
+  try {
+    const show = _activeShow();
+    if (!show) { _closeSermonPicker(); return; }
+
+    const slides = [];
+    const title = sermon.title || 'Untitled Sermon';
+    const scripture = sermon.scripture || sermon.passage || '';
+    const preacher = sermon.preacher || sermon.speaker || '';
+
+    // 1. Title slide (announcement type)
+    slides.push(_makeSlide('announce', title + (preacher ? `\n\n${preacher}` : '')));
+
+    // 2. Scripture reference slide (scripture type) if available
+    if (scripture) {
+      slides.push(_makeSlide('scripture', scripture));
+    }
+
+    // 3. Main points (from sections if available, or notes)
+    const UR = window.UpperRoom;
+    if (UR && typeof UR.getSermon === 'function') {
+      try {
+        const full = await UR.getSermon(sermon.id);
+        // If sermon has structured sections (from FEED app)
+        if (Array.isArray(full.sections) && full.sections.length) {
+          full.sections.forEach(sec => {
+            if (sec.type === 'intro' || sec.type === 'conclusion' || sec.type === 'point') {
+              const text = [sec.heading || '', sec.content || ''].filter(Boolean).join('\n\n');
+              if (text.trim()) slides.push(_makeSlide('lyrics', text.trim()));
+            }
+          });
+        }
+        // Fallback: use notes field if no sections
+        else if (full.notes && full.notes.trim()) {
+          const stanzas = full.notes.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
+          stanzas.forEach(text => slides.push(_makeSlide('lyrics', text)));
+        }
+      } catch (_) { /* fall through to basic sermon data */ }
+    }
+
+    // Fallback: if no slides generated yet, use basic notes
+    if (slides.length === 1 && sermon.notes && sermon.notes.trim()) {
+      const stanzas = sermon.notes.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
+      stanzas.forEach(text => slides.push(_makeSlide('lyrics', text)));
+    }
+
+    // If still only title slide, add a blank content slide
+    if (slides.length === 1) {
+      slides.push(_makeSlide('lyrics', '(Add sermon content here)'));
+    }
+
+    // Insert slides after current active slide
+    show.slides.splice(_st.activeSlide + 1, 0, ...slides);
+    _st.activeSlide += 1;
+
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _renderProps();
+    _pushToPresent();
+    _closeSermonPicker();
+
+    if (statusEl) statusEl.textContent = `Generated ${slides.length} slide${slides.length === 1 ? '' : 's'} from "${title}"`;
+  } catch (err) {
+    console.error('FlockShow: sermon import failed', err);
     if (statusEl) statusEl.textContent = `Import failed: ${err.message || 'Please try again.'}`;
   }
 }

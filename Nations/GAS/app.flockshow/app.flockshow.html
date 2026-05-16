@@ -815,6 +815,10 @@
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 17V7m0 10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m0 10a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m0 10V7m0 10a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2"/></svg>
             From FlockStand…
           </button>
+          <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-from-sermon-btn" style="align-self:flex-start;margin-bottom:8px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            From Sermon…
+          </button>
           <textarea class="fs-import-area" id="fs-import-area"
             placeholder="Paste full lyrics — blank lines become separate slides…" rows="5"></textarea>
           <button class="fs-btn fs-btn--ghost fs-btn--sm" id="fs-import-btn" style="margin-top:4px;align-self:flex-start">Split into slides</button>
@@ -875,6 +879,28 @@
     <div id="fs-sp-list" class="fs-sp-list"></div>
     <div class="fs-sp-footer">
       <span id="fs-sp-status" class="fs-sp-status">Loading songs…</span>
+    </div>
+  </div>
+</div>
+
+<!-- Sermon picker modal (FlockOS sermons → FlockShow) -->
+<div id="fs-sermon-picker" hidden aria-modal="true" role="dialog" aria-label="Pick a sermon">
+  <div class="fs-sp-backdrop" id="fs-serm-backdrop"></div>
+  <div class="fs-sp-panel">
+    <div class="fs-sp-header">
+      <div class="fs-sp-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        Import from Sermon
+      </div>
+      <button class="fs-sp-close" id="fs-serm-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="fs-sp-search-wrap">
+      <svg class="fs-sp-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="fs-serm-search" class="fs-sp-search" type="search" placeholder="Search sermons…" autocomplete="off">
+    </div>
+    <div id="fs-serm-list" class="fs-sp-list"></div>
+    <div class="fs-sp-footer">
+      <span id="fs-serm-status" class="fs-sp-status">Loading sermons…</span>
     </div>
   </div>
 </div>
