@@ -22,6 +22,8 @@ const musicStandAppState = {
     loaded: false,
     loading: false,
     filter: '',
+    currentPage: 1,         // current page for song library pagination
+    songsPerPage: 50,       // songs per page limit
     currentSong: null,
     currentArrangement: null,
     editorMode: 'create',   // 'create' | 'edit'
@@ -38,40 +40,141 @@ let _msSongsLoadedAt = 0;
 // ── In-place song filter (called on every search keystroke — no DOM rebuild) ─
 function msFilterSongsInPlace() {
     var q = (musicStandAppState.filter || '').toLowerCase();
-    var visibleTable = 0;
-    var visibleCards = 0;
-    var total = musicStandAppState.songs.length;
+    var allSongs = musicStandAppState.songs;
+    var total = allSongs.length;
 
-    // Desktop table rows
+    // Filter songs by search query
+    var filtered = q 
+        ? allSongs.filter(function(song) {
+            var title = (song.title || '').toLowerCase();
+            var artist = (song.artist || '').toLowerCase();
+            return title.indexOf(q) !== -1 || artist.indexOf(q) !== -1;
+          })
+        : allSongs;
+
+    var filteredCount = filtered.length;
+
+    // Calculate pagination
+    var perPage = musicStandAppState.songsPerPage;
+    var totalPages = Math.ceil(filteredCount / perPage);
+    var currentPage = musicStandAppState.currentPage;
+    
+    // Ensure current page is valid
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+    musicStandAppState.currentPage = currentPage;
+
+    var startIdx = (currentPage - 1) * perPage;
+    var endIdx = startIdx + perPage;
+    var pageSongs = filtered.slice(startIdx, endIdx);
+
+    // Hide/show based on whether song is in current page
     var tbody = document.querySelector('#ms-tab-songs .ms-table tbody');
     if (tbody) {
         tbody.querySelectorAll('tr[data-song-idx]').forEach(function(tr) {
-            var title  = (tr.dataset.title  || '').toLowerCase();
-            var artist = (tr.dataset.artist || '').toLowerCase();
-            var show = !q || title.indexOf(q) !== -1 || artist.indexOf(q) !== -1;
-            tr.style.display = show ? '' : 'none';
-            if (show) visibleTable++;
+            var idx = Number(tr.getAttribute('data-song-idx'));
+            var song = allSongs[idx];
+            var inFiltered = filtered.indexOf(song) !== -1;
+            var inPage = pageSongs.indexOf(song) !== -1;
+            tr.style.display = (inFiltered && inPage) ? '' : 'none';
         });
     }
 
     // Mobile cards
     document.querySelectorAll('#ms-tab-songs .ms-song-card[data-song-idx]').forEach(function(card) {
-        var title  = (card.dataset.title  || '').toLowerCase();
-        var artist = (card.dataset.artist || '').toLowerCase();
-        var show = !q || title.indexOf(q) !== -1 || artist.indexOf(q) !== -1;
-        card.style.display = show ? '' : 'none';
-        if (show) visibleCards++;
+        var idx = Number(card.getAttribute('data-song-idx'));
+        var song = allSongs[idx];
+        var inFiltered = filtered.indexOf(song) !== -1;
+        var inPage = pageSongs.indexOf(song) !== -1;
+        card.style.display = (inFiltered && inPage) ? '' : 'none';
     });
 
-    var shown = tbody ? visibleTable : visibleCards;
+    var shown = pageSongs.length;
 
     // Update count label
     var counter = document.getElementById('ms-song-count');
-    if (counter) counter.textContent = shown + ' of ' + total + ' songs';
+    if (counter) {
+        if (filteredCount === total) {
+            counter.textContent = 'Showing ' + shown + ' of ' + total + ' songs';
+        } else {
+            counter.textContent = 'Showing ' + shown + ' of ' + filteredCount + ' matching songs (' + total + ' total)';
+        }
+    }
 
     // Show/hide "no match" placeholder
     var noMatch = document.getElementById('ms-no-match');
-    if (noMatch) noMatch.style.display = (shown === 0 && total > 0) ? '' : 'none';
+    if (noMatch) noMatch.style.display = (filteredCount === 0 && total > 0) ? '' : 'none';
+
+    // Update pagination controls
+    msUpdatePaginationControls(currentPage, totalPages, filteredCount);
+}
+
+// ── Update pagination controls ────────────────────────────────
+function msUpdatePaginationControls(currentPage, totalPages, filteredCount) {
+    var pagination = document.getElementById('ms-pagination');
+    if (!pagination) return;
+
+    if (totalPages <= 1) {
+        pagination.style.display = 'none';
+        return;
+    }
+
+    pagination.style.display = 'flex';
+
+    var html = '';
+    
+    // Previous button
+    if (currentPage > 1) {
+        html += '<button class="ms-btn ms-btn-secondary ms-btn-sm" data-page="' + (currentPage - 1) + '">← Previous</button>';
+    } else {
+        html += '<button class="ms-btn ms-btn-secondary ms-btn-sm" disabled>← Previous</button>';
+    }
+
+    // Page numbers (show max 5 page buttons)
+    var startPage = Math.max(1, currentPage - 2);
+    var endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+    }
+
+    if (startPage > 1) {
+        html += '<button class="ms-btn ms-btn-secondary ms-btn-sm" data-page="1">1</button>';
+        if (startPage > 2) {
+            html += '<span style="padding:0 8px;color:#64748b;">...</span>';
+        }
+    }
+
+    for (var i = startPage; i <= endPage; i++) {
+        if (i === currentPage) {
+            html += '<button class="ms-btn ms-btn-primary ms-btn-sm" disabled>' + i + '</button>';
+        } else {
+            html += '<button class="ms-btn ms-btn-secondary ms-btn-sm" data-page="' + i + '">' + i + '</button>';
+        }
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            html += '<span style="padding:0 8px;color:#64748b;">...</span>';
+        }
+        html += '<button class="ms-btn ms-btn-secondary ms-btn-sm" data-page="' + totalPages + '">' + totalPages + '</button>';
+    }
+
+    // Next button
+    if (currentPage < totalPages) {
+        html += '<button class="ms-btn ms-btn-secondary ms-btn-sm" data-page="' + (currentPage + 1) + '">Next →</button>';
+    } else {
+        html += '<button class="ms-btn ms-btn-secondary ms-btn-sm" disabled>Next →</button>';
+    }
+
+    pagination.innerHTML = html;
+
+    // Bind page button events
+    pagination.querySelectorAll('button[data-page]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            musicStandAppState.currentPage = Number(btn.getAttribute('data-page'));
+            msFilterSongsInPlace();
+        });
+    });
 }
 var _msSongDetailCache = {};          // keyed by songId → full song+arrangements
 const _MS_SONG_TTL = 120000;         // 2-min warm window for song list
@@ -650,6 +753,9 @@ function msRenderSongsTab() {
                 songs.length + ' of ' + songs.length + ' songs' +
             '</p>';
 
+    // Add pagination controls container
+    html += '<div id="ms-pagination" style="display:flex;gap:8px;align-items:center;justify-content:center;margin-top:16px;flex-wrap:wrap;"></div>';
+
     panel.innerHTML = html;
 
     // Apply the current filter without rebuilding the DOM.
@@ -660,6 +766,7 @@ function msRenderSongsTab() {
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             musicStandAppState.filter = searchInput.value;
+            musicStandAppState.currentPage = 1; // Reset to first page on filter change
             msFilterSongsInPlace(); // in-place show/hide — no DOM rebuild
         });
         // NOTE: no searchInput.focus() here — it causes scroll + layout churn on every render
