@@ -47,11 +47,11 @@ fi
 # ── Church definitions ────────────────────────────────────────────────
 # FORMAT:  "FolderName|ConfigFile|CACHE_NAME"
 CHURCHES=(
-  "Root|FlockOS-Root.json|flockos-root-v1.01"
-  "FlockOS|FlockOS-Root.json|flockos-v1.01"
-  "TBC|Trinity.json|flockos-tbc-v1.01"
-  "TheForest|TheForest.json|flockos-theforest-v1.01"
-  "GAS|GAS.json|flockos-gas-v1.01"
+  "Root|FlockOS-Root.json|flockos-root-v1.02"
+  "FlockOS|FlockOS-Root.json|flockos-v1.02"
+  "TBC|Trinity.json|flockos-tbc-v1.02"
+  "TheForest|TheForest.json|flockos-theforest-v1.02"
+  "GAS|GAS.json|flockos-gas-v1.02"
 )
 
 # ── Pre-flight ────────────────────────────────────────────────────────
