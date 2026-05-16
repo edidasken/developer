@@ -652,7 +652,7 @@ async function msLoadSongs() {
     try {
         var rows;
         if (_msFB()) {
-            rows = await UpperRoom.listSongs();
+            rows = await UpperRoom.listSongs({ limit: 1000 });
         } else {
             var data = await msApiCall('songs.list', { activeOnly: 'false' });
             rows = data ? (data.rows || []) : [];
