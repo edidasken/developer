@@ -744,7 +744,7 @@
     if (inputEl) {
       inputEl.placeholder = (conv.type === 'sms')
         ? 'Type a message — will open your SMS app…'
-        : 'iMessage';
+        : 'FlockChat';
     }
 
     // Show thread pane (mobile)
