@@ -83,22 +83,36 @@
       background: var(--fc-bg);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 1.5rem; z-index: 9000;
+      gap: 1.25rem; z-index: 9000;
       transition: opacity 0.3s ease;
     }
     #fc-boot.fade-out { opacity: 0; pointer-events: none; }
     .fc-boot-icon {
-      width: 72px; height: 72px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #007aff, #0051d5);
+      width: 84px; height: 84px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #0c4a6e 0%, #06b6d4 100%);
       display: flex; align-items: center; justify-content: center;
-      font-size: 2.5rem;
-      box-shadow: var(--fc-shadow-lg);
+      box-shadow: 0 14px 40px rgba(6, 182, 212, .35), 0 4px 12px rgba(0,0,0,.18);
+    }
+    .fc-boot-icon svg {
+      width: 44px; height: 44px;
+      stroke: #fff;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .fc-boot-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--fc-text);
+      margin-top: .25rem;
     }
     .fc-boot-spinner {
-      width: 32px; height: 32px;
-      border: 3px solid var(--fc-border);
-      border-top-color: var(--fc-sent-bg);
+      width: 28px; height: 28px;
+      border: 2.5px solid var(--fc-border);
+      border-top-color: #06b6d4;
       border-radius: 50%;
       animation: fc-spin 0.8s linear infinite;
     }
@@ -902,7 +916,10 @@
 
   <!-- Boot Splash -->
   <div id="fc-boot">
-    <div class="fc-boot-icon">💬</div>
+    <div class="fc-boot-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <div class="fc-boot-name">FlockChat</div>
     <div class="fc-boot-spinner"></div>
     <div class="fc-boot-status" id="fc-boot-status">Connecting…</div>
   </div>

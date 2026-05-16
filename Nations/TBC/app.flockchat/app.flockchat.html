@@ -5,8 +5,8 @@
   <base href="../">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <title>FlockChat</title>
-  <link rel="icon" type="image/png" href="../Images/icon-chat.svg">
-  <link rel="apple-touch-icon" href="../Images/icon-chat.svg">
+  <link rel="icon" type="image/png" href="Images/icon-chat.svg">
+  <link rel="apple-touch-icon" href="Images/icon-chat.svg">
   <link rel="manifest" href="app.flockchat/manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -83,22 +83,36 @@
       background: var(--fc-bg);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 1.5rem; z-index: 9000;
+      gap: 1.25rem; z-index: 9000;
       transition: opacity 0.3s ease;
     }
     #fc-boot.fade-out { opacity: 0; pointer-events: none; }
     .fc-boot-icon {
-      width: 72px; height: 72px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #007aff, #0051d5);
+      width: 84px; height: 84px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #0c4a6e 0%, #06b6d4 100%);
       display: flex; align-items: center; justify-content: center;
-      font-size: 2.5rem;
-      box-shadow: var(--fc-shadow-lg);
+      box-shadow: 0 14px 40px rgba(6, 182, 212, .35), 0 4px 12px rgba(0,0,0,.18);
+    }
+    .fc-boot-icon svg {
+      width: 44px; height: 44px;
+      stroke: #fff;
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .fc-boot-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--fc-text);
+      margin-top: .25rem;
     }
     .fc-boot-spinner {
-      width: 32px; height: 32px;
-      border: 3px solid var(--fc-border);
-      border-top-color: var(--fc-sent-bg);
+      width: 28px; height: 28px;
+      border: 2.5px solid var(--fc-border);
+      border-top-color: #06b6d4;
       border-radius: 50%;
       animation: fc-spin 0.8s linear infinite;
     }
@@ -246,6 +260,30 @@
       font-size: 1.125rem;
       font-weight: 700;
     }
+    .fc-conv-icon.sms {
+      background: linear-gradient(135deg, #34d399, #10b981);
+    }
+    .fc-user-item.sms .fc-user-avatar {
+      background: linear-gradient(135deg, #34d399, #10b981);
+    }
+    .fc-user-badge {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 6px;
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border-radius: 999px;
+      vertical-align: middle;
+    }
+    .fc-user-badge.sms {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+    }
+    .fc-user-badge.muted {
+      background: rgba(148, 163, 184, 0.18);
+      color: #94a3b8;
+    }
 
     .fc-conv-content {
       flex: 1;
@@ -286,6 +324,72 @@
       font-weight: 500;
       color: var(--fc-text);
     }
+
+    /* ─── Per-row action menu (Archive / Delete) ─────────────────────── */
+    .fc-conv-actions-btn {
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      color: var(--fc-text-muted);
+      font-size: 1.1rem;
+      line-height: 1;
+      border-radius: 50%;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.12s, background 0.12s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fc-conv-item:hover .fc-conv-actions-btn,
+    .fc-conv-actions-btn.open { opacity: 1; }
+    .fc-conv-actions-btn:hover { background: var(--fc-divider); }
+    @media (hover: none) {
+      .fc-conv-actions-btn { opacity: 0.7; }
+    }
+    .fc-conv-menu {
+      position: absolute;
+      top: calc(50% + 16px);
+      right: 14px;
+      background: var(--fc-surface);
+      border: 1px solid var(--fc-divider);
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+      z-index: 20;
+      min-width: 160px;
+      overflow: hidden;
+    }
+    .fc-conv-menu button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      color: var(--fc-text);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .fc-conv-menu button:hover { background: var(--fc-panel); }
+    .fc-conv-menu button.danger { color: #ef4444; }
+
+    .fc-archive-toggle {
+      width: 100%;
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      border-top: 1px solid var(--fc-divider);
+      color: var(--fc-text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+    }
+    .fc-archive-toggle:hover { background: var(--fc-panel); color: var(--fc-text); }
 
     .fc-conv-badge {
       position: absolute;
@@ -812,7 +916,10 @@
 
   <!-- Boot Splash -->
   <div id="fc-boot">
-    <div class="fc-boot-icon">💬</div>
+    <div class="fc-boot-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <div class="fc-boot-name">FlockChat</div>
     <div class="fc-boot-spinner"></div>
     <div class="fc-boot-status" id="fc-boot-status">Connecting…</div>
   </div>
@@ -855,7 +962,7 @@
         </div>
         <div class="fc-composer">
           <div class="fc-input-wrap">
-            <textarea class="fc-input" id="fc-input" placeholder="iMessage" rows="1"></textarea>
+            <textarea class="fc-input" id="fc-input" placeholder="FlockChat" rows="1"></textarea>
           </div>
           <button class="fc-send-btn" id="fc-send" disabled>↑</button>
         </div>

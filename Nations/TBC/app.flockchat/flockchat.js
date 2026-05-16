@@ -40,6 +40,8 @@
   let _messages = [];
   let _convUnsub = null;
   let _msgUnsub = null;
+  let _showArchived = false;
+  let _openMenuConvId = null;
 
   /* ── DOM Helpers ────────────────────────────────────────────────────── */
   const $ = id => document.getElementById(id);
@@ -74,18 +76,35 @@
       return;
     }
     
-    // Wait for Firebase
-    await _waitFor(() => typeof window.firebase !== 'undefined');
+    // Wait for Firebase + UpperRoom (Firebase Auth wrapper)
+    await _waitFor(() => typeof window.firebase !== 'undefined' && typeof window.UpperRoom !== 'undefined');
 
     _setBootStatus('Connecting…');
-    
-    // Init Firestore
+
+    // Authenticate to Firebase via UpperRoom (custom token from GAS).
+    // Firestore rules require request.auth != null — without this every
+    // read fails with "Missing or insufficient permissions."
+    try {
+      await window.UpperRoom.init(window.FLOCK_FIREBASE_CONFIG);
+      await window.UpperRoom.authenticate();
+    } catch (err) {
+      _setBootStatus('Sign-in failed. Please refresh.');
+      throw err;
+    }
+
+    // Init Firestore (after auth so reads succeed)
     try {
       _db = firebase.firestore();
     } catch (err) {
       _setBootStatus('Failed to connect. Please refresh.');
       throw err;
     }
+
+    // Prefer Firebase Auth uid for Firestore writes (matches request.auth.uid)
+    try {
+      const fbUser = firebase.auth().currentUser;
+      if (fbUser && fbUser.uid) _me.uid = fbUser.uid;
+    } catch (_) {}
 
     // Init FCM (push notifications)
     _initFCM().catch(err => console.warn('[FlockChat] FCM init failed:', err));
@@ -138,6 +157,32 @@
       if (d.role && d.role !== _me.role) _me.role = d.role;
       if (d.displayName) _me.displayName = d.displayName;
       ref.update({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
+    }
+    // Mark this person's member doc as FlockChat-active so OTHER members
+    // know we can be reached in-app (vs SMS fallback).
+    _markMemberFlockchatActive().catch(err => console.warn('[FlockChat] flockchatActive flag failed:', err));
+  }
+
+  async function _markMemberFlockchatActive() {
+    const myEmail = (_me?.email || '').toLowerCase();
+    if (!myEmail || !_db) return;
+    // Find by primaryEmail first, then email.
+    const tries = [
+      _db.collection('members').where('primaryEmail', '==', myEmail).limit(1),
+      _db.collection('members').where('email',        '==', myEmail).limit(1)
+    ];
+    for (const q of tries) {
+      try {
+        const snap = await q.get();
+        if (!snap.empty) {
+          const doc = snap.docs[0];
+          await doc.ref.update({
+            flockchatActive: true,
+            flockchatLastSeen: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          return;
+        }
+      } catch (_) { /* try next */ }
     }
   }
 
@@ -193,22 +238,9 @@
 
     console.log('[FlockChat] Seeding default conversations');
 
-    // 1. Church Announcements
-    await _db.collection('conversations').add({
-      type: 'announcement',
-      name: 'Church Announcements',
-      icon: '📢',
-      participants: [_me.uid],
-      lastMessage: {
-        text: 'Welcome to FlockChat! This is where pastors share important updates.',
-        author: 'system',
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      },
-      lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
-      unreadCount: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      createdBy: _me.uid
-    });
+    // (Church Announcements is NOT seeded — it's a single shared doc at
+    //  conversations/announcements, mirrored from the_announcements view.
+    //  FlockChat injects it as a static entry in _renderConversations.)
 
     // 2. Prayer Chain
     await _db.collection('conversations').add({
@@ -217,7 +249,7 @@
       icon: '🙏',
       participants: [_me.uid],
       lastMessage: {
-        text: 'Share your prayer requests here. We\'re praying together!',
+        text: 'Type a prayer request below — it goes straight to the church Prayer Chain.',
         author: 'system',
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       },
@@ -359,26 +391,48 @@
 
   async function _loadUsers() {
     try {
-      const snap = await _db.collection('users').orderBy('displayName').get();
-      _allUsers = [];
-      console.log('[FlockChat] Loading users. Current user UID:', _me.uid);
+      // Source of truth = The Fold (members collection), NOT the chat-only
+      // `users` collection (which accumulates duplicates from every sign-in).
+      const snap = await _db.collection('members').orderBy('lastName').get();
+      const myEmail = (_me.email || '').toLowerCase();
+      const byEmail = new Map();
       snap.forEach(doc => {
-        const u = doc.data();
-        u.uid = doc.id;
-        console.log('[FlockChat] User doc:', u.uid, u.displayName, u.email);
-        // Don't include self
-        if (u.uid !== _me.uid) {
-          _allUsers.push(u);
-        }
+        const m = doc.data() || {};
+        m.uid = doc.id;
+        // Filter out archived/inactive
+        const ms = String(m.membershipStatus || '').toLowerCase();
+        const st = String(m.status || '').toLowerCase();
+        if (ms === 'archived' || st === 'inactive' || st === 'archived') return;
+        // Normalize display fields for the renderer
+        const first = m.firstName || '';
+        const last  = m.lastName  || '';
+        const name  = m.displayName || m.name || (first + ' ' + last).trim() || m.primaryEmail || m.email || 'Unknown';
+        const email = (m.primaryEmail || m.email || '').toLowerCase();
+        if (!email && !name) return;
+        // Exclude self by email (uid won't match — Auth uid vs member doc id)
+        if (email && email === myEmail) return;
+        // Dedupe by email (fall back to uid when email missing)
+        const key = email || m.uid;
+        if (byEmail.has(key)) return;
+        const phoneRaw = m.primaryPhone || m.mobile || m.phone || m.phoneNumber || '';
+        const phone = String(phoneRaw).replace(/[^\d+]/g, '');
+        byEmail.set(key, {
+          uid: m.uid,
+          displayName: name,
+          email: email,
+          phone: phone,
+          flockchatActive: !!m.flockchatActive,
+          role: m.role || m.memberType || 'member'
+        });
       });
-      console.log('[FlockChat] Loaded', _allUsers.length, 'other users (excluding self)');
-      
-      // If database only has current user, show helpful message
+      _allUsers = Array.from(byEmail.values())
+        .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
+      console.log('[FlockChat] Loaded', _allUsers.length, 'members from The Fold');
       if (_allUsers.length === 0) {
-        _toast('No other members found. Invite team members to get started!', 'info');
+        _toast('No other members found in The Fold yet.', 'info');
       }
     } catch (err) {
-      console.error('[FlockChat] Failed to load users:', err);
+      console.error('[FlockChat] Failed to load members:', err);
       _toast('Failed to load members', 'error');
     }
   }
@@ -401,14 +455,31 @@
       const name = u.displayName || u.email || 'Unknown';
       const initials = _initials(name);
       const email = u.email || '';
+      const phone = u.phone || '';
+      const onFC  = !!u.flockchatActive;
       // Escape quotes for onclick attribute
       const safeName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      // Route: FlockChat user → in-app DM. Otherwise if we have a phone → SMS.
+      let onclick, badge, sub;
+      if (onFC) {
+        onclick = `window._createDirectMessage('${u.uid}', '${safeName}')`;
+        badge = '';
+        sub = email;
+      } else if (phone) {
+        onclick = `window._startSmsConversation('${u.uid}', '${safeName}', '${phone}')`;
+        badge = '<span class="fc-user-badge sms" title="Not on FlockChat — will text via SMS">SMS</span>';
+        sub = phone;
+      } else {
+        onclick = `window._toast && window._toast('No phone or FlockChat account on file for ' + ${JSON.stringify(name)}, 'info')`;
+        badge = '<span class="fc-user-badge muted" title="No phone on file">No contact</span>';
+        sub = email || 'No contact info';
+      }
       return `
-        <div class="fc-user-item" data-uid="${u.uid}" data-name="${_e(name)}" onclick="window._createDirectMessage('${u.uid}', '${safeName}')">
+        <div class="fc-user-item ${onFC ? '' : 'sms'}" data-uid="${u.uid}" data-name="${_e(name)}" onclick="${onclick}">
           <div class="fc-user-avatar">${initials}</div>
           <div class="fc-user-info">
-            <div class="fc-user-name">${_e(name)}</div>
-            <div class="fc-user-email">${_e(email)}</div>
+            <div class="fc-user-name">${_e(name)} ${badge}</div>
+            <div class="fc-user-email">${_e(sub)}</div>
           </div>
         </div>
       `;
@@ -490,6 +561,72 @@
     }
   };
 
+  /* ── SMS Fallback (member not on FlockChat) ──────────────────────────── */
+  function _smsHref(phone, body) {
+    // sms:NUMBER?&body=... works on both iOS and Android.
+    const num = String(phone || '').replace(/[^\d+]/g, '');
+    const txt = body ? ('?&body=' + encodeURIComponent(body)) : '';
+    return 'sms:' + num + txt;
+  }
+
+  function _launchSms(phone, body) {
+    try { window.location.href = _smsHref(phone, body); } catch (_) {}
+  }
+
+  window._startSmsConversation = async function(memberUid, otherName, phone) {
+    _closeNewConversationModal();
+    if (!phone) { _toast('No phone number on file', 'error'); return; }
+
+    try {
+      // Find existing SMS conversation for this phone (so it logs to recents
+      // instead of creating a new card every tap).
+      const existingSnap = await _db.collection('conversations')
+        .where('type', '==', 'sms')
+        .where('participants', 'array-contains', _me.uid)
+        .get();
+
+      let convId = null;
+      existingSnap.forEach(doc => {
+        const d = doc.data();
+        if (d.smsPhone === phone) convId = doc.id;
+      });
+
+      if (!convId) {
+        const docRef = await _db.collection('conversations').add({
+          type: 'sms',
+          name: otherName,
+          icon: '💬',
+          smsPhone: phone,
+          smsMemberUid: memberUid,
+          participants: [_me.uid],
+          lastMessage: {
+            text: 'Texts via SMS — not in FlockChat',
+            author: 'system',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          },
+          lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
+          unreadCount: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdBy: _me.uid
+        });
+        convId = docRef.id;
+      } else {
+        // Bump lastActivity so it sorts to the top of recents.
+        await _db.collection('conversations').doc(convId).update({
+          lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(() => {});
+      }
+
+      // Open the thread (composer will route sends to native SMS).
+      window._openConversation(convId);
+      // Also launch the native composer immediately for first-tap convenience.
+      _launchSms(phone, '');
+    } catch (err) {
+      console.error('[FlockChat] Failed to start SMS conversation:', err);
+      _toast('Failed to start SMS: ' + (err.message || 'Unknown'), 'error');
+    }
+  };
+
   /* ── Load Conversations ──────────────────────────────────────────────── */
   function _loadConversations() {
     if (_convUnsub) _convUnsub();
@@ -502,13 +639,60 @@
         snap.forEach(doc => {
           const d = doc.data();
           d.id = doc.id;
+          // The shared announcements doc is injected separately (no
+          // participants array → wouldn't match this query anyway, but
+          // belt-and-suspenders).
+          if (d.id === ANNOUNCEMENTS_ID) return;
+          // Per-user soft delete: if I removed this conversation from my
+          // view, never show it again on this account.
+          if (Array.isArray(d.deletedBy) && d.deletedBy.includes(_me.uid)) return;
           _conversations.push(d);
         });
+        _injectAnnouncements();
         _renderConversations();
       }, err => {
         console.error('[FlockChat] Failed to load conversations:', err);
         _toast('Failed to load conversations', 'error');
       });
+  }
+
+  // Listen to the shared announcements doc so the static thread's preview
+  // + sort key stay fresh when leadership posts.
+  let _annDocUnsub = null;
+  let _annLastSnippet = '';
+  let _annLastAt = null;
+
+  function _injectAnnouncements() {
+    const entry = {
+      id: ANNOUNCEMENTS_ID,
+      type: 'announcement',
+      name: 'Church Announcements',
+      icon: '📢',
+      participants: [],
+      lastMessage: { text: _annLastSnippet || 'Tap to view church-wide announcements.', author: '', timestamp: _annLastAt },
+      lastActivity: _annLastAt,
+      unreadCount: 0,
+      _static: true
+    };
+    _conversations.unshift(entry);
+
+    if (_annDocUnsub) return; // already listening
+    try {
+      _annDocUnsub = _db.collection('conversations').doc(ANNOUNCEMENTS_ID)
+        .onSnapshot(doc => {
+          const d = doc.exists ? doc.data() : null;
+          _annLastSnippet = (d && d.lastSnippet) || '';
+          _annLastAt = (d && d.lastMessageAt) || null;
+          const e = _conversations.find(c => c.id === ANNOUNCEMENTS_ID);
+          if (e) {
+            e.lastMessage = { text: _annLastSnippet || 'Tap to view church-wide announcements.', author: '', timestamp: _annLastAt };
+            e.lastActivity = _annLastAt;
+            _renderConversations();
+          }
+        }, err => console.warn('[FlockChat] announcements doc listen failed:', err));
+    } catch (err) {
+      console.warn('[FlockChat] announcements doc listen setup failed:', err);
+    }
   }
 
   function _filterConversations(query) {
@@ -521,11 +705,26 @@
     });
   }
 
+  function _isStaticConv(c) {
+    return c && (c._static === true || c.type === 'announcement' || c.type === 'prayer' || c.id === ANNOUNCEMENTS_ID);
+  }
+  function _isArchivedForMe(c) {
+    return c && Array.isArray(c.archivedBy) && c.archivedBy.includes(_me?.uid);
+  }
+
   function _renderConversations() {
     const list = $('fc-list');
     if (!list) return;
 
-    if (_conversations.length === 0) {
+    // Split into visible vs archived (static threads always visible).
+    const archivedCount = _conversations.filter(c => !_isStaticConv(c) && _isArchivedForMe(c)).length;
+    const visible = _conversations.filter(c => {
+      if (_isStaticConv(c)) return true;
+      const archived = _isArchivedForMe(c);
+      return _showArchived ? archived : !archived;
+    });
+
+    if (visible.length === 0 && archivedCount === 0) {
       list.innerHTML = `
         <div class="fc-empty">
           <div class="fc-empty-icon">💬</div>
@@ -536,16 +735,31 @@
       return;
     }
 
-    list.innerHTML = _conversations.map(c => {
+    const rows = visible.map(c => {
       const isActive = c.id === _activeConvId;
       const unread = c.unreadCount || 0;
       const time = _formatTime(c.lastActivity);
       const preview = c.lastMessage?.text || 'No messages yet';
-      
+      const isStatic = _isStaticConv(c);
+      const menuOpen = _openMenuConvId === c.id;
+
       let iconClass = 'fc-conv-icon';
       if (c.type === 'prayer') iconClass += ' prayer';
       if (c.type === 'announcement') iconClass += ' announcement';
       if (c.type === 'dm') iconClass += ' dm';
+      if (c.type === 'sms') iconClass += ' sms';
+
+      const actionsBtn = isStatic ? '' : `
+          <button class="fc-conv-actions-btn ${menuOpen ? 'open' : ''}"
+                  title="More"
+                  onclick="event.stopPropagation(); window._toggleConvMenu('${c.id}')">⋯</button>
+          ${menuOpen ? `
+            <div class="fc-conv-menu" onclick="event.stopPropagation()">
+              <button onclick="window._archiveConv('${c.id}')">${_isArchivedForMe(c) ? 'Unarchive' : 'Archive'}</button>
+              <button class="danger" onclick="window._deleteConv('${c.id}')">Delete</button>
+            </div>
+          ` : ''}
+      `;
 
       return `
         <div class="fc-conv-item ${isActive ? 'active' : ''} ${unread > 0 ? 'unread' : ''}"
@@ -561,10 +775,103 @@
             <div class="fc-conv-preview">${_e(preview)}</div>
           </div>
           ${unread > 0 ? `<div class="fc-conv-badge">${unread}</div>` : ''}
+          ${actionsBtn}
         </div>
       `;
     }).join('');
+
+    let footer = '';
+    if (_showArchived) {
+      footer = `<button class="fc-archive-toggle" onclick="window._toggleArchivedView()">← Back to active</button>`;
+    } else if (archivedCount > 0) {
+      footer = `<button class="fc-archive-toggle" onclick="window._toggleArchivedView()">Show archived (${archivedCount})</button>`;
+    }
+
+    list.innerHTML = rows + footer;
   }
+
+  // Close menu when clicking elsewhere
+  document.addEventListener('click', () => {
+    if (_openMenuConvId) {
+      _openMenuConvId = null;
+      _renderConversations();
+    }
+  });
+
+  window._toggleConvMenu = function(convId) {
+    _openMenuConvId = (_openMenuConvId === convId) ? null : convId;
+    _renderConversations();
+  };
+
+  window._toggleArchivedView = function() {
+    _showArchived = !_showArchived;
+    _openMenuConvId = null;
+    _renderConversations();
+  };
+
+  window._archiveConv = async function(convId) {
+    _openMenuConvId = null;
+    const conv = _conversations.find(c => c.id === convId);
+    if (!conv || _isStaticConv(conv)) return;
+    const archived = _isArchivedForMe(conv);
+    try {
+      const op = archived
+        ? firebase.firestore.FieldValue.arrayRemove(_me.uid)
+        : firebase.firestore.FieldValue.arrayUnion(_me.uid);
+      await _db.collection('conversations').doc(convId).update({ archivedBy: op });
+      _toast(archived ? 'Conversation unarchived' : 'Conversation archived', 'success');
+    } catch (err) {
+      console.error('[FlockChat] archive failed:', err);
+      _toast('Failed to update conversation', 'error');
+    }
+  };
+
+  window._deleteConv = async function(convId) {
+    _openMenuConvId = null;
+    const conv = _conversations.find(c => c.id === convId);
+    if (!conv || _isStaticConv(conv)) return;
+    if (!confirm(`Delete "${conv.name}" from your messages?\n\nThe conversation will be removed from your view. Other participants keep their copy.`)) return;
+
+    try {
+      // Soft-delete for me: drop from participants + record in deletedBy.
+      await _db.collection('conversations').doc(convId).update({
+        participants: firebase.firestore.FieldValue.arrayRemove(_me.uid),
+        deletedBy:    firebase.firestore.FieldValue.arrayUnion(_me.uid)
+      });
+
+      // If everyone has deleted it, hard-delete the doc + its messages.
+      const fresh = await _db.collection('conversations').doc(convId).get();
+      const data = fresh.exists ? fresh.data() : null;
+      if (data && Array.isArray(data.participants) && data.participants.length === 0) {
+        try {
+          const msgs = await _db.collection('conversations').doc(convId).collection('messages').get();
+          const batch = _db.batch();
+          msgs.forEach(m => batch.delete(m.ref));
+          batch.delete(_db.collection('conversations').doc(convId));
+          await batch.commit();
+        } catch (e) {
+          // Best-effort hard delete; soft delete already succeeded.
+          console.warn('[FlockChat] hard-delete cleanup failed:', e);
+        }
+      }
+
+      // If we were viewing it, clear the thread.
+      if (_activeConvId === convId) {
+        _activeConvId = null;
+        if (_msgUnsub) { _msgUnsub(); _msgUnsub = null; }
+        const thread = $('fc-thread');
+        if (thread) thread.classList.remove('active');
+        const name = $('fc-thread-name'); if (name) name.textContent = 'Select a conversation';
+        const meta = $('fc-thread-meta'); if (meta) meta.textContent = '';
+        const msgContainer = $('fc-messages');
+        if (msgContainer) msgContainer.innerHTML = '';
+      }
+      _toast('Conversation deleted', 'success');
+    } catch (err) {
+      console.error('[FlockChat] delete failed:', err);
+      _toast('Failed to delete conversation', 'error');
+    }
+  };
 
   /* ── Open Conversation ───────────────────────────────────────────────── */
   window._openConversation = function(convId) {
@@ -586,7 +893,22 @@
     if (name) name.textContent = conv.name;
     if (meta) {
       const count = conv.participants?.length || 0;
-      meta.textContent = conv.type === 'dm' ? 'Direct Message' : `${count} ${count === 1 ? 'member' : 'members'}`;
+      if (conv.type === 'sms') meta.textContent = 'SMS • ' + (conv.smsPhone || 'no number');
+      else if (conv.type === 'prayer') meta.textContent = 'Prayer Chain • posts here become church prayer requests';
+      else if (conv.type === 'announcement') meta.textContent = 'Church-wide announcements';
+      else meta.textContent = conv.type === 'dm' ? 'Direct Message' : `${count} ${count === 1 ? 'member' : 'members'}`;
+    }
+
+    // Composer hint for SMS threads
+    const inputEl = $('fc-input');
+    if (inputEl) {
+      inputEl.placeholder = (conv.type === 'sms')
+        ? 'Type a message — will open your SMS app…'
+        : (conv.type === 'prayer')
+          ? 'Share a prayer request…'
+          : (conv.type === 'announcement')
+            ? 'Post an announcement to the whole church…'
+            : 'FlockChat';
     }
 
     // Show thread pane (mobile)
@@ -598,6 +920,9 @@
   };
 
   function _markAsRead(convId) {
+    // The shared announcements doc has no per-user unreadCount and members
+    // typically can't write to it — don't try.
+    if (convId === ANNOUNCEMENTS_ID) return;
     _db.collection('conversations').doc(convId).update({
       unreadCount: 0
     }).catch(() => {});
@@ -611,6 +936,50 @@
     if (!msgContainer) return;
 
     msgContainer.innerHTML = '<div class="fc-loading"><div class="fc-spinner"></div></div>';
+
+    // Special path: shared church announcements channel uses the wall/UpperRoom
+    // shape ({ body, senderName, senderEmail, sentAt }) instead of FlockChat's
+    // ({ text, authorName, author, timestamp }). Map on the fly.
+    if (convId === ANNOUNCEMENTS_ID) {
+      _msgUnsub = _db.collection('conversations').doc(convId).collection('messages')
+        .orderBy('sentAt', 'asc')
+        .limit(MSG_LIMIT)
+        .onSnapshot(snap => {
+          _messages = [];
+          snap.forEach(doc => {
+            const d = doc.data() || {};
+            _messages.push({
+              id:         doc.id,
+              text:       d.body || d.text || '',
+              author:     d.senderEmail || d.author || '',
+              authorName: d.senderName  || d.authorName || 'Leadership',
+              type:       'announcement',
+              timestamp:  d.sentAt || d.timestamp || null
+            });
+          });
+          if (_messages.length === 0) {
+            const c = $('fc-messages');
+            if (c) c.innerHTML = `
+              <div class="fc-empty">
+                <div class="fc-empty-icon">📢</div>
+                <div class="fc-empty-title">No announcements yet</div>
+                <div class="fc-empty-text">When leadership posts, it'll show up here.</div>
+              </div>`;
+            return;
+          }
+          _renderMessages();
+          _scrollToBottom();
+        }, err => {
+          console.error('[FlockChat] Failed to load announcements:', err);
+          msgContainer.innerHTML = `
+            <div class="fc-empty">
+              <div class="fc-empty-icon">⚠️</div>
+              <div class="fc-empty-title">Couldn't load announcements</div>
+              <div class="fc-empty-text">Please try again.</div>
+            </div>`;
+        });
+      return;
+    }
 
     _msgUnsub = _db.collection('conversations').doc(convId).collection('messages')
       .orderBy('timestamp', 'asc')
@@ -729,7 +1098,72 @@
 
     try {
       const conv = _conversations.find(c => c.id === _activeConvId);
+
+      // Church Announcements: route through UpperRoom so the post lands in
+      // the same shared channel that The Announcements view reads/writes.
+      if (_activeConvId === ANNOUNCEMENTS_ID || conv?.type === 'announcement') {
+        if (!window.UpperRoom || typeof window.UpperRoom.sendMessage !== 'function') {
+          _toast('Announcements channel unavailable', 'error');
+          return;
+        }
+        try {
+          await window.UpperRoom.sendMessage(ANNOUNCEMENTS_ID, text);
+          input.value = '';
+          input.style.height = 'auto';
+          _toast('📢 Posted to Church Announcements', 'success');
+        } catch (err) {
+          console.error('[FlockChat] Failed to post announcement:', err);
+          _toast(err?.message || 'Failed to post announcement', 'error');
+        }
+        return;
+      }
+
+      // SMS conversations: hand off to the native SMS composer with the
+      // text prefilled, and log the attempt so the thread + recents update.
+      if (conv?.type === 'sms') {        const phone = conv.smsPhone;
+        if (!phone) { _toast('No phone on file for this contact', 'error'); return; }
+        _launchSms(phone, text);
+        await _db.collection('conversations').doc(_activeConvId).collection('messages').add({
+          text,
+          author: _me.uid,
+          authorName: _me.displayName || _me.email,
+          type: 'sms',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        await _db.collection('conversations').doc(_activeConvId).update({
+          lastMessage: {
+            text: '📲 ' + text,
+            author: _me.uid,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          },
+          lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        input.value = '';
+        input.style.height = 'auto';
+        return;
+      }
+
       const msgType = conv?.type === 'prayer' ? 'prayer' : conv?.type === 'announcement' ? 'announcement' : 'text';
+
+      // Prayer Chain: also create an actual PrayerRequest in the church's
+      // prayers collection so it shows up in The Prayer Chain admin view
+      // (auto-assigned to the lead pastor by UpperRoom.createPrayer).
+      let createdPrayerId = null;
+      if (msgType === 'prayer' && window.UpperRoom && typeof window.UpperRoom.createPrayer === 'function') {
+        try {
+          createdPrayerId = await window.UpperRoom.createPrayer({
+            submitterName:  _me.displayName || _me.email || 'Anonymous',
+            submitterEmail: _me.email || '',
+            prayerText:     text,
+            category:       'Other',
+            isConfidential: 'FALSE',
+            followUpRequested: 'FALSE'
+          });
+        } catch (err) {
+          console.error('[FlockChat] Failed to create PrayerRequest:', err);
+          _toast('Posted to chat, but failed to log prayer request', 'error');
+        }
+      }
 
       await _db.collection('conversations').doc(_activeConvId).collection('messages').add({
         text,
@@ -737,8 +1171,13 @@
         authorName: _me.displayName || _me.email,
         type: msgType,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        prayerCount: msgType === 'prayer' ? 0 : null
+        prayerCount: msgType === 'prayer' ? 0 : null,
+        prayerId: createdPrayerId || null
       });
+
+      if (createdPrayerId) {
+        _toast('🙏 Prayer request submitted to the church', 'success');
+      }
 
       // Update conversation lastMessage
       await _db.collection('conversations').doc(_activeConvId).update({

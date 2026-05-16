@@ -14408,27 +14408,24 @@ flock-tabs [role="tablist"], .tabs-bar {
 #ms-auth-overlay, #ms-auth-overlay * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 
-/* ── App layout ──────────────────────────────────────────────────────────── */
-#ms-app { display: flex; flex-direction: column; height: 100dvh; }
+/* ── App layout — grid (header row + body row), header in normal flow.
+   Modeled after FlockShow's #fs-root grid: no fixed header, no clearance
+   padding, no cream-strip leakage. ─────────────────────────────────────── */
+#ms-app {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100dvh;
+  overflow: hidden;
+}
 #ms-app[hidden] { display: none; }
 .ms-body {
-  display: flex; flex: 1; overflow: hidden;
-  padding-top: calc(var(--ms-header-h) + var(--ms-safe-top));
-  /* Paint the gap above sidebar navy and above main page-bg so the cream
-     padding strip below the header disappears visually. */
-  background: linear-gradient(
-    to right,
-    var(--side-bg) 0,
-    var(--side-bg) var(--ms-sidebar-w),
-    var(--ms-bg) var(--ms-sidebar-w),
-    var(--ms-bg) 100%
-  );
+  display: flex; min-height: 0; overflow: hidden;
+  /* Header is a static grid row above us — no clearance padding needed. */
 }
 
-/* ── Header — canonical FlockOS dark navy chrome ─────────────────────────── */
+/* ── Header — canonical FlockOS dark navy chrome (in flow, not fixed) ───── */
 .ms-header {
-  position: fixed;
-  top: 0; left: 0; right: 0;
+  position: relative;
   height: calc(var(--ms-header-h) + var(--ms-safe-top));
   padding-top: var(--ms-safe-top);
   background: var(--top-bg);
@@ -14557,6 +14554,7 @@ flock-tabs [role="tablist"], .tabs-bar {
   color: var(--side-ink);
   overflow-y: auto; overflow-x: hidden;
   display: flex; flex-direction: column;
+  /* Header is a sibling grid row above .ms-body now — no clearance needed. */
   padding: 12px 8px;
   gap: 4px;
   scrollbar-width: thin;
@@ -14597,8 +14595,12 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-nav-item--live:hover { background: var(--ms-rose-soft); color: var(--ms-rose); }
 
 /* ── Main content area ───────────────────────────────────────────────────── */
-.ms-main { flex: 1; min-width: 0; overflow-x: hidden; overflow-y: auto; }
-.ms-view { padding: 24px; max-width: 1100px; overflow-x: hidden; box-sizing: border-box; }
+.ms-main {
+  flex: 1; min-width: 0; overflow-x: hidden; overflow-y: auto;
+  background: var(--ms-bg);
+  /* Header is now a sibling grid row above .ms-body — no clearance needed. */
+}
+.ms-view { padding: 28px 24px 24px; max-width: 1100px; overflow-x: hidden; box-sizing: border-box; }
 .ms-view--wide { max-width: none; }
 
 /* ── Mobile bottom nav — dark navy ───────────────────────────────────────── */
@@ -14643,13 +14645,38 @@ flock-tabs [role="tablist"], .tabs-bar {
 
 /* ── Page hero ───────────────────────────────────────────────────────────── */
 .ms-page-hero {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  gap: 16px; flex-wrap: wrap; margin-bottom: 28px;
-  padding-bottom: 20px; border-bottom: 1px solid var(--ms-line);
+  position: relative;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  padding: 18px 22px;
+  margin-bottom: 22px;
+  background: linear-gradient(135deg, #0f1735 0%, #1b264f 100%);
+  border: 1px solid rgba(232,168,56,0.22);
+  border-radius: var(--ms-r-xl, 14px);
+  overflow: hidden;
+  box-shadow: 0 12px 28px -20px rgba(15,23,53,0.55);
 }
-.ms-page-hero-text h1 { font-size: 1.6rem; font-weight: 800; color: var(--ms-ink); letter-spacing: -.02em; }
-.ms-page-hero-text p  { color: var(--ms-ink-muted); font-size: .88rem; margin-top: 4px; }
+.ms-page-hero::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2.5px;
+  background: linear-gradient(90deg, #38bdf8 0%, #818cf8 28%, #a78bfa 52%, #e8a838 78%, #34d399 100%);
+  opacity: 0.92;
+}
+.ms-page-hero-text h1 { font-size: 1.5rem; font-weight: 800; color: #fff; letter-spacing: -.02em; }
+.ms-page-hero-text p  { color: rgba(255,255,255,0.74); font-size: .88rem; margin-top: 4px; }
 .ms-page-hero-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+/* Buttons sitting on the navy hero strip get a gold-on-navy treatment */
+.ms-page-hero .ms-btn--primary {
+  background: var(--ms-gold, #e8a838); color: #1a1208; font-weight: 700;
+  border: 1px solid transparent;
+  box-shadow: 0 6px 16px -8px rgba(232,168,56,0.65);
+}
+.ms-page-hero .ms-btn--primary:hover { background: #f0b845; }
+.ms-page-hero .ms-btn:not(.ms-btn--primary):not(.ms-btn--danger) {
+  color: #fff; border-color: rgba(255,255,255,0.22); background: transparent;
+}
+.ms-page-hero .ms-btn:not(.ms-btn--primary):not(.ms-btn--danger):hover {
+  background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.34);
+}
 
 /* ── Cards ───────────────────────────────────────────────────────────────── */
 .ms-card { background: var(--ms-bg-card); border: 1px solid var(--ms-line); border-radius: var(--ms-r-lg); padding: 18px 20px; transition: border-color .2s; }
@@ -14982,6 +15009,8 @@ flock-tabs [role="tablist"], .tabs-bar {
    Scoped to `.ms-dash` so it only affects the home dashboard view, leaving
    the Service Plans grid (which reuses .ms-service-card) untouched. */
 .ms-dash { --dash-navy-1: #0f1735; --dash-navy-2: #1b264f; --dash-gold: var(--ms-gold,#e8a838); }
+/* Dashboard view inherits .ms-view's standard 18px top padding so the hero
+   card has the same breathing room as every other page-hero. */
 
 /* Hero card */
 .ms-dash-hero {
@@ -15155,6 +15184,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 @media (max-width: 860px) {
   .ms-sidebar {
     display: none;
+    /* Drawer mode below resets these. */
   }
   .ms-sidebar.is-open {
     display: flex; position: fixed;
@@ -15167,7 +15197,7 @@ flock-tabs [role="tablist"], .tabs-bar {
   .ms-main        { background: var(--ms-bg); }
   .ms-menu-toggle { display: flex; }
   .ms-view        {
-    padding: calc(var(--ms-header-h) + var(--ms-safe-top) + 12px) 16px calc(var(--ms-bnav-h) + 12px);
+    padding: 16px 16px calc(var(--ms-bnav-h) + 12px);
     max-width: none;
   }
   .ms-editor-layout { grid-template-columns: 1fr; }
