@@ -14390,15 +14390,15 @@ flock-tabs [role="tablist"], .tabs-bar {
   --ms-r-lg: var(--radius-lg, 16px);
   --ms-r-xl: var(--radius-xl, 24px);
 
-  /* Chord section label colors */
+  /* Chord section label colors - navy/gold theme (ALL gold for consistency) */
   --sc-chorus:    var(--gold, #e8a838);
-  --sc-verse:     #2563eb;
-  --sc-bridge:    #7c3aed;
-  --sc-intro:     #059669;
-  --sc-outro:     #e11d48;
-  --sc-pre-chorus:#0284c7;
-  --sc-tag:       #d97706;
-  --sc-default:   #6b7280;
+  --sc-verse:     var(--gold, #e8a838);
+  --sc-bridge:    var(--gold, #e8a838);
+  --sc-intro:     var(--gold, #e8a838);
+  --sc-outro:     var(--gold, #e8a838);
+  --sc-pre-chorus:var(--gold, #e8a838);
+  --sc-tag:       var(--gold, #e8a838);
+  --sc-default:   var(--gold, #e8a838);
 }
 
 /* ── Navy card text & border (cards are navy gradient on cream page) ─────
