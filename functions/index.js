@@ -6,6 +6,116 @@ const chromium = require('@sparticuz/chromium');
 admin.initializeApp();
 
 /**
+ * Helper function to log in to SongSelect
+ * Returns the authenticated page
+ */
+async function loginToSongSelect(page, email, password) {
+  // Go to SongSelect login
+  await page.goto('https://songselect.ccli.com/account/signin', {
+    waitUntil: 'domcontentloaded',
+    timeout: 30000
+  });
+  
+  // Wait a bit for any JavaScript to load the login form
+  await page.waitForTimeout(2000);
+
+  // Check current URL - might have been redirected
+  const currentUrl = page.url();
+  console.log('Current URL after navigation:', currentUrl);
+
+  // Try multiple possible selectors for email/username field
+  let emailSelector = null;
+  const possibleEmailSelectors = [
+    '#EmailAddress',
+    'input[type="email"]',
+    'input[name="email"]',
+    'input[name="username"]',
+    'input[placeholder*="email" i]',
+    'input[placeholder*="username" i]'
+  ];
+  
+  for (const selector of possibleEmailSelectors) {
+    try {
+      await page.waitForSelector(selector, {visible: true, timeout: 3000});
+      emailSelector = selector;
+      console.log('Found email field with selector:', selector);
+      break;
+    } catch (e) {
+      // Try next selector
+    }
+  }
+
+  if (!emailSelector) {
+    // Capture page state for debugging
+    const pageUrl = page.url();
+    const pageTitle = await page.title();
+    const inputFields = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('input')).map(input => ({
+        type: input.type,
+        id: input.id,
+        name: input.name,
+        placeholder: input.placeholder,
+        className: input.className
+      }));
+    });
+    const buttons = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('button, a.button')).map(btn => ({
+        text: btn.textContent?.trim(),
+        className: btn.className,
+        href: btn.href || null
+      })).slice(0, 10);
+    });
+    console.error(`Login form not found. URL: ${pageUrl}, Title: ${pageTitle}`);
+    console.error('Available input fields:', JSON.stringify(inputFields, null, 2));
+    console.error('Available buttons:', JSON.stringify(buttons, null, 2));
+    throw new Error(`Login form not found. URL: ${pageUrl}, Available inputs: ${JSON.stringify(inputFields)}`);
+  }
+  
+  // Find password selector
+  let passwordSelector = null;
+  const possiblePasswordSelectors = [
+    '#Password',
+    'input[type="password"]',
+    'input[name="password"]'
+  ];
+  
+  for (const selector of possiblePasswordSelectors) {
+    try {
+      await page.waitForSelector(selector, {visible: true, timeout: 1000});
+      passwordSelector = selector;
+      console.log('Found password field with selector:', selector);
+      break;
+    } catch (e) {
+      // Try next selector
+    }
+  }
+  
+  if (!passwordSelector) {
+    throw new Error('Password field not found on page');
+  }
+
+  // Fill in credentials using dynamic selectors
+  await page.type(emailSelector, email, {delay: 50});
+  await page.type(passwordSelector, password, {delay: 50});
+  
+  // Submit form
+  await Promise.all([
+    page.click('button[type="submit"]'),
+    page.waitForNavigation({waitUntil: 'networkidle2', timeout: 10000})
+  ]);
+
+  // Check if login was successful
+  const url = page.url();
+  const isLoggedIn = !url.includes('/signin') && !url.includes('/error');
+
+  if (!isLoggedIn) {
+    throw new Error('Invalid SongSelect credentials');
+  }
+  
+  return page;
+}
+
+/**
  * SongSelect Authentication
  * Validates SongSelect credentials by logging in
  */
@@ -33,53 +143,8 @@ exports.songSelectAuth = onCall({
     // Set user agent to avoid bot detection
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
     
-    // Go to SongSelect login
-    await page.goto('https://songselect.ccli.com/account/signin', {
-      waitUntil: 'networkidle2',
-      timeout: 30000
-    });
-
-    // Wait for login form to be visible
-    try {
-      await page.waitForSelector('#EmailAddress', {visible: true, timeout: 15000});
-      await page.waitForSelector('#Password', {visible: true, timeout: 15000});
-    } catch (selectorError) {
-      // Capture page state for debugging
-      const pageUrl = page.url();
-      const pageTitle = await page.title();
-      const pageHtml = await page.content();
-      const inputFields = await page.evaluate(() => {
-        return Array.from(document.querySelectorAll('input')).map(input => ({
-          type: input.type,
-          id: input.id,
-          name: input.name,
-          placeholder: input.placeholder,
-          className: input.className
-        }));
-      });
-      console.error(`Login form not found. URL: ${pageUrl}, Title: ${pageTitle}`);
-      console.error('Available input fields:', JSON.stringify(inputFields, null, 2));
-      console.error('Page HTML length:', pageHtml.length);
-      throw new Error(`Login form not found. Available inputs: ${JSON.stringify(inputFields)}`);
-    }
-
-    // Fill in credentials
-    await page.type('#EmailAddress', email, {delay: 50});
-    await page.type('#Password', password, {delay: 50});
-    
-    // Submit form
-    await Promise.all([
-      page.click('button[type="submit"]'),
-      page.waitForNavigation({waitUntil: 'networkidle2', timeout: 10000})
-    ]);
-
-    // Check if login was successful
-    const url = page.url();
-    const isLoggedIn = !url.includes('/signin') && !url.includes('/error');
-
-    if (!isLoggedIn) {
-      throw new HttpsError('unauthenticated', 'Invalid SongSelect credentials');
-    }
+    // Use helper function to log in
+    await loginToSongSelect(page, email, password);
 
     return {
       ok: true,
@@ -125,40 +190,8 @@ exports.songSelectSearch = onCall({
     // Set user agent to avoid bot detection
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
     
-    // Login first
-    await page.goto('https://songselect.ccli.com/account/signin', {
-      waitUntil: 'networkidle2',
-      timeout: 30000
-    });
-
-    // Wait for login form
-    try {
-      await page.waitForSelector('#EmailAddress', {visible: true, timeout: 15000});
-      await page.waitForSelector('#Password', {visible: true, timeout: 15000});
-    } catch (selectorError) {
-      const pageUrl = page.url();
-      const pageTitle = await page.title();
-      const inputFields = await page.evaluate(() => {
-        return Array.from(document.querySelectorAll('input')).map(input => ({
-          type: input.type,
-          id: input.id,
-          name: input.name,
-          placeholder: input.placeholder,
-          className: input.className
-        }));
-      });
-      console.error(`Login form not found. URL: ${pageUrl}, Title: ${pageTitle}`);
-      console.error('Available input fields:', JSON.stringify(inputFields, null, 2));
-      throw new Error(`Login form not found. Available inputs: ${JSON.stringify(inputFields)}`);
-    }
-
-    await page.type('#EmailAddress', email, {delay: 50});
-    await page.type('#Password', password, {delay: 50});
-    
-    await Promise.all([
-      page.click('button[type="submit"]'),
-      page.waitForNavigation({waitUntil: 'networkidle2'})
-    ]);
+    // Use helper function to log in
+    await loginToSongSelect(page, email, password);
 
     // Search for songs
     await page.goto(`https://songselect.ccli.com/search/results?List=${encodeURIComponent(query)}`, {
@@ -235,40 +268,8 @@ exports.songSelectImport = onCall({
     // Set user agent to avoid bot detection
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
     
-    // Login
-    await page.goto('https://songselect.ccli.com/account/signin', {
-      waitUntil: 'networkidle2',
-      timeout: 30000
-    });
-
-    // Wait for login form
-    try {
-      await page.waitForSelector('#EmailAddress', {visible: true, timeout: 15000});
-      await page.waitForSelector('#Password', {visible: true, timeout: 15000});
-    } catch (selectorError) {
-      const pageUrl = page.url();
-      const pageTitle = await page.title();
-      const inputFields = await page.evaluate(() => {
-        return Array.from(document.querySelectorAll('input')).map(input => ({
-          type: input.type,
-          id: input.id,
-          name: input.name,
-          placeholder: input.placeholder,
-          className: input.className
-        }));
-      });
-      console.error(`Login form not found. URL: ${pageUrl}, Title: ${pageTitle}`);
-      console.error('Available input fields:', JSON.stringify(inputFields, null, 2));
-      throw new Error(`Login form not found. Available inputs: ${JSON.stringify(inputFields)}`);
-    }
-
-    await page.type('#EmailAddress', email, {delay: 50});
-    await page.type('#Password', password, {delay: 50});
-    
-    await Promise.all([
-      page.click('button[type="submit"]'),
-      page.waitForNavigation({waitUntil: 'networkidle2'})
-    ]);
+    // Use helper function to log in
+    await loginToSongSelect(page, email, password);
 
     // Go to song page
     await page.goto(`https://songselect.ccli.com/Songs/${songId}`, {
