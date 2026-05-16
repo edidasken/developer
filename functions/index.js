@@ -23,6 +23,25 @@ async function loginToSongSelect(page, email, password) {
     timeout: 30000
   });
   
+  // Set cookie consent cookies to bypass dialog
+  await page.setCookie({
+    name: 'CookieConsent',
+    value: '-1',
+    domain: '.songselect.ccli.com'
+  });
+  
+  await page.setCookie({
+    name: 'CookieConsentBulkTicket',
+    value: 'granted',
+    domain: '.songselect.ccli.com'
+  });
+  
+  // Reload page so cookies take effect
+  await page.reload({
+    waitUntil: 'domcontentloaded',
+    timeout: 30000
+  });
+  
   // Wait a bit for any JavaScript to load the login form
   await page.waitForTimeout(3000);
 
@@ -37,37 +56,40 @@ async function loginToSongSelect(page, email, password) {
   
   // Handle cookie consent dialog if present
   try {
-    const cookieButtonSelector = await page.evaluate(() => {
+    // Try to find and click the "Allow all" button
+    const allowAllButton = await page.evaluate(() => {
       const buttons = Array.from(document.querySelectorAll('button, a'));
-      const cookieButton = buttons.find(btn => 
+      return buttons.some(btn => 
         btn.textContent?.includes('Allow all') || 
-        btn.textContent?.includes('Allow Only Necessary') ||
-        btn.textContent?.includes('Accept') ||
         btn.className?.includes('CybotCookiebotDialogBodyButton')
       );
-      if (cookieButton) {
-        return cookieButton.textContent?.trim();
-      }
-      return null;
     });
     
-    if (cookieButtonSelector) {
-      console.log('Found cookie consent dialog, clicking:', cookieButtonSelector);
-      await page.evaluate(() => {
-        const buttons = Array.from(document.querySelectorAll('button, a'));
-        const cookieButton = buttons.find(btn => 
-          btn.textContent?.includes('Allow all') || 
-          btn.textContent?.includes('Allow Only Necessary') ||
-          btn.textContent?.includes('Accept') ||
-          btn.className?.includes('CybotCookiebotDialogBodyButton')
+    if (allowAllButton) {
+      console.log('Found cookie consent dialog, attempting to dismiss');
+      
+      // Click using page.evaluate to directly trigger the button
+      const clicked = await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('button'));
+        const allowButton = buttons.find(btn => 
+          btn.textContent?.trim() === 'Allow all' ||
+          btn.textContent?.trim() === 'Allow Only Necessary'
         );
-        if (cookieButton) {
-          cookieButton.click();
+        if (allowButton) {
+          allowButton.click();
+          return true;
         }
+        return false;
       });
-      // Wait for dialog to dismiss
-      await page.waitForTimeout(2000);
-      console.log('Cookie consent dialog dismissed');
+      
+      if (clicked) {
+        console.log('Clicked cookie consent button');
+        // Wait for dialog to dismiss and page to update
+        await page.waitForTimeout(3000);
+        console.log('Cookie consent dialog should be dismissed');
+      } else {
+        console.log('Could not find clickable cookie button');
+      }
     }
   } catch (cookieError) {
     console.log('No cookie dialog found or error dismissing:', cookieError.message);

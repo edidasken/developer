@@ -651,9 +651,10 @@ function _renderSongs(main) {
 
 async function _renderServices(main) {
   main.innerHTML = `
-    <div class="ms-view">
-      <div class="ms-page-hero">
+    <div class="ms-view ms-dash">
+      <div class="ms-page-hero ms-dash-hero">
         <div class="ms-page-hero-text">
+          <div class="ms-dash-eyebrow">FlockStand · Service Plans</div>
           <h1>Service Plans</h1>
           <p>Build and manage your worship setlists, team notes, and service orders.</p>
         </div>
@@ -694,8 +695,8 @@ async function _loadAndRenderPlans(main) {
       ${sorted.map(p => {
         const songs = p.songs || p.setlist || [];
         const isActive = p.id === S.activePlanId;
-        return `<div class="ms-service-card${isActive ? ' is-active' : ''}" data-plan-id="${_e(p.id)}"
-          style="cursor:pointer;text-align:left;${isActive ? 'border-color:var(--ms-gold);' : ''}">
+        return `<div class="ms-service-card ms-dash-action${isActive ? ' is-active' : ''}" data-plan-id="${_e(p.id)}"
+          style="cursor:pointer;text-align:left;padding:20px;${isActive ? 'border-color:var(--ms-gold);' : ''}">
           <div class="ms-service-card-header">
             <div>
               <div class="ms-service-card-title">${_e(p.serviceType || 'Service')}</div>
@@ -964,12 +965,14 @@ function _setlistItemHtml(s, i) {
 
 function _renderImport(main) {
   main.innerHTML = `
-    <div class="ms-view">
+    <div class="ms-view ms-dash">
       <!-- Navy card header matching FlockStand dashboard theme -->
-      <div class="pray-liturgy-card" style="margin-bottom:24px;">
-        <div style="font-size:1.4rem;margin-bottom:12px;">📥</div>
-        <div class="pray-liturgy-title">Import Songs</div>
-        <div class="pray-liturgy-verse">Bring songs in from CCLI SongSelect, Planning Center, or paste raw ChordPro.</div>
+      <div class="ms-dash-hero" style="margin-bottom:24px;">
+        <div class="ms-page-hero-text">
+          <div class="ms-dash-eyebrow">FlockStand · Import</div>
+          <h1 style="font-size:1.6rem;margin-bottom:8px;">📥 Import Songs</h1>
+          <p>Bring songs in from CCLI SongSelect, Planning Center, or paste raw ChordPro.</p>
+        </div>
       </div>
 
       <div class="ms-import-tabs" id="imp-tabs">
@@ -981,9 +984,9 @@ function _renderImport(main) {
       <!-- ChordPro / SongSelect -->
       <div class="ms-import-panel is-active" id="imp-panel-chordpro">
         <!-- SongSelect Direct Connection -->
-        <div class="ms-card" style="max-width:520px;margin-bottom:24px;">
+        <div class="ms-dash-action" style="max-width:520px;margin-bottom:24px;display:block;cursor:default;">
           <div style="font-size:1.4rem;margin-bottom:12px;">🎵</div>
-          <div style="font-weight:700;font-size:1rem;margin-bottom:8px;">CCLI SongSelect Direct Import</div>
+          <div style="font-weight:700;font-size:1rem;margin-bottom:8px;color:#fff;">CCLI SongSelect Direct Import</div>
           <p style="color:var(--ms-ink-muted);font-size:.88rem;line-height:1.6;margin-bottom:16px;">
             Connect your SongSelect account to browse and import songs directly without downloading files.
           </p>
@@ -1065,9 +1068,9 @@ function _renderImport(main) {
 
       <!-- Planning Center Direct Connection -->
       <div class="ms-import-panel" id="imp-panel-planning-center">
-        <div class="ms-card" style="max-width:520px;margin-bottom:24px;">
+        <div class="ms-dash-action" style="max-width:520px;margin-bottom:24px;display:block;cursor:default;">
           <div style="font-size:1.4rem;margin-bottom:12px;">📋</div>
-          <div style="font-weight:700;font-size:1rem;margin-bottom:8px;">Planning Center Online</div>
+          <div style="font-weight:700;font-size:1rem;margin-bottom:8px;color:#fff;">Planning Center Online</div>
           <p style="color:var(--ms-ink-muted);font-size:.88rem;line-height:1.6;margin-bottom:16px;">
             Connect your Planning Center account to import service plans and songs directly.
           </p>
@@ -1943,16 +1946,17 @@ function _keyOptions(selected = 'C') {
 
 function _renderSettings(main) {
   main.innerHTML = `
-    <div class="ms-view" style="max-width:640px;">
-      <div class="ms-page-hero">
+    <div class="ms-view ms-dash" style="max-width:640px;">
+      <div class="ms-page-hero ms-dash-hero">
         <div class="ms-page-hero-text">
+          <div class="ms-dash-eyebrow">FlockStand · Settings</div>
           <h1>Settings</h1>
           <p>Customize your FlockStand experience.</p>
         </div>
       </div>
 
-      <div class="ms-settings-section">
-        <h2>Display</h2>
+      <div class="ms-dash-action" style="display:block;cursor:default;margin-bottom:20px;">
+        <h2 style="color:var(--dash-gold);font-size:1.1rem;margin-bottom:16px;letter-spacing:0.06em;">Display</h2>
         <div class="ms-field" style="margin-bottom:16px;">
           <div class="ms-label">Default Song Font Size</div>
           <div style="display:flex;align-items:center;gap:12px;">
@@ -1980,8 +1984,8 @@ function _renderSettings(main) {
         </div>
       </div>
 
-      <div class="ms-settings-section">
-        <h2>Live Presenter</h2>
+      <div class="ms-dash-action" style="display:block;cursor:default;margin-bottom:20px;">
+        <h2 style="color:var(--dash-gold);font-size:1.1rem;margin-bottom:16px;letter-spacing:0.06em;">Live Presenter</h2>
         <div class="ms-field" style="margin-bottom:16px;">
           <div class="ms-label">Live Mode Font Size</div>
           <div style="display:flex;align-items:center;gap:12px;">
@@ -1991,9 +1995,9 @@ function _renderSettings(main) {
         </div>
       </div>
 
-      <div class="ms-settings-section">
-        <h2>Account</h2>
-        <div style="background:var(--ms-bg-card);border:1px solid var(--ms-line);border-radius:var(--ms-r-lg);padding:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div class="ms-dash-action" style="display:block;cursor:default;">
+        <h2 style="color:var(--dash-gold);font-size:1.1rem;margin-bottom:16px;letter-spacing:0.06em;">Account</h2>
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:var(--ms-r-lg);padding:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
           <div>
             <div style="font-weight:700">${_e(S.user?.displayName || 'Worship Team')}</div>
             <div style="font-size:.82rem;color:var(--ms-ink-muted)">${_e(S.user?.email || '')}</div>
