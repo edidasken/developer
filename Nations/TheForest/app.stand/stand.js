@@ -2000,8 +2000,8 @@ function _renderSettings(main) {
         <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:var(--ms-r-lg);padding:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
           <div>
             <div style="font-weight:700">${_e(S.user?.displayName || 'Worship Team')}</div>
-            <div style="font-size:.82rem;color:var(--ms-ink-muted)">${_e(S.user?.email || '')}</div>
-            <div style="font-size:.75rem;color:var(--ms-ink-faint);margin-top:2px;text-transform:capitalize">${_e(S.user?.role || 'member')}</div>
+            <div style="font-size:.82rem;color:rgba(255,255,255,0.65)">${_e(S.user?.email || '')}</div>
+            <div style="font-size:.75rem;color:rgba(255,255,255,0.45);margin-top:2px;text-transform:capitalize">${_e(S.user?.role || 'member')}</div>
           </div>
           <button class="ms-btn ms-btn--danger ms-btn--sm" id="set-signout">Sign Out</button>
         </div>
