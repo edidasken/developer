@@ -30,6 +30,7 @@
   /* ── Constants ─────────────────────────────────────────────────────── */
   const VERSION = 'v3.0.0';
   const MSG_LIMIT = 100;
+  const ANNOUNCEMENTS_ID = 'announcements';
 
   /* ── State ─────────────────────────────────────────────────────────── */
   let _db = null;
