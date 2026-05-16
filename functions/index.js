@@ -261,11 +261,54 @@ async function loginToSongSelect(page, email, password) {
   await page.type(emailSelector, email, {delay: 50});
   await page.type(passwordSelector, password, {delay: 50});
   
-  // Submit form
-  await Promise.all([
-    page.click('button[type="submit"]'),
-    page.waitForNavigation({waitUntil: 'networkidle2', timeout: 10000})
-  ]);
+  // Submit form - try multiple button selectors
+  let submitButton = null;
+  const possibleSubmitSelectors = [
+    'button[type="submit"]',
+    'button.primary',
+    'button.button.primary',
+    'input[type="submit"]'
+  ];
+  
+  for (const selector of possibleSubmitSelectors) {
+    try {
+      const exists = await page.$(selector);
+      if (exists) {
+        submitButton = selector;
+        console.log('Found submit button with selector:', selector);
+        break;
+      }
+    } catch (e) {
+      // Try next selector
+    }
+  }
+  
+  if (!submitButton) {
+    // Try finding by text content
+    const clicked = await page.evaluate(() => {
+      const buttons = Array.from(document.querySelectorAll('button'));
+      const signInBtn = buttons.find(btn => 
+        btn.textContent?.trim().toLowerCase() === 'sign in'
+      );
+      if (signInBtn) {
+        signInBtn.click();
+        return true;
+      }
+      return false;
+    });
+    
+    if (clicked) {
+      console.log('Clicked submit button by text content');
+    } else {
+      throw new Error('Could not find submit button');
+    }
+  } else {
+    // Click using selector
+    await Promise.all([
+      page.click(submitButton),
+      page.waitForNavigation({waitUntil: 'networkidle2', timeout: 10000}).catch(() => {})
+    ]);
+  }
 
   // Check if login was successful
   const url = page.url();

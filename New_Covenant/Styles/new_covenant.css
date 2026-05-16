@@ -14881,7 +14881,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-editor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
 .ms-editor-col    { display: flex; flex-direction: column; gap: 16px; }
 .ms-field         { display: flex; flex-direction: column; gap: 6px; }
-.ms-label         { font-size: .78rem; font-weight: 700; color: var(--ms-ink-muted); letter-spacing: .05em; text-transform: uppercase; }
+.ms-label         { font-size: .78rem; font-weight: 700; color: var(--gold); letter-spacing: .05em; text-transform: uppercase; }
 .ms-input, .ms-select, .ms-textarea {
   padding: 10px 14px; border-radius: var(--ms-r-md);
   background: var(--ms-bg-card); border: 1px solid var(--ms-line);
