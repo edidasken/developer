@@ -587,13 +587,7 @@ function msRenderShell() {
                 '</div>' +
             '</div>' +
 
-            '<div class="ms-tabs">' +
-                '<button class="ms-tab-btn ms-active" data-ms-tab="songs">Song Library</button>' +
-                '<button class="ms-tab-btn" data-ms-tab="stand">FlockStand</button>' +
-            '</div>' +
-
             '<div id="ms-tab-songs"></div>' +
-            '<div id="ms-tab-stand" style="display:none;"></div>' +
 
             /* Song editor overlay */
             '<div id="ms-song-overlay" class="ms-overlay" aria-hidden="true">' +
@@ -605,41 +599,6 @@ function msRenderShell() {
                 '<div class="ms-modal" id="ms-arr-modal"></div>' +
             '</div>' +
         '</div>';
-
-    // Tab switching
-    container.querySelectorAll('.ms-tab-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            var target = btn.getAttribute('data-ms-tab');
-            msActivateTab(target);
-        });
-    });
-}
-
-function msActivateTab(tabName) {
-    musicStandAppState.activeTab = tabName;
-    var container = document.querySelector('.ms-app');
-    if (!container) return;
-
-    container.querySelectorAll('.ms-tab-btn').forEach(function(btn) {
-        var t = btn.getAttribute('data-ms-tab');
-        if (t === tabName) {
-            btn.classList.add('ms-active');
-        } else {
-            btn.classList.remove('ms-active');
-        }
-    });
-
-    var songsPanel = document.getElementById('ms-tab-songs');
-    var standPanel = document.getElementById('ms-tab-stand');
-
-    if (tabName === 'songs') {
-        songsPanel.style.display = '';
-        standPanel.style.display = 'none';
-    } else {
-        songsPanel.style.display = 'none';
-        standPanel.style.display = '';
-        msRenderStandTab();
-    }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
