@@ -113,33 +113,45 @@ async function _load() {
   // Render localStorage immediately for zero-wait UX
   try {
     const cached = JSON.parse(localStorage.getItem(FS_KEY) || '[]');
+    console.log('[FlockShow] _load: localStorage cache count =', cached.length);
     if (cached.length) {
       _st.shows = cached;
       if (_st.view === 'library') _renderLibrary();
     }
-  } catch (_) {}
+  } catch (e) {
+    console.warn('[FlockShow] _load: localStorage parse failed', e);
+  }
 
   // Firestore — update in background
   if (_fsFB()) {
     try {
+      console.log('[FlockShow] _load: calling UpperRoom.listPresentations…');
       const result = await window.UpperRoom.listPresentations({ limit: 200 });
       const rows = Array.isArray(result) ? result : (result.results || result.rows || []);
+      console.log('[FlockShow] _load: Firestore returned', rows.length, 'rows',
+                  Array.isArray(result) ? '(array)' : '(object)', result);
       _st.shows = rows.map(r => { r._fsId = r.id; return r; });
       _lsSync();
       if (_st.view === 'library') _renderLibrary();
       return;
     } catch (e) {
-      console.warn('[FlockShow] Firestore load failed, trying GAS:', e);
+      console.error('[FlockShow] _load: Firestore listPresentations FAILED:', e);
     }
+  } else {
+    console.warn('[FlockShow] _load: UpperRoom not ready, skipping Firestore. ' +
+                 'UpperRoom present? ' + !!window.UpperRoom +
+                 ', isReady? ' + (window.UpperRoom && typeof window.UpperRoom.isReady === 'function' ? window.UpperRoom.isReady() : 'n/a'));
   }
   // GAS fallback
   const gasData = await _fsApiCall('presentations.list', {});
   if (gasData && Array.isArray(gasData.rows)) {
+    console.log('[FlockShow] _load: GAS returned', gasData.rows.length, 'rows');
     _st.shows = gasData.rows.map(r => { r._gasId = r.id; return r; });
     _lsSync();
     if (_st.view === 'library') _renderLibrary();
     return;
   }
+  console.log('[FlockShow] _load: no GAS data; final _st.shows.length =', _st.shows.length);
   // localStorage already rendered above — nothing more to do
 }
 
@@ -164,16 +176,21 @@ async function _syncShow(show) {
   if (_fsFB()) {
     try {
       if (show._fsId) {
+        console.log('[FlockShow] _syncShow: UPDATE id=' + show._fsId + ' name="' + payload.name + '"');
         await window.UpperRoom.updatePresentation(Object.assign({ id: show._fsId }, payload));
       } else {
+        console.log('[FlockShow] _syncShow: CREATE name="' + payload.name + '" slides=' + payload.slides.length);
         const res = await window.UpperRoom.createPresentation(payload);
         show._fsId = res.id;
+        console.log('[FlockShow] _syncShow: CREATE OK — _fsId=' + show._fsId);
       }
       _lsSync();
       return;
     } catch (e) {
-      console.warn('[FlockShow] Firestore sync failed:', e);
+      console.error('[FlockShow] _syncShow: Firestore write FAILED:', e);
     }
+  } else {
+    console.warn('[FlockShow] _syncShow: UpperRoom not ready — write skipped');
   }
   // GAS fallback
   if (String(window.PASTORAL_DB_V2_ENDPOINT || '').trim()) {
@@ -377,16 +394,74 @@ function _renderLibrary() {
     : _st.shows;
 
   if (!shows.length) {
+    if (q) {
+      grid.innerHTML = `
+        <div class="fs-empty">
+          <div class="fs-empty-icon">🎬</div>
+          <div style="font:600 1rem 'Plus Jakarta Sans',sans-serif;color:var(--fs-ink)">
+            No shows match your search
+          </div>
+          <div style="font:0.82rem 'Plus Jakarta Sans',sans-serif;color:var(--fs-muted)">
+            Try a different search term
+          </div>
+        </div>`;
+      return;
+    }
+    // First-run welcome — navy/gold "Vespers" themed card + feature tiles.
     grid.innerHTML = `
-      <div class="fs-empty">
-        <div class="fs-empty-icon">🎬</div>
-        <div style="font:600 1rem 'Plus Jakarta Sans',sans-serif;color:var(--fs-ink)">
-          ${q ? 'No shows match your search' : 'No shows yet'}
+      <div class="fs-welcome">
+        <div class="fs-welcome-hero devo-dark-card">
+          <div class="word-body">
+            <div class="word-eyebrow devo-dark-eyebrow">
+              <span>For the Shepherds</span>
+              <span class="word-theme devo-dark-theme">Free • Forever</span>
+            </div>
+            <div class="word-title devo-dark-title">Welcome, Pastor.</div>
+            <div class="word-scrip devo-dark-scrip">
+              <em>"Praise Him with strings and pipe."</em> &mdash; Psalm 150:4
+            </div>
+            <p class="word-tease devo-dark-tease">
+              Every premium tool in FlockOS &mdash; FlockShow, FEED, GROW, STAND, and FlockChat &mdash;
+              is yours at no cost. You carry the weight of ministry, and we want nothing standing
+              between you and the people you shepherd. <strong>We are praying for you. We love you.
+              Thank you for the work you do.</strong>
+            </p>
+            <button type="button" class="fs-btn fs-btn--primary fs-welcome-cta" id="fs-welcome-new-btn">
+              + Create your first show
+            </button>
+          </div>
         </div>
-        <div style="font:0.82rem 'Plus Jakarta Sans',sans-serif;color:var(--fs-muted)">
-          ${q ? 'Try a different search term' : 'Click "New Show" to create your first presentation'}
+
+        <div class="fs-welcome-features">
+          <div class="fs-welcome-feat">
+            <div class="fs-welcome-feat-icon">🎬</div>
+            <div class="fs-welcome-feat-title">Multi-Slide Presentations</div>
+            <div class="fs-welcome-feat-body">
+              Build beautiful worship slides with lyrics, scripture, and announcements.
+            </div>
+          </div>
+          <div class="fs-welcome-feat">
+            <div class="fs-welcome-feat-icon">📖</div>
+            <div class="fs-welcome-feat-title">Import from Sermons &amp; Songs</div>
+            <div class="fs-welcome-feat-body">
+              Auto-generate slides from your FlockOS sermon library or FlockStand worship songs.
+            </div>
+          </div>
+          <div class="fs-welcome-feat">
+            <div class="fs-welcome-feat-icon">✦</div>
+            <div class="fs-welcome-feat-title">Gradient Backgrounds &amp; Themes</div>
+            <div class="fs-welcome-feat-body">
+              18 stunning gradients plus custom colours &mdash; apply themes across an entire show in one click.
+            </div>
+          </div>
         </div>
       </div>`;
+
+    // Wire the welcome CTA to the same handler the main "+ New Show" button uses.
+    const cta = document.getElementById('fs-welcome-new-btn');
+    if (cta) cta.addEventListener('click', () => {
+      document.getElementById('fs-new-show-btn')?.click();
+    });
     return;
   }
 

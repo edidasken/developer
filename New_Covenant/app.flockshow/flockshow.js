@@ -113,33 +113,45 @@ async function _load() {
   // Render localStorage immediately for zero-wait UX
   try {
     const cached = JSON.parse(localStorage.getItem(FS_KEY) || '[]');
+    console.log('[FlockShow] _load: localStorage cache count =', cached.length);
     if (cached.length) {
       _st.shows = cached;
       if (_st.view === 'library') _renderLibrary();
     }
-  } catch (_) {}
+  } catch (e) {
+    console.warn('[FlockShow] _load: localStorage parse failed', e);
+  }
 
   // Firestore — update in background
   if (_fsFB()) {
     try {
+      console.log('[FlockShow] _load: calling UpperRoom.listPresentations…');
       const result = await window.UpperRoom.listPresentations({ limit: 200 });
       const rows = Array.isArray(result) ? result : (result.results || result.rows || []);
+      console.log('[FlockShow] _load: Firestore returned', rows.length, 'rows',
+                  Array.isArray(result) ? '(array)' : '(object)', result);
       _st.shows = rows.map(r => { r._fsId = r.id; return r; });
       _lsSync();
       if (_st.view === 'library') _renderLibrary();
       return;
     } catch (e) {
-      console.warn('[FlockShow] Firestore load failed, trying GAS:', e);
+      console.error('[FlockShow] _load: Firestore listPresentations FAILED:', e);
     }
+  } else {
+    console.warn('[FlockShow] _load: UpperRoom not ready, skipping Firestore. ' +
+                 'UpperRoom present? ' + !!window.UpperRoom +
+                 ', isReady? ' + (window.UpperRoom && typeof window.UpperRoom.isReady === 'function' ? window.UpperRoom.isReady() : 'n/a'));
   }
   // GAS fallback
   const gasData = await _fsApiCall('presentations.list', {});
   if (gasData && Array.isArray(gasData.rows)) {
+    console.log('[FlockShow] _load: GAS returned', gasData.rows.length, 'rows');
     _st.shows = gasData.rows.map(r => { r._gasId = r.id; return r; });
     _lsSync();
     if (_st.view === 'library') _renderLibrary();
     return;
   }
+  console.log('[FlockShow] _load: no GAS data; final _st.shows.length =', _st.shows.length);
   // localStorage already rendered above — nothing more to do
 }
 
@@ -164,16 +176,21 @@ async function _syncShow(show) {
   if (_fsFB()) {
     try {
       if (show._fsId) {
+        console.log('[FlockShow] _syncShow: UPDATE id=' + show._fsId + ' name="' + payload.name + '"');
         await window.UpperRoom.updatePresentation(Object.assign({ id: show._fsId }, payload));
       } else {
+        console.log('[FlockShow] _syncShow: CREATE name="' + payload.name + '" slides=' + payload.slides.length);
         const res = await window.UpperRoom.createPresentation(payload);
         show._fsId = res.id;
+        console.log('[FlockShow] _syncShow: CREATE OK — _fsId=' + show._fsId);
       }
       _lsSync();
       return;
     } catch (e) {
-      console.warn('[FlockShow] Firestore sync failed:', e);
+      console.error('[FlockShow] _syncShow: Firestore write FAILED:', e);
     }
+  } else {
+    console.warn('[FlockShow] _syncShow: UpperRoom not ready — write skipped');
   }
   // GAS fallback
   if (String(window.PASTORAL_DB_V2_ENDPOINT || '').trim()) {
@@ -193,11 +210,18 @@ async function _syncShow(show) {
 
 // Delete a show from Firestore/GAS (fire-and-forget safe)
 async function _removeShow(show) {
+  console.log('[FlockShow] _removeShow: id=' + show.id + ' _fsId=' + (show._fsId || '(none)') + ' _gasId=' + (show._gasId || '(none)'));
   if (_fsFB() && show._fsId) {
-    try { await window.UpperRoom.deletePresentation(show._fsId); }
-    catch (e) { console.warn('[FlockShow] Firestore delete failed:', e); }
+    try {
+      await window.UpperRoom.deletePresentation(show._fsId);
+      console.log('[FlockShow] _removeShow: Firestore delete OK');
+    } catch (e) {
+      console.error('[FlockShow] _removeShow: Firestore delete FAILED:', e);
+    }
   } else if (String(window.PASTORAL_DB_V2_ENDPOINT || '').trim() && show._gasId) {
     await _fsApiCall('presentations.delete', { id: show._gasId });
+  } else {
+    console.warn('[FlockShow] _removeShow: no remote id to delete (local-only show)');
   }
   _lsSync();
 }
@@ -228,7 +252,12 @@ function _activeSlide() { const sh = _activeShow(); return sh?.slides[_st.active
 function _save(show) {
   _lsSync();
   const toSync = show || _activeShow();
-  if (toSync) _syncShow(toSync); // fire-and-forget
+  if (toSync) {
+    console.log('[FlockShow] _save: queue sync for id=' + toSync.id + ' _fsId=' + (toSync._fsId || '(none)'));
+    _syncShow(toSync); // fire-and-forget
+  } else {
+    console.log('[FlockShow] _save: no active show to sync (lsSync only)');
+  }
 }
 
 function _touch(show) { show.updatedAt = Date.now(); _save(show); }
@@ -377,16 +406,74 @@ function _renderLibrary() {
     : _st.shows;
 
   if (!shows.length) {
+    if (q) {
+      grid.innerHTML = `
+        <div class="fs-empty">
+          <div class="fs-empty-icon">🎬</div>
+          <div style="font:600 1rem 'Plus Jakarta Sans',sans-serif;color:var(--fs-ink)">
+            No shows match your search
+          </div>
+          <div style="font:0.82rem 'Plus Jakarta Sans',sans-serif;color:var(--fs-muted)">
+            Try a different search term
+          </div>
+        </div>`;
+      return;
+    }
+    // First-run welcome — navy/gold "Vespers" themed card + feature tiles.
     grid.innerHTML = `
-      <div class="fs-empty">
-        <div class="fs-empty-icon">🎬</div>
-        <div style="font:600 1rem 'Plus Jakarta Sans',sans-serif;color:var(--fs-ink)">
-          ${q ? 'No shows match your search' : 'No shows yet'}
+      <div class="fs-welcome">
+        <div class="fs-welcome-hero devo-dark-card">
+          <div class="word-body">
+            <div class="word-eyebrow devo-dark-eyebrow">
+              <span>For the Shepherds</span>
+              <span class="word-theme devo-dark-theme">Free • Forever</span>
+            </div>
+            <div class="word-title devo-dark-title">Welcome, Pastor.</div>
+            <div class="word-scrip devo-dark-scrip">
+              <em>"Praise Him with strings and pipe."</em> &mdash; Psalm 150:4
+            </div>
+            <p class="word-tease devo-dark-tease">
+              Every premium tool in FlockOS &mdash; FlockShow, FEED, GROW, STAND, and FlockChat &mdash;
+              is yours at no cost. You carry the weight of ministry, and we want nothing standing
+              between you and the people you shepherd. <strong>We are praying for you. We love you.
+              Thank you for the work you do.</strong>
+            </p>
+            <button type="button" class="fs-btn fs-btn--primary fs-welcome-cta" id="fs-welcome-new-btn">
+              + Create your first show
+            </button>
+          </div>
         </div>
-        <div style="font:0.82rem 'Plus Jakarta Sans',sans-serif;color:var(--fs-muted)">
-          ${q ? 'Try a different search term' : 'Click "New Show" to create your first presentation'}
+
+        <div class="fs-welcome-features">
+          <div class="fs-welcome-feat">
+            <div class="fs-welcome-feat-icon">🎬</div>
+            <div class="fs-welcome-feat-title">Multi-Slide Presentations</div>
+            <div class="fs-welcome-feat-body">
+              Build beautiful worship slides with lyrics, scripture, and announcements.
+            </div>
+          </div>
+          <div class="fs-welcome-feat">
+            <div class="fs-welcome-feat-icon">📖</div>
+            <div class="fs-welcome-feat-title">Import from Sermons &amp; Songs</div>
+            <div class="fs-welcome-feat-body">
+              Auto-generate slides from your FlockOS sermon library or FlockStand worship songs.
+            </div>
+          </div>
+          <div class="fs-welcome-feat">
+            <div class="fs-welcome-feat-icon">✦</div>
+            <div class="fs-welcome-feat-title">Gradient Backgrounds &amp; Themes</div>
+            <div class="fs-welcome-feat-body">
+              18 stunning gradients plus custom colours &mdash; apply themes across an entire show in one click.
+            </div>
+          </div>
         </div>
       </div>`;
+
+    // Wire the welcome CTA to the same handler the main "+ New Show" button uses.
+    const cta = document.getElementById('fs-welcome-new-btn');
+    if (cta) cta.addEventListener('click', () => {
+      document.getElementById('fs-new-show-btn')?.click();
+    });
     return;
   }
 
@@ -620,8 +707,10 @@ function _openShow(id) {
 }
 
 function _newShow() {
+  console.log('[FlockShow] _newShow: opening name modal');
   _openNameModal('New Show', 'Show Name', name => {
     const show = _makeShow(name);
+    console.log('[FlockShow] _newShow: created locally id=' + show.id + ' name="' + show.name + '"');
     _st.shows.unshift(show);
     _save(show);
     _openShow(show.id);
@@ -2082,37 +2171,47 @@ function _renderUserChip(N) {
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 async function _boot() {
+  const _t0 = Date.now();
+  console.log('[FlockShow] _boot: start, readyState=' + document.readyState);
   try {
     await _waitFor(() => typeof window.Nehemiah !== 'undefined');
+    console.log('[FlockShow] _boot: Nehemiah present after ' + (Date.now() - _t0) + 'ms');
   } catch (_) {
-    // firm_foundation.js didn't load (e.g. local dev) — run ungated
+    console.warn('[FlockShow] _boot: Nehemiah NEVER appeared — running ungated (local dev path)');
     _renderUserChip(null);
     await _load(); _wire(); _renderAll();
     return;
   }
 
   const N = window.Nehemiah;
+  const sess = (typeof N.getSession === 'function') ? N.getSession() : null;
+  console.log('[FlockShow] _boot: session =', sess ? { email: sess.email, hasToken: !!sess.token } : null);
 
   if (typeof N.isAuthenticated === 'function' && !N.isAuthenticated()) {
-    // Redirect to FlockShow's standalone sign-in page (Stand pattern)
+    console.warn('[FlockShow] _boot: NOT authenticated — redirecting to sign-in');
     const base = location.href.replace(/\/app\.flockshow\/app\.flockshow\.html.*$/, '/');
     location.replace(base + 'app.flockshow/');
     return;
   }
+  console.log('[FlockShow] _boot: authenticated ✓');
 
   // Authenticated — dismiss overlay and launch
   _dismissAuthOverlay();
   _renderUserChip(N);
   // Wait for UpperRoom to finish its async authentication before loading Firestore data.
   // Without this, _fsFB() may return false and _load() falls back to empty localStorage.
+  const _tUR = Date.now();
   try {
     await _waitFor(() => window.UpperRoom && typeof window.UpperRoom.isReady === 'function' && window.UpperRoom.isReady(), 8000);
+    console.log('[FlockShow] _boot: UpperRoom ready after ' + (Date.now() - _tUR) + 'ms');
   } catch (_) {
-    // UpperRoom didn't come up in time — proceed with GAS/localStorage fallback
+    console.error('[FlockShow] _boot: UpperRoom TIMEOUT (8s) — proceeding without Firestore. ' +
+                  'UpperRoom present? ' + !!window.UpperRoom);
   }
   await _load();
   _wire();
   _renderAll();
+  console.log('[FlockShow] _boot: complete after ' + (Date.now() - _t0) + 'ms, shows.length=' + _st.shows.length);
 }
 
 if (document.readyState === 'loading') {
