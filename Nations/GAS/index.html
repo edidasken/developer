@@ -532,7 +532,17 @@
       font-size: 0.95rem;
     }
     @media (max-width: 640px) {
-      .pastor-modal { max-height: 92vh; border-radius: 16px; }
+      .pastor-modal-backdrop {
+        padding: 0.5rem;
+        align-items: flex-start;
+        padding-top: max(0.5rem, env(safe-area-inset-top));
+        padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+      }
+      .pastor-modal {
+        max-height: 90dvh;
+        max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 1rem);
+        border-radius: 16px;
+      }
       .pastor-modal-header { padding: 1.1rem 1.2rem; }
       .pastor-modal-title { font-size: 1.15rem; }
       .pastor-modal-body { padding: 1.2rem; }
