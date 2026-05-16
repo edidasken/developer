@@ -271,7 +271,7 @@
       flex: 1; display: flex; flex-direction: column;
       gap: 0; padding: 0; overflow-y: auto; overflow-x: hidden;
       -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
-      background: var(--bm-bg);
+      background: var(--bg);
     }
     .bm-land {
       max-width: 1180px; width: 100%; margin: 0 auto;
@@ -282,9 +282,9 @@
       display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
       padding: 22px 24px;
       border-radius: 18px;
-      background: linear-gradient(135deg, rgba(232,168,56,0.12), rgba(167,139,250,0.08));
-      border: 1px solid rgba(232,168,56,0.20);
-      box-shadow: 0 6px 24px rgba(0,0,0,0.04);
+      background: #1a2555;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.20);
     }
     .bm-land-hero-icon {
       width: 56px; height: 56px; border-radius: 16px;
@@ -295,11 +295,11 @@
     }
     .bm-land-hero-text { flex: 1; min-width: 200px; }
     .bm-land-hero-h {
-      font: 700 1.45rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      font: 700 1.45rem 'Plus Jakarta Sans', sans-serif; color: #ffffff;
       margin: 0 0 4px 0; letter-spacing: -0.01em;
     }
     .bm-land-hero-p {
-      font: 0.88rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted);
+      font: 0.88rem 'Plus Jakarta Sans', sans-serif; color: rgba(255,255,255,0.85);
       margin: 0; line-height: 1.55;
     }
     .bm-land-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -312,15 +312,15 @@
     .bm-land-grid--4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 
     .bm-land-card {
-      background: var(--bm-card, #ffffff);
-      border: 1px solid var(--bm-border, rgba(0,0,0,0.06));
+      background: #1a2555;
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 14px; padding: 18px 18px 16px;
       display: flex; flex-direction: column; gap: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.10);
       transition: box-shadow 0.18s ease, transform 0.18s ease;
       min-width: 0;
     }
-    .bm-land-card:hover { box-shadow: 0 6px 22px rgba(0,0,0,0.06); }
+    .bm-land-card:hover { box-shadow: 0 6px 22px rgba(0,0,0,0.15); }
     .bm-land-card--span2 { grid-column: span 2; }
     @media (max-width: 720px) { .bm-land-card--span2 { grid-column: auto; } }
 
@@ -329,73 +329,76 @@
     }
     .bm-land-card-icon {
       width: 32px; height: 32px; border-radius: 10px;
-      background: linear-gradient(135deg, rgba(232,168,56,0.15), rgba(167,139,250,0.10));
+      background: rgba(232,168,56,0.20);
       display: flex; align-items: center; justify-content: center;
-      color: var(--bm-accent, #e8a838); flex-shrink: 0;
+      color: var(--gold); flex-shrink: 0;
     }
     .bm-land-card-h {
-      font: 700 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      font: 700 0.95rem 'Plus Jakarta Sans', sans-serif; color: #ffffff;
       flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .bm-land-card-sub {
-      font: 0.75rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      font: 0.75rem 'Plus Jakarta Sans', sans-serif; color: rgba(255,255,255,0.50);
       text-transform: uppercase; letter-spacing: 0.04em;
     }
     .bm-land-card-body {
-      font: 0.85rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted);
+      font: 0.85rem 'Plus Jakarta Sans', sans-serif; color: rgba(255,255,255,0.85);
       line-height: 1.55; min-height: 40px;
     }
     .bm-land-empty-line {
-      font: italic 0.80rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      font: italic 0.80rem 'Plus Jakarta Sans', sans-serif; color: rgba(255,255,255,0.50);
       padding: 6px 0;
     }
     .bm-land-list { display: flex; flex-direction: column; gap: 6px; }
     .bm-land-list-item {
       display: flex; align-items: center; gap: 10px;
       padding: 8px 10px; border-radius: 8px; cursor: pointer;
-      background: rgba(0,0,0,0.02); transition: background 0.15s ease;
+      background: rgba(0,0,0,0.15); transition: background 0.15s ease;
       border: 1px solid transparent;
     }
     .bm-land-list-item:hover {
-      background: rgba(232,168,56,0.08);
-      border-color: rgba(232,168,56,0.18);
+      background: rgba(0,0,0,0.25);
+      border-color: rgba(255,255,255,0.15);
     }
     .bm-land-list-item-title {
       flex: 1; font: 600 0.85rem 'Plus Jakarta Sans', sans-serif;
-      color: var(--bm-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       min-width: 0;
     }
     .bm-land-list-item-meta {
-      font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: rgba(255,255,255,0.50);
       flex-shrink: 0;
     }
     .bm-land-verse {
-      font: italic 0.92rem 'Noto Serif', Georgia, serif; color: var(--bm-ink);
+      font: italic 0.92rem 'Noto Serif', Georgia, serif; color: rgba(255,255,255,0.90);
       line-height: 1.65; padding: 10px 14px;
-      border-left: 3px solid rgba(232,168,56,0.45);
-      background: rgba(232,168,56,0.04);
+      border-left: 3px solid var(--gold);
+      background: rgba(0,0,0,0.20);
       border-radius: 0 8px 8px 0;
     }
     .bm-land-verse-ref {
-      font: 600 0.78rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-accent, #e8a838);
+      font: 600 0.78rem 'Plus Jakarta Sans', sans-serif; color: var(--gold);
       margin-top: 6px; display: block;
     }
     .bm-land-mini-input {
       width: 100%; padding: 9px 12px; box-sizing: border-box;
-      border-radius: 8px; border: 1px solid var(--bm-border, rgba(0,0,0,0.10));
-      background: var(--bm-card, #ffffff); color: var(--bm-ink);
+      border-radius: 8px; border: 1px solid rgba(255,255,255,0.20);
+      background: rgba(0,0,0,0.15); color: #ffffff;
       font: 0.85rem 'Plus Jakarta Sans', sans-serif;
     }
     .bm-land-mini-input:focus {
-      outline: none; border-color: var(--bm-accent, #e8a838);
+      outline: none; border-color: var(--gold);
       box-shadow: 0 0 0 3px rgba(232,168,56,0.15);
+    }
+    .bm-land-mini-input::placeholder {
+      color: rgba(255,255,255,0.50);
     }
     .bm-land-tags { display: flex; flex-wrap: wrap; gap: 6px; }
     .bm-land-tag {
       font: 600 0.74rem 'Plus Jakarta Sans', sans-serif;
       padding: 5px 10px; border-radius: 999px;
-      background: rgba(232,168,56,0.10); color: var(--bm-ink);
-      border: 1px solid rgba(232,168,56,0.22); cursor: pointer;
+      background: rgba(232,168,56,0.15); color: var(--gold);
+      border: 1px solid rgba(232,168,56,0.30); cursor: pointer;
       transition: background 0.15s ease;
     }
     .bm-land-tag:hover { background: rgba(232,168,56,0.20); }
