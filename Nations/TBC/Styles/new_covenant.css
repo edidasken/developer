@@ -15209,6 +15209,13 @@ flock-tabs [role="tablist"], .tabs-bar {
   background: rgba(232,168,56,0.18); color: var(--dash-gold);
 }
 
+/* Service cards in Services view — ensure white/readable text on navy cards */
+.ms-dash .ms-service-card .ms-service-card-title { color: #fff; }
+.ms-dash .ms-service-card .ms-service-song-row   { color: rgba(255,255,255,0.86); }
+.ms-dash .ms-service-card .ms-key-badge {
+  background: rgba(232,168,56,0.18); color: var(--dash-gold);
+}
+
 /* Quick actions list */
 .ms-dash-actions { display: flex; flex-direction: column; gap: 10px; }
 .ms-dash-action {
