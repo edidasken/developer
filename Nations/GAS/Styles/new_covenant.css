@@ -15162,6 +15162,18 @@ flock-tabs [role="tablist"], .tabs-bar {
 }
 .ms-dash-hero .ms-btn--primary:hover { background: #f0b845; }
 
+/* Import view tabs - navy theme when inside .ms-dash */
+.ms-dash .ms-import-tabs { border-bottom-color: rgba(255,255,255,0.12); }
+.ms-dash .ms-import-tab { color: rgba(255,255,255,0.65); }
+.ms-dash .ms-import-tab.is-active { color: var(--dash-gold); border-bottom-color: var(--dash-gold); }
+.ms-dash .ms-import-tab:hover { color: rgba(255,255,255,0.85); }
+
+/* Import view form elements - navy theme */
+.ms-dash .ms-import-panel .ms-label { color: var(--dash-gold); }
+.ms-dash .ms-import-panel .ms-field-hint { color: rgba(255,255,255,0.58); }
+.ms-dash .ms-import-panel p { color: rgba(255,255,255,0.72) !important; }
+.ms-dash .ms-import-panel .ms-empty-content { color: rgba(255,255,255,0.65); }
+
 /* Stat cards: navy bg, colored stripe + colored number */
 .ms-dash .ms-stats-grid { gap: 14px; margin-bottom: 26px; }
 .ms-dash .ms-stat-card {
