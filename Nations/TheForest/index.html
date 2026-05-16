@@ -35,23 +35,12 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #09102e;
-      --card:     #111b44;
-      --ink:      #eef1fb;
-      --muted:    #9ba8d0;
-      --faint:    #3d4f7c;
-      --gold:     #e8a838;
-      --blue:     #5b8dee;
-      --line:     rgba(255,255,255,0.09);
-      --font:     'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      --serif:    'Merriweather', Georgia, serif;
-      --safe-top: env(safe-area-inset-top, 0px);
       --safe-bot: env(safe-area-inset-bottom, 0px);
     }
 
     html, body {
       height: 100dvh;
-      font-family: var(--font);
+      font-family: var(--font-ui, 'Plus Jakarta Sans', system-ui, sans-serif);
       -webkit-font-smoothing: antialiased;
       background: var(--bg);
       color: var(--ink);
@@ -59,9 +48,6 @@
       overscroll-behavior: none;
     }
     body { display: flex; flex-direction: column; }
-
-    /* Single cheap gradient — no double radial on every repaint */
-    body { background-image: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(91,141,238,0.14) 0%, transparent 60%); }
 
     /* ── Launcher shell ────────────────────────────────────────────── */
     .launcher {
@@ -141,7 +127,7 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: var(--line);
+      background: rgba(0,0,0,0.06);
     }
     .section-label .section-icon {
       font-size: 0.78rem;
@@ -161,7 +147,7 @@
       position: fixed; inset: 0; z-index: 9000;
       align-items: flex-start; justify-content: center;
       padding: 60px 16px 40px;
-      background: rgba(9,16,46,0.72);
+      background: rgba(0,0,0,0.65);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       overflow-y: auto;
@@ -169,10 +155,10 @@
     .signin-overlay.is-open { display: flex; }
 
     .signin-sheet {
-      background: linear-gradient(160deg,#111b44 0%,#0c1445 60%,#0a1035 100%);
+      background: var(--bg-raised);
       border: 1px solid rgba(232,168,56,0.20);
       border-radius: 20px;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(232,168,56,0.08);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.15), 0 0 0 1px rgba(232,168,56,0.08);
       width: 100%; max-width: 400px;
       padding: 28px 28px 24px;
       position: relative;
@@ -180,13 +166,13 @@
 
     .signin-close {
       position: absolute; top: 14px; right: 14px;
-      background: rgba(255,255,255,0.06); border: none;
+      background: var(--bg-hover); border: none;
       width: 32px; height: 32px; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--muted); font-size: 1rem;
+      cursor: pointer; color: var(--ink-muted); font-size: 1rem;
       transition: background 0.15s, color 0.15s;
     }
-    .signin-close:hover { background: rgba(255,255,255,0.12); color: var(--ink); }
+    .signin-close:hover { background: var(--bg-sunken); color: var(--ink); }
 
     .signin-logo {
       display: flex; align-items: center; justify-content: center;
@@ -217,19 +203,19 @@
       color: var(--muted);
     }
     .signin-field input {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: var(--bg-sunken);
+      border: 1px solid var(--line-strong, rgba(0,0,0,0.12));
       border-radius: 10px;
       padding: 10px 13px; font-size: 0.93rem;
       color: var(--ink); outline: none;
-      font-family: var(--font);
+      font-family: var(--font-ui);
       transition: border-color 0.15s, background 0.15s;
     }
     .signin-field input:focus {
-      border-color: rgba(232,168,56,0.55);
-      background: rgba(255,255,255,0.09);
+      border-color: rgba(232,168,56,0.65);
+      background: var(--bg);
     }
-    .signin-field input::placeholder { color: var(--muted); opacity: 0.6; }
+    .signin-field input::placeholder { color: var(--ink-muted); opacity: 0.7; }
 
     .signin-error {
       background: rgba(239,68,68,0.12);
@@ -246,7 +232,7 @@
       font-size: 0.95rem; font-weight: 700;
       color: #0c1445; cursor: pointer;
       transition: filter 0.15s, transform 0.12s;
-      font-family: var(--font);
+      font-family: var(--font-ui);
     }
     .signin-btn:hover:not(:disabled) { filter: brightness(1.08); }
     .signin-btn:active:not(:disabled) { transform: scale(0.98); }
@@ -257,9 +243,9 @@
     }
     .signin-forgot button {
       background: none; border: none;
-      color: var(--muted); font-size: 0.8rem;
+      color: var(--ink-muted); font-size: 0.8rem;
       cursor: pointer; text-decoration: underline;
-      font-family: var(--font);
+      font-family: var(--font-ui);
       transition: color 0.15s;
     }
     .signin-forgot button:hover { color: var(--gold); }
@@ -269,19 +255,18 @@
       display: flex;
       align-items: center;
       gap: 0.85rem;
-      padding: 0.9rem 1.1rem;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      background: #1a2555;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
       text-decoration: none;
-      color: var(--ink);
-      box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       transition: transform 0.13s ease, box-shadow 0.13s ease, border-color 0.13s ease;
-      /* GPU-hint so transition uses compositor */
       will-change: transform;
     }
-    .app-btn:hover  { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.36); }
-    .app-btn:active { transform: scale(0.985); box-shadow: none; }
+    .app-btn:hover  { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.25); border-color: rgba(255,255,255,0.12); }
+    .app-btn:active { transform: scale(0.99); }
 
     /* accent border per app */
     .app-btn--grow       { border-color: rgba(232,168,56,0.20); }
@@ -302,10 +287,10 @@
     .app-btn:hover.app-btn--wellspring { border-color: rgba(34,197,94,0.50);  }
 
     .app-icon {
-      width: 42px; height: 42px;
-      border-radius: 10px;
+      width: 48px; height: 48px;
+      border-radius: 12px;
       flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.28);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
       display: flex; align-items: center; justify-content: center;
     }
     .app-icon--grow       { background: linear-gradient(135deg,#78350f,#d97706); }
@@ -334,25 +319,25 @@
     .app-label span {
       display: block;
       font-size: 0.77rem;
-      color: var(--muted);
+      color: rgba(255,255,255,0.65);
       margin-top: 0.1rem;
     }
     .app-arrow {
       font-size: 1rem;
-      color: var(--faint);
+      color: rgba(255,255,255,0.4);
       transition: color 0.13s, transform 0.13s;
       flex-shrink: 0;
     }
-    .app-btn:hover .app-arrow { color: var(--ink); transform: translateX(3px); }
+    .app-btn:hover .app-arrow { color: rgba(255,255,255,0.8); transform: translateX(3px); }
 
     /* ── PTR ───────────────────────────────────────────────────────── */
     @media (max-width: 860px) {
       .ptr-indicator {
-        display: none; position: fixed; top: calc(var(--safe-top) + 8px);
+        display: none; position: fixed; top: calc(var(--safe-top, 0px) + 8px);
         left: 50%; transform: translateX(-50%);
-        z-index: 9998; background: var(--card); border: 1px solid var(--line);
-        border-radius: 20px; padding: 5px 13px; font-size: 0.72rem; color: var(--muted);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.28); white-space: nowrap;
+        z-index: 9998; background: var(--bg-raised); border: 1px solid var(--line-strong, rgba(0,0,0,0.12));
+        border-radius: 20px; padding: 5px 13px; font-size: 0.72rem; color: var(--ink-muted);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.10); white-space: nowrap;
       }
       .ptr-indicator.visible { display: block; }
     }
@@ -365,16 +350,18 @@
     }
     .pastor-btn {
       display: flex; align-items: center; justify-content: center; gap: 9px;
-      padding: 13px 20px; border-radius: 14px; cursor: pointer;
-      border: 1px solid rgba(91,141,238,0.35);
-      background: rgba(91,141,238,0.12); color: #a0beff;
-      font: 700 0.9rem var(--font); text-decoration: none;
-      transition: background 0.15s, border-color 0.15s, transform 0.13s;
+      padding: 13px 20px; border-radius: 12px; cursor: pointer;
+      border: 1px solid rgba(91,141,238,0.20);
+      background: #ffffff; color: #5b8dee;
+      font: 700 0.9rem var(--font-ui); text-decoration: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: background 0.15s, border-color 0.15s, transform 0.13s, box-shadow 0.13s;
     }
     .pastor-btn:hover {
-      background: rgba(91,141,238,0.22);
-      border-color: rgba(91,141,238,0.55);
-      transform: translateY(-2px);
+      background: rgba(91,141,238,0.04);
+      border-color: rgba(91,141,238,0.30);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
     .pastor-btn:active { transform: scale(0.985); }
 
@@ -391,10 +378,10 @@
       opacity: 1; pointer-events: auto;
     }
     .pastor-modal {
-      background: var(--card);
-      border: 1px solid var(--line);
+      background: var(--bg);
+      border: 1px solid var(--line-strong, rgba(0,0,0,0.12));
       border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.20);
       width: 100%; max-width: 720px;
       max-height: 88vh;
       display: flex; flex-direction: column;
@@ -406,26 +393,36 @@
     }
     .pastor-modal-header {
       padding: 1.4rem 1.6rem;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 1px solid var(--line-strong, rgba(0,0,0,0.12));
       display: flex; align-items: center; justify-content: space-between;
       flex-shrink: 0;
     }
     .pastor-modal-title {
-      font-size: 1.3rem; font-weight: 800;
-      letter-spacing: -0.02em; color: var(--gold);
+      font-size: 1.7rem; font-weight: 700;
+      letter-spacing: 0.02em; color: var(--gold);
       display: flex; align-items: center; gap: 0.6rem;
+      -webkit-text-stroke: 2.5px #1a2555;
+      paint-order: stroke fill;
+    }
+    .pastor-modal-title svg {
+      width: 36px; height: 36px;
+      padding: 8px;
+      background: #1a2555;
+      border-radius: 50%;
+      color: var(--gold);
+      flex-shrink: 0;
     }
     .pastor-modal-close {
       width: 32px; height: 32px; border-radius: 8px;
-      border: 1px solid var(--line); background: transparent;
-      color: var(--muted); font-size: 1.2rem;
+      border: 1px solid var(--line-strong, rgba(0,0,0,0.12)); background: transparent;
+      color: var(--ink-muted); font-size: 1.2rem;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
       flex-shrink: 0; line-height: 1;
     }
     .pastor-modal-close:hover {
-      background: rgba(255,255,255,0.06);
-      color: var(--ink); border-color: var(--muted);
+      background: var(--bg-hover);
+      color: var(--ink); border-color: var(--ink-muted);
     }
     .pastor-modal-body {
       padding: 1.6rem;
@@ -433,73 +430,106 @@
       -webkit-overflow-scrolling: touch;
       flex: 1;
     }
-    .pastor-content { color: var(--ink); line-height: 1.7; }
+    .pastor-content { color: var(--ink); line-height: 1.75; font-size: 1.1rem; }
+    .pastor-content > p:first-of-type {
+      text-align: center;
+      font-size: 1.35rem;
+      margin: 0 0 2rem;
+      padding: 1.5rem;
+      background: #1a2555;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #ffffff;
+    }
+    .pastor-content > p:first-of-type em {
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.9);
+    }
     .pastor-content h2 {
-      font-size: 1.5rem; font-weight: 800;
-      color: var(--gold); margin-top: 2rem; margin-bottom: 0.8rem;
-      letter-spacing: -0.02em; display: flex; align-items: center; gap: 0.6rem;
+      font-size: 2rem; font-weight: 800;
+      color: var(--gold); margin-top: 2.5rem; margin-bottom: 1.2rem;
+      letter-spacing: -0.02em; display: flex; align-items: center; gap: 0.7rem;
     }
     .pastor-content h2:first-child { margin-top: 0; }
     .pastor-content h3 {
-      font-size: 1.2rem; font-weight: 700;
-      color: var(--blue); margin-top: 1.8rem; margin-bottom: 0.6rem;
+      font-size: 1.5rem; font-weight: 700;
+      color: #1a2555; margin-top: 2rem; margin-bottom: 1rem;
       letter-spacing: -0.01em;
     }
     .pastor-content h4 {
-      font-size: 1rem; font-weight: 700;
-      color: var(--ink); margin-top: 1.2rem; margin-bottom: 0.5rem;
+      font-size: 1.25rem; font-weight: 700;
+      color: var(--ink); margin-top: 1.5rem; margin-bottom: 0.8rem;
     }
     .pastor-content p {
-      margin-bottom: 1rem; color: var(--muted);
+      margin-bottom: 1.2rem; color: var(--ink); font-size: 1.1rem;
     }
-    .pastor-content strong { color: var(--ink); font-weight: 700; }
-    .pastor-content em { font-family: var(--serif); color: #a0beff; font-style: italic; }
+    .pastor-content strong { color: #1a2555; font-weight: 700; }
+    .pastor-content em { font-family: var(--font-serif); color: var(--gold); font-style: italic; font-size: 1.15rem; }
     .pastor-content ul, .pastor-content ol {
-      margin-bottom: 1rem; padding-left: 1.5rem;
+      margin-bottom: 1.5rem; padding-left: 1.2rem;
     }
     .pastor-content li {
-      margin-bottom: 0.5rem; color: var(--muted);
+      margin-bottom: 0.8rem; color: var(--ink); font-size: 1.1rem; line-height: 1.7;
     }
     .pastor-content blockquote {
-      border-left: 3px solid var(--gold);
-      padding: 0.8rem 1.2rem;
-      margin: 1.2rem 0;
-      background: rgba(232,168,56,0.06);
-      border-radius: 0 10px 10px 0;
-      font-family: var(--serif);
+      border-left: 4px solid var(--gold);
+      padding: 1.2rem 1.5rem;
+      margin: 1.8rem 0;
+      background: var(--gold-soft);
+      border-radius: 0 12px 12px 0;
+      font-family: var(--font-serif);
       font-style: italic;
-      color: #d0d9f8;
+      color: var(--ink);
+      font-size: 1.15rem;
     }
-    .pastor-content blockquote p { margin-bottom: 0.4rem; }
+    .pastor-content blockquote p { margin-bottom: 0.5rem; font-size: 1.15rem; }
     .pastor-content blockquote cite {
-      display: block; font-size: 0.85rem;
-      color: var(--gold); margin-top: 0.5rem;
+      display: block; font-size: 1rem;
+      color: var(--gold); margin-top: 0.7rem;
       font-style: normal; font-weight: 600;
     }
     .pastor-content hr {
       border: none; height: 1px;
-      background: var(--line);
+      background: var(--line-strong, rgba(0,0,0,0.12));
       margin: 2rem 0;
     }
     .pastor-app-section {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 1.2rem;
-      margin: 1.5rem 0;
-      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 1.5rem 1.8rem;
+      margin: 2rem 0;
+      background: #1a2555;
+      color: #ffffff;
     }
-    .pastor-app-section h3 { margin-top: 0; }
+    .pastor-app-section h2 { margin-top: 0; font-size: 2rem; color: #ffffff; letter-spacing: -0.02em; }
+    .pastor-app-section h3 { margin-top: 1.5rem; font-size: 1.5rem; color: #ffffff; }
+    .pastor-app-section h4 { margin-top: 1.2rem; font-size: 1.25rem; color: #ffffff; }
+    .pastor-app-section p { color: rgba(255,255,255,0.85); font-size: 1.1rem; line-height: 1.7; }
+    .pastor-app-section strong { color: #ffffff; }
+    .pastor-app-section ul, .pastor-app-section ol { padding-left: 1.2rem; }
+    .pastor-app-section li { color: rgba(255,255,255,0.85); font-size: 1.1rem; line-height: 1.7; margin-bottom: 0.8rem; }
+    .pastor-app-section blockquote { background: rgba(0,0,0,0.2); border-left-color: var(--gold); color: rgba(255,255,255,0.9); }
+    .pastor-app-section blockquote p { color: rgba(255,255,255,0.9); }
+    .pastor-app-section blockquote cite { color: var(--gold); }
     .pastor-charge {
-      background: rgba(91,141,238,0.08);
-      border: 1px solid rgba(91,141,238,0.25);
-      border-radius: 10px;
-      padding: 1rem 1.2rem;
-      margin-top: 1rem;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 1.2rem 1.5rem;
+      margin-top: 1.2rem;
     }
     .pastor-charge blockquote {
       margin: 0;
-      border-left-color: var(--blue);
+      border-left-color: var(--gold);
       background: transparent;
+      color: rgba(255,255,255,0.9);
+      font-size: 1.05rem;
+    }
+    .pastor-charge blockquote p { font-size: 1.05rem; }
+    .pastor-charge cite {
+      color: var(--gold) !important;
+      font-size: 0.95rem;
     }
     @media (max-width: 640px) {
       .pastor-modal { max-height: 92vh; border-radius: 16px; }
@@ -757,6 +787,7 @@
           <p><em>"I am the vine; you are the branches."</em> — John 15:5</p>
           <hr>
 
+          <div class="pastor-app-section">
           <h2>What FlockOS Is</h2>
           <p>FlockOS is a complete church management and ministry platform — built specifically for pastors who understand that ministry is not a workflow problem, but a calling. It brings together every dimension of church life into one integrated system: member care, pastoral notes, prayer requests, small groups, events, attendance, giving, discipleship resources, missions data, worship planning, and real-time communication.</p>
           <p>Think of it as the operating system for your church — not just software that manages a contact list, but a full infrastructure that grows with you from your first twenty members to your five hundredth, carrying the story of every soul God brings through your doors.</p>
@@ -768,9 +799,11 @@
           <h3>The Foundation: Free, Because the Gospel Is Free</h3>
           <p><strong>No subscription fees. No per-seat pricing. No "upgrade to unlock pastoral care." Every feature. Every module. Every update. Free.</strong></p>
           <p>The resources of a large church deserve to be in the hands of the smallest congregation. The pastor of twelve should have the same tools as the pastor of twelve hundred. <em>"Freely you have received; freely give."</em> (Matthew 10:8)</p>
+          </div>
 
           <hr>
 
+          <div class="pastor-app-section">
           <h2>How FlockOS Works — No IT Required</h2>
           <p>FlockOS is a <strong>web-based progressive web app</strong> that runs in any modern browser on any device — desktop, tablet, or phone. There's no software to install, no server to maintain, and no IT team required.</p>
 
@@ -797,6 +830,7 @@
             <li><strong>Firebase Security Rules</strong> enforce strict data access — members can only see what their role permits</li>
             <li><strong>No third-party tracking</strong> — your church data stays with you, not with advertisers</li>
           </ul>
+          </div>
 
           <hr>
 
@@ -901,6 +935,7 @@
 
           <hr>
 
+          <div class="pastor-app-section">
           <h2>The Bottom Line for Pastors</h2>
           <p>FlockOS is not a product. It's a calling made software. It was built to serve you — to give you back time, to help you remember the people God has entrusted to you, and to support the ministry He's placed on your shoulders.</p>
           <p>It's free because the Gospel is free. It's offline-capable because the Great Commission doesn't stop at the edge of the internet. It's integrated because the body of Christ doesn't work in silos.</p>
@@ -910,6 +945,7 @@
             <p><em>"And he gave the apostles, the prophets, the evangelists, the shepherds and teachers, to equip the saints for the work of ministry, for building up the body of Christ."</em></p>
             <cite>— Ephesians 4:11-12 (ESV)</cite>
           </blockquote>
+          </div>
         </div>
       </div>
     </div>
