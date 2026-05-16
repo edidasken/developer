@@ -34,6 +34,44 @@ async function loginToSongSelect(page, email, password) {
   if (!currentUrl.includes('signin') && !currentUrl.includes('login')) {
     console.warn('Redirected away from signin page to:', currentUrl);
   }
+  
+  // Handle cookie consent dialog if present
+  try {
+    const cookieButtonSelector = await page.evaluate(() => {
+      const buttons = Array.from(document.querySelectorAll('button, a'));
+      const cookieButton = buttons.find(btn => 
+        btn.textContent?.includes('Allow all') || 
+        btn.textContent?.includes('Allow Only Necessary') ||
+        btn.textContent?.includes('Accept') ||
+        btn.className?.includes('CybotCookiebotDialogBodyButton')
+      );
+      if (cookieButton) {
+        return cookieButton.textContent?.trim();
+      }
+      return null;
+    });
+    
+    if (cookieButtonSelector) {
+      console.log('Found cookie consent dialog, clicking:', cookieButtonSelector);
+      await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('button, a'));
+        const cookieButton = buttons.find(btn => 
+          btn.textContent?.includes('Allow all') || 
+          btn.textContent?.includes('Allow Only Necessary') ||
+          btn.textContent?.includes('Accept') ||
+          btn.className?.includes('CybotCookiebotDialogBodyButton')
+        );
+        if (cookieButton) {
+          cookieButton.click();
+        }
+      });
+      // Wait for dialog to dismiss
+      await page.waitForTimeout(2000);
+      console.log('Cookie consent dialog dismissed');
+    }
+  } catch (cookieError) {
+    console.log('No cookie dialog found or error dismissing:', cookieError.message);
+  }
 
   // Try multiple possible selectors for email/username field
   let emailSelector = null;
