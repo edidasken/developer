@@ -30,15 +30,30 @@ exports.songSelectAuth = onCall({
 
     const page = await browser.newPage();
     
+    // Set user agent to avoid bot detection
+    await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    
     // Go to SongSelect login
     await page.goto('https://songselect.ccli.com/account/signin', {
       waitUntil: 'networkidle2',
       timeout: 30000
     });
 
+    // Wait for login form to be visible
+    try {
+      await page.waitForSelector('#EmailAddress', {visible: true, timeout: 15000});
+      await page.waitForSelector('#Password', {visible: true, timeout: 15000});
+    } catch (selectorError) {
+      // Capture page state for debugging
+      const pageUrl = page.url();
+      const pageTitle = await page.title();
+      console.error(`Login form not found. URL: ${pageUrl}, Title: ${pageTitle}`);
+      throw new Error(`Login form not found on page. Current URL: ${pageUrl}`);
+    }
+
     // Fill in credentials
-    await page.type('#EmailAddress', email);
-    await page.type('#Password', password);
+    await page.type('#EmailAddress', email, {delay: 50});
+    await page.type('#Password', password, {delay: 50});
     
     // Submit form
     await Promise.all([
@@ -95,14 +110,28 @@ exports.songSelectSearch = onCall({
 
     const page = await browser.newPage();
     
+    // Set user agent to avoid bot detection
+    await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    
     // Login first
     await page.goto('https://songselect.ccli.com/account/signin', {
       waitUntil: 'networkidle2',
       timeout: 30000
     });
 
-    await page.type('#EmailAddress', email);
-    await page.type('#Password', password);
+    // Wait for login form
+    try {
+      await page.waitForSelector('#EmailAddress', {visible: true, timeout: 15000});
+      await page.waitForSelector('#Password', {visible: true, timeout: 15000});
+    } catch (selectorError) {
+      const pageUrl = page.url();
+      const pageTitle = await page.title();
+      console.error(`Login form not found. URL: ${pageUrl}, Title: ${pageTitle}`);
+      throw new Error(`Login form not found on page. Current URL: ${pageUrl}`);
+    }
+
+    await page.type('#EmailAddress', email, {delay: 50});
+    await page.type('#Password', password, {delay: 50});
     
     await Promise.all([
       page.click('button[type="submit"]'),
@@ -183,14 +212,28 @@ exports.songSelectImport = onCall({
 
     const page = await browser.newPage();
     
+    // Set user agent to avoid bot detection
+    await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    
     // Login
     await page.goto('https://songselect.ccli.com/account/signin', {
       waitUntil: 'networkidle2',
       timeout: 30000
     });
 
-    await page.type('#EmailAddress', email);
-    await page.type('#Password', password);
+    // Wait for login form
+    try {
+      await page.waitForSelector('#EmailAddress', {visible: true, timeout: 15000});
+      await page.waitForSelector('#Password', {visible: true, timeout: 15000});
+    } catch (selectorError) {
+      const pageUrl = page.url();
+      const pageTitle = await page.title();
+      console.error(`Login form not found. URL: ${pageUrl}, Title: ${pageTitle}`);
+      throw new Error(`Login form not found on page. Current URL: ${pageUrl}`);
+    }
+
+    await page.type('#EmailAddress', email, {delay: 50});
+    await page.type('#Password', password, {delay: 50});
     
     await Promise.all([
       page.click('button[type="submit"]'),
