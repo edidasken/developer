@@ -95,36 +95,20 @@ function _openConfirmModal(title, msg, okLabel, onConfirm) {
   if (!host) { if (window.confirm(msg)) onConfirm(); return; }
   const id = 'ms-confirm-' + Date.now();
   host.insertAdjacentHTML('beforeend', `
-    <div id="${id}" style="
-      position:fixed;inset:0;z-index:1100;
-      display:flex;align-items:center;justify-content:center;">
-      <div style="
-        position:absolute;inset:0;
-        background:var(--modal-dim);backdrop-filter:blur(4px);"
-        id="${id}-bd"></div>
-      <div style="
-        position:relative;z-index:1;
-        background:var(--bg-raised);border:1px solid var(--line);
-        border-radius:16px;width:min(360px,92vw);
-        padding:22px 24px 18px;
-        box-shadow:0 24px 72px rgba(0,0,0,0.22);
-        display:flex;flex-direction:column;gap:12px;">
-        <div style="font:700 0.95rem 'Plus Jakarta Sans',sans-serif;color:var(--ink)">${title}</div>
-        <div style="font:0.84rem 'Plus Jakarta Sans',sans-serif;color:var(--ink-muted);line-height:1.5">${msg}</div>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button id="${id}-cancel" style="
-            padding:8px 16px;border-radius:8px;border:1px solid var(--line);
-            background:transparent;color:var(--ink);font:600 0.84rem 'Plus Jakarta Sans',sans-serif;cursor:pointer">Cancel</button>
-          <button id="${id}-ok" style="
-            padding:8px 16px;border-radius:8px;border:none;
-            background:#ef4444;color:#fff;font:600 0.84rem 'Plus Jakarta Sans',sans-serif;cursor:pointer">${okLabel || 'Delete'}</button>
+    <div class="ms-modal-backdrop" id="${id}-backdrop">
+      <div class="ms-modal ms-dash" id="${id}" style="max-width:420px;">
+        <div class="ms-modal-title">${title}</div>
+        <div style="font-size:.88rem;color:rgba(255,255,255,0.78);line-height:1.5;margin-bottom:16px;">${msg}</div>
+        <div class="ms-modal-actions">
+          <button class="ms-btn ms-btn--ghost" id="${id}-cancel">Cancel</button>
+          <button class="ms-btn ms-btn--danger" id="${id}-ok">${okLabel || 'Delete'}</button>
         </div>
       </div>
     </div>`);
-  function _close() { document.getElementById(id)?.remove(); document.removeEventListener('keydown', _esc); }
+  function _close() { document.getElementById(`${id}-backdrop`)?.remove(); document.removeEventListener('keydown', _esc); }
   document.getElementById(`${id}-ok`).onclick     = () => { _close(); onConfirm(); };
   document.getElementById(`${id}-cancel`).onclick  = _close;
-  document.getElementById(`${id}-bd`).onclick      = _close;
+  document.getElementById(`${id}-backdrop`).onclick = (e) => { if (e.target.classList.contains('ms-modal-backdrop')) _close(); };
   function _esc(e) { if (e.key === 'Escape') { e.preventDefault(); _close(); } }
   document.addEventListener('keydown', _esc);
 }
@@ -785,7 +769,7 @@ function _openServiceEditor(plan) {
 
   host.innerHTML = `
     <div class="ms-modal-backdrop" id="svc-editor-backdrop">
-      <div class="ms-modal" style="max-width:680px;">
+      <div class="ms-modal ms-dash" style="max-width:680px;">
         <div class="ms-modal-title">${isEdit ? 'Edit Service Plan' : 'New Service Plan'}</div>
         <div class="ms-row" style="margin-bottom:12px;">
           <div class="ms-field">
