@@ -431,6 +431,12 @@ function _renderLibrary() {
       return;
     }
     // First-run welcome — navy/gold "Vespers" themed card + feature tiles.
+    const _sess = (window.Modules && typeof window.Modules.getSession === 'function')
+      ? (window.Modules.getSession() || {})
+      : {};
+    const _displayName = _sess.displayName || _sess.name || (_sess.email ? _sess.email.split('@')[0] : '');
+    const _firstName = (String(_displayName).trim().split(/\s+/)[0] || '').replace(/[<>&"']/g, '');
+    const _welcomeName = _firstName || 'Pastor';
     grid.innerHTML = `
       <div class="fs-welcome">
         <div class="fs-welcome-hero devo-dark-card">
@@ -439,7 +445,7 @@ function _renderLibrary() {
               <span>For the Shepherds</span>
               <span class="word-theme devo-dark-theme">Free • Forever</span>
             </div>
-            <div class="word-title devo-dark-title">Welcome, Pastor.</div>
+            <div class="word-title devo-dark-title">Welcome, ${_welcomeName}.</div>
             <div class="word-scrip devo-dark-scrip">
               <em>"Praise Him with strings and pipe."</em> &mdash; Psalm 150:4
             </div>
