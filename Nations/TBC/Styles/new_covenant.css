@@ -14968,7 +14968,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-label         { font-size: .78rem; font-weight: 700; color: var(--gold); letter-spacing: .05em; text-transform: uppercase; }
 .ms-input, .ms-select, .ms-textarea {
   padding: 10px 14px; border-radius: var(--ms-r-md);
-  background: var(--ms-bg-card); border: 1px solid var(--ms-line);
+  background: #ffffff; border: 1px solid var(--ms-line);
   color: var(--ms-ink); font-size: .9rem; font-family: var(--ms-font); outline: none;
   transition: border-color .15s;
 }
