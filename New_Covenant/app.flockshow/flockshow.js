@@ -2198,15 +2198,28 @@ async function _boot() {
   // Authenticated — dismiss overlay and launch
   _dismissAuthOverlay();
   _renderUserChip(N);
-  // Wait for UpperRoom to finish its async authentication before loading Firestore data.
-  // Without this, _fsFB() may return false and _load() falls back to empty localStorage.
+  // Explicitly init + authenticate UpperRoom (Firestore). firm_foundation.js
+  // calls init() but does NOT authenticate, so _ready stays false unless we
+  // drive it here. Mirrors the pattern in feed.js.
   const _tUR = Date.now();
-  try {
-    await _waitFor(() => window.UpperRoom && typeof window.UpperRoom.isReady === 'function' && window.UpperRoom.isReady(), 8000);
-    console.log('[FlockShow] _boot: UpperRoom ready after ' + (Date.now() - _tUR) + 'ms');
-  } catch (_) {
-    console.error('[FlockShow] _boot: UpperRoom TIMEOUT (8s) — proceeding without Firestore. ' +
-                  'UpperRoom present? ' + !!window.UpperRoom);
+  if (window.UpperRoom) {
+    try {
+      if (typeof window.UpperRoom.isReady === 'function' && !window.UpperRoom.isReady()) {
+        console.log('[FlockShow] _boot: UpperRoom not ready — calling init() + authenticate()');
+        await window.UpperRoom.init();
+        await window.UpperRoom.authenticate();
+      }
+      if (typeof window.UpperRoom.waitReady === 'function') {
+        await window.UpperRoom.waitReady();
+      } else {
+        await _waitFor(() => window.UpperRoom.isReady && window.UpperRoom.isReady(), 8000);
+      }
+      console.log('[FlockShow] _boot: UpperRoom ready after ' + (Date.now() - _tUR) + 'ms, isReady=' + window.UpperRoom.isReady());
+    } catch (e) {
+      console.error('[FlockShow] _boot: UpperRoom init/authenticate FAILED — proceeding without Firestore:', e);
+    }
+  } else {
+    console.warn('[FlockShow] _boot: window.UpperRoom is undefined — Firestore unavailable');
   }
   await _load();
   _wire();
