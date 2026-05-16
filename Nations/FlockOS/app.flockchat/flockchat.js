@@ -156,6 +156,32 @@
       if (d.displayName) _me.displayName = d.displayName;
       ref.update({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
     }
+    // Mark this person's member doc as FlockChat-active so OTHER members
+    // know we can be reached in-app (vs SMS fallback).
+    _markMemberFlockchatActive().catch(err => console.warn('[FlockChat] flockchatActive flag failed:', err));
+  }
+
+  async function _markMemberFlockchatActive() {
+    const myEmail = (_me?.email || '').toLowerCase();
+    if (!myEmail || !_db) return;
+    // Find by primaryEmail first, then email.
+    const tries = [
+      _db.collection('members').where('primaryEmail', '==', myEmail).limit(1),
+      _db.collection('members').where('email',        '==', myEmail).limit(1)
+    ];
+    for (const q of tries) {
+      try {
+        const snap = await q.get();
+        if (!snap.empty) {
+          const doc = snap.docs[0];
+          await doc.ref.update({
+            flockchatActive: true,
+            flockchatLastSeen: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          return;
+        }
+      } catch (_) { /* try next */ }
+    }
   }
 
   /* ── FCM Push Notifications ─────────────────────────────────────────── */
@@ -399,10 +425,14 @@
         // Dedupe by email (fall back to uid when email missing)
         const key = email || m.uid;
         if (byEmail.has(key)) return;
+        const phoneRaw = m.primaryPhone || m.mobile || m.phone || m.phoneNumber || '';
+        const phone = String(phoneRaw).replace(/[^\d+]/g, '');
         byEmail.set(key, {
           uid: m.uid,
           displayName: name,
           email: email,
+          phone: phone,
+          flockchatActive: !!m.flockchatActive,
           role: m.role || m.memberType || 'member'
         });
       });
@@ -436,14 +466,31 @@
       const name = u.displayName || u.email || 'Unknown';
       const initials = _initials(name);
       const email = u.email || '';
+      const phone = u.phone || '';
+      const onFC  = !!u.flockchatActive;
       // Escape quotes for onclick attribute
       const safeName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      // Route: FlockChat user → in-app DM. Otherwise if we have a phone → SMS.
+      let onclick, badge, sub;
+      if (onFC) {
+        onclick = `window._createDirectMessage('${u.uid}', '${safeName}')`;
+        badge = '';
+        sub = email;
+      } else if (phone) {
+        onclick = `window._startSmsConversation('${u.uid}', '${safeName}', '${phone}')`;
+        badge = '<span class="fc-user-badge sms" title="Not on FlockChat — will text via SMS">SMS</span>';
+        sub = phone;
+      } else {
+        onclick = `window._toast && window._toast('No phone or FlockChat account on file for ' + ${JSON.stringify(name)}, 'info')`;
+        badge = '<span class="fc-user-badge muted" title="No phone on file">No contact</span>';
+        sub = email || 'No contact info';
+      }
       return `
-        <div class="fc-user-item" data-uid="${u.uid}" data-name="${_e(name)}" onclick="window._createDirectMessage('${u.uid}', '${safeName}')">
+        <div class="fc-user-item ${onFC ? '' : 'sms'}" data-uid="${u.uid}" data-name="${_e(name)}" onclick="${onclick}">
           <div class="fc-user-avatar">${initials}</div>
           <div class="fc-user-info">
-            <div class="fc-user-name">${_e(name)}</div>
-            <div class="fc-user-email">${_e(email)}</div>
+            <div class="fc-user-name">${_e(name)} ${badge}</div>
+            <div class="fc-user-email">${_e(sub)}</div>
           </div>
         </div>
       `;
@@ -525,6 +572,72 @@
     }
   };
 
+  /* ── SMS Fallback (member not on FlockChat) ──────────────────────────── */
+  function _smsHref(phone, body) {
+    // sms:NUMBER?&body=... works on both iOS and Android.
+    const num = String(phone || '').replace(/[^\d+]/g, '');
+    const txt = body ? ('?&body=' + encodeURIComponent(body)) : '';
+    return 'sms:' + num + txt;
+  }
+
+  function _launchSms(phone, body) {
+    try { window.location.href = _smsHref(phone, body); } catch (_) {}
+  }
+
+  window._startSmsConversation = async function(memberUid, otherName, phone) {
+    _closeNewConversationModal();
+    if (!phone) { _toast('No phone number on file', 'error'); return; }
+
+    try {
+      // Find existing SMS conversation for this phone (so it logs to recents
+      // instead of creating a new card every tap).
+      const existingSnap = await _db.collection('conversations')
+        .where('type', '==', 'sms')
+        .where('participants', 'array-contains', _me.uid)
+        .get();
+
+      let convId = null;
+      existingSnap.forEach(doc => {
+        const d = doc.data();
+        if (d.smsPhone === phone) convId = doc.id;
+      });
+
+      if (!convId) {
+        const docRef = await _db.collection('conversations').add({
+          type: 'sms',
+          name: otherName,
+          icon: '💬',
+          smsPhone: phone,
+          smsMemberUid: memberUid,
+          participants: [_me.uid],
+          lastMessage: {
+            text: 'Texts via SMS — not in FlockChat',
+            author: 'system',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          },
+          lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
+          unreadCount: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdBy: _me.uid
+        });
+        convId = docRef.id;
+      } else {
+        // Bump lastActivity so it sorts to the top of recents.
+        await _db.collection('conversations').doc(convId).update({
+          lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(() => {});
+      }
+
+      // Open the thread (composer will route sends to native SMS).
+      window._openConversation(convId);
+      // Also launch the native composer immediately for first-tap convenience.
+      _launchSms(phone, '');
+    } catch (err) {
+      console.error('[FlockChat] Failed to start SMS conversation:', err);
+      _toast('Failed to start SMS: ' + (err.message || 'Unknown'), 'error');
+    }
+  };
+
   /* ── Load Conversations ──────────────────────────────────────────────── */
   function _loadConversations() {
     if (_convUnsub) _convUnsub();
@@ -581,6 +694,7 @@
       if (c.type === 'prayer') iconClass += ' prayer';
       if (c.type === 'announcement') iconClass += ' announcement';
       if (c.type === 'dm') iconClass += ' dm';
+      if (c.type === 'sms') iconClass += ' sms';
 
       return `
         <div class="fc-conv-item ${isActive ? 'active' : ''} ${unread > 0 ? 'unread' : ''}"
@@ -621,7 +735,16 @@
     if (name) name.textContent = conv.name;
     if (meta) {
       const count = conv.participants?.length || 0;
-      meta.textContent = conv.type === 'dm' ? 'Direct Message' : `${count} ${count === 1 ? 'member' : 'members'}`;
+      if (conv.type === 'sms') meta.textContent = 'SMS • ' + (conv.smsPhone || 'no number');
+      else meta.textContent = conv.type === 'dm' ? 'Direct Message' : `${count} ${count === 1 ? 'member' : 'members'}`;
+    }
+
+    // Composer hint for SMS threads
+    const inputEl = $('fc-input');
+    if (inputEl) {
+      inputEl.placeholder = (conv.type === 'sms')
+        ? 'Type a message — will open your SMS app…'
+        : 'iMessage';
     }
 
     // Show thread pane (mobile)
@@ -764,6 +887,33 @@
 
     try {
       const conv = _conversations.find(c => c.id === _activeConvId);
+
+      // SMS conversations: hand off to the native SMS composer with the
+      // text prefilled, and log the attempt so the thread + recents update.
+      if (conv?.type === 'sms') {
+        const phone = conv.smsPhone;
+        if (!phone) { _toast('No phone on file for this contact', 'error'); return; }
+        _launchSms(phone, text);
+        await _db.collection('conversations').doc(_activeConvId).collection('messages').add({
+          text,
+          author: _me.uid,
+          authorName: _me.displayName || _me.email,
+          type: 'sms',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        await _db.collection('conversations').doc(_activeConvId).update({
+          lastMessage: {
+            text: '📲 ' + text,
+            author: _me.uid,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          },
+          lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        input.value = '';
+        input.style.height = 'auto';
+        return;
+      }
+
       const msgType = conv?.type === 'prayer' ? 'prayer' : conv?.type === 'announcement' ? 'announcement' : 'text';
 
       await _db.collection('conversations').doc(_activeConvId).collection('messages').add({
