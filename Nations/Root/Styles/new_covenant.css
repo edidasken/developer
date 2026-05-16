@@ -2413,6 +2413,7 @@ input, select, textarea {
   line-height: 1.6;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -3725,6 +3726,7 @@ details.settings-section.settings-accordion > .settings-accordion-trigger {
   text-align: right;
   font-variant-numeric: tabular-nums;
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 .studio-pct::-webkit-inner-spin-button,
 .studio-pct::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -8791,6 +8793,7 @@ html[data-platform="xbox"] {
   font-size: 14px;
   -ms-content-zooming: none;
   -ms-touch-action: pan-x pan-y;
+  touch-action: pan-x pan-y;
 }
 html[data-platform="xbox"] .card-grid {
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -10170,7 +10173,6 @@ flock-tabs [role="tablist"], .tabs-bar {
 .mini-cal-header { font: 700 0.82rem var(--font-ui); color: var(--ink, #1b264f); background: var(--bg-base, #f2f4fb); padding: 10px 14px; letter-spacing: 0.02em; border-bottom: 1px solid var(--line); }
 .mini-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 10px; }
 .cal-label { text-align: center; font: 600 0.62rem var(--font-ui); color: var(--ink-muted, #7a7f96); padding: 2px 0 4px; }
-.cal-empty { }
 .cal-day {
   text-align: center; font: 0.76rem var(--font-ui); color: var(--ink, #1b264f);
   padding: 4px 2px; border-radius: 4px; cursor: pointer;
@@ -10783,7 +10785,6 @@ flock-tabs [role="tablist"], .tabs-bar {
 
 /* Funds */
 .gift-funds { display: flex; flex-direction: column; gap: 14px; }
-.gift-fund-row {}
 .gift-fund-head { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
 .gift-fund-dot  { width: 10px; height: 10px; border-radius: 50%; flex: none; }
 .gift-fund-name { font: 600 0.84rem var(--font-ui); color: var(--ink, #1b264f); flex: 1; }
@@ -10989,7 +10990,6 @@ flock-tabs [role="tablist"], .tabs-bar {
 .pray-liturgy-row.is-now { background: rgba(232,168,56,.16); border-left: 3px solid var(--gold,#e8a838); padding-left: 7px; }
 .pray-liturgy-row.is-now .pray-lit-time { color: #fff; }
 .pray-lit-icon      { font-size: 1.25rem; flex: none; }
-.pray-lit-body      {}
 .pray-lit-time      { font: 700 1rem var(--font-ui); color: #fff; }
 .pray-lit-now-pill  { display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 999px; background: var(--gold,#e8a838); color: #1b264f; font: 700 0.68rem var(--font-ui); text-transform: uppercase; letter-spacing: .05em; vertical-align: middle; }
 .pray-lit-text      { font: 0.95rem/1.55 var(--font-ui); color: rgba(255,255,255,.88); margin-top: 4px; }
@@ -11060,8 +11060,6 @@ flock-tabs [role="tablist"], .tabs-bar {
 
 /* Lower row */
 .wv-lower-row         { display: grid; grid-template-columns: 1fr 280px; gap: 16px; align-items: start; }
-.wv-initiatives-card  {}
-.wv-milestones-card   {}
 
 /* Initiatives */
 .wv-init-list { display: flex; flex-direction: column; gap: 8px; }
@@ -12153,7 +12151,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 }
 .pc-req-text {
   font: 0.83rem/1.55 var(--font-ui); color: var(--ink, #1b264f);
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .pc-req-foot {
@@ -12287,7 +12285,6 @@ flock-tabs [role="tablist"], .tabs-bar {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   font: 600 0.90rem var(--font-ui); color: var(--ink, #1b264f); margin-bottom: 4px;
 }
-.ctf-party  { /* inherits */ }
 .ctf-case-issue { font: 0.82rem/1.4 var(--font-ui); color: var(--ink-muted, #7a7f96); margin-bottom: 8px; }
 .ctf-case-foot  { display: flex; align-items: center; gap: 8px; }
 .ctf-stage-badge {
@@ -13815,7 +13812,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .coun-card-meta-col .grow-card-title { font-size: 0.93rem; font-weight: 600; margin: 0; }
 .coun-card-teaser {
   margin: 0; font-size: 0.78rem; line-height: 1.45; color: var(--muted, #7a7f96);
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .grow-detail { margin-top: 18px; padding: 20px; border: 1px solid var(--border, #e5e7ef); border-radius: 12px; }
 
@@ -14829,6 +14826,20 @@ flock-tabs [role="tablist"], .tabs-bar {
   .ms-hero-pillars { font-size: .76rem; padding: 8px 14px; }
   .ms-hero-dot { display: none; }
   .ms-hero-pillars > span { flex-basis: 100%; text-align: center; }
+  /* Service card mobile optimizations */
+  .ms-service-card { padding: 14px 16px; }
+  .ms-service-card-title { font-size: .92rem; }
+  .ms-service-card-date { font-size: .75rem; }
+  .ms-service-card-header { gap: 8px; }
+  .ms-service-song-row { font-size: .78rem; gap: 8px; }
+  .ms-btn--sm { font-size: .75rem; padding: 5px 10px; }
+}
+@media (max-width: 400px) {
+  .ms-service-card { padding: 12px 14px; }
+  .ms-service-card-title { font-size: .88rem; }
+  .ms-service-card-date { font-size: .72rem; }
+  .ms-service-song-row { font-size: .75rem; gap: 6px; }
+  .ms-service-song-row .ms-key-badge { width: 20px; height: 20px; font-size: .62rem; }
 }
 
 /* ── Song grid / list ────────────────────────────────────────────────────── */
@@ -14982,14 +14993,16 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-field-hint { font-size: .73rem; color: var(--ms-ink-faint); margin-top: 3px; }
 
 /* ── Service plans ───────────────────────────────────────────────────────── */
-.ms-service-card { background: var(--ms-bg-card); border: 1px solid var(--ms-line); border-radius: var(--ms-r-lg); padding: 18px 20px; cursor: pointer; transition: all .2s var(--ms-ease); }
+.ms-service-card { background: var(--ms-bg-card); border: 1px solid var(--ms-line); border-radius: var(--ms-r-lg); padding: 18px 20px; cursor: pointer; transition: all .2s var(--ms-ease); display: flex; flex-direction: column; min-width: 0; }
 .ms-service-card:hover { border-color: var(--ms-gold-glow); background: var(--ms-bg-card-hi); }
-.ms-service-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.ms-service-card-title  { font-weight: 700; font-size: 1rem; }
-.ms-service-card-date   { font-size: .82rem; color: var(--ms-gold); font-weight: 600; }
-.ms-service-card-songs  { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
-.ms-service-song-row    { display: flex; align-items: center; gap: 10px; font-size: .83rem; color: var(--ms-ink-muted); padding: 3px 0; }
-.ms-service-song-row .ms-key-badge { width: 22px; height: 22px; font-size: .66rem; }
+.ms-service-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; min-width: 0; }
+.ms-service-card-title  { font-weight: 700; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.3; max-height: 2.6em; }
+.ms-service-card-date   { font-size: .82rem; color: var(--ms-gold); font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.ms-service-card-songs  { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ms-service-song-row    { display: flex; align-items: center; gap: 10px; font-size: .83rem; color: var(--ms-ink-muted); padding: 3px 0; min-width: 0; }
+.ms-service-song-row > span:not(.ms-key-badge):not(.ms-tempo-badge) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ms-service-song-row .ms-key-badge { width: 22px; height: 22px; font-size: .66rem; flex-shrink: 0; }
+.ms-service-song-row .ms-tempo-badge { flex-shrink: 0; }
 .ms-setlist             { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
 .ms-setlist-item        { display: flex; align-items: center; gap: 12px; background: var(--ms-bg-card); border: 1px solid var(--ms-line); border-radius: var(--ms-r-md); padding: 12px 14px; }
 .ms-setlist-grip        { cursor: grab; color: var(--ms-ink-faint); font-size: 1.1rem; user-select: none; }

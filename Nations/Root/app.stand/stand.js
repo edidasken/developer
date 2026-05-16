@@ -689,20 +689,20 @@ async function _loadAndRenderPlans(main) {
       return;
     }
     const sorted = [...plans].sort((a, b) => new Date(b.serviceDate||0) - new Date(a.serviceDate||0));
-    listEl.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;">
+    listEl.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%, 280px),1fr));gap:14px;">
       ${sorted.map(p => {
         const songs = p.songs || p.setlist || [];
         const isActive = p.id === S.activePlanId;
         return `<div class="ms-service-card ms-dash-action${isActive ? ' is-active' : ''}" data-plan-id="${_e(p.id)}"
           style="cursor:pointer;text-align:left;padding:20px;${isActive ? 'border-color:var(--ms-gold);' : ''}">
           <div class="ms-service-card-header">
-            <div>
+            <div style="flex:1;min-width:0;">
               <div class="ms-service-card-title">${_e(p.serviceType || 'Service')}</div>
-              <div style="font-size:.75rem;color:rgba(255,255,255,0.58);margin-top:2px;">${_e(p.theme||p.seriesTitle||'')}</div>
+              <div style="font-size:.75rem;color:rgba(255,255,255,0.58);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${_e(p.theme||p.seriesTitle||'')}</div>
             </div>
-            <div style="text-align:right">
+            <div style="text-align:right;flex-shrink:0;">
               <div class="ms-service-card-date">${_fmtDate(p.serviceDate)}</div>
-              ${isActive ? '<div style="font-size:.68rem;color:var(--ms-gold);font-weight:700;margin-top:2px;">ACTIVE</div>' : ''}
+              ${isActive ? '<div style="font-size:.68rem;color:var(--ms-gold);font-weight:700;margin-top:2px;white-space:nowrap;">ACTIVE</div>' : ''}
             </div>
           </div>
           <div class="ms-service-card-songs">
@@ -715,8 +715,8 @@ async function _loadAndRenderPlans(main) {
             ${songs.length > 5 ? `<div style="font-size:.73rem;color:rgba(255,255,255,0.45)">+${songs.length-5} more songs</div>` : ''}
             ${!songs.length ? '<div style="font-size:.78rem;color:rgba(255,255,255,0.45);padding:4px 0">No songs yet — tap to add</div>' : ''}
           </div>
-          ${(() => { const sr = p.sermonId && S.sermons.find(s => s.id === p.sermonId); return sr ? `<div style="font-size:.75rem;color:rgba(255,255,255,0.65);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);filter:brightness(0) invert(1) opacity(0.85);display:inline-block;">📖</div><div style="font-size:.75rem;color:rgba(255,255,255,0.65);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);display:inline;"> ${_e(sr.title||'Sermon')}${sr.passage ? ' · ' + _e(sr.passage) : ''}</div>` : ''; })()}
-          <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+          ${(() => { const sr = p.sermonId && S.sermons.find(s => s.id === p.sermonId); return sr ? `<div style="font-size:.75rem;color:rgba(255,255,255,0.65);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><span style="filter:brightness(0) invert(1) opacity(0.85);">📖</span> ${_e(sr.title||'Sermon')}${sr.passage ? ' · ' + _e(sr.passage) : ''}</div>` : ''; })()}
+          <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center;">
             <button class="ms-btn ms-btn--ghost ms-btn--sm svc-edit-btn" data-plan-id="${_e(p.id)}">Edit</button>
             <button class="ms-btn ms-btn--ghost ms-btn--sm svc-live-btn" data-plan-id="${_e(p.id)}" style="color:var(--ms-rose);">▶ Live</button>
             <button class="ms-btn ms-btn--danger ms-btn--sm svc-del-btn" data-plan-id="${_e(p.id)}">Delete</button>
