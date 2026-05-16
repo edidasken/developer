@@ -687,7 +687,6 @@ function msRenderSongsTab() {
     var html =
         '<div class="ms-search-bar">' +
             '<input type="text" class="ms-input ms-search-input" id="ms-song-search" placeholder="Search songs by title or artist..." value="' + msEscapeHtml(musicStandAppState.filter) + '">' +
-            '<button class="ms-btn ms-btn-secondary" id="ms-import-song-btn" style="white-space:nowrap;">&#x29C9; SongSelect</button>' +
             '<button class="ms-btn ms-btn-primary" id="ms-add-song-btn">+ Add Song</button>' +
         '</div>';
 
@@ -779,11 +778,6 @@ function msRenderSongsTab() {
             _msActiveEditRow = null;
             msOpenSongEditor(null);
         });
-    }
-
-    var importBtn = document.getElementById('ms-import-song-btn');
-    if (importBtn) {
-        importBtn.addEventListener('click', function() { msOpenSongSelectImport(); });
     }
 
     // Play buttons — idx is now the index into the full songs array
@@ -2622,162 +2616,6 @@ function msInstrumentOptions(selected) {
     return html;
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// SONGSELECT IMPORT
-// Paste-and-parse ChordPro from CCLI SongSelect, Planning Center, or any
-// ChordPro source. Stores the song in its original key so every arrangement
-// can auto-transpose from it.
-// ══════════════════════════════════════════════════════════════════════════════
-
-function msOpenSongSelectImport() {
-    var overlay = document.getElementById('ms-song-overlay');
-    var modal   = document.getElementById('ms-song-modal');
-    if (!overlay || !modal) return;
-
-    modal.innerHTML =
-        '<div class="ms-modal-header">' +
-            '<h3 class="ms-modal-title">&#x29C9; Import from SongSelect / ChordPro</h3>' +
-            '<button class="ms-close-btn" id="ms-import-close">&times;</button>' +
-        '</div>' +
-        '<p style="color:#94a3b8;font-size:0.9rem;margin:0 0 14px 0;">Paste a ChordPro chord chart from CCLI SongSelect, Planning Center, or any ChordPro source. The song will be saved in its <strong style="color:#22d3ee;">original key</strong> and can be transposed at any time.</p>' +
-        '<div class="ms-form-group">' +
-            '<label class="ms-label" for="ms-import-text">Paste Chord Chart</label>' +
-            '<textarea class="ms-input ms-textarea" id="ms-import-text" rows="16" style="font-family:monospace;font-size:0.85rem;" placeholder="{title: Amazing Grace}&#10;{artist: John Newton}&#10;{key: G}&#10;{ccli: 4768151}&#10;&#10;{comment: Verse 1}&#10;[G]Amazing [C]grace how [G]sweet the sound&#10;That [G]saved a [Em]wretch like [D]me..."></textarea>' +
-        '</div>' +
-        '<div id="ms-import-preview" style="display:none;"></div>' +
-        '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">' +
-            '<button class="ms-btn ms-btn-secondary" id="ms-import-cancel">Cancel</button>' +
-            '<button class="ms-btn ms-btn-secondary" id="ms-import-parse">Preview Parse</button>' +
-            '<button class="ms-btn ms-btn-primary" id="ms-import-save" style="display:none;">Save to Library</button>' +
-        '</div>';
-
-    overlay.classList.add('ms-visible');
-    overlay.setAttribute('aria-hidden', 'false');
-
-    document.getElementById('ms-import-close').addEventListener('click', function() { msCloseSongEditor(); });
-    document.getElementById('ms-import-cancel').addEventListener('click', function() { msCloseSongEditor(); });
-    overlay.addEventListener('click', function(e) { if (e.target === overlay) msCloseSongEditor(); });
-
-    var _parsed = null;
-
-    document.getElementById('ms-import-parse').addEventListener('click', function() {
-        var text = document.getElementById('ms-import-text').value;
-        _parsed = msParseSongSelect(text);
-        var preview = document.getElementById('ms-import-preview');
-        var saveBtn = document.getElementById('ms-import-save');
-
-        if (!_parsed.title && !_parsed.chordSheet) {
-            preview.style.display = 'block';
-            preview.innerHTML = '<div style="color:#f87171;padding:12px;background:rgba(239,68,68,0.1);border-radius:8px;margin-bottom:12px;">Could not detect song data. Make sure you paste valid ChordPro content.</div>';
-            saveBtn.style.display = 'none';
-            return;
-        }
-
-        preview.style.display = 'block';
-        preview.innerHTML =
-            '<div style="background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.2);border-radius:10px;padding:14px;margin-bottom:12px;">' +
-                '<div style="font-weight:700;color:#22d3ee;font-size:0.8rem;text-transform:uppercase;margin-bottom:10px;">Parsed Preview</div>' +
-                '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;font-size:0.9rem;">' +
-                    '<span style="color:#94a3b8;">Title</span><span style="color:#fff;">' + msEscapeHtml(_parsed.title || '—') + '</span>' +
-                    '<span style="color:#94a3b8;">Artist</span><span style="color:#fff;">' + msEscapeHtml(_parsed.artist || '—') + '</span>' +
-                    '<span style="color:#94a3b8;">Original Key</span><span style="color:#22d3ee;font-weight:700;">' + msEscapeHtml(_parsed.key || '—') + '</span>' +
-                    '<span style="color:#94a3b8;">CCLI #</span><span style="color:#fff;">' + msEscapeHtml(_parsed.ccliNumber || '—') + '</span>' +
-                    '<span style="color:#94a3b8;">Tempo</span><span style="color:#fff;">' + msEscapeHtml(_parsed.bpm || '—') + '</span>' +
-                    '<span style="color:#94a3b8;">Time Signature</span><span style="color:#fff;">' + msEscapeHtml(_parsed.timeSignature || '—') + '</span>' +
-                    '<span style="color:#94a3b8;">Sections detected</span><span style="color:#fff;">' + (_parsed.sections || 0) + '</span>' +
-                '</div>' +
-            '</div>';
-        saveBtn.style.display = '';
-    });
-
-    document.getElementById('ms-import-save').addEventListener('click', async function() {
-        if (!_parsed) return;
-        var saveBtn = document.getElementById('ms-import-save');
-        saveBtn.disabled = true;
-        saveBtn.textContent = 'Saving...';
-        try {
-            await msSaveImportedSong(_parsed);
-            msCloseSongEditor();
-            _msSongsLoadedAt = 0;
-            _msSongDetailCache = {};
-            await msLoadSongs();
-        } catch (err) {
-            console.error('MusicStand: SongSelect import failed', err);
-            saveBtn.disabled = false;
-            saveBtn.textContent = 'Save to Library';
-        }
-    });
-}
-
-function msParseSongSelect(text) {
-    var result = { title: '', artist: '', key: '', ccliNumber: '', bpm: '', timeSignature: '', capo: '', chordSheet: text, sections: 0 };
-    if (!text) return result;
-
-    var lines = text.split('\n');
-
-    for (var i = 0; i < lines.length; i++) {
-        var line = lines[i];
-        // Parse ChordPro directives like {title: Amazing Grace}
-        var m = line.match(/^\{([\w\-]+):\s*(.+?)\s*\}$/i);
-        if (m) {
-            var key = m[1].toLowerCase();
-            var val = m[2].trim();
-            if (key === 'title' || key === 't')                           result.title = val;
-            else if (key === 'artist' || key === 'a' || key === 'composer') result.artist = val;
-            else if (key === 'key')                                        result.key = val;
-            else if (key === 'capo')                                       result.capo = val;
-            else if (key === 'tempo' || key === 'bpm')                     result.bpm = val;
-            else if (key === 'time')                                       result.timeSignature = val;
-            else if (key === 'ccli')                                       result.ccliNumber = val;
-            else if (key === 'comment' || key === 'c')                     result.sections++;
-        }
-    }
-
-    // Count {comment:} directives if we didn't accumulate them above
-    var commentCount = (text.match(/^\{c(?:omment)?:/gim) || []).length;
-    if (commentCount > result.sections) result.sections = commentCount;
-
-    // If no section headings found, count blank-line-separated chord blocks
-    if (!result.sections) {
-        var blocks = text.split(/\n\s*\n/);
-        result.sections = blocks.filter(function(b) { return b.trim() && /\[[A-G][#b]?/.test(b); }).length;
-    }
-
-    // If no title found from directives, try the first short non-chord non-directive line
-    if (!result.title) {
-        for (var j = 0; j < Math.min(lines.length, 5); j++) {
-            var l = lines[j].trim();
-            if (l && !l.startsWith('{') && !l.startsWith('[') && l.length < 80) {
-                result.title = l;
-                break;
-            }
-        }
-    }
-
-    return result;
-}
-
-async function msSaveImportedSong(parsed) {
-    var payload = {
-        title:          parsed.title || 'Imported Song',
-        artist:         parsed.artist || '',
-        defaultKey:     parsed.key || 'C',
-        chordSheetKey:  parsed.key || 'C',
-        chordSheet:     parsed.chordSheet || '',
-        ccliNumber:     parsed.ccliNumber || '',
-        tempoBpm:       parsed.bpm || '0',
-        timeSignature:  parsed.timeSignature || '4/4',
-        active:         'TRUE',
-        notes:          'Imported from SongSelect / ChordPro'
-    };
-    if (parsed.capo) payload.capo = parsed.capo;
-
-    if (_msFB()) {
-        await UpperRoom.createSong(payload);
-    } else {
-        await msApiCall('songs.create', payload);
-    }
-}
 window.openMusicStandApp = openMusicStandApp;
 
 /* Expose as window.TheShofar for inline onclick= handlers */
