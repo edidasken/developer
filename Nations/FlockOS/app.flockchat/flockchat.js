@@ -233,48 +233,39 @@
 
   /* ── Seed Default Conversations ─────────────────────────────────────── */
   async function _seedConversations() {
-    const snap = await _db.collection('conversations').limit(1).get();
-    if (!snap.empty) return; // Already seeded
-
-    console.log('[FlockChat] Seeding default conversations');
-
     // (Church Announcements is NOT seeded — it's a single shared doc at
     //  conversations/announcements, mirrored from the_announcements view.
     //  FlockChat injects it as a static entry in _renderConversations.)
 
-    // 2. Prayer Chain
-    await _db.collection('conversations').add({
-      type: 'prayer',
-      name: 'Prayer Chain',
-      icon: '🙏',
-      participants: [_me.uid],
-      lastMessage: {
-        text: 'Type a prayer request below — it goes straight to the church Prayer Chain.',
-        author: 'system',
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      },
-      lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
-      unreadCount: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      createdBy: _me.uid
-    });
-
-    // 3. General Chat
-    await _db.collection('conversations').add({
-      type: 'group',
-      name: 'General Chat',
-      icon: '👥',
-      participants: [_me.uid],
-      lastMessage: {
-        text: 'This is the place for general conversation and fellowship!',
-        author: 'system',
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      },
-      lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
-      unreadCount: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      createdBy: _me.uid
-    });
+    // Prayer Chain is per-user (a private funnel into the church Prayer
+    // Chain). Make sure THIS user has one — independently of whether other
+    // users have already seeded their own.
+    try {
+      const mine = await _db.collection('conversations')
+        .where('type', '==', 'prayer')
+        .where('participants', 'array-contains', _me.uid)
+        .limit(1).get();
+      if (mine.empty) {
+        console.log('[FlockChat] Seeding Prayer Chain for', _me.uid);
+        await _db.collection('conversations').add({
+          type: 'prayer',
+          name: 'Prayer Chain',
+          icon: '🙏',
+          participants: [_me.uid],
+          lastMessage: {
+            text: 'Type a prayer request below — it goes straight to the church Prayer Chain.',
+            author: 'system',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          },
+          lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
+          unreadCount: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdBy: _me.uid
+        });
+      }
+    } catch (err) {
+      console.warn('[FlockChat] Prayer Chain seed failed:', err);
+    }
   }
 
   /* ── Mount App ──────────────────────────────────────────────────────── */
@@ -630,6 +621,13 @@
   function _loadConversations() {
     if (_convUnsub) _convUnsub();
 
+    // Render the static pinned threads (Church Announcements) immediately
+    // so the list never looks empty — even if the conversations query is
+    // still loading or fails outright.
+    _conversations = [];
+    _injectAnnouncements();
+    _renderConversations();
+
     _convUnsub = _db.collection('conversations')
       .where('participants', 'array-contains', _me.uid)
       .orderBy('lastActivity', 'desc')
@@ -652,6 +650,10 @@
       }, err => {
         console.error('[FlockChat] Failed to load conversations:', err);
         _toast('Failed to load conversations', 'error');
+        // Even on error, keep statics visible so the user isn't stranded.
+        _conversations = [];
+        _injectAnnouncements();
+        _renderConversations();
       });
   }
 
