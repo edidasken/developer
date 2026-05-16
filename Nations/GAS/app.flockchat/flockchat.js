@@ -236,22 +236,9 @@
 
     console.log('[FlockChat] Seeding default conversations');
 
-    // 1. Church Announcements
-    await _db.collection('conversations').add({
-      type: 'announcement',
-      name: 'Church Announcements',
-      icon: '📢',
-      participants: [_me.uid],
-      lastMessage: {
-        text: 'Welcome to FlockChat! This is where pastors share important updates.',
-        author: 'system',
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      },
-      lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
-      unreadCount: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      createdBy: _me.uid
-    });
+    // (Church Announcements is NOT seeded — it's a single shared doc at
+    //  conversations/announcements, mirrored from the_announcements view.
+    //  FlockChat injects it as a static entry in _renderConversations.)
 
     // 2. Prayer Chain
     await _db.collection('conversations').add({
@@ -650,13 +637,57 @@
         snap.forEach(doc => {
           const d = doc.data();
           d.id = doc.id;
+          // The shared announcements doc is injected separately (no
+          // participants array → wouldn't match this query anyway, but
+          // belt-and-suspenders).
+          if (d.id === ANNOUNCEMENTS_ID) return;
           _conversations.push(d);
         });
+        _injectAnnouncements();
         _renderConversations();
       }, err => {
         console.error('[FlockChat] Failed to load conversations:', err);
         _toast('Failed to load conversations', 'error');
       });
+  }
+
+  // Listen to the shared announcements doc so the static thread's preview
+  // + sort key stay fresh when leadership posts.
+  let _annDocUnsub = null;
+  let _annLastSnippet = '';
+  let _annLastAt = null;
+
+  function _injectAnnouncements() {
+    const entry = {
+      id: ANNOUNCEMENTS_ID,
+      type: 'announcement',
+      name: 'Church Announcements',
+      icon: '📢',
+      participants: [],
+      lastMessage: { text: _annLastSnippet || 'Tap to view church-wide announcements.', author: '', timestamp: _annLastAt },
+      lastActivity: _annLastAt,
+      unreadCount: 0,
+      _static: true
+    };
+    _conversations.unshift(entry);
+
+    if (_annDocUnsub) return; // already listening
+    try {
+      _annDocUnsub = _db.collection('conversations').doc(ANNOUNCEMENTS_ID)
+        .onSnapshot(doc => {
+          const d = doc.exists ? doc.data() : null;
+          _annLastSnippet = (d && d.lastSnippet) || '';
+          _annLastAt = (d && d.lastMessageAt) || null;
+          const e = _conversations.find(c => c.id === ANNOUNCEMENTS_ID);
+          if (e) {
+            e.lastMessage = { text: _annLastSnippet || 'Tap to view church-wide announcements.', author: '', timestamp: _annLastAt };
+            e.lastActivity = _annLastAt;
+            _renderConversations();
+          }
+        }, err => console.warn('[FlockChat] announcements doc listen failed:', err));
+    } catch (err) {
+      console.warn('[FlockChat] announcements doc listen setup failed:', err);
+    }
   }
 
   function _filterConversations(query) {
@@ -737,6 +768,7 @@
       const count = conv.participants?.length || 0;
       if (conv.type === 'sms') meta.textContent = 'SMS • ' + (conv.smsPhone || 'no number');
       else if (conv.type === 'prayer') meta.textContent = 'Prayer Chain • posts here become church prayer requests';
+      else if (conv.type === 'announcement') meta.textContent = 'Church-wide announcements';
       else meta.textContent = conv.type === 'dm' ? 'Direct Message' : `${count} ${count === 1 ? 'member' : 'members'}`;
     }
 
@@ -747,7 +779,9 @@
         ? 'Type a message — will open your SMS app…'
         : (conv.type === 'prayer')
           ? 'Share a prayer request…'
-          : 'FlockChat';
+          : (conv.type === 'announcement')
+            ? 'Post an announcement to the whole church…'
+            : 'FlockChat';
     }
 
     // Show thread pane (mobile)
@@ -759,6 +793,9 @@
   };
 
   function _markAsRead(convId) {
+    // The shared announcements doc has no per-user unreadCount and members
+    // typically can't write to it — don't try.
+    if (convId === ANNOUNCEMENTS_ID) return;
     _db.collection('conversations').doc(convId).update({
       unreadCount: 0
     }).catch(() => {});
@@ -772,6 +809,50 @@
     if (!msgContainer) return;
 
     msgContainer.innerHTML = '<div class="fc-loading"><div class="fc-spinner"></div></div>';
+
+    // Special path: shared church announcements channel uses the wall/UpperRoom
+    // shape ({ body, senderName, senderEmail, sentAt }) instead of FlockChat's
+    // ({ text, authorName, author, timestamp }). Map on the fly.
+    if (convId === ANNOUNCEMENTS_ID) {
+      _msgUnsub = _db.collection('conversations').doc(convId).collection('messages')
+        .orderBy('sentAt', 'asc')
+        .limit(MSG_LIMIT)
+        .onSnapshot(snap => {
+          _messages = [];
+          snap.forEach(doc => {
+            const d = doc.data() || {};
+            _messages.push({
+              id:         doc.id,
+              text:       d.body || d.text || '',
+              author:     d.senderEmail || d.author || '',
+              authorName: d.senderName  || d.authorName || 'Leadership',
+              type:       'announcement',
+              timestamp:  d.sentAt || d.timestamp || null
+            });
+          });
+          if (_messages.length === 0) {
+            const c = $('fc-messages');
+            if (c) c.innerHTML = `
+              <div class="fc-empty">
+                <div class="fc-empty-icon">📢</div>
+                <div class="fc-empty-title">No announcements yet</div>
+                <div class="fc-empty-text">When leadership posts, it'll show up here.</div>
+              </div>`;
+            return;
+          }
+          _renderMessages();
+          _scrollToBottom();
+        }, err => {
+          console.error('[FlockChat] Failed to load announcements:', err);
+          msgContainer.innerHTML = `
+            <div class="fc-empty">
+              <div class="fc-empty-icon">⚠️</div>
+              <div class="fc-empty-title">Couldn't load announcements</div>
+              <div class="fc-empty-text">Please try again.</div>
+            </div>`;
+        });
+      return;
+    }
 
     _msgUnsub = _db.collection('conversations').doc(convId).collection('messages')
       .orderBy('timestamp', 'asc')
@@ -891,10 +972,28 @@
     try {
       const conv = _conversations.find(c => c.id === _activeConvId);
 
+      // Church Announcements: route through UpperRoom so the post lands in
+      // the same shared channel that The Announcements view reads/writes.
+      if (_activeConvId === ANNOUNCEMENTS_ID || conv?.type === 'announcement') {
+        if (!window.UpperRoom || typeof window.UpperRoom.sendMessage !== 'function') {
+          _toast('Announcements channel unavailable', 'error');
+          return;
+        }
+        try {
+          await window.UpperRoom.sendMessage(ANNOUNCEMENTS_ID, text);
+          input.value = '';
+          input.style.height = 'auto';
+          _toast('📢 Posted to Church Announcements', 'success');
+        } catch (err) {
+          console.error('[FlockChat] Failed to post announcement:', err);
+          _toast(err?.message || 'Failed to post announcement', 'error');
+        }
+        return;
+      }
+
       // SMS conversations: hand off to the native SMS composer with the
       // text prefilled, and log the attempt so the thread + recents update.
-      if (conv?.type === 'sms') {
-        const phone = conv.smsPhone;
+      if (conv?.type === 'sms') {        const phone = conv.smsPhone;
         if (!phone) { _toast('No phone on file for this contact', 'error'); return; }
         _launchSms(phone, text);
         await _db.collection('conversations').doc(_activeConvId).collection('messages').add({
