@@ -1061,29 +1061,59 @@ function _renderImport(main) {
         </div>
       </div>
 
-      <!-- Planning Center OAuth -->
+      <!-- Planning Center Direct Connection -->
       <div class="ms-import-panel" id="imp-panel-planning-center">
-        <div class="ms-card" style="max-width:520px;">
+        <div class="ms-card" style="max-width:520px;margin-bottom:24px;">
           <div style="font-size:1.4rem;margin-bottom:12px;">📋</div>
           <div style="font-weight:700;font-size:1rem;margin-bottom:8px;">Planning Center Online</div>
           <p style="color:var(--ms-ink-muted);font-size:.88rem;line-height:1.6;margin-bottom:16px;">
-            Connect your Planning Center account to import service plans and songs directly. Your PCO data syncs automatically when you add songs to a service.
+            Connect your Planning Center account to import service plans and songs directly.
           </p>
-          <p style="font-size:.8rem;color:var(--ms-ink-faint);margin-bottom:16px;line-height:1.5;">
-            <strong style="color:var(--ms-ink)">How it works:</strong> FlockOS reads your PCO song library (read-only). It never writes to Planning Center. You stay in control.
-          </p>
-          <button class="ms-btn ms-btn--primary" id="imp-pco-connect">Connect Planning Center</button>
-          <p style="font-size:.72rem;color:var(--ms-ink-faint);margin-top:12px;">Requires a Planning Center account with Songs access.</p>
+          <div id="pco-connect-form" hidden>
+            <p style="font-size:.82rem;color:var(--ms-ink-muted);margin-bottom:12px;line-height:1.5;">
+              Generate a Personal Access Token from your PCO account: <a href="https://api.planningcenteronline.com/oauth/applications" target="_blank" style="color:var(--ms-violet)">PCO Developer Apps</a>
+            </p>
+            <div class="ms-field" style="margin-bottom:12px;">
+              <div class="ms-label">Application ID</div>
+              <input class="ms-input" type="text" id="pco-app-id" placeholder="Your PCO App ID">
+            </div>
+            <div class="ms-field" style="margin-bottom:16px;">
+              <div class="ms-label">Secret</div>
+              <input class="ms-input" type="password" id="pco-secret" placeholder="Your PCO Secret">
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button class="ms-btn ms-btn--primary" id="pco-connect-btn">Connect</button>
+              <button class="ms-btn ms-btn--ghost" id="pco-cancel-btn">Cancel</button>
+            </div>
+            <p style="font-size:.72rem;color:var(--ms-ink-faint);margin-top:12px;">Your credentials are stored locally and used only to access your PCO library.</p>
+          </div>
+          <div id="pco-connected-view" hidden>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:10px;margin-bottom:16px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <div style="flex:1;">
+                <div style="font-weight:600;font-size:.88rem;">Connected to Planning Center</div>
+                <div style="font-size:.78rem;color:var(--ms-ink-muted);"><span id="pco-user-display"></span></div>
+              </div>
+              <button class="ms-btn ms-btn--ghost ms-btn--sm" id="pco-disconnect-btn">Disconnect</button>
+            </div>
+            <div class="ms-field" style="margin-bottom:12px;">
+              <div class="ms-label">Search Planning Center Songs</div>
+              <input class="ms-input" type="text" id="pco-search" placeholder="Search by title...">
+            </div>
+            <button class="ms-btn ms-btn--primary" id="pco-search-btn" style="margin-bottom:16px;">Search</button>
+            <div id="pco-results" hidden></div>
+          </div>
+          <button class="ms-btn ms-btn--primary" id="pco-show-connect" hidden>Connect Planning Center</button>
         </div>
 
         <div style="margin-top:28px;">
           <div class="ms-label" style="margin-bottom:12px;">Or paste a Planning Center chord sheet</div>
-          <textarea class="ms-input ms-textarea ms-content-editor" id="imp-pco-text" rows="10" placeholder="Paste the chord chart text from Planning Center here…"></textarea>
+          <textarea class="ms-input ms-textarea ms-content-editor" id="pco-text" rows="10" placeholder="Paste the chord chart text from Planning Center here…"></textarea>
           <div style="margin-top:10px;display:flex;gap:10px;">
-            <button class="ms-btn ms-btn--ghost" id="imp-pco-parse">Parse &amp; Preview</button>
+            <button class="ms-btn ms-btn--ghost" id="pco-parse">Parse &amp; Preview</button>
           </div>
-          <div id="imp-pco-preview" hidden style="margin-top:12px;"></div>
-          <button class="ms-btn ms-btn--primary" id="imp-pco-save" hidden style="margin-top:10px;">Save to Library</button>
+          <div id="pco-preview" hidden style="margin-top:12px;"></div>
+          <button class="ms-btn ms-btn--primary" id="pco-save" hidden style="margin-top:10px;">Save to Library</button>
         </div>
       </div>
 
@@ -1174,6 +1204,9 @@ function _renderImport(main) {
   // SongSelect Direct Connection
   _initSongSelectConnection(main);
 
+  // Planning Center Direct Connection
+  _initPlanningCenterConnection(main);
+
   // ChordPro parse + save
   let _cpParsed = null;
   main.querySelector('#imp-cp-parse')?.addEventListener('click', () => {
@@ -1189,20 +1222,15 @@ function _renderImport(main) {
 
   // PCO paste parse + save
   let _pcoParsed = null;
-  main.querySelector('#imp-pco-parse')?.addEventListener('click', () => {
-    const text = main.querySelector('#imp-pco-text').value;
+  main.querySelector('#pco-parse')?.addEventListener('click', () => {
+    const text = main.querySelector('#pco-text').value;
     _pcoParsed = _parseChordPro(text);
-    _showImportPreview(main.querySelector('#imp-pco-preview'), _pcoParsed, text);
-    main.querySelector('#imp-pco-save').hidden = !_pcoParsed.title;
+    _showImportPreview(main.querySelector('#pco-preview'), _pcoParsed, text);
+    main.querySelector('#pco-save').hidden = !_pcoParsed.title;
   });
-  main.querySelector('#imp-pco-save')?.addEventListener('click', async () => {
+  main.querySelector('#pco-save')?.addEventListener('click', async () => {
     if (!_pcoParsed) return;
-    await _saveParsedSong(_pcoParsed, main.querySelector('#imp-pco-save'));
-  });
-
-  // PCO connect (placeholder — OAuth would be a backend feature)
-  main.querySelector('#imp-pco-connect')?.addEventListener('click', () => {
-    _toast('Planning Center OAuth coming soon. Use the paste method below for now.', 'info');
+    await _saveParsedSong(_pcoParsed, main.querySelector('#pco-save'));
   });
 
   // Manual preview
@@ -1521,6 +1549,260 @@ function _parseChordPro(text) {
   }
   return result;
 }
+
+/* ═══ Planning Center Online Connection ═══ */
+
+function _initPlanningCenterConnection(main) {
+  // Check if credentials exist
+  const pcoCredentials = _getPlanningCenterCredentials();
+  
+  if (pcoCredentials && pcoCredentials.appId) {
+    main.querySelector('#pco-connected-view').hidden = false;
+    main.querySelector('#pco-user-display').textContent = pcoCredentials.userName || 'Connected';
+  } else {
+    main.querySelector('#pco-show-connect').hidden = false;
+  }
+
+  // Show connect form
+  main.querySelector('#pco-show-connect')?.addEventListener('click', () => {
+    main.querySelector('#pco-show-connect').hidden = true;
+    main.querySelector('#pco-connect-form').hidden = false;
+  });
+
+  // Cancel connection
+  main.querySelector('#pco-cancel-btn')?.addEventListener('click', () => {
+    main.querySelector('#pco-connect-form').hidden = true;
+    main.querySelector('#pco-show-connect').hidden = false;
+    main.querySelector('#pco-app-id').value = '';
+    main.querySelector('#pco-secret').value = '';
+  });
+
+  // Connect to Planning Center
+  main.querySelector('#pco-connect-btn')?.addEventListener('click', async () => {
+    const appId = main.querySelector('#pco-app-id').value.trim();
+    const secret = main.querySelector('#pco-secret').value.trim();
+    
+    if (!appId || !secret) {
+      _toast('Please enter both App ID and Secret', 'error');
+      return;
+    }
+
+    const btn = main.querySelector('#pco-connect-btn');
+    btn.disabled = true;
+    btn.textContent = 'Connecting...';
+
+    try {
+      if (!_fb()) throw new Error('Firebase not initialized');
+      
+      const functions = firebase.functions();
+      const pcoAuth = functions.httpsCallable('pcoAuth');
+      
+      const result = await pcoAuth({ appId, secret });
+      
+      if (result.data && result.data.ok) {
+        // Store credentials locally
+        _savePlanningCenterCredentials({ 
+          appId, 
+          secret,
+          userName: result.data.user?.name || 'PCO User'
+        });
+        
+        main.querySelector('#pco-connect-form').hidden = true;
+        main.querySelector('#pco-connected-view').hidden = false;
+        main.querySelector('#pco-user-display').textContent = result.data.user?.name || 'Connected';
+        main.querySelector('#pco-app-id').value = '';
+        main.querySelector('#pco-secret').value = '';
+        
+        _toast('Connected to Planning Center', 'success');
+      } else {
+        throw new Error('Invalid credentials');
+      }
+    } catch (err) {
+      _toast('Connection failed: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Connect';
+    }
+  });
+
+  // Disconnect from Planning Center
+  main.querySelector('#pco-disconnect-btn')?.addEventListener('click', () => {
+    if (confirm('Disconnect from Planning Center?')) {
+      _clearPlanningCenterCredentials();
+      main.querySelector('#pco-connected-view').hidden = true;
+      main.querySelector('#pco-show-connect').hidden = false;
+      _toast('Disconnected from Planning Center', 'info');
+    }
+  });
+
+  // Search Planning Center
+  main.querySelector('#pco-search-btn')?.addEventListener('click', async () => {
+    const query = main.querySelector('#pco-search').value.trim();
+    if (!query) {
+      _toast('Enter a search term', 'error');
+      return;
+    }
+
+    const btn = main.querySelector('#pco-search-btn');
+    const resultsEl = main.querySelector('#pco-results');
+    
+    btn.disabled = true;
+    btn.textContent = 'Searching...';
+    resultsEl.hidden = false;
+    resultsEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ms-ink-muted);">Searching Planning Center...</div>';
+
+    try {
+      const credentials = _getPlanningCenterCredentials();
+      const results = await _searchPlanningCenter(query, credentials);
+      _renderPlanningCenterResults(resultsEl, results);
+    } catch (err) {
+      resultsEl.innerHTML = `<div style="padding:20px;text-align:center;color:var(--ms-danger);">Search failed: ${_e(err.message)}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Search';
+    }
+  });
+
+  // Search on Enter key
+  main.querySelector('#pco-search')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      main.querySelector('#pco-search-btn').click();
+    }
+  });
+}
+
+function _getPlanningCenterCredentials() {
+  try {
+    const stored = localStorage.getItem('flockos_pco_creds');
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+}
+
+function _savePlanningCenterCredentials(creds) {
+  localStorage.setItem('flockos_pco_creds', JSON.stringify(creds));
+}
+
+function _clearPlanningCenterCredentials() {
+  localStorage.removeItem('flockos_pco_creds');
+}
+
+async function _searchPlanningCenter(query, credentials) {
+  if (!_fb()) throw new Error('Firebase not initialized');
+  
+  const functions = firebase.functions();
+  const pcoSearchSongs = functions.httpsCallable('pcoSearchSongs');
+  
+  const result = await pcoSearchSongs({
+    appId: credentials.appId,
+    secret: credentials.secret,
+    query: query
+  });
+  
+  if (result.data && result.data.ok) {
+    return result.data.results || [];
+  }
+  
+  throw new Error(result.data?.message || 'Search failed');
+}
+
+function _renderPlanningCenterResults(el, results) {
+  if (!results || results.length === 0) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ms-ink-muted);">No results found</div>';
+    return;
+  }
+
+  el.innerHTML = `
+    <div style="margin-bottom:12px;">
+      <div class="ms-label">${results.length} song${results.length === 1 ? '' : 's'} found</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      ${results.map((song, idx) => `
+        <div class="ms-card" style="cursor:pointer;" data-pco-song-idx="${idx}">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:700;font-size:.95rem;margin-bottom:4px;">${_e(song.title)}</div>
+              <div style="font-size:.82rem;color:var(--ms-ink-muted);">
+                ${song.artist ? _e(song.artist) : ''}
+                ${song.ccliNumber ? (song.artist ? ' • ' : '') + 'CCLI ' + _e(song.ccliNumber) : ''}
+              </div>
+              ${song.themes ? `<div style="font-size:.75rem;color:var(--ms-violet);margin-top:4px;">${_e(song.themes)}</div>` : ''}
+            </div>
+            <button class="ms-btn ms-btn--primary ms-btn--sm" data-pco-import="${idx}">Import</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  // Attach import handlers
+  el.querySelectorAll('[data-pco-import]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.pcoImport);
+      const song = results[idx];
+      await _importPlanningCenterSong(song, btn);
+    });
+  });
+}
+
+async function _importPlanningCenterSong(song, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Importing...';
+
+  try {
+    if (!_fb()) throw new Error('Firebase not initialized');
+    
+    const credentials = _getPlanningCenterCredentials();
+    if (!credentials) throw new Error('Not connected to Planning Center');
+    
+    const functions = firebase.functions();
+    const pcoImportSong = functions.httpsCallable('pcoImportSong');
+    
+    const result = await pcoImportSong({
+      appId: credentials.appId,
+      secret: credentials.secret,
+      songId: song.id
+    });
+    
+    if (!result.data || !result.data.ok) {
+      throw new Error(result.data?.message || 'Import failed');
+    }
+    
+    // Parse and save the ChordPro data
+    const chordPro = result.data.chordPro;
+    const parsed = _parseChordPro(chordPro);
+    
+    const payload = {
+      title:         parsed.title || result.data.title || song.title,
+      artist:        parsed.artist || result.data.artist || song.artist,
+      defaultKey:    parsed.key || 'C',
+      chordSheetKey: parsed.key || 'C',
+      chordSheet:    chordPro,
+      ccliNumber:    parsed.ccliNumber || result.data.ccliNumber || song.ccliNumber || '',
+      tempoBpm:      parsed.bpm || '0',
+      timeSignature: parsed.timeSignature || '4/4',
+      active:        'TRUE',
+      notes:         'Imported from Planning Center',
+    };
+
+    if (UpperRoom.createSong) {
+      await UpperRoom.createSong(payload);
+      S.songs = [];
+      _toast(`"${payload.title}" imported successfully`, 'success');
+      setTimeout(() => _navigate('songs'), 1000);
+    } else {
+      throw new Error('Unable to save song - not connected to database');
+    }
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Import';
+    _toast('Import failed: ' + err.message, 'error');
+  }
+}
+
+/* ═══ End Planning Center ═══ */
 
 function _showImportPreview(el, parsed, rawText) {
   el.hidden = false;

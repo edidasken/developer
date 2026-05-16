@@ -248,3 +248,198 @@ ${songData.lyrics}`;
     }
   }
 });
+
+/**
+ * Planning Center Online - Validate Personal Access Token
+ * PCO uses Personal Access Tokens for API access
+ */
+exports.pcoAuth = onCall(async (request) => {
+  const {appId, secret} = request.data;
+
+  if (!appId || !secret) {
+    throw new HttpsError('invalid-argument', 'App ID and Secret are required');
+  }
+
+  try {
+    // Test the credentials by fetching the current user
+    const response = await fetch('https://api.planningcenteronline.com/services/v2/me', {
+      headers: {
+        'Authorization': 'Basic ' + Buffer.from(`${appId}:${secret}`).toString('base64')
+      }
+    });
+
+    if (!response.ok) {
+      throw new HttpsError('unauthenticated', 'Invalid Planning Center credentials');
+    }
+
+    const data = await response.json();
+    const user = data.data;
+
+    return {
+      ok: true,
+      message: 'Successfully authenticated with Planning Center',
+      user: {
+        id: user.id,
+        name: user.attributes.name || user.attributes.email
+      }
+    };
+
+  } catch (error) {
+    console.error('PCO auth error:', error);
+    throw new HttpsError('internal', error.message || 'Authentication failed');
+  }
+});
+
+/**
+ * Planning Center Online - Search Songs
+ * Searches the PCO Services song library
+ */
+exports.pcoSearchSongs = onCall(async (request) => {
+  const {appId, secret, query} = request.data;
+
+  if (!appId || !secret || !query) {
+    throw new HttpsError('invalid-argument', 'App ID, Secret, and query are required');
+  }
+
+  try {
+    const auth = Buffer.from(`${appId}:${secret}`).toString('base64');
+    
+    // Search songs endpoint
+    const response = await fetch(
+      `https://api.planningcenteronline.com/services/v2/songs?where[title]=${encodeURIComponent(query)}&per_page=20`,
+      {
+        headers: {
+          'Authorization': `Basic ${auth}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new HttpsError('internal', 'Failed to search Planning Center songs');
+    }
+
+    const data = await response.json();
+    const songs = data.data.map(song => ({
+      id: song.id,
+      title: song.attributes.title,
+      artist: song.attributes.author || '',
+      ccliNumber: song.attributes.ccli_number || '',
+      themes: song.attributes.themes || '',
+      lastScheduled: song.attributes.last_scheduled_at,
+      createdAt: song.attributes.created_at
+    }));
+
+    return {
+      ok: true,
+      results: songs,
+      count: songs.length
+    };
+
+  } catch (error) {
+    console.error('PCO search error:', error);
+    throw new HttpsError('internal', error.message || 'Search failed');
+  }
+});
+
+/**
+ * Planning Center Online - Import Song
+ * Fetches full song details including arrangements
+ */
+exports.pcoImportSong = onCall(async (request) => {
+  const {appId, secret, songId} = request.data;
+
+  if (!appId || !secret || !songId) {
+    throw new HttpsError('invalid-argument', 'App ID, Secret, and songId are required');
+  }
+
+  try {
+    const auth = Buffer.from(`${appId}:${secret}`).toString('base64');
+    const headers = {
+      'Authorization': `Basic ${auth}`
+    };
+
+    // Fetch song details
+    const songResponse = await fetch(
+      `https://api.planningcenteronline.com/services/v2/songs/${songId}`,
+      {headers}
+    );
+
+    if (!songResponse.ok) {
+      throw new HttpsError('not-found', 'Song not found');
+    }
+
+    const songData = await songResponse.json();
+    const song = songData.data;
+
+    // Fetch arrangements for this song
+    const arrangementsResponse = await fetch(
+      `https://api.planningcenteronline.com/services/v2/songs/${songId}/arrangements`,
+      {headers}
+    );
+
+    let arrangements = [];
+    let chordPro = '';
+    
+    if (arrangementsResponse.ok) {
+      const arrangementsData = await arrangementsResponse.json();
+      arrangements = arrangementsData.data;
+
+      // Use the first arrangement's chord chart if available
+      if (arrangements.length > 0) {
+        const firstArr = arrangements[0];
+        const arrId = firstArr.id;
+
+        // Fetch the chord chart for this arrangement
+        const chartResponse = await fetch(
+          `https://api.planningcenteronline.com/services/v2/songs/${songId}/arrangements/${arrId}`,
+          {headers}
+        );
+
+        if (chartResponse.ok) {
+          const chartData = await chartResponse.json();
+          const chart = chartData.data;
+          
+          // Build ChordPro from PCO data
+          const lyrics = chart.attributes.chord_chart || chart.attributes.lyrics || '';
+          const key = chart.attributes.chord_chart_key || song.attributes.author;
+          
+          chordPro = `{title: ${song.attributes.title}}
+{artist: ${song.attributes.author || ''}}
+${song.attributes.ccli_number ? `{ccli: ${song.attributes.ccli_number}}` : ''}
+${key ? `{key: ${key}}` : ''}
+${song.attributes.themes ? `{comment: Themes: ${song.attributes.themes}}` : ''}
+
+${lyrics}`;
+        }
+      }
+    }
+
+    // If no chord chart, create basic structure
+    if (!chordPro) {
+      chordPro = `{title: ${song.attributes.title}}
+{artist: ${song.attributes.author || ''}}
+${song.attributes.ccli_number ? `{ccli: ${song.attributes.ccli_number}}` : ''}
+
+{comment: No chord chart available in Planning Center}
+{comment: Add lyrics and chords manually}`;
+    }
+
+    return {
+      ok: true,
+      title: song.attributes.title,
+      artist: song.attributes.author || '',
+      ccliNumber: song.attributes.ccli_number || '',
+      themes: song.attributes.themes || '',
+      chordPro: chordPro,
+      arrangements: arrangements.map(arr => ({
+        id: arr.id,
+        name: arr.attributes.name,
+        key: arr.attributes.chord_chart_key
+      }))
+    };
+
+  } catch (error) {
+    console.error('PCO import error:', error);
+    throw new HttpsError('internal', error.message || 'Import failed');
+  }
+});
