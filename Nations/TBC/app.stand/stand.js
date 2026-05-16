@@ -606,8 +606,8 @@ async function _loadDashboardData(main) {
                 <span class="ms-key-badge">${_e((s.key||s.defaultKey||'—').substring(0,2))}</span>
                 <span>${_e(s.title||s.songTitle||'Untitled')}</span>
               </div>`).join('')}
-            ${(p.songs||p.setlist||[]).length > 4 ? `<div style="font-size:.75rem;color:var(--ms-ink-faint);padding:2px 0">+${(p.songs||p.setlist||[]).length-4} more</div>` : ''}
-          </div>` : '<div style="font-size:.8rem;color:var(--ms-ink-faint);margin-top:8px;">No songs added yet</div>'}
+            ${(p.songs||p.setlist||[]).length > 4 ? `<div style="font-size:.75rem;color:rgba(255,255,255,0.45);padding:2px 0">+${(p.songs||p.setlist||[]).length-4} more</div>` : ''}
+          </div>` : '<div style="font-size:.8rem;color:rgba(255,255,255,0.45);margin-top:8px;">No songs added yet</div>'}
         </button>
       `).join('');
       upcomingEl.querySelectorAll('.ms-service-card').forEach(card => {
@@ -700,7 +700,7 @@ async function _loadAndRenderPlans(main) {
           <div class="ms-service-card-header">
             <div>
               <div class="ms-service-card-title">${_e(p.serviceType || 'Service')}</div>
-              <div style="font-size:.75rem;color:var(--ms-ink-muted);margin-top:2px;">${_e(p.theme||p.seriesTitle||'')}</div>
+              <div style="font-size:.75rem;color:rgba(255,255,255,0.58);margin-top:2px;">${_e(p.theme||p.seriesTitle||'')}</div>
             </div>
             <div style="text-align:right">
               <div class="ms-service-card-date">${_fmtDate(p.serviceDate)}</div>
@@ -714,10 +714,10 @@ async function _loadAndRenderPlans(main) {
                 <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_e(s.title||s.songTitle||'Untitled')}</span>
                 ${s.tempoBpm||s.bpm ? `<span class="ms-tempo-badge">${s.tempoBpm||s.bpm} bpm</span>` : ''}
               </div>`).join('')}
-            ${songs.length > 5 ? `<div style="font-size:.73rem;color:var(--ms-ink-faint)">+${songs.length-5} more songs</div>` : ''}
-            ${!songs.length ? '<div style="font-size:.78rem;color:var(--ms-ink-faint);padding:4px 0">No songs yet — tap to add</div>' : ''}
+            ${songs.length > 5 ? `<div style="font-size:.73rem;color:rgba(255,255,255,0.45)">+${songs.length-5} more songs</div>` : ''}
+            ${!songs.length ? '<div style="font-size:.78rem;color:rgba(255,255,255,0.45);padding:4px 0">No songs yet — tap to add</div>' : ''}
           </div>
-          ${(() => { const sr = p.sermonId && S.sermons.find(s => s.id === p.sermonId); return sr ? `<div style="font-size:.75rem;color:var(--ms-ink-muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--ms-line);">📖 ${_e(sr.title||'Sermon')}${sr.passage ? ' · ' + _e(sr.passage) : ''}</div>` : ''; })()}
+          ${(() => { const sr = p.sermonId && S.sermons.find(s => s.id === p.sermonId); return sr ? `<div style="font-size:.75rem;color:rgba(255,255,255,0.65);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);filter:brightness(0) invert(1) opacity(0.85);display:inline-block;">📖</div><div style="font-size:.75rem;color:rgba(255,255,255,0.65);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);display:inline;"> ${_e(sr.title||'Sermon')}${sr.passage ? ' · ' + _e(sr.passage) : ''}</div>` : ''; })()}
           <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
             <button class="ms-btn ms-btn--ghost ms-btn--sm svc-edit-btn" data-plan-id="${_e(p.id)}">Edit</button>
             <button class="ms-btn ms-btn--ghost ms-btn--sm svc-live-btn" data-plan-id="${_e(p.id)}" style="color:var(--ms-rose);">▶ Live</button>
@@ -985,9 +985,9 @@ function _renderImport(main) {
       <div class="ms-import-panel is-active" id="imp-panel-chordpro">
         <!-- SongSelect Direct Connection -->
         <div class="ms-dash-action" style="max-width:520px;margin-bottom:24px;display:block;cursor:default;">
-          <div style="font-size:1.4rem;margin-bottom:12px;">🎵</div>
+          <div style="font-size:1.4rem;margin-bottom:12px;filter:brightness(0) invert(1) opacity(0.9);">🎵</div>
           <div style="font-weight:700;font-size:1rem;margin-bottom:8px;color:#fff;">CCLI SongSelect Direct Import</div>
-          <p style="color:var(--ms-ink-muted);font-size:.88rem;line-height:1.6;margin-bottom:16px;">
+          <p style="color:rgba(255,255,255,0.78);font-size:.88rem;line-height:1.6;margin-bottom:16px;">
             Connect your SongSelect account to browse and import songs directly without downloading files.
           </p>
           <div id="ss-connect-form" hidden>
@@ -1003,14 +1003,14 @@ function _renderImport(main) {
               <button class="ms-btn ms-btn--primary" id="ss-connect-btn">Connect</button>
               <button class="ms-btn ms-btn--ghost" id="ss-cancel-btn">Cancel</button>
             </div>
-            <p style="font-size:.72rem;color:var(--ms-ink-faint);margin-top:12px;">Your credentials are stored securely and only used to access your SongSelect library.</p>
+            <p style="font-size:.72rem;color:rgba(255,255,255,0.5);margin-top:12px;">Your credentials are stored securely and only used to access your SongSelect library.</p>
           </div>
           <div id="ss-connected-view" hidden>
             <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:10px;margin-bottom:16px;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               <div style="flex:1;">
                 <div style="font-weight:600;font-size:.88rem;">Connected to SongSelect</div>
-                <div style="font-size:.78rem;color:var(--ms-ink-muted);"><span id="ss-email-display"></span></div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,0.65);"><span id="ss-email-display"></span></div>
               </div>
               <button class="ms-btn ms-btn--ghost ms-btn--sm" id="ss-disconnect-btn">Disconnect</button>
             </div>
@@ -1027,7 +1027,7 @@ function _renderImport(main) {
         <div style="margin-bottom:16px;">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
             <div style="flex:1;height:1px;background:var(--ms-line);"></div>
-            <span style="font-size:.85rem;color:var(--ms-ink-muted);font-weight:600;">OR PASTE DIRECTLY</span>
+            <span style="font-size:.85rem;color:rgba(255,255,255,0.5);font-weight:600;">OR PASTE DIRECTLY</span>
             <div style="flex:1;height:1px;background:var(--ms-line);"></div>
           </div>
           <div class="ms-import-source-grid">
@@ -1069,13 +1069,13 @@ function _renderImport(main) {
       <!-- Planning Center Direct Connection -->
       <div class="ms-import-panel" id="imp-panel-planning-center">
         <div class="ms-dash-action" style="max-width:520px;margin-bottom:24px;display:block;cursor:default;">
-          <div style="font-size:1.4rem;margin-bottom:12px;">📋</div>
+          <div style="font-size:1.4rem;margin-bottom:12px;filter:brightness(0) invert(1) opacity(0.9);">📋</div>
           <div style="font-weight:700;font-size:1rem;margin-bottom:8px;color:#fff;">Planning Center Online</div>
-          <p style="color:var(--ms-ink-muted);font-size:.88rem;line-height:1.6;margin-bottom:16px;">
+          <p style="color:rgba(255,255,255,0.78);font-size:.88rem;line-height:1.6;margin-bottom:16px;">
             Connect your Planning Center account to import service plans and songs directly.
           </p>
           <div id="pco-connect-form" hidden>
-            <p style="font-size:.82rem;color:var(--ms-ink-muted);margin-bottom:12px;line-height:1.5;">
+            <p style="font-size:.82rem;color:rgba(255,255,255,0.72);margin-bottom:12px;line-height:1.5;">
               Generate a Personal Access Token from your PCO account: <a href="https://api.planningcenteronline.com/oauth/applications" target="_blank" style="color:var(--ms-violet)">PCO Developer Apps</a>
             </p>
             <div class="ms-field" style="margin-bottom:12px;">
@@ -1090,14 +1090,14 @@ function _renderImport(main) {
               <button class="ms-btn ms-btn--primary" id="pco-connect-btn">Connect</button>
               <button class="ms-btn ms-btn--ghost" id="pco-cancel-btn">Cancel</button>
             </div>
-            <p style="font-size:.72rem;color:var(--ms-ink-faint);margin-top:12px;">Your credentials are stored locally and used only to access your PCO library.</p>
+            <p style="font-size:.72rem;color:rgba(255,255,255,0.5);margin-top:12px;">Your credentials are stored locally and used only to access your PCO library.</p>
           </div>
           <div id="pco-connected-view" hidden>
             <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);border-radius:10px;margin-bottom:16px;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               <div style="flex:1;">
                 <div style="font-weight:600;font-size:.88rem;">Connected to Planning Center</div>
-                <div style="font-size:.78rem;color:var(--ms-ink-muted);"><span id="pco-user-display"></span></div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,0.65);"><span id="pco-user-display"></span></div>
               </div>
               <button class="ms-btn ms-btn--ghost ms-btn--sm" id="pco-disconnect-btn">Disconnect</button>
             </div>

@@ -15009,7 +15009,11 @@ flock-tabs [role="tablist"], .tabs-bar {
   border-color: var(--dash-gold, #e8a838);
   box-shadow: 0 0 0 2px rgba(232,168,56,0.25), 0 12px 28px -22px rgba(15,23,53,0.55);
 }
-.ms-import-source-icon { font-size: 1.5rem; margin-bottom: 6px; }
+.ms-import-source-icon { 
+  font-size: 1.5rem; 
+  margin-bottom: 6px; 
+  filter: brightness(0) invert(1) opacity(0.85);
+}
 .ms-import-source-name { font-weight: 700; font-size: .85rem; color: #fff; }
 .ms-import-source-desc { font-size: .72rem; color: rgba(255,255,255,0.65); margin-top: 4px; line-height: 1.3; }
 .ms-import-result       { padding: 14px 16px; border-radius: var(--ms-r-md); background: var(--ms-bg-card); border: 1px solid var(--ms-line); margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }

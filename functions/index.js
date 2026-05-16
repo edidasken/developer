@@ -23,7 +23,7 @@ async function loginToSongSelect(page, email, password) {
     timeout: 30000
   });
   
-  // Set cookie consent cookies to bypass dialog
+  // Set cookie consent cookies to bypass dialog on songselect domain
   await page.setCookie({
     name: 'CookieConsent',
     value: '-1',
@@ -34,6 +34,19 @@ async function loginToSongSelect(page, email, password) {
     name: 'CookieConsentBulkTicket',
     value: 'granted',
     domain: '.songselect.ccli.com'
+  });
+  
+  // Also set for profile.ccli.com domain (where sign-in actually happens)
+  await page.setCookie({
+    name: 'CookieConsent',
+    value: '-1',
+    domain: '.ccli.com'
+  });
+  
+  await page.setCookie({
+    name: 'CookieConsentBulkTicket',
+    value: 'granted',
+    domain: '.ccli.com'
   });
   
   // Reload page so cookies take effect
@@ -76,9 +89,30 @@ async function loginToSongSelect(page, email, password) {
           signInBtn.click();
         }
       });
-      // Wait for login form to appear
+      // Wait for navigation to profile.ccli.com
+      await page.waitForNavigation({waitUntil: 'domcontentloaded', timeout: 10000}).catch(() => {});
+      // Wait a bit more for page to load
       await page.waitForTimeout(2000);
-      console.log('Clicked Sign In button, waiting for login form');
+      console.log('Navigated after clicking Sign In button');
+      
+      // Dismiss cookie dialog on the new domain if present
+      const clicked = await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('button'));
+        const allowButton = buttons.find(btn => 
+          btn.textContent?.trim() === 'Allow all' ||
+          btn.textContent?.trim() === 'Allow Only Necessary'
+        );
+        if (allowButton) {
+          allowButton.click();
+          return true;
+        }
+        return false;
+      });
+      
+      if (clicked) {
+        console.log('Dismissed cookie dialog on redirected page');
+        await page.waitForTimeout(2000);
+      }
     }
   } catch (signInError) {
     console.log('No Sign In button found or error clicking:', signInError.message);
