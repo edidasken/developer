@@ -260,7 +260,7 @@
       icon: '🙏',
       participants: [_me.uid],
       lastMessage: {
-        text: 'Share your prayer requests here. We\'re praying together!',
+        text: 'Type a prayer request below — it goes straight to the church Prayer Chain.',
         author: 'system',
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       },
@@ -736,6 +736,7 @@
     if (meta) {
       const count = conv.participants?.length || 0;
       if (conv.type === 'sms') meta.textContent = 'SMS • ' + (conv.smsPhone || 'no number');
+      else if (conv.type === 'prayer') meta.textContent = 'Prayer Chain • posts here become church prayer requests';
       else meta.textContent = conv.type === 'dm' ? 'Direct Message' : `${count} ${count === 1 ? 'member' : 'members'}`;
     }
 
@@ -744,7 +745,9 @@
     if (inputEl) {
       inputEl.placeholder = (conv.type === 'sms')
         ? 'Type a message — will open your SMS app…'
-        : 'FlockChat';
+        : (conv.type === 'prayer')
+          ? 'Share a prayer request…'
+          : 'FlockChat';
     }
 
     // Show thread pane (mobile)
@@ -916,14 +919,39 @@
 
       const msgType = conv?.type === 'prayer' ? 'prayer' : conv?.type === 'announcement' ? 'announcement' : 'text';
 
+      // Prayer Chain: also create an actual PrayerRequest in the church's
+      // prayers collection so it shows up in The Prayer Chain admin view
+      // (auto-assigned to the lead pastor by UpperRoom.createPrayer).
+      let createdPrayerId = null;
+      if (msgType === 'prayer' && window.UpperRoom && typeof window.UpperRoom.createPrayer === 'function') {
+        try {
+          createdPrayerId = await window.UpperRoom.createPrayer({
+            submitterName:  _me.displayName || _me.email || 'Anonymous',
+            submitterEmail: _me.email || '',
+            prayerText:     text,
+            category:       'Other',
+            isConfidential: 'FALSE',
+            followUpRequested: 'FALSE'
+          });
+        } catch (err) {
+          console.error('[FlockChat] Failed to create PrayerRequest:', err);
+          _toast('Posted to chat, but failed to log prayer request', 'error');
+        }
+      }
+
       await _db.collection('conversations').doc(_activeConvId).collection('messages').add({
         text,
         author: _me.uid,
         authorName: _me.displayName || _me.email,
         type: msgType,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        prayerCount: msgType === 'prayer' ? 0 : null
+        prayerCount: msgType === 'prayer' ? 0 : null,
+        prayerId: createdPrayerId || null
       });
+
+      if (createdPrayerId) {
+        _toast('🙏 Prayer request submitted to the church', 'success');
+      }
 
       // Update conversation lastMessage
       await _db.collection('conversations').doc(_activeConvId).update({
