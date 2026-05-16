@@ -625,14 +625,14 @@ async function _loadDashboardData(main) {
 
 function _renderSongs(main) {
   // The Shofar expects a container with id="ms-app-container".
-  // Wrap it in .ms-view so it inherits the same side padding as every other view.
-  main.innerHTML = `<div class="ms-view"><div id="ms-app-container"></div></div>`;
+  // Wrap it in .ms-view.ms-dash for navy/gold theme consistency across all FlockStand views.
+  main.innerHTML = `<div class="ms-view ms-dash"><div id="ms-app-container"></div></div>`;
   // Give the DOM a tick to settle, then let The Shofar take over
   requestAnimationFrame(() => {
     try { window.openMusicStandApp(); } catch (err) {
       console.error('[MusicStand] The Shofar failed to open:', err);
       main.innerHTML = `
-        <div class="ms-view">
+        <div class="ms-view ms-dash">
           <div class="ms-empty-state">
             <div class="ms-empty-state-icon">🎵</div>
             <div class="ms-empty-state-title">Song Library unavailable</div>
