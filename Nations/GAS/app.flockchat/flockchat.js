@@ -40,6 +40,8 @@
   let _messages = [];
   let _convUnsub = null;
   let _msgUnsub = null;
+  let _showArchived = false;
+  let _openMenuConvId = null;
 
   /* ── DOM Helpers ────────────────────────────────────────────────────── */
   const $ = id => document.getElementById(id);
@@ -641,6 +643,9 @@
           // participants array → wouldn't match this query anyway, but
           // belt-and-suspenders).
           if (d.id === ANNOUNCEMENTS_ID) return;
+          // Per-user soft delete: if I removed this conversation from my
+          // view, never show it again on this account.
+          if (Array.isArray(d.deletedBy) && d.deletedBy.includes(_me.uid)) return;
           _conversations.push(d);
         });
         _injectAnnouncements();
@@ -700,11 +705,26 @@
     });
   }
 
+  function _isStaticConv(c) {
+    return c && (c._static === true || c.type === 'announcement' || c.type === 'prayer' || c.id === ANNOUNCEMENTS_ID);
+  }
+  function _isArchivedForMe(c) {
+    return c && Array.isArray(c.archivedBy) && c.archivedBy.includes(_me?.uid);
+  }
+
   function _renderConversations() {
     const list = $('fc-list');
     if (!list) return;
 
-    if (_conversations.length === 0) {
+    // Split into visible vs archived (static threads always visible).
+    const archivedCount = _conversations.filter(c => !_isStaticConv(c) && _isArchivedForMe(c)).length;
+    const visible = _conversations.filter(c => {
+      if (_isStaticConv(c)) return true;
+      const archived = _isArchivedForMe(c);
+      return _showArchived ? archived : !archived;
+    });
+
+    if (visible.length === 0 && archivedCount === 0) {
       list.innerHTML = `
         <div class="fc-empty">
           <div class="fc-empty-icon">💬</div>
@@ -715,17 +735,31 @@
       return;
     }
 
-    list.innerHTML = _conversations.map(c => {
+    const rows = visible.map(c => {
       const isActive = c.id === _activeConvId;
       const unread = c.unreadCount || 0;
       const time = _formatTime(c.lastActivity);
       const preview = c.lastMessage?.text || 'No messages yet';
-      
+      const isStatic = _isStaticConv(c);
+      const menuOpen = _openMenuConvId === c.id;
+
       let iconClass = 'fc-conv-icon';
       if (c.type === 'prayer') iconClass += ' prayer';
       if (c.type === 'announcement') iconClass += ' announcement';
       if (c.type === 'dm') iconClass += ' dm';
       if (c.type === 'sms') iconClass += ' sms';
+
+      const actionsBtn = isStatic ? '' : `
+          <button class="fc-conv-actions-btn ${menuOpen ? 'open' : ''}"
+                  title="More"
+                  onclick="event.stopPropagation(); window._toggleConvMenu('${c.id}')">⋯</button>
+          ${menuOpen ? `
+            <div class="fc-conv-menu" onclick="event.stopPropagation()">
+              <button onclick="window._archiveConv('${c.id}')">${_isArchivedForMe(c) ? 'Unarchive' : 'Archive'}</button>
+              <button class="danger" onclick="window._deleteConv('${c.id}')">Delete</button>
+            </div>
+          ` : ''}
+      `;
 
       return `
         <div class="fc-conv-item ${isActive ? 'active' : ''} ${unread > 0 ? 'unread' : ''}"
@@ -741,10 +775,103 @@
             <div class="fc-conv-preview">${_e(preview)}</div>
           </div>
           ${unread > 0 ? `<div class="fc-conv-badge">${unread}</div>` : ''}
+          ${actionsBtn}
         </div>
       `;
     }).join('');
+
+    let footer = '';
+    if (_showArchived) {
+      footer = `<button class="fc-archive-toggle" onclick="window._toggleArchivedView()">← Back to active</button>`;
+    } else if (archivedCount > 0) {
+      footer = `<button class="fc-archive-toggle" onclick="window._toggleArchivedView()">Show archived (${archivedCount})</button>`;
+    }
+
+    list.innerHTML = rows + footer;
   }
+
+  // Close menu when clicking elsewhere
+  document.addEventListener('click', () => {
+    if (_openMenuConvId) {
+      _openMenuConvId = null;
+      _renderConversations();
+    }
+  });
+
+  window._toggleConvMenu = function(convId) {
+    _openMenuConvId = (_openMenuConvId === convId) ? null : convId;
+    _renderConversations();
+  };
+
+  window._toggleArchivedView = function() {
+    _showArchived = !_showArchived;
+    _openMenuConvId = null;
+    _renderConversations();
+  };
+
+  window._archiveConv = async function(convId) {
+    _openMenuConvId = null;
+    const conv = _conversations.find(c => c.id === convId);
+    if (!conv || _isStaticConv(conv)) return;
+    const archived = _isArchivedForMe(conv);
+    try {
+      const op = archived
+        ? firebase.firestore.FieldValue.arrayRemove(_me.uid)
+        : firebase.firestore.FieldValue.arrayUnion(_me.uid);
+      await _db.collection('conversations').doc(convId).update({ archivedBy: op });
+      _toast(archived ? 'Conversation unarchived' : 'Conversation archived', 'success');
+    } catch (err) {
+      console.error('[FlockChat] archive failed:', err);
+      _toast('Failed to update conversation', 'error');
+    }
+  };
+
+  window._deleteConv = async function(convId) {
+    _openMenuConvId = null;
+    const conv = _conversations.find(c => c.id === convId);
+    if (!conv || _isStaticConv(conv)) return;
+    if (!confirm(`Delete "${conv.name}" from your messages?\n\nThe conversation will be removed from your view. Other participants keep their copy.`)) return;
+
+    try {
+      // Soft-delete for me: drop from participants + record in deletedBy.
+      await _db.collection('conversations').doc(convId).update({
+        participants: firebase.firestore.FieldValue.arrayRemove(_me.uid),
+        deletedBy:    firebase.firestore.FieldValue.arrayUnion(_me.uid)
+      });
+
+      // If everyone has deleted it, hard-delete the doc + its messages.
+      const fresh = await _db.collection('conversations').doc(convId).get();
+      const data = fresh.exists ? fresh.data() : null;
+      if (data && Array.isArray(data.participants) && data.participants.length === 0) {
+        try {
+          const msgs = await _db.collection('conversations').doc(convId).collection('messages').get();
+          const batch = _db.batch();
+          msgs.forEach(m => batch.delete(m.ref));
+          batch.delete(_db.collection('conversations').doc(convId));
+          await batch.commit();
+        } catch (e) {
+          // Best-effort hard delete; soft delete already succeeded.
+          console.warn('[FlockChat] hard-delete cleanup failed:', e);
+        }
+      }
+
+      // If we were viewing it, clear the thread.
+      if (_activeConvId === convId) {
+        _activeConvId = null;
+        if (_msgUnsub) { _msgUnsub(); _msgUnsub = null; }
+        const thread = $('fc-thread');
+        if (thread) thread.classList.remove('active');
+        const name = $('fc-thread-name'); if (name) name.textContent = 'Select a conversation';
+        const meta = $('fc-thread-meta'); if (meta) meta.textContent = '';
+        const msgContainer = $('fc-messages');
+        if (msgContainer) msgContainer.innerHTML = '';
+      }
+      _toast('Conversation deleted', 'success');
+    } catch (err) {
+      console.error('[FlockChat] delete failed:', err);
+      _toast('Failed to delete conversation', 'error');
+    }
+  };
 
   /* ── Open Conversation ───────────────────────────────────────────────── */
   window._openConversation = function(convId) {

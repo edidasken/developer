@@ -311,6 +311,72 @@
       color: var(--fc-text);
     }
 
+    /* ─── Per-row action menu (Archive / Delete) ─────────────────────── */
+    .fc-conv-actions-btn {
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      color: var(--fc-text-muted);
+      font-size: 1.1rem;
+      line-height: 1;
+      border-radius: 50%;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.12s, background 0.12s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fc-conv-item:hover .fc-conv-actions-btn,
+    .fc-conv-actions-btn.open { opacity: 1; }
+    .fc-conv-actions-btn:hover { background: var(--fc-divider); }
+    @media (hover: none) {
+      .fc-conv-actions-btn { opacity: 0.7; }
+    }
+    .fc-conv-menu {
+      position: absolute;
+      top: calc(50% + 16px);
+      right: 14px;
+      background: var(--fc-surface);
+      border: 1px solid var(--fc-divider);
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+      z-index: 20;
+      min-width: 160px;
+      overflow: hidden;
+    }
+    .fc-conv-menu button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 10px 14px;
+      background: transparent;
+      border: none;
+      color: var(--fc-text);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .fc-conv-menu button:hover { background: var(--fc-panel); }
+    .fc-conv-menu button.danger { color: #ef4444; }
+
+    .fc-archive-toggle {
+      width: 100%;
+      padding: 12px 20px;
+      background: transparent;
+      border: none;
+      border-top: 1px solid var(--fc-divider);
+      color: var(--fc-text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+    }
+    .fc-archive-toggle:hover { background: var(--fc-panel); color: var(--fc-text); }
+
     .fc-conv-badge {
       position: absolute;
       top: 14px;
