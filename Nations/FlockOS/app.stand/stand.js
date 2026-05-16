@@ -1290,16 +1290,27 @@ function _initSongSelectConnection(main) {
     btn.textContent = 'Connecting...';
 
     try {
-      // Store credentials (in real implementation, these would be sent to backend)
-      _saveSongSelectCredentials({ email, password });
+      // Call Firebase Function to validate credentials
+      const auth = firebase.auth();
+      const functions = firebase.functions();
+      const songSelectAuth = functions.httpsCallable('songSelectAuth');
       
-      main.querySelector('#ss-connect-form').hidden = true;
-      main.querySelector('#ss-connected-view').hidden = false;
-      main.querySelector('#ss-email-display').textContent = email;
-      main.querySelector('#ss-email').value = '';
-      main.querySelector('#ss-password').value = '';
+      const result = await songSelectAuth({ email, password });
       
-      _toast('Connected to SongSelect', 'success');
+      if (result.data && result.data.ok) {
+        // Store credentials locally (encrypted storage would be better)
+        _saveSongSelectCredentials({ email, password });
+        
+        main.querySelector('#ss-connect-form').hidden = true;
+        main.querySelector('#ss-connected-view').hidden = false;
+        main.querySelector('#ss-email-display').textContent = email;
+        main.querySelector('#ss-email').value = '';
+        main.querySelector('#ss-password').value = '';
+        
+        _toast('Connected to SongSelect', 'success');
+      } else {
+        throw new Error('Invalid credentials');
+      }
     } catch (err) {
       _toast('Connection failed: ' + err.message, 'error');
     } finally {
@@ -1372,36 +1383,22 @@ function _clearSongSelectCredentials() {
 }
 
 async function _searchSongSelect(query, credentials) {
-  // NOTE: This is a placeholder implementation
-  // In production, this would make a call to your backend which would:
-  // 1. Use the credentials to authenticate with CCLI SongSelect API
-  // 2. Search for songs
-  // 3. Return results
+  if (!_fb()) throw new Error('Firebase not initialized');
   
-  // For now, return mock data to demonstrate the UI
-  // You would replace this with actual API integration
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        {
-          id: '7118914',
-          title: 'Goodness of God',
-          artist: 'Bethel Music',
-          ccliNumber: '7118914',
-          key: 'C',
-          preview: '{title: Goodness of God}\n{artist: Bethel Music}\n{key: C}\n{ccli: 7118914}\n\n{comment: Verse 1}\n[C]I love You [F]Lord...'
-        },
-        {
-          id: '7036612',
-          title: 'Way Maker',
-          artist: 'Sinach',
-          ccliNumber: '7115744',
-          key: 'D',
-          preview: '{title: Way Maker}\n{artist: Sinach}\n{key: D}\n{ccli: 7115744}\n\n{comment: Verse 1}\n[D]You are here...'
-        }
-      ]);
-    }, 800);
+  const functions = firebase.functions();
+  const songSelectSearch = functions.httpsCallable('songSelectSearch');
+  
+  const result = await songSelectSearch({
+    email: credentials.email,
+    password: credentials.password,
+    query: query
   });
+  
+  if (result.data && result.data.ok) {
+    return result.data.results || [];
+  }
+  
+  throw new Error(result.data?.message || 'Search failed');
 }
 
 function _renderSongSelectResults(el, results) {
@@ -1446,27 +1443,43 @@ async function _importSongSelectSong(song, btn) {
   btn.textContent = 'Importing...';
 
   try {
-    // In production, you would:
-    // 1. Call your backend to get the full ChordPro file from SongSelect
-    // 2. Parse the ChordPro
-    // 3. Save to library
+    if (!_fb()) throw new Error('Firebase not initialized');
     
-    // For now, use the preview data
-    const parsed = _parseChordPro(song.preview);
+    // Get full ChordPro from Firebase Function
+    const credentials = _getSongSelectCredentials();
+    if (!credentials) throw new Error('Not connected to SongSelect');
+    
+    const functions = firebase.functions();
+    const songSelectImport = functions.httpsCallable('songSelectImport');
+    
+    const result = await songSelectImport({
+      email: credentials.email,
+      password: credentials.password,
+      songId: song.songId || song.id
+    });
+    
+    if (!result.data || !result.data.ok) {
+      throw new Error(result.data?.message || 'Import failed');
+    }
+    
+    // Parse and save the ChordPro data
+    const chordPro = result.data.chordPro;
+    const parsed = _parseChordPro(chordPro);
+    
     const payload = {
-      title:         parsed.title || song.title,
-      artist:        parsed.artist || song.artist,
-      defaultKey:    parsed.key || song.key || 'C',
-      chordSheetKey: parsed.key || song.key || 'C',
-      chordSheet:    song.preview || '',
-      ccliNumber:    parsed.ccliNumber || song.ccliNumber || '',
+      title:         parsed.title || result.data.title || song.title,
+      artist:        parsed.artist || result.data.artist || song.artist,
+      defaultKey:    parsed.key || result.data.key || song.key || 'C',
+      chordSheetKey: parsed.key || result.data.key || song.key || 'C',
+      chordSheet:    chordPro,
+      ccliNumber:    parsed.ccliNumber || result.data.ccliNumber || song.ccliNumber || '',
       tempoBpm:      parsed.bpm || '0',
       timeSignature: parsed.timeSignature || '4/4',
       active:        'TRUE',
       notes:         'Imported from SongSelect',
     };
 
-    if (_fb() && UpperRoom.createSong) {
+    if (UpperRoom.createSong) {
       await UpperRoom.createSong(payload);
       S.songs = [];
       _toast(`"${payload.title}" imported successfully`, 'success');

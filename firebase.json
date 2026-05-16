@@ -12,8 +12,8 @@
     "indexes": "flockchat-firestore.indexes.json"
   },
   "functions": {
-    "source": "FlockChat-Functions",
-    "runtime": "nodejs22",
+    "source": "functions",
+    "runtime": "nodejs18",
     "ignore": [
       "node_modules",
       ".git",
