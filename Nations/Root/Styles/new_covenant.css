@@ -14600,7 +14600,7 @@ flock-tabs [role="tablist"], .tabs-bar {
   background: var(--ms-bg);
   /* Header is now a sibling grid row above .ms-body — no clearance needed. */
 }
-.ms-view { padding: 12px 24px 24px; max-width: 1100px; overflow-x: hidden; box-sizing: border-box; }
+.ms-view { padding: 18px 24px 24px; max-width: 1100px; overflow-x: hidden; box-sizing: border-box; }
 .ms-view--wide { max-width: none; }
 
 /* ── Mobile bottom nav — dark navy ───────────────────────────────────────── */
