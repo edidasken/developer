@@ -50,9 +50,16 @@
 
     :root {
       --ws-navy-bg:    #09102e;
+      --ws-navy-deep:  #060a22;
       --ws-navy-card:  #111b44;
+      --ws-navy-card2: #0f1840;
       --ws-gold:       #e8a838;
+      --ws-gold-soft:  rgba(232,168,56,0.22);
       --ws-blue:       #5b8dee;
+      --ws-ink:        #eef1fb;
+      --ws-ink-muted:  rgba(238,241,251,0.66);
+      --ws-line:       rgba(255,255,255,0.08);
+      --ws-line-strong:rgba(232,168,56,0.28);
     }
 
     html, body {
@@ -61,11 +68,14 @@
       -webkit-font-smoothing: antialiased;
       overflow: hidden;
       overscroll-behavior: none;
+      color: #1e293b;
+      background: var(--bg, #f7f8fb);
     }
 
-    body { 
-      display: flex; 
+    body {
+      display: flex;
       flex-direction: column;
+      background: var(--bg, #f7f8fb);
     }
 
     /* ── Main scroll container ──────────────────────────────────── */
@@ -88,11 +98,24 @@
 
     /* ── Hero ───────────────────────────────────────────────────── */
     .ws-hero {
+      position: relative;
       text-align: center;
-      padding: 3rem 2rem;
-      background: var(--ws-navy-bg);
-      border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 3rem 2rem 2.4rem;
+      background:
+        radial-gradient(ellipse 90% 60% at 50% 0%, rgba(91,141,238,0.22) 0%, transparent 70%),
+        linear-gradient(160deg, var(--ws-navy-card) 0%, var(--ws-navy-card2) 55%, #0a1238 100%);
+      border: 1px solid var(--ws-line-strong);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow:
+        0 24px 60px -28px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(255,255,255,0.03) inset,
+        0 0 60px -20px rgba(232,168,56,0.25);
+    }
+    .ws-hero::before {
+      content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2.5px;
+      background: linear-gradient(90deg,#38bdf8 0%,#818cf8 28%,#a78bfa 52%,#e8a838 78%,#34d399 100%);
+      opacity: 0.92; pointer-events: none;
     }
     .ws-hero-icon {
       font-size: 4rem;
@@ -124,80 +147,110 @@
 
     /* ── Cards ──────────────────────────────────────────────────── */
     .ws-card {
-      background: white;
-      border: 1px solid var(--color-line, #e2e8f0);
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      position: relative;
+      background: linear-gradient(165deg, var(--ws-navy-card) 0%, var(--ws-navy-card2) 100%);
+      border: 1px solid var(--ws-line);
+      border-radius: 18px;
+      padding: 1.5rem 1.6rem;
+      box-shadow:
+        0 18px 44px -28px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(255,255,255,0.03) inset;
+      color: var(--ws-ink);
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .ws-card::before {
+      content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px;
+      background: linear-gradient(90deg, transparent 0%, var(--ws-gold-soft) 20%, var(--ws-gold) 50%, var(--ws-gold-soft) 80%, transparent 100%);
+      opacity: 0.55; pointer-events: none;
+    }
+    .ws-card:hover {
+      border-color: var(--ws-gold-soft);
+      box-shadow:
+        0 22px 50px -28px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(232,168,56,0.12) inset,
+        0 0 40px -22px rgba(232,168,56,0.35);
     }
     .ws-card-header {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 1.25rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--color-line, #e2e8f0);
+      gap: 0.7rem;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.9rem;
+      border-bottom: 1px solid var(--ws-line);
     }
     .ws-card-icon {
-      font-size: 1.5rem;
-      opacity: 0.7;
+      font-size: 1.4rem;
+      filter: drop-shadow(0 2px 8px rgba(232,168,56,0.35));
     }
     .ws-card h2 {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      color: var(--color-ink, #1e293b);
+      color: var(--ws-ink);
       flex: 1;
+      letter-spacing: -0.01em;
     }
     .ws-card-body {
       display: flex;
       flex-direction: column;
       gap: 1rem;
+      color: var(--ws-ink);
     }
+    .ws-card-body p { color: rgba(238,241,251,0.82); }
+    .ws-card-body strong { color: var(--ws-gold); font-weight: 700; }
+    .ws-card-body ul { color: rgba(238,241,251,0.82); }
+    .ws-card-body ul strong { color: var(--ws-ink); }
 
     /* ── Status ─────────────────────────────────────────────────── */
     .ws-status {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.2rem;
     }
     .ws-status-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.65rem 0;
+      padding: 0.6rem 0;
+      border-bottom: 1px dashed var(--ws-line);
     }
+    .ws-status-row:last-child { border-bottom: none; }
     .ws-status-label {
-      font-size: 0.9rem;
-      color: var(--color-ink-muted, #64748b);
+      font-size: 0.88rem;
+      color: var(--ws-ink-muted);
       font-weight: 500;
     }
     .ws-status-value {
       font-size: 0.9rem;
-      color: var(--color-ink, #1e293b);
+      color: var(--ws-ink);
       font-weight: 600;
     }
     .ws-badge {
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      padding: 0.3rem 0.7rem;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 600;
+      padding: 0.32rem 0.72rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
     }
     .ws-badge--active {
       background: rgba(232,168,56,0.18);
       color: var(--ws-gold);
-      box-shadow: 0 0 12px rgba(232,168,56,0.25);
+      border: 1px solid rgba(232,168,56,0.35);
+      box-shadow: 0 0 14px rgba(232,168,56,0.3);
     }
     .ws-badge--inactive {
-      background: rgba(100,116,139,0.15);
-      color: #64748b;
+      background: rgba(255,255,255,0.05);
+      color: rgba(238,241,251,0.55);
+      border: 1px solid rgba(255,255,255,0.08);
     }
     .ws-badge--loaded {
       background: rgba(91,141,238,0.18);
       color: var(--ws-blue);
-      box-shadow: 0 0 10px rgba(91,141,238,0.2);
+      border: 1px solid rgba(91,141,238,0.35);
+      box-shadow: 0 0 10px rgba(91,141,238,0.25);
     }
 
     /* ── Buttons ────────────────────────────────────────────────── */
@@ -222,30 +275,32 @@
     }
     .ws-btn--primary {
       background: linear-gradient(135deg, var(--ws-gold), #d89528);
-      color: #09102e;
-      box-shadow: 0 2px 12px rgba(232,168,56,0.35);
+      color: #1a1208;
+      box-shadow: 0 6px 18px -6px rgba(232,168,56,0.55);
     }
     .ws-btn--primary:hover:not(:disabled) {
-      box-shadow: 0 4px 18px rgba(232,168,56,0.5);
+      box-shadow: 0 10px 26px -6px rgba(232,168,56,0.7);
       transform: translateY(-1px);
     }
     .ws-btn--secondary {
-      background: white;
-      color: var(--color-ink, #1e293b);
-      border: 1px solid var(--color-line, #e2e8f0);
+      background: rgba(255,255,255,0.04);
+      color: var(--ws-ink);
+      border: 1px solid rgba(255,255,255,0.16);
     }
     .ws-btn--secondary:hover:not(:disabled) {
-      border-color: var(--ws-blue);
-      background: rgba(91,141,238,0.05);
+      border-color: var(--ws-gold-soft);
+      background: rgba(232,168,56,0.08);
+      color: var(--ws-gold);
     }
     .ws-btn--danger {
-      background: rgba(239,68,68,0.15);
-      color: #ef4444;
-      border: 1px solid rgba(239,68,68,0.3);
+      background: rgba(239,68,68,0.12);
+      color: #fca5a5;
+      border: 1px solid rgba(239,68,68,0.35);
     }
     .ws-btn--danger:hover:not(:disabled) {
-      background: rgba(239,68,68,0.25);
-      border-color: rgba(239,68,68,0.5);
+      background: rgba(239,68,68,0.2);
+      border-color: rgba(239,68,68,0.55);
+      color: #fecaca;
     }
     .ws-btn--full {
       width: 100%;
@@ -256,21 +311,22 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem;
+      padding: 1rem 1.1rem;
       background: rgba(91,141,238,0.08);
       border-radius: 12px;
-      border: 1px solid var(--ws-line);
+      border: 1px solid rgba(91,141,238,0.18);
     }
     .ws-toggle-label {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 600;
-      color: var(--color-ink, #1e293b);
+      color: var(--ws-ink);
     }
     .ws-toggle {
       position: relative;
       width: 50px;
       height: 28px;
-      background: #cbd5e1;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.08);
       border-radius: 14px;
       cursor: pointer;
       transition: background 0.2s;
@@ -311,44 +367,79 @@
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
-      border: 2px dashed var(--color-line, #e2e8f0);
-      border-radius: 12px;
-      background: rgba(91,141,238,0.02);
+      padding: 1rem 1.25rem;
+      border: 1.5px dashed rgba(255,255,255,0.18);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.02);
       cursor: pointer;
       transition: all 0.15s;
       font-size: 0.9rem;
       font-weight: 600;
-      color: var(--color-ink-muted, #64748b);
+      color: rgba(238,241,251,0.78);
     }
     .ws-file-label:hover {
       border-color: var(--ws-gold);
-      background: rgba(232,168,56,0.12);
+      background: rgba(232,168,56,0.08);
       color: var(--ws-gold);
     }
 
     /* ── Info box ───────────────────────────────────────────────── */
     .ws-info {
-      background: rgba(91,141,238,0.06);
-      border: 1px solid rgba(91,141,238,0.15);
+      background:
+        linear-gradient(180deg, rgba(91,141,238,0.10) 0%, rgba(91,141,238,0.04) 100%);
+      border: 1px solid rgba(91,141,238,0.22);
       border-radius: 12px;
-      padding: 1rem;
+      padding: 0.95rem 1.05rem;
       font-size: 0.87rem;
       line-height: 1.6;
-      color: var(--color-ink, #1e293b);
+      color: rgba(238,241,251,0.82);
     }
     .ws-info-title {
       font-weight: 700;
       margin-bottom: 0.35rem;
       color: var(--ws-blue);
+      letter-spacing: 0.01em;
+    }
+    .ws-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .ws-info-label {
+      font-size: 0.85rem;
+      color: var(--ws-ink-muted);
+      font-weight: 500;
+    }
+
+    /* Dark inputs inside cards */
+    .ws-card-body input[type="text"],
+    .ws-card-body input[type="url"],
+    .ws-card-body input[type="password"] {
+      background: rgba(0,0,0,0.28) !important;
+      border: 1px solid rgba(255,255,255,0.12) !important;
+      border-radius: 12px !important;
+      color: var(--ws-ink) !important;
+      font-family: inherit !important;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+      -webkit-appearance: none;
+    }
+    .ws-card-body input::placeholder { color: rgba(238,241,251,0.35); }
+    .ws-card-body input[type="text"]:focus,
+    .ws-card-body input[type="url"]:focus,
+    .ws-card-body input[type="password"]:focus {
+      border-color: var(--ws-gold) !important;
+      background: rgba(0,0,0,0.4) !important;
+      box-shadow: 0 0 0 3px rgba(232,168,56,0.18);
     }
 
     /* ── Loading ────────────────────────────────────────────────── */
     .ws-loading {
       display: none;
       text-align: center;
-      padding: 2rem;
-      color: var(--color-ink-muted, #64748b);
+      padding: 1.5rem;
+      color: var(--ws-ink-muted);
     }
     .ws-loading.active {
       display: block;
@@ -357,7 +448,7 @@
       display: inline-block;
       width: 32px;
       height: 32px;
-      border: 3px solid #e2e8f0;
+      border: 3px solid rgba(255,255,255,0.10);
       border-top-color: var(--ws-gold);
       border-radius: 50%;
       animation: ws-spin 0.8s linear infinite;
@@ -426,7 +517,7 @@
               <li><strong>Free forever:</strong> No hosting costs, no vendor lock-in, no surprise shutdowns</li>
             </ul>
           </div>
-          <p style="font-size: 1.05rem; line-height: 1.75; margin-top: 1.5rem; padding: 1.25rem 1.5rem; color: var(--color-ink, #1e293b); font-style: italic; border-left: 4px solid var(--ws-gold); background: rgba(232,168,56,0.04); border-radius: 0 12px 12px 0;">
+          <p style="font-size: 1.05rem; line-height: 1.75; margin-top: 1.5rem; padding: 1.25rem 1.5rem; color: rgba(238,241,251,0.92); font-style: italic; border-left: 4px solid var(--ws-gold); background: rgba(232,168,56,0.06); border-radius: 0 12px 12px 0;">
             "The wind blows wherever it pleases. You hear its sound, but you cannot tell where it comes from 
             or where it is going. So it is with everyone born of the Spirit." — John 3:8
             <br><br>

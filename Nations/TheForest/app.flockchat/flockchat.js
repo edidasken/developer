@@ -30,6 +30,7 @@
   /* ── Constants ─────────────────────────────────────────────────────── */
   const VERSION = 'v3.0.0';
   const MSG_LIMIT = 100;
+  const ANNOUNCEMENTS_ID = 'announcements';
 
   /* ── State ─────────────────────────────────────────────────────────── */
   let _db = null;
@@ -233,48 +234,39 @@
 
   /* ── Seed Default Conversations ─────────────────────────────────────── */
   async function _seedConversations() {
-    const snap = await _db.collection('conversations').limit(1).get();
-    if (!snap.empty) return; // Already seeded
-
-    console.log('[FlockChat] Seeding default conversations');
-
     // (Church Announcements is NOT seeded — it's a single shared doc at
     //  conversations/announcements, mirrored from the_announcements view.
     //  FlockChat injects it as a static entry in _renderConversations.)
 
-    // 2. Prayer Chain
-    await _db.collection('conversations').add({
-      type: 'prayer',
-      name: 'Prayer Chain',
-      icon: '🙏',
-      participants: [_me.uid],
-      lastMessage: {
-        text: 'Type a prayer request below — it goes straight to the church Prayer Chain.',
-        author: 'system',
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      },
-      lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
-      unreadCount: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      createdBy: _me.uid
-    });
-
-    // 3. General Chat
-    await _db.collection('conversations').add({
-      type: 'group',
-      name: 'General Chat',
-      icon: '👥',
-      participants: [_me.uid],
-      lastMessage: {
-        text: 'This is the place for general conversation and fellowship!',
-        author: 'system',
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      },
-      lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
-      unreadCount: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      createdBy: _me.uid
-    });
+    // Prayer Chain is per-user (a private funnel into the church Prayer
+    // Chain). Make sure THIS user has one — independently of whether other
+    // users have already seeded their own.
+    try {
+      const mine = await _db.collection('conversations')
+        .where('type', '==', 'prayer')
+        .where('participants', 'array-contains', _me.uid)
+        .limit(1).get();
+      if (mine.empty) {
+        console.log('[FlockChat] Seeding Prayer Chain for', _me.uid);
+        await _db.collection('conversations').add({
+          type: 'prayer',
+          name: 'Prayer Chain',
+          icon: '🙏',
+          participants: [_me.uid],
+          lastMessage: {
+            text: 'Type a prayer request below — it goes straight to the church Prayer Chain.',
+            author: 'system',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+          },
+          lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
+          unreadCount: 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdBy: _me.uid
+        });
+      }
+    } catch (err) {
+      console.warn('[FlockChat] Prayer Chain seed failed:', err);
+    }
   }
 
   /* ── Mount App ──────────────────────────────────────────────────────── */
@@ -617,10 +609,9 @@
         }).catch(() => {});
       }
 
-      // Open the thread (composer will route sends to native SMS).
+      // Open the thread — user types in the FlockChat composer; pressing
+      // Send packages the message and hands it off to the native SMS app.
       window._openConversation(convId);
-      // Also launch the native composer immediately for first-tap convenience.
-      _launchSms(phone, '');
     } catch (err) {
       console.error('[FlockChat] Failed to start SMS conversation:', err);
       _toast('Failed to start SMS: ' + (err.message || 'Unknown'), 'error');
@@ -630,6 +621,13 @@
   /* ── Load Conversations ──────────────────────────────────────────────── */
   function _loadConversations() {
     if (_convUnsub) _convUnsub();
+
+    // Render the static pinned threads (Church Announcements) immediately
+    // so the list never looks empty — even if the conversations query is
+    // still loading or fails outright.
+    _conversations = [];
+    _injectAnnouncements();
+    _renderConversations();
 
     _convUnsub = _db.collection('conversations')
       .where('participants', 'array-contains', _me.uid)
@@ -653,6 +651,10 @@
       }, err => {
         console.error('[FlockChat] Failed to load conversations:', err);
         _toast('Failed to load conversations', 'error');
+        // Even on error, keep statics visible so the user isn't stranded.
+        _conversations = [];
+        _injectAnnouncements();
+        _renderConversations();
       });
   }
 
@@ -1120,7 +1122,8 @@
 
       // SMS conversations: hand off to the native SMS composer with the
       // text prefilled, and log the attempt so the thread + recents update.
-      if (conv?.type === 'sms') {        const phone = conv.smsPhone;
+      if (conv?.type === 'sms') {
+        const phone = conv.smsPhone;
         if (!phone) { _toast('No phone on file for this contact', 'error'); return; }
         _launchSms(phone, text);
         await _db.collection('conversations').doc(_activeConvId).collection('messages').add({
@@ -1138,6 +1141,27 @@
           },
           lastActivity: firebase.firestore.FieldValue.serverTimestamp()
         });
+        // Log to the member's ContactLog so it shows up on their Fold page.
+        if (conv.smsMemberUid && window.UpperRoom && typeof window.UpperRoom.createContact === 'function') {
+          try {
+            const today = new Date().toISOString().slice(0, 10);
+            await window.UpperRoom.createContact({
+              memberId:           conv.smsMemberUid,
+              contactDate:        today,
+              contactType:        'Text',
+              direction:          'Outbound',
+              subject:            'FlockChat → SMS',
+              details:            text,
+              followUpNeeded:     'FALSE',
+              followUpDate:       '',
+              followUpCompleted:  'FALSE',
+              contactedBy:        _me.displayName || _me.email || ''
+            });
+          } catch (logErr) {
+            console.warn('[FlockChat] ContactLog write failed:', logErr);
+          }
+        }
+        _toast('📲 SMS opened — tap Send in your messages app', 'success');
         input.value = '';
         input.style.height = 'auto';
         return;

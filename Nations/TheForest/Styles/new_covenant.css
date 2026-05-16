@@ -15453,7 +15453,7 @@ body:not(.veil-app):not([class*="-app"]) .ptr-indicator {
 .unity-header {
   display: flex; align-items: center; gap: 8px;
   padding: var(--safe-top, 0px) 14px 0;
-  height: calc(56px + var(--safe-top, 0px));
+  height: calc(var(--topbar-h, 60px) + var(--safe-top, 0px));
   background: var(--top-bg, #0c1445);
   color: var(--top-ink, #fff);
   border-bottom: none;
