@@ -376,26 +376,44 @@
 
   async function _loadUsers() {
     try {
-      const snap = await _db.collection('users').orderBy('displayName').get();
-      _allUsers = [];
-      console.log('[FlockChat] Loading users. Current user UID:', _me.uid);
+      // Source of truth = The Fold (members collection), NOT the chat-only
+      // `users` collection (which accumulates duplicates from every sign-in).
+      const snap = await _db.collection('members').orderBy('lastName').get();
+      const myEmail = (_me.email || '').toLowerCase();
+      const byEmail = new Map();
       snap.forEach(doc => {
-        const u = doc.data();
-        u.uid = doc.id;
-        console.log('[FlockChat] User doc:', u.uid, u.displayName, u.email);
-        // Don't include self
-        if (u.uid !== _me.uid) {
-          _allUsers.push(u);
-        }
+        const m = doc.data() || {};
+        m.uid = doc.id;
+        // Filter out archived/inactive
+        const ms = String(m.membershipStatus || '').toLowerCase();
+        const st = String(m.status || '').toLowerCase();
+        if (ms === 'archived' || st === 'inactive' || st === 'archived') return;
+        // Normalize display fields for the renderer
+        const first = m.firstName || '';
+        const last  = m.lastName  || '';
+        const name  = m.displayName || m.name || (first + ' ' + last).trim() || m.primaryEmail || m.email || 'Unknown';
+        const email = (m.primaryEmail || m.email || '').toLowerCase();
+        if (!email && !name) return;
+        // Exclude self by email (uid won't match — Auth uid vs member doc id)
+        if (email && email === myEmail) return;
+        // Dedupe by email (fall back to uid when email missing)
+        const key = email || m.uid;
+        if (byEmail.has(key)) return;
+        byEmail.set(key, {
+          uid: m.uid,
+          displayName: name,
+          email: email,
+          role: m.role || m.memberType || 'member'
+        });
       });
-      console.log('[FlockChat] Loaded', _allUsers.length, 'other users (excluding self)');
-      
-      // If database only has current user, show helpful message
+      _allUsers = Array.from(byEmail.values())
+        .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''));
+      console.log('[FlockChat] Loaded', _allUsers.length, 'members from The Fold');
       if (_allUsers.length === 0) {
-        _toast('No other members found. Invite team members to get started!', 'info');
+        _toast('No other members found in The Fold yet.', 'info');
       }
     } catch (err) {
-      console.error('[FlockChat] Failed to load users:', err);
+      console.error('[FlockChat] Failed to load members:', err);
       _toast('Failed to load members', 'error');
     }
   }
