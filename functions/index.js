@@ -10,6 +10,13 @@ admin.initializeApp();
  * Returns the authenticated page
  */
 async function loginToSongSelect(page, email, password) {
+  // Hide webdriver properties to avoid bot detection
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'webdriver', {
+      get: () => false,
+    });
+  });
+  
   // Go to SongSelect login
   await page.goto('https://songselect.ccli.com/account/signin', {
     waitUntil: 'domcontentloaded',
@@ -17,11 +24,16 @@ async function loginToSongSelect(page, email, password) {
   });
   
   // Wait a bit for any JavaScript to load the login form
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(3000);
 
   // Check current URL - might have been redirected
   const currentUrl = page.url();
   console.log('Current URL after navigation:', currentUrl);
+  
+  // Check if we got redirected (might indicate we're already logged in or blocked)
+  if (!currentUrl.includes('signin') && !currentUrl.includes('login')) {
+    console.warn('Redirected away from signin page to:', currentUrl);
+  }
 
   // Try multiple possible selectors for email/username field
   let emailSelector = null;
@@ -59,16 +71,37 @@ async function loginToSongSelect(page, email, password) {
       }));
     });
     const buttons = await page.evaluate(() => {
-      return Array.from(document.querySelectorAll('button, a.button')).map(btn => ({
+      return Array.from(document.querySelectorAll('button, a.button, a[href*="sign"], a[href*="login"]')).map(btn => ({
         text: btn.textContent?.trim(),
         className: btn.className,
         href: btn.href || null
-      })).slice(0, 10);
+      })).slice(0, 15);
     });
+    const iframes = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('iframe')).map(iframe => ({
+        src: iframe.src,
+        id: iframe.id,
+        name: iframe.name
+      }));
+    });
+    const pageStructure = await page.evaluate(() => {
+      const forms = Array.from(document.querySelectorAll('form')).map(f => ({
+        id: f.id,
+        className: f.className,
+        action: f.action,
+        inputCount: f.querySelectorAll('input').length
+      }));
+      const mainContent = document.body?.textContent?.substring(0, 500);
+      return {forms, mainContent};
+    });
+    
     console.error(`Login form not found. URL: ${pageUrl}, Title: ${pageTitle}`);
     console.error('Available input fields:', JSON.stringify(inputFields, null, 2));
-    console.error('Available buttons:', JSON.stringify(buttons, null, 2));
-    throw new Error(`Login form not found. URL: ${pageUrl}, Available inputs: ${JSON.stringify(inputFields)}`);
+    console.error('Available buttons/links:', JSON.stringify(buttons, null, 2));
+    console.error('Iframes:', JSON.stringify(iframes, null, 2));
+    console.error('Page structure:', JSON.stringify(pageStructure, null, 2));
+    
+    throw new Error(`Login form not found. URL: ${pageUrl}, Inputs: ${JSON.stringify(inputFields)}, Buttons: ${JSON.stringify(buttons)}, Forms: ${JSON.stringify(pageStructure.forms)}`);
   }
   
   // Find password selector
@@ -131,8 +164,18 @@ exports.songSelectAuth = onCall({
 
   let browser;
   try {
+    // Add extra stealth args to avoid bot detection
+    const stealthArgs = [
+      ...chromium.args,
+      '--disable-blink-features=AutomationControlled',
+      '--disable-dev-shm-usage',
+      '--no-first-run',
+      '--no-default-browser-check',
+      '--disable-infobars'
+    ];
+    
     browser = await puppeteer.launch({
-      args: chromium.args,
+      args: stealthArgs,
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
       headless: chromium.headless
@@ -178,8 +221,18 @@ exports.songSelectSearch = onCall({
 
   let browser;
   try {
+    // Add extra stealth args to avoid bot detection
+    const stealthArgs = [
+      ...chromium.args,
+      '--disable-blink-features=AutomationControlled',
+      '--disable-dev-shm-usage',
+      '--no-first-run',
+      '--no-default-browser-check',
+      '--disable-infobars'
+    ];
+    
     browser = await puppeteer.launch({
-      args: chromium.args,
+      args: stealthArgs,
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
       headless: chromium.headless
@@ -256,8 +309,18 @@ exports.songSelectImport = onCall({
 
   let browser;
   try {
+    // Add extra stealth args to avoid bot detection
+    const stealthArgs = [
+      ...chromium.args,
+      '--disable-blink-features=AutomationControlled',
+      '--disable-dev-shm-usage',
+      '--no-first-run',
+      '--no-default-browser-check',
+      '--disable-infobars'
+    ];
+    
     browser = await puppeteer.launch({
-      args: chromium.args,
+      args: stealthArgs,
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
       headless: chromium.headless
