@@ -312,37 +312,37 @@ function msEnsureStyles() {
     var style = document.createElement('style');
     style.id = 'ms-styles';
     style.textContent = [
-        '.ms-app { padding:0 0 var(--scroll-tail-pad) 0; color:#111827; font-family:Inter,sans-serif; }',
-        '.ms-card { background:#ffffff; border:1px solid rgba(0,0,0,0.08); border-radius:14px; padding:18px; margin-bottom:14px; box-shadow:0 10px 24px rgba(15,23,42,0.04); }',
-        '.ms-title { margin:0 0 8px 0; font-family:Merriweather,serif; font-size:1.55rem; color:#111827; text-align:center; }',
-        '.ms-subtitle { margin:0; color:#6b7280; font-size:0.96rem; text-align:center; }',
+        '.ms-app { padding:0 0 var(--scroll-tail-pad) 0; color:rgba(255,255,255,0.86); font-family:Inter,sans-serif; }',
+        '.ms-card { background:linear-gradient(135deg, #0f1735 0%, #1b264f 100%); border:1px solid rgba(232,168,56,0.25); border-radius:14px; padding:18px; margin-bottom:14px; box-shadow:0 10px 24px rgba(15,23,42,0.15); }',
+        '.ms-title { margin:0 0 8px 0; font-family:Merriweather,serif; font-size:1.55rem; color:#ffffff; text-align:center; }',
+        '.ms-subtitle { margin:0; color:rgba(255,255,255,0.65); font-size:0.96rem; text-align:center; }',
 
         /* Tabs */
-        '.ms-tabs { display:flex; gap:0; border-bottom:1px solid rgba(0,0,0,0.08); margin-bottom:18px; }',
-        '.ms-tab-btn { flex:1; padding:14px 8px; background:transparent; color:#94a3b8; border:none; border-bottom:2px solid transparent; font-weight:700; font-size:1rem; cursor:pointer; transition:all 0.2s; font-family:Inter,sans-serif; }',
-        '.ms-tab-btn.ms-active { color:#c97d10; border-bottom-color:#c97d10; background:rgba(201,125,16,0.05); }',
+        '.ms-tabs { display:flex; gap:0; border-bottom:1px solid rgba(232,168,56,0.25); margin-bottom:18px; }',
+        '.ms-tab-btn { flex:1; padding:14px 8px; background:transparent; color:rgba(255,255,255,0.55); border:none; border-bottom:2px solid transparent; font-weight:700; font-size:1rem; cursor:pointer; transition:all 0.2s; font-family:Inter,sans-serif; }',
+        '.ms-tab-btn.ms-active { color:#e8a838; border-bottom-color:#e8a838; background:rgba(232,168,56,0.08); }',
 
         /* Table */
         '.ms-table { width:100%; border-collapse:collapse; font-size:0.92rem; }',
-        '.ms-table th { padding:10px 8px; text-align:left; color:#6b7280; font-weight:600; font-size:0.8rem; text-transform:uppercase; border-bottom:1px solid rgba(0,0,0,0.10); }',
-        '.ms-table td { padding:10px 8px; border-bottom:1px solid rgba(0,0,0,0.06); color:#111827; }',
-        '.ms-table tr:hover td { background:rgba(0,0,0,0.03); }',
+        '.ms-table th { padding:10px 8px; text-align:left; color:rgba(255,255,255,0.55); font-weight:600; font-size:0.8rem; text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.12); }',
+        '.ms-table td { padding:10px 8px; border-bottom:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.86); }',
+        '.ms-table tr:hover td { background:rgba(255,255,255,0.05); }',
 
         /* Buttons */
         '.ms-btn { display:inline-flex; align-items:center; gap:6px; padding:10px 18px; border-radius:10px; border:none; font-weight:700; font-size:0.95rem; cursor:pointer; transition:all 0.15s; font-family:Inter,sans-serif; }',
-        '.ms-btn-primary { background:linear-gradient(135deg,#c97d10,#b56c0a); color:#fff; }',
+        '.ms-btn-primary { background:linear-gradient(135deg,#e8a838,#d4941f); color:#0f172a; }',
         '.ms-btn-primary:hover { filter:brightness(1.1); }',
-        '.ms-btn-secondary { background:#f3f4f6; color:#374151; border:1px solid rgba(0,0,0,0.12); }',
-        '.ms-btn-secondary:hover { background:#e5e7eb; }',
-        '.ms-btn-danger { background:rgba(220,38,38,0.08); color:#dc2626; border:1px solid rgba(220,38,38,0.25); }',
-        '.ms-btn-danger:hover { background:rgba(220,38,38,0.15); }',
+        '.ms-btn-secondary { background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.86); border:1px solid rgba(255,255,255,0.15); }',
+        '.ms-btn-secondary:hover { background:rgba(255,255,255,0.12); }',
+        '.ms-btn-danger { background:rgba(220,38,38,0.12); color:#fca5a5; border:1px solid rgba(220,38,38,0.35); }',
+        '.ms-btn-danger:hover { background:rgba(220,38,38,0.2); }',
         '.ms-btn-sm { padding:6px 12px; font-size:0.85rem; border-radius:8px; }',
 
         /* Form */
         '.ms-form-group { margin-bottom:14px; }',
-        '.ms-label { display:block; margin-bottom:4px; color:#6b7280; font-size:0.85rem; font-weight:600; text-transform:uppercase; }',
-        '.ms-input { width:100%; padding:10px 12px; background:#f9fafb; border:1px solid rgba(0,0,0,0.15); border-radius:10px; color:#111827; font-size:0.95rem; font-family:Inter,sans-serif; box-sizing:border-box; }',
-        '.ms-input:focus { outline:none; border-color:#c97d10; box-shadow:0 0 0 2px rgba(201,125,16,0.15); }',
+        '.ms-label { display:block; margin-bottom:4px; color:#e8a838; font-size:0.85rem; font-weight:600; text-transform:uppercase; }',
+        '.ms-input { width:100%; padding:10px 12px; background:#ffffff; border:1px solid rgba(0,0,0,0.15); border-radius:10px; color:#111827; font-size:0.95rem; font-family:Inter,sans-serif; box-sizing:border-box; }',
+        '.ms-input:focus { outline:none; border-color:#e8a838; box-shadow:0 0 0 2px rgba(232,168,56,0.2); }',
         '.ms-textarea { resize:vertical; min-height:100px; }',
         '.ms-select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'8\' viewBox=\'0 0 12 8\'%3E%3Cpath d=\'M1 1l5 5 5-5\' stroke=\'%2394a3b8\' stroke-width=\'2\' fill=\'none\'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:36px; }',
 
@@ -351,9 +351,9 @@ function msEnsureStyles() {
         '.ms-search-input { flex:1; min-width:160px; }',
 
         /* Overlay / Modal */
-        '.ms-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); z-index:9999; display:none; align-items:center; justify-content:center; padding:16px; }',
+        '.ms-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.65); z-index:9999; display:none; align-items:center; justify-content:center; padding:16px; }',
         '.ms-overlay.ms-visible { display:flex; }',
-        '.ms-modal { background:#ffffff; border:1px solid rgba(0,0,0,0.10); border-radius:18px; padding:18px 20px; width:100%; max-width:640px; max-height:85vh; overflow-y:auto; color:#111827; }',
+        '.ms-modal { background:linear-gradient(135deg, #0f1735 0%, #1b264f 100%); border:1px solid rgba(232,168,56,0.35); border-radius:18px; padding:18px 20px; width:100%; max-width:640px; max-height:85vh; overflow-y:auto; color:rgba(255,255,255,0.86); }',
         '.ms-modal--fullscreen { max-width:100%; max-height:100%; width:100%; height:100%; border-radius:0; border:none; display:flex; flex-direction:column; padding:12px 18px 10px 18px; }',
         /* in play view: strip inner card chrome and let CSS columns fill the height */
         '.ms-modal--fullscreen .ms-chord-display { flex:1; min-height:0; overflow-y:auto; margin-bottom:0; padding:6px 0; border:none; border-radius:0; background:transparent; box-shadow:none; }',
@@ -365,9 +365,9 @@ function msEnsureStyles() {
         '.ms-modal--fullscreen .ms-cp-section-label { font-size:0.72rem; margin-bottom:4px; }',
         '.ms-modal--fullscreen .ms-cp-spacer { height:8px; }',
         '.ms-modal-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; gap:8px; }',
-        '.ms-modal-title { margin:0; font-family:Merriweather,serif; font-size:1.05rem; color:#111827; }',
-        '.ms-close-btn { background:none; border:none; color:#6b7280; font-size:1.2rem; cursor:pointer; padding:0 4px; }',
-        '.ms-close-btn:hover { color:#111827; }',
+        '.ms-modal-title { margin:0; font-family:Merriweather,serif; font-size:1.05rem; color:#ffffff; }',
+        '.ms-close-btn { background:none; border:none; color:rgba(255,255,255,0.65); font-size:1.2rem; cursor:pointer; padding:0 4px; }',
+        '.ms-close-btn:hover { color:#ffffff; }',
 
         /* FlockStand full-screen view */
         '.ms-stand-view { min-height:60vh; }',
@@ -438,7 +438,7 @@ function msEnsureStyles() {
         /* Arrangement card */
         '.ms-arr-card { background:#f9fafb; border:1px solid rgba(0,0,0,0.09); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; }',
         '.ms-arr-info { flex:1; min-width:200px; }',
-        '.ms-arr-key { font-weight:700; color:#c97d10; }',
+        '.ms-arr-key { font-weight:700; color:#e8a838; }',
 
         /* ── Section visibility strip ── */
         '.ms-sec-strip { display:flex; gap:5px; flex-wrap:wrap; padding:4px 0 6px; flex-shrink:0; }',
@@ -710,10 +710,10 @@ function msRenderSongsTab() {
         for (var i = 0; i < songs.length; i++) {
             var s = songs[i];
             html += '<tr data-song-idx="' + i + '" data-title="' + msEscapeHtml(s.title || '') + '" data-artist="' + msEscapeHtml(s.artist || '') + '">' +
-                '<td><a href="#" class="ms-song-link" data-song-idx="' + i + '" style="color:#c97d10;text-decoration:none;font-weight:600;">' + msEscapeHtml(s.title) + '</a></td>' +
-                '<td style="color:#6b7280;">' + msEscapeHtml(s.artist) + '</td>' +
+                '<td><a href="#" class="ms-song-link" data-song-idx="' + i + '" style="color:#e8a838;text-decoration:none;font-weight:600;">' + msEscapeHtml(s.title) + '</a></td>' +
+                '<td style="color:rgba(255,255,255,0.65);">' + msEscapeHtml(s.artist) + '</td>' +
                 '<td><span class="ms-stand-badge">' + msEscapeHtml(s.defaultKey || '—') + '</span></td>' +
-                '<td style="color:#6b7280;">' + (s.tempoBpm || '—') + '</td>' +
+                '<td style="color:rgba(255,255,255,0.65);">' + (s.tempoBpm || '—') + '</td>' +
                 '<td style="white-space:nowrap;">' +
                     '<button class="ms-btn ms-btn-primary ms-btn-sm ms-play-song" data-song-idx="' + i + '">&#9654; Play</button> ' +
                     '<button class="ms-btn ms-btn-secondary ms-btn-sm ms-edit-song" data-row-index="' + s.index + '" data-song-idx="' + i + '">Edit</button> ' +

@@ -14770,57 +14770,56 @@ flock-tabs [role="tablist"], .tabs-bar {
 /* ── FlockStand hero ─────────────────────────────────────────────────────── */
 .ms-hero {
   padding: 38px 28px 30px !important;
-  background: linear-gradient(180deg, #fffaf0 0%, #fffefb 60%, #fffaf0 100%);
-  border: 1px solid var(--ms-gold-glow, #e7d59a) !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 8px 22px -16px rgba(168,85,247,.18);
+  background: linear-gradient(135deg, var(--dash-navy-1) 0%, var(--dash-navy-2) 100%);
+  border: 1px solid rgba(232,168,56,0.35) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 8px 22px -16px rgba(232,168,56,.2);
   margin-bottom: 22px;
 }
 .ms-hero::before {
   content: "";
   position: absolute; left: 0; right: 0; top: 0; height: 3px;
-  background: linear-gradient(90deg, #a855f7 0%, #ec4899 50%, #f59e0b 100%);
+  background: linear-gradient(90deg, var(--dash-gold) 0%, #f59e0b 50%, #eab308 100%);
   opacity: .85;
 }
 .ms-hero-glyph {
   font-size: 2rem; line-height: 1; margin-bottom: 8px;
   display: inline-block;
-  filter: drop-shadow(0 2px 6px rgba(168,85,247,.25));
+  filter: drop-shadow(0 2px 6px rgba(232,168,56,.3));
 }
 .ms-hero-title {
   font-family: 'Playfair Display', Georgia, serif !important;
   font-size: clamp(1.9rem, 3.6vw, 2.6rem) !important;
   font-weight: 800; letter-spacing: -.015em;
-  background: linear-gradient(90deg, #1f1147 0%, #4c1d95 55%, #a855f7 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
+  color: #ffffff;
   margin: 0 0 10px;
 }
 .ms-hero-verse {
   font-style: italic;
   font-size: .92rem;
-  color: var(--ms-ink-muted);
+  color: rgba(255,255,255,0.72);
   max-width: 640px; margin: 4px auto 14px;
   line-height: 1.55;
 }
 .ms-hero-ref {
   font-style: normal; font-weight: 700;
-  color: #a855f7; letter-spacing: .02em;
+  color: var(--dash-gold); letter-spacing: .02em;
   margin-left: 4px;
 }
 .ms-hero-lede {
   font-size: 1.02rem !important;
-  color: var(--ms-ink) !important;
+  color: rgba(255,255,255,0.86) !important;
   max-width: 680px; margin: 0 auto 18px;
   line-height: 1.55;
 }
 .ms-hero-pillars {
   display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center;
-  gap: 6px 12px; font-size: .82rem; color: var(--ms-ink-muted);
+  gap: 6px 12px; font-size: .82rem; color: rgba(255,255,255,0.78);
   padding: 8px 18px; border-radius: 999px;
-  background: rgba(168,85,247,.06);
-  border: 1px solid rgba(168,85,247,.15);
+  background: rgba(232,168,56,0.12);
+  border: 1px solid rgba(232,168,56,0.28);
 }
-.ms-hero-pillars strong { color: #4c1d95; font-weight: 700; margin-right: 2px; }
-.ms-hero-dot { color: #a855f7; opacity: .55; }
+.ms-hero-pillars strong { color: var(--dash-gold); font-weight: 700; margin-right: 2px; }
+.ms-hero-dot { color: var(--dash-gold); opacity: .65; }
 @media (max-width: 540px) {
   .ms-hero { padding: 28px 18px 22px !important; }
   .ms-hero-pillars { font-size: .76rem; padding: 8px 14px; }
