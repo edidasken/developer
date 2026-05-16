@@ -71,7 +71,18 @@ const _esc = _e;
 
 function _fmtDate(ts) {
   if (!ts) return '';
-  return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  // Firestore Timestamp objects expose toDate() / toMillis(); raw numbers / ISO strings work directly.
+  var d;
+  if (typeof ts === 'object' && ts !== null) {
+    if (typeof ts.toDate === 'function')      d = ts.toDate();
+    else if (typeof ts.toMillis === 'function') d = new Date(ts.toMillis());
+    else if (typeof ts.seconds === 'number')    d = new Date(ts.seconds * 1000);
+    else                                        d = new Date(ts);
+  } else {
+    d = new Date(ts);
+  }
+  if (!d || isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 // ── Firestore / GAS / localStorage storage layer ─────────────────────────────
@@ -477,26 +488,48 @@ function _renderLibrary() {
     return;
   }
 
-  grid.innerHTML = shows.map(show => {
-    const pips = show.slides.slice(0, 10).map(sl =>
-      `<div class="fs-slide-pip" style="background:${_e(_slideBg(sl, show))}"></div>`).join('');
+  // Slim Vespers-themed banner sits above the show grid so the encouragement
+  // copy stays in front of pastors even after their library fills up.
+  const banner = `
+    <div class="fs-lib-banner devo-dark-card">
+      <div class="fs-lib-banner-body">
+        <div class="fs-lib-banner-eyebrow">
+          <span>For the Shepherds</span>
+          <span class="fs-lib-banner-pill">Free \u2022 Forever</span>
+        </div>
+        <div class="fs-lib-banner-msg">
+          We are praying for you. We love you. Thank you for the work you do.
+        </div>
+      </div>
+    </div>`;
+
+  const cards = shows.map(show => {
+    const dateStr = _fmtDate(show.updatedAt || show.createdAt);
+    const pips = show.slides.slice(0, 10).map(sl => {
+      const bg = _slideBg(sl, show);
+      const fg = _slideCol(sl, show);
+      const icon = _e(SLIDE_TYPES[sl.type] && SLIDE_TYPES[sl.type].icon || '\u2726');
+      return `<div class="fs-slide-pip" style="background:${_e(bg)};color:${_e(fg)}"><span class="fs-slide-pip-icon">${icon}</span></div>`;
+    }).join('');
     const overflow = show.slides.length > 10
-      ? `<div class="fs-slide-pip" style="background:var(--bg-overlay,rgba(0,0,0,0.06));font-size:0.42rem;color:var(--fs-muted);display:flex;align-items:center;justify-content:center">+${show.slides.length - 10}</div>`
+      ? `<div class="fs-slide-pip fs-slide-pip--more">+${show.slides.length - 10}</div>`
       : '';
     return `
       <div class="fs-show-card" data-show-id="${_e(show.id)}">
         <div class="fs-show-name">${_e(show.name)}</div>
         <div class="fs-show-meta">
-          ${show.slides.length} slide${show.slides.length !== 1 ? 's' : ''}&nbsp;&middot;&nbsp;${_fmtDate(show.updatedAt)}
+          ${show.slides.length} slide${show.slides.length !== 1 ? 's' : ''}${dateStr ? '&nbsp;&middot;&nbsp;' + dateStr : ''}
         </div>
         <div class="fs-show-preview">${pips}${overflow}</div>
-        <div class="fs-show-actions" onclick="event.stopPropagation()">
+        <div class="fs-show-actions">
           <button class="fs-show-action-btn fs-show-action-btn--edit" data-act="edit" data-id="${_e(show.id)}">Edit</button>
           <button class="fs-show-action-btn fs-show-action-btn--dup"  data-act="dup"  data-id="${_e(show.id)}">Duplicate</button>
           <button class="fs-show-action-btn fs-show-action-btn--del"  data-act="del"  data-id="${_e(show.id)}">Delete</button>
         </div>
       </div>`;
   }).join('');
+
+  grid.innerHTML = banner + cards;
 }
 
 // ── Render: slide thumbnails ──────────────────────────────────────────────────
@@ -1361,6 +1394,8 @@ function _wire() {
       if (btn.dataset.act === 'del')  _delShow(id);
       return;
     }
+    // Clicks inside the actions row (gaps between buttons) should NOT open the show.
+    if (e.target.closest('.fs-show-actions')) return;
     const card = e.target.closest('[data-show-id]');
     if (card) _openShow(card.dataset.showId);
   });
