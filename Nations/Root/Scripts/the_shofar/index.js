@@ -425,15 +425,16 @@ function msEnsureStyles() {
         /* cards hidden by default; shown on mobile via media query */
         '.ms-song-cards { display:none; max-width:100%; overflow-x:hidden; }',
 
-        /* Song card (mobile) — each one is its own pill on the page background */
-        '.ms-song-card { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; margin-bottom:12px; background:#ffffff; border:1px solid #cbd5e1; border-radius:14px; box-shadow:0 4px 10px rgba(15,23,42,0.08), 0 1px 3px rgba(15,23,42,0.06); max-width:100%; box-sizing:border-box; }',
+        /* Song card (mobile) — navy/gold theme matching FlockStand */
+        '.ms-song-card { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; margin-bottom:12px; background:linear-gradient(135deg, #0f1735 0%, #1b264f 100%); border:1px solid rgba(232,168,56,0.25); border-radius:14px; box-shadow:0 4px 10px rgba(15,23,42,0.15); max-width:100%; box-sizing:border-box; transition:all 0.2s; }',
+        '.ms-song-card:hover { border-color:rgba(232,168,56,0.45); box-shadow:0 6px 14px rgba(15,23,42,0.22), 0 0 0 1px rgba(232,168,56,0.15); }',
         '.ms-song-card:last-child { margin-bottom:0; }',
         '.ms-song-card-info { flex:1; min-width:0; }',
-        '.ms-song-card-title { font-weight:800; color:#0f172a; font-size:0.98rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:5px; letter-spacing:-0.005em; }',
+        '.ms-song-card-title { font-weight:800; color:#ffffff; font-size:0.98rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:5px; letter-spacing:-0.005em; }',
         '.ms-song-card-meta { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }',
-        '.ms-song-card-meta span:not(.ms-stand-badge) { font-size:0.8rem; color:#475569; }',
+        '.ms-song-card-meta span:not(.ms-stand-badge) { font-size:0.8rem; color:rgba(255,255,255,0.65); }',
         '.ms-song-card-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }',
-        '.ms-song-card-play { padding:8px 14px !important; font-size:0.88rem !important; box-shadow:0 1px 2px rgba(180,108,10,0.2); }',
+        '.ms-song-card-play { padding:8px 14px !important; font-size:0.88rem !important; box-shadow:0 1px 2px rgba(232,168,56,0.3); }',
 
         /* Arrangement card */
         '.ms-arr-card { background:#f9fafb; border:1px solid rgba(0,0,0,0.09); border-radius:12px; padding:14px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; }',
