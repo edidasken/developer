@@ -403,13 +403,13 @@
     }
     .bm-land-tag:hover { background: rgba(232,168,56,0.20); }
     .bm-land-tag-count {
-      color: var(--bm-faint); margin-left: 4px; font-weight: 500;
+      color: rgba(255,255,255,0.65); margin-left: 4px; font-weight: 500;
     }
     .bm-land-cta-row {
       display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px;
     }
     .bm-land-progress {
-      height: 6px; border-radius: 3px; background: rgba(0,0,0,0.06);
+      height: 6px; border-radius: 3px; background: rgba(0,0,0,0.30);
       overflow: hidden; margin-top: 6px;
     }
     .bm-land-progress-bar {
@@ -418,7 +418,7 @@
     }
     /* ── Bible Reading Plan ───────────────────────────────────────────── */
     .bm-land-plan-current {
-      font: 600 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      font: 600 0.95rem 'Plus Jakarta Sans', sans-serif; color: #ffffff;
       padding: 4px 0 2px;
     }
     .bm-land-plan-actions {
@@ -427,19 +427,19 @@
     .bm-land-plan-btn {
       padding: 6px 12px; border-radius: 8px; cursor: pointer;
       font: 600 0.78rem 'Plus Jakarta Sans', sans-serif;
-      background: rgba(0,0,0,0.04); color: var(--bm-ink);
-      border: 1px solid var(--bm-border, rgba(0,0,0,0.08));
+      background: rgba(0,0,0,0.25); color: #ffffff;
+      border: 1px solid rgba(255,255,255,0.15);
       transition: background 0.14s, border-color 0.14s, transform 0.08s;
     }
-    .bm-land-plan-btn:hover { background: rgba(232,168,56,0.08); border-color: rgba(232,168,56,0.30); }
+    .bm-land-plan-btn:hover { background: rgba(0,0,0,0.35); border-color: rgba(255,255,255,0.25); }
     .bm-land-plan-btn:active { transform: scale(0.97); }
     .bm-land-plan-btn--primary {
       background: var(--bm-accent, #e8a838); color: #fff;
       border-color: var(--bm-accent, #e8a838);
     }
     .bm-land-plan-btn--primary:hover { background: #c48a20; border-color: #c48a20; }
-    .bm-land-plan-btn--ghost { background: transparent; color: var(--bm-muted); }
-    .bm-land-plan-btn--ghost:hover { color: var(--bm-ink); background: rgba(0,0,0,0.04); }
+    .bm-land-plan-btn--ghost { background: transparent; color: rgba(255,255,255,0.75); }
+    .bm-land-plan-btn--ghost:hover { color: #ffffff; background: rgba(255,255,255,0.08); }
 
     /* ── Prayer List ──────────────────────────────────────────────────── */
     .bm-land-prayer-form {
@@ -453,34 +453,34 @@
     .bm-land-prayer-item {
       display: flex; align-items: flex-start; gap: 8px;
       padding: 8px 10px; border-radius: 9px;
-      background: rgba(0,0,0,0.02);
-      border: 1px solid var(--bm-border, rgba(0,0,0,0.06));
+      background: rgba(0,0,0,0.20);
+      border: 1px solid rgba(255,255,255,0.10);
       transition: background 0.12s;
     }
-    .bm-land-prayer-item:hover { background: rgba(232,168,56,0.05); }
+    .bm-land-prayer-item:hover { background: rgba(0,0,0,0.30); }
     .bm-land-prayer-item.is-answered {
-      opacity: 0.55;
-      background: rgba(34,197,94,0.06); border-color: rgba(34,197,94,0.18);
+      opacity: 0.65;
+      background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.30);
     }
     .bm-land-prayer-item.is-answered .bm-land-prayer-text {
-      text-decoration: line-through; color: var(--bm-muted);
+      text-decoration: line-through; color: rgba(255,255,255,0.70);
     }
     .bm-land-prayer-text {
       flex: 1; font: 0.84rem 'Plus Jakarta Sans', sans-serif;
-      color: var(--bm-ink); line-height: 1.4; word-break: break-word; min-width: 0;
+      color: #ffffff; line-height: 1.4; word-break: break-word; min-width: 0;
     }
     .bm-land-prayer-meta {
-      font: 0.68rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      font: 0.68rem 'Plus Jakarta Sans', sans-serif; color: rgba(255,255,255,0.60);
       margin-top: 2px;
     }
     .bm-land-prayer-actions { display: flex; gap: 4px; flex-shrink: 0; }
     .bm-land-prayer-icon {
       background: transparent; border: 0; cursor: pointer;
-      padding: 4px; border-radius: 6px; color: var(--bm-muted);
+      padding: 4px; border-radius: 6px; color: rgba(255,255,255,0.65);
       transition: color 0.12s, background 0.12s;
       display: inline-flex; align-items: center; justify-content: center;
     }
-    .bm-land-prayer-icon:hover { color: var(--bm-ink); background: rgba(0,0,0,0.05); }
+    .bm-land-prayer-icon:hover { color: #ffffff; background: rgba(255,255,255,0.10); }
     .bm-land-prayer-icon.is-answer:hover { color: #22c55e; }
     .bm-land-prayer-icon.is-delete:hover { color: #ef4444; }
     .bm-land-archive-grid {
@@ -490,54 +490,54 @@
     }
     .bm-land-archive-item {
       padding: 10px 12px; border-radius: 10px;
-      background: rgba(0,0,0,0.02);
-      border: 1px solid var(--bm-border, rgba(0,0,0,0.05));
+      background: rgba(0,0,0,0.20);
+      border: 1px solid rgba(255,255,255,0.10);
       cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease;
       display: flex; flex-direction: column; gap: 4px; min-width: 0;
     }
     .bm-land-archive-item:hover {
-      background: rgba(232,168,56,0.06);
-      border-color: rgba(232,168,56,0.20);
+      background: rgba(0,0,0,0.30);
+      border-color: rgba(255,255,255,0.20);
     }
     .bm-land-archive-title {
-      font: 600 0.85rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      font: 600 0.85rem 'Plus Jakarta Sans', sans-serif; color: #ffffff;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .bm-land-archive-meta {
-      font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: rgba(255,255,255,0.65);
       display: flex; gap: 8px; align-items: center;
     }
     .bm-land-tool-card {
-      background: var(--bm-card, #ffffff);
-      border: 1px solid var(--bm-border, rgba(0,0,0,0.06));
+      background: rgba(0,0,0,0.20);
+      border: 1px solid rgba(255,255,255,0.10);
       border-radius: 14px; padding: 16px;
       display: flex; flex-direction: column; gap: 8px;
       cursor: pointer; transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
     .bm-land-tool-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(232,168,56,0.10);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.30);
     }
     .bm-land-tool-h {
-      font: 700 0.92rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      font: 700 0.92rem 'Plus Jakarta Sans', sans-serif; color: #ffffff;
     }
     .bm-land-tool-p {
-      font: 0.78rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-muted);
+      font: 0.78rem 'Plus Jakarta Sans', sans-serif; color: rgba(255,255,255,0.85);
       line-height: 1.5;
     }
     .bm-land-pill-soon {
       display: inline-block; font: 600 0.65rem 'Plus Jakarta Sans', sans-serif;
       text-transform: uppercase; letter-spacing: 0.05em;
       padding: 2px 8px; border-radius: 999px;
-      background: rgba(167,139,250,0.12); color: #6d52d6;
-      border: 1px solid rgba(167,139,250,0.25);
+      background: rgba(167,139,250,0.20); color: #c4b5fd;
+      border: 1px solid rgba(167,139,250,0.40);
     }
     .bm-land-pill-open {
       display: inline-block; font: 600 0.65rem 'Plus Jakarta Sans', sans-serif;
       text-transform: uppercase; letter-spacing: 0.05em;
       padding: 2px 9px; border-radius: 999px;
-      background: rgba(232,168,56,0.12); color: #b87a13;
-      border: 1px solid rgba(232,168,56,0.30);
+      background: rgba(232,168,56,0.20); color: var(--gold);
+      border: 1px solid rgba(232,168,56,0.40);
     }
     .bm-land-tool-card:hover .bm-land-pill-open {
       background: var(--bm-accent, #e8a838); color: #fff; border-color: var(--bm-accent, #e8a838);
@@ -545,17 +545,20 @@
     .bm-land-scratch {
       width: 100%; min-height: 100px; box-sizing: border-box;
       padding: 10px 12px; border-radius: 10px;
-      border: 1px solid var(--bm-border, rgba(0,0,0,0.10));
-      background: var(--bm-card, #ffffff); color: var(--bm-ink);
+      border: 1px solid rgba(255,255,255,0.20);
+      background: rgba(0,0,0,0.20); color: #ffffff;
       font: 0.86rem 'Plus Jakarta Sans', sans-serif; line-height: 1.55;
       resize: vertical;
     }
     .bm-land-scratch:focus {
-      outline: none; border-color: var(--bm-accent, #e8a838);
+      outline: none; border-color: var(--gold);
       box-shadow: 0 0 0 3px rgba(232,168,56,0.15);
     }
+    .bm-land-scratch::placeholder {
+      color: rgba(255,255,255,0.50);
+    }
     .bm-land-saved-hint {
-      font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-faint);
+      font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: rgba(255,255,255,0.60);
       align-self: flex-end;
     }
 
