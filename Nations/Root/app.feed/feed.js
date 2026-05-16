@@ -72,12 +72,16 @@ function _active() { return S.sermons.find(s => s.id === S.activeId) || null; }
 // ── Model factories ───────────────────────────────────────────────────────────
 function _makeSection(type = 'point', title = '') {
   return {
-    id:         _uid(),
+    id:           _uid(),
     type,
-    title:      title || _sectionTitle(type),
-    notes:      '',
-    scripture:  '',
+    title:        title || _sectionTitle(type),
+    notes:        '',
+    scripture:    '',
     scriptureRef: '',
+    // Whether this section is included when the sermon is pushed to FlockShow.
+    // Transitions default to OFF (they're stage notes, not slides); everything
+    // else defaults to ON.
+    includeInShow: type !== 'transition',
   };
 }
 
@@ -375,19 +379,64 @@ function _renderOutline() {
     `<option value="${t}">${t.charAt(0).toUpperCase() + t.slice(1)}</option>`
   ).join('');
 
-  container.innerHTML = (s.sections || []).map((sec, idx) => `
-    <div class="bm-outline-section${sec._collapsed ? ' collapsed' : ''}" data-sid="${_e(sec.id)}" draggable="true">
+  // Live totals for the helper banner: how many sections are checked,
+  // and how many slides they'll add up to in FlockShow.
+  const sections = s.sections || [];
+  let bannerIncluded = 0, bannerSlides = 0;
+  sections.forEach(sec => {
+    if (typeof sec.includeInShow !== 'boolean') {
+      sec.includeInShow = sec.type !== 'transition';
+    }
+    if (sec.includeInShow) {
+      bannerIncluded += 1;
+      bannerSlides += _estimateSlidesForSection(sec);
+    }
+  });
+  const bannerHtml = `
+    <div class="bm-outline-banner">
+      <span class="bm-outline-banner-icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </span>
+      <span class="bm-outline-banner-msg">
+        Tick a section to include it in <strong>FlockShow</strong>. Long paragraphs auto-split into multiple slides at sentence boundaries.
+      </span>
+      <span class="bm-outline-banner-count" id="bm-outline-banner-count">${bannerIncluded} of ${sections.length} \u00b7 ${bannerSlides} slide${bannerSlides === 1 ? '' : 's'}</span>
+    </div>
+  `;
+
+  container.innerHTML = bannerHtml + (s.sections || []).map((sec, idx) => {
+    // Backfill the include flag on older sections that pre-date this field.
+    if (typeof sec.includeInShow !== 'boolean') {
+      sec.includeInShow = sec.type !== 'transition';
+    }
+    const slideEst = _estimateSlidesForSection(sec);
+    const slideMeta = sec.includeInShow
+      ? (slideEst === 0
+          ? 'No slides yet \u2014 add notes to generate'
+          : `\u2192 ${slideEst} slide${slideEst === 1 ? '' : 's'} in FlockShow`)
+      : 'Skipped in FlockShow';
+    return `
+    <div class="bm-outline-section${sec._collapsed ? ' collapsed' : ''}${sec.includeInShow ? '' : ' not-in-show'}" data-sid="${_e(sec.id)}" draggable="true">
       <div class="bm-section-header">
         <button class="bm-icon-btn bm-collapse-btn" data-action="toggle-collapse" data-sid="${_e(sec.id)}" title="${sec._collapsed ? 'Expand' : 'Collapse'}" aria-expanded="${!sec._collapsed}">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
+        <label class="bm-section-include" title="Include this section when pushing to FlockShow">
+          <input type="checkbox" class="bm-section-include-cb" data-action="toggle-include" data-sid="${_e(sec.id)}" ${sec.includeInShow ? 'checked' : ''} aria-label="Include in FlockShow">
+          <span class="bm-section-include-box" aria-hidden="true">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg>
+          </span>
+        </label>
         <span class="bm-section-drag" title="Drag to reorder">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/><circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/></svg>
         </span>
         <select class="bm-section-type-select ${_e(sec.type)}" data-field="type" data-sid="${_e(sec.id)}" title="Change section type">
           ${SECTION_TYPES.map(t => `<option value="${t}"${t === sec.type ? ' selected' : ''}>${t.charAt(0).toUpperCase() + t.slice(1)}</option>`).join('')}
         </select>
-        <input class="bm-section-title-input" type="text" value="${_e(sec.title)}" placeholder="Section title…" data-field="title" data-sid="${_e(sec.id)}" autocomplete="off">
+        <div class="bm-section-title-wrap">
+          <input class="bm-section-title-input" type="text" value="${_e(sec.title)}" placeholder="Section title…" data-field="title" data-sid="${_e(sec.id)}" autocomplete="off">
+          <div class="bm-section-slide-meta" data-slide-meta="${_e(sec.id)}">${_e(slideMeta)}</div>
+        </div>
         <div class="bm-section-actions">
           <button class="bm-icon-btn" data-action="move-up" data-sid="${_e(sec.id)}" title="Move up"${idx === 0 ? ' disabled' : ''}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
@@ -411,8 +460,8 @@ function _renderOutline() {
         ` : ''}
         <textarea class="bm-notes-textarea" placeholder="${_sectionPlaceholder(sec.type)}" data-field="notes" data-sid="${_e(sec.id)}">${_e(sec.notes)}</textarea>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 
   _bindOutlineEvents(container);
   _updateStats();
@@ -451,6 +500,10 @@ function _bindOutlineEvents(container) {
         _renderOutline(); // re-render to show/hide scripture block
         return;
       }
+      // Notes / scripture edits change the slide estimate — update it live.
+      if (field === 'notes' || field === 'scripture' || field === 'scriptureRef' || field === 'title') {
+        _refreshSlideMeta(sec, container);
+      }
       _queueSave();
       _updateStats();
     });
@@ -459,6 +512,22 @@ function _bindOutlineEvents(container) {
       _autoResize(el);
       el.addEventListener('input', () => _autoResize(el));
     }
+  });
+
+  // Include-in-FlockShow checkboxes (separate from action buttons because
+  // they're <input> elements that fire 'change', not 'click').
+  container.querySelectorAll('input.bm-section-include-cb').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const s = _active();
+      if (!s) return;
+      const sec = s.sections.find(x => x.id === cb.dataset.sid);
+      if (!sec) return;
+      sec.includeInShow = !!cb.checked;
+      const wrap = container.querySelector(`.bm-outline-section[data-sid="${sec.id}"]`);
+      if (wrap) wrap.classList.toggle('not-in-show', !sec.includeInShow);
+      _refreshSlideMeta(sec, container);
+      _queueSave();
+    });
   });
 
   // Action buttons
@@ -1111,6 +1180,62 @@ function _scriptureToSlides(verseText, ref) {
 }
 
 // Build the FULL FlockShow show object from a sermon
+
+// Estimate how many FlockShow slides a single section would emit if it were
+// included.  Mirrors the logic in `_buildShowFromSermon` so the outline can
+// show users a live count.
+function _estimateSlidesForSection(sec) {
+  if (!sec) return 0;
+  const heading = (sec.title || _sectionTitle(sec.type) || '').trim();
+  const notes   = (sec.notes || '').trim();
+  let count = heading ? 1 : 0; // section TITLE slide
+  if (sec.type === 'scripture') {
+    const ref = (sec.scriptureRef || heading || '').trim();
+    count += _scriptureToSlides(sec.scripture || notes, ref).length;
+    return count;
+  }
+  if (sec.type === 'transition') {
+    // Transition emits a blank stage-note slide only when there are notes.
+    return notes ? (count + 1) : count;
+  }
+  if (notes) count += _chunkProseToSlides(notes).length;
+  return count;
+}
+
+// Recompute the "X of Y · N slides" totals shown in the outline banner.
+function _refreshOutlineBanner() {
+  const s = _active();
+  const node = document.getElementById('bm-outline-banner-count');
+  if (!s || !node) return;
+  const sections = s.sections || [];
+  let inc = 0, slides = 0;
+  sections.forEach(sec => {
+    if (sec.includeInShow !== false) {
+      inc += 1;
+      slides += _estimateSlidesForSection(sec);
+    }
+  });
+  node.textContent = `${inc} of ${sections.length} \u00b7 ${slides} slide${slides === 1 ? '' : 's'}`;
+}
+
+// Update just the meta line under one section's header in-place (no full re-render).
+function _refreshSlideMeta(sec, container) {
+  if (!sec || !container) return;
+  const node = container.querySelector(`[data-slide-meta="${sec.id}"]`);
+  if (!node) return;
+  const wrap = container.querySelector(`.bm-outline-section[data-sid="${sec.id}"]`);
+  if (sec.includeInShow === false) {
+    node.textContent = 'Skipped in FlockShow';
+  } else {
+    const n = _estimateSlidesForSection(sec);
+    node.textContent = n === 0
+      ? 'No slides yet \u2014 add notes to generate'
+      : `\u2192 ${n} slide${n === 1 ? '' : 's'} in FlockShow`;
+  }
+  if (wrap) wrap.classList.toggle('not-in-show', sec.includeInShow === false);
+  _refreshOutlineBanner();
+}
+
 function _buildShowFromSermon(s) {
   const slides = [];
 
@@ -1134,8 +1259,8 @@ function _buildShowFromSermon(s) {
     slides.push(_mkShowSlide('scripture', '', { reference: s.passage }));
   }
 
-  // 4. Walk every section in order
-  (s.sections || []).forEach((sec, idx) => {
+  // 4. Walk every section in order — skip those the user opted out of.
+  (s.sections || []).filter(sec => sec.includeInShow !== false).forEach((sec, idx, arr) => {
     const showType = _FEED_TO_SHOW_TYPE[sec.type] || 'lyrics';
     const heading  = (sec.title || _sectionTitle(sec.type) || '').trim();
     const notes    = (sec.notes || '').trim();
@@ -1143,7 +1268,7 @@ function _buildShowFromSermon(s) {
     // Section TITLE slide (gives the pastor a visual breath between blocks)
     if (heading) {
       slides.push(_mkShowSlide('announce', heading, {
-        notes: `Section ${idx + 1} of ${s.sections.length}`,
+        notes: `Section ${idx + 1} of ${arr.length}`,
       }));
     }
 

@@ -684,11 +684,78 @@
     .bm-section-type.prayer     { background: rgba(167,139,250,0.20); color: var(--bm-purple); }
     .bm-section-type.transition { background: var(--bg-input); color: var(--bm-muted);  }
 
+    .bm-section-title-wrap {
+      flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0;
+    }
     .bm-section-title-input {
-      flex: 1; background: none; border: none; outline: none;
-      font: 600 1rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      width: 100%; background: none; border: none; outline: none;
+      font: 600 0.95rem 'Plus Jakarta Sans', sans-serif; color: var(--bm-ink);
+      padding: 0;
     }
     .bm-section-title-input::placeholder { color: var(--bm-faint); font-weight: 500; }
+    .bm-section-slide-meta {
+      font: 500 0.7rem 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-faint); letter-spacing: .01em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .bm-outline-section.not-in-show .bm-section-slide-meta {
+      color: var(--bm-muted); font-style: italic;
+    }
+
+    /* Include-in-FlockShow checkbox */
+    .bm-section-include {
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0; cursor: pointer; position: relative;
+      width: 18px; height: 18px;
+    }
+    .bm-section-include input.bm-section-include-cb {
+      position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%;
+      margin: 0; cursor: pointer;
+    }
+    .bm-section-include-box {
+      width: 16px; height: 16px; border-radius: 4px;
+      border: 1.5px solid var(--bm-border-lit);
+      background: var(--bg-sunken);
+      display: inline-flex; align-items: center; justify-content: center;
+      color: transparent; transition: all 0.12s;
+    }
+    .bm-section-include:hover .bm-section-include-box {
+      border-color: var(--gold);
+    }
+    .bm-section-include input.bm-section-include-cb:checked + .bm-section-include-box {
+      background: var(--gold); border-color: var(--gold); color: #1a1208;
+    }
+    .bm-section-include input.bm-section-include-cb:focus-visible + .bm-section-include-box {
+      box-shadow: 0 0 0 3px rgba(232,168,56,0.25);
+    }
+
+    /* Dimmed section when excluded from FlockShow */
+    .bm-outline-section.not-in-show { opacity: 0.62; }
+    .bm-outline-section.not-in-show .bm-section-title-input,
+    .bm-outline-section.not-in-show .bm-notes-textarea { color: var(--bm-muted); }
+
+    /* Helper banner above the outline sections */
+    .bm-outline-banner {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 14px; margin-bottom: 14px;
+      background: rgba(232,168,56,0.07);
+      border: 1px solid rgba(232,168,56,0.18);
+      border-radius: 9px;
+      font: 500 0.78rem/1.45 'Plus Jakarta Sans', sans-serif;
+      color: var(--bm-muted);
+    }
+    .bm-outline-banner-icon {
+      flex-shrink: 0; color: var(--bm-accent);
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .bm-outline-banner-msg { flex: 1; }
+    .bm-outline-banner-msg strong { color: var(--bm-accent); font-weight: 700; }
+    .bm-outline-banner-count {
+      flex-shrink: 0; color: var(--bm-ink);
+      font-weight: 600; font-size: 0.74rem;
+      padding: 3px 9px; border-radius: 999px;
+      background: rgba(232,168,56,0.14); white-space: nowrap;
+    }
 
     .bm-section-actions { display: flex; gap: 5px; flex-shrink: 0; }
     .bm-icon-btn {
