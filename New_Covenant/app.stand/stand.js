@@ -476,36 +476,40 @@ function _navigate(view) {
 
 async function _renderDashboard(main) {
   main.innerHTML = `
-    <div class="ms-view">
-      <div class="ms-page-hero">
+    <div class="ms-view ms-dash">
+      <div class="ms-page-hero ms-dash-hero">
         <div class="ms-page-hero-text">
-          <h1>Dashboard</h1>
-          <p>Welcome back, ${_e(S.user?.displayName || 'Worship Team')}. Here's your week at a glance.</p>
+          <div class="ms-dash-eyebrow">FlockStand · Dashboard</div>
+          <h1>Welcome back, ${_e((S.user?.displayName || 'Worship Team').split(' ')[0])}</h1>
+          <p>Your week at a glance &mdash; setlists, songs, and what's coming next.</p>
         </div>
         <div class="ms-page-hero-actions">
           <button class="ms-btn ms-btn--primary" id="db-new-service-btn">+ New Service Plan</button>
         </div>
       </div>
       <div class="ms-stats-grid" id="db-stats"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap;" id="db-cols">
-        <div>
+      <div class="ms-dash-cols" id="db-cols">
+        <div class="ms-dash-col">
           <div class="ms-section-title">Upcoming Services</div>
           <div class="ms-upcoming-list" id="db-upcoming"><div class="ms-loading-center"><div class="ms-spinner"></div></div></div>
         </div>
-        <div>
+        <div class="ms-dash-col">
           <div class="ms-section-title">Quick Actions</div>
-          <div style="display:flex;flex-direction:column;gap:10px;" id="db-actions">
-            <button class="ms-btn ms-btn--ghost" data-view="songs" style="justify-content:flex-start;gap:12px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-              Browse Song Library
+          <div class="ms-dash-actions" id="db-actions">
+            <button class="ms-dash-action" data-view="songs">
+              <span class="ms-dash-action-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+              <span class="ms-dash-action-label">Browse Song Library</span>
+              <span class="ms-dash-action-chev" aria-hidden="true">›</span>
             </button>
-            <button class="ms-btn ms-btn--ghost" data-view="import" style="justify-content:flex-start;gap:12px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Import a Song
+            <button class="ms-dash-action" data-view="import">
+              <span class="ms-dash-action-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+              <span class="ms-dash-action-label">Import a Song</span>
+              <span class="ms-dash-action-chev" aria-hidden="true">›</span>
             </button>
-            <button class="ms-btn ms-btn--ghost" id="db-live-quick" style="justify-content:flex-start;gap:12px;color:var(--ms-rose);">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
-              Enter Live Mode
+            <button class="ms-dash-action ms-dash-action--live" id="db-live-quick">
+              <span class="ms-dash-action-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></span>
+              <span class="ms-dash-action-label">Enter Live Mode</span>
+              <span class="ms-dash-action-chev" aria-hidden="true">›</span>
             </button>
           </div>
         </div>
