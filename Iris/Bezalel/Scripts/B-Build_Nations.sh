@@ -219,6 +219,7 @@ PYEOF
   export _NC_FB_CONFIG="$FB_CONFIG_JSON"
   GAS_ONLY=$(jq -r '.gasOnly // false' "$CFG")
   export _NC_GAS_ONLY="$GAS_ONLY"
+  export _NC_FOLDER="$FOLDER"
   python3 << 'PYEOF'
 import os, json, re
 
@@ -552,7 +553,52 @@ else:
     print(f'  ✓ app.embeds/embed-launcher.html → {name} / {base_url}')
 PYEOF
 
-  # ── 9e. Patch app.embeds/embed-flockchat.html — Firebase config ──────
+  # ── 9d-ii. Patch app.flockchat/app.flockchat.html — per-church Firebase config ──
+  python3 << 'PYEOF'
+import os, json, re
+
+t        = os.environ['_NC_TARGET']
+fb_raw   = os.environ['_NC_FB_CONFIG']
+gas_only = os.environ.get('_NC_GAS_ONLY', 'false').strip().lower() == 'true'
+path     = t + '/app.flockchat/app.flockchat.html'
+
+if not os.path.exists(path):
+    print('  ✓ app.flockchat/app.flockchat.html not present — skip Firebase patch')
+else:
+    with open(path, 'r') as f:
+        content = f.read()
+
+    if gas_only:
+        content = re.sub(
+            r'[ \t]*<!--\s*Firebase Config\s*-->\n\s*<script>\s*window\.FLOCK_FIREBASE_CONFIG\s*=\s*\{[^}]+\};\s*</script>\n?',
+            '', content, flags=re.DOTALL)
+        content = re.sub(r'[ \t]*<script[^>]+gstatic\.com/firebasejs[^>]*></script>\n?', '', content)
+        if '<head>' in content:
+            content = content.replace('<head>', '<head>\n  <script>window.FLOCK_NO_FIREBASE = true;</script>', 1)
+        print('  ✓ app.flockchat/app.flockchat.html Firebase stripped (GAS-only build)')
+    else:
+        try:
+            fb_obj = json.loads(fb_raw)
+        except Exception:
+            fb_obj = None
+        if isinstance(fb_obj, dict) and 'projectId' in fb_obj:
+            cfg_lines = ['    window.FLOCK_FIREBASE_CONFIG = {']
+            for k, v in fb_obj.items():
+                cfg_lines.append(f"      {k}:  '{v}',")
+            cfg_lines.append('    };')
+            new_block = '\n'.join(cfg_lines)
+            content = re.sub(
+                r'window\.FLOCK_FIREBASE_CONFIG\s*=\s*\{[^}]+\};',
+                new_block, content, flags=re.DOTALL)
+            print(f'  ✓ app.flockchat/app.flockchat.html Firebase config → {fb_obj["projectId"]}')
+        else:
+            print('  ✓ app.flockchat/app.flockchat.html Firebase config kept as default (flockos-notify)')
+
+    with open(path, 'w') as f:
+        f.write(content)
+PYEOF
+
+  # ── 9e. Patch app.embeds/embed-flockchat.html — iframe src ───────────
   python3 << 'PYEOF'
 import os, json, re
 
