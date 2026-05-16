@@ -14550,11 +14550,8 @@ flock-tabs [role="tablist"], .tabs-bar {
   color: var(--side-ink);
   overflow-y: auto; overflow-x: hidden;
   display: flex; flex-direction: column;
-  /* Top padding clears the fixed header so nav items aren't hidden under it.
-     Sidebar bg tiles up to viewport top behind the header — kills cream gap.
-     No extra margin above the first nav item so it sits flush below the
-     rainbow stripe, matching the dashboard hero card. */
-  padding: calc(var(--ms-header-h) + var(--ms-safe-top)) 8px 12px;
+  /* Header is a sibling grid row above .ms-body now — no clearance needed. */
+  padding: 12px 8px;
   gap: 4px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.10) transparent;
@@ -14597,8 +14594,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-main {
   flex: 1; min-width: 0; overflow-x: hidden; overflow-y: auto;
   background: var(--ms-bg);
-  /* Top padding clears the fixed header — main bg tiles up to viewport top. */
-  padding-top: calc(var(--ms-header-h) + var(--ms-safe-top));
+  /* Header is now a sibling grid row above .ms-body — no clearance needed. */
 }
 .ms-view { padding: 24px; max-width: 1100px; overflow-x: hidden; box-sizing: border-box; }
 .ms-view--wide { max-width: none; }
@@ -14984,13 +14980,10 @@ flock-tabs [role="tablist"], .tabs-bar {
    Scoped to `.ms-dash` so it only affects the home dashboard view, leaving
    the Service Plans grid (which reuses .ms-service-card) untouched. */
 .ms-dash { --dash-navy-1: #0f1735; --dash-navy-2: #1b264f; --dash-gold: var(--ms-gold,#e8a838); }
-/* Dashboard butts directly against the header — kill the .ms-view top padding
-   so the hero card sits flush below the rainbow stripe. (.ms-main still clears
-   the fixed header itself, so content isn't hidden.) Side + bottom padding kept.
-   Desktop only — at <=860px, .ms-view owns the header clearance, so we leave it. */
-@media (min-width: 861px) {
-  .ms-view.ms-dash { padding-top: 0; }
-}
+/* Dashboard hero butts directly against the header — zero top padding on the
+   .ms-view wrapper so the navy hero card touches the bottom border of the
+   header. (Side + bottom padding kept.) */
+.ms-view.ms-dash { padding-top: 0; }
 
 /* Hero card */
 .ms-dash-hero {
@@ -15164,8 +15157,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 @media (max-width: 860px) {
   .ms-sidebar {
     display: none;
-    /* Reset desktop header-clearance padding for the slide-in mobile drawer */
-    padding: 12px 8px;
+    /* Drawer mode below resets these. */
   }
   .ms-sidebar.is-open {
     display: flex; position: fixed;
@@ -15175,11 +15167,10 @@ flock-tabs [role="tablist"], .tabs-bar {
   }
   .ms-bottom-nav  { display: flex; }
   .ms-body        { padding-top: 0; padding-bottom: 0; }
-  /* Mobile clears the header via .ms-view padding (below); main no longer needs it */
-  .ms-main        { background: var(--ms-bg); padding-top: 0; }
+  .ms-main        { background: var(--ms-bg); }
   .ms-menu-toggle { display: flex; }
   .ms-view        {
-    padding: calc(var(--ms-header-h) + var(--ms-safe-top) + 12px) 16px calc(var(--ms-bnav-h) + 12px);
+    padding: 16px 16px calc(var(--ms-bnav-h) + 12px);
     max-width: none;
   }
   .ms-editor-layout { grid-template-columns: 1fr; }
