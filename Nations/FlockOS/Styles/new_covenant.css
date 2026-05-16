@@ -14413,18 +14413,9 @@ flock-tabs [role="tablist"], .tabs-bar {
 #ms-app[hidden] { display: none; }
 .ms-body {
   display: flex; flex: 1; overflow: hidden;
-  padding-top: calc(var(--ms-header-h) + var(--ms-safe-top));
-  /* Paint the gap above sidebar navy and above main page-bg so the cream
-     padding strip below the header disappears visually. NOTE: --side-bg is
-     itself a gradient, so we can't reference it here — must use a solid
-     navy that matches the sidebar's top-left endpoint (#0c1445). */
-  background: linear-gradient(
-    to right,
-    #0c1445 0,
-    #0c1445 var(--ms-sidebar-w),
-    var(--ms-bg) var(--ms-sidebar-w),
-    var(--ms-bg) 100%
-  );
+  /* Header-clearance lives on the children (.ms-sidebar, .ms-main) so their
+     own backgrounds tile up to the top of the viewport behind the fixed
+     header — no cream gap can show through. */
 }
 
 /* ── Header — canonical FlockOS dark navy chrome ─────────────────────────── */
@@ -14559,7 +14550,9 @@ flock-tabs [role="tablist"], .tabs-bar {
   color: var(--side-ink);
   overflow-y: auto; overflow-x: hidden;
   display: flex; flex-direction: column;
-  padding: 12px 8px;
+  /* Top padding clears the fixed header so nav items aren't hidden under it.
+     Sidebar bg tiles up to viewport top behind the header — kills cream gap. */
+  padding: calc(var(--ms-header-h) + var(--ms-safe-top) + 12px) 8px 12px;
   gap: 4px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.10) transparent;
@@ -14599,7 +14592,12 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-nav-item--live:hover { background: var(--ms-rose-soft); color: var(--ms-rose); }
 
 /* ── Main content area ───────────────────────────────────────────────────── */
-.ms-main { flex: 1; min-width: 0; overflow-x: hidden; overflow-y: auto; }
+.ms-main {
+  flex: 1; min-width: 0; overflow-x: hidden; overflow-y: auto;
+  background: var(--ms-bg);
+  /* Top padding clears the fixed header — main bg tiles up to viewport top. */
+  padding-top: calc(var(--ms-header-h) + var(--ms-safe-top));
+}
 .ms-view { padding: 24px; max-width: 1100px; overflow-x: hidden; box-sizing: border-box; }
 .ms-view--wide { max-width: none; }
 
@@ -15157,6 +15155,8 @@ flock-tabs [role="tablist"], .tabs-bar {
 @media (max-width: 860px) {
   .ms-sidebar {
     display: none;
+    /* Reset desktop header-clearance padding for the slide-in mobile drawer */
+    padding: 12px 8px;
   }
   .ms-sidebar.is-open {
     display: flex; position: fixed;
@@ -15166,7 +15166,8 @@ flock-tabs [role="tablist"], .tabs-bar {
   }
   .ms-bottom-nav  { display: flex; }
   .ms-body        { padding-top: 0; padding-bottom: 0; }
-  .ms-main        { background: var(--ms-bg); }
+  /* Mobile clears the header via .ms-view padding (below); main no longer needs it */
+  .ms-main        { background: var(--ms-bg); padding-top: 0; }
   .ms-menu-toggle { display: flex; }
   .ms-view        {
     padding: calc(var(--ms-header-h) + var(--ms-safe-top) + 12px) 16px calc(var(--ms-bnav-h) + 12px);
