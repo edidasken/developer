@@ -9,7 +9,10 @@ admin.initializeApp();
  * SongSelect Authentication
  * Validates SongSelect credentials by logging in
  */
-exports.songSelectAuth = onCall(async (request) => {
+exports.songSelectAuth = onCall({
+  memory: '1GiB',
+  timeoutSeconds: 60
+}, async (request) => {
   const {email, password} = request.data;
 
   if (!email || !password) {
@@ -71,7 +74,10 @@ exports.songSelectAuth = onCall(async (request) => {
  * SongSelect Search
  * Searches SongSelect library and returns results
  */
-exports.songSelectSearch = onCall(async (request) => {
+exports.songSelectSearch = onCall({
+  memory: '1GiB',
+  timeoutSeconds: 60
+}, async (request) => {
   const {email, password, query} = request.data;
 
   if (!email || !password || !query) {
@@ -156,7 +162,10 @@ exports.songSelectSearch = onCall(async (request) => {
  * SongSelect Import
  * Fetches full ChordPro file for a song
  */
-exports.songSelectImport = onCall(async (request) => {
+exports.songSelectImport = onCall({
+  memory: '1GiB',
+  timeoutSeconds: 60
+}, async (request) => {
   const {email, password, songId} = request.data;
 
   if (!email || !password || !songId) {
