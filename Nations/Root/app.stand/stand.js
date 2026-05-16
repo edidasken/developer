@@ -45,6 +45,8 @@ const S = {
   metroBeats:    4,
   metroPlaying:  false,
   metroTick:     0,
+  ssResults:     [],     // All SongSelect search results
+  ssFilter:      '',     // Current filter text for SongSelect results
   prefs: {
     defaultFontSize: 17,
     showChords:      true,
@@ -1432,35 +1434,115 @@ async function _searchSongSelect(query, credentials) {
 function _renderSongSelectResults(el, results) {
   if (!results || results.length === 0) {
     el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ms-ink-muted);">No results found</div>';
+    S.ssResults = [];
     return;
   }
 
+  // Store all results globally
+  S.ssResults = results;
+  S.ssFilter = '';
+
+  // Render with filter input and results
   el.innerHTML = `
     <div style="margin-bottom:12px;">
       <div class="ms-label">${results.length} song${results.length === 1 ? '' : 's'} found</div>
+      <input 
+        class="ms-input" 
+        type="text" 
+        id="ss-filter-input" 
+        placeholder="Filter results by title, artist, or CCLI..."
+        style="margin-top:8px;"
+      >
+      <div id="ss-result-count" style="font-size:.82rem;color:var(--ms-ink-muted);margin-top:6px;"></div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      ${results.map((song, idx) => `
-        <div class="ms-card" style="cursor:pointer;" data-ss-song-idx="${idx}">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div style="flex:1;min-width:0;">
-              <div style="font-weight:700;font-size:.95rem;margin-bottom:4px;">${_e(song.title)}</div>
-              <div style="font-size:.82rem;color:var(--ms-ink-muted);">${_e(song.artist)} ${song.ccliNumber ? '• CCLI ' + _e(song.ccliNumber) : ''}</div>
-              ${song.key ? `<div style="font-size:.75rem;color:var(--ms-gold);margin-top:4px;">Key: ${_e(song.key)}</div>` : ''}
-            </div>
-            <button class="ms-btn ms-btn--primary ms-btn--sm" data-ss-import="${idx}">Import</button>
-          </div>
-        </div>
-      `).join('')}
-    </div>
+    <div id="ss-results-container" style="display:flex;flex-direction:column;gap:10px;"></div>
   `;
 
+  // Attach filter handler
+  const filterInput = el.querySelector('#ss-filter-input');
+  if (filterInput) {
+    filterInput.addEventListener('input', (e) => {
+      S.ssFilter = e.target.value.toLowerCase().trim();
+      _filterAndRenderSongSelectResults(el);
+    });
+  }
+
+  // Initial render
+  _filterAndRenderSongSelectResults(el);
+}
+
+function _filterAndRenderSongSelectResults(el) {
+  const container = el.querySelector('#ss-results-container');
+  const countEl = el.querySelector('#ss-result-count');
+  
+  if (!container) return;
+
+  // Filter results
+  const filtered = S.ssFilter
+    ? S.ssResults.filter(song => 
+        (song.title || '').toLowerCase().includes(S.ssFilter) ||
+        (song.artist || '').toLowerCase().includes(S.ssFilter) ||
+        (song.ccliNumber || '').includes(S.ssFilter)
+      )
+    : S.ssResults;
+
+  // Limit display to 50 songs
+  const displayed = filtered.slice(0, 50);
+  const hasMore = filtered.length > 50;
+
+  // Update count
+  if (countEl) {
+    if (filtered.length === S.ssResults.length) {
+      countEl.textContent = hasMore 
+        ? `Showing ${displayed.length} of ${filtered.length} songs`
+        : `Showing all ${displayed.length} song${displayed.length === 1 ? '' : 's'}`;
+    } else {
+      countEl.textContent = hasMore
+        ? `Showing ${displayed.length} of ${filtered.length} matching songs (${S.ssResults.length} total)`
+        : `${filtered.length} matching song${filtered.length === 1 ? '' : 's'} (${S.ssResults.length} total)`;
+    }
+  }
+
+  // Render displayed songs
+  if (displayed.length === 0) {
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ms-ink-muted);">No songs match your filter</div>';
+    return;
+  }
+
+  container.innerHTML = displayed.map((song, idx) => {
+    // Find the original index in filtered array (for data attribute)
+    const filteredIdx = S.ssResults.findIndex(s => 
+      s.songId === song.songId && s.title === song.title
+    );
+    
+    return `
+      <div class="ms-card" style="cursor:pointer;" data-ss-song-idx="${filteredIdx}">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:.95rem;margin-bottom:4px;">${_e(song.title)}</div>
+            <div style="font-size:.82rem;color:var(--ms-ink-muted);">${_e(song.artist)} ${song.ccliNumber ? '• CCLI ' + _e(song.ccliNumber) : ''}</div>
+            ${song.key ? `<div style="font-size:.75rem;color:var(--ms-gold);margin-top:4px;">Key: ${_e(song.key)}</div>` : ''}
+          </div>
+          <button class="ms-btn ms-btn--primary ms-btn--sm" data-ss-import="${filteredIdx}">Import</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (hasMore) {
+    container.innerHTML += `
+      <div style="padding:12px;text-align:center;color:var(--ms-ink-muted);font-size:.85rem;font-style:italic;">
+        ${filtered.length - 50} more song${filtered.length - 50 === 1 ? '' : 's'} available — refine your filter to see them
+      </div>
+    `;
+  }
+
   // Attach import handlers
-  el.querySelectorAll('[data-ss-import]').forEach(btn => {
+  container.querySelectorAll('[data-ss-import]').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const idx = parseInt(btn.dataset.ssImport);
-      const song = results[idx];
+      const song = S.ssResults[idx];
       await _importSongSelectSong(song, btn);
     });
   });

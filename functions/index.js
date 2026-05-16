@@ -171,9 +171,7 @@ exports.songSelectSearch = onCall({
       const songs = [];
       const items = document.querySelectorAll('.song-result');
       
-      items.forEach((item, idx) => {
-        if (idx >= 20) return; // Limit to 20 results
-        
+      items.forEach((item) => {
         const titleEl = item.querySelector('.song-title');
         const artistEl = item.querySelector('.song-author');
         const ccliEl = item.querySelector('.song-number');
