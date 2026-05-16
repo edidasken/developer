@@ -65,9 +65,9 @@ const _uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,
 
 const _e = s => String(s ?? '').replace(/[&<>"']/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-const _esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
-  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// _esc is an alias for _e — both helpers HTML-escape user-controlled strings
+// before they are dropped into innerHTML / template-literal markup.
+const _esc = _e;
 
 function _fmtDate(ts) {
   if (!ts) return '';
@@ -143,14 +143,30 @@ async function _load() {
   // localStorage already rendered above — nothing more to do
 }
 
+// Build the Firestore-bound payload for a show.  Includes every field the
+// FlockShow side needs to round-trip cleanly — most importantly `theme` (so
+// the show's gradient survives the first save), and `sermonId`/`serviceDate`
+// (so a presentation pushed from FEED stays linked to its sermon and won't
+// be duplicated on the next push).
+function _showPayload(show) {
+  return {
+    name:        show.name || 'Untitled',
+    slides:      Array.isArray(show.slides) ? show.slides : [],
+    theme:       show.theme || { bg: '', tc: '' },
+    sermonId:    show.sermonId    || '',
+    serviceDate: show.serviceDate || '',
+  };
+}
+
 // Sync a single show to Firestore/GAS/localStorage (fire-and-forget safe)
 async function _syncShow(show) {
+  const payload = _showPayload(show);
   if (_fsFB()) {
     try {
       if (show._fsId) {
-        await window.UpperRoom.updatePresentation({ id: show._fsId, name: show.name, slides: show.slides });
+        await window.UpperRoom.updatePresentation(Object.assign({ id: show._fsId }, payload));
       } else {
-        const res = await window.UpperRoom.createPresentation({ name: show.name, slides: show.slides });
+        const res = await window.UpperRoom.createPresentation(payload);
         show._fsId = res.id;
       }
       _lsSync();
@@ -163,9 +179,9 @@ async function _syncShow(show) {
   if (String(window.PASTORAL_DB_V2_ENDPOINT || '').trim()) {
     try {
       if (show._gasId) {
-        await _fsApiCall('presentations.update', { id: show._gasId, name: show.name, slides: JSON.stringify(show.slides) });
+        await _fsApiCall('presentations.update', { id: show._gasId, name: payload.name, slides: JSON.stringify(payload.slides) });
       } else {
-        const res = await _fsApiCall('presentations.create', { name: show.name, slides: JSON.stringify(show.slides) });
+        const res = await _fsApiCall('presentations.create', { name: payload.name, slides: JSON.stringify(payload.slides) });
         if (res && res.row) show._gasId = res.row.id;
       }
     } catch (e) {
@@ -291,21 +307,22 @@ html, body {
 </div>
 ${counter}${nextHtml}${noteHtml}
 <script>
+var _bg = ${JSON.stringify(bg)};
 var _blacked = false;
 document.addEventListener('keydown', function(e) {
   var o = window.opener;
   // B = black screen toggle
   if (e.key === 'b' || e.key === 'B') {
     _blacked = !_blacked;
-    document.body.style.background = _blacked ? '#000' : '${bg}';
+    document.body.style.background = _blacked ? '#000' : _bg;
     document.querySelector('.slide').style.visibility = _blacked ? 'hidden' : 'visible';
     return;
   }
   if (!o || !o._fsKey) return;
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
-    e.preventDefault(); _blacked = false; document.body.style.background='${bg}'; document.querySelector('.slide').style.visibility='visible'; o._fsKey('next');
+    e.preventDefault(); _blacked = false; document.body.style.background=_bg; document.querySelector('.slide').style.visibility='visible'; o._fsKey('next');
   } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
-    e.preventDefault(); _blacked = false; document.body.style.background='${bg}'; document.querySelector('.slide').style.visibility='visible'; o._fsKey('prev');
+    e.preventDefault(); _blacked = false; document.body.style.background=_bg; document.querySelector('.slide').style.visibility='visible'; o._fsKey('prev');
   } else if (e.key === 'f' || e.key === 'F') {
     document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
   } else if (e.key === 'Escape') {
@@ -450,7 +467,7 @@ function _renderPreview() {
 
   if (sl.type === 'scripture' && sl.reference) {
     refEl.textContent  = sl.reference;
-    refEl.style.color  = _slideCol(sl);
+    refEl.style.color  = _slideCol(sl, show);
     refEl.hidden = false;
   } else {
     refEl.hidden = true;
@@ -805,6 +822,10 @@ function _setBibleTranslation(t) {
 }
 
 let _lastBibleData = null;
+let _lastBibleSlideId = null;  // capture which slide the fetch targeted, so
+                                // a later "Split into verses" doesn't blow
+                                // away an unrelated slide if the user moved
+                                // selection in the meantime
 
 async function _fetchBibleVerse() {
   const queryEl    = document.getElementById('fs-bible-query');
@@ -830,6 +851,7 @@ async function _fetchBibleVerse() {
     const sl   = _activeSlide();
     const show = _activeShow();
     if (!sl || !show) { _bibleStatus('Select a slide first.', 'err'); return; }
+    _lastBibleSlideId = sl.id;
 
     const verses = data.verses || [];
     const text   = verses.map(v => v.text.trim()).join('\n');
@@ -865,6 +887,11 @@ function _splitBibleVerses() {
   if (!_lastBibleData || !(_lastBibleData.verses || []).length) return;
   const show = _activeShow();
   if (!show) return;
+  // Locate the slide we originally wrote the fetched verses into.  If the
+  // user has since clicked a different slide, fall back to the current
+  // active slide so we don't clobber unrelated content unexpectedly.
+  let targetIdx = show.slides.findIndex(s => s.id === _lastBibleSlideId);
+  if (targetIdx < 0) targetIdx = _st.activeSlide;
   const label  = (document.getElementById('fs-bible-translation')?.value || 'kjv').toUpperCase();
   const verses = _lastBibleData.verses;
 
@@ -873,8 +900,9 @@ function _splitBibleVerses() {
     sl.reference = `${v.book_name} ${v.chapter}:${v.verse} (${label})`;
     return sl;
   });
-  // Replace current slide with one per verse
-  show.slides.splice(_st.activeSlide, 1, ...newSlides);
+  // Replace target slide with one per verse
+  show.slides.splice(targetIdx, 1, ...newSlides);
+  _st.activeSlide = targetIdx;
   _touch(show);
   _renderSlideList();
   _renderPreview();
@@ -1748,58 +1776,210 @@ function _renderSermonPickerList(sermons) {
   });
 }
 
+// ── Sermon → slide builder ───────────────────────────────────────────────────
+// Mirror of FEED's `_buildShowFromSermon` so the picker path produces the same
+// quality deck as the FEED "Send to FlockShow" push.  Keep the two in sync.
+
+const _SLIDE_CHAR_TARGET = 260;   // soft max chars per content slide
+const _SLIDE_CHAR_HARD   = 360;   // hard max — never exceed on one slide
+
+// FEED section type → FlockShow slide type
+const _FEED_TO_SHOW_TYPE = {
+  intro:        'lyrics',
+  scripture:    'scripture',
+  point:        'lyrics',
+  illustration: 'lyrics',
+  explanation:  'lyrics',
+  application:  'lyrics',
+  prayer:       'announce',
+  conclusion:   'announce',
+  transition:   'blank',
+};
+
+// Default section heading when the pastor didn't name the section
+const _SECTION_DEFAULT_TITLE = {
+  intro:        'Introduction',
+  scripture:    'Scripture',
+  point:        'Main Point',
+  illustration: 'Illustration',
+  explanation:  'Explanation',
+  application:  'Application',
+  prayer:       'Prayer',
+  conclusion:   'Conclusion',
+  transition:   'Transition',
+};
+
+// Split a long block of prose into slide-sized chunks (paragraph → sentence).
+function _chunkProseToSlides(text, targetLen) {
+  targetLen = targetLen || _SLIDE_CHAR_TARGET;
+  const out = [];
+  if (!text || !String(text).trim()) return out;
+
+  const paragraphs = String(text)
+    .replace(/\r\n/g, '\n')
+    .split(/\n{2,}/)
+    .map(p => p.trim())
+    .filter(Boolean);
+
+  paragraphs.forEach(para => {
+    if (para.length <= targetLen) { out.push(para); return; }
+    const sentences = para.match(/[^.!?]+[.!?]+[")'\]]*\s*|[^.!?]+$/g) || [para];
+    let bucket = '';
+    sentences.forEach(raw => {
+      const s = raw.trim();
+      if (!s) return;
+      if (s.length > _SLIDE_CHAR_HARD) {
+        if (bucket) { out.push(bucket.trim()); bucket = ''; }
+        for (let i = 0; i < s.length; i += _SLIDE_CHAR_HARD) {
+          out.push(s.slice(i, i + _SLIDE_CHAR_HARD).trim());
+        }
+        return;
+      }
+      if (bucket && (bucket.length + 1 + s.length) > targetLen) {
+        out.push(bucket.trim());
+        bucket = s;
+      } else {
+        bucket = bucket ? (bucket + ' ' + s) : s;
+      }
+    });
+    if (bucket.trim()) out.push(bucket.trim());
+  });
+
+  return out;
+}
+
+// Split scripture text into one slide per verse, tagging each with the ref.
+function _scriptureToSlides(verseText, ref) {
+  const mk = (text) => {
+    const sl = _makeSlide('scripture', text);
+    sl.reference = ref || '';
+    return sl;
+  };
+  if (!verseText || !String(verseText).trim()) {
+    return ref ? [mk('')] : [];
+  }
+  let text = String(verseText).replace(/\r\n/g, '\n').trim();
+  let verses;
+  if (/\s\d+\s+\S/.test(text) || /^\d+\s+/.test(text)) {
+    verses = text.split(/\s(?=\d+\s+[A-Z“"‘'])/).map(v => v.trim()).filter(Boolean);
+  } else {
+    verses = text.split(/\n+/).map(v => v.trim()).filter(Boolean);
+  }
+  if (verses.length <= 1) {
+    return _chunkProseToSlides(text).map(mk);
+  }
+  return verses.map(mk);
+}
+
+// Build the full slide array for a sermon.  Returns an array of slide objects
+// ready to splice into a show.
+function _buildSlidesFromSermon(s) {
+  const slides = [];
+
+  // 1. Title slide
+  const titleLines = [s.title || 'Untitled Sermon'];
+  const speaker    = s.speaker || s.preacher || '';
+  if (speaker) titleLines.push(speaker);
+  slides.push(_makeSlide('announce', titleLines.join('\n')));
+
+  // 2. Series + date
+  const dateStr = s.date
+    ? new Date(s.date + 'T00:00:00').toLocaleDateString('en-US',
+        { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    : '';
+  if (s.series || dateStr) {
+    slides.push(_makeSlide('announce', [s.series, dateStr].filter(Boolean).join('\n')));
+  }
+
+  // 3. Top-level passage
+  const passage = s.passage || s.scripture || '';
+  if (passage) {
+    const sl = _makeSlide('scripture', '');
+    sl.reference = passage;
+    slides.push(sl);
+  }
+
+  // 4. Walk sections
+  const sections = Array.isArray(s.sections) ? s.sections : [];
+  sections.forEach((sec, idx) => {
+    const showType = _FEED_TO_SHOW_TYPE[sec.type] || 'lyrics';
+    const heading  = (sec.title || _SECTION_DEFAULT_TITLE[sec.type] || '').trim();
+    const notes    = (sec.notes || '').trim();
+
+    if (heading) {
+      const tSlide = _makeSlide('announce', heading);
+      tSlide.notes = `Section ${idx + 1} of ${sections.length}`;
+      slides.push(tSlide);
+    }
+
+    if (sec.type === 'scripture') {
+      const ref = (sec.scriptureRef || heading || '').trim();
+      const verses = _scriptureToSlides(sec.scripture || notes, ref);
+      verses.forEach(v => { v.notes = heading || ref || ''; slides.push(v); });
+      return;
+    }
+
+    if (sec.type === 'transition') {
+      if (notes) {
+        const b = _makeSlide('blank', '');
+        b.notes = `[Transition] ${notes}`;
+        slides.push(b);
+      }
+      return;
+    }
+
+    if (!notes) return;
+
+    const chunks = _chunkProseToSlides(notes);
+    chunks.forEach((chunk, i) => {
+      const sl = _makeSlide(showType, chunk);
+      sl.notes = chunks.length > 1 ? `${heading} (${i + 1}/${chunks.length})` : heading;
+      slides.push(sl);
+    });
+  });
+
+  // 5. Altar call
+  if (s.altarCall && s.altarCall.trim()) {
+    const altarChunks = _chunkProseToSlides(s.altarCall.trim());
+    altarChunks.forEach((chunk, i) => {
+      const sl = _makeSlide('announce', chunk);
+      sl.notes = altarChunks.length > 1
+        ? `Altar Call (${i + 1}/${altarChunks.length})`
+        : 'Altar Call';
+      slides.push(sl);
+    });
+  }
+
+  // 6. Legacy fallback: no structured sections AND has free-form `notes`
+  if (!sections.length && s.notes && s.notes.trim()) {
+    _chunkProseToSlides(s.notes.trim()).forEach(chunk => {
+      slides.push(_makeSlide('lyrics', chunk));
+    });
+  }
+
+  return slides;
+}
+
 async function _importSermonAsSlides(sermon) {
   const statusEl = document.getElementById('fs-serm-status');
-  if (statusEl) statusEl.textContent = `Generating slides for "${sermon.title}"…`;
+  const title = sermon.title || 'Untitled Sermon';
+  if (statusEl) statusEl.textContent = `Generating slides for "${title}"…`;
 
   try {
     const show = _activeShow();
     if (!show) { _closeSermonPicker(); return; }
 
-    const slides = [];
-    const title = sermon.title || 'Untitled Sermon';
-    const scripture = sermon.scripture || sermon.passage || '';
-    const preacher = sermon.preacher || sermon.speaker || '';
-
-    // 1. Title slide (announcement type)
-    slides.push(_makeSlide('announce', title + (preacher ? `\n\n${preacher}` : '')));
-
-    // 2. Scripture reference slide (scripture type) if available
-    if (scripture) {
-      slides.push(_makeSlide('scripture', scripture));
-    }
-
-    // 3. Main points (from sections if available, or notes)
+    // Fetch the FULL sermon (sections live on the detail doc, not the list row)
+    let fullSermon = sermon;
     const UR = window.UpperRoom;
     if (UR && typeof UR.getSermon === 'function') {
-      try {
-        const full = await UR.getSermon(sermon.id);
-        // If sermon has structured sections (from FEED app)
-        if (Array.isArray(full.sections) && full.sections.length) {
-          full.sections.forEach(sec => {
-            if (sec.type === 'intro' || sec.type === 'conclusion' || sec.type === 'point') {
-              const text = [sec.heading || '', sec.content || ''].filter(Boolean).join('\n\n');
-              if (text.trim()) slides.push(_makeSlide('lyrics', text.trim()));
-            }
-          });
-        }
-        // Fallback: use notes field if no sections
-        else if (full.notes && full.notes.trim()) {
-          const stanzas = full.notes.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
-          stanzas.forEach(text => slides.push(_makeSlide('lyrics', text)));
-        }
-      } catch (_) { /* fall through to basic sermon data */ }
+      try { fullSermon = await UR.getSermon(sermon.id); }
+      catch (_) { /* fall back to row data */ }
     }
 
-    // Fallback: if no slides generated yet, use basic notes
-    if (slides.length === 1 && sermon.notes && sermon.notes.trim()) {
-      const stanzas = sermon.notes.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
-      stanzas.forEach(text => slides.push(_makeSlide('lyrics', text)));
-    }
-
-    // If still only title slide, add a blank content slide
-    if (slides.length === 1) {
-      slides.push(_makeSlide('lyrics', '(Add sermon content here)'));
+    const slides = _buildSlidesFromSermon(fullSermon);
+    if (!slides.length) {
+      slides.push(_makeSlide('lyrics', '(No sermon content yet — add slides manually)'));
     }
 
     // Insert slides after current active slide
