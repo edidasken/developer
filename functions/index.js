@@ -47,8 +47,20 @@ exports.songSelectAuth = onCall({
       // Capture page state for debugging
       const pageUrl = page.url();
       const pageTitle = await page.title();
+      const pageHtml = await page.content();
+      const inputFields = await page.evaluate(() => {
+        return Array.from(document.querySelectorAll('input')).map(input => ({
+          type: input.type,
+          id: input.id,
+          name: input.name,
+          placeholder: input.placeholder,
+          className: input.className
+        }));
+      });
       console.error(`Login form not found. URL: ${pageUrl}, Title: ${pageTitle}`);
-      throw new Error(`Login form not found on page. Current URL: ${pageUrl}`);
+      console.error('Available input fields:', JSON.stringify(inputFields, null, 2));
+      console.error('Page HTML length:', pageHtml.length);
+      throw new Error(`Login form not found. Available inputs: ${JSON.stringify(inputFields)}`);
     }
 
     // Fill in credentials
@@ -126,8 +138,18 @@ exports.songSelectSearch = onCall({
     } catch (selectorError) {
       const pageUrl = page.url();
       const pageTitle = await page.title();
+      const inputFields = await page.evaluate(() => {
+        return Array.from(document.querySelectorAll('input')).map(input => ({
+          type: input.type,
+          id: input.id,
+          name: input.name,
+          placeholder: input.placeholder,
+          className: input.className
+        }));
+      });
       console.error(`Login form not found. URL: ${pageUrl}, Title: ${pageTitle}`);
-      throw new Error(`Login form not found on page. Current URL: ${pageUrl}`);
+      console.error('Available input fields:', JSON.stringify(inputFields, null, 2));
+      throw new Error(`Login form not found. Available inputs: ${JSON.stringify(inputFields)}`);
     }
 
     await page.type('#EmailAddress', email, {delay: 50});
@@ -228,8 +250,18 @@ exports.songSelectImport = onCall({
     } catch (selectorError) {
       const pageUrl = page.url();
       const pageTitle = await page.title();
+      const inputFields = await page.evaluate(() => {
+        return Array.from(document.querySelectorAll('input')).map(input => ({
+          type: input.type,
+          id: input.id,
+          name: input.name,
+          placeholder: input.placeholder,
+          className: input.className
+        }));
+      });
       console.error(`Login form not found. URL: ${pageUrl}, Title: ${pageTitle}`);
-      throw new Error(`Login form not found on page. Current URL: ${pageUrl}`);
+      console.error('Available input fields:', JSON.stringify(inputFields, null, 2));
+      throw new Error(`Login form not found. Available inputs: ${JSON.stringify(inputFields)}`);
     }
 
     await page.type('#EmailAddress', email, {delay: 50});
