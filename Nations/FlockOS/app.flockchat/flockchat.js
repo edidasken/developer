@@ -617,10 +617,9 @@
         }).catch(() => {});
       }
 
-      // Open the thread (composer will route sends to native SMS).
+      // Open the thread — user types in the FlockChat composer; pressing
+      // Send packages the message and hands it off to the native SMS app.
       window._openConversation(convId);
-      // Also launch the native composer immediately for first-tap convenience.
-      _launchSms(phone, '');
     } catch (err) {
       console.error('[FlockChat] Failed to start SMS conversation:', err);
       _toast('Failed to start SMS: ' + (err.message || 'Unknown'), 'error');
@@ -1120,7 +1119,8 @@
 
       // SMS conversations: hand off to the native SMS composer with the
       // text prefilled, and log the attempt so the thread + recents update.
-      if (conv?.type === 'sms') {        const phone = conv.smsPhone;
+      if (conv?.type === 'sms') {
+        const phone = conv.smsPhone;
         if (!phone) { _toast('No phone on file for this contact', 'error'); return; }
         _launchSms(phone, text);
         await _db.collection('conversations').doc(_activeConvId).collection('messages').add({
@@ -1138,6 +1138,27 @@
           },
           lastActivity: firebase.firestore.FieldValue.serverTimestamp()
         });
+        // Log to the member's ContactLog so it shows up on their Fold page.
+        if (conv.smsMemberUid && window.UpperRoom && typeof window.UpperRoom.createContact === 'function') {
+          try {
+            const today = new Date().toISOString().slice(0, 10);
+            await window.UpperRoom.createContact({
+              memberId:           conv.smsMemberUid,
+              contactDate:        today,
+              contactType:        'Text',
+              direction:          'Outbound',
+              subject:            'FlockChat → SMS',
+              details:            text,
+              followUpNeeded:     'FALSE',
+              followUpDate:       '',
+              followUpCompleted:  'FALSE',
+              contactedBy:        _me.displayName || _me.email || ''
+            });
+          } catch (logErr) {
+            console.warn('[FlockChat] ContactLog write failed:', logErr);
+          }
+        }
+        _toast('📲 SMS opened — tap Send in your messages app', 'success');
         input.value = '';
         input.style.height = 'auto';
         return;
