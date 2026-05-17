@@ -1097,9 +1097,12 @@
           firestoreLoading.classList.add('active');
           firestoreBtn.disabled = true;
 
-          // Discover ALL root-level collections via REST API using the current user's auth token
+          // Discover ALL root-level collections via REST API using the current user's auth token.
+          // Wait for Firebase Auth to restore its session (currentUser is null until async restore).
           let collections = [];
-          const currentUser = firebase.auth ? firebase.auth().currentUser : null;
+          const currentUser = firebase.auth
+            ? await new Promise(resolve => { const u = firebase.auth().onAuthStateChanged(user => { u(); resolve(user); }); })
+            : null;
           if (currentUser) {
             const idToken = await currentUser.getIdToken();
             const projectId = firebase.app().options.projectId;
