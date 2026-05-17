@@ -1524,20 +1524,63 @@
     });
   }
 
+  // Maps a contactLog contactType string to the canonical touch channel value.
+  var _CONTACT_TYPE_TO_CHANNEL = {
+    'text':          'text',
+    'sms':           'text',
+    'phone call':    'call',
+    'phone':         'call',
+    'call':          'call',
+    'email':         'email',
+    'home visit':    'visit',
+    'office visit':  'visit',
+    'video call':    'call',
+  };
+
   function listTouches(opts) {
     opts = opts || {};
     if (!opts.memberId) return Promise.reject('memberId required');
-    // No orderBy — avoids requiring a composite Firestore index on a new collection.
-    // Sort client-side instead (descending by loggedAt).
-    var q = _touchesRef().where('memberId', '==', opts.memberId);
     var limit = opts.limit || 50;
-    return q.get().then(function(snap) {
-      var rows = snap.docs.map(function(d) { var r = d.data(); r.id = d.id; return r; });
-      rows.sort(function(a, b) {
-        var ta = a.loggedAt && a.loggedAt.toMillis ? a.loggedAt.toMillis() : (a.loggedAt ? new Date(a.loggedAt).getTime() : 0);
-        var tb = b.loggedAt && b.loggedAt.toMillis ? b.loggedAt.toMillis() : (b.loggedAt ? new Date(b.loggedAt).getTime() : 0);
-        return tb - ta;
+
+    // Query both collections in parallel so that historical contactLog records
+    // (written before the touches collection existed) surface alongside newer
+    // entries written directly to touches.
+    var touchQuery = _touchesRef().where('memberId', '==', opts.memberId).get();
+    var contactQuery = _contactsRef().where('memberId', '==', opts.memberId).get();
+
+    return Promise.all([touchQuery, contactQuery]).then(function(results) {
+      var touchSnap   = results[0];
+      var contactSnap = results[1];
+
+      // Native touches rows
+      var rows = touchSnap.docs.map(function(d) {
+        var r = d.data(); r.id = d.id; return r;
       });
+
+      // Map contactLog entries to touch shape, skipping any already in touches
+      // (guard: if a touch was written by the new code it won't be in contactLog).
+      contactSnap.docs.forEach(function(d) {
+        var c = d.data();
+        var typeKey = String(c.contactType || '').toLowerCase().trim();
+        var channel = _CONTACT_TYPE_TO_CHANNEL[typeKey] || 'unknown';
+        rows.push({
+          id:         'd_' + d.id,   // prefix avoids id collision with touches docs
+          memberId:   c.memberId,
+          memberName: c.memberName || '',
+          channel:    channel,
+          note:       c.details || c.subject || '',
+          loggedBy:   c.contactedBy || c.createdBy || '',
+          loggedAt:   c.createdAt || null,
+          _source:    'contactLog'
+        });
+      });
+
+      function _ms(ts) {
+        if (!ts) return 0;
+        if (ts.toMillis) return ts.toMillis();
+        return new Date(ts).getTime() || 0;
+      }
+      rows.sort(function(a, b) { return _ms(b.loggedAt) - _ms(a.loggedAt); });
       return rows.slice(0, limit);
     });
   }
