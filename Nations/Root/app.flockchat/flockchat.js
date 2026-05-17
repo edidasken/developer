@@ -1141,24 +1141,17 @@
           },
           lastActivity: firebase.firestore.FieldValue.serverTimestamp()
         });
-        // Log to the member's ContactLog so it shows up on their Fold page.
-        if (conv.smsMemberUid && window.UpperRoom && typeof window.UpperRoom.createContact === 'function') {
+        // Log to the member's touch history so it shows up on their Fold page.
+        if (conv.smsMemberUid && window.UpperRoom && typeof window.UpperRoom.createTouch === 'function') {
           try {
-            const today = new Date().toISOString().slice(0, 10);
-            await window.UpperRoom.createContact({
-              memberId:           conv.smsMemberUid,
-              contactDate:        today,
-              contactType:        'Text',
-              direction:          'Outbound',
-              subject:            'FlockChat → SMS',
-              details:            text,
-              followUpNeeded:     'FALSE',
-              followUpDate:       '',
-              followUpCompleted:  'FALSE',
-              contactedBy:        _me.displayName || _me.email || ''
+            await window.UpperRoom.createTouch({
+              memberId:   conv.smsMemberUid,
+              memberName: conv.name || '',
+              channel:    'text',
+              note:       text
             });
           } catch (logErr) {
-            console.warn('[FlockChat] ContactLog write failed:', logErr);
+            console.warn('[FlockChat] Touch log write failed:', logErr);
           }
         }
         _toast('📲 SMS opened — tap Send in your messages app', 'success');
