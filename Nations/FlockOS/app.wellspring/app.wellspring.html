@@ -1075,36 +1075,39 @@
           return;
         }
 
-        // Initialize Firebase if not already initialized
-        if (!firebase.apps || firebase.apps.length === 0) {
-          if (!window.FLOCK_FIREBASE_CONFIG) {
-            alert('Firebase configuration is missing. Cannot export from Firestore.');
-            return;
-          }
-          try {
-            firebase.initializeApp(window.FLOCK_FIREBASE_CONFIG);
-          } catch (err) {
-            console.error('[Wellspring] Firebase init failed:', err);
-            alert('Failed to initialize Firebase: ' + err.message);
-            return;
-          }
-        }
-
-        // Get Firestore instance
-        const db = firebase.firestore();
-
         try {
           firestoreLoading.classList.add('active');
           firestoreBtn.disabled = true;
 
-          // Discover ALL root-level collections via REST API using the current user's auth token.
-          // Wait for Firebase Auth to restore its session (currentUser is null until async restore).
+          // Initialize Firebase + UpperRoom with full custom-claims auth.
+          // UpperRoom.authenticate() restores the persisted Firebase session and
+          // ensures the token carries churchId/role custom claims that Firestore
+          // security rules require. Without this the reads succeed structurally
+          // but return 0 docs because the rules reject the unclaimed token.
+          if (typeof UpperRoom !== 'undefined' && UpperRoom.init) {
+            await UpperRoom.init();
+            await UpperRoom.authenticate();
+          } else if (!firebase.apps || firebase.apps.length === 0) {
+            if (!window.FLOCK_FIREBASE_CONFIG) {
+              firestoreLoading.classList.remove('active');
+              firestoreBtn.disabled = false;
+              alert('Firebase configuration is missing. Cannot export from Firestore.');
+              return;
+            }
+            firebase.initializeApp(window.FLOCK_FIREBASE_CONFIG);
+          }
+
+          // Get Firestore instance (same one UpperRoom already authenticated)
+          const db = firebase.firestore();
+
+          // Discover ALL root-level collections via REST API.
+          // currentUser now has custom claims thanks to UpperRoom.authenticate().
           let collections = [];
           const currentUser = firebase.auth
             ? await new Promise(resolve => { const u = firebase.auth().onAuthStateChanged(user => { u(); resolve(user); }); })
             : null;
           if (currentUser) {
-            const idToken = await currentUser.getIdToken();
+            const idToken = await currentUser.getIdToken(/* forceRefresh */ true);
             const projectId = firebase.app().options.projectId;
             const resp = await fetch(
               `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:listCollectionIds`,
@@ -1119,9 +1122,9 @@
               collections = json.collectionIds || [];
             }
           }
-          // Fallback to known FlockOS collections if discovery fails or user is not authed
+          // Fallback to known FlockOS collections if discovery fails
           if (collections.length === 0) {
-            collections = ['Members','Families','Books','Messages','Events','Requests'];
+            collections = ['prayers','conversations','broadcasts','templates','Members','Families','Books','Messages','Events','Requests'];
           }
 
           const result = await ws.exportFromFirestore(db, collections);
