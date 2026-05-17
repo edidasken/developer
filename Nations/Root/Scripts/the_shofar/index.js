@@ -396,27 +396,27 @@ function msEnsureStyles() {
         '.ms-arr-chip--active { background:#0f172a; color:#fff; border-color:#0f172a; }',
 
         /* ── ChordPro rendered output ── */
-        '.ms-chord-display { background:#ffffff; border:1px solid rgba(0,0,0,0.08); border-radius:12px; padding:12px 16px; margin-bottom:0; overflow-y:auto; }',
+        '.ms-chord-display { background:linear-gradient(135deg, #0f1735 0%, #1b264f 100%); border:1px solid rgba(232,168,56,0.25); border-radius:12px; padding:12px 16px; margin-bottom:0; overflow-y:auto; }',
         /* Two-column layout — tuned for iPad portrait */
-        '.ms-cp-song { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.86rem; line-height:1.22; color:#111827; column-count:2; column-gap:22px; }',
-        '.ms-cp-title { font-size:1.05rem; font-weight:800; color:#111827; margin:0 0 2px 0; column-span:all; }',
-        '.ms-cp-subtitle { font-size:0.8rem; color:#6b7280; margin:0 0 10px 0; column-span:all; }',
+        '.ms-cp-song { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.86rem; line-height:1.22; color:rgba(255,255,255,0.86); column-count:2; column-gap:22px; }',
+        '.ms-cp-title { font-size:1.05rem; font-weight:800; color:#ffffff; margin:0 0 2px 0; column-span:all; }',
+        '.ms-cp-subtitle { font-size:0.8rem; color:rgba(255,255,255,0.65); margin:0 0 10px 0; column-span:all; }',
         /* Section label */
-        '.ms-cp-section-label { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#6b7280; margin:0 0 3px 0; padding:0; border:none; }',
+        '.ms-cp-section-label { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,0.55); margin:0 0 3px 0; padding:0; border:none; }',
         /* Each section stays together — now nested inside .ms-cp-sec-group */
         '.ms-cp-section { break-inside:avoid; page-break-inside:avoid; }',
         '.ms-cp-spacer { height:6px; }',
         /* Each line = flex row of chord+lyric pairs, wraps as full pairs */
         '.ms-cp-row { display:flex; flex-wrap:wrap; align-items:flex-end; gap:0; margin-bottom:1px; }',
         '.ms-cp-pair { display:inline-flex; flex-direction:column; align-items:flex-start; }',
-        '.ms-cp-chord { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.72rem; font-weight:800; color:#dc2626; line-height:1.2; min-height:1.2em; white-space:pre; padding-right:5px; }',
+        '.ms-cp-chord { font-family:system-ui,"Segoe UI",sans-serif; font-size:0.72rem; font-weight:800; color:#e8a838; line-height:1.2; min-height:1.2em; white-space:pre; padding-right:5px; }',
         '.ms-cp-chord--empty { color:transparent; }',
-        '.ms-cp-word { font-size:0.86rem; color:#111827; white-space:pre; line-height:1.4; }',
+        '.ms-cp-word { font-size:0.86rem; color:rgba(255,255,255,0.86); white-space:pre; line-height:1.4; }',
         '.ms-cp-word--space { color:transparent; }',
-        '.ms-cp-lyric-only { font-size:0.86rem; color:#111827; line-height:1.5; }',
+        '.ms-cp-lyric-only { font-size:0.86rem; color:rgba(255,255,255,0.86); line-height:1.5; }',
 
-        '.ms-chord-line { color:#dc2626; font-weight:700; }',
-        '.ms-lyric-line { color:#111827; }',
+        '.ms-chord-line { color:#e8a838; font-weight:700; }',
+        '.ms-lyric-line { color:rgba(255,255,255,0.86); }',
         '.ms-stand-nav { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-top:1px solid rgba(0,0,0,0.08); }',
         '.ms-stand-counter { color:#6b7280; font-size:0.9rem; }',
 

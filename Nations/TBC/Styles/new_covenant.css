@@ -14447,6 +14447,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-sheet .ms-btn--ghost,
 .ms-modal .ms-btn--ghost,
 .ms-import-result .ms-btn--ghost,
+.ms-import-panel .ms-btn--ghost,
 .ms-dash-action .ms-btn--ghost,
 [id^="ss-"].ms-btn--ghost,
 [class*="ss-"] .ms-btn--ghost {
@@ -14462,6 +14463,7 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-sheet .ms-btn--ghost:hover,
 .ms-modal .ms-btn--ghost:hover,
 .ms-import-result .ms-btn--ghost:hover,
+.ms-import-panel .ms-btn--ghost:hover,
 .ms-dash-action .ms-btn--ghost:hover,
 [id^="ss-"].ms-btn--ghost:hover,
 [class*="ss-"] .ms-btn--ghost:hover {
@@ -15127,7 +15129,11 @@ flock-tabs [role="tablist"], .tabs-bar {
 /* ── Dashboard: navy / gold treatment ────────────────────────────────────
    Scoped to `.ms-dash` so it only affects the home dashboard view, leaving
    the Service Plans grid (which reuses .ms-service-card) untouched. */
-.ms-dash { --dash-navy-1: #0f1735; --dash-navy-2: #1b264f; --dash-gold: var(--ms-gold,#e8a838); }
+.ms-dash { 
+  --dash-navy-1: #0f1735; 
+  --dash-navy-2: #1b264f; 
+  --dash-gold: var(--ms-gold,#e8a838); 
+}
 /* Dashboard view inherits .ms-view's standard 18px top padding so the hero
    card has the same breathing room as every other page-hero. */
 
@@ -15163,16 +15169,120 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ms-dash-hero .ms-btn--primary:hover { background: #f0b845; }
 
 /* Import view tabs - navy theme when inside .ms-dash */
-.ms-dash .ms-import-tabs { border-bottom-color: rgba(255,255,255,0.12); }
-.ms-dash .ms-import-tab { color: rgba(255,255,255,0.65); }
-.ms-dash .ms-import-tab.is-active { color: var(--dash-gold); border-bottom-color: var(--dash-gold); }
-.ms-dash .ms-import-tab:hover { color: rgba(255,255,255,0.85); }
+.ms-dash .ms-import-tabs { border-bottom: none; gap: 8px; margin-bottom: 24px; }
+.ms-dash .ms-import-tab { 
+  color: rgba(255,255,255,0.65); 
+  background: linear-gradient(135deg, #0f1735 0%, #1b264f 100%);
+  border: 1px solid rgba(232,168,56,0.25);
+  border-radius: 10px;
+  padding: 12px 20px;
+  border-bottom: none;
+  margin-bottom: 0;
+}
+.ms-dash .ms-import-tab.is-active { 
+  color: var(--dash-gold); 
+  background: linear-gradient(135deg, #0f1735 0%, #1b264f 100%);
+  border-color: var(--dash-gold);
+  font-weight: 700;
+  box-shadow: 0 0 0 2px rgba(232,168,56,0.15);
+}
+.ms-dash .ms-import-tab:hover { 
+  color: #ffffff; 
+  border-color: rgba(232,168,56,0.45);
+}
 
 /* Import view form elements - navy theme */
 .ms-dash .ms-import-panel .ms-label { color: var(--dash-gold); }
-.ms-dash .ms-import-panel .ms-field-hint { color: rgba(255,255,255,0.58); }
-.ms-dash .ms-import-panel p { color: rgba(255,255,255,0.72) !important; }
-.ms-dash .ms-import-panel .ms-empty-content { color: rgba(255,255,255,0.65); }
+.ms-dash .ms-import-panel .ms-field-hint { color: rgba(15,23,53,0.65); }
+.ms-dash .ms-import-panel p { color: rgba(15,23,53,0.72) !important; }
+.ms-dash .ms-import-panel .ms-empty-content { color: rgba(15,23,53,0.65); }
+.ms-dash .ms-import-panel .ms-btn--primary {
+  background: var(--dash-gold); color: #1a1208; font-weight: 700;
+  box-shadow: 0 6px 18px -8px rgba(232,168,56,0.7);
+}
+.ms-dash .ms-import-panel .ms-btn--primary:hover { background: #f0b845; }
+.ms-dash .ms-import-panel .ms-btn--ghost {
+  background: linear-gradient(135deg, #0f1735 0%, #1b264f 100%);
+  color: var(--dash-gold);
+  border: 1px solid rgba(232,168,56,0.35);
+  font-weight: 700;
+}
+.ms-dash .ms-import-panel .ms-btn--ghost:hover {
+  background: linear-gradient(135deg, #131c3e 0%, #21305f 100%);
+  color: #f0b845;
+  border-color: rgba(232,168,56,0.55);
+}
+/* All form inputs and textareas stretch full width */
+.ms-dash .ms-import-panel .ms-input,
+.ms-dash .ms-import-panel .ms-textarea,
+.ms-dash .ms-import-panel .ms-content-editor {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+/* Navy action card inside import panels - fix text contrast */
+.ms-dash .ms-import-panel .ms-dash-action {
+  background: linear-gradient(135deg, #0f1735 0%, #1b264f 100%);
+  border: 1px solid rgba(232,168,56,0.35);
+  border-radius: 14px;
+  padding: 24px;
+}
+.ms-dash .ms-import-panel .ms-dash-action p {
+  color: rgba(255,255,255,0.78) !important;
+}
+.ms-dash .ms-import-panel .ms-dash-action div[style*="color"] {
+  color: #ffffff !important;
+}
+/* Preview area - inherit The Shofar's navy/gold theme */
+.ms-dash .ms-import-panel #imp-cp-preview,
+.ms-dash .ms-import-panel #pco-preview,
+.ms-dash .ms-import-panel #imp-m-preview {
+  background: linear-gradient(135deg, #0f1735 0%, #1b264f 100%) !important;
+  border: 1px solid rgba(232,168,56,0.25) !important;
+  padding: 18px !important;
+  border-radius: 12px !important;
+}
+.ms-dash .ms-import-panel .ms-content-preview {
+  background: linear-gradient(135deg, #0f1735 0%, #1b264f 100%) !important;
+  border: 1px solid rgba(232,168,56,0.25) !important;
+}
+/* Preview chord/lyric text - gold chords, white lyrics */
+.ms-dash .ms-import-panel #imp-cp-preview .ms-pair-chord,
+.ms-dash .ms-import-panel #pco-preview .ms-pair-chord,
+.ms-dash .ms-import-panel #imp-m-preview .ms-pair-chord {
+  color: var(--dash-gold) !important;
+}
+.ms-dash .ms-import-panel #imp-cp-preview .ms-pair-lyric,
+.ms-dash .ms-import-panel #imp-cp-preview .ms-lyric-line,
+.ms-dash .ms-import-panel #pco-preview .ms-pair-lyric,
+.ms-dash .ms-import-panel #pco-preview .ms-lyric-line,
+.ms-dash .ms-import-panel #imp-m-preview .ms-pair-lyric,
+.ms-dash .ms-import-panel #imp-m-preview .ms-lyric-line {
+  color: rgba(255,255,255,0.86) !important;
+}
+/* Preview song content container needs navy background too */
+.ms-dash .ms-import-panel #imp-cp-preview .ms-song-content,
+.ms-dash .ms-import-panel #pco-preview .ms-song-content,
+.ms-dash .ms-import-panel #imp-m-preview .ms-song-content {
+  background: transparent !important;
+}
+/* Fix preview text colors - white text on navy background */
+.ms-dash .ms-import-panel #imp-cp-preview span,
+.ms-dash .ms-import-panel #pco-preview span,
+.ms-dash .ms-import-panel #imp-cp-preview div[style*="Chart preview"] {
+  color: rgba(255,255,255,0.86) !important;
+}
+/* Keep gold accents gold */
+.ms-dash .ms-import-panel #imp-cp-preview span[style*="--ms-gold"],
+.ms-dash .ms-import-panel #pco-preview span[style*="--ms-gold"] {
+  color: var(--dash-gold) !important;
+}
+/* Fix parsed card background - navy instead of light gold */
+.ms-dash .ms-import-panel #imp-cp-preview > div:first-child,
+.ms-dash .ms-import-panel #pco-preview > div:first-child {
+  background: linear-gradient(135deg, #131c3e 0%, #1f2a55 100%) !important;
+  border-color: rgba(232,168,56,0.35) !important;
+}
 
 /* Stat cards: navy bg, colored stripe + colored number */
 .ms-dash .ms-stats-grid { gap: 14px; margin-bottom: 26px; }
