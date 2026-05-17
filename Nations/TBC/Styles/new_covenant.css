@@ -13159,6 +13159,19 @@ flock-tabs [role="tablist"], .tabs-bar {
 
 .ur-read-controls { display: flex; gap: 10px; margin: 18px 0 8px; flex-wrap: wrap; }
 
+/* Ghost buttons inside the Upper Room get explicit navy/gold treatment so they
+   are legible on the cream page background between cards. */
+.upper-room .flock-btn--ghost {
+  background: transparent;
+  color: #1b264f;
+  border: 1.5px solid rgba(27,38,79,0.35);
+}
+.upper-room .flock-btn--ghost:hover {
+  background: rgba(27,38,79,0.06);
+  border-color: #e8a838;
+  color: #1b264f;
+}
+
 .ur-read-table { background: linear-gradient(135deg, #0f1735 0%, #1b264f 100%); border: 1px solid rgba(232,168,56,0.22); border-radius: 12px; overflow: auto; }
 .ur-read-tbl   { width: 100%; border-collapse: collapse; }
 .ur-read-tbl th, .ur-read-tbl td { padding: 10px 12px; text-align: left; border-bottom: 1px solid rgba(232,168,56,0.15); font: 0.9rem var(--font-ui); color: rgba(255,255,255,0.86); }
