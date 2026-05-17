@@ -12993,6 +12993,19 @@ flock-tabs [role="tablist"], .tabs-bar {
    THE UPPER ROOM — Devotional / Reading / Journal / Prayer  (Navy/Gold theme)
    ════════════════════════════════════════════════════════════════════════════ */
 
+/* ── Override the shared page-hero to match the navy/gold context ─────────── */
+.upper-room .page-hero {
+  background: linear-gradient(135deg, #0f1735 0%, #1b264f 100%);
+  border: 1px solid rgba(232,168,56,0.25);
+  border-radius: 14px;
+  padding: 26px 28px 24px;
+  margin-bottom: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.40);
+}
+.upper-room .page-hero-title    { color: #fff; }
+.upper-room .page-hero-sub      { color: rgba(255,255,255,0.70); }
+.upper-room .page-hero-scripture { color: rgba(232,168,56,0.90); }
+
 /* Scope CSS-variable overrides so inline styles in child views also flip to
    navy/gold without touching any JS.  */
 .upper-room {
@@ -13099,12 +13112,12 @@ flock-tabs [role="tablist"], .tabs-bar {
 .ur-devo-block { padding: 16px 18px; border-radius: 12px; }
 .ur-devo-block h4 { font: 700 0.78rem var(--font-ui); letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 8px; }
 .ur-devo-block p  { font: 0.98rem/1.55 var(--font-ui); margin: 0; }
-.ur-devo-question { background: rgba(232,168,56,0.10); border-left: 3px solid rgba(232,168,56,0.70); }
+.ur-devo-question { background: rgba(232,168,56,0.12); border-left: 3px solid #e8a838; }
 .ur-devo-question h4 { color: #e8a838; }
-.ur-devo-question p  { color: rgba(255,255,255,0.82); }
-.ur-devo-prayer   { background: rgba(255,255,255,0.06); border-left: 3px solid rgba(255,255,255,0.30); }
-.ur-devo-prayer h4   { color: rgba(255,255,255,0.70); }
-.ur-devo-prayer p    { color: rgba(255,255,255,0.82); }
+.ur-devo-question p  { color: rgba(255,255,255,0.86); }
+.ur-devo-prayer   { background: rgba(255,255,255,0.08); border-left: 3px solid rgba(255,255,255,0.40); }
+.ur-devo-prayer h4   { color: rgba(255,255,255,0.80); }
+.ur-devo-prayer p    { color: rgba(255,255,255,0.86); }
 .ur-devo-foot { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-top: 6px; border-top: 1px solid rgba(232,168,56,0.20); }
 .ur-save-status { font: 0.85rem var(--font-ui); color: rgba(255,255,255,0.50); }
 
