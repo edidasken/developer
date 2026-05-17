@@ -2059,8 +2059,8 @@ function msParseSections(text) {
 // ── Section strip HTML builder ─────────────────────────────────
 function msBuildSectionStrip(sections) {
     if (!sections || !sections.length) return '';
-    var cols = { verse:'#60a5fa', chorus:'#f472b6', bridge:'#a78bfa', intro:'#34d399', outro:'#34d399', tag:'#fbbf24', prechorus:'#fb923c', interlude:'#94a3b8' };
-    function col(type) { for (var k in cols) { if (type && type.indexOf(k) !== -1) return cols[k]; } return '#94a3b8'; }
+    var cols = { verse:'#e8a838', chorus:'#e8a838', bridge:'#e8a838', intro:'#e8a838', outro:'#e8a838', tag:'#e8a838', prechorus:'#e8a838', interlude:'#e8a838' };
+    function col(type) { for (var k in cols) { if (type && type.indexOf(k) !== -1) return cols[k]; } return '#e8a838'; }
     var h = '<div class="ms-sec-strip" id="ms-sec-strip">';
     sections.forEach(function(s) {
         var c = col(s.type);
@@ -2100,16 +2100,16 @@ function msRenderChordPro(text, visMap) {
     var inSection  = false;   // inside a .ms-cp-section (break-inside row group)
     var secCounter = 0;       // increments per section label — must match msParseSections order
 
-    // Section label colours
+    // Section label colours - unified gold theme
     var sectionColors = {
-        verse:    '#60a5fa',
-        chorus:   '#f472b6',
-        bridge:   '#a78bfa',
-        intro:    '#34d399',
-        outro:    '#34d399',
-        tag:      '#fbbf24',
-        prechorus:'#fb923c',
-        interlude:'#94a3b8',
+        verse:    '#e8a838',
+        chorus:   '#e8a838',
+        bridge:   '#e8a838',
+        intro:    '#e8a838',
+        outro:    '#e8a838',
+        tag:      '#e8a838',
+        prechorus:'#e8a838',
+        interlude:'#e8a838',
     };
 
     function sectionColor(name) {
