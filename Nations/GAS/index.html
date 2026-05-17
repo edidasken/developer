@@ -379,8 +379,11 @@
       z-index: 9999; background: rgba(0,0,0,0.75);
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
       display: flex; align-items: center; justify-content: center;
-      padding: 1rem; opacity: 0; pointer-events: none;
+      padding: env(safe-area-inset-top, 1rem) env(safe-area-inset-right, 1rem) env(safe-area-inset-bottom, 1rem) env(safe-area-inset-left, 1rem);
+      padding: max(env(safe-area-inset-top), 1rem) max(env(safe-area-inset-right), 1rem) max(env(safe-area-inset-bottom), 1rem) max(env(safe-area-inset-left), 1rem);
+      opacity: 0; pointer-events: none;
       transition: opacity 0.25s ease;
+      touch-action: none;
     }
     .pastor-modal-backdrop.visible {
       opacity: 1; pointer-events: auto;
@@ -392,6 +395,7 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.20);
       width: 100%; max-width: 720px;
       max-height: 88vh;
+      max-height: 88dvh;
       display: flex; flex-direction: column;
       transform: scale(0.94); opacity: 0;
       transition: transform 0.25s ease, opacity 0.25s ease;
@@ -421,9 +425,9 @@
       flex-shrink: 0;
     }
     .pastor-modal-close {
-      width: 32px; height: 32px; border-radius: 8px;
+      min-width: 44px; min-height: 44px; width: 44px; height: 44px; border-radius: 10px;
       border: 1px solid var(--line-strong, rgba(0,0,0,0.12)); background: transparent;
-      color: var(--ink-muted); font-size: 1.2rem;
+      color: var(--ink-muted); font-size: 1.3rem;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
       flex-shrink: 0; line-height: 1;
@@ -436,7 +440,21 @@
       padding: 1.6rem;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       flex: 1;
+    }
+    @media (max-width: 600px) {
+      .pastor-modal {
+        border-radius: 16px 16px 0 0;
+        max-height: 92vh; max-height: 92dvh;
+        margin-top: auto; margin-bottom: 0;
+      }
+      .pastor-modal-backdrop {
+        align-items: flex-end;
+        padding: 0;
+      }
+      .pastor-modal-title { font-size: 1.3rem; }
+      .pastor-modal-body { padding: 1.2rem; }
     }
     .pastor-content { color: var(--ink); line-height: 1.75; font-size: 1.1rem; }
     .pastor-content > p:first-of-type {
@@ -791,7 +809,7 @@
   <div class="ptr-indicator" id="ptrIndicator">&#8635; Release to refresh</div>
 
   <!-- Pastor Modal -->
-  <div class="pastor-modal-backdrop" id="pastorModalBackdrop" onclick="if(event.target===this) _closePastorModal()">
+  <div class="pastor-modal-backdrop" id="pastorModalBackdrop">
     <div class="pastor-modal">
       <div class="pastor-modal-header">
         <div class="pastor-modal-title">
