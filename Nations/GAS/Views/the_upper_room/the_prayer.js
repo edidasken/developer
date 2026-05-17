@@ -62,85 +62,19 @@ function _empty(text) {
 export function mountPrayer(panel, ctx) {
   const UR = window.UpperRoom;
 
-  // Always show Prayer Chain CTA
+  // Always show Prayer Chain CTA with embedded FlockChat
   panel.innerHTML = /* html */`
     <div class="ur-prayer-cta">
       <h3>Pray with the flock</h3>
       <p>Standing requests, the prayer chain, and live updates from your church family.</p>
-      <button type="button" class="flock-btn flock-btn--primary" data-ur-jump="the_prayer_chain">
-        Open the Prayer Chain
-      </button>
-    </div>
-    <div id="ur-my-submissions" style="padding:0 0 32px;">
-      <div style="text-align:center;padding:32px 0;color:var(--ink-faint,#94a3b8);font:0.88rem var(--font-ui,sans-serif);">
-        <div style="width:28px;height:28px;border:2.5px solid var(--line,#e5e7ef);border-top-color:var(--gold,#e8a838);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px;"></div>
-        Loading your submissions…
-      </div>
+      <iframe
+        src="../app.flockchat/app.flockchat.html"
+        title="FlockChat"
+        allow="clipboard-read; clipboard-write; microphone; camera; autoplay; fullscreen"
+        referrerpolicy="strict-origin-when-cross-origin"
+        loading="eager"
+        style="display:block;width:100%;height:520px;border:0;border-radius:14px;margin-top:16px;overflow:hidden;">
+      </iframe>
     </div>
   `;
-
-  // Wire prayer chain button
-  panel.querySelector('[data-ur-jump]')?.addEventListener('click', () => {
-    ctx?.go?.('the_prayer_chain');
-  });
-
-  const sub = panel.querySelector('#ur-my-submissions');
-
-  if (!UR || !UR.isReady()) {
-    sub.innerHTML = `<p style="font:0.85rem var(--font-ui,sans-serif);color:var(--ink-faint,#94a3b8);padding:8px 0;">Sign in to see your submitted requests.</p>`;
-    return;
-  }
-
-  const email = UR.userEmail();
-  if (!email) {
-    sub.innerHTML = `<p style="font:0.85rem var(--font-ui,sans-serif);color:var(--ink-faint,#94a3b8);padding:8px 0;">Sign in to see your submitted requests.</p>`;
-    return;
-  }
-
-  // Fetch both in parallel
-  Promise.all([
-    UR.listPrayers({ limit: 20 }).catch(() => []),
-    UR.listOutreachContacts({ byEmail: email, limit: 20 }).catch(() => []),
-  ]).then(([prayers, contacts]) => {
-    // Sort contacts by createdAt descending (done client-side because we skip orderBy)
-    contacts.sort((a, b) => {
-      const ta = a.createdAt?.seconds ?? 0;
-      const tb = b.createdAt?.seconds ?? 0;
-      return tb - ta;
-    });
-
-    let html = '';
-
-    // Prayer requests
-    if (prayers.length) {
-      const cards = prayers.map(p => _card({
-        icon: '🙏',
-        label: p.category || 'Prayer Request',
-        date: _fmt(p.submittedAt),
-        status: p.status || 'New',
-        body: p.prayerText,
-      })).join('');
-      html += _section('My Prayer Requests', cards);
-    } else {
-      html += _section('My Prayer Requests', _empty('No prayer requests submitted yet.'));
-    }
-
-    // Contact / outreach forms
-    if (contacts.length) {
-      const cards = contacts.map(c => _card({
-        icon: '✉️',
-        label: c.requestType || 'Contact Form',
-        date: _fmt(c.createdAt),
-        status: c.status || 'New',
-        body: c.message,
-      })).join('');
-      html += _section('My Contact Forms', cards);
-    } else {
-      html += _section('My Contact Forms', _empty('No contact forms submitted yet.'));
-    }
-
-    sub.innerHTML = html;
-  }).catch(() => {
-    sub.innerHTML = `<p style="font:0.85rem var(--font-ui,sans-serif);color:var(--ink-faint,#94a3b8);padding:8px 0;">Could not load submissions. Please try again later.</p>`;
-  });
 }
