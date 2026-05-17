@@ -39,7 +39,7 @@ const TABS = [
 export function render(params = {}) {
   const initial = TABS.some(t => t.id === params.tab) ? params.tab : 'devotional';
   return /* html */`
-    <section class="upper-room">
+    <section class="upper-room ms-dash">
       ${pageHero({
         title: 'The Upper Room',
         subtitle: 'A daily place for the Word — devotion, reading, journal, and prayer.',
