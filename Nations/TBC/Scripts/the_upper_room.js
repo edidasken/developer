@@ -181,23 +181,15 @@
   /* ── Authenticate via Custom Token from Apps Script ────────────── */
   function authenticate() {
     console.log('[FLOCK-DEBUG] UpperRoom.authenticate() called — _ready=' + _ready + ', hasCurrentUser=' + !!(_auth && _auth.currentUser));
-    // Get session from FlockOS auth
+    // Get session from FlockOS auth (available when running inside the Launcher/FlockOS app).
     var session = null;
     if (typeof Nehemiah !== 'undefined' && Nehemiah.getSession) {
       session = Nehemiah.getSession();
     } else if (typeof TheVine !== 'undefined' && TheVine.session) {
       session = TheVine.session();
     }
-    if (!session || !session.email) {
-      console.error('[FLOCK-DEBUG] UpperRoom.authenticate() — NO SESSION, rejecting');
-      return Promise.reject(new Error('No FlockOS session'));
-    }
 
-    _userEmail = session.email;
-    _userName  = session.displayName || session.email;
-    console.log('[FLOCK-DEBUG] UpperRoom.authenticate() — email=' + _userEmail + ', churchId=' + _resolveChurchId());
-
-    // Determine churchId from page context
+    // Determine churchId from page context (needed even in Firebase-only path).
     _churchId = _resolveChurchId();
 
     // Wait for Firebase Auth to finish restoring any persisted session from
@@ -209,7 +201,19 @@
         console.log('[FLOCK-DEBUG] UpperRoom.authenticate() — onAuthStateChanged fired, user=' + (user ? user.uid : 'null'));
 
         if (user) {
-          // Firebase persisted a session — verify custom claims are still present
+          // Firebase persisted a session — fill in email from Firebase user if
+          // Nehemiah/TheVine session isn't available (e.g. standalone app page).
+          if (!session || !session.email) {
+            _userEmail = user.email || user.uid;
+            _userName  = user.displayName || user.email || user.uid;
+            console.log('[FLOCK-DEBUG] UpperRoom.authenticate() — no FlockOS session; using Firebase user email=' + _userEmail);
+          } else {
+            _userEmail = session.email;
+            _userName  = session.displayName || session.email;
+          }
+          console.log('[FLOCK-DEBUG] UpperRoom.authenticate() — email=' + _userEmail + ', churchId=' + _churchId);
+
+          // Verify custom claims are still present.
           console.log('[FLOCK-DEBUG] UpperRoom.authenticate() — restored user, checking claims…');
           _withTimeout(
             user.getIdTokenResult()
@@ -220,14 +224,24 @@
                   console.log('[FLOCK-DEBUG] UpperRoom.authenticate() — FAST PATH: reusing persisted session (no GAS call)');
                   return;  // claims intact — no re-auth needed
                 }
-                // Claims lost after token refresh — get a fresh custom token
+                // Claims lost after token refresh — get a fresh custom token.
+                // This requires Nehemiah/TheVine to be available.
+                if (!session || !session.email) {
+                  throw new Error('No FlockOS session — please sign in from the FlockOS Launcher first.');
+                }
                 console.log('[FLOCK-DEBUG] UpperRoom.authenticate() — claims LOST, re-minting…');
                 return _mintAndSignIn();
               }),
             30000, 'Firebase authentication'
           ).then(resolve).catch(reject);
         } else {
-          // No persisted session — full sign-in via GAS
+          // No persisted Firebase session at all — require Nehemiah/TheVine to mint a new one.
+          if (!session || !session.email) {
+            console.error('[FLOCK-DEBUG] UpperRoom.authenticate() — no Firebase session and no FlockOS session');
+            return reject(new Error('No FlockOS session — please sign in from the FlockOS Launcher first.'));
+          }
+          _userEmail = session.email;
+          _userName  = session.displayName || session.email;
           console.log('[FLOCK-DEBUG] UpperRoom.authenticate() — not signed in, calling _mintAndSignIn()…');
           _mintAndSignIn().then(resolve).catch(reject);
         }
