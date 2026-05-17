@@ -1093,28 +1093,39 @@
         // Get Firestore instance
         const db = firebase.firestore();
 
-        // Prompt for collection names
-        const collectionsInput = prompt(
-          'Enter collection names to export (comma-separated):\n\nExample: Members,Families,Books,Messages,Events,Requests',
-          'Members,Families,Books,Messages,Events,Requests'
-        );
-        if (!collectionsInput) return;
-
-        const collections = collectionsInput.split(',').map(s => s.trim()).filter(Boolean);
-        if (collections.length === 0) {
-          alert('No collections specified');
-          return;
-        }
-
         try {
           firestoreLoading.classList.add('active');
           firestoreBtn.disabled = true;
+
+          // Discover ALL root-level collections via REST API using the current user's auth token
+          let collections = [];
+          const currentUser = firebase.auth ? firebase.auth().currentUser : null;
+          if (currentUser) {
+            const idToken = await currentUser.getIdToken();
+            const projectId = firebase.app().options.projectId;
+            const resp = await fetch(
+              `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:listCollectionIds`,
+              {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+              }
+            );
+            if (resp.ok) {
+              const json = await resp.json();
+              collections = json.collectionIds || [];
+            }
+          }
+          // Fallback to known FlockOS collections if discovery fails or user is not authed
+          if (collections.length === 0) {
+            collections = ['Members','Families','Books','Messages','Events','Requests'];
+          }
 
           const result = await ws.exportFromFirestore(db, collections);
 
           firestoreLoading.classList.remove('active');
           firestoreBtn.disabled = false;
-          alert(`Firestore export complete!\n\nFile: ${result.fileName}\nCollections: ${result.collections}\nTotal documents: ${result.totalDocs.toLocaleString()}`);
+          alert(`Firestore export complete!\n\nFile: ${result.fileName}\nCollections exported: ${result.collections}\nTotal documents: ${result.totalDocs.toLocaleString()}`);
         } catch (err) {
           firestoreLoading.classList.remove('active');
           firestoreBtn.disabled = false;

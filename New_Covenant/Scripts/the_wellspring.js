@@ -614,8 +614,7 @@ const TheWellspring = (() => {
     a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 250);
     return fileName;
   }
 
@@ -660,8 +659,7 @@ const TheWellspring = (() => {
     a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 250);
 
     return { fileName, collections: collections.length, totalDocs };
   }
