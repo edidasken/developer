@@ -965,10 +965,28 @@
   <script src="Scripts/the_true_vine.js"></script>
   <script src="Scripts/firm_foundation.js"></script>
 
+  <!-- Firebase SDK + UpperRoom — required for profile panel (prayer, journal, calendar) -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script defer src="Scripts/the_upper_room.js"></script>
+
   <!-- Unity header mount: same chrome as every app -->
   <script type="module">
     import { mountUnityHeader } from './Scripts/the_unity_header.js';
     import { openUnityProfile } from './Scripts/the_unity_profile.js';
+
+    // Init UpperRoom (Firebase / Firestore) so the profile panel can load live data.
+    // This mirrors what firm_foundation.js does on sign-in — here we restore the
+    // already-persisted Firebase Auth session when the user arrives already logged in.
+    (async () => {
+      try {
+        if (typeof UpperRoom !== 'undefined' && UpperRoom.init) {
+          await UpperRoom.init();
+          await UpperRoom.authenticate();
+        }
+      } catch (_) { /* best-effort — profile falls back to showing empty sections */ }
+    })();
 
     // Read shared FlockOS auth session (set by Nehemiah / firm_foundation.js after sign-in).
     let user = null;
