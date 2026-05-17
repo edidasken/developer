@@ -261,7 +261,7 @@ async function boot() {
 
     // If not authenticated, send back to login page
     if (typeof N.isAuthenticated === 'function' && !N.isAuthenticated()) {
-      window.location.replace('./index.html');
+      window.location.replace('app.stand/index.html');
       return;
     }
 
@@ -376,7 +376,7 @@ function _wireHeader() {
       appIconSvg:  STAND_ICON,
       appAccent:   '#a855f7',
       appAccentDk: '#4c1d95',
-      homeHref:    './',
+      homeHref:    'app.stand/',
       user:        S.user || null,
       onSignOut:   _signOutAndRedirect,
       onHamburger: () => {
