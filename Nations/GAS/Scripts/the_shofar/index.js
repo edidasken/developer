@@ -322,10 +322,13 @@ function msEnsureStyles() {
         '.ms-tab-btn { flex:1; padding:14px 8px; background:transparent; color:rgba(255,255,255,0.55); border:none; border-bottom:2px solid transparent; font-weight:700; font-size:1rem; cursor:pointer; transition:all 0.2s; font-family:Inter,sans-serif; }',
         '.ms-tab-btn.ms-active { color:#e8a838; border-bottom-color:#e8a838; background:rgba(232,168,56,0.08); }',
 
-        /* Table */
+        /* Table — desktop/tablet view: navy/gold theme matching mobile cards */
+        '.ms-song-table-wrap { overflow-x:auto; background:linear-gradient(135deg,#0f1735 0%,#1b264f 100%); border:1px solid rgba(232,168,56,0.25); border-radius:14px; overflow:hidden; }',
         '.ms-table { width:100%; border-collapse:collapse; font-size:0.92rem; }',
-        '.ms-table th { padding:10px 8px; text-align:left; color:rgba(255,255,255,0.55); font-weight:600; font-size:0.8rem; text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.12); }',
-        '.ms-table td { padding:10px 8px; border-bottom:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.86); }',
+        '.ms-table thead { background:rgba(15,23,53,0.6); }',
+        '.ms-table th { padding:12px 12px; text-align:left; color:rgba(232,168,56,0.85); font-weight:700; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; border-bottom:1px solid rgba(232,168,56,0.2); }',
+        '.ms-table td { padding:12px 12px; border-bottom:1px solid rgba(255,255,255,0.07); color:rgba(255,255,255,0.86); }',
+        '.ms-table tbody tr:last-child td { border-bottom:none; }',
         '.ms-table tr:hover td { background:rgba(255,255,255,0.05); }',
 
         /* Buttons */
