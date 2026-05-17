@@ -62,13 +62,22 @@ function _empty(text) {
 export function mountPrayer(panel, ctx) {
   const UR = window.UpperRoom;
 
+  // Derive FlockChat URL from current page location so it works on any host
+  // (GitHub Pages, Firebase Hosting, local dev server, etc.)
+  // Page lives at: …/app.flockos/app.flockos.html
+  // FlockChat lives at: …/app.flockchat/app.flockchat.html
+  const _chatUrl = (() => {
+    const base = window.location.href.replace(/\/app\.flockos\/[^?#]*.*$/, '');
+    return base + '/app.flockchat/app.flockchat.html';
+  })();
+
   // Always show Prayer Chain CTA with embedded FlockChat
   panel.innerHTML = /* html */`
     <div class="ur-prayer-cta">
       <h3>Pray with the flock</h3>
       <p>Standing requests, the prayer chain, and live updates from your church family.</p>
       <iframe
-        src="../app.flockchat/app.flockchat.html"
+        src="${_chatUrl}"
         title="FlockChat"
         allow="clipboard-read; clipboard-write; microphone; camera; autoplay; fullscreen"
         referrerpolicy="strict-origin-when-cross-origin"
