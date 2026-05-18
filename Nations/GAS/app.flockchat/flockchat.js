@@ -493,9 +493,10 @@
             _renderConversations();
             return;
           }
-          // If the channel has an explicit members list and user is not on it, hide it
+          // If the channel is private and user is not on the members list, hide it
+          const accessMode = d?.accessMode || 'open';
           const members = d?.members || [];
-          if (!_meIsAllAccess && _me?.uid && members.length > 0 && !members.includes(_me.uid)) {
+          if (!_meIsAllAccess && _me?.uid && accessMode === 'private' && !members.includes(_me.uid)) {
             _conversations = _conversations.filter(c => c.id !== id);
             _renderConversations();
             return;
@@ -1598,17 +1599,43 @@
   async function _loadAllUsers() {
     if (_allUsersCache) return _allUsersCache;
     try {
-      const snap = await _db.collection('users').orderBy('displayName').limit(500).get();
-      _allUsersCache = [];
-      snap.forEach(doc => {
-        if (doc.id === _me?.uid) return; // skip self
-        const d = doc.data();
-        const entry = { uid: doc.id, name: d.displayName || d.email || doc.id, email: d.email || '' };
-        _userCache[doc.id] = { name: entry.name, email: entry.email };
-        _allUsersCache.push(entry);
+      // Source of truth = The Fold (members collection).
+      // users collection accumulates auth duplicates — never use it as a roster.
+      const [membersSnap, usersSnap] = await Promise.all([
+        _db.collection('members').orderBy('lastName').get(),
+        _db.collection('users').limit(1000).get()
+      ]);
+      // Build email → auth UID map
+      const emailToUid = new Map();
+      usersSnap.forEach(doc => {
+        const email = (doc.data().email || '').toLowerCase();
+        if (email && !emailToUid.has(email)) emailToUid.set(email, doc.id);
       });
+      const myEmail = (_me?.email || '').toLowerCase();
+      const byEmail = new Map();
+      membersSnap.forEach(doc => {
+        const m = doc.data() || {};
+        const pin = doc.id;
+        // Skip inactive / archived
+        const ms = String(m.membershipStatus || '').toLowerCase();
+        const st = String(m.status || '').toLowerCase();
+        if (ms === 'archived' || st === 'inactive' || st === 'archived') return;
+        const first = m.firstName || '';
+        const last  = m.lastName  || '';
+        const name  = m.displayName || m.name || (first + ' ' + last).trim() || m.primaryEmail || m.email || 'Unknown';
+        const email = (m.primaryEmail || m.email || '').toLowerCase();
+        if (email && email === myEmail) return; // skip self
+        const key = email || pin;
+        if (byEmail.has(key)) return; // dedupe
+        const uid = emailToUid.get(email) || null;
+        if (!uid || uid === _me?.uid) return; // skip if no auth account or self
+        byEmail.set(key, { uid, name, email, pin });
+        _userCache[uid] = { name, email };
+      });
+      _allUsersCache = Array.from(byEmail.values())
+        .sort((a, b) => a.name.localeCompare(b.name));
     } catch (err) {
-      console.warn('[FlockChat] Failed to load users for manager:', err);
+      console.warn('[FlockChat] Failed to load members for manager:', err);
       _allUsersCache = [];
     }
     return _allUsersCache;
@@ -1637,8 +1664,9 @@
       ]);
 
       const data    = snap.exists ? snap.data() : {};
-      const members = data.members        || [];
-      const banned  = data.bannedMembers  || [];
+      const members    = data.members        || [];
+      const banned     = data.bannedMembers  || [];
+      const accessMode = data.accessMode     || 'open';
 
       // Fetch display names for current members and banned
       const [memberUsers, bannedUsers] = await Promise.all([
@@ -1646,7 +1674,7 @@
         Promise.all(banned.map(uid  => _fetchUserName(uid).then(u => ({ uid, ...u }))))
       ]);
 
-      _renderChannelManager(body, memberUsers, allUsers, bannedUsers, members, banned);
+      _renderChannelManager(body, memberUsers, allUsers, bannedUsers, members, banned, accessMode);
     } catch (err) {
       console.error('[FlockChat] Channel manager load failed:', err);
       body.innerHTML = `<div class="fc-mgr-empty">Failed to load channel data.</div>`;
@@ -1659,24 +1687,42 @@
     _mgrSelected.clear();
   };
 
-  function _renderChannelManager(body, memberUsers, allUsers, bannedUsers, memberUids, bannedUids) {
-    const isRestricted = memberUids.length > 0;
+  window._setChannelMode = async function(mode) {
+    if (!_meIsAllAccess || !_activeConvId) return;
+    try {
+      await _db.collection('conversations').doc(_activeConvId).update({ accessMode: mode });
+      // Refresh manager to reflect new mode
+      window._openChannelManager();
+    } catch (err) {
+      console.error('[FlockChat] Failed to set channel mode:', err);
+      _toast('Failed to update channel mode.', 'error');
+    }
+  };
+
+  function _renderChannelManager(body, memberUsers, allUsers, bannedUsers, memberUids, bannedUids, accessMode) {
+    accessMode = accessMode || 'open';
     let html = '';
 
-    // ── Access status ──
+    // ── Access mode toggle ──
     html += `
-      <div style="padding:12px 20px 0;">
-        <div class="fc-mgr-status ${isRestricted ? 'restricted' : 'open'}">
-          ${isRestricted
-            ? `🔒 Restricted — only ${memberUids.length} member${memberUids.length !== 1 ? 's' : ''} can see this channel`
-            : '🌐 Open — all church members can see this channel'}
+      <div style="padding:14px 20px 0;">
+        <div class="fc-mgr-mode-row">
+          <button class="fc-mgr-mode-btn${accessMode === 'open' ? ' active' : ''}"
+                  onclick="window._setChannelMode('open')">🌐 Open</button>
+          <button class="fc-mgr-mode-btn${accessMode === 'private' ? ' active' : ''}"
+                  onclick="window._setChannelMode('private')">🔒 Private</button>
+        </div>
+        <div class="fc-mgr-mode-desc">
+          ${accessMode === 'open'
+            ? 'All church members can see and join this channel.'
+            : 'Only added members can see this channel.'}
         </div>
       </div>`;
 
     // ── Current members ──
-    html += `<div class="fc-mgr-section" style="margin-top:10px">Current Members</div>`;
+    html += `<div class="fc-mgr-section" style="margin-top:10px">Current Members ${memberUids.length > 0 ? `<span style="font-weight:400;text-transform:none;font-size:0.8rem;opacity:0.7">(${memberUids.length})</span>` : ''}</div>`;
     if (memberUsers.length === 0) {
-      html += `<div class="fc-mgr-empty">No explicit members. Channel is open to all.</div>`;
+      html += `<div class="fc-mgr-empty">${accessMode === 'private' ? 'No members added yet — channel is hidden from all.' : 'No explicit members. Channel is open to all.'}</div>`;
     } else {
       memberUsers.forEach(u => {
         html += `
@@ -1684,7 +1730,7 @@
             <div class="fc-mgr-avatar">${_initials(u.name)}</div>
             <div class="fc-mgr-member-info">
               <div class="fc-mgr-member-name">${_e(u.name)}</div>
-              ${u.email ? `<div class="fc-mgr-member-sub">${_e(u.email)}</div>` : ''}
+              <div class="fc-mgr-member-sub">${u.pin ? 'PIN ' + _e(u.pin) : _e(u.email || '')}</div>
             </div>
             <button class="fc-mgr-ban-btn"
                     onclick="window._adminRemoveFromChannel('${_e(u.uid)}','${_e(u.name)}')">
@@ -1710,13 +1756,13 @@
     } else {
       addable.forEach(u => {
         html += `
-          <label class="fc-mgr-user-item" data-name="${_e(u.name.toLowerCase())}" data-email="${_e(u.email.toLowerCase())}">
+          <label class="fc-mgr-user-item" data-name="${_e(u.name.toLowerCase())}" data-email="${_e(u.email.toLowerCase())}" data-pin="${_e(u.pin||'')}">
             <input type="checkbox" class="fc-mgr-check"
                    onchange="window._toggleMgrSelect('${_e(u.uid)}')" value="${_e(u.uid)}">
             <div class="fc-mgr-avatar" style="width:32px;height:32px;font-size:0.75rem">${_initials(u.name)}</div>
             <div class="fc-mgr-member-info">
               <div class="fc-mgr-member-name">${_e(u.name)}</div>
-              ${u.email ? `<div class="fc-mgr-member-sub">${_e(u.email)}</div>` : ''}
+              <div class="fc-mgr-member-sub">${u.pin ? 'PIN ' + _e(u.pin) : _e(u.email || '')}</div>
             </div>
           </label>`;
       });
@@ -1740,7 +1786,7 @@
             <div class="fc-mgr-avatar" style="background:linear-gradient(135deg,#3b0d1e,#f43f5e)">${_initials(u.name)}</div>
             <div class="fc-mgr-member-info">
               <div class="fc-mgr-member-name">${_e(u.name)}</div>
-              ${u.email ? `<div class="fc-mgr-member-sub">${_e(u.email)}</div>` : ''}
+              <div class="fc-mgr-member-sub">${u.pin ? 'PIN ' + _e(u.pin) : _e(u.email || '')}</div>
             </div>
             <button class="fc-mgr-restore-btn"
                     onclick="window._adminRestoreMember('${_e(u.uid)}','${_e(u.name)}')">
