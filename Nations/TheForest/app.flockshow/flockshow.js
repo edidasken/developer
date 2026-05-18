@@ -27,6 +27,21 @@ const SLIDE_TYPES = {
   blank:     { bg: '#000000', text: '#ffffff',  label: 'Blank',        icon: '⬛' },
 };
 
+// ── Sermon source-type badge config ──────────────────────────────────────────
+// Shown in the top-left corner of the present window for sermon-generated slides
+// so the worship team can tell at a glance what kind of content is on screen.
+const _SOURCE_BADGE = {
+  scripture:    { label: '📖 Scripture',    bg: 'rgba(232,168,56,0.85)',  ink: 'rgba(10,10,20,0.90)' },
+  prayer:       { label: '🙏 Prayer',        bg: 'rgba(139,92,246,0.85)', ink: '#fff' },
+  point:        { label: '📌 Main Point',    bg: 'rgba(255,255,255,0.72)', ink: 'rgba(10,10,20,0.90)' },
+  intro:        { label: 'Introduction',     bg: 'rgba(255,255,255,0.50)', ink: 'rgba(10,10,20,0.90)' },
+  illustration: { label: 'Illustration',     bg: 'rgba(255,255,255,0.50)', ink: 'rgba(10,10,20,0.90)' },
+  explanation:  { label: 'Explanation',      bg: 'rgba(255,255,255,0.50)', ink: 'rgba(10,10,20,0.90)' },
+  application:  { label: 'Application',      bg: 'rgba(74,222,128,0.80)',  ink: 'rgba(10,10,20,0.90)' },
+  conclusion:   { label: 'Conclusion',       bg: 'rgba(255,200,56,0.75)',  ink: 'rgba(10,10,20,0.90)' },
+  'altar-call': { label: '✝ Altar Call',     bg: 'rgba(248,113,113,0.85)', ink: '#fff' },
+};
+
 // ── Gradient / colour presets ─────────────────────────────────────────────────
 const GRADIENTS = [
   { label: 'Default',      bg: '',                                                tc: '' },
@@ -307,6 +322,8 @@ function _buildPresentDoc(show, idx) {
     ? `<div style="position:fixed;bottom:14px;right:14px;font:0.68rem system-ui,sans-serif;color:rgba(255,255,255,.45);background:rgba(255,255,255,.08);padding:4px 10px;border-radius:6px;max-width:260px;text-align:right">${_esc(sl.notes)}</div>`
     : '';
   const counter = `<div style="position:fixed;top:12px;right:14px;font:0.65rem system-ui,sans-serif;color:rgba(255,255,255,.22)">${idx + 1}&thinsp;/&thinsp;${show.slides.length}</div>`;
+  const _bdef = _SOURCE_BADGE[sl.sourceType];
+  const badgeHtml = _bdef ? `<div style="position:fixed;top:12px;left:14px;font:600 0.60rem system-ui,sans-serif;color:${_bdef.ink};background:${_bdef.bg};padding:3px 10px;border-radius:12px;letter-spacing:.04em">${_bdef.label}</div>` : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -345,7 +362,7 @@ html, body {
   <div class="slide-text">${body}</div>
   ${refHtml}
 </div>
-${counter}${nextHtml}${noteHtml}
+${counter}${badgeHtml}${nextHtml}${noteHtml}
 <script>
 var _bg = ${JSON.stringify(bg)};
 var _blacked = false;
@@ -2010,7 +2027,9 @@ function _buildSlidesFromSermon(s) {
   const titleLines = [s.title || 'Untitled Sermon'];
   const speaker    = s.speaker || s.preacher || '';
   if (speaker) titleLines.push(speaker);
-  slides.push(_makeSlide('announce', titleLines.join('\n')));
+  const titleSlide = _makeSlide('announce', titleLines.join('\n'));
+  titleSlide.sourceType = 'title';
+  slides.push(titleSlide);
 
   // 2. Series + date
   const dateStr = s.date
@@ -2018,7 +2037,9 @@ function _buildSlidesFromSermon(s) {
         { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
     : '';
   if (s.series || dateStr) {
-    slides.push(_makeSlide('announce', [s.series, dateStr].filter(Boolean).join('\n')));
+    const seriesSlide = _makeSlide('announce', [s.series, dateStr].filter(Boolean).join('\n'));
+    seriesSlide.sourceType = 'series';
+    slides.push(seriesSlide);
   }
 
   // 3. Top-level passage
@@ -2026,6 +2047,7 @@ function _buildSlidesFromSermon(s) {
   if (passage) {
     const sl = _makeSlide('scripture', '');
     sl.reference = passage;
+    sl.sourceType = 'passage';
     slides.push(sl);
   }
 
@@ -2039,13 +2061,14 @@ function _buildSlidesFromSermon(s) {
     if (heading) {
       const tSlide = _makeSlide('announce', heading);
       tSlide.notes = `Section ${idx + 1} of ${sections.length}`;
+      // No sourceType badge on heading slides — the text IS the label
       slides.push(tSlide);
     }
 
     if (sec.type === 'scripture') {
       const ref = (sec.scriptureRef || heading || '').trim();
       const verses = _scriptureToSlides(sec.scripture || notes, ref);
-      verses.forEach(v => { v.notes = heading || ref || ''; slides.push(v); });
+      verses.forEach(v => { v.notes = heading || ref || ''; v.sourceType = 'scripture'; slides.push(v); });
       return;
     }
 
@@ -2064,6 +2087,7 @@ function _buildSlidesFromSermon(s) {
     chunks.forEach((chunk, i) => {
       const sl = _makeSlide(showType, chunk);
       sl.notes = chunks.length > 1 ? `${heading} (${i + 1}/${chunks.length})` : heading;
+      sl.sourceType = sec.type;   // 'intro', 'point', 'illustration', 'prayer', etc.
       slides.push(sl);
     });
   });
@@ -2076,6 +2100,7 @@ function _buildSlidesFromSermon(s) {
       sl.notes = altarChunks.length > 1
         ? `Altar Call (${i + 1}/${altarChunks.length})`
         : 'Altar Call';
+      sl.sourceType = 'altar-call';
       slides.push(sl);
     });
   }
@@ -2086,6 +2111,9 @@ function _buildSlidesFromSermon(s) {
       slides.push(_makeSlide('lyrics', chunk));
     });
   }
+
+  // Uniform 40px font on all sermon slides (non-blank)
+  slides.forEach(sl => { if (sl.type !== 'blank') sl.fontSize = 40; });
 
   return slides;
 }

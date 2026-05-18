@@ -1242,7 +1242,9 @@ function _buildShowFromSermon(s) {
   // 1. Title slide
   const titleLines = [s.title || 'Untitled Sermon'];
   if (s.speaker) titleLines.push(s.speaker);
-  slides.push(_mkShowSlide('announce', titleLines.join('\n')));
+  const titleSlide = _mkShowSlide('announce', titleLines.join('\n'));
+  titleSlide.sourceType = 'title';
+  slides.push(titleSlide);
 
   // 2. Series + date slide (optional)
   const dateStr = s.date
@@ -1251,12 +1253,16 @@ function _buildShowFromSermon(s) {
     : '';
   if (s.series || dateStr) {
     const subParts = [s.series, dateStr].filter(Boolean);
-    slides.push(_mkShowSlide('announce', subParts.join('\n')));
+    const seriesSlide = _mkShowSlide('announce', subParts.join('\n'));
+    seriesSlide.sourceType = 'series';
+    slides.push(seriesSlide);
   }
 
   // 3. Top-level passage
   if (s.passage) {
-    slides.push(_mkShowSlide('scripture', '', { reference: s.passage }));
+    const passageSlide = _mkShowSlide('scripture', '', { reference: s.passage });
+    passageSlide.sourceType = 'passage';
+    slides.push(passageSlide);
   }
 
   // 4. Walk every section in order — skip those the user opted out of.
@@ -1266,6 +1272,7 @@ function _buildShowFromSermon(s) {
     const notes    = (sec.notes || '').trim();
 
     // Section TITLE slide (gives the pastor a visual breath between blocks)
+    // No sourceType badge on heading slides — the text IS the label
     if (heading) {
       slides.push(_mkShowSlide('announce', heading, {
         notes: `Section ${idx + 1} of ${arr.length}`,
@@ -1275,7 +1282,7 @@ function _buildShowFromSermon(s) {
     if (sec.type === 'scripture') {
       const ref = (sec.scriptureRef || heading || '').trim();
       const verses = _scriptureToSlides(sec.scripture || notes, ref);
-      verses.forEach(v => { v.notes = heading || ref || ''; slides.push(v); });
+      verses.forEach(v => { v.notes = heading || ref || ''; v.sourceType = 'scripture'; slides.push(v); });
       return;
     }
 
@@ -1292,11 +1299,13 @@ function _buildShowFromSermon(s) {
     // Auto-break long notes into slide-sized chunks
     const chunks = _chunkProseToSlides(notes);
     chunks.forEach((chunk, i) => {
-      slides.push(_mkShowSlide(showType, chunk, {
+      const sl = _mkShowSlide(showType, chunk, {
         notes: chunks.length > 1
           ? `${heading} (${i + 1}/${chunks.length})`
           : heading,
-      }));
+      });
+      sl.sourceType = sec.type;   // 'intro', 'point', 'illustration', 'prayer', etc.
+      slides.push(sl);
     });
   });
 
@@ -1304,13 +1313,18 @@ function _buildShowFromSermon(s) {
   if (s.altarCall && s.altarCall.trim()) {
     const altarChunks = _chunkProseToSlides(s.altarCall.trim());
     altarChunks.forEach((chunk, i) => {
-      slides.push(_mkShowSlide('announce', chunk, {
+      const sl = _mkShowSlide('announce', chunk, {
         notes: altarChunks.length > 1
           ? `Altar Call (${i + 1}/${altarChunks.length})`
           : 'Altar Call',
-      }));
+      });
+      sl.sourceType = 'altar-call';
+      slides.push(sl);
     });
   }
+
+  // Uniform 40px font on all sermon slides (non-blank)
+  slides.forEach(sl => { if (sl.type !== 'blank') sl.fontSize = 40; });
 
   return {
     name:        s.title || 'Untitled Sermon',
