@@ -52,10 +52,13 @@
   // Personal sanctuary channel (journal, prayers, devotional, reading)
   const SANCTUARY_ID = 'my-sanctuary';
 
+  // Recent Sermons feed channel
+  const SERMONS_ID = 'recent-sermons';
+
   // Quick-lookup Set of all static group IDs (includes info + sanctuary)
   const ALL_GROUP_IDS = new Set([
     ANNOUNCEMENTS_ID, MENS_MINISTRY_ID, WOMENS_MINISTRY_ID,
-    INFO_FLOCKCHAT_ID, INFO_FLOCKOS_ID, SANCTUARY_ID,
+    INFO_FLOCKCHAT_ID, INFO_FLOCKOS_ID, SANCTUARY_ID, SERMONS_ID,
     ...ALL_MEMBER_GROUPS.map(g => g.id)
   ]);
 
@@ -1031,6 +1034,7 @@
     _injectAnnouncements();
     _injectInfoChannels();
     _injectSanctuary();
+    _injectSermons();
     _renderConversations();
 
     _convUnsub = _db.collection('conversations')
@@ -1051,6 +1055,7 @@
         _injectAnnouncements();
         _injectInfoChannels();
         _injectSanctuary();
+        _injectSermons();
         _renderConversations();
       }, err => {
         console.error('[FlockChat] Failed to load conversations:', err);
@@ -1061,6 +1066,7 @@
         _injectAnnouncements();
         _injectInfoChannels();
         _injectSanctuary();
+        _injectSermons();
         _renderConversations();
       });
   }
@@ -1145,6 +1151,20 @@
     });
   }
 
+  function _injectSermons() {
+    _conversations = _conversations.filter(c => c.id !== SERMONS_ID);
+    _conversations.unshift({
+      id:           SERMONS_ID,
+      type:         'recent-sermons',
+      name:         'Recent Sermons',
+      participants: [],
+      lastMessage:  { text: 'Last 12 preached messages from your church', author: '', timestamp: null },
+      lastActivity: null,
+      unreadCount:  0,
+      _static:      true
+    });
+  }
+
   function _filterConversations(query) {
     const list = $('fc-list');
     if (!list) return;
@@ -1192,6 +1212,8 @@
         return `<svg ${sz} ${S}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>`;
       case 'my-sanctuary':
         return `<svg ${sz} ${S}><line x1="12" y1="2" x2="12" y2="8"/><path d="M9 8c0 1.66 1.34 3 3 3s3-1.34 3-3c0-2-3-5-3-5S9 6 9 8z"/><rect x="10" y="11" width="4" height="11" rx="1"/><line x1="9" y1="14" x2="15" y2="14"/></svg>`;
+      case 'recent-sermons':
+        return `<svg ${sz} ${S}><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`;
       default:
         return `<svg ${sz} ${S}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
     }
@@ -1292,6 +1314,13 @@
           <rect x="10" y="11" width="4" height="11" rx="1"/>
           <line x1="9" y1="14" x2="15" y2="14"/>
         </svg>`;
+      case 'recent-sermons':
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>`;
       default:
         // Generic chat bubble
         return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
@@ -1309,6 +1338,7 @@
       || c.type === 'info-flockchat'
       || c.type === 'info-flockos'
       || c.type === 'my-sanctuary'
+      || c.type === 'recent-sermons'
       || ALL_MEMBER_GROUPS.some(g => g.type === c.type));
   }
   function _isArchivedForMe(c) {
@@ -1340,7 +1370,7 @@
 
     // ── Pinned section (all channel types) ───────────────────────────────
     const PINNED_TYPES = [
-      'my-sanctuary',
+      'my-sanctuary', 'recent-sermons',
       'announcement', 'prayer', 'pastoral',
       'ministry-men', 'ministry-women',
       'servant-team', 'worship-team', 'missions-team',
@@ -1555,6 +1585,8 @@
       else if (conv.type === 'outreach')      meta.textContent = 'Outreach \u2022 evangelism & outreach contacts';
       else if (conv.type === 'info-flockchat') meta.textContent = 'FlockChat guide \u2022 tap any card to read more';
       else if (conv.type === 'info-flockos')   meta.textContent = 'FlockOS guide \u2022 tap any card to read more';
+      else if (conv.type === 'my-sanctuary')   meta.textContent = 'Your personal devotional & prayer hub';
+      else if (conv.type === 'recent-sermons') meta.textContent = 'Last 12 preached sermons from your church';
       else meta.textContent = conv.type === 'dm' ? 'Direct Message' : `${count} ${count === 1 ? 'member' : 'members'}`;
     }
 
@@ -1603,7 +1635,7 @@
     // Hide composer for read-only info channels and sanctuary (has its own input)
     const composer = document.querySelector('.fc-composer');
     if (composer) {
-      const hideComposer = INFO_IDS.has(convId) || convId === SANCTUARY_ID;
+      const hideComposer = INFO_IDS.has(convId) || convId === SANCTUARY_ID || convId === SERMONS_ID;
       composer.style.display = hideComposer ? 'none' : '';
     }
 
@@ -1635,6 +1667,12 @@
     // Personal sanctuary hub — journal, prayers, devotional, reading
     if (convId === SANCTUARY_ID) {
       _renderSanctuary(msgContainer);
+      return;
+    }
+
+    // Recent Sermons feed
+    if (convId === SERMONS_ID) {
+      _renderSermons(msgContainer);
       return;
     }
 
@@ -2586,6 +2624,122 @@
       saveBtn.textContent = 'Save to Journal'; saveBtn.disabled = false;
     }
   };
+
+  /* ── Recent Sermons Feed ─────────────────────────────────────────────── */
+
+  let _srmPage    = 0;
+  let _srmAllRows = [];
+  const SRM_PAGE_SIZE = 12;
+
+  async function _renderSermons(container) {
+    container.innerHTML = '<div class="fc-loading"><div class="fc-spinner"></div></div>';
+    _srmAllRows = [];
+    try {
+      const UR = window.UpperRoom;
+      if (UR && typeof UR.listSermons === 'function') {
+        // Fetch broadly then client-filter for any "preached" status variant
+        const all = await UR.listSermons({ limit: 200 }) || [];
+        _srmAllRows = all.filter(r => {
+          const s = (r.status || '').toLowerCase();
+          return s === 'preached' || s === 'delivered';
+        });
+      }
+    } catch (err) {
+      console.warn('[Sermons] fetch failed', err);
+    }
+    _srmPage = 0;
+    _renderSermonPage(container);
+  }
+
+  function _renderSermonPage(container) {
+    const total = _srmAllRows.length;
+    if (total === 0) {
+      container.innerHTML = `
+        <div class="fc-sct-section">
+          <div class="fc-sct-word-empty">
+            <div class="fc-sct-word-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+            </div>
+            <p>No preached sermons found yet.</p>
+          </div>
+        </div>`;
+      return;
+    }
+    const pages = Math.max(1, Math.ceil(total / SRM_PAGE_SIZE));
+    _srmPage = Math.min(_srmPage, pages - 1);
+    const start = _srmPage * SRM_PAGE_SIZE;
+    const slice = _srmAllRows.slice(start, start + SRM_PAGE_SIZE);
+    const pagBar = pages > 1 ? `
+      <div class="fc-sct-pagination">
+        <button class="fc-sct-pg-btn" ${_srmPage === 0 ? 'disabled' : ''} onclick="window._srmChangePage(${_srmPage - 1})">&#8592; Prev</button>
+        <span class="fc-sct-pg-info">${_srmPage + 1} / ${pages}</span>
+        <button class="fc-sct-pg-btn" ${_srmPage >= pages - 1 ? 'disabled' : ''} onclick="window._srmChangePage(${_srmPage + 1})">Next &#8594;</button>
+      </div>` : '';
+    container.innerHTML = `
+      <div class="fc-sct-section fc-srm-feed">
+        ${slice.map(_sermonBubble).join('')}
+        ${pagBar}
+      </div>`;
+  }
+
+  window._srmChangePage = function(page) {
+    const container = $('fc-messages');
+    if (!container) return;
+    _srmPage = page;
+    _renderSermonPage(container);
+    container.scrollTop = 0;
+  };
+
+  function _sermonBubble(s) {
+    const title     = _e(s.title || s.Title || 'Untitled Sermon');
+    const preacher  = _e(s.preacher || s.preacherName || s.Preacher || s['Preacher Name'] || 'Pastor');
+    const rawDate   = s.date || s.Date || s.deliveredAt || s.createdAt || '';
+    let dateStr = '';
+    if (rawDate) {
+      try {
+        const d = rawDate.toDate ? rawDate.toDate() : new Date(rawDate);
+        dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      } catch (_) {}
+    }
+    const series    = _e(s.seriesTitle || s.seriesName || s.series || s.Series || '');
+    const scripture = _e(s.scriptureRefs || s.scripture || s.passageRef || s['Scripture Refs'] || s.Scripture || '');
+    const summary   = _e(s.summary || s.Summary || s.description || '');
+    const rawTags   = Array.isArray(s.topicTags) ? s.topicTags
+                      : (s['Topic Tags'] ? String(s['Topic Tags']).split(',') : []);
+    const tags      = rawTags.slice(0, 5).map(t => t.trim()).filter(Boolean);
+    const serviceType = _e(s.serviceType || s['Service Type'] || '');
+
+    return `
+      <div class="fc-sct-word-msg fc-srm-msg">
+        <div class="fc-sct-word-avatar fc-srm-avatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </div>
+        <div class="fc-sct-word-bubble fc-srm-bubble">
+          <div class="fc-srm-accent-bar"></div>
+          <div class="fc-sct-word-bubble-sender">FlockOS &bull; Sermon</div>
+          <div class="fc-srm-title">${title}</div>
+          <div class="fc-srm-meta-row">
+            <span class="fc-srm-preacher">${preacher}</span>
+            ${dateStr ? `<span class="fc-srm-dot">&middot;</span><span class="fc-srm-date">${dateStr}</span>` : ''}
+          </div>
+          ${serviceType ? `<div class="fc-srm-service-pill">${serviceType}</div>` : ''}
+          ${series ? `<div class="fc-srm-series-pill">Series &bull; ${series}</div>` : ''}
+          ${scripture ? `<div class="fc-srm-scripture">${scripture}</div>` : ''}
+          ${summary ? `<div class="fc-srm-summary">${summary}</div>` : ''}
+          ${tags.length ? `<div class="fc-srm-tags">${tags.map(t => `<span class="fc-srm-tag">${_e(t)}</span>`).join('')}</div>` : ''}
+        </div>
+      </div>`;
+  }
 
   /* ── End of My Sanctuary ────────────────────────────────────────────── */
 
