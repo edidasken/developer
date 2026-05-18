@@ -742,8 +742,10 @@ function _renderProps() {
   // Font size slider
   const fsSlider = document.getElementById('fs-prop-font-size');
   const fsLabel  = document.getElementById('fs-prop-font-size-val');
+  const fsNum    = document.getElementById('fs-prop-font-size-num');
   if (fsSlider) fsSlider.value = sl.fontSize || 0;
   if (fsLabel)  fsLabel.textContent = (sl.fontSize && sl.fontSize > 0) ? sl.fontSize + 'px' : 'Auto';
+  if (fsNum && fsNum !== document.activeElement) fsNum.value = (sl.fontSize && sl.fontSize > 0) ? sl.fontSize : '';
 
   // Theme swatches — mark active
   const activeBg = sl.bgColor || '';
@@ -1741,7 +1743,23 @@ function _wire() {
     if (!sl || !show) return;
     sl.fontSize = +e.target.value;
     const label = document.getElementById('fs-prop-font-size-val');
+    const num   = document.getElementById('fs-prop-font-size-num');
     if (label) label.textContent = sl.fontSize > 0 ? sl.fontSize + 'px' : 'Auto';
+    if (num && num !== document.activeElement) num.value = sl.fontSize > 0 ? sl.fontSize : '';
+    _touch(show);
+    _renderSlideList();
+    _renderPreview();
+    _pushToPresent();
+  });
+  document.getElementById('fs-prop-font-size-num')?.addEventListener('input', e => {
+    const sl = _activeSlide(); const show = _activeShow();
+    if (!sl || !show) return;
+    const val = parseInt(e.target.value);
+    sl.fontSize = (val >= 12 && val <= 120) ? val : 0;
+    const slider = document.getElementById('fs-prop-font-size');
+    const label  = document.getElementById('fs-prop-font-size-val');
+    if (slider) slider.value = sl.fontSize;
+    if (label)  label.textContent = sl.fontSize > 0 ? sl.fontSize + 'px' : 'Auto';
     _touch(show);
     _renderSlideList();
     _renderPreview();
@@ -1753,8 +1771,10 @@ function _wire() {
     sl.fontSize = 0;
     const slider = document.getElementById('fs-prop-font-size');
     const label  = document.getElementById('fs-prop-font-size-val');
+    const num    = document.getElementById('fs-prop-font-size-num');
     if (slider) slider.value = 0;
     if (label)  label.textContent = 'Auto';
+    if (num)    num.value = '';
     _touch(show);
     _renderSlideList();
     _renderPreview();

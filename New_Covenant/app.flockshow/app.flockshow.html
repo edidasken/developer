@@ -535,7 +535,7 @@
     /* ── Properties panel (right) ──────────────────────────────────────── */
     #fs-slide-props {
       background: var(--fs-bg); border-left: 1px solid rgba(0,0,0,0.08);
-      overflow-y: auto; padding: 14px 13px; display: flex; flex-direction: column; gap: 14px;
+      overflow-y: auto; padding: 10px 10px; display: flex; flex-direction: column; gap: 6px;
       scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.25) transparent;
     }
 
@@ -567,10 +567,10 @@
       margin-left: 4px; opacity: 0.7;
     }
     .fs-align-btn {
-      flex: 1; padding: 6px 4px; border-radius: 7px;
-      font: 600 0.72rem 'Plus Jakarta Sans', sans-serif;
+      flex: 1; height: 32px; border-radius: 7px;
       border: 1px solid var(--fs-border); background: var(--fs-bg-overlay);
-      color: var(--fs-muted); cursor: pointer; transition: all 0.12s; text-align: center;
+      color: var(--fs-muted); cursor: pointer; transition: all 0.12s;
+      display: flex; align-items: center; justify-content: center;
     }
     .fs-align-btn:hover { background: var(--fs-bg-hover); color: var(--fs-ink); }
     .fs-align-btn--active { border-color: var(--fs-accent) !important; background: var(--fs-accent-dim) !important; color: var(--fs-accent) !important; }
@@ -587,18 +587,38 @@
     .fs-pos-arrow:disabled { opacity: 0.3; cursor: default; }
     .fs-position-select { flex: 1; min-width: 0; }
 
+    .fs-type-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 4px; }
     .fs-type-btn {
-      padding: 7px 4px; border-radius: 7px; font: 500 0.70rem 'Plus Jakarta Sans', sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      padding: 8px 3px; border-radius: 7px; font: 500 0.62rem 'Plus Jakarta Sans', sans-serif;
       border: 1px solid var(--fs-border); background: var(--fs-bg-overlay);
-      color: var(--fs-muted); cursor: pointer; transition: all 0.12s; text-align: center;
+      color: var(--fs-muted); cursor: pointer; transition: all 0.12s; text-align: center; line-height: 1;
     }
+    .fs-type-btn svg { flex-shrink: 0; }
     .fs-type-btn:hover { background: var(--fs-bg-hover); color: var(--fs-ink); }
     .fs-type-btn.fs-type-btn--active { border-color: var(--fs-accent); background: var(--fs-accent-dim); color: var(--fs-accent); }
     .fs-color-input { width: 34px; height: 28px; padding: 1px 2px; border: 1px solid var(--fs-border); border-radius: 6px; cursor: pointer; background: none; }
-    .fs-color-val { font: 0.75rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted); flex: 1; }
-    .fs-color-reset { font: 0.70rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-accent); background: none; border: none; cursor: pointer; padding: 2px 4px; }
-
-    .fs-color-row { display: flex; align-items: center; gap: 8px; }
+    .fs-color-well {
+      width: 54px; height: 38px; flex-shrink: 0; padding: 3px;
+      border: 1.5px solid rgba(15,20,50,0.20); border-radius: 8px;
+      cursor: pointer; background: none;
+    }
+    .fs-color-well::-webkit-color-swatch-wrapper { padding: 0; border-radius: 5px; overflow: hidden; }
+    .fs-color-well::-webkit-color-swatch { border: none; border-radius: 5px; }
+    .fs-color-well:hover { border-color: var(--fs-accent); }
+    .fs-color-info { display: flex; flex-direction: column; justify-content: center; gap: 2px; flex: 1; min-width: 0; }
+    .fs-color-val { font: 600 0.73rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fs-color-reset { font: 0.68rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-accent); background: none; border: none; cursor: pointer; padding: 0; text-align: left; }
+    .fs-color-reset:hover { text-decoration: underline; }
+    .fs-color-row { display: flex; align-items: center; gap: 10px; }
+    .fs-font-num {
+      width: 58px; flex-shrink: 0; padding: 5px 6px;
+      background: var(--fs-bg-input); border: 1px solid var(--fs-border); border-radius: 7px;
+      font: 600 0.82rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-ink);
+      text-align: center; outline: none;
+    }
+    .fs-font-num:focus { border-color: var(--fs-accent); }
+    .fs-font-num::placeholder { color: var(--fs-muted); font-weight: 400; }
       width: 100%; min-height: 70px; background: var(--fs-bg-input);
       border: 1px dashed rgba(232,168,56,0.25); border-radius: 8px;
       padding: 8px 10px; font: 0.78rem 'Plus Jakarta Sans', sans-serif;
@@ -1010,10 +1030,22 @@
         <div class="fs-prop-section">
           <div class="fs-prop-label">Slide Type</div>
           <div class="fs-type-grid">
-            <button class="fs-type-btn" data-type="lyrics">🎵 Lyrics</button>
-            <button class="fs-type-btn" data-type="scripture">📖 Scripture</button>
-            <button class="fs-type-btn" data-type="announce">📣 Announce</button>
-            <button class="fs-type-btn" data-type="blank">⬛ Blank</button>
+            <button class="fs-type-btn" data-type="lyrics">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+              <span>Lyrics</span>
+            </button>
+            <button class="fs-type-btn" data-type="scripture">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              <span>Scripture</span>
+            </button>
+            <button class="fs-type-btn" data-type="announce">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 11 18-9v20L3 13"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+              <span>Announce</span>
+            </button>
+            <button class="fs-type-btn" data-type="blank">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+              <span>Blank</span>
+            </button>
           </div>
         </div>
 
@@ -1022,9 +1054,9 @@
         <div class="fs-prop-section">
           <div class="fs-prop-label">Slide Position</div>
           <div class="fs-position-row">
-            <button class="fs-pos-arrow" id="fs-slide-up-btn" title="Move slide up">↑</button>
+            <button class="fs-pos-arrow" id="fs-slide-up-btn" title="Move slide up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m18 15-6-6-6 6"/></svg></button>
             <select class="fs-prop-input fs-position-select" id="fs-slide-pos-select"></select>
-            <button class="fs-pos-arrow" id="fs-slide-down-btn" title="Move slide down">↓</button>
+            <button class="fs-pos-arrow" id="fs-slide-down-btn" title="Move slide down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button>
           </div>
         </div>
 
@@ -1036,9 +1068,9 @@
 
           <div class="fs-prop-label" style="margin-top:8px">Text Alignment</div>
           <div class="fs-align-row">
-            <button class="fs-align-btn" data-align="left">☰ Left</button>
-            <button class="fs-align-btn fs-align-btn--active" data-align="center">≡ Center</button>
-            <button class="fs-align-btn" data-align="right">Right ☰</button>
+            <button class="fs-align-btn" data-align="left" title="Align left"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="21" y1="6" x2="3" y2="6"/><line x1="15" y1="12" x2="3" y2="12"/><line x1="17" y1="18" x2="3" y2="18"/></svg></button>
+            <button class="fs-align-btn fs-align-btn--active" data-align="center" title="Align center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="21" y1="6" x2="3" y2="6"/><line x1="17" y1="12" x2="7" y2="12"/><line x1="19" y1="18" x2="5" y2="18"/></svg></button>
+            <button class="fs-align-btn" data-align="right" title="Align right"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="12" x2="9" y2="12"/><line x1="21" y1="18" x2="7" y2="18"/></svg></button>
           </div>
 
           <div class="fs-prop-label" style="margin-top:8px">Text</div>
@@ -1084,18 +1116,22 @@
         <div class="fs-prop-section">
           <div class="fs-prop-label">Background Color</div>
           <div class="fs-color-row">
-            <input class="fs-color-input" id="fs-prop-bg" type="color" value="#0b0d14">
-            <span class="fs-color-val" id="fs-prop-bg-label">Default</span>
-            <button class="fs-color-reset" id="fs-prop-bg-reset">Reset</button>
+            <input class="fs-color-well" id="fs-prop-bg" type="color" value="#0b0d14" title="Click to change background color">
+            <div class="fs-color-info">
+              <span class="fs-color-val" id="fs-prop-bg-label">Default</span>
+              <button class="fs-color-reset" id="fs-prop-bg-reset">Reset to default</button>
+            </div>
           </div>
         </div>
 
         <div class="fs-prop-section">
           <div class="fs-prop-label">Text Color</div>
           <div class="fs-color-row">
-            <input class="fs-color-input" id="fs-prop-tc" type="color" value="#f0f1f8">
-            <span class="fs-color-val" id="fs-prop-tc-label">Default</span>
-            <button class="fs-color-reset" id="fs-prop-tc-reset">Reset</button>
+            <input class="fs-color-well" id="fs-prop-tc" type="color" value="#f0f1f8" title="Click to change text color">
+            <div class="fs-color-info">
+              <span class="fs-color-val" id="fs-prop-tc-label">Default</span>
+              <button class="fs-color-reset" id="fs-prop-tc-reset">Reset to default</button>
+            </div>
           </div>
         </div>
 
@@ -1103,7 +1139,7 @@
           <div class="fs-prop-label">Font Size</div>
           <div class="fs-font-row">
             <input type="range" class="fs-range" id="fs-prop-font-size" min="12" max="120" step="4" value="0">
-            <span class="fs-range-val" id="fs-prop-font-size-val">Auto</span>
+            <input type="number" class="fs-font-num" id="fs-prop-font-size-num" min="12" max="120" step="4" placeholder="Auto">
           </div>
           <button class="fs-color-reset" id="fs-prop-font-reset" style="align-self:flex-start;margin-top:3px">Reset to Auto</button>
         </div>
