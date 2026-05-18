@@ -53,7 +53,7 @@
        (white-ish) tokens. --fs-bg is the cream page background showing at edges. */
     :root {
       /* Surfaces — page edges cream, panels/cards navy gradient */
-      --fs-bg:        var(--bg, #faf9f6);                                    /* page edges = cream */
+      --fs-bg:        var(--bg, #f5f0e4);                                    /* page edges = cream */
       --fs-panel:     linear-gradient(135deg, #0f1735 0%, #1b264f 100%);     /* navy gradient panels */
       --fs-panel-alt: linear-gradient(135deg, #14204a 0%, #243068 100%);     /* slightly lighter navy */
       --fs-border:    rgba(255,255,255,0.10);                                /* subtle border on navy */
@@ -575,6 +575,17 @@
     .fs-align-btn:hover { background: var(--fs-bg-hover); color: var(--fs-ink); }
     .fs-align-btn--active { border-color: var(--fs-accent) !important; background: var(--fs-accent-dim) !important; color: var(--fs-accent) !important; }
     .fs-align-row { display: flex; gap: 5px; }
+    .fs-position-row { display: flex; align-items: center; gap: 6px; }
+    .fs-pos-arrow {
+      flex-shrink: 0; width: 30px; height: 30px;
+      background: var(--fs-panel); border: 1px solid var(--fs-border);
+      border-radius: 6px; color: var(--fs-ink); font-size: 1rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .15s, border-color .15s;
+    }
+    .fs-pos-arrow:hover:not(:disabled) { background: var(--fs-hover); border-color: var(--fs-accent); color: var(--fs-accent); }
+    .fs-pos-arrow:disabled { opacity: 0.3; cursor: default; }
+    .fs-position-select { flex: 1; min-width: 0; }
 
     .fs-type-btn {
       padding: 7px 4px; border-radius: 7px; font: 500 0.70rem 'Plus Jakarta Sans', sans-serif;
@@ -846,6 +857,47 @@
     .fs-prop-input::placeholder { color: var(--ink-faint); }
     .fs-prop-textarea { min-height: 90px; }
     .fs-prop-divider { display: none; }
+
+    /* ── Props panel: scoped light cream theme ────────────────────────── */
+    #fs-slide-props {
+      --fs-panel:      #fdf8f0;
+      --fs-panel-alt:  #f7f0e4;
+      --fs-border:     rgba(15,20,50,0.13);
+      --fs-ink:        rgba(15,20,50,0.90);
+      --fs-muted:      rgba(15,20,50,0.52);
+      --fs-bg-input:   rgba(255,255,255,0.82);
+      --fs-bg-overlay: rgba(15,20,50,0.05);
+      --fs-bg-hover:   rgba(15,20,50,0.09);
+      --fs-accent-dim: rgba(232,168,56,0.22);
+      background: #f5f0e4;
+    }
+    /* Dark-arrow SVG for selects inside light panel */
+    #fs-slide-props select.fs-prop-input,
+    #fs-slide-props .fs-bible-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(15%2C20%2C50%2C0.45)'/%3E%3C/svg%3E");
+    }
+    /* Swatch + chip borders for light panel */
+    #fs-slide-props .fs-swatch:hover { border-color: rgba(15,20,50,0.38); }
+    #fs-slide-props .fs-theme-chip   { border-color: rgba(15,20,50,0.15); }
+
+    /* ── Library header: cream-safe overrides ──────────────────────────── */
+    .fs-lib-title { color: rgba(15,20,50,0.90); }
+    #fs-import-show-btn,
+    #fs-import-pro-btn,
+    #fs-export-show-btn {
+      background: rgba(15,20,50,0.08);
+      color: rgba(15,20,50,0.82);
+      border: 1px solid rgba(15,20,50,0.22);
+      box-shadow: none;
+    }
+    #fs-import-show-btn:hover,
+    #fs-import-pro-btn:hover,
+    #fs-export-show-btn:hover {
+      background: rgba(15,20,50,0.15);
+      color: rgba(15,20,50,1);
+      border-color: rgba(15,20,50,0.35);
+    }
+    #fs-export-show-btn:disabled { opacity: 0.35; }
   </style>
 </head>
 <body>
@@ -960,6 +1012,17 @@
             <button class="fs-type-btn" data-type="scripture">📖 Scripture</button>
             <button class="fs-type-btn" data-type="announce">📣 Announce</button>
             <button class="fs-type-btn" data-type="blank">⬛ Blank</button>
+          </div>
+        </div>
+
+        <hr class="fs-prop-divider">
+
+        <div class="fs-prop-section">
+          <div class="fs-prop-label">Slide Position</div>
+          <div class="fs-position-row">
+            <button class="fs-pos-arrow" id="fs-slide-up-btn" title="Move slide up">↑</button>
+            <select class="fs-prop-input fs-position-select" id="fs-slide-pos-select"></select>
+            <button class="fs-pos-arrow" id="fs-slide-down-btn" title="Move slide down">↓</button>
           </div>
         </div>
 

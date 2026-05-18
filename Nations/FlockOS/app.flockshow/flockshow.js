@@ -760,6 +760,23 @@ function _renderProps() {
   if (titleEl && titleEl !== document.activeElement) titleEl.value = show.name;
   if (countEl) countEl.textContent = `${show.slides.length} slide${show.slides.length !== 1 ? 's' : ''}`;
 
+  // Slide position select + arrows
+  const posSelect = document.getElementById('fs-slide-pos-select');
+  const upBtn     = document.getElementById('fs-slide-up-btn');
+  const downBtn   = document.getElementById('fs-slide-down-btn');
+  if (posSelect) {
+    posSelect.innerHTML = '';
+    show.slides.forEach((_, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `Slide ${i + 1} of ${show.slides.length}`;
+      if (i === _st.activeSlide) opt.selected = true;
+      posSelect.appendChild(opt);
+    });
+  }
+  if (upBtn)   upBtn.disabled   = _st.activeSlide === 0;
+  if (downBtn) downBtn.disabled = _st.activeSlide === show.slides.length - 1;
+
   // Show-level metadata (speaker / sermon title watermark)
   const speakerEl  = document.getElementById('fs-show-speaker');
   const stitleEl   = document.getElementById('fs-show-sermon-title');
@@ -957,6 +974,22 @@ function _addSlide(type) {
   const sl = _makeSlide(type, '');
   show.slides.splice(_st.activeSlide + 1, 0, sl);
   _st.activeSlide += 1;
+  _touch(show);
+  _renderSlideList();
+  _renderPreview();
+  _renderProps();
+  _pushToPresent();
+}
+
+function _moveSlide(toIdx) {
+  const show = _activeShow();
+  if (!show) return;
+  const from = _st.activeSlide;
+  const slides = show.slides;
+  if (toIdx < 0 || toIdx >= slides.length || toIdx === from) return;
+  const [sl] = slides.splice(from, 1);
+  slides.splice(toIdx, 0, sl);
+  _st.activeSlide = toIdx;
   _touch(show);
   _renderSlideList();
   _renderPreview();
@@ -1557,6 +1590,11 @@ function _wire() {
   /* ── Duplicate / delete slide ── */
   document.getElementById('fs-dup-slide-btn')?.addEventListener('click', _dupSlide);
   document.getElementById('fs-del-slide-btn')?.addEventListener('click', _delSlide);
+
+  /* ── Slide position (up / down / select) ── */
+  document.getElementById('fs-slide-up-btn')?.addEventListener('click', () => _moveSlide(_st.activeSlide - 1));
+  document.getElementById('fs-slide-down-btn')?.addEventListener('click', () => _moveSlide(_st.activeSlide + 1));
+  document.getElementById('fs-slide-pos-select')?.addEventListener('change', e => _moveSlide(parseInt(e.target.value)));
 
   /* ── Preview navigation ── */
   document.getElementById('fs-prev-btn')?.addEventListener('click', () => _selectSlide(_st.activeSlide - 1));
