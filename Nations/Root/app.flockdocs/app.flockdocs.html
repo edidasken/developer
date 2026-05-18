@@ -410,6 +410,149 @@
       font: 500 0.813rem var(--font-ui);
       color: var(--ink-muted);
     }
+
+    /* ── New-document split-button dropdown ──────────────────────────────── */
+    .fd-new-btn-wrap {
+      position: relative; display: flex; align-items: stretch;
+    }
+    .fd-new-btn-wrap > .fd-btn { border-radius: 8px 0 0 8px; gap: 6px; }
+    .fd-new-type-toggle {
+      width: 28px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--gold); color: #0c1445;
+      border: 0; border-left: 1px solid rgba(0,0,0,0.18);
+      border-radius: 0 8px 8px 0;
+      cursor: pointer; font-size: 0.75rem; font-weight: 700;
+      transition: background 150ms;
+    }
+    .fd-new-type-toggle:hover { background: #f0b534; }
+    .fd-new-menu {
+      position: absolute; top: calc(100% + 6px); right: 0;
+      background: var(--bg-raised); border: 1px solid var(--line);
+      border-radius: 10px; padding: 6px;
+      min-width: 190px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+      z-index: 600;
+    }
+    .fd-new-menu-item {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 10px 12px;
+      background: transparent; border: 0; border-radius: 6px;
+      color: var(--ink); font: 500 0.875rem var(--font-ui);
+      text-align: left; cursor: pointer;
+      transition: background 150ms;
+    }
+    .fd-new-menu-item:hover { background: rgba(59,130,246,0.12); color: #3b82f6; }
+
+    /* ── Spreadsheet doc card accent ─────────────────────────────────────── */
+    .fd-doc-icon.fd-doc-sheet {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+    }
+
+    /* ── Spreadsheet editor view ─────────────────────────────────────────── */
+    .fd-sheet-view {
+      display: flex; flex-direction: column;
+      height: 100%; background: var(--bg);
+    }
+
+    .fd-sheet-toolbar {
+      display: flex; align-items: center; gap: 4px;
+      padding: 8px 16px;
+      background: var(--bg-raised); border-bottom: 1px solid var(--line);
+      flex-shrink: 0; flex-wrap: wrap;
+    }
+    .fd-sheet-name-input {
+      border: 1px solid transparent; background: transparent;
+      color: var(--ink); font: 600 0.938rem var(--font-ui);
+      padding: 4px 8px; border-radius: 6px; outline: none;
+      max-width: 220px;
+    }
+    .fd-sheet-name-input:hover { border-color: var(--line); }
+    .fd-sheet-name-input:focus { border-color: #3b82f6; background: var(--bg); }
+
+    /* Formula bar */
+    .fd-formula-bar {
+      display: flex; align-items: center;
+      background: var(--bg-raised); border-bottom: 2px solid var(--line);
+      flex-shrink: 0; height: 30px;
+    }
+    .fd-cell-ref-box {
+      width: 68px; min-width: 68px;
+      font: 600 0.813rem 'Courier New', monospace; color: var(--ink);
+      padding: 0 8px; border-right: 1px solid var(--line);
+      height: 100%; display: flex; align-items: center; justify-content: center;
+    }
+    .fd-formula-input {
+      flex: 1; border: 0; background: transparent;
+      color: var(--ink); font: 400 0.875rem 'Courier New', monospace;
+      padding: 0 10px; outline: none; height: 100%;
+    }
+
+    /* Grid wrapper */
+    .fd-grid-wrap {
+      flex: 1; overflow: auto; background: white;
+      position: relative;
+    }
+
+    /* Grid table */
+    .fd-grid {
+      border-collapse: collapse; table-layout: fixed;
+      min-width: max-content;
+      font: 400 0.813rem 'Plus Jakarta Sans', sans-serif;
+    }
+    .fd-grid * { box-sizing: border-box; }
+    .fd-corner {
+      position: sticky; top: 0; left: 0; z-index: 4;
+      width: 48px; min-width: 48px;
+      background: #f0f3f5; border: 1px solid #c9d1d9;
+    }
+    .fd-col-header {
+      position: sticky; top: 0; z-index: 3;
+      background: #f0f3f5; border: 1px solid #c9d1d9;
+      text-align: center;
+      font: 500 0.75rem 'Plus Jakarta Sans', sans-serif; color: #57606a;
+      user-select: none;
+      min-width: 100px; width: 100px; height: 24px; padding: 0;
+      cursor: default;
+    }
+    .fd-col-header.is-col-selected { background: #1a73e8; color: white; }
+    .fd-row-header {
+      position: sticky; left: 0; z-index: 2;
+      width: 48px; min-width: 48px;
+      background: #f0f3f5; border: 1px solid #c9d1d9;
+      text-align: center;
+      font: 500 0.75rem 'Plus Jakarta Sans', sans-serif; color: #57606a;
+      user-select: none; height: 24px; padding: 0; cursor: default;
+    }
+    .fd-row-header.is-row-selected { background: #1a73e8; color: white; }
+    .fd-cell {
+      border: 1px solid #c9d1d9;
+      min-width: 100px; width: 100px; height: 24px;
+      padding: 2px 4px; overflow: hidden;
+      white-space: nowrap; text-overflow: ellipsis;
+      color: #1f2937; cursor: cell; vertical-align: middle;
+      position: relative;
+    }
+    .fd-cell:hover { background: #f8fafc; }
+    .fd-cell.is-selected {
+      outline: 2px solid #1a73e8; outline-offset: -1px;
+      background: #e8f0fe !important;
+    }
+    .fd-cell.is-editing {
+      outline: 2px solid #1a73e8; outline-offset: -1px;
+      overflow: visible; padding: 0; z-index: 10;
+    }
+    .fd-cell.fd-bold { font-weight: 700; }
+    .fd-cell.fd-num, .fd-cell.fd-currency,
+    .fd-cell.fd-percent, .fd-cell.fd-decimal { text-align: right; }
+    .fd-cell-editor {
+      width: 100%; height: 100%;
+      min-width: 100px;
+      border: 0; outline: none;
+      padding: 2px 4px;
+      font: inherit; background: white; color: #1f2937;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -438,12 +581,29 @@
 
         <div class="fd-spacer"></div>
 
-        <button class="fd-btn" id="fd-new-doc-btn">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-          </svg>
-          New Document
-        </button>
+        <div class="fd-new-btn-wrap" id="fd-new-btn-wrap">
+          <button class="fd-btn" id="fd-new-doc-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            New
+          </button>
+          <button class="fd-new-type-toggle" id="fd-new-type-toggle" aria-label="Choose document type">▾</button>
+          <div class="fd-new-menu hidden" id="fd-new-menu">
+            <button class="fd-new-menu-item" onclick="FlockDocs.createNewDocument()">
+              <svg fill="white" viewBox="0 0 24 24" width="20" height="20" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);border-radius:4px;padding:2px">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/>
+              </svg>
+              Document
+            </button>
+            <button class="fd-new-menu-item" onclick="FlockDocs.createNewSpreadsheet()">
+              <svg fill="white" viewBox="0 0 24 24" width="20" height="20" style="background:linear-gradient(135deg,#16a34a,#15803d);border-radius:4px;padding:2px">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-2h2v2zm0-4H7v-2h2v2zm0-4H7V7h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
+              </svg>
+              Spreadsheet
+            </button>
+          </div>
+        </div>
 
         <button class="fd-btn-icon" id="fd-user-menu-btn" aria-label="Account">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -624,9 +784,49 @@
         </div>
       </div>
 
-    </div>
+      <!-- Spreadsheet editor view -->
+      <div class="fd-sheet-view hidden" id="fd-sheet-view">
 
-    <!-- Footer -->
+        <!-- Spreadsheet toolbar -->
+        <div class="fd-sheet-toolbar">
+          <button class="fd-toolbar-btn" id="fd-sheet-back-btn" title="Back to library">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+          </button>
+          <div class="fd-toolbar-divider"></div>
+          <input type="text" class="fd-sheet-name-input" id="fd-sheet-name" value="Untitled Spreadsheet" placeholder="Spreadsheet name">
+          <div class="fd-toolbar-divider"></div>
+          <!-- Bold -->
+          <button class="fd-toolbar-btn" id="fs-bold-btn" title="Bold (Ctrl+B)">
+            <svg fill="currentColor" viewBox="0 0 24 24">
+              <path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>
+            </svg>
+          </button>
+          <!-- Number formats -->
+          <button class="fd-toolbar-btn fs-fmt-btn" data-fmt="plain" title="General">123</button>
+          <button class="fd-toolbar-btn fs-fmt-btn" data-fmt="currency" title="Currency ($)">$</button>
+          <button class="fd-toolbar-btn fs-fmt-btn" data-fmt="percent" title="Percent (%)">%</button>
+          <button class="fd-toolbar-btn fs-fmt-btn" data-fmt="decimal" title="2 decimal places">0.0</button>
+          <div class="fd-spacer"></div>
+          <span id="fd-sheet-save-status" style="font:500 0.813rem var(--font-ui);color:var(--ink-muted);padding-right:8px">All changes saved</span>
+          <button class="fd-btn fd-btn--ghost" id="fd-sheet-save-btn">Save</button>
+        </div>
+
+        <!-- Formula bar -->
+        <div class="fd-formula-bar">
+          <div class="fd-cell-ref-box" id="fs-cell-ref">A1</div>
+          <input type="text" id="fs-formula-input" class="fd-formula-input" placeholder="Enter value or =SUM(A1:A10) formula…">
+        </div>
+
+        <!-- Grid -->
+        <div class="fd-grid-wrap" id="fd-grid-wrap" tabindex="0">
+          <!-- Rendered by FlockSheets JS -->
+        </div>
+
+      </div><!-- /#fd-sheet-view -->
+
+    </div><!-- /#fd-main -->
     <div id="fd-footer">
       <div>FlockDocs — Productivity Suite for Your Church</div>
       <div id="fd-save-status">All changes saved</div>
