@@ -48,7 +48,7 @@ const SECTIONS = [
       return [
         { label: 'Firebase Project',  value: projId,                       type: 'text'  },
         { label: 'GAS Endpoint',      value: 'Connected (TheScrolls)',      type: 'badge', status: 'ok'   },
-        { label: 'Push Notifications',value: 'VAPID key set',              type: 'badge', status: 'ok'   },
+        { type: 'vapid' },
         { type: 'network-status-heading' },
         { type: 'missions-source', id: 'ms-src-flock', label: 'Flock Network Status', desc: 'Core Flock platform connectivity', url: 'https://www.yhwh.one' },
         { label: 'Joshua Project API', type: 'jp-api' },
@@ -891,11 +891,71 @@ function _wireIntegrationsPanel(root) {
       const key = input?.value.trim();
       if (key) await _saveAndTestBibleApiKey(root, key);
     }
+    if (btn.dataset.act === 'vapid-save') {
+      const input = panel.querySelector('[data-bind="vapid-key-input"]');
+      const key = input?.value.trim();
+      if (key) await _saveVapidKey(root, key);
+    }
   });
   // Load saved key statuses on first render
   _loadJpStatus(root);
   _loadBibleApiStatus(root);
+  _loadVapidStatus(root);
   _pollMissionsSources(root);
+}
+
+/* ── Push Notifications / VAPID key ─────────────────────────────────────── */
+
+async function _loadVapidStatus(root) {
+  const badge = root.querySelector('[data-bind="vapid-status"]');
+  const input = root.querySelector('[data-bind="vapid-key-input"]');
+  if (!badge) return;
+  _setVapidBadge(badge, 'checking');
+  try {
+    const snap = await firebase.firestore().collection('settings').doc('notifications').get();
+    const key  = (snap.exists && snap.data()?.vapidKey) || '';
+    if (key) {
+      if (input) input.placeholder = '••••••••  (key saved — paste new to replace)';
+      _setVapidBadge(badge, 'ok');
+    } else {
+      _setVapidBadge(badge, 'not-set');
+    }
+  } catch (err) {
+    console.warn('[wall/vapid] load failed', err);
+    _setVapidBadge(badge, 'not-set');
+  }
+}
+
+async function _saveVapidKey(root, key) {
+  const badge = root.querySelector('[data-bind="vapid-status"]');
+  const input = root.querySelector('[data-bind="vapid-key-input"]');
+  if (!badge) return;
+  _setVapidBadge(badge, 'saving');
+  try {
+    await firebase.firestore().collection('settings').doc('notifications')
+      .set({ vapidKey: key }, { merge: true });
+    if (input) {
+      input.value = '';
+      input.placeholder = '••••••••  (key saved — paste new to replace)';
+    }
+    _setVapidBadge(badge, 'ok');
+  } catch (err) {
+    console.warn('[wall/vapid] save failed', err);
+    _setVapidBadge(badge, 'save-error');
+  }
+}
+
+function _setVapidBadge(badge, state) {
+  const map = {
+    checking:     { status: 'muted', text: 'Checking…'     },
+    saving:       { status: 'muted', text: 'Saving…'       },
+    ok:           { status: 'ok',    text: 'Key set'        },
+    'not-set':    { status: 'warn',  text: 'Not configured' },
+    'save-error': { status: 'warn',  text: 'Save failed'   },
+  };
+  const { status, text } = map[state] || map['not-set'];
+  badge.className = `wall-status-badge wall-status--${status}`;
+  badge.textContent = text;
 }
 
 async function _loadJpStatus(root) {
@@ -3171,6 +3231,26 @@ function _settingRow(s) {
           </div>
           <a href="https://scripture.api.bible/sign-up" target="_blank" rel="noopener noreferrer"
             style="font-size:.75rem;color:var(--accent,#4a7fa5);text-decoration:none">Get a free key at api.bible ↗</a>
+        </div>
+      </div>`;
+  }
+  if (s.type === 'vapid') {
+    return /* html */`
+      <div class="wall-setting-row" style="align-items:flex-start;gap:12px">
+        <div class="wall-setting-label" style="padding-top:6px">Push Notifications</div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+          <span class="wall-status-badge wall-status--muted" data-bind="vapid-status">Loading…</span>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+            <input type="password" class="wall-jp-key-input" data-bind="vapid-key-input"
+              placeholder="Paste VAPID Web Push key…"
+              autocomplete="off" spellcheck="false"
+              style="font-size:.82rem;padding:5px 8px;border:1px solid var(--line,#e5e7ef);border-radius:6px;width:260px;background:var(--bg-raised,#fff);color:var(--ink,#1b264f)" />
+            <button class="flock-btn flock-btn--primary flock-btn--sm" data-act="vapid-save" type="button">Save</button>
+          </div>
+          <a href="https://console.firebase.google.com/project/_/settings/cloudmessaging"
+            target="_blank" rel="noopener noreferrer"
+            style="font-size:.75rem;color:var(--accent,#4a7fa5);text-decoration:none"
+            >Firebase Console → Cloud Messaging → Web Push certificates ↗</a>
         </div>
       </div>`;
   }
