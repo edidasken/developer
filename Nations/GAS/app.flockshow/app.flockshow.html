@@ -409,6 +409,20 @@
       min-width: 100px; max-width: 220px; flex-shrink: 1;
     }
     .fs-show-title-input::placeholder { color: var(--fs-muted); }
+    .fs-show-info-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--fs-border);
+      color: var(--fs-muted);
+      font: 0.72rem 'Plus Jakarta Sans', sans-serif;
+      padding: 3px 4px;
+      outline: none;
+      transition: border-color .15s, color .15s;
+      margin-bottom: 4px;
+    }
+    .fs-show-info-input:focus { border-bottom-color: var(--fs-accent); color: var(--fs-ink); }
+    .fs-show-info-input::placeholder { color: var(--fs-muted); opacity: 0.45; }
     .fs-slide-count { font: 0.72rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted); flex-shrink: 0; }
 
     .fs-editor-body { display: grid; grid-template-columns: 196px 1fr 260px; overflow: hidden; }
@@ -888,6 +902,14 @@
 
       <!-- Right: properties -->
       <div id="fs-slide-props">
+        <div class="fs-prop-section">
+          <div class="fs-prop-label">Show Info <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.60rem;opacity:0.6">— watermark on all slides</span></div>
+          <input class="fs-show-info-input" id="fs-show-sermon-title" type="text" placeholder="Sermon title (shown faintly on screen)…" maxlength="80">
+          <input class="fs-show-info-input" id="fs-show-speaker" type="text" placeholder="Preacher name…" maxlength="60">
+        </div>
+
+        <hr class="fs-prop-divider">
+
         <div class="fs-prop-section">
           <div class="fs-prop-label">Slide Type</div>
           <div class="fs-type-grid">

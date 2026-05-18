@@ -1377,15 +1377,17 @@ function _buildShowFromSermon(s) {
     });
   }
 
-  // Uniform 40px font on all sermon slides (non-blank)
-  slides.forEach(sl => { if (sl.type !== 'blank') sl.fontSize = 40; });
+  // Uniform 34px font on all sermon slides (non-blank)
+  slides.forEach(sl => { if (sl.type !== 'blank') sl.fontSize = 34; });
 
   return {
     name:        s.title || 'Untitled Sermon',
+    speaker:     s.speaker || s.preacher || '',
+    sermonTitle: s.title || '',
     slides,
     sermonId:    s.id,
     serviceDate: s.date || '',
-    theme:       { bg: '', tc: '' },
+    theme:       { bg: 'linear-gradient(135deg,#0d1a2b,#0a2040)', tc: '#7dd3fc' },
   };
 }
 

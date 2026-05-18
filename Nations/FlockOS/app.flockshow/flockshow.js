@@ -21,10 +21,10 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
 const FS_KEY = 'flockshow_shows_v1';
 
 const SLIDE_TYPES = {
-  lyrics:    { bg: '#0b0d14', text: '#f0f1f8', label: 'Lyrics',       icon: '🎵' },
-  scripture: { bg: '#0d1a2b', text: '#e8d5a3', label: 'Scripture',    icon: '📖' },
-  announce:  { bg: '#1a0e3c', text: '#ffffff',  label: 'Announcement', icon: '📣' },
-  blank:     { bg: '#000000', text: '#ffffff',  label: 'Blank',        icon: '⬛' },
+  lyrics:    { bg: 'linear-gradient(135deg,#0d1a2b,#0a2040)', text: '#7dd3fc', label: 'Lyrics',       icon: '🎵' },
+  scripture: { bg: 'linear-gradient(135deg,#0d1a2b,#0a2040)', text: '#7dd3fc', label: 'Scripture',    icon: '📖' },
+  announce:  { bg: 'linear-gradient(135deg,#0d1a2b,#0a2040)', text: '#7dd3fc', label: 'Announcement', icon: '📣' },
+  blank:     { bg: '#000000',                                   text: '#ffffff',  label: 'Blank',        icon: '⬛' },
 };
 
 // ── Sermon source-type badge config ──────────────────────────────────────────
@@ -260,12 +260,14 @@ function _makeSlide(type = 'lyrics', text = '') {
 function _makeShow(name = 'New Show') {
   const now = Date.now();
   return {
-    id:        _uid(),
+    id:          _uid(),
     name,
-    slides:    [_makeSlide('announce', name)],
-    theme:     { bg: '', tc: '' },
-    createdAt: now,
-    updatedAt: now,
+    speaker:     '',
+    sermonTitle: '',
+    slides:      [_makeSlide('announce', name)],
+    theme:       { bg: 'linear-gradient(135deg,#0d1a2b,#0a2040)', tc: '#7dd3fc' },
+    createdAt:   now,
+    updatedAt:   now,
   };
 }
 
@@ -294,13 +296,7 @@ function _slideCol(sl, show) { return sl.textColor || show?.theme?.tc || SLIDE_T
 
 function _slideFontSize(sl) {
   if (sl.fontSize && sl.fontSize > 0) return sl.fontSize + 'px';
-  const len = (sl.text || '').length;
-  if (len === 0)   return '4rem';
-  if (len < 40)    return '3.2rem';
-  if (len < 100)   return '2.4rem';
-  if (len < 200)   return '1.8rem';
-  if (len < 400)   return '1.3rem';
-  return '1rem';
+  return '32px';
 }
 
 // ── Inline formatting helpers ─────────────────────────────────────────────────
@@ -346,7 +342,11 @@ function _buildPresentDoc(show, idx) {
   const fs     = _slideFontSize(sl);
   const body   = sl.type === 'blank' ? '' : _renderFormattedText(sl.text || '');
   const refHtml = (sl.type === 'scripture' && sl.reference)
-    ? `<div style="margin-top:1.2rem;font-size:.65em;opacity:.6;font-style:italic">${_esc(sl.reference)}</div>`
+    ? `<div style="margin-top:1.2rem;font-size:28px;opacity:.65;font-style:italic;letter-spacing:.01em">${_esc(sl.reference)}</div>`
+    : '';
+  const speakerLine = [show.sermonTitle, show.speaker].filter(Boolean).join('  ·  ');
+  const infoHtml = speakerLine
+    ? `<div style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);font:500 0.60rem system-ui,sans-serif;color:rgba(255,255,255,.28);letter-spacing:.05em;white-space:nowrap;pointer-events:none;user-select:none">${_esc(speakerLine)}</div>`
     : '';
   const next    = show.slides[idx + 1];
   const nextHtml = next
@@ -396,7 +396,7 @@ html, body {
   <div class="slide-text">${body}</div>
   ${refHtml}
 </div>
-${counter}${badgeHtml}${nextHtml}${noteHtml}
+${counter}${badgeHtml}${nextHtml}${noteHtml}${infoHtml}
 <script>
 var _bg = ${JSON.stringify(bg)};
 var _blacked = false;
@@ -727,6 +727,12 @@ function _renderProps() {
   const countEl   = document.getElementById('fs-slide-count');
   if (titleEl && titleEl !== document.activeElement) titleEl.value = show.name;
   if (countEl) countEl.textContent = `${show.slides.length} slide${show.slides.length !== 1 ? 's' : ''}`;
+
+  // Show-level metadata (speaker / sermon title watermark)
+  const speakerEl  = document.getElementById('fs-show-speaker');
+  const stitleEl   = document.getElementById('fs-show-sermon-title');
+  if (speakerEl && speakerEl !== document.activeElement)  speakerEl.value = show.speaker    || '';
+  if (stitleEl  && stitleEl  !== document.activeElement)  stitleEl.value  = show.sermonTitle || '';
 
   // Export button enabled when in editor
   const expBtn = document.getElementById('fs-export-show-btn');
@@ -1471,6 +1477,22 @@ function _wire() {
     _touch(show);
   });
 
+  /* ── Show-level watermark: speaker / sermon title ── */
+  document.getElementById('fs-show-speaker')?.addEventListener('input', e => {
+    const show = _activeShow();
+    if (!show) return;
+    show.speaker = e.target.value;
+    _touch(show);
+    _pushToPresent();
+  });
+  document.getElementById('fs-show-sermon-title')?.addEventListener('input', e => {
+    const show = _activeShow();
+    if (!show) return;
+    show.sermonTitle = e.target.value;
+    _touch(show);
+    _pushToPresent();
+  });
+
   /* ── Slide list: select slide ── */
   document.getElementById('fs-slide-list')?.addEventListener('click', e => {
     const item = e.target.closest('[data-slide-idx]');
@@ -2173,8 +2195,8 @@ function _buildSlidesFromSermon(s) {
     });
   }
 
-  // Uniform 40px font on all sermon slides (non-blank)
-  slides.forEach(sl => { if (sl.type !== 'blank') sl.fontSize = 40; });
+  // Uniform 34px font on all sermon slides (non-blank)
+  slides.forEach(sl => { if (sl.type !== 'blank') sl.fontSize = 34; });
 
   return slides;
 }
@@ -2200,6 +2222,12 @@ async function _importSermonAsSlides(sermon) {
     if (!slides.length) {
       slides.push(_makeSlide('lyrics', '(No sermon content yet — add slides manually)'));
     }
+
+    // Store sermon metadata on the show for on-screen watermark
+    if (!show.speaker    && (fullSermon.speaker || fullSermon.preacher))
+      show.speaker    = fullSermon.speaker || fullSermon.preacher;
+    if (!show.sermonTitle && fullSermon.title)
+      show.sermonTitle = fullSermon.title;
 
     // Insert slides after current active slide
     show.slides.splice(_st.activeSlide + 1, 0, ...slides);
