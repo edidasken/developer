@@ -1813,6 +1813,10 @@
     const isPrivate = e.private !== false;
     const bodyText = e.entry || e.body || e.text || '';
     const titleText = e.title || '';
+    const isShared = !!e.sharedWithPastor;
+    const shareBtn = isShared
+      ? `<span class="fc-sct-badge published">Shared with Pastor \u2713</span>`
+      : `<button class="fc-sct-publish-btn" onclick="window._shareJournalWithPastor('${_e(e.id)}')">Share with the Pastor</button>`;
     return `
       <div class="fc-sct-entry" data-entry-id="${_e(e.id)}" data-entry-body="${_e(bodyText)}">
         <div class="fc-sct-entry-meta">
@@ -1821,14 +1825,97 @@
           <button class="fc-sct-entry-edit" title="Edit" onclick="window._editJournalEntry('${_e(e.id)}')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
-          <button class="fc-sct-entry-del" title="Delete" onclick="window._deleteJournalEntry('${_e(e.id)}')">
+          <button class="fc-sct-entry-del" title="Delete" onclick="window._confirmJournalDelete('${_e(e.id)}')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
         </div>
+        <div class="fc-sct-entry-share-row">${shareBtn}</div>
         ${titleText ? `<div class="fc-sct-entry-title">${_e(titleText)}</div>` : ''}
         <div class="fc-sct-entry-text">${_e(bodyText)}</div>
       </div>`;
   }
+
+  window._confirmJournalDelete = function(id) {
+    const card = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
+    if (!card || card.querySelector('.fc-sct-del-confirm')) return;
+    const delBtn = card.querySelector('.fc-sct-entry-del');
+    if (delBtn) delBtn.style.visibility = 'hidden';
+    const row = document.createElement('span');
+    row.className = 'fc-sct-del-confirm';
+    row.innerHTML = `<span class="fc-sct-del-label">Delete?</span>
+      <button class="fc-sct-del-yes" onclick="window._executeJournalDelete('${_e(id)}')">Yes</button>
+      <button class="fc-sct-del-no" onclick="window._cancelDeleteConfirm('${_e(id)}')">No</button>`;
+    const meta = card.querySelector('.fc-sct-entry-meta');
+    if (meta) meta.appendChild(row);
+  };
+
+  window._cancelDeleteConfirm = function(id) {
+    const card = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
+    if (!card) return;
+    const row = card.querySelector('.fc-sct-del-confirm');
+    if (row) row.remove();
+    const delBtn = card.querySelector('.fc-sct-entry-del');
+    if (delBtn) delBtn.style.visibility = '';
+  };
+
+  window._executeJournalDelete = async function(id) {
+    if (!id) return;
+    const UR = window.UpperRoom;
+    if (!UR || typeof UR.deleteJournal !== 'function') return;
+    try { await UR.deleteJournal({ id }); }
+    catch (err) { console.error('[Sanctuary] delete journal', err); return; }
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane && _sanctuaryTab === 'journal') await _sctJournal(pane);
+  };
+
+  window._shareJournalWithPastor = async function(id) {
+    if (!id || !_db || !_me || !_pastorUid) return;
+    const card = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
+    const bodyText = card ? (card.dataset.entryBody || '') : '';
+    const btn = card ? card.querySelector('.fc-sct-publish-btn') : null;
+    if (btn) { btn.disabled = true; btn.textContent = 'Sharing\u2026'; }
+    try {
+      // Find (or create) this member's pastoral conversation
+      let pastorConvId = null;
+      const snap = await _db.collection('conversations')
+        .where('type', '==', 'pastoral')
+        .where('participants', 'array-contains', _me.uid)
+        .limit(1).get();
+      if (!snap.empty) {
+        pastorConvId = snap.docs[0].id;
+      } else if (_pastorUid !== _me.uid) {
+        const ref = await _db.collection('conversations').add({
+          type: 'pastoral', name: 'Message the Pastor', icon: '\u2709\ufe0f',
+          participants: [_me.uid, _pastorUid],
+          lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdBy: _me.uid,
+        });
+        pastorConvId = ref.id;
+      }
+      if (pastorConvId) {
+        await _db.collection('conversations').doc(pastorConvId)
+          .collection('messages').add({
+            text: bodyText,
+            authorName:  _me.name || _me.email,
+            author:      _me.uid,
+            authorEmail: _me.email,
+            timestamp:   firebase.firestore.FieldValue.serverTimestamp(),
+            sharedFromJournal: true,
+          });
+      }
+      await _db.collection('journal').doc(id).update({
+        sharedWithPastor:   true,
+        sharedWithPastorAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    } catch (err) {
+      console.error('[Sanctuary] share journal with pastor', err);
+      if (btn) { btn.disabled = false; btn.textContent = 'Share with the Pastor'; }
+      return;
+    }
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane) await _sctJournal(pane);
+  };
 
   window._editJournalEntry = function(id) {
     const card = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
@@ -1903,15 +1990,8 @@
     if (pane) await _sctJournal(pane);
   };
 
-  window._deleteJournalEntry = async function(id) {
-    if (!id) return;
-    const UR = window.UpperRoom;
-    if (!UR || typeof UR.deleteJournal !== 'function') return;
-    try { await UR.deleteJournal({ id }); }
-    catch (err) { console.error('[Sanctuary] delete journal', err); return; }
-    const pane = document.getElementById('fc-sct-pane');
-    if (pane && _sanctuaryTab === 'journal') await _sctJournal(pane);
-  };
+  // _deleteJournalEntry kept for legacy callers; UI now goes through _confirmJournalDelete
+  window._deleteJournalEntry = window._executeJournalDelete;
 
   /* Prayers tab */
   async function _sctPrayers(pane) {
@@ -1952,7 +2032,7 @@
           ${isPublished
             ? '<span class="fc-sct-badge published">Shared to Prayer Chain \u2713</span>'
             : `<button class="fc-sct-publish-btn" onclick="window._publishPrayer('${_e(e.id)}')">Share to Prayer Chain</button>`}
-          <button class="fc-sct-entry-del" title="Delete" onclick="window._deletePrayer('${_e(e.id)}')">
+          <button class="fc-sct-entry-del" title="Delete" onclick="window._confirmPrayerDelete('${_e(e.id)}')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
         </div>
@@ -2007,13 +2087,30 @@
     if (pane) await _sctPrayers(pane);
   };
 
-  window._deletePrayer = async function(id) {
+  window._confirmPrayerDelete = function(id) {
+    const card = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
+    if (!card || card.querySelector('.fc-sct-del-confirm')) return;
+    const delBtn = card.querySelector('.fc-sct-entry-del');
+    if (delBtn) delBtn.style.visibility = 'hidden';
+    const row = document.createElement('span');
+    row.className = 'fc-sct-del-confirm';
+    row.innerHTML = `<span class="fc-sct-del-label">Delete?</span>
+      <button class="fc-sct-del-yes" onclick="window._executePrayerDelete('${_e(id)}')">Yes</button>
+      <button class="fc-sct-del-no" onclick="window._cancelDeleteConfirm('${_e(id)}')">No</button>`;
+    const meta = card.querySelector('.fc-sct-entry-meta');
+    if (meta) meta.appendChild(row);
+  };
+
+  window._executePrayerDelete = async function(id) {
     if (!id || !_db) return;
     try { await _db.collection('prayers').doc(id).delete(); }
     catch (err) { console.error('[Sanctuary] delete prayer', err); return; }
     const pane = document.getElementById('fc-sct-pane');
     if (pane && _sanctuaryTab === 'prayers') await _sctPrayers(pane);
   };
+
+  // _deletePrayer kept for legacy callers
+  window._deletePrayer = window._executePrayerDelete;
 
   /* Today's Word tab */
   async function _sctWord(pane) {
