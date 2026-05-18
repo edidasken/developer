@@ -26,24 +26,24 @@ service cloud.firestore {
 
     function userRole() {
       // Check Firestore permissions collection (source of truth for roles)
-      let permDoc = get(/databases/$(database)/documents/permissions/$(userEmail()));
-      return permDoc.data.role;
+      // Returns null if no permissions doc exists (user defaults to member)
+      let permPath = /databases/$(database)/documents/permissions/$(userEmail());
+      return exists(permPath) ? get(permPath).data.role : null;
     }
 
     function isPastorOrAdmin() {
       // Check if permissions doc exists and has pastor/admin/seed role
-      return exists(/databases/$(database)/documents/permissions/$(userEmail())) 
-        && userRole() in ['pastor', 'admin', 'seed'];
+      let role = userRole();
+      return role != null && role in ['pastor', 'admin', 'seed'];
     }
 
     function isSeedOnly() {
-      return exists(/databases/$(database)/documents/permissions/$(userEmail())) 
-        && userRole() == 'seed';
+      return userRole() == 'seed';
     }
 
     function isLeaderOrAbove() {
-      return exists(/databases/$(database)/documents/permissions/$(userEmail())) 
-        && userRole() in ['leader', 'pastor', 'admin', 'seed'];
+      let role = userRole();
+      return role != null && role in ['leader', 'pastor', 'admin', 'seed'];
     }
 
     // ── Conversations (DMs, Rooms, Threads, Channels) ───────────────
@@ -233,19 +233,19 @@ service cloud.firestore {
       }
 
       // ── Users (AuthUsers) ──────────────────────────────────────────
-      match /users/{email} {
+      match /users/{uid} {
         // Read own profile or pastor/admin can read all
         allow read: if isSignedIn() && (
-          email == userEmail()
+          uid == request.auth.uid
           || isPastorOrAdmin()
         );
 
-        // Create: pastor/admin only
-        allow create: if isSignedIn() && isPastorOrAdmin();
+        // Create: any signed-in user can create their own profile
+        allow create: if isSignedIn() && uid == request.auth.uid;
 
-        // Update: own profile (limited) or pastor/admin
+        // Update: own profile or pastor/admin
         allow update: if isSignedIn() && (
-          email == userEmail()
+          uid == request.auth.uid
           || isPastorOrAdmin()
         );
 
@@ -255,11 +255,9 @@ service cloud.firestore {
 
       // ── Members ─────────────────────────────────────────────────────
       match /members/{memberId} {
-        // Read: own record or leader+
-        allow read: if isSignedIn() && (
-          resource.data.primaryEmail == userEmail()
-          || isLeaderOrAbove()
-        );
+        // Read: any signed-in member can read any member (directory is browsable)
+        // or leader+ for administrative access
+        allow read: if isSignedIn();
 
         // Create: leader+ can add members
         allow create: if isSignedIn() && isLeaderOrAbove();
