@@ -18,6 +18,7 @@
 const STORE_KEY_PREFS = 'fd_prefs';
 const COLLECTION_DOCS = 'flockDocs';
 const COLLECTION_FOLDERS = 'flockFolders';
+const COLLECTION_FORM_RESPONSES = 'flockFormResponses';
 
 /* ── State ────────────────────────────────────────────────────────────────── */
 const S = {
@@ -84,6 +85,15 @@ const S = {
     presenterMode: false,
     presenterIdx: 0,
   },
+  // Session 9: FlockForms state
+  form: {
+    title: 'Untitled Form',
+    description: '',
+    fields: [],         // [{ id, type, label, required, options, placeholder, condition }]
+    selectedFieldId: null,
+    autoSaveTimer: null,
+    responses: [],
+  },
 };
 
 /* ── Initialization ───────────────────────────────────────────────────────── */
@@ -92,6 +102,7 @@ window.FlockDocs = {
   createNewDocument,
   createNewSpreadsheet,
   createNewPresentation,
+  createNewForm,
   showTemplatePicker,
   showShareDialog,
   openDocument,
@@ -102,6 +113,7 @@ window.FlockDocs = {
   exportDocAsPdf: () => _exportDocAsPdf(),
   exportSheetAsCsv: () => _exportSheetAsCsv(),
   exportSheetAsXlsx: () => _exportSheetAsXlsx(),
+  copyPublicFormLink: () => _copyPublicFormLink(),
 };
 
 // Wait for firm_foundation.js to complete auth
@@ -129,6 +141,16 @@ function init() {
 
   _loadPrefs();
   _bindEvents();
+
+  // Session 9: Public form responder mode
+  const params = new URLSearchParams(window.location.search);
+  const publicFormId = params.get('publicForm');
+  if (publicFormId) {
+    _openPublicForm(publicFormId);
+    console.log('[FlockDocs] Public form mode:', publicFormId);
+    return;
+  }
+
   _loadDocuments();
   _loadFolders();
   
@@ -302,6 +324,106 @@ function _bindEvents() {
     if (e.target.files[0]) _importSheetXlsx(e.target.files[0]);
     e.target.value = '';
   });
+
+  // ── Session 9: FlockForms bindings ──────────────────────────────────────
+  document.getElementById('fd-form-back-btn')?.addEventListener('click', _closeFormEditor);
+  document.getElementById('fd-form-save-btn')?.addEventListener('click', _saveForm);
+  document.getElementById('fd-form-copy-link-btn')?.addEventListener('click', _copyPublicFormLink);
+  document.getElementById('fd-form-open-public-btn')?.addEventListener('click', _openCurrentFormPublic);
+  document.getElementById('fd-form-public-submit-btn')?.addEventListener('click', _submitPublicFormResponse);
+
+  document.getElementById('fd-form-name-input')?.addEventListener('input', (e) => {
+    if (!S.currentDoc) return;
+    S.currentDoc.name = e.target.value || 'Untitled Form';
+    _autoSaveForm();
+  });
+  document.getElementById('fd-form-title-input')?.addEventListener('input', (e) => {
+    S.form.title = e.target.value || 'Untitled Form';
+    _renderFormFields();
+    _autoSaveForm();
+  });
+  document.getElementById('fd-form-description-input')?.addEventListener('input', (e) => {
+    S.form.description = e.target.value || '';
+    _autoSaveForm();
+  });
+  document.getElementById('fd-form-notify-email-input')?.addEventListener('input', _autoSaveForm);
+  document.querySelectorAll('[data-add-field]').forEach(btn => {
+    btn.addEventListener('click', () => _addFormField(btn.dataset.addField));
+  });
+
+  document.getElementById('fd-form-fields-list')?.addEventListener('click', (e) => {
+    const card = e.target.closest('[data-field-id]');
+    if (card) _selectFormField(card.dataset.fieldId);
+    const delBtn = e.target.closest('[data-del-field]');
+    if (delBtn) {
+      e.stopPropagation();
+      _deleteFormField(delBtn.dataset.delField);
+    }
+  });
+
+  document.getElementById('fd-form-field-label-input')?.addEventListener('input', () => {
+    const f = _selectedFormField();
+    if (!f) return;
+    f.label = document.getElementById('fd-form-field-label-input')?.value || 'Untitled Question';
+    _renderFormFields();
+    _autoSaveForm();
+  });
+  document.getElementById('fd-form-field-placeholder-input')?.addEventListener('input', () => {
+    const f = _selectedFormField();
+    if (!f) return;
+    f.placeholder = document.getElementById('fd-form-field-placeholder-input')?.value || '';
+    _renderFormFields();
+    _autoSaveForm();
+  });
+  document.getElementById('fd-form-field-required-select')?.addEventListener('change', () => {
+    const f = _selectedFormField();
+    if (!f) return;
+    f.required = document.getElementById('fd-form-field-required-select')?.value === 'true';
+    _renderFormFields();
+    _autoSaveForm();
+  });
+  document.getElementById('fd-form-add-option-btn')?.addEventListener('click', () => {
+    const f = _selectedFormField();
+    if (!f || !Array.isArray(f.options)) return;
+    f.options.push('New option');
+    _renderFieldSettings();
+    _renderFormFields();
+    _autoSaveForm();
+  });
+  document.getElementById('fd-form-options-list')?.addEventListener('input', (e) => {
+    const f = _selectedFormField();
+    if (!f || !Array.isArray(f.options)) return;
+    const idx = Number(e.target.dataset.optIdx);
+    if (!Number.isFinite(idx)) return;
+    f.options[idx] = e.target.value;
+    _renderFormFields();
+    _autoSaveForm();
+  });
+  document.getElementById('fd-form-options-list')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-del-opt]');
+    if (!btn) return;
+    const f = _selectedFormField();
+    if (!f || !Array.isArray(f.options)) return;
+    f.options.splice(Number(btn.dataset.delOpt), 1);
+    if (!f.options.length) f.options = ['Option 1'];
+    _renderFieldSettings();
+    _renderFormFields();
+    _autoSaveForm();
+  });
+  document.getElementById('fd-form-cond-field-select')?.addEventListener('change', _applyFieldConditionFromUi);
+  document.getElementById('fd-form-cond-value-input')?.addEventListener('input', _applyFieldConditionFromUi);
+  document.getElementById('fd-form-clear-condition-btn')?.addEventListener('click', () => {
+    const f = _selectedFormField();
+    if (!f) return;
+    f.condition = null;
+    _renderFieldSettings();
+    _renderFormFields();
+    _autoSaveForm();
+  });
+
+  document.getElementById('fd-form-refresh-responses-btn')?.addEventListener('click', _loadFormResponses);
+  document.getElementById('fd-form-export-responses-btn')?.addEventListener('click', _exportFormResponsesCsv);
+  document.getElementById('fd-form-view-responses-sheet-btn')?.addEventListener('click', _viewResponsesInSpreadsheet);
 
   // Chart modal controls
   document.getElementById('fd-chart-modal-close')?.addEventListener('click', _closeChartBuilder);
@@ -615,6 +737,43 @@ function createNewSpreadsheet() {
   _openSpreadsheetEditor();
 }
 
+function createNewForm() {
+  document.getElementById('fd-new-menu')?.classList.add('hidden');
+  S.currentDoc = {
+    id: null,
+    name: 'Untitled Form',
+    type: 'form',
+    formSchema: '',
+    notifyEmail: S.user?.email || '',
+    ownerId: S.user.uid,
+    ownerName: S.user.displayName,
+    shared: true,
+    folderId: null,
+    deleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  S.form = {
+    title: 'Untitled Form',
+    description: '',
+    fields: [
+      {
+        id: 'fld_' + Date.now().toString(36),
+        type: 'text',
+        label: 'Your response',
+        required: false,
+        placeholder: 'Type your answer',
+        options: [],
+        condition: null,
+      },
+    ],
+    selectedFieldId: null,
+    autoSaveTimer: null,
+    responses: [],
+  };
+  _openFormEditor();
+}
+
 async function openDocument(docId) {
   if (!_checkFirebase()) return;
 
@@ -642,6 +801,8 @@ async function openDocument(docId) {
       _openSpreadsheetEditor();
     } else if (S.currentDoc.type === 'presentation') {
       _openSlidesEditor();
+    } else if (S.currentDoc.type === 'form') {
+      _openFormEditor();
     } else {
       _openEditor();
     }
@@ -804,7 +965,11 @@ function _renderDocuments() {
 function _renderDocCard(doc) {
   const icon = _getDocIcon(doc.type);
   const date = _formatDate(doc.updatedAt);
-  const sheetClass = doc.type === 'spreadsheet' ? ' fd-doc-sheet' : (doc.type === 'presentation' ? ' fd-doc-pres' : '');
+  const sheetClass = doc.type === 'spreadsheet'
+    ? ' fd-doc-sheet'
+    : (doc.type === 'presentation'
+      ? ' fd-doc-pres'
+      : (doc.type === 'form' ? ' fd-doc-form' : ''));
   
   return `
     <div class="fd-doc-card" onclick="FlockDocs.openDocument('${doc.id}')">
@@ -851,6 +1016,10 @@ function _openEditor() {
 
   if (libraryView) libraryView.classList.add('hidden');
   if (editorView) editorView.classList.remove('hidden');
+  document.getElementById('fd-sheet-view')?.classList.add('hidden');
+  document.getElementById('fd-slides-view')?.classList.add('hidden');
+  document.getElementById('fd-form-view')?.classList.add('hidden');
+  document.getElementById('fd-form-public-view')?.classList.add('hidden');
   
   if (editor) {
     editor.innerHTML = S.currentDoc.content;
@@ -928,6 +1097,7 @@ function _getDocIcon(type) {
     document: `<svg fill="white" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg>`,
     spreadsheet: `<svg fill="white" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-2h2v2zm0-4H7v-2h2v2zm0-4H7V7h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>`,
     presentation: `<svg fill="white" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/></svg>`,
+    form: `<svg fill="white" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-9 14H7v-2h3v2zm7-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>`,
   };
   return icons[type] || icons.document;
 }
@@ -1046,6 +1216,9 @@ function _openSpreadsheetEditor() {
   // Show spreadsheet view, hide others
   document.getElementById('fd-library-view')?.classList.add('hidden');
   document.getElementById('fd-editor-view')?.classList.add('hidden');
+  document.getElementById('fd-slides-view')?.classList.add('hidden');
+  document.getElementById('fd-form-view')?.classList.add('hidden');
+  document.getElementById('fd-form-public-view')?.classList.add('hidden');
   document.getElementById('fd-sheet-view')?.classList.remove('hidden');
 
   // Set spreadsheet name
@@ -4060,6 +4233,8 @@ function _openSlidesEditor() {
   document.getElementById('fd-library-view')?.classList.add('hidden');
   document.getElementById('fd-editor-view')?.classList.add('hidden');
   document.getElementById('fd-sheet-view')?.classList.add('hidden');
+  document.getElementById('fd-form-view')?.classList.add('hidden');
+  document.getElementById('fd-form-public-view')?.classList.add('hidden');
   document.getElementById('fd-slides-view')?.classList.remove('hidden');
 
   // Populate name
@@ -4860,4 +5035,618 @@ function _bindSlidesEvents() {
 
   // Bind drag events (global, idempotent)
   _bindSlidesDragEvents();
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SESSION 9: FLOCKFORMS — FORM BUILDER + RESPONSES
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+function _formFieldId() {
+  return 'fld_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+}
+
+function _selectedFormField() {
+  return S.form.fields.find(f => f.id === S.form.selectedFieldId) || null;
+}
+
+function _defaultFieldByType(type) {
+  var labelMap = {
+    text: 'Short answer question',
+    multiple: 'Choose one option',
+    checkboxes: 'Select one or more options',
+    dropdown: 'Select an option',
+  };
+  return {
+    id: _formFieldId(),
+    type: type,
+    label: labelMap[type] || 'Question',
+    required: false,
+    placeholder: type === 'text' ? 'Your answer' : '',
+    options: (type === 'multiple' || type === 'checkboxes' || type === 'dropdown')
+      ? ['Option 1', 'Option 2']
+      : [],
+    condition: null,
+  };
+}
+
+function _openFormEditor() {
+  if (!S.currentDoc) return;
+
+  if (S.currentDoc.formSchema) {
+    try {
+      var parsed = JSON.parse(S.currentDoc.formSchema);
+      S.form.title = parsed.title || S.currentDoc.name || 'Untitled Form';
+      S.form.description = parsed.description || '';
+      S.form.fields = Array.isArray(parsed.fields) ? parsed.fields : [];
+    } catch (_) {
+      S.form.title = S.currentDoc.name || 'Untitled Form';
+      S.form.description = '';
+      S.form.fields = [];
+    }
+  } else {
+    S.form.title = S.currentDoc.name || 'Untitled Form';
+    S.form.description = '';
+    if (!S.form.fields.length) S.form.fields = [_defaultFieldByType('text')];
+  }
+
+  if (!Array.isArray(S.form.fields) || !S.form.fields.length) {
+    S.form.fields = [_defaultFieldByType('text')];
+  }
+
+  S.form.fields = S.form.fields.map(f => ({
+    id: f.id || _formFieldId(),
+    type: f.type || 'text',
+    label: f.label || 'Question',
+    required: !!f.required,
+    placeholder: f.placeholder || '',
+    options: Array.isArray(f.options) ? f.options : [],
+    condition: f.condition || null,
+  }));
+
+  S.form.selectedFieldId = S.form.fields[0]?.id || null;
+
+  document.getElementById('fd-library-view')?.classList.add('hidden');
+  document.getElementById('fd-editor-view')?.classList.add('hidden');
+  document.getElementById('fd-sheet-view')?.classList.add('hidden');
+  document.getElementById('fd-slides-view')?.classList.add('hidden');
+  document.getElementById('fd-form-public-view')?.classList.add('hidden');
+  document.getElementById('fd-form-view')?.classList.remove('hidden');
+
+  var nameInput = document.getElementById('fd-form-name-input');
+  if (nameInput) nameInput.value = S.currentDoc.name || 'Untitled Form';
+  var titleInput = document.getElementById('fd-form-title-input');
+  if (titleInput) titleInput.value = S.form.title || 'Untitled Form';
+  var descInput = document.getElementById('fd-form-description-input');
+  if (descInput) descInput.value = S.form.description || '';
+  var notifyInput = document.getElementById('fd-form-notify-email-input');
+  if (notifyInput) notifyInput.value = S.currentDoc.notifyEmail || S.user?.email || '';
+
+  _renderFormFields();
+  _renderFieldSettings();
+  _loadFormResponses();
+}
+
+function _closeFormEditor() {
+  clearTimeout(S.form.autoSaveTimer);
+  document.getElementById('fd-form-view')?.classList.add('hidden');
+  document.getElementById('fd-form-public-view')?.classList.add('hidden');
+  document.getElementById('fd-library-view')?.classList.remove('hidden');
+
+  document.getElementById('fd-topbar-wrap')?.style.removeProperty('display');
+  document.getElementById('fd-sidebar-wrap')?.style.removeProperty('display');
+  document.getElementById('fd-footer')?.style.removeProperty('display');
+
+  S.currentDoc = null;
+  _loadDocuments();
+}
+
+function _formSchemaPayload() {
+  return {
+    title: S.form.title || S.currentDoc?.name || 'Untitled Form',
+    description: S.form.description || '',
+    fields: S.form.fields || [],
+  };
+}
+
+function _autoSaveForm() {
+  clearTimeout(S.form.autoSaveTimer);
+  var status = document.getElementById('fd-form-save-status');
+  if (status) status.textContent = 'Unsaved changes...';
+  S.form.autoSaveTimer = setTimeout(_saveForm, 2000);
+}
+
+async function _saveForm() {
+  if (!S.currentDoc || !_checkFirebase()) return;
+
+  var status = document.getElementById('fd-form-save-status');
+  if (status) status.textContent = 'Saving...';
+
+  S.currentDoc.name = document.getElementById('fd-form-name-input')?.value || S.form.title || 'Untitled Form';
+  S.currentDoc.notifyEmail = document.getElementById('fd-form-notify-email-input')?.value || '';
+
+  var schema = _formSchemaPayload();
+  S.currentDoc.formSchema = JSON.stringify(schema);
+
+  var payload = {
+    name: S.currentDoc.name,
+    type: 'form',
+    formSchema: S.currentDoc.formSchema,
+    notifyEmail: S.currentDoc.notifyEmail,
+    shared: true,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedBy: S.user.uid,
+    updatedByName: S.user.displayName || 'Anonymous',
+  };
+
+  try {
+    var db = firebase.firestore();
+    if (S.currentDoc.id) {
+      await db.collection(COLLECTION_DOCS).doc(S.currentDoc.id).update(payload);
+    } else {
+      var ref = await db.collection(COLLECTION_DOCS).add({
+        ...payload,
+        ownerId: S.currentDoc.ownerId,
+        ownerName: S.currentDoc.ownerName,
+        sharedWith: [],
+        churchPermission: 'view',
+        folderId: null,
+        deleted: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      S.currentDoc.id = ref.id;
+    }
+    if (status) status.textContent = 'All changes saved';
+  } catch (err) {
+    console.error('[FlockForms] Save error:', err);
+    if (status) status.textContent = 'Error saving';
+    _toast('Failed to save form', 'error');
+  }
+}
+
+function _addFormField(type) {
+  var f = _defaultFieldByType(type);
+  S.form.fields.push(f);
+  S.form.selectedFieldId = f.id;
+  _renderFormFields();
+  _renderFieldSettings();
+  _autoSaveForm();
+}
+
+function _deleteFormField(fieldId) {
+  var idx = S.form.fields.findIndex(f => f.id === fieldId);
+  if (idx < 0) return;
+  S.form.fields.splice(idx, 1);
+  if (!S.form.fields.length) S.form.fields.push(_defaultFieldByType('text'));
+  S.form.selectedFieldId = S.form.fields[0].id;
+  _renderFormFields();
+  _renderFieldSettings();
+  _autoSaveForm();
+}
+
+function _selectFormField(fieldId) {
+  S.form.selectedFieldId = fieldId;
+  _renderFormFields();
+  _renderFieldSettings();
+}
+
+function _fieldTypeLabel(type) {
+  return ({
+    text: 'Text',
+    multiple: 'Multiple',
+    checkboxes: 'Checkboxes',
+    dropdown: 'Dropdown',
+  }[type] || 'Question');
+}
+
+function _renderFieldPreview(field) {
+  if (field.type === 'text') {
+    return '<input type="text" disabled placeholder="' + _e(field.placeholder || 'Your answer') + '">';
+  }
+  if (field.type === 'dropdown') {
+    var opts = (field.options || []).map(o => '<option>' + _e(o) + '</option>').join('');
+    return '<select disabled><option>Select...</option>' + opts + '</select>';
+  }
+  if (field.type === 'multiple') {
+    return (field.options || []).map(o => '<label class="fd-choice"><input type="radio" disabled> ' + _e(o) + '</label>').join('');
+  }
+  if (field.type === 'checkboxes') {
+    return (field.options || []).map(o => '<label class="fd-choice"><input type="checkbox" disabled> ' + _e(o) + '</label>').join('');
+  }
+  return '';
+}
+
+function _renderFormFields() {
+  var list = document.getElementById('fd-form-fields-list');
+  if (!list) return;
+
+  list.innerHTML = S.form.fields.map((field, idx) => {
+    var selected = field.id === S.form.selectedFieldId ? ' is-selected' : '';
+    var condition = field.condition
+      ? '<div class="fd-form-condition-note">Shows when "' + _e(_fieldLabelById(field.condition.fieldId) || 'another field') + '" equals "' + _e(field.condition.equals || '') + '"</div>'
+      : '';
+
+    return '<div class="fd-form-card fd-form-field-card' + selected + '" data-field-id="' + field.id + '">'
+      + '<div class="fd-form-field-head">'
+      + '<span class="fd-form-field-type">' + _fieldTypeLabel(field.type) + ' #' + (idx + 1) + '</span>'
+      + '<div class="fd-form-field-actions">'
+      + '<button class="fd-form-mini-btn" data-del-field="' + field.id + '">Delete</button>'
+      + '</div></div>'
+      + '<div class="fd-form-field-label">' + _e(field.label)
+      + (field.required ? '<span class="fd-form-required-badge">Required</span>' : '') + '</div>'
+      + '<div class="fd-form-field-preview">' + _renderFieldPreview(field) + '</div>'
+      + condition
+      + '</div>';
+  }).join('');
+}
+
+function _fieldLabelById(fieldId) {
+  return S.form.fields.find(f => f.id === fieldId)?.label || '';
+}
+
+function _renderFieldSettings() {
+  var empty = document.getElementById('fd-form-field-settings-empty');
+  var pane = document.getElementById('fd-form-field-settings');
+  var field = _selectedFormField();
+
+  if (!field) {
+    empty?.classList.remove('hidden');
+    pane?.classList.add('hidden');
+    return;
+  }
+
+  empty?.classList.add('hidden');
+  pane?.classList.remove('hidden');
+
+  var labelInput = document.getElementById('fd-form-field-label-input');
+  var phInput = document.getElementById('fd-form-field-placeholder-input');
+  var reqSelect = document.getElementById('fd-form-field-required-select');
+  if (labelInput) labelInput.value = field.label || '';
+  if (phInput) {
+    phInput.value = field.placeholder || '';
+    phInput.disabled = field.type !== 'text';
+  }
+  if (reqSelect) reqSelect.value = field.required ? 'true' : 'false';
+
+  var optionsWrap = document.getElementById('fd-form-options-wrap');
+  if (optionsWrap) {
+    optionsWrap.style.display = (field.type === 'multiple' || field.type === 'checkboxes' || field.type === 'dropdown')
+      ? 'block'
+      : 'none';
+  }
+
+  var optionsList = document.getElementById('fd-form-options-list');
+  if (optionsList) {
+    optionsList.innerHTML = (field.options || []).map((opt, idx) => (
+      '<div class="fd-form-option-row">'
+      + '<input data-opt-idx="' + idx + '" value="' + _e(opt) + '">'
+      + '<button data-del-opt="' + idx + '" title="Remove option">✕</button>'
+      + '</div>'
+    )).join('');
+  }
+
+  var condField = document.getElementById('fd-form-cond-field-select');
+  var condVal = document.getElementById('fd-form-cond-value-input');
+  if (condField) {
+    var candidates = S.form.fields.filter(f => f.id !== field.id);
+    condField.innerHTML = '<option value="">Always show</option>' + candidates
+      .map(c => '<option value="' + c.id + '">' + _e(c.label) + '</option>').join('');
+    condField.value = field.condition?.fieldId || '';
+  }
+  if (condVal) condVal.value = field.condition?.equals || '';
+}
+
+function _applyFieldConditionFromUi() {
+  var field = _selectedFormField();
+  if (!field) return;
+  var condFieldId = document.getElementById('fd-form-cond-field-select')?.value || '';
+  var equalsVal = document.getElementById('fd-form-cond-value-input')?.value || '';
+
+  if (!condFieldId) {
+    field.condition = null;
+  } else {
+    field.condition = { fieldId: condFieldId, equals: equalsVal };
+  }
+  _renderFormFields();
+  _autoSaveForm();
+}
+
+function _copyPublicFormLink() {
+  if (!S.currentDoc?.id) {
+    _toast('Save the form first to generate a link', 'warning');
+    return;
+  }
+  var url = window.location.origin + window.location.pathname + '?publicForm=' + encodeURIComponent(S.currentDoc.id);
+  navigator.clipboard?.writeText(url).then(() => {
+    _toast('Public form link copied', 'success');
+  }).catch(() => {
+    _toast('Could not copy link automatically', 'warning');
+  });
+}
+
+function _openCurrentFormPublic() {
+  if (!S.currentDoc?.id) {
+    _toast('Save the form first to open public view', 'warning');
+    return;
+  }
+  window.open(window.location.origin + window.location.pathname + '?publicForm=' + encodeURIComponent(S.currentDoc.id), '_blank');
+}
+
+async function _loadFormResponses() {
+  if (!S.currentDoc?.id || !_checkFirebase()) return;
+  try {
+    var snap = await firebase.firestore().collection(COLLECTION_FORM_RESPONSES)
+      .where('formId', '==', S.currentDoc.id)
+      .orderBy('submittedAt', 'desc')
+      .get();
+    S.form.responses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    _renderFormResponsesTable();
+  } catch (err) {
+    try {
+      var snap2 = await firebase.firestore().collection(COLLECTION_FORM_RESPONSES)
+        .where('formId', '==', S.currentDoc.id)
+        .get();
+      S.form.responses = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
+      _renderFormResponsesTable();
+    } catch (e2) {
+      console.error('[FlockForms] load responses failed', e2);
+      _toast('Could not load responses', 'warning');
+    }
+  }
+}
+
+function _renderFormResponsesTable() {
+  var head = document.getElementById('fd-form-responses-head');
+  var body = document.getElementById('fd-form-responses-body');
+  if (!head || !body) return;
+
+  var labels = S.form.fields.map(f => f.label || 'Question');
+  head.innerHTML = '<tr><th>Submitted</th>' + labels.map(l => '<th>' + _e(l) + '</th>').join('') + '</tr>';
+
+  if (!S.form.responses.length) {
+    body.innerHTML = '<tr><td colspan="' + (labels.length + 1) + '" style="color:#64748b">No responses yet</td></tr>';
+    return;
+  }
+
+  body.innerHTML = S.form.responses.map(r => {
+    var submitted = _formatDate(r.submittedAt);
+    var cells = S.form.fields.map(f => {
+      var ans = r.answers?.[f.id];
+      if (Array.isArray(ans)) ans = ans.join(', ');
+      return '<td>' + _e(ans ?? '') + '</td>';
+    }).join('');
+    return '<tr><td>' + _e(submitted) + '</td>' + cells + '</tr>';
+  }).join('');
+}
+
+function _csvCell(v) {
+  var s = String(v ?? '');
+  if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+
+function _exportFormResponsesCsv() {
+  var headers = ['Submitted'].concat(S.form.fields.map(f => f.label || 'Question'));
+  var lines = [headers.map(_csvCell).join(',')];
+  S.form.responses.forEach(r => {
+    var row = [_formatDate(r.submittedAt)];
+    S.form.fields.forEach(f => {
+      var v = r.answers?.[f.id];
+      row.push(Array.isArray(v) ? v.join('; ') : (v ?? ''));
+    });
+    lines.push(row.map(_csvCell).join(','));
+  });
+  _triggerDownload(lines.join('\n'), (_safeDocName() + '-responses.csv'), 'text/csv;charset=utf-8');
+}
+
+async function _viewResponsesInSpreadsheet() {
+  if (!S.form.responses.length) {
+    _toast('No responses to view yet', 'warning');
+    return;
+  }
+  var sheetData = {};
+  var headers = ['Submitted'].concat(S.form.fields.map(f => f.label || 'Question'));
+  headers.forEach((h, colIdx) => {
+    var ref = _colToLetter(colIdx) + '1';
+    sheetData[ref] = { v: h, s: { bold: true, fmt: 'plain' } };
+  });
+
+  S.form.responses.forEach((r, rIdx) => {
+    var row = rIdx + 2;
+    sheetData['A' + row] = { v: _formatDate(r.submittedAt), s: { fmt: 'plain' } };
+    S.form.fields.forEach((f, fi) => {
+      var val = r.answers?.[f.id];
+      if (Array.isArray(val)) val = val.join(', ');
+      var ref = _colToLetter(fi + 1) + row;
+      sheetData[ref] = { v: val ?? '', s: { fmt: 'plain' } };
+    });
+  });
+
+  S.currentDoc = {
+    id: null,
+    name: (S.currentDoc?.name || 'Form') + ' Responses',
+    type: 'spreadsheet',
+    sheetData: JSON.stringify(sheetData),
+    colWidths: '{}',
+    ownerId: S.user.uid,
+    ownerName: S.user.displayName,
+    shared: false,
+    folderId: null,
+    deleted: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  _openSpreadsheetEditor();
+}
+
+function _isFieldVisibleByAnswers(field, answers) {
+  if (!field?.condition?.fieldId) return true;
+  var base = answers[field.condition.fieldId];
+  var expected = String(field.condition.equals ?? '').toLowerCase();
+  if (Array.isArray(base)) return base.map(v => String(v).toLowerCase()).includes(expected);
+  return String(base ?? '').toLowerCase() === expected;
+}
+
+function _renderPublicField(field, idx, answers) {
+  if (!_isFieldVisibleByAnswers(field, answers)) return '';
+
+  var req = field.required ? '<span class="fd-form-required-badge">Required</span>' : '';
+  var header = '<div class="fd-form-field-label">' + _e(field.label || ('Question ' + (idx + 1))) + req + '</div>';
+
+  if (field.type === 'text') {
+    return '<div class="fd-form-card" data-public-field="' + field.id + '">' + header
+      + '<input class="fd-form-control" data-answer-text="' + field.id + '" placeholder="' + _e(field.placeholder || 'Your answer') + '" value="' + _e(answers[field.id] || '') + '"></div>';
+  }
+  if (field.type === 'dropdown') {
+    var opts = (field.options || []).map(o => '<option value="' + _e(o) + '">' + _e(o) + '</option>').join('');
+    return '<div class="fd-form-card" data-public-field="' + field.id + '">' + header
+      + '<select class="fd-form-control" data-answer-dropdown="' + field.id + '"><option value="">Select...</option>' + opts + '</select></div>';
+  }
+  if (field.type === 'multiple') {
+    var radios = (field.options || []).map(o => '<label class="fd-choice"><input type="radio" name="ans_' + field.id + '" data-answer-radio="' + field.id + '" value="' + _e(o) + '"> ' + _e(o) + '</label>').join('');
+    return '<div class="fd-form-card" data-public-field="' + field.id + '">' + header + radios + '</div>';
+  }
+  if (field.type === 'checkboxes') {
+    var checks = (field.options || []).map(o => '<label class="fd-choice"><input type="checkbox" data-answer-checkbox="' + field.id + '" value="' + _e(o) + '"> ' + _e(o) + '</label>').join('');
+    return '<div class="fd-form-card" data-public-field="' + field.id + '">' + header + checks + '</div>';
+  }
+  return '';
+}
+
+async function _openPublicForm(formId) {
+  if (!_checkFirebase()) return;
+  try {
+    var snap = await firebase.firestore().collection(COLLECTION_DOCS).doc(formId).get();
+    if (!snap.exists) {
+      _toast('Form not found', 'error');
+      return;
+    }
+    var doc = { id: snap.id, ...snap.data() };
+    if (doc.type !== 'form') {
+      _toast('This link is not a form', 'error');
+      return;
+    }
+
+    S.currentDoc = doc;
+    var schema = {};
+    try { schema = JSON.parse(doc.formSchema || '{}'); } catch (_) { schema = {}; }
+    S.form.title = schema.title || doc.name || 'Form';
+    S.form.description = schema.description || '';
+    S.form.fields = Array.isArray(schema.fields) ? schema.fields : [];
+
+    document.getElementById('fd-topbar-wrap')?.style.setProperty('display', 'none');
+    document.getElementById('fd-sidebar-wrap')?.style.setProperty('display', 'none');
+    document.getElementById('fd-footer')?.style.setProperty('display', 'none');
+
+    document.getElementById('fd-library-view')?.classList.add('hidden');
+    document.getElementById('fd-editor-view')?.classList.add('hidden');
+    document.getElementById('fd-sheet-view')?.classList.add('hidden');
+    document.getElementById('fd-slides-view')?.classList.add('hidden');
+    document.getElementById('fd-form-view')?.classList.add('hidden');
+    document.getElementById('fd-form-public-view')?.classList.remove('hidden');
+
+    document.getElementById('fd-form-public-title').textContent = S.form.title;
+    document.getElementById('fd-form-public-desc').textContent = S.form.description || '';
+
+    var answers = {};
+    var container = document.getElementById('fd-form-public-fields');
+    if (container) container.innerHTML = S.form.fields.map((f, idx) => _renderPublicField(f, idx, answers)).join('');
+
+    var rerender = () => {
+      var collected = _collectPublicAnswers();
+      if (!container) return;
+      container.innerHTML = S.form.fields.map((f, idx) => _renderPublicField(f, idx, collected)).join('');
+      _applyAnswersToPublicInputs(collected);
+    };
+    container?.addEventListener('input', rerender);
+    container?.addEventListener('change', rerender);
+  } catch (err) {
+    console.error('[FlockForms] open public form failed', err);
+    _toast('Failed to load public form', 'error');
+  }
+}
+
+function _collectPublicAnswers() {
+  var answers = {};
+  S.form.fields.forEach(field => {
+    if (!_isFieldVisibleByAnswers(field, answers)) return;
+    if (field.type === 'text') {
+      answers[field.id] = document.querySelector('[data-answer-text="' + field.id + '"]')?.value || '';
+    } else if (field.type === 'dropdown') {
+      answers[field.id] = document.querySelector('[data-answer-dropdown="' + field.id + '"]')?.value || '';
+    } else if (field.type === 'multiple') {
+      answers[field.id] = document.querySelector('[data-answer-radio="' + field.id + '"]:checked')?.value || '';
+    } else if (field.type === 'checkboxes') {
+      answers[field.id] = Array.from(document.querySelectorAll('[data-answer-checkbox="' + field.id + '"]:checked')).map(el => el.value);
+    }
+  });
+  return answers;
+}
+
+function _applyAnswersToPublicInputs(answers) {
+  S.form.fields.forEach(field => {
+    var val = answers[field.id];
+    if (field.type === 'text') {
+      var el = document.querySelector('[data-answer-text="' + field.id + '"]');
+      if (el) el.value = val || '';
+    } else if (field.type === 'dropdown') {
+      var sel = document.querySelector('[data-answer-dropdown="' + field.id + '"]');
+      if (sel) sel.value = val || '';
+    } else if (field.type === 'multiple') {
+      document.querySelectorAll('[data-answer-radio="' + field.id + '"]').forEach(r => {
+        r.checked = (r.value === val);
+      });
+    } else if (field.type === 'checkboxes') {
+      var arr = Array.isArray(val) ? val : [];
+      document.querySelectorAll('[data-answer-checkbox="' + field.id + '"]').forEach(c => {
+        c.checked = arr.includes(c.value);
+      });
+    }
+  });
+}
+
+function _validatePublicAnswers(answers) {
+  for (var i = 0; i < S.form.fields.length; i++) {
+    var f = S.form.fields[i];
+    if (!_isFieldVisibleByAnswers(f, answers)) continue;
+    if (!f.required) continue;
+    var v = answers[f.id];
+    if (Array.isArray(v) && v.length === 0) return 'Please answer: ' + (f.label || ('Question ' + (i + 1)));
+    if (!Array.isArray(v) && String(v ?? '').trim() === '') return 'Please answer: ' + (f.label || ('Question ' + (i + 1)));
+  }
+  return '';
+}
+
+async function _submitPublicFormResponse() {
+  if (!S.currentDoc?.id || !_checkFirebase()) return;
+  var answers = _collectPublicAnswers();
+  var err = _validatePublicAnswers(answers);
+  if (err) {
+    _toast(err, 'warning');
+    return;
+  }
+
+  try {
+    await firebase.firestore().collection(COLLECTION_FORM_RESPONSES).add({
+      formId: S.currentDoc.id,
+      formName: S.currentDoc.name || S.form.title,
+      ownerId: S.currentDoc.ownerId,
+      answers,
+      submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      submittedBy: S.user?.uid || null,
+      submittedByName: S.user?.displayName || S.user?.email || 'Anonymous',
+      submittedByEmail: S.user?.email || '',
+    });
+
+    _toast('Response submitted. Thank you!', 'success');
+
+    var notify = S.currentDoc.notifyEmail || '';
+    if (notify) {
+      var subject = encodeURIComponent('[FlockForms] New response: ' + (S.currentDoc.name || S.form.title));
+      var body = encodeURIComponent('A new response was submitted to "' + (S.currentDoc.name || S.form.title) + '".\n\nOpen responses in FlockDocs to review details.');
+      window.open('mailto:' + notify + '?subject=' + subject + '&body=' + body, '_self');
+    }
+  } catch (e) {
+    console.error('[FlockForms] submit response failed', e);
+    _toast('Failed to submit response', 'error');
+  }
 }

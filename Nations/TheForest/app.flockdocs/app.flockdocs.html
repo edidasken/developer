@@ -2066,6 +2066,214 @@
       from { transform: scale(0.85); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       SESSION 9: FLOCKFORMS
+       ══════════════════════════════════════════════════════════════════════ */
+    .fd-doc-icon.fd-doc-form {
+      background: linear-gradient(135deg, #9333ea, #7e22ce);
+    }
+    .fd-form-view {
+      display: flex; flex-direction: column;
+      flex: 1; overflow: hidden; background: var(--bg);
+    }
+    .fd-form-toolbar {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg-raised);
+    }
+    .fd-form-name-input {
+      border: none; outline: none; background: transparent;
+      font: 600 0.9rem var(--font-ui); color: var(--ink);
+      min-width: 220px; max-width: 360px;
+      padding: 4px 6px; border-radius: 6px;
+    }
+    .fd-form-name-input:focus, .fd-form-name-input:hover { background: rgba(255,255,255,0.06); }
+    .fd-form-main {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 0;
+      flex: 1;
+      min-height: 0;
+    }
+    .fd-form-builder {
+      overflow-y: auto;
+      padding: 16px;
+      border-right: 1px solid var(--line);
+      background: #f8fafc;
+    }
+    .fd-form-card {
+      background: #fff; border: 1px solid #dbe3ef; border-radius: 12px;
+      padding: 16px; margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .fd-form-field-card {
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+    .fd-form-field-card.is-selected { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.14); }
+    .fd-form-field-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .fd-form-field-type {
+      font: 700 0.675rem var(--font-ui);
+      color: #4f46e5;
+      background: #eef2ff;
+      border-radius: 999px;
+      padding: 3px 8px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .fd-form-field-actions { display: flex; gap: 6px; }
+    .fd-form-mini-btn {
+      border: 1px solid #d1d5db; border-radius: 6px;
+      background: #fff; color: #475569;
+      font: 500 0.75rem var(--font-ui);
+      padding: 4px 7px; cursor: pointer;
+    }
+    .fd-form-mini-btn:hover { border-color: #94a3b8; color: #0f172a; }
+    .fd-form-field-label {
+      font: 600 0.95rem var(--font-ui);
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+    .fd-form-field-preview input[type="text"], .fd-form-field-preview select {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font: 500 0.85rem var(--font-ui);
+      color: #334155;
+      background: #fff;
+    }
+    .fd-form-field-preview .fd-choice {
+      display: flex; align-items: center; gap: 7px;
+      margin-bottom: 6px;
+      font: 500 0.82rem var(--font-ui);
+      color: #334155;
+    }
+    .fd-form-required-badge {
+      display: inline-flex; align-items: center;
+      margin-left: 6px;
+      font: 700 0.65rem var(--font-ui);
+      color: #b91c1c;
+      background: #fee2e2;
+      border-radius: 999px;
+      padding: 2px 6px;
+      text-transform: uppercase;
+    }
+    .fd-form-condition-note {
+      margin-top: 8px;
+      font: 500 0.74rem var(--font-ui);
+      color: #6b7280;
+    }
+    .fd-form-add-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .fd-form-add-btn {
+      border: 1px dashed #94a3b8;
+      border-radius: 8px;
+      background: #fff;
+      color: #334155;
+      padding: 8px 10px;
+      font: 600 0.8rem var(--font-ui);
+      cursor: pointer;
+      text-align: center;
+    }
+    .fd-form-add-btn:hover {
+      border-color: #3b82f6;
+      color: #1d4ed8;
+      background: #eff6ff;
+    }
+    .fd-form-side {
+      overflow-y: auto;
+      background: var(--bg-raised);
+      padding: 14px;
+    }
+    .fd-form-side-title {
+      font: 700 0.76rem var(--font-ui);
+      color: var(--ink-muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .fd-form-control {
+      width: 100%; border: 1px solid #cbd5e1; border-radius: 8px;
+      padding: 8px 10px; background: #fff; color: #0f172a;
+      font: 500 0.84rem var(--font-ui);
+      margin-bottom: 10px;
+    }
+    .fd-form-label-sm {
+      display: block;
+      font: 600 0.74rem var(--font-ui);
+      color: #64748b;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .fd-form-option-row {
+      display: flex; gap: 6px; margin-bottom: 6px;
+    }
+    .fd-form-option-row input {
+      flex: 1;
+      border: 1px solid #cbd5e1; border-radius: 7px;
+      padding: 7px 8px; font: 500 0.8rem var(--font-ui);
+    }
+    .fd-form-option-row button {
+      border: 1px solid #fca5a5; background: #fff1f2; color: #be123c;
+      border-radius: 7px; padding: 0 8px; cursor: pointer;
+    }
+    .fd-form-responses-table-wrap {
+      overflow: auto;
+      max-height: 260px;
+      border: 1px solid #dbe3ef;
+      border-radius: 10px;
+      background: #fff;
+    }
+    .fd-form-responses-table {
+      width: 100%;
+      border-collapse: collapse;
+      font: 500 0.78rem var(--font-ui);
+    }
+    .fd-form-responses-table th, .fd-form-responses-table td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+      color: #334155;
+    }
+    .fd-form-responses-table th { background: #f8fafc; font-weight: 700; color: #475569; }
+    .fd-form-public-view {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px 14px 42px;
+      overflow-y: auto;
+      height: calc(100vh - 56px);
+      background: #f8fafc;
+    }
+    .fd-form-public-header {
+      background: #fff;
+      border: 1px solid #dbe3ef;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .fd-form-public-title {
+      font: 800 1.3rem var(--font-ui);
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .fd-form-public-desc {
+      font: 500 0.9rem var(--font-ui);
+      color: #475569;
+    }
+    .fd-form-public-submit {
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -2120,6 +2328,12 @@
                 <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/>
               </svg>
               Presentation
+            </button>
+            <button class="fd-new-menu-item" onclick="FlockDocs.createNewForm()">
+              <svg fill="white" viewBox="0 0 24 24" width="20" height="20" style="background:linear-gradient(135deg,#9333ea,#7e22ce);border-radius:4px;padding:2px">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5c0-1.1-.9-2-2-2zm-9 14H7v-2h3v2zm7-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+              </svg>
+              Form
             </button>
             <button class="fd-new-menu-item" onclick="FlockDocs.showTemplatePicker()">
               <svg fill="white" viewBox="0 0 24 24" width="20" height="20" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);border-radius:4px;padding:2px">
@@ -2815,6 +3029,115 @@
         </div>
 
       </div><!-- /#fd-sheet-view -->
+
+      <!-- Session 9: Form editor view -->
+      <div class="fd-form-view hidden" id="fd-form-view">
+        <div class="fd-form-toolbar">
+          <button class="fd-toolbar-btn" id="fd-form-back-btn" title="Back to library">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+          </button>
+          <div class="fd-toolbar-divider"></div>
+          <input type="text" class="fd-form-name-input" id="fd-form-name-input" value="Untitled Form" placeholder="Form name">
+          <div class="fd-toolbar-divider"></div>
+          <button class="fd-toolbar-btn" id="fd-form-copy-link-btn" title="Copy public form link">
+            🔗 Public Link
+          </button>
+          <button class="fd-toolbar-btn" id="fd-form-open-public-btn" title="Open public form">
+            🌐 Open Public
+          </button>
+          <div class="fd-spacer"></div>
+          <span id="fd-form-save-status" style="font:500 0.813rem var(--font-ui);color:var(--ink-muted);padding-right:8px">All changes saved</span>
+          <button class="fd-btn fd-btn--ghost" id="fd-form-save-btn">Save</button>
+        </div>
+
+        <div class="fd-form-main">
+          <div class="fd-form-builder">
+            <div class="fd-form-card">
+              <label class="fd-form-label-sm">Form Title</label>
+              <input class="fd-form-control" id="fd-form-title-input" placeholder="Form title">
+              <label class="fd-form-label-sm">Form Description</label>
+              <textarea class="fd-form-control" id="fd-form-description-input" rows="3" placeholder="Describe this form"></textarea>
+            </div>
+
+            <div class="fd-form-card">
+              <div class="fd-form-side-title">Questions</div>
+              <div id="fd-form-fields-list"></div>
+              <div class="fd-form-add-grid">
+                <button class="fd-form-add-btn" data-add-field="text">+ Text</button>
+                <button class="fd-form-add-btn" data-add-field="multiple">+ Multiple Choice</button>
+                <button class="fd-form-add-btn" data-add-field="checkboxes">+ Checkboxes</button>
+                <button class="fd-form-add-btn" data-add-field="dropdown">+ Dropdown</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="fd-form-side">
+            <div class="fd-form-card">
+              <div class="fd-form-side-title">Field Settings</div>
+              <div id="fd-form-field-settings-empty" style="font:500 0.82rem var(--font-ui);color:#64748b">Select a question to edit settings.</div>
+              <div id="fd-form-field-settings" class="hidden">
+                <label class="fd-form-label-sm">Question Label</label>
+                <input class="fd-form-control" id="fd-form-field-label-input" placeholder="Question text">
+
+                <label class="fd-form-label-sm">Placeholder (Text only)</label>
+                <input class="fd-form-control" id="fd-form-field-placeholder-input" placeholder="Placeholder text">
+
+                <label class="fd-form-label-sm">Required</label>
+                <select class="fd-form-control" id="fd-form-field-required-select">
+                  <option value="false">Optional</option>
+                  <option value="true">Required</option>
+                </select>
+
+                <div id="fd-form-options-wrap">
+                  <label class="fd-form-label-sm">Options</label>
+                  <div id="fd-form-options-list"></div>
+                  <button class="fd-form-mini-btn" id="fd-form-add-option-btn">+ Add Option</button>
+                </div>
+
+                <hr style="border:0;border-top:1px solid #e2e8f0;margin:10px 0">
+                <div class="fd-form-side-title" style="margin-bottom:6px">Conditional Logic</div>
+                <label class="fd-form-label-sm">Show this field when...</label>
+                <select class="fd-form-control" id="fd-form-cond-field-select"></select>
+                <input class="fd-form-control" id="fd-form-cond-value-input" placeholder="Equals this value">
+                <button class="fd-form-mini-btn" id="fd-form-clear-condition-btn">Clear Condition</button>
+              </div>
+            </div>
+
+            <div class="fd-form-card">
+              <div class="fd-form-side-title">Response Settings</div>
+              <label class="fd-form-label-sm">Notification Email</label>
+              <input class="fd-form-control" id="fd-form-notify-email-input" placeholder="example@church.org">
+            </div>
+
+            <div class="fd-form-card">
+              <div class="fd-form-side-title">Responses</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+                <button class="fd-form-mini-btn" id="fd-form-refresh-responses-btn">Refresh</button>
+                <button class="fd-form-mini-btn" id="fd-form-export-responses-btn">Export CSV</button>
+                <button class="fd-form-mini-btn" id="fd-form-view-responses-sheet-btn">View in Spreadsheet</button>
+              </div>
+              <div class="fd-form-responses-table-wrap">
+                <table class="fd-form-responses-table">
+                  <thead id="fd-form-responses-head"></thead>
+                  <tbody id="fd-form-responses-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /#fd-form-view -->
+
+      <!-- Session 9: public form responder view -->
+      <div class="fd-form-public-view hidden" id="fd-form-public-view">
+        <div class="fd-form-public-header">
+          <div class="fd-form-public-title" id="fd-form-public-title">Form</div>
+          <div class="fd-form-public-desc" id="fd-form-public-desc"></div>
+        </div>
+        <div id="fd-form-public-fields"></div>
+        <button class="fd-btn fd-form-public-submit" id="fd-form-public-submit-btn">Submit Response</button>
+      </div>
 
       <!-- Chart Builder Modal (hidden by default) -->
       <div class="fd-chart-modal-overlay hidden" id="fd-chart-modal-overlay">
