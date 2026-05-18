@@ -623,8 +623,8 @@ service cloud.firestore {
 
       // ── Quarterly Worship Plans (draft data for the quarterly planner) ─
       match /quarterlyPlans/{planId} {
-        allow read: if isSignedIn() && isPastorTimothyOrAbove();
-        allow create, update: if isSignedIn() && isPastorTimothyOrAbove();
+        allow read: if isSignedIn() && isLeaderOrAbove();
+        allow create, update: if isSignedIn() && isLeaderOrAbove();
         allow delete: if isSignedIn() && isPastorOrAdmin();
       }
 
