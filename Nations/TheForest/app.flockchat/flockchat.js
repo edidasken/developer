@@ -1699,7 +1699,7 @@
     const subtitleEl = $('fc-info-modal-subtitle');
     const bodyEl     = $('fc-info-modal-body');
     if (!modal || !bodyEl) return;
-    if (titleEl)    titleEl.textContent    = msg.icon + '  ' + msg.title;
+    if (titleEl)    titleEl.innerHTML    = msg.icon + '&nbsp;&nbsp;' + _e(msg.title);
     if (subtitleEl) subtitleEl.textContent = msg.preview;
     bodyEl.innerHTML = msg.body;
     modal.removeAttribute('hidden');
