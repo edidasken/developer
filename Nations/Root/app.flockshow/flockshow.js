@@ -301,12 +301,13 @@ function _slideFontSize(sl) {
 }
 
 // ── Inline formatting helpers ─────────────────────────────────────────────────
-// Converts lightweight markers to safe HTML: **bold**, __underline__, ==highlight==
+// Converts lightweight markers to safe HTML: **bold**, _italic_, __underline__, ==highlight==
 // HTML special chars are escaped first so no injection is possible.
 function _renderFormattedText(text) {
   return (text || '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>')
+    .replace(/_(.+?)_/gs,        '<em>$1</em>')
     .replace(/__(.+?)__/gs,     '<u>$1</u>')
     .replace(/==(.+?)==/gs,     '<mark style="background:rgba(232,168,56,0.38);color:inherit;border-radius:3px;padding:0 3px">$1</mark>');
 }
