@@ -308,8 +308,8 @@ function _renderFormattedText(text) {
   const _inline = s =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
      .replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>')
+     .replace(/__(.+?)__/gs,     '<u>$1</u>')          // double-underscore BEFORE single
      .replace(/_(.+?)_/gs,       '<em>$1</em>')
-     .replace(/__(.+?)__/gs,     '<u>$1</u>')
      .replace(/==(.+?)==/gs,     '<mark style="background:rgba(232,168,56,0.38);color:inherit;border-radius:3px;padding:0 3px">$1</mark>');
   const _alignMap = { l: 'left', c: 'center', r: 'right' };
   const _lineRx   = /^\[(l|c|r)\] ?/;
@@ -351,18 +351,24 @@ function _formatLineAlign(el, dir) {
 // Wrap the currently-selected text in a textarea with open/close markers.
 // If the selection is already wrapped, toggle it off instead.
 function _formatTag(el, open, close) {
-  const start = el.selectionStart;
-  const end   = el.selectionEnd;
-  const val   = el.value;
-  const sel   = val.slice(start, end);
+  const start  = el.selectionStart;
+  const end    = el.selectionEnd;
+  const val    = el.value;
+  const sel    = val.slice(start, end);
   if (!sel) return;
   const before = val.slice(0, start);
   const after  = val.slice(end);
+  // Case 1: selection includes the markers (e.g. selected "**Worship**")
   if (sel.startsWith(open) && sel.endsWith(close) && sel.length > open.length + close.length) {
     const inner = sel.slice(open.length, sel.length - close.length);
     el.value = before + inner + after;
     el.selectionStart = start;
     el.selectionEnd   = start + inner.length;
+  // Case 2: context wraps the selection (e.g. selected "Worship" inside **Worship**)
+  } else if (before.endsWith(open) && after.startsWith(close)) {
+    el.value = before.slice(0, before.length - open.length) + sel + after.slice(close.length);
+    el.selectionStart = start - open.length;
+    el.selectionEnd   = end   - open.length;
   } else {
     el.value = before + open + sel + close + after;
     el.selectionStart = start + open.length;
@@ -1685,15 +1691,26 @@ function _wire() {
   });
 
   /* ── Text alignment ── */
+  // When the text textarea is focused, alignment buttons apply per-line markers.
+  // When no textarea is focused, they set the slide-wide alignment as before.
   document.querySelectorAll('.fs-align-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('mousedown', e => {
+      e.preventDefault(); // keep textarea focus if it was active
       const sl = _activeSlide(); const show = _activeShow();
       if (!sl || !show) return;
-      sl.align = btn.dataset.align;
-      _touch(show);
-      document.querySelectorAll('.fs-align-btn').forEach(b => b.classList.toggle('fs-align-btn--active', b.dataset.align === sl.align));
-      _renderPreview();
-      _pushToPresent();
+      const ta  = document.getElementById('fs-prop-text');
+      const dir = btn.dataset.align.charAt(0); // 'left'→'l', 'center'→'c', 'right'→'r'
+      if (ta && document.activeElement === ta) {
+        // Per-line mode: toggle [l]/[c]/[r] prefix on the current line
+        _formatLineAlign(ta, dir);
+      } else {
+        // Slide-wide mode: set the slide alignment property
+        sl.align = btn.dataset.align;
+        _touch(show);
+        document.querySelectorAll('.fs-align-btn').forEach(b => b.classList.toggle('fs-align-btn--active', b.dataset.align === sl.align));
+        _renderPreview();
+        _pushToPresent();
+      }
     });
   });
 
