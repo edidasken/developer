@@ -237,6 +237,75 @@
       background: color-mix(in srgb, var(--fc-sent-bg) 4%, var(--fc-surface));
     }
 
+    /* ─── iOS-style Pinned Section ───────────────────────────────────── */
+    .fc-pinned-section {
+      padding: 14px 20px 16px;
+      background: var(--fc-surface);
+      border-bottom: 1px solid var(--fc-divider);
+    }
+    .fc-pinned-header {
+      display: flex; align-items: center; gap: 5px;
+      margin-bottom: 14px;
+    }
+    .fc-pinned-header-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      color: var(--fc-text-muted); text-transform: uppercase;
+    }
+    .fc-pinned-header-icon {
+      font-size: 10px; opacity: 0.55;
+    }
+    .fc-pinned-grid {
+      display: flex; gap: 8px;
+    }
+    .fc-pinned-item {
+      display: flex; flex-direction: column; align-items: center;
+      flex: 1; max-width: 88px; gap: 7px;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .fc-pinned-bubble {
+      width: 62px; height: 62px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.75rem;
+      position: relative;
+      transition: transform 0.13s ease, box-shadow 0.13s ease;
+      flex-shrink: 0;
+    }
+    .fc-pinned-item:hover .fc-pinned-bubble,
+    .fc-pinned-item:active .fc-pinned-bubble { transform: scale(0.94); }
+    .fc-pinned-item.active .fc-pinned-bubble {
+      box-shadow: 0 0 0 3px var(--fc-sent-bg);
+    }
+    .fc-pinned-bubble.announcement {
+      background: linear-gradient(145deg, #f59e0b, #d97706);
+    }
+    .fc-pinned-bubble.prayer {
+      background: linear-gradient(145deg, #a855f7, #7c3aed);
+    }
+    .fc-pinned-badge {
+      position: absolute; top: -1px; right: -1px;
+      background: #ff3b30; color: #fff; border-radius: 10px;
+      font-size: 10px; font-weight: 700; min-width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 5px; border: 2px solid var(--fc-surface);
+    }
+    .fc-pinned-name {
+      font-size: 11.5px; font-weight: 500; text-align: center;
+      color: var(--fc-text); line-height: 1.3;
+      max-width: 80px;
+      overflow: hidden;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    }
+    .fc-pinned-preview-dot {
+      position: absolute; bottom: 2px; right: 2px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--fc-surface);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; line-height: 1;
+    }
+    /* Dark mode overrides */
+    [data-theme="dark"] .fc-pinned-section { background: var(--fc-panel); }
+    [data-theme="dark"] .fc-pinned-badge { border-color: var(--fc-panel); }
+
     .fc-conv-icon {
       width: 52px; height: 52px;
       border-radius: 50%;

@@ -737,7 +737,41 @@
       return;
     }
 
-    const rows = visible.map(c => {
+    // ── Pinned section (Church Announcements + Prayer Chain) ──────────────
+    const pinned  = visible.filter(c => c.type === 'announcement' || c.type === 'prayer');
+    const regular = visible.filter(c => c.type !== 'announcement' && c.type !== 'prayer');
+
+    let pinnedHtml = '';
+    if (pinned.length > 0) {
+      const bubbles = pinned.map(c => {
+        const isActive  = c.id === _activeConvId;
+        const unread    = c.unreadCount || 0;
+        const typeClass = c.type === 'announcement' ? 'announcement' : 'prayer';
+        const badge     = unread > 0
+          ? `<div class="fc-pinned-badge">${unread > 9 ? '9+' : unread}</div>` : '';
+        return `
+          <div class="fc-pinned-item ${isActive ? 'active' : ''}"
+               data-id="${c.id}"
+               onclick="window._openConversation('${c.id}')">
+            <div class="fc-pinned-bubble ${typeClass}">
+              ${_e(c.icon || '💬')}
+              ${badge}
+            </div>
+            <div class="fc-pinned-name">${_e(c.name)}</div>
+          </div>`;
+      }).join('');
+      pinnedHtml = `
+        <div class="fc-pinned-section">
+          <div class="fc-pinned-header">
+            <span class="fc-pinned-header-icon">📌</span>
+            <span class="fc-pinned-header-label">Pinned</span>
+          </div>
+          <div class="fc-pinned-grid">${bubbles}</div>
+        </div>`;
+    }
+
+    // ── Regular conversation rows ─────────────────────────────────────────
+    const rows = regular.map(c => {
       const isActive = c.id === _activeConvId;
       const unread = c.unreadCount || 0;
       const time = _formatTime(c.lastActivity);
@@ -789,7 +823,7 @@
       footer = `<button class="fc-archive-toggle" onclick="window._toggleArchivedView()">Show archived (${archivedCount})</button>`;
     }
 
-    list.innerHTML = rows + footer;
+    list.innerHTML = pinnedHtml + rows + footer;
   }
 
   // Close menu when clicking elsewhere
