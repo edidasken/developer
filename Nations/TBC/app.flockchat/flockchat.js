@@ -1036,6 +1036,7 @@
     _injectSanctuary();
     _injectSermons();
     _renderConversations();
+    _srmCheckNewBadge();
 
     _convUnsub = _db.collection('conversations')
       .where('participants', 'array-contains', _me.uid)
@@ -2627,9 +2628,48 @@
 
   /* ── Recent Sermons Feed ─────────────────────────────────────────────── */
 
-  let _srmPage    = 0;
-  let _srmAllRows = [];
-  const SRM_PAGE_SIZE = 12;
+  let _srmPage         = 0;
+  let _srmAllRows      = [];
+  let _srmBadgeChecked = false;
+  const SRM_PAGE_SIZE  = 12;
+
+  // ── Badge helpers ──────────────────────────────────────────────────────
+  function _srmSeenKey()    { return 'flock-srm-latest-id'; }
+  function _srmGetSeenId()  { try { return localStorage.getItem(_srmSeenKey()) || ''; } catch { return ''; } }
+  function _srmSetSeenId(id){ try { localStorage.setItem(_srmSeenKey(), id || ''); } catch {} }
+
+  function _srmUpdateBadge(n) {
+    const entry = _conversations.find(c => c.id === SERMONS_ID);
+    if (entry) entry.unreadCount = n;
+    const bubble = document.querySelector(`.fc-pinned-item[data-id="${SERMONS_ID}"] .fc-pinned-bubble`);
+    if (!bubble) return;
+    let badge = bubble.querySelector('.fc-pinned-badge');
+    if (n > 0) {
+      if (!badge) { badge = document.createElement('div'); badge.className = 'fc-pinned-badge'; bubble.appendChild(badge); }
+      badge.textContent = n > 9 ? '9+' : String(n);
+    } else {
+      badge?.remove();
+    }
+  }
+
+  async function _srmCheckNewBadge() {
+    if (_srmBadgeChecked) return;
+    _srmBadgeChecked = true;
+    const UR = window.UpperRoom;
+    if (!UR || typeof UR.listSermons !== 'function') return;
+    try {
+      const all = await UR.listSermons({ limit: 50 }) || [];
+      const preached = all.filter(r => ['preached','delivered'].includes((r.status||'').toLowerCase()));
+      if (!preached.length) return;
+      const seenId  = _srmGetSeenId();
+      const seenIdx = preached.findIndex(r => r.id === seenId);
+      // seenIdx === -1 → never seen (all new); === 0 → fully current; > 0 → that many new
+      const newCount = seenIdx === -1 ? preached.length : seenIdx;
+      if (newCount > 0) _srmUpdateBadge(Math.min(newCount, 9));
+    } catch (err) {
+      console.warn('[Sermons] badge check failed', err);
+    }
+  }
 
   async function _renderSermons(container) {
     container.innerHTML = '<div class="fc-loading"><div class="fc-spinner"></div></div>';
@@ -2646,6 +2686,11 @@
       }
     } catch (err) {
       console.warn('[Sermons] fetch failed', err);
+    }
+    // Mark all as seen and clear badge
+    if (_srmAllRows.length > 0) {
+      _srmSetSeenId(_srmAllRows[0].id);
+      _srmUpdateBadge(0);
     }
     _srmPage = 0;
     _renderSermonPage(container);
