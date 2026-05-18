@@ -23,6 +23,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SEED_DB_PATH = REPO_ROOT / "New_Covenant" / "Data" / "seed_database.json"
 TEACHING_PLANS_PATH = REPO_ROOT / "New_Covenant" / "Data" / "teaching_plans.js"
+STRONGS_GREEK_PATH = REPO_ROOT / "New_Covenant" / "Data" / "strongs-greek.js"
+STRONGS_HEBREW_PATH = REPO_ROOT / "New_Covenant" / "Data" / "strongs-hebrew.js"
 
 # Collections from church.firestore.rules that should exist
 REQUIRED_COLLECTIONS = [
@@ -255,6 +257,39 @@ def load_teaching_plans():
         return []
 
 
+def load_strongs_lexicon(file_path, lexicon_name):
+    """Parse strongs-greek.js or strongs-hebrew.js and return array of documents."""
+    if not file_path.exists():
+        print(f"  ⚠ {file_path.name} not found, skipping")
+        return []
+    
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # Extract the JSON object from: export default {...}
+    match = re.search(r'export\s+default\s+(\{[\s\S]*\});?\s*$', content)
+    if not match:
+        print(f"  ⚠ Could not parse {file_path.name}")
+        return []
+    
+    try:
+        # Parse the object
+        obj = json.loads(match.group(1))
+        
+        # Convert from {G1234: {...}, G1235: {...}} to [{_id: "G1234", ...}, {_id: "G1235", ...}]
+        documents = []
+        for strongs_id, entry in obj.items():
+            doc = {"_id": strongs_id}
+            doc.update(entry)
+            documents.append(doc)
+        
+        print(f"  ✓ Loaded {len(documents)} {lexicon_name} entries")
+        return documents
+    except json.JSONDecodeError as e:
+        print(f"  ⚠ JSON parse error in {file_path.name}: {e}")
+        return []
+
+
 def update_seed_database():
     """Update seed_database.json to match church.firestore.rules."""
     print(f"Loading seed database: {SEED_DB_PATH}")
@@ -297,6 +332,10 @@ def update_seed_database():
             # Value-added collections might have seed data
             elif coll == 'teachingPlans':
                 collections[coll] = load_teaching_plans()
+            elif coll == 'lexiconGreek':
+                collections[coll] = load_strongs_lexicon(STRONGS_GREEK_PATH, "Greek")
+            elif coll == 'lexiconHebrew':
+                collections[coll] = load_strongs_lexicon(STRONGS_HEBREW_PATH, "Hebrew")
             elif coll == 'appConfig':
                 # Add default app config with maintenance mode
                 collections[coll] = [{
@@ -335,9 +374,32 @@ def update_seed_database():
         for name in sorted(cleared):
             print(f"  ∅ {name}")
     
-    # 5. Update metadata
+    # 5. Populate empty value-added collections that should have data
+    populated = []
+    if 'lexiconGreek' in collections and not collections['lexiconGreek']:
+        collections['lexiconGreek'] = load_strongs_lexicon(STRONGS_GREEK_PATH, "Greek")
+        if collections['lexiconGreek']:
+            populated.append(f"lexiconGreek ({len(collections['lexiconGreek'])} docs)")
+    
+    if 'lexiconHebrew' in collections and not collections['lexiconHebrew']:
+        collections['lexiconHebrew'] = load_strongs_lexicon(STRONGS_HEBREW_PATH, "Hebrew")
+        if collections['lexiconHebrew']:
+            populated.append(f"lexiconHebrew ({len(collections['lexiconHebrew'])} docs)")
+    
+    if populated:
+        print(f"\n✓ Populated {len(populated)} value-added collections:")
+        for name in populated:
+            print(f"  📚 {name}")
+    
+    # 6. Update metadata
     total_docs = sum(len(docs) for docs in collections.values())
     total_collections = len(collections)
+    
+    # Check if we have Strong's data
+    has_strongs = (
+        collections.get('lexiconGreek') and len(collections['lexiconGreek']) > 0 and
+        collections.get('lexiconHebrew') and len(collections['lexiconHebrew']) > 0
+    )
     
     db['__meta'] = {
         "exportedAt": datetime.now(timezone.utc).isoformat(),
@@ -347,14 +409,14 @@ def update_seed_database():
         "version": "seed-2.1",
         "collections": total_collections,
         "totalDocs": total_docs,
-        "includesStrongs": False,
-        "note": "Complete seed database for a fresh FlockOS church deployment. All collections from church.firestore.rules are present. Value-added collections (books, theology, devotionals, teachingPlans, etc.) contain seed data. Personal collections (prayers, conversations, journal, etc.) are empty arrays. Import via Admin → Church Audit → ⬆ Import .json"
+        "includesStrongs": has_strongs,
+        "note": "Complete seed database for a fresh FlockOS church deployment. All collections from church.firestore.rules are present. Value-added collections (books, theology, devotionals, teachingPlans, lexicons, etc.) contain seed data. Personal collections (prayers, conversations, journal, etc.) are empty arrays. Import via Admin → Church Audit → ⬆ Import .json"
     }
     
     # Reorder collections alphabetically
     db['collections'] = dict(sorted(collections.items()))
     
-    # 6. Save updated database
+    # 7. Save updated database
     print(f"\n✓ Updating seed_database.json:")
     print(f"  Collections: {original_count} → {total_collections}")
     print(f"  Total docs: {total_docs}")
