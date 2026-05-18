@@ -51,6 +51,12 @@ const S = {
     freezeCol: false,      // Freeze first data column
     sortCol: null,         // Last sorted column letter
     sortAsc: true,         // Sort direction
+    // Session 4 state
+    charts: [],            // Array of chart definitions { id, type, range, title, hasHeaders, paletteIdx, showLegend }
+    chartBuilderOpen: false,
+    chartPreviewInstance: null, // Chart.js instance in the builder preview
+    chartPaletteIdx: 0,         // Currently selected palette in builder
+    chartType: 'bar',           // Currently selected chart type in builder
   },
 };
 
@@ -230,6 +236,33 @@ function _bindEvents() {
 
   // Grid keyboard navigation
   document.getElementById('fd-grid-wrap')?.addEventListener('keydown', _onGridKeydown);
+
+  // Insert chart button
+  document.getElementById('fs-chart-btn')?.addEventListener('click', _showChartBuilder);
+
+  // Chart modal controls
+  document.getElementById('fd-chart-modal-close')?.addEventListener('click', _closeChartBuilder);
+  document.getElementById('fd-chart-cancel-btn')?.addEventListener('click', _closeChartBuilder);
+  document.getElementById('fd-chart-insert-btn')?.addEventListener('click', _insertChart);
+  document.getElementById('fd-chart-range')?.addEventListener('input', _updateChartPreview);
+  document.getElementById('fd-chart-headers')?.addEventListener('change', _updateChartPreview);
+  document.getElementById('fd-chart-title')?.addEventListener('input', _updateChartPreview);
+  document.getElementById('fd-chart-legend')?.addEventListener('change', _updateChartPreview);
+
+  // Chart type buttons (delegated)
+  document.getElementById('fd-chart-type-grid')?.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-chart-type]');
+    if (!btn) return;
+    document.querySelectorAll('[data-chart-type]').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    S.sheet.chartType = btn.dataset.chartType;
+    _updateChartPreview();
+  });
+
+  // Close chart modal on overlay click
+  document.getElementById('fd-chart-modal-overlay')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('fd-chart-modal-overlay')) _closeChartBuilder();
+  });
 
   // Close all popups when clicking outside
   document.addEventListener('click', (e) => {
@@ -689,6 +722,9 @@ function _openSpreadsheetEditor() {
   S.sheet.hiddenRows = new Set();
   S.sheet.clipboard = null;
   S.sheet.copyRef = null;
+  S.sheet.charts = [];
+  S.sheet.chartType = 'bar';
+  S.sheet.chartPaletteIdx = 0;
 
   if (S.currentDoc.sheetMeta) {
     try {
@@ -704,6 +740,7 @@ function _openSpreadsheetEditor() {
         }
         _applyFiltersToHiddenRows();
       }
+      if (Array.isArray(meta.charts)) S.sheet.charts = meta.charts;
     } catch (_) { /* ignore */ }
   }
 
@@ -722,8 +759,14 @@ function _openSpreadsheetEditor() {
   // Build color picker swatches (done once per open)
   _initColorPickers();
 
+  // Init chart builder palettes (done once per open)
+  _initChartPalettes();
+
   // Render the grid
   _renderGrid();
+
+  // Render any saved charts
+  _renderChartsPanel();
 
   // Bind grid mouse events once via the persistent wrap element (not the table)
   const wrap = document.getElementById('fd-grid-wrap');
@@ -747,6 +790,12 @@ function _closeSpreadsheetEditor() {
   // Commit any pending edit
   if (S.sheet.isEditing) _commitCellEdit();
 
+  // Close chart builder if open
+  _closeChartBuilder();
+
+  // Destroy any live Chart.js instances in the panel
+  _destroyPanelCharts();
+
   document.getElementById('fd-sheet-view')?.classList.add('hidden');
   document.getElementById('fd-library-view')?.classList.remove('hidden');
 
@@ -759,6 +808,7 @@ function _closeSpreadsheetEditor() {
   S.sheet.filterActive = false;
   S.sheet.filterValues = {};
   S.sheet.hiddenRows = new Set();
+  S.sheet.charts = [];
   clearTimeout(S.sheet.autoSaveTimer);
 
   _loadDocuments();
@@ -1570,7 +1620,7 @@ async function _saveSpreadsheet() {
   const sheetData = JSON.stringify(S.sheet.data);
   const colWidths  = JSON.stringify(S.sheet.colWidths);
 
-  // Serialize Session 3 metadata
+  // Serialize Session 3+4 metadata
   const filterValsSerialized = {};
   for (const [col, valSet] of Object.entries(S.sheet.filterValues)) {
     filterValsSerialized[col] = Array.from(valSet);
@@ -1582,6 +1632,7 @@ async function _saveSpreadsheet() {
     sortAsc:      S.sheet.sortAsc,
     filterActive: S.sheet.filterActive,
     filterValues: filterValsSerialized,
+    charts:       S.sheet.charts,   // Session 4: chart definitions
   });
 
   const saveStatus = document.getElementById('fd-sheet-save-status');
@@ -1961,3 +2012,355 @@ function _updateFreezeBtn() {
   else if (fc)  btn.title = 'Unfreeze column A';
   else          btn.title = 'Freeze top row';
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SESSION 4: CHARTS & VISUALIZATIONS
+   "The heavens declare the glory of God; the skies proclaim the work of his hands."
+   — Psalm 19:1
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Color Palettes ───────────────────────────────────────────────────────── */
+const FS_CHART_PALETTES = [
+  { name: 'Ocean',    colors: ['#2563eb','#0891b2','#059669','#7c3aed','#db2777','#ea580c'] },
+  { name: 'Church',   colors: ['#1a73e8','#f59e0b','#10b981','#8b5cf6','#ef4444','#64748b'] },
+  { name: 'Harvest',  colors: ['#d97706','#b45309','#15803d','#166534','#92400e','#78350f'] },
+  { name: 'Pastel',   colors: ['#93c5fd','#6ee7b7','#fde68a','#fca5a5','#c4b5fd','#a5f3fc'] },
+  { name: 'Mono',     colors: ['#1f2937','#374151','#6b7280','#9ca3af','#d1d5db','#f3f4f6'] },
+];
+
+function _initChartPalettes() {
+  const container = document.getElementById('fd-chart-palettes');
+  if (!container || container._built) return;
+  container._built = true;
+  container.innerHTML = FS_CHART_PALETTES.map((palette, idx) => {
+    const dots = palette.colors.slice(0, 4).map(c =>
+      `<div class="fd-palette-dot" style="background:${c}"></div>`).join('');
+    return `<button class="fd-palette-btn${idx === 0 ? ' is-active' : ''}"
+      data-palette="${idx}" title="${palette.name}">${dots}</button>`;
+  }).join('');
+  container.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-palette]');
+    if (!btn) return;
+    container.querySelectorAll('.fd-palette-btn').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    S.sheet.chartPaletteIdx = parseInt(btn.dataset.palette, 10);
+    _updateChartPreview();
+  });
+}
+
+/* ── Chart Builder ────────────────────────────────────────────────────────── */
+function _showChartBuilder() {
+  S.sheet.chartBuilderOpen = true;
+
+  // Pre-fill range from current selection
+  const rangeInput = document.getElementById('fd-chart-range');
+  if (rangeInput && S.sheet.selected && !rangeInput.value) {
+    rangeInput.value = S.sheet.selected;
+  }
+
+  // Restore type selection
+  document.querySelectorAll('[data-chart-type]').forEach(b => {
+    b.classList.toggle('is-active', b.dataset.chartType === S.sheet.chartType);
+  });
+
+  document.getElementById('fd-chart-modal-overlay')?.classList.remove('hidden');
+  _updateChartPreview();
+}
+
+function _closeChartBuilder() {
+  if (!S.sheet.chartBuilderOpen) return;
+  S.sheet.chartBuilderOpen = false;
+
+  // Destroy preview chart instance
+  if (S.sheet.chartPreviewInstance) {
+    S.sheet.chartPreviewInstance.destroy();
+    S.sheet.chartPreviewInstance = null;
+  }
+  document.getElementById('fd-chart-modal-overlay')?.classList.add('hidden');
+}
+
+/* ── Build Chart.js data config from sheet data + range string ────────────── */
+function _buildChartData(rangeStr, hasHeaders, type, paletteIdx) {
+  rangeStr = rangeStr.trim().toUpperCase();
+  if (!rangeStr.match(/^[A-Z]+\d+(:[A-Z]+\d+)?$/)) return null;
+
+  const refs = _parseRange(rangeStr);
+  if (!refs.length) return null;
+
+  // Find the bounding box
+  const parsedAll = refs.map(_parseRef);
+  const colLetters = [...new Set(parsedAll.map(r => r.col))].sort();
+  const rowNums = [...new Set(parsedAll.map(r => parseInt(r.row, 10)))].sort((a, b) => a - b);
+
+  if (colLetters.length === 0 || rowNums.length === 0) return null;
+
+  const palette = FS_CHART_PALETTES[paletteIdx] || FS_CHART_PALETTES[0];
+
+  // Extract labels (first column) and series (remaining columns)
+  const labelCol = colLetters[0];
+  const dataStartCol = 1; // index into colLetters
+
+  // Determine header row offset
+  const dataRowStart = hasHeaders ? 1 : 0;
+  if (dataRowStart >= rowNums.length) return null;
+
+  const labels = rowNums.slice(dataRowStart).map(r => {
+    const val = _getCellDisplay(`${labelCol}${r}`);
+    return val !== '' ? val : `Row ${r}`;
+  });
+
+  if (colLetters.length < 2) {
+    // Single column: values in label col, synthetic series
+    const values = rowNums.slice(dataRowStart).map(r =>
+      parseFloat(_getCellRawValue(`${labelCol}${r}`)) || 0
+    );
+    const seriesLabel = hasHeaders
+      ? (_getCellDisplay(`${labelCol}${rowNums[0]}`) || 'Values')
+      : 'Values';
+    return {
+      labels,
+      datasets: [{
+        label: seriesLabel,
+        data: values,
+        backgroundColor: _buildBgColors(type, palette, 0, labels.length),
+        borderColor: type === 'line' ? palette.colors[0] : undefined,
+        borderWidth: type === 'line' ? 2 : 1,
+        fill: false,
+      }],
+    };
+  }
+
+  // Multiple columns: each column (after first) is a dataset
+  const datasets = colLetters.slice(dataStartCol).map((col, colIdx) => {
+    const seriesLabel = hasHeaders
+      ? (_getCellDisplay(`${col}${rowNums[0]}`) || col)
+      : col;
+    const data = rowNums.slice(dataRowStart).map(r =>
+      parseFloat(_getCellRawValue(`${col}${r}`)) || 0
+    );
+    const color = palette.colors[colIdx % palette.colors.length];
+    return {
+      label: seriesLabel,
+      data,
+      backgroundColor: _buildBgColors(type, palette, colIdx, labels.length),
+      borderColor: type === 'line' ? color : undefined,
+      borderWidth: type === 'line' ? 2 : 1,
+      fill: false,
+    };
+  });
+
+  return { labels, datasets };
+}
+
+function _buildBgColors(type, palette, colIdx, count) {
+  if (type === 'pie' || type === 'doughnut') {
+    // Each slice gets its own color
+    return Array.from({ length: count }, (_, i) =>
+      palette.colors[i % palette.colors.length] + 'cc');
+  }
+  const color = palette.colors[colIdx % palette.colors.length];
+  return color + 'cc'; // single color with transparency
+}
+
+/* ── Live Preview in modal ────────────────────────────────────────────────── */
+function _updateChartPreview() {
+  const rangeStr = document.getElementById('fd-chart-range')?.value || '';
+  const hasHeaders = document.getElementById('fd-chart-headers')?.checked !== false;
+  const title = document.getElementById('fd-chart-title')?.value || '';
+  const showLegend = document.getElementById('fd-chart-legend')?.checked !== false;
+  const type = S.sheet.chartType;
+  const paletteIdx = S.sheet.chartPaletteIdx;
+
+  const msgEl = document.getElementById('fd-chart-preview-msg');
+  const canvas = document.getElementById('fd-chart-preview-canvas');
+  if (!canvas) return;
+
+  if (!rangeStr.trim()) {
+    if (msgEl) msgEl.textContent = 'Enter a data range to preview the chart.';
+    if (S.sheet.chartPreviewInstance) {
+      S.sheet.chartPreviewInstance.destroy();
+      S.sheet.chartPreviewInstance = null;
+    }
+    return;
+  }
+
+  const chartData = _buildChartData(rangeStr, hasHeaders, type, paletteIdx);
+  if (!chartData) {
+    if (msgEl) msgEl.textContent = 'Could not parse range. Try something like A1:C10.';
+    return;
+  }
+  if (msgEl) msgEl.textContent = '';
+
+  // Destroy old preview instance before creating new one
+  if (S.sheet.chartPreviewInstance) {
+    S.sheet.chartPreviewInstance.destroy();
+    S.sheet.chartPreviewInstance = null;
+  }
+
+  const ctx = canvas.getContext('2d');
+  S.sheet.chartPreviewInstance = new Chart(ctx, _buildChartJsConfig(type, chartData, title, showLegend));
+}
+
+/* Build a Chart.js configuration object */
+function _buildChartJsConfig(type, chartData, title, showLegend) {
+  const isRadial = type === 'pie' || type === 'doughnut';
+  return {
+    type,
+    data: chartData,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 250 },
+      plugins: {
+        legend: { display: showLegend, position: isRadial ? 'right' : 'top' },
+        title: {
+          display: !!title,
+          text: title,
+          font: { size: 14, weight: '600', family: "'Plus Jakarta Sans', sans-serif" },
+          color: '#1f2937',
+        },
+        tooltip: { mode: 'index', intersect: false },
+      },
+      scales: isRadial ? {} : {
+        x: {
+          ticks: { font: { size: 11, family: "'Plus Jakarta Sans', sans-serif" }, color: '#6b7280' },
+          grid: { color: '#e5e7eb' },
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { font: { size: 11, family: "'Plus Jakarta Sans', sans-serif" }, color: '#6b7280' },
+          grid: { color: '#e5e7eb' },
+        },
+      },
+    },
+  };
+}
+
+/* ── Insert Chart (save to sheet + render in panel) ─────────────────────── */
+function _insertChart() {
+  const rangeStr = document.getElementById('fd-chart-range')?.value || '';
+  const hasHeaders = document.getElementById('fd-chart-headers')?.checked !== false;
+  const title = document.getElementById('fd-chart-title')?.value.trim() || 'Chart';
+  const showLegend = document.getElementById('fd-chart-legend')?.checked !== false;
+  const type = S.sheet.chartType;
+  const paletteIdx = S.sheet.chartPaletteIdx;
+
+  if (!rangeStr.trim()) {
+    const msgEl = document.getElementById('fd-chart-preview-msg');
+    if (msgEl) msgEl.textContent = 'Please enter a data range first.';
+    return;
+  }
+
+  const chartDef = {
+    id: `chart_${Date.now()}`,
+    type,
+    range: rangeStr.trim().toUpperCase(),
+    title,
+    hasHeaders,
+    paletteIdx,
+    showLegend,
+  };
+
+  S.sheet.charts.push(chartDef);
+  _closeChartBuilder();
+  _renderChartsPanel();
+  _autoSaveSheet();
+  _toast(`Chart "${title}" inserted`, 'success');
+}
+
+/* ── Charts Panel ─────────────────────────────────────────────────────────── */
+function _renderChartsPanel() {
+  const row = document.getElementById('fd-charts-row');
+  if (!row) return;
+
+  // Destroy all existing Chart.js instances in panel before re-rendering
+  _destroyPanelCharts();
+  row.innerHTML = '';
+
+  if (!S.sheet.charts.length) {
+    row.innerHTML = '<span class="fd-charts-empty">No charts yet — click the chart icon in the toolbar to insert one.</span>';
+    return;
+  }
+
+  for (const chart of S.sheet.charts) {
+    const card = document.createElement('div');
+    card.className = 'fd-chart-card';
+    card.dataset.chartId = chart.id;
+    card.innerHTML = `
+      <div class="fd-chart-card-header">
+        <div class="fd-chart-card-title">${_e(chart.title)}</div>
+        <div class="fd-chart-card-actions">
+          <button class="fd-chart-action-btn" title="Download as PNG"
+            onclick="_fsExportChart('${chart.id}')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="15" height="15">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+          </button>
+          <button class="fd-chart-action-btn delete" title="Delete chart"
+            onclick="_fsDeleteChart('${chart.id}')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="15" height="15">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="fd-chart-canvas-wrap">
+        <canvas id="fd-chart-canvas-${chart.id}"></canvas>
+      </div>
+    `;
+    row.appendChild(card);
+  }
+
+  // Render each chart after DOM is updated
+  requestAnimationFrame(() => {
+    for (const chart of S.sheet.charts) {
+      const canvas = document.getElementById(`fd-chart-canvas-${chart.id}`);
+      if (!canvas) continue;
+      const chartData = _buildChartData(chart.range, chart.hasHeaders, chart.type, chart.paletteIdx);
+      if (!chartData) continue;
+      const ctx = canvas.getContext('2d');
+      canvas._chartInstance = new Chart(ctx, _buildChartJsConfig(
+        chart.type, chartData, chart.title, chart.showLegend
+      ));
+    }
+  });
+}
+
+function _destroyPanelCharts() {
+  // Destroy all Chart.js instances attached to panel canvases
+  document.querySelectorAll('[id^="fd-chart-canvas-"]').forEach(canvas => {
+    if (canvas._chartInstance) {
+      canvas._chartInstance.destroy();
+      canvas._chartInstance = null;
+    }
+  });
+}
+
+/* ── Export chart as image ────────────────────────────────────────────────── */
+function _fsExportChart(chartId) {
+  const canvas = document.getElementById(`fd-chart-canvas-${chartId}`);
+  if (!canvas) return;
+  const chart = S.sheet.charts.find(c => c.id === chartId);
+  const name = (chart?.title || 'chart').replace(/\s+/g, '_').toLowerCase();
+  const link = document.createElement('a');
+  link.download = `${name}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+window._fsExportChart = _fsExportChart;
+
+/* ── Delete chart ─────────────────────────────────────────────────────────── */
+function _fsDeleteChart(chartId) {
+  // Destroy the Chart.js instance first
+  const canvas = document.getElementById(`fd-chart-canvas-${chartId}`);
+  if (canvas?._chartInstance) {
+    canvas._chartInstance.destroy();
+    canvas._chartInstance = null;
+  }
+  S.sheet.charts = S.sheet.charts.filter(c => c.id !== chartId);
+  _renderChartsPanel();
+  _autoSaveSheet();
+}
+window._fsDeleteChart = _fsDeleteChart;

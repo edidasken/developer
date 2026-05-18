@@ -673,6 +673,172 @@
     .fd-grid.fs-freeze-row.fs-freeze-col tbody tr:first-child td[data-col="A"] {
       z-index: 3;
     }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       SESSION 4: Charts & Visualizations
+       ══════════════════════════════════════════════════════════════════════ */
+
+    /* Charts panel — sits below the grid inside the sheet view */
+    .fd-charts-panel {
+      flex-shrink: 0;
+      background: var(--bg);
+      border-top: 2px solid var(--line);
+      padding: 16px;
+      overflow-x: auto;
+    }
+    .fd-charts-panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .fd-charts-panel-title {
+      font: 600 0.875rem var(--font-ui); color: var(--ink-muted);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .fd-charts-row {
+      display: flex; gap: 20px; flex-wrap: nowrap; overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .fd-chart-card {
+      flex-shrink: 0;
+      background: var(--bg-raised);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      width: 340px;
+      position: relative;
+    }
+    .fd-chart-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .fd-chart-card-title {
+      font: 600 0.875rem var(--font-ui); color: var(--ink);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      max-width: 230px;
+    }
+    .fd-chart-card-actions {
+      display: flex; gap: 4px; flex-shrink: 0;
+    }
+    .fd-chart-action-btn {
+      width: 28px; height: 28px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: transparent; border: 1px solid var(--line); border-radius: 6px;
+      color: var(--ink-muted); cursor: pointer; transition: background 150ms, color 150ms;
+    }
+    .fd-chart-action-btn:hover { background: rgba(59,130,246,0.12); color: #3b82f6; border-color: #3b82f6; }
+    .fd-chart-action-btn.delete:hover { background: rgba(239,68,68,0.1); color: #ef4444; border-color: #ef4444; }
+    .fd-chart-canvas-wrap {
+      position: relative; width: 100%; height: 200px;
+    }
+
+    /* Chart builder modal */
+    .fd-chart-modal-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,0.45);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .fd-chart-modal {
+      background: var(--bg-raised);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      width: 100%; max-width: 780px;
+      max-height: calc(100vh - 32px);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.32);
+    }
+    .fd-chart-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 24px 14px;
+      border-bottom: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .fd-chart-modal-title {
+      font: 700 1.0625rem var(--font-ui); color: var(--ink);
+    }
+    .fd-chart-modal-body {
+      display: flex; gap: 0; flex: 1; overflow: hidden;
+    }
+    .fd-chart-modal-controls {
+      width: 280px; flex-shrink: 0;
+      padding: 20px;
+      border-right: 1px solid var(--line);
+      overflow-y: auto;
+    }
+    .fd-chart-modal-preview {
+      flex: 1; padding: 20px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: var(--bg);
+      overflow: auto;
+    }
+    .fd-chart-modal-preview-canvas-wrap {
+      position: relative; width: 100%; max-width: 400px;
+      height: 280px;
+    }
+    .fd-chart-modal-footer {
+      display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+      padding: 14px 24px;
+      border-top: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+
+    /* Form controls inside modal */
+    .fd-form-group {
+      margin-bottom: 14px;
+    }
+    .fd-form-label {
+      display: block;
+      font: 600 0.813rem var(--font-ui); color: var(--ink-muted);
+      margin-bottom: 5px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .fd-form-input {
+      width: 100%; padding: 8px 10px;
+      border: 1px solid var(--line); border-radius: 7px;
+      font: 400 0.875rem var(--font-ui); color: var(--ink);
+      background: var(--bg); outline: none; box-sizing: border-box;
+      transition: border-color 150ms;
+    }
+    .fd-form-input:focus { border-color: #3b82f6; }
+    .fd-chart-type-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .fd-chart-type-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 5px; padding: 10px 6px;
+      border: 2px solid var(--line); border-radius: 8px;
+      background: var(--bg); cursor: pointer;
+      font: 500 0.75rem var(--font-ui); color: var(--ink-muted);
+      transition: border-color 150ms, color 150ms, background 150ms;
+    }
+    .fd-chart-type-btn:hover { border-color: #3b82f6; color: #3b82f6; }
+    .fd-chart-type-btn.is-active {
+      border-color: #3b82f6; color: #3b82f6;
+      background: rgba(59,130,246,0.08);
+    }
+    .fd-chart-type-btn svg { width: 28px; height: 28px; }
+
+    /* Color palette selector */
+    .fd-palette-row {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .fd-palette-btn {
+      display: flex; gap: 2px; align-items: center;
+      padding: 4px 8px; border: 2px solid var(--line); border-radius: 6px;
+      background: var(--bg); cursor: pointer;
+      transition: border-color 150ms;
+    }
+    .fd-palette-btn.is-active { border-color: #3b82f6; }
+    .fd-palette-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+
+    /* Empty charts state */
+    .fd-charts-empty {
+      font: 400 0.875rem var(--font-ui); color: var(--ink-muted);
+      padding: 4px 0;
+    }
   </style>
 </head>
 <body>
@@ -1015,6 +1181,16 @@
             </svg>
           </button>
 
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Insert Chart -->
+          <button class="fd-toolbar-btn" id="fs-chart-btn" title="Insert chart">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </button>
+
           <div class="fd-spacer"></div>
           <span id="fd-sheet-save-status" style="font:500 0.813rem var(--font-ui);color:var(--ink-muted);padding-right:8px">All changes saved</span>
           <button class="fd-btn fd-btn--ghost" id="fd-sheet-save-btn">Save</button>
@@ -1031,7 +1207,130 @@
           <!-- Rendered by FlockSheets JS -->
         </div>
 
+        <!-- Charts Panel (below grid) -->
+        <div class="fd-charts-panel" id="fd-charts-panel">
+          <div class="fd-charts-panel-header">
+            <span class="fd-charts-panel-title">Charts</span>
+          </div>
+          <div class="fd-charts-row" id="fd-charts-row">
+            <span class="fd-charts-empty">No charts yet — click the chart icon in the toolbar to insert one.</span>
+          </div>
+        </div>
+
       </div><!-- /#fd-sheet-view -->
+
+      <!-- Chart Builder Modal (hidden by default) -->
+      <div class="fd-chart-modal-overlay hidden" id="fd-chart-modal-overlay">
+        <div class="fd-chart-modal" role="dialog" aria-modal="true" aria-label="Chart Builder">
+
+          <div class="fd-chart-modal-header">
+            <div class="fd-chart-modal-title">Insert Chart</div>
+            <button class="fd-btn-icon" id="fd-chart-modal-close" aria-label="Close">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="fd-chart-modal-body">
+
+            <!-- Controls column -->
+            <div class="fd-chart-modal-controls">
+
+              <!-- Chart type -->
+              <div class="fd-form-group">
+                <label class="fd-form-label">Chart Type</label>
+                <div class="fd-chart-type-grid" id="fd-chart-type-grid">
+                  <button class="fd-chart-type-btn is-active" data-chart-type="bar">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                    </svg>
+                    Bar
+                  </button>
+                  <button class="fd-chart-type-btn" data-chart-type="line">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 17l5-5 4 4 5-6 4 3"/>
+                    </svg>
+                    Line
+                  </button>
+                  <button class="fd-chart-type-btn" data-chart-type="pie">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M11 2v10l7 7A9 9 0 0111 2zm2 0a9 9 0 017 14L13 9V2z"/>
+                    </svg>
+                    Pie
+                  </button>
+                  <button class="fd-chart-type-btn" data-chart-type="doughnut">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 3a7 7 0 110 14A7 7 0 0112 5zm0 3a4 4 0 100 8 4 4 0 000-8z" opacity=".4"/>
+                      <path d="M12 2v5a5 5 0 015 5h5A10 10 0 0012 2z"/>
+                    </svg>
+                    Doughnut
+                  </button>
+                </div>
+              </div>
+
+              <!-- Data range -->
+              <div class="fd-form-group">
+                <label class="fd-form-label" for="fd-chart-range">Data Range</label>
+                <input type="text" id="fd-chart-range" class="fd-form-input"
+                  placeholder="e.g. A1:C10" autocomplete="off" spellcheck="false">
+                <div style="font:400 0.75rem var(--font-ui);color:var(--ink-muted);margin-top:4px">
+                  First column = labels, other columns = data series
+                </div>
+              </div>
+
+              <!-- First row as headers -->
+              <div class="fd-form-group" style="display:flex;align-items:center;gap:8px">
+                <input type="checkbox" id="fd-chart-headers" checked style="cursor:pointer;width:16px;height:16px">
+                <label for="fd-chart-headers" style="font:500 0.875rem var(--font-ui);color:var(--ink);cursor:pointer">
+                  First row contains headers
+                </label>
+              </div>
+
+              <!-- Chart title -->
+              <div class="fd-form-group">
+                <label class="fd-form-label" for="fd-chart-title">Chart Title</label>
+                <input type="text" id="fd-chart-title" class="fd-form-input"
+                  placeholder="My Chart" autocomplete="off">
+              </div>
+
+              <!-- Color palette -->
+              <div class="fd-form-group">
+                <label class="fd-form-label">Color Palette</label>
+                <div class="fd-palette-row" id="fd-chart-palettes">
+                  <!-- Injected by JS -->
+                </div>
+              </div>
+
+              <!-- Show legend -->
+              <div class="fd-form-group" style="display:flex;align-items:center;gap:8px">
+                <input type="checkbox" id="fd-chart-legend" checked style="cursor:pointer;width:16px;height:16px">
+                <label for="fd-chart-legend" style="font:500 0.875rem var(--font-ui);color:var(--ink);cursor:pointer">
+                  Show legend
+                </label>
+              </div>
+
+            </div><!-- /.fd-chart-modal-controls -->
+
+            <!-- Preview column -->
+            <div class="fd-chart-modal-preview">
+              <div style="font:600 0.75rem var(--font-ui);color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px">Preview</div>
+              <div class="fd-chart-modal-preview-canvas-wrap">
+                <canvas id="fd-chart-preview-canvas"></canvas>
+              </div>
+              <div id="fd-chart-preview-msg" style="font:400 0.813rem var(--font-ui);color:var(--ink-muted);margin-top:10px;text-align:center"></div>
+            </div>
+
+          </div><!-- /.fd-chart-modal-body -->
+
+          <div class="fd-chart-modal-footer">
+            <button class="fd-btn fd-btn--ghost" id="fd-chart-cancel-btn">Cancel</button>
+            <button class="fd-btn" id="fd-chart-insert-btn">Insert Chart</button>
+          </div>
+
+        </div><!-- /.fd-chart-modal -->
+      </div><!-- /#fd-chart-modal-overlay -->
 
     </div><!-- /#fd-main -->
     <div id="fd-footer">
@@ -1040,6 +1339,11 @@
     </div>
 
   </div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js"
+    integrity="sha384-G436+Z2nlA8+PNoeRvWdxKbvOf8E/y+lYxqht2iBwNHTQDV5CJr3+AGVj8fGZi5t"
+    crossorigin="anonymous"></script>
 
   <!-- Firebase & Auth -->
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
