@@ -2111,14 +2111,20 @@
   };
 
   function _sctPrayerEntryHTML(e) {
-    const date = _sctDate(e.createdAt);
-    const isPrivate = e.isConfidential !== false;
+    const bodyText  = e.prayerText || e['Prayer Text'] || e.text || '';
+    const dateTs    = e.submittedAt || e['Submitted At'] || e.createdAt || null;
+    const date      = _sctDate(dateTs);
+    const confRaw   = e.isConfidential !== undefined ? e.isConfidential : e['Is Confidential'];
+    const isPrivate = confRaw === 'TRUE' || confRaw === true;
     const isPublished = !!e.published;
     return `
-      <div class="fc-sct-entry" data-entry-id="${_e(e.id)}" data-prayer-text="${_e(e.text || '')}">
+      <div class="fc-sct-entry" data-entry-id="${_e(e.id)}" data-prayer-text="${_e(bodyText)}">
         <div class="fc-sct-entry-meta">
           <span class="fc-sct-entry-date">${date}</span>
           <span class="fc-sct-badge ${isPrivate ? 'private' : 'shared'}">${isPrivate ? 'Private' : 'Shared'}</span>
+          <button class="fc-sct-entry-edit" title="Edit" onclick="window._editPrayer('${_e(e.id)}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
           ${isPublished
             ? '<span class="fc-sct-badge published">Shared to Prayer Chain \u2713</span>'
             : `<button class="fc-sct-publish-btn" onclick="window._publishPrayer('${_e(e.id)}')">Share to Prayer Chain</button>`}
@@ -2126,9 +2132,58 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
         </div>
-        <div class="fc-sct-entry-text">${_e(e.text || '')}</div>
+        <div class="fc-sct-entry-text">${_e(bodyText)}</div>
       </div>`;
   }
+
+  window._editPrayer = function(id) {
+    const card = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
+    if (!card || card.querySelector('.fc-sct-edit-area')) return;
+    const bodyText = card.dataset.prayerText || '';
+    const textEl = card.querySelector('.fc-sct-entry-text');
+    if (textEl) textEl.style.display = 'none';
+    const editEl = document.createElement('div');
+    editEl.className = 'fc-sct-edit-block';
+    editEl.innerHTML = `
+      <textarea class="fc-sct-edit-area" rows="5">${_e(bodyText)}</textarea>
+      <div class="fc-sct-edit-actions">
+        <button class="fc-sct-edit-cancel" onclick="window._cancelPrayerEdit('${_e(id)}')">Cancel</button>
+        <button class="fc-sct-edit-save" onclick="window._savePrayerEdit('${_e(id)}')">Save</button>
+      </div>`;
+    card.appendChild(editEl);
+    editEl.querySelector('textarea').focus();
+  };
+
+  window._cancelPrayerEdit = function(id) {
+    const card = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
+    if (!card) return;
+    const textEl = card.querySelector('.fc-sct-entry-text');
+    if (textEl) textEl.style.display = '';
+    const editEl = card.querySelector('.fc-sct-edit-block');
+    if (editEl) editEl.remove();
+  };
+
+  window._savePrayerEdit = async function(id) {
+    const card = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
+    if (!card) return;
+    const ta = card.querySelector('.fc-sct-edit-area');
+    if (!ta) return;
+    const newText = ta.value.trim();
+    if (!newText) return;
+    const saveBtn = card.querySelector('.fc-sct-edit-save');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving\u2026'; }
+    const UR = window.UpperRoom;
+    try {
+      if (!UR || typeof UR.updatePrayer !== 'function') throw new Error('UpperRoom unavailable');
+      await UR.updatePrayer(id, { prayerText: newText });
+    } catch (err) {
+      console.error('[Sanctuary] edit prayer', err);
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
+      return;
+    }
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane) await _sctPrayers(pane);
+  };
 
   window._savePrayer = async function() {
     const ta = document.getElementById('fc-sct-ptext');
