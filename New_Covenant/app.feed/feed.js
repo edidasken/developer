@@ -1633,6 +1633,7 @@ function _openPrintWindow(s, bodyHtml) {
     .bmp-section-title { font: 600 14pt 'Plus Jakarta Sans', sans-serif; color: #111; line-height: 1.3; }
     .bmp-transition-section { display: flex; align-items: center; gap: 8pt; padding: 5pt 10pt; border: none; border-top: 1pt dashed #ccc; border-bottom: 1pt dashed #ccc; background: transparent !important; }
     .bmp-transition-section .bmp-section-accent { display: none; }
+    .bmp-prayer-inline { background: #faf5ff !important; border-color: #e9d5ff !important; }
     .bmp-verse-block { margin: 6pt 0; padding: 9pt 12pt 9pt 13pt; background: #fef9ec; border-left: 3pt solid #e8a838; }
     .bmp-verse-ref { font: 700 11.5pt 'Plus Jakarta Sans', sans-serif; color: #c48a20; margin-bottom: 4pt; }
     .bmp-verse-text { font: italic 13pt/1.7 Georgia, serif; color: #2c2c2c; }
@@ -1789,13 +1790,29 @@ function _buildPresentHtml(s) {
   html += '<div id="bmp-sections">';
   const prayerSections = [];
   (s.sections || []).forEach(sec => {
-    if (sec.type === 'prayer') { prayerSections.push(sec); return; }
     const t      = _TYPE[sec.type] || _TYPE.point;
     const title  = (sec.title       || '').trim();
     const notes  = (sec.notes       || '').trim();
     const ref    = (sec.scriptureRef|| '').trim();
     const verse  = (sec.scripture   || '').trim();
     if (!title && !notes && !ref && !verse) return;
+    if (sec.type === 'prayer') {
+      // Collect for bottom summary AND render in-flow
+      prayerSections.push(sec);
+      html += `
+        <div class="bmp-section bmp-prayer-inline">
+          <div class="bmp-section-accent" style="background:${t.color}"></div>
+          <div class="bmp-section-content">
+            <div class="bmp-section-head">
+              <span class="bmp-type-pill" style="color:${t.color};border-color:${t.color}">${t.label}</span>
+              ${title ? `<span class="bmp-section-title">${_e(title)}</span>` : ''}
+            </div>
+            ${notes ? `<div class="bmp-notes">${_e(notes).replace(/\n/g, '<br>')}</div>` : ''}
+          </div>
+        </div>
+      `;
+      return;
+    }
     const isTransition = sec.type === 'transition';
     html += `
       <div class="bmp-section${isTransition ? ' bmp-transition-section' : ''}">
