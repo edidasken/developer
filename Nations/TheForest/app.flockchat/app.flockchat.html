@@ -650,7 +650,7 @@
       background: var(--fc-surface);
       border-radius: 20px 20px 0 0;
       box-shadow: 0 -4px 32px rgba(0,0,0,0.18);
-      max-height: 75%;
+      max-height: 88%;
       display: flex; flex-direction: column;
       overflow: hidden;
       animation: fc-mgr-slide-up 0.22s ease;
@@ -727,6 +727,54 @@
       transition: background 0.15s, color 0.15s;
     }
     .fc-mgr-restore-btn:hover { background: #22c55e; color: white; }
+    /* Channel access status badge */
+    .fc-mgr-status {
+      border-radius: 8px; padding: 8px 12px;
+      font-size: 0.8125rem; font-weight: 500;
+    }
+    .fc-mgr-status.open {
+      background: rgba(34,197,94,0.12); color: #16a34a;
+      border: 1px solid rgba(34,197,94,0.3);
+    }
+    .fc-mgr-status.restricted {
+      background: rgba(245,158,11,0.12); color: #b45309;
+      border: 1px solid rgba(245,158,11,0.3);
+    }
+    /* Member search input */
+    .fc-mgr-search {
+      flex: 1; height: 36px; border-radius: 10px;
+      border: 1px solid var(--fc-divider);
+      background: var(--fc-bg); color: var(--fc-text);
+      padding: 0 12px; font-size: 0.875rem;
+      outline: none;
+    }
+    .fc-mgr-search:focus { border-color: #06b6d4; }
+    /* Scrollable user checklist */
+    .fc-mgr-user-list {
+      max-height: 200px; overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      border-top: 1px solid var(--fc-divider);
+      border-bottom: 1px solid var(--fc-divider);
+    }
+    .fc-mgr-user-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 20px; cursor: pointer;
+      transition: background 0.12s;
+    }
+    .fc-mgr-user-item:hover { background: var(--fc-hover, rgba(0,0,0,0.04)); }
+    .fc-mgr-check {
+      width: 18px; height: 18px; accent-color: #06b6d4; flex-shrink: 0; cursor: pointer;
+    }
+    /* Add members button */
+    .fc-mgr-add-btn {
+      width: 100%; padding: 10px;
+      background: linear-gradient(135deg, #0c4a6e, #06b6d4);
+      color: white; border: none; border-radius: 10px;
+      font-size: 0.9375rem; font-weight: 600; cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .fc-mgr-add-btn:disabled { opacity: 0.4; cursor: default; }
+    .fc-mgr-add-btn:not(:disabled):hover { opacity: 0.88; }
     /* Admin delete button on messages */
     .fc-msg-admin-del {
       background: none; border: none; cursor: pointer;

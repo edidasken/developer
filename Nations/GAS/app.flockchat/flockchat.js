@@ -493,6 +493,13 @@
             _renderConversations();
             return;
           }
+          // If the channel has an explicit members list and user is not on it, hide it
+          const members = d?.members || [];
+          if (!_meIsAllAccess && _me?.uid && members.length > 0 && !members.includes(_me.uid)) {
+            _conversations = _conversations.filter(c => c.id !== id);
+            _renderConversations();
+            return;
+          }
 
           const e = _conversations.find(c => c.id === id);
           if (e) {
@@ -1574,6 +1581,8 @@
   /* ── Admin: Channel Manager ─────────────────────────────────────────── */
   // Cache uid → { name, email } to avoid redundant Firestore reads
   const _userCache = {};
+  let _allUsersCache = null; // all church users loaded once per session
+  let _mgrSelected = new Set(); // UIDs checked in the add-members picker
 
   async function _fetchUserName(uid) {
     if (_userCache[uid]) return _userCache[uid];
@@ -1586,12 +1595,31 @@
     } catch { return { name: uid, email: '' }; }
   }
 
+  async function _loadAllUsers() {
+    if (_allUsersCache) return _allUsersCache;
+    try {
+      const snap = await _db.collection('users').orderBy('displayName').limit(500).get();
+      _allUsersCache = [];
+      snap.forEach(doc => {
+        if (doc.id === _me?.uid) return; // skip self
+        const d = doc.data();
+        const entry = { uid: doc.id, name: d.displayName || d.email || doc.id, email: d.email || '' };
+        _userCache[doc.id] = { name: entry.name, email: entry.email };
+        _allUsersCache.push(entry);
+      });
+    } catch (err) {
+      console.warn('[FlockChat] Failed to load users for manager:', err);
+      _allUsersCache = [];
+    }
+    return _allUsersCache;
+  }
+
   window._openChannelManager = async function() {
     if (!_meIsAllAccess || !_activeConvId) return;
-    const overlay  = $('fc-mgr-overlay');
-    const drawer   = $('fc-mgr-drawer');
-    const title    = $('fc-mgr-title');
-    const body     = $('fc-mgr-body');
+    const overlay = $('fc-mgr-overlay');
+    const drawer  = $('fc-mgr-drawer');
+    const title   = $('fc-mgr-title');
+    const body    = $('fc-mgr-body');
     if (!overlay || !drawer || !body) return;
 
     const conv = _conversations.find(c => c.id === _activeConvId);
@@ -1600,26 +1628,25 @@
 
     overlay.removeAttribute('hidden');
     drawer.removeAttribute('hidden');
+    _mgrSelected.clear();
 
-    // Load banned list from Firestore, then render
     try {
-      const snap = await _db.collection('conversations').doc(_activeConvId).get();
-      const banned = (snap.exists ? snap.data()?.bannedMembers : null) || [];
-
-      // Unique active participants from current message list (exclude banned)
-      const activeUids = [...new Set(
-        _messages
-          .filter(m => m.author && m.author !== _me.uid && !banned.includes(m.author))
-          .map(m => m.author)
-      )];
-
-      // Fetch names concurrently
-      const [activeUsers, bannedUsers] = await Promise.all([
-        Promise.all(activeUids.map(uid => _fetchUserName(uid).then(u => ({ uid, ...u })))),
-        Promise.all(banned.map(uid     => _fetchUserName(uid).then(u => ({ uid, ...u }))))
+      const [snap, allUsers] = await Promise.all([
+        _db.collection('conversations').doc(_activeConvId).get(),
+        _loadAllUsers()
       ]);
 
-      _renderChannelManager(body, activeUsers, bannedUsers);
+      const data    = snap.exists ? snap.data() : {};
+      const members = data.members        || [];
+      const banned  = data.bannedMembers  || [];
+
+      // Fetch display names for current members and banned
+      const [memberUsers, bannedUsers] = await Promise.all([
+        Promise.all(members.map(uid => _fetchUserName(uid).then(u => ({ uid, ...u })))),
+        Promise.all(banned.map(uid  => _fetchUserName(uid).then(u => ({ uid, ...u }))))
+      ]);
+
+      _renderChannelManager(body, memberUsers, allUsers, bannedUsers, members, banned);
     } catch (err) {
       console.error('[FlockChat] Channel manager load failed:', err);
       body.innerHTML = `<div class="fc-mgr-empty">Failed to load channel data.</div>`;
@@ -1627,20 +1654,31 @@
   };
 
   window._closeChannelManager = function() {
-    const overlay = $('fc-mgr-overlay');
-    const drawer  = $('fc-mgr-drawer');
-    if (overlay) overlay.setAttribute('hidden', '');
-    if (drawer)  drawer.setAttribute('hidden', '');
+    $('fc-mgr-overlay')?.setAttribute('hidden', '');
+    $('fc-mgr-drawer')?.setAttribute('hidden', '');
+    _mgrSelected.clear();
   };
 
-  function _renderChannelManager(body, activeUsers, bannedUsers) {
+  function _renderChannelManager(body, memberUsers, allUsers, bannedUsers, memberUids, bannedUids) {
+    const isRestricted = memberUids.length > 0;
     let html = '';
 
-    html += `<div class="fc-mgr-section">Recent Participants</div>`;
-    if (activeUsers.length === 0) {
-      html += `<div class="fc-mgr-empty">No recent message senders.</div>`;
+    // ── Access status ──
+    html += `
+      <div style="padding:12px 20px 0;">
+        <div class="fc-mgr-status ${isRestricted ? 'restricted' : 'open'}">
+          ${isRestricted
+            ? `🔒 Restricted — only ${memberUids.length} member${memberUids.length !== 1 ? 's' : ''} can see this channel`
+            : '🌐 Open — all church members can see this channel'}
+        </div>
+      </div>`;
+
+    // ── Current members ──
+    html += `<div class="fc-mgr-section" style="margin-top:10px">Current Members</div>`;
+    if (memberUsers.length === 0) {
+      html += `<div class="fc-mgr-empty">No explicit members. Channel is open to all.</div>`;
     } else {
-      activeUsers.forEach(u => {
+      memberUsers.forEach(u => {
         html += `
           <div class="fc-mgr-member">
             <div class="fc-mgr-avatar">${_initials(u.name)}</div>
@@ -1649,16 +1687,52 @@
               ${u.email ? `<div class="fc-mgr-member-sub">${_e(u.email)}</div>` : ''}
             </div>
             <button class="fc-mgr-ban-btn"
-                    onclick="window._adminBanMember('${_e(u.uid)}','${_e(u.name)}')">
+                    onclick="window._adminRemoveFromChannel('${_e(u.uid)}','${_e(u.name)}')">
               Remove
             </button>
           </div>`;
       });
     }
 
-    html += `<div class="fc-mgr-section" style="margin-top:8px">Removed Members</div>`;
+    // ── Add members picker ──
+    const addable = allUsers.filter(u => !memberUids.includes(u.uid) && !bannedUids.includes(u.uid));
+    html += `
+      <div class="fc-mgr-section" style="margin-top:10px">Add Members</div>
+      <div style="padding:6px 20px 8px; display:flex; gap:8px; align-items:center;">
+        <input id="fc-mgr-search" class="fc-mgr-search" type="search"
+               placeholder="Search by name or email…"
+               oninput="window._filterMgrList(this)">
+      </div>
+      <div class="fc-mgr-user-list" id="fc-mgr-user-list">`;
+
+    if (addable.length === 0) {
+      html += `<div class="fc-mgr-empty">All users are already members.</div>`;
+    } else {
+      addable.forEach(u => {
+        html += `
+          <label class="fc-mgr-user-item" data-name="${_e(u.name.toLowerCase())}" data-email="${_e(u.email.toLowerCase())}">
+            <input type="checkbox" class="fc-mgr-check"
+                   onchange="window._toggleMgrSelect('${_e(u.uid)}')" value="${_e(u.uid)}">
+            <div class="fc-mgr-avatar" style="width:32px;height:32px;font-size:0.75rem">${_initials(u.name)}</div>
+            <div class="fc-mgr-member-info">
+              <div class="fc-mgr-member-name">${_e(u.name)}</div>
+              ${u.email ? `<div class="fc-mgr-member-sub">${_e(u.email)}</div>` : ''}
+            </div>
+          </label>`;
+      });
+    }
+    html += `</div>
+      <div style="padding:10px 20px 4px;">
+        <button id="fc-mgr-add-btn" class="fc-mgr-add-btn" disabled
+                onclick="window._adminAddSelected()">
+          Add Members
+        </button>
+      </div>`;
+
+    // ── Banned members ──
+    html += `<div class="fc-mgr-section" style="margin-top:10px">Removed / Banned</div>`;
     if (bannedUsers.length === 0) {
-      html += `<div class="fc-mgr-empty">No one has been removed.</div>`;
+      html += `<div class="fc-mgr-empty">No one has been banned.</div>`;
     } else {
       bannedUsers.forEach(u => {
         html += `
@@ -1679,21 +1753,78 @@
     body.innerHTML = html;
   }
 
+  // Toggle a UID in the selection set and update the Add button
+  window._toggleMgrSelect = function(uid) {
+    if (_mgrSelected.has(uid)) _mgrSelected.delete(uid);
+    else _mgrSelected.add(uid);
+    const btn = $('fc-mgr-add-btn');
+    if (btn) {
+      const n = _mgrSelected.size;
+      btn.textContent = n > 0 ? `Add ${n} Member${n !== 1 ? 's' : ''}` : 'Add Members';
+      btn.disabled = n === 0;
+    }
+  };
+
+  // Filter the user checklist based on search input
+  window._filterMgrList = function(input) {
+    const q = input.value.toLowerCase();
+    document.querySelectorAll('#fc-mgr-user-list .fc-mgr-user-item').forEach(el => {
+      const match = (el.dataset.name || '').includes(q) || (el.dataset.email || '').includes(q);
+      el.style.display = match ? '' : 'none';
+    });
+  };
+
+  // Commit the selected UIDs to the members array
+  window._adminAddSelected = async function() {
+    const uids = [..._mgrSelected];
+    if (!uids.length || !_activeConvId) return;
+    const btn = $('fc-mgr-add-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Adding…'; }
+    try {
+      await _db.collection('conversations').doc(_activeConvId).update({
+        members: firebase.firestore.FieldValue.arrayUnion(...uids)
+      });
+      _mgrSelected.clear();
+      _toast(`${uids.length} member${uids.length !== 1 ? 's' : ''} added`, 'success');
+      // Invalidate users cache so re-renders are fresh
+      _allUsersCache = null;
+      window._openChannelManager();
+    } catch (err) {
+      console.error('[FlockChat] Add members failed:', err);
+      _toast('Failed to add members', 'error');
+      if (btn) { btn.disabled = false; btn.textContent = `Add ${uids.length} Member${uids.length !== 1 ? 's' : ''}`; }
+    }
+  };
+
+  // Remove someone from the explicit members list
+  window._adminRemoveFromChannel = async function(uid, displayName) {
+    if (!_meIsAllAccess || !_activeConvId || !uid) return;
+    if (!confirm(`Remove ${displayName || uid} from this channel's member list?`)) return;
+    try {
+      await _db.collection('conversations').doc(_activeConvId).update({
+        members: firebase.firestore.FieldValue.arrayRemove(uid)
+      });
+      _toast(`${displayName || 'Member'} removed from channel`, 'success');
+      window._openChannelManager();
+    } catch (err) {
+      console.error('[FlockChat] Remove member failed:', err);
+      _toast('Failed to remove member', 'error');
+    }
+  };
+
   window._adminBanMember = async function(uid, displayName) {
     if (!_meIsAllAccess || !_activeConvId || !uid) return;
-    if (!confirm(`Remove ${displayName || uid} from this channel?`)) return;
+    if (!confirm(`Ban ${displayName || uid} from this channel?`)) return;
     try {
       await _db.collection('conversations').doc(_activeConvId).update({
         bannedMembers: firebase.firestore.FieldValue.arrayUnion(uid)
       });
-      // Evict from cache so name refetch works
       delete _userCache[uid];
-      _toast(`${displayName || 'Member'} removed from channel`, 'success');
-      // Re-open manager to refresh list
+      _toast(`${displayName || 'Member'} banned from channel`, 'success');
       window._openChannelManager();
     } catch (err) {
       console.error('[FlockChat] Ban member failed:', err);
-      _toast('Failed to remove member', 'error');
+      _toast('Failed to ban member', 'error');
     }
   };
 
