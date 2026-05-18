@@ -553,6 +553,126 @@
       font: inherit; background: white; color: #1f2937;
       display: block;
     }
+
+    /* ── Session 3: Colors, Borders, Sort, Filter, Fill, Freeze ──────────── */
+
+    /* Toolbar popup anchor (parent for absolutely-positioned popups) */
+    .fd-popup-anchor { position: relative; display: inline-flex; }
+
+    /* Color picker popup */
+    .fs-color-popup {
+      position: absolute; top: calc(100% + 6px); left: 50%;
+      transform: translateX(-50%);
+      z-index: 700;
+      background: var(--bg-raised); border: 1px solid var(--line);
+      border-radius: 10px; padding: 8px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+      width: 130px;
+    }
+    .fs-swatches {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
+    }
+    .fs-swatch {
+      width: 22px; height: 22px; border-radius: 4px; cursor: pointer;
+      border: 1px solid rgba(0,0,0,0.15);
+      transition: transform 100ms, box-shadow 100ms;
+    }
+    .fs-swatch:hover { transform: scale(1.18); box-shadow: 0 2px 8px rgba(0,0,0,0.22); }
+    /* "No color" swatch — diagonal stripe */
+    .fs-swatch-none {
+      background: white;
+      background-image:
+        linear-gradient(135deg, transparent 40%, #f87171 40%, #f87171 60%, transparent 60%);
+    }
+    /* Color bar indicator under button icon */
+    .fs-color-bar {
+      width: 14px; height: 3px; border-radius: 2px; margin-top: 2px;
+    }
+
+    /* Border picker popup */
+    .fs-border-popup {
+      position: absolute; top: calc(100% + 6px); left: 0;
+      z-index: 700;
+      background: var(--bg-raised); border: 1px solid var(--line);
+      border-radius: 10px; padding: 6px;
+      min-width: 168px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+    }
+    .fs-border-opt {
+      display: flex; align-items: center; gap: 8px;
+      width: 100%; padding: 8px 10px;
+      background: transparent; border: 0; border-radius: 6px;
+      color: var(--ink); font: 500 0.813rem var(--font-ui);
+      text-align: left; cursor: pointer; transition: background 150ms;
+    }
+    .fs-border-opt:hover { background: rgba(59,130,246,0.1); color: #3b82f6; }
+
+    /* Sort indicator in column headers */
+    .fd-col-header.fs-sorted-asc::after  { content: ' ↑'; font-size: 0.65rem; color: #1a73e8; }
+    .fd-col-header.fs-sorted-desc::after { content: ' ↓'; font-size: 0.65rem; color: #1a73e8; }
+
+    /* Filter indicator inside column header */
+    .fs-filter-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 14px; height: 14px; border-radius: 2px;
+      background: #1a73e8; color: white;
+      font-size: 7px; line-height: 1; cursor: pointer;
+      margin-left: 3px; vertical-align: middle;
+      border: 0; padding: 0; flex-shrink: 0;
+    }
+    .fs-filter-btn.is-active { background: #d97706; }
+
+    /* Filter dropdown */
+    .fs-filter-dropdown {
+      position: absolute; z-index: 800;
+      background: white; border: 1px solid #c9d1d9;
+      border-radius: 8px; padding: 6px;
+      min-width: 160px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      top: 24px; left: 0;
+    }
+    .fs-filter-search {
+      width: 100%; padding: 5px 8px;
+      border: 1px solid #c9d1d9; border-radius: 5px;
+      font: 400 0.813rem var(--font-ui); color: #1f2937;
+      margin-bottom: 4px; outline: none; box-sizing: border-box;
+    }
+    .fs-filter-list { max-height: 140px; overflow-y: auto; }
+    .fs-filter-item {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 4px; cursor: pointer; border-radius: 4px;
+      font: 400 0.813rem var(--font-ui); color: #1f2937;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: background 100ms;
+    }
+    .fs-filter-item:hover { background: #f0f3f5; }
+    .fs-filter-item input[type=checkbox] { margin: 0; cursor: pointer; flex-shrink: 0; }
+    .fs-filter-apply {
+      width: 100%; margin-top: 6px; padding: 5px;
+      background: #1a73e8; color: white;
+      border: 0; border-radius: 5px; cursor: pointer;
+      font: 500 0.813rem var(--font-ui);
+    }
+    .fs-filter-apply:hover { background: #1557b0; }
+
+    /* Copy-source dashed outline */
+    .fd-cell.is-copy-source {
+      outline: 2px dashed #1a73e8; outline-offset: -2px;
+    }
+
+    /* Freeze: make first data row / first data col sticky */
+    .fd-grid.fs-freeze-row tbody tr:first-child td,
+    .fd-grid.fs-freeze-row tbody tr:first-child th {
+      position: sticky; top: 24px; z-index: 2;
+      background: #f0f9f4;
+    }
+    .fd-grid.fs-freeze-col tbody td[data-col="A"] {
+      position: sticky; left: 48px; z-index: 1;
+      background: #f0f9f4;
+    }
+    .fd-grid.fs-freeze-row.fs-freeze-col tbody tr:first-child td[data-col="A"] {
+      z-index: 3;
+    }
   </style>
 </head>
 <body>
@@ -808,6 +928,93 @@
           <button class="fd-toolbar-btn fs-fmt-btn" data-fmt="currency" title="Currency ($)">$</button>
           <button class="fd-toolbar-btn fs-fmt-btn" data-fmt="percent" title="Percent (%)">%</button>
           <button class="fd-toolbar-btn fs-fmt-btn" data-fmt="decimal" title="2 decimal places">0.0</button>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Background color -->
+          <div class="fd-popup-anchor" id="fs-bg-wrap">
+            <button class="fd-toolbar-btn" id="fs-bg-btn" title="Cell background color" style="flex-direction:column;gap:0;padding:4px 6px">
+              <svg fill="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                <path d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15a1.49 1.49 0 000 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10L10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/>
+              </svg>
+              <div class="fs-color-bar" id="fs-bg-bar" style="background:#ffff00"></div>
+            </button>
+            <div class="fs-color-popup hidden" id="fs-bg-popup"></div>
+          </div>
+
+          <!-- Text color -->
+          <div class="fd-popup-anchor" id="fs-tc-wrap">
+            <button class="fd-toolbar-btn" id="fs-tc-btn" title="Text color" style="flex-direction:column;gap:0;padding:4px 6px">
+              <span style="font:700 0.9rem var(--font-ui);line-height:1.2">A</span>
+              <div class="fs-color-bar" id="fs-tc-bar" style="background:#dc2626"></div>
+            </button>
+            <div class="fs-color-popup hidden" id="fs-tc-popup"></div>
+          </div>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Border picker -->
+          <div class="fd-popup-anchor" id="fs-border-wrap">
+            <button class="fd-toolbar-btn" id="fs-border-btn" title="Cell borders">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+                <rect x="3" y="3" width="18" height="18" stroke-width="2"/>
+                <line x1="3" y1="12" x2="21" y2="12" stroke-width="1.5"/>
+                <line x1="12" y1="3" x2="12" y2="21" stroke-width="1.5"/>
+              </svg>
+            </button>
+            <div class="fs-border-popup hidden" id="fs-border-popup">
+              <button class="fs-border-opt" onclick="_fsSetBorder('all')">☰ All borders</button>
+              <button class="fs-border-opt" onclick="_fsSetBorder('outer')">□ Outer border</button>
+              <button class="fs-border-opt" onclick="_fsSetBorder('top')">⊤ Top</button>
+              <button class="fs-border-opt" onclick="_fsSetBorder('bottom')">⊥ Bottom</button>
+              <button class="fs-border-opt" onclick="_fsSetBorder('left')">⊣ Left</button>
+              <button class="fs-border-opt" onclick="_fsSetBorder('right')">⊢ Right</button>
+              <button class="fs-border-opt" onclick="_fsSetBorder(null)">✕ No borders</button>
+            </div>
+          </div>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Sort -->
+          <button class="fd-toolbar-btn" id="fs-sort-asc-btn" title="Sort A → Z (by selected column)">
+            <svg fill="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/>
+            </svg>
+          </button>
+          <button class="fd-toolbar-btn" id="fs-sort-desc-btn" title="Sort Z → A (by selected column)" style="transform:scaleY(-1)">
+            <svg fill="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/>
+            </svg>
+          </button>
+
+          <!-- Filter toggle -->
+          <button class="fd-toolbar-btn" id="fs-filter-btn" title="Toggle filter row">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18l-7 7.5V19l-4-2v-5.5L3 4z"/>
+            </svg>
+          </button>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Fill down / Fill right -->
+          <button class="fd-toolbar-btn" id="fs-fill-down-btn" title="Fill down (Ctrl+D)">
+            <svg fill="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/>
+            </svg>
+          </button>
+          <button class="fd-toolbar-btn" id="fs-fill-right-btn" title="Fill right (Ctrl+R)">
+            <svg fill="currentColor" viewBox="0 0 24 24" width="18" height="18" style="transform:rotate(-90deg)">
+              <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/>
+            </svg>
+          </button>
+
+          <!-- Freeze -->
+          <button class="fd-toolbar-btn" id="fs-freeze-btn" title="Freeze top row">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/>
+            </svg>
+          </button>
+
           <div class="fd-spacer"></div>
           <span id="fd-sheet-save-status" style="font:500 0.813rem var(--font-ui);color:var(--ink-muted);padding-right:8px">All changes saved</span>
           <button class="fd-btn fd-btn--ghost" id="fd-sheet-save-btn">Save</button>
