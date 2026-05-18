@@ -1666,6 +1666,94 @@
       color: var(--ink);
       cursor: pointer;
     }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       SESSION 7: IMPORT / EXPORT
+       ══════════════════════════════════════════════════════════════════════ */
+
+    /* ── Export/Import dropdown button ───────────────────────────────────── */
+    .fd-io-wrap {
+      position: relative;
+    }
+    .fd-io-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font: 600 0.813rem var(--font-ui);
+      color: var(--ink);
+      cursor: pointer;
+      transition: background 150ms, border-color 150ms;
+      white-space: nowrap;
+    }
+    .fd-io-btn:hover { background: rgba(255,255,255,0.05); border-color: var(--ink-muted); }
+    .fd-io-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .fd-io-btn .fd-io-caret {
+      width: 10px; height: 10px;
+      opacity: 0.65;
+      transition: transform 200ms;
+    }
+    .fd-io-dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 600;
+      background: var(--bg-raised);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 6px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+      min-width: 200px;
+    }
+    .fd-io-group-label {
+      padding: 6px 10px 2px;
+      font: 600 0.688rem var(--font-ui);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+    }
+    .fd-io-item {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%;
+      padding: 8px 10px;
+      background: transparent;
+      border: 0;
+      border-radius: 7px;
+      font: 500 0.875rem var(--font-ui);
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      transition: background 150ms;
+    }
+    .fd-io-item:hover { background: rgba(59,130,246,0.08); color: #3b82f6; }
+    .fd-io-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .fd-io-separator {
+      height: 1px;
+      background: var(--line);
+      margin: 5px 6px;
+    }
+
+    /* ── Import progress banner ───────────────────────────────────────────── */
+    .fd-import-banner {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 20px;
+      background: rgba(59,130,246,0.08);
+      border-bottom: 1px solid rgba(59,130,246,0.2);
+      font: 500 0.875rem var(--font-ui);
+      color: #3b82f6;
+    }
+    .fd-import-spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(59,130,246,0.3);
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: fd-spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes fd-spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -1961,6 +2049,62 @@
                 d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4"/>
             </svg>
           </button>
+
+          <!-- Export / Import dropdown -->
+          <div class="fd-io-wrap fd-popup-anchor" id="fd-writer-io-wrap">
+            <button class="fd-io-btn" id="fd-writer-io-btn" title="Import / Export">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+              </svg>
+              Import / Export
+              <svg class="fd-io-caret" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+            <div class="fd-io-dropdown hidden" id="fd-writer-io-dropdown">
+              <div class="fd-io-group-label">Export</div>
+              <button class="fd-io-item" id="fd-export-html-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Download as HTML
+              </button>
+              <button class="fd-io-item" id="fd-export-pdf-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4"/>
+                </svg>
+                Export as PDF (Print)
+              </button>
+              <button class="fd-io-item" id="fd-export-txt-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Download as Text
+              </button>
+              <button class="fd-io-item" id="fd-email-doc-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Email as Attachment
+              </button>
+              <div class="fd-io-separator"></div>
+              <div class="fd-io-group-label">Import</div>
+              <button class="fd-io-item" id="fd-import-docx-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                </svg>
+                Import DOCX File
+              </button>
+            </div>
+          </div>
+          <!-- Hidden DOCX file input -->
+          <input type="file" id="fd-docx-file-input" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" class="hidden">
 
           <div class="fd-spacer"></div>
 
@@ -2276,6 +2420,56 @@
             </svg>
           </button>
 
+          <!-- Sheet Export / Import dropdown -->
+          <div class="fd-io-wrap fd-popup-anchor" id="fd-sheet-io-wrap">
+            <button class="fd-io-btn" id="fd-sheet-io-btn" title="Import / Export">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+              </svg>
+              Import / Export
+              <svg class="fd-io-caret" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+              </svg>
+            </button>
+            <div class="fd-io-dropdown hidden" id="fd-sheet-io-dropdown">
+              <div class="fd-io-group-label">Export</div>
+              <button class="fd-io-item" id="fd-export-csv-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Download as CSV
+              </button>
+              <button class="fd-io-item" id="fd-export-xlsx-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Download as Excel (.xlsx)
+              </button>
+              <div class="fd-io-separator"></div>
+              <div class="fd-io-group-label">Import</div>
+              <button class="fd-io-item" id="fd-import-csv-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                </svg>
+                Import CSV File
+              </button>
+              <button class="fd-io-item" id="fd-import-xlsx-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                </svg>
+                Import Excel File
+              </button>
+            </div>
+          </div>
+          <!-- Hidden file inputs for sheet import -->
+          <input type="file" id="fd-csv-file-input" accept=".csv,text/csv" class="hidden">
+          <input type="file" id="fd-xlsx-file-input" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" class="hidden">
+
           <div class="fd-spacer"></div>
           <span id="fd-sheet-save-status" style="font:500 0.813rem var(--font-ui);color:var(--ink-muted);padding-right:8px">All changes saved</span>
           <button class="fd-btn fd-btn--ghost" id="fd-sheet-save-btn">Save</button>
@@ -2429,6 +2623,12 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js"
     integrity="sha384-G436+Z2nlA8+PNoeRvWdxKbvOf8E/y+lYxqht2iBwNHTQDV5CJr3+AGVj8fGZi5t"
     crossorigin="anonymous"></script>
+
+  <!-- Session 7: SheetJS (CSV/XLSX export+import) -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+  <!-- Session 7: Mammoth.js (DOCX → HTML import) -->
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 
   <!-- Firebase & Auth -->
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>

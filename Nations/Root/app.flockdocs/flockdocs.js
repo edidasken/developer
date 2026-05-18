@@ -84,6 +84,10 @@ window.FlockDocs = {
   saveDocument,
   deleteDocument,
   switchView,
+  exportDocAsHtml: () => _exportDocAsHtml(),
+  exportDocAsPdf: () => _exportDocAsPdf(),
+  exportSheetAsCsv: () => _exportSheetAsCsv(),
+  exportSheetAsXlsx: () => _exportSheetAsXlsx(),
 };
 
 // Wait for firm_foundation.js to complete auth
@@ -255,6 +259,36 @@ function _bindEvents() {
   // Insert chart button
   document.getElementById('fs-chart-btn')?.addEventListener('click', _showChartBuilder);
 
+  // Session 7: Spreadsheet Import/Export bindings
+  document.getElementById('fd-sheet-io-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('fd-sheet-io-dropdown')?.classList.toggle('hidden');
+  });
+  document.getElementById('fd-export-csv-btn')?.addEventListener('click', () => {
+    document.getElementById('fd-sheet-io-dropdown')?.classList.add('hidden');
+    _exportSheetAsCsv();
+  });
+  document.getElementById('fd-export-xlsx-btn')?.addEventListener('click', () => {
+    document.getElementById('fd-sheet-io-dropdown')?.classList.add('hidden');
+    _exportSheetAsXlsx();
+  });
+  document.getElementById('fd-import-csv-btn')?.addEventListener('click', () => {
+    document.getElementById('fd-sheet-io-dropdown')?.classList.add('hidden');
+    document.getElementById('fd-csv-file-input')?.click();
+  });
+  document.getElementById('fd-import-xlsx-btn')?.addEventListener('click', () => {
+    document.getElementById('fd-sheet-io-dropdown')?.classList.add('hidden');
+    document.getElementById('fd-xlsx-file-input')?.click();
+  });
+  document.getElementById('fd-csv-file-input')?.addEventListener('change', (e) => {
+    if (e.target.files[0]) _importSheetCsv(e.target.files[0]);
+    e.target.value = '';
+  });
+  document.getElementById('fd-xlsx-file-input')?.addEventListener('change', (e) => {
+    if (e.target.files[0]) _importSheetXlsx(e.target.files[0]);
+    e.target.value = '';
+  });
+
   // Chart modal controls
   document.getElementById('fd-chart-modal-close')?.addEventListener('click', _closeChartBuilder);
   document.getElementById('fd-chart-cancel-btn')?.addEventListener('click', _closeChartBuilder);
@@ -312,6 +346,13 @@ function _bindEvents() {
     // Writer page layout popup
     if (!document.getElementById('fd-layout-btn-wrap')?.contains(e.target)) {
       document.getElementById('fd-layout-popup')?.classList.add('hidden');
+    }
+    // Session 7: IO dropdown menus
+    if (!document.getElementById('fd-writer-io-wrap')?.contains(e.target)) {
+      document.getElementById('fd-writer-io-dropdown')?.classList.add('hidden');
+    }
+    if (!document.getElementById('fd-sheet-io-wrap')?.contains(e.target)) {
+      document.getElementById('fd-sheet-io-dropdown')?.classList.add('hidden');
     }
   });
 
@@ -434,6 +475,36 @@ function _bindEvents() {
   document.getElementById('fd-version-restore-btn')?.addEventListener('click', _restoreVersion);
   document.getElementById('fd-version-preview-overlay')?.addEventListener('click', (e) => {
     if (e.target === document.getElementById('fd-version-preview-overlay')) _closeVersionPreview();
+  });
+
+  // ── Session 7: Import/Export — Writer ─────────────────────────────────
+  document.getElementById('fd-writer-io-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('fd-writer-io-dropdown')?.classList.toggle('hidden');
+  });
+  document.getElementById('fd-export-html-btn')?.addEventListener('click', () => {
+    document.getElementById('fd-writer-io-dropdown')?.classList.add('hidden');
+    _exportDocAsHtml();
+  });
+  document.getElementById('fd-export-pdf-btn')?.addEventListener('click', () => {
+    document.getElementById('fd-writer-io-dropdown')?.classList.add('hidden');
+    _exportDocAsPdf();
+  });
+  document.getElementById('fd-export-txt-btn')?.addEventListener('click', () => {
+    document.getElementById('fd-writer-io-dropdown')?.classList.add('hidden');
+    _exportDocAsText();
+  });
+  document.getElementById('fd-email-doc-btn')?.addEventListener('click', () => {
+    document.getElementById('fd-writer-io-dropdown')?.classList.add('hidden');
+    _emailDocument();
+  });
+  document.getElementById('fd-import-docx-btn')?.addEventListener('click', () => {
+    document.getElementById('fd-writer-io-dropdown')?.classList.add('hidden');
+    document.getElementById('fd-docx-file-input')?.click();
+  });
+  document.getElementById('fd-docx-file-input')?.addEventListener('change', (e) => {
+    if (e.target.files[0]) _importDocx(e.target.files[0]);
+    e.target.value = '';
   });
 }
 
@@ -3413,4 +3484,458 @@ function _copyShareLink() {
       _toast('Could not copy link automatically', 'warning');
     }
   });
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SESSION 7: IMPORT / EXPORT
+   "Whatever you do, work at it with all your heart, as working for the Lord"
+   — Colossians 3:23
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Utilities ───────────────────────────────────────────────────────────── */
+
+function _triggerDownload(content, filename, mimeType) {
+  var blob = new Blob([content], { type: mimeType });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
+}
+
+function _triggerBinaryDownload(arrayBuffer, filename) {
+  var blob = new Blob([arrayBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
+}
+
+function _safeDocName() {
+  return (S.currentDoc && S.currentDoc.name || 'Untitled')
+    .replace(/[<>:"/\\|?*]/g, '-').trim() || 'Untitled';
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   WRITER — EXPORT
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+function _exportDocAsHtml() {
+  if (!S.currentDoc) {
+    _toast('Please open a document first', 'warning');
+    return;
+  }
+  var editor = document.getElementById('fd-editor-content');
+  if (!editor) return;
+  var docName = _safeDocName();
+  var header = document.getElementById('fd-doc-header')?.innerHTML || '';
+  var footer = document.getElementById('fd-doc-footer')?.innerHTML || '';
+
+  var html = '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
+    + '<meta charset="UTF-8">\n'
+    + '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+    + '<title>' + _e(docName) + '</title>\n'
+    + '<style>\n'
+    + '  body { font: 400 14px/1.6 Georgia, serif; color: #1f2937; max-width: 816px; margin: 0 auto; padding: 40px 96px; }\n'
+    + '  h1 { font-size: 2rem; margin: 0 0 16px; }\n'
+    + '  h2 { font-size: 1.5rem; margin: 24px 0 12px; }\n'
+    + '  h3 { font-size: 1.25rem; margin: 20px 0 10px; }\n'
+    + '  table { border-collapse: collapse; width: 100%; margin: 16px 0; }\n'
+    + '  td, th { border: 1px solid #d1d5db; padding: 8px 12px; vertical-align: top; }\n'
+    + '  th { background: #f9fafb; font-weight: 700; }\n'
+    + '  img { max-width: 100%; height: auto; display: block; margin: 8px 0; }\n'
+    + '  hr.fd-page-break { border: none; border-top: 2px dashed #d1d5db; margin: 32px 0; }\n'
+    + '  .fd-doc-header { border-bottom: 1px solid #e5e7eb; margin-bottom: 24px; padding-bottom: 8px; font-size: 12px; color: #6b7280; }\n'
+    + '  .fd-doc-footer { border-top: 1px solid #e5e7eb; margin-top: 24px; padding-top: 8px; font-size: 12px; color: #6b7280; }\n'
+    + '</style>\n</head>\n<body>\n';
+
+  if (header) {
+    html += '<div class="fd-doc-header">' + header + '</div>\n';
+  }
+  html += editor.innerHTML + '\n';
+  if (footer) {
+    html += '<div class="fd-doc-footer">' + footer + '</div>\n';
+  }
+  html += '</body>\n</html>';
+
+  _triggerDownload(html, docName + '.html', 'text/html;charset=utf-8');
+  _toast('Document downloaded as HTML', 'success');
+}
+
+function _exportDocAsPdf() {
+  if (!S.currentDoc) {
+    _toast('Please open a document first', 'warning');
+    return;
+  }
+  _toast('Opening print dialog — choose "Save as PDF" in your browser', 'info', 4000);
+  setTimeout(function() { window.print(); }, 500);
+}
+
+function _exportDocAsText() {
+  if (!S.currentDoc) {
+    _toast('Please open a document first', 'warning');
+    return;
+  }
+  var editor = document.getElementById('fd-editor-content');
+  if (!editor) return;
+
+  // Extract plain text preserving some structure
+  var clone = editor.cloneNode(true);
+  // Replace block elements with newlines
+  clone.querySelectorAll('p, div, h1, h2, h3, h4, h5, h6, li, tr, br').forEach(function(el) {
+    el.insertAdjacentText('afterend', '\n');
+  });
+  var text = clone.textContent.replace(/\n{3,}/g, '\n\n').trim();
+
+  _triggerDownload(text, _safeDocName() + '.txt', 'text/plain;charset=utf-8');
+  _toast('Document downloaded as plain text', 'success');
+}
+
+function _emailDocument() {
+  if (!S.currentDoc) {
+    _toast('Please open a document first', 'warning');
+    return;
+  }
+  var editor = document.getElementById('fd-editor-content');
+  if (!editor) return;
+
+  var docName = _safeDocName();
+
+  // Build plain text excerpt for email body
+  var clone = editor.cloneNode(true);
+  clone.querySelectorAll('p, div, h1, h2, h3, h4, h5, h6, li, br').forEach(function(el) {
+    el.insertAdjacentText('afterend', '\n');
+  });
+  var bodyText = clone.textContent.replace(/\n{3,}/g, '\n\n').trim();
+  var subject = encodeURIComponent(docName);
+  var bodyEncoded = encodeURIComponent(
+    bodyText.substring(0, 1800) + (bodyText.length > 1800 ? '\n\n[...document continues]' : '')
+  );
+
+  window.location.href = 'mailto:?subject=' + subject + '&body=' + bodyEncoded;
+  _toast('Opening your email client…', 'info');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   WRITER — IMPORT DOCX
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+async function _importDocx(file) {
+  if (!window.mammoth) {
+    _toast('DOCX import library is loading, please try again in a moment', 'warning');
+    return;
+  }
+  if (!S.currentDoc) {
+    _toast('Please open or create a document first', 'warning');
+    return;
+  }
+
+  // Show loading banner
+  var presenceBar = document.getElementById('fd-presence-bar');
+  var banner = null;
+  if (presenceBar) {
+    banner = document.createElement('div');
+    banner.className = 'fd-import-banner';
+    banner.innerHTML = '<div class="fd-import-spinner"></div><span>Importing ' + _e(file.name) + '…</span>';
+    presenceBar.parentNode.insertBefore(banner, presenceBar.nextSibling);
+  }
+
+  try {
+    var arrayBuffer = await file.arrayBuffer();
+    var result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+
+    if (result.messages && result.messages.length > 0) {
+      console.info('[FlockDocs] DOCX import messages:', result.messages);
+    }
+
+    var editor = document.getElementById('fd-editor-content');
+    if (!editor) return;
+
+    // Confirm if editor has content
+    var hasContent = editor.textContent.trim().length > 0
+      && editor.textContent.trim() !== 'Start typing...';
+    if (hasContent) {
+      if (!confirm('Replace the current document content with the imported DOCX?\n\nThis will overwrite what is already in the editor.')) {
+        return;
+      }
+    }
+
+    editor.innerHTML = result.value;
+
+    // Update doc name from filename
+    var importedName = file.name.replace(/\.docx$/i, '').trim();
+    if (importedName) {
+      S.currentDoc.name = importedName;
+      var docNameInput = document.getElementById('fd-doc-name-input');
+      if (docNameInput) docNameInput.value = importedName;
+    }
+
+    _autoSave();
+    _toast('DOCX imported successfully', 'success');
+  } catch (err) {
+    console.error('[FlockDocs] DOCX import error:', err);
+    _toast('Failed to import DOCX: ' + (err.message || 'Unknown error'), 'error');
+  } finally {
+    if (banner) banner.remove();
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SPREADSHEET — EXPORT CSV
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+function _exportSheetAsCsv() {
+  if (!S.currentDoc || S.currentDoc.type !== 'spreadsheet') {
+    _toast('Please open a spreadsheet first', 'warning');
+    return;
+  }
+
+  var data = S.sheet.data;
+  var rows = S.sheet.rows;
+  var cols = S.sheet.cols;
+  var csvRows = [];
+
+  for (var r = 1; r <= rows; r++) {
+    var rowData = [];
+    for (var c = 0; c < cols; c++) {
+      var col = String.fromCharCode(65 + c);
+      var ref = col + r;
+      var cell = data[ref];
+      var val = cell ? (cell.v !== undefined ? cell.v : '') : '';
+      // Quote if needed
+      var str = String(val);
+      if (str.indexOf(',') !== -1 || str.indexOf('"') !== -1 || str.indexOf('\n') !== -1) {
+        str = '"' + str.replace(/"/g, '""') + '"';
+      }
+      rowData.push(str);
+    }
+    // Trim trailing empty cells
+    while (rowData.length > 0 && rowData[rowData.length - 1] === '') {
+      rowData.pop();
+    }
+    if (rowData.length > 0) {
+      csvRows.push(rowData.join(','));
+    } else if (csvRows.length > 0) {
+      // Keep blank row if not at end
+      csvRows.push('');
+    }
+  }
+
+  // Trim trailing empty rows
+  while (csvRows.length > 0 && csvRows[csvRows.length - 1] === '') {
+    csvRows.pop();
+  }
+
+  var csv = csvRows.join('\r\n');
+  _triggerDownload(csv, _safeDocName() + '.csv', 'text/csv;charset=utf-8');
+  _toast('Spreadsheet exported as CSV', 'success');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SPREADSHEET — EXPORT XLSX
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+function _exportSheetAsXlsx() {
+  if (!S.currentDoc || S.currentDoc.type !== 'spreadsheet') {
+    _toast('Please open a spreadsheet first', 'warning');
+    return;
+  }
+  if (!window.XLSX) {
+    _toast('Excel export library is loading, please try again in a moment', 'warning');
+    return;
+  }
+
+  var data = S.sheet.data;
+  var rows = S.sheet.rows;
+  var cols = S.sheet.cols;
+
+  // Build a 2-D array of raw values
+  var matrix = [];
+  var lastNonEmptyRow = 0;
+  for (var r = 1; r <= rows; r++) {
+    var rowArr = [];
+    var hasValue = false;
+    for (var c = 0; c < cols; c++) {
+      var col = String.fromCharCode(65 + c);
+      var ref = col + r;
+      var cell = data[ref];
+      var val = cell ? (cell.v !== undefined ? cell.v : '') : '';
+      // Try numeric conversion
+      if (val !== '' && !isNaN(Number(val))) val = Number(val);
+      rowArr.push(val);
+      if (val !== '') hasValue = true;
+    }
+    if (hasValue) lastNonEmptyRow = r;
+    matrix.push(rowArr);
+  }
+  // Trim trailing empty rows
+  matrix = matrix.slice(0, lastNonEmptyRow);
+  // Trim trailing empty columns per row
+  var maxCols = 0;
+  matrix.forEach(function(row) {
+    var last = row.length;
+    while (last > 0 && (row[last - 1] === '' || row[last - 1] === undefined)) last--;
+    if (last > maxCols) maxCols = last;
+  });
+  matrix = matrix.map(function(row) { return row.slice(0, maxCols); });
+
+  try {
+    var ws = XLSX.utils.aoa_to_sheet(matrix);
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, _safeDocName().substring(0, 31));
+    var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    _triggerBinaryDownload(wbout, _safeDocName() + '.xlsx');
+    _toast('Spreadsheet exported as Excel (.xlsx)', 'success');
+  } catch (err) {
+    console.error('[FlockDocs] XLSX export error:', err);
+    _toast('Failed to export Excel file', 'error');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SPREADSHEET — IMPORT CSV
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+async function _importSheetCsv(file) {
+  if (!S.currentDoc || S.currentDoc.type !== 'spreadsheet') {
+    _toast('Please open a spreadsheet first', 'warning');
+    return;
+  }
+
+  try {
+    var text = await file.text();
+    var parsed = _parseCsvText(text);
+    _importMatrixIntoSheet(parsed, file.name.replace(/\.csv$/i, ''));
+    _toast('CSV imported successfully', 'success');
+  } catch (err) {
+    console.error('[FlockDocs] CSV import error:', err);
+    _toast('Failed to import CSV: ' + (err.message || 'Unknown error'), 'error');
+  }
+}
+
+function _parseCsvText(text) {
+  // RFC 4180-compatible CSV parser
+  var rows = [];
+  var lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  var i = 0;
+  var n = lines.length;
+
+  while (i < n) {
+    var row = [];
+    while (i < n && lines[i] !== '\n') {
+      var cell = '';
+      if (lines[i] === '"') {
+        // Quoted cell
+        i++;
+        while (i < n) {
+          if (lines[i] === '"' && lines[i + 1] === '"') {
+            cell += '"'; i += 2;
+          } else if (lines[i] === '"') {
+            i++; break;
+          } else {
+            cell += lines[i++];
+          }
+        }
+        // Skip comma or newline after closing quote
+        if (lines[i] === ',') i++;
+      } else {
+        // Unquoted cell — read until comma or newline
+        while (i < n && lines[i] !== ',' && lines[i] !== '\n') {
+          cell += lines[i++];
+        }
+        if (lines[i] === ',') i++;
+      }
+      row.push(cell);
+    }
+    if (lines[i] === '\n') i++;
+    rows.push(row);
+  }
+  // Remove trailing empty rows
+  while (rows.length > 0 && rows[rows.length - 1].every(function(c) { return c === ''; })) {
+    rows.pop();
+  }
+  return rows;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SPREADSHEET — IMPORT XLSX
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+async function _importSheetXlsx(file) {
+  if (!S.currentDoc || S.currentDoc.type !== 'spreadsheet') {
+    _toast('Please open a spreadsheet first', 'warning');
+    return;
+  }
+  if (!window.XLSX) {
+    _toast('Excel import library is loading, please try again in a moment', 'warning');
+    return;
+  }
+
+  try {
+    var arrayBuffer = await file.arrayBuffer();
+    var wb = XLSX.read(arrayBuffer, { type: 'array' });
+    // Import the first sheet
+    var wsName = wb.SheetNames[0];
+    var ws = wb.Sheets[wsName];
+    var matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    _importMatrixIntoSheet(matrix, file.name.replace(/\.(xlsx|xls)$/i, ''));
+    _toast('Excel file imported successfully', 'success');
+  } catch (err) {
+    console.error('[FlockDocs] XLSX import error:', err);
+    _toast('Failed to import Excel file: ' + (err.message || 'Unknown error'), 'error');
+  }
+}
+
+/* ── Shared: load a 2-D matrix into the active spreadsheet ───────────────── */
+
+function _importMatrixIntoSheet(matrix, nameHint) {
+  if (!matrix || matrix.length === 0) {
+    _toast('The file appears to be empty', 'warning');
+    return;
+  }
+
+  var confirm_replace = true;
+  var hasData = Object.keys(S.sheet.data).some(function(k) { return S.sheet.data[k] && S.sheet.data[k].v !== ''; });
+  if (hasData) {
+    confirm_replace = confirm('Replace the current spreadsheet data with the imported data?\n\nThis will overwrite all existing cells.');
+    if (!confirm_replace) return;
+  }
+
+  // Clear existing data
+  S.sheet.data = {};
+
+  var rows = Math.min(matrix.length, S.sheet.rows);
+  var cols = S.sheet.cols;
+
+  for (var r = 0; r < rows; r++) {
+    var row = matrix[r];
+    if (!row) continue;
+    var colCount = Math.min(row.length, cols);
+    for (var c = 0; c < colCount; c++) {
+      var val = row[c];
+      if (val === null || val === undefined) val = '';
+      var str = String(val);
+      if (str !== '') {
+        var colLetter = String.fromCharCode(65 + c);
+        var ref = colLetter + (r + 1);
+        S.sheet.data[ref] = { v: str, f: '', s: {} };
+      }
+    }
+  }
+
+  // Update spreadsheet name if we have a hint
+  if (nameHint) {
+    S.currentDoc.name = nameHint;
+    var nameInput = document.getElementById('fd-sheet-name');
+    if (nameInput) nameInput.value = nameHint;
+  }
+
+  // Re-render grid and save
+  _renderGrid();
+  _autoSaveSheet();
 }
