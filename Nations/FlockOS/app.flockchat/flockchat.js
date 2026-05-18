@@ -2042,17 +2042,44 @@
   window._deleteJournalEntry = window._executeJournalDelete;
 
   /* Prayers tab */
-  async function _sctPrayers(pane) {
-    let entries = [];
-    if (_db && _me && _me.email) {
-      try {
-        const snap = await _db.collection('prayers')
-          .where('createdBy', '==', _me.email)
-          .orderBy('createdAt', 'desc')
-          .limit(50).get();
-        snap.forEach(d => { const o = d.data(); o.id = d.id; entries.push(o); });
-      } catch (err) { console.warn('[Sanctuary] prayers fetch', err); }
+  let _pAllEntries = [];
+  let _pPage      = 0;
+  let _pPageSize  = 25;
+
+  async function _sctPrayers(pane, opts = {}) {
+    if (opts.page     !== undefined) _pPage     = opts.page;
+    if (opts.pageSize !== undefined) { _pPageSize = opts.pageSize; _pPage = 0; }
+
+    if (opts.forceRefetch !== false) {
+      _pAllEntries = [];
+      if (_db && _me && _me.email) {
+        try {
+          const snap = await _db.collection('prayers')
+            .where('createdBy', '==', _me.email)
+            .orderBy('createdAt', 'desc')
+            .limit(500).get();
+          snap.forEach(d => { const o = d.data(); o.id = d.id; _pAllEntries.push(o); });
+        } catch (err) { console.warn('[Sanctuary] prayers fetch', err); }
+      }
     }
+
+    const total  = _pAllEntries.length;
+    const pages  = Math.max(1, Math.ceil(total / _pPageSize));
+    _pPage       = Math.min(_pPage, pages - 1);
+    const start  = _pPage * _pPageSize;
+    const slice  = _pAllEntries.slice(start, start + _pPageSize);
+    const end    = Math.min(start + _pPageSize, total);
+
+    const pageSizeOpts = [25, 50, 75, 100].map(n =>
+      `<option value="${n}"${n === _pPageSize ? ' selected' : ''}>${n}</option>`).join('');
+
+    const paginationBar = total > _pPageSize ? `
+      <div class="fc-sct-pagination">
+        <button class="fc-sct-pg-btn" onclick="window._pChangePage(${_pPage - 1})" ${_pPage === 0 ? 'disabled' : ''}>&lsaquo; Prev</button>
+        <span class="fc-sct-pg-info">${start + 1}&ndash;${end} of ${total}</span>
+        <button class="fc-sct-pg-btn" onclick="window._pChangePage(${_pPage + 1})" ${_pPage >= pages - 1 ? 'disabled' : ''}>Next &rsaquo;</button>
+      </div>` : '';
+
     pane.innerHTML = `
       <div class="fc-sct-section">
         <div class="fc-sct-compose">
@@ -2062,11 +2089,30 @@
             <button class="fc-sct-save-btn" onclick="window._savePrayer()">Save Prayer</button>
           </div>
         </div>
+        ${total > 0 ? `
+        <div class="fc-sct-list-header">
+          <span class="fc-sct-list-count">${total} pra${total === 1 ? 'yer' : 'yers'}</span>
+          <label class="fc-sct-per-page">
+            Per page:
+            <select class="fc-sct-per-page-sel" onchange="window._pChangePageSize(+this.value)">${pageSizeOpts}</select>
+          </label>
+        </div>` : ''}
         <div class="fc-sct-list" id="fc-sct-plist">
-          ${entries.length ? entries.map(e => _sctPrayerEntryHTML(e)).join('') : '<div class="fc-sct-empty">No prayer entries yet. Write your first one above.</div>'}
+          ${slice.length ? slice.map(e => _sctPrayerEntryHTML(e)).join('') : '<div class="fc-sct-empty">No prayer entries yet. Write your first one above.</div>'}
         </div>
+        ${paginationBar}
       </div>`;
   }
+
+  window._pChangePage = function(page) {
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane) _sctPrayers(pane, { page, forceRefetch: false });
+  };
+
+  window._pChangePageSize = function(size) {
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane) _sctPrayers(pane, { pageSize: size, forceRefetch: false });
+  };
 
   function _sctPrayerEntryHTML(e) {
     const date = _sctDate(e.createdAt);
@@ -2111,7 +2157,7 @@
       return;
     }
     const pane = document.getElementById('fc-sct-pane');
-    if (pane) await _sctPrayers(pane);
+    if (pane) { _pPage = 0; await _sctPrayers(pane); }
   };
 
   window._publishPrayer = async function(id) {
@@ -2132,7 +2178,7 @@
       });
     } catch (err) { console.error('[Sanctuary] publish prayer', err); return; }
     const pane = document.getElementById('fc-sct-pane');
-    if (pane) await _sctPrayers(pane);
+    if (pane) await _sctPrayers(pane);  // keep current page after publish
   };
 
   window._confirmPrayerDelete = function(id) {
@@ -2154,7 +2200,7 @@
     try { await _db.collection('prayers').doc(id).delete(); }
     catch (err) { console.error('[Sanctuary] delete prayer', err); return; }
     const pane = document.getElementById('fc-sct-pane');
-    if (pane && _sanctuaryTab === 'prayers') await _sctPrayers(pane);
+    if (pane && _sanctuaryTab === 'prayers') await _sctPrayers(pane);  // keep current page
   };
 
   // _deletePrayer kept for legacy callers
