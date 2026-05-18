@@ -804,9 +804,11 @@
     .fc-info-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
     .fc-info-card:active { transform: scale(0.985); }
     .fc-info-card-icon {
-      font-size: 1.75rem; line-height: 1;
-      flex-shrink: 0; width: 40px; text-align: center;
+      display: flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px; flex-shrink: 0;
+      background: rgba(6,182,212,0.1); border-radius: 12px;
     }
+    .fc-info-card-icon svg { display: block; }
     .fc-info-card-body { flex: 1; min-width: 0; }
     .fc-info-card-title {
       font-size: 0.9375rem; font-weight: 600;
