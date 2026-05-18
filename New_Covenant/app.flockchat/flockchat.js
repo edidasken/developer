@@ -707,6 +707,53 @@
     });
   }
 
+  /* ── Pinned-bubble SVG icons (consistent FlockChat colour palette) ──── */
+  function _pinnedIcon(type) {
+    const S = 'fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"';
+    switch (type) {
+      case 'announcement':
+        // Megaphone with sound waves
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        </svg>`;
+      case 'prayer':
+        // Latin cross
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <line x1="12" y1="2" x2="12" y2="22"/>
+          <line x1="4" y1="8" x2="20" y2="8"/>
+        </svg>`;
+      case 'pastoral':
+        // Envelope with a heart – private pastoral message
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+          <path d="M12 13l-8-6h16l-8 6z"/>
+        </svg>`;
+      case 'ministry-men':
+        // Anchor
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <circle cx="12" cy="5" r="3"/>
+          <line x1="12" y1="8" x2="12" y2="22"/>
+          <path d="M5 15H2a10 10 0 0 0 20 0h-3"/>
+          <line x1="5" y1="8" x2="19" y2="8"/>
+        </svg>`;
+      case 'ministry-women':
+        // Lily / bloom
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <path d="M12 22V12"/>
+          <path d="M12 12C12 12 8 9 8 6a4 4 0 0 1 8 0c0 3-4 6-4 6z"/>
+          <path d="M12 12c0 0-4 1-6 4a4 4 0 0 0 6 0"/>
+          <path d="M12 12c0 0 4 1 6 4a4 4 0 0 1-6 0"/>
+        </svg>`;
+      default:
+        // Generic chat bubble
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>`;
+    }
+  }
+
   function _isStaticConv(c) {
     return c && (c._static === true || c.type === 'announcement' || c.type === 'prayer' || c.id === ANNOUNCEMENTS_ID);
   }
@@ -754,7 +801,7 @@
                data-id="${c.id}"
                onclick="window._openConversation('${c.id}')">
             <div class="fc-pinned-bubble ${typeClass}">
-              ${_e(c.icon || '💬')}
+              ${_pinnedIcon(c.type)}
               ${badge}
             </div>
             <div class="fc-pinned-name">${_e(c.name)}</div>

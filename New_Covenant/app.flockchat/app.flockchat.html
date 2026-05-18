@@ -265,21 +265,39 @@
     .fc-pinned-bubble {
       width: 62px; height: 62px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.75rem;
       position: relative;
       transition: transform 0.13s ease, box-shadow 0.13s ease;
       flex-shrink: 0;
+      /* FlockChat palette — overridden per-type below */
+      background: linear-gradient(145deg, #0c4a6e, #06b6d4);
+      box-shadow: 0 2px 8px rgba(6,182,212,0.25);
     }
+    .fc-pinned-bubble svg { display: block; flex-shrink: 0; }
     .fc-pinned-item:hover .fc-pinned-bubble,
     .fc-pinned-item:active .fc-pinned-bubble { transform: scale(0.94); }
     .fc-pinned-item.active .fc-pinned-bubble {
       box-shadow: 0 0 0 3px var(--fc-sent-bg);
     }
+    /* Per-type colour variations — all in the same dark-navy → vivid family */
     .fc-pinned-bubble.announcement {
-      background: linear-gradient(145deg, #f59e0b, #d97706);
+      background: linear-gradient(145deg, #0c4a6e, #0ea5e9);
+      box-shadow: 0 2px 8px rgba(14,165,233,0.28);
     }
     .fc-pinned-bubble.prayer {
-      background: linear-gradient(145deg, #a855f7, #7c3aed);
+      background: linear-gradient(145deg, #1e1b4b, #6366f1);
+      box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+    }
+    .fc-pinned-bubble.pastoral {
+      background: linear-gradient(145deg, #0c4a6e, #06b6d4);
+      box-shadow: 0 2px 8px rgba(6,182,212,0.28);
+    }
+    .fc-pinned-bubble.ministry-men {
+      background: linear-gradient(145deg, #0f2d5e, #3b82f6);
+      box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+    }
+    .fc-pinned-bubble.ministry-women {
+      background: linear-gradient(145deg, #2d1b69, #a78bfa);
+      box-shadow: 0 2px 8px rgba(167,139,250,0.3);
     }
     .fc-pinned-badge {
       position: absolute; top: -1px; right: -1px;
