@@ -1,8 +1,132 @@
 rules_version = '2';
+
+// ═══════════════════════════════════════════════════════════════════════
+// FlockOS — Firestore Security Rules
+// Project: flockos-truth (canonical truth content database)
+//
+// This project is the source-of-truth for all Bible/theology content.
+// Bulk seeding uses Admin SDK (bypasses rules). The TheTruth editor
+// accesses via client SDK with app-layer pastor/admin role checks.
+//
+// Deploy:
+//   firebase deploy --only firestore:rules --project flockos-truth
+// ═══════════════════════════════════════════════════════════════════════
+
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ── Helper functions ────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userRole() {
+      return request.auth.token.role;
+    }
+
+    function isPastorOrAdmin() {
+      return userRole() in ['pastor', 'admin', 'seed']
+          || request.auth.token.get('isSeed', false) == true;
+    }
+
+    function isLeaderOrAbove() {
+      return userRole() in ['leader', 'pastor', 'admin', 'seed']
+          || request.auth.token.get('isSeed', false) == true;
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    // TRUTH CONTENT
+    // Read  : any signed-in user
+    // Write : any signed-in user (bulk seeding uses Admin SDK; TheTruth
+    //         editor applies pastor/admin gate at the app layer)
+    // ═════════════════════════════════════════════════════════════════════
+
+    match /theology/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /devotionals/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /apologetics/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /counseling/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /genealogy/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /words/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /heart/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /reading/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /quiz/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /books/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /mirror/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /teachingPlans/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /lexiconGreek/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /lexiconHebrew/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /quotes/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+    match /illustrations/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // ── Config / metadata ───────────────────────────────────────────────
+    match /config/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && isPastorOrAdmin();
+    }
+
+    // ── Schema Backup Milestones (written by build scripts via Admin SDK) ─
+    match /milestones/{docId} {
+      allow read: if isSignedIn();
+      allow write: if false;  // Admin SDK bypasses rules
+    }
+
+    // ── App Config (maintenance flag) ───────────────────────────────────
+    match /appConfig/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn() && isPastorOrAdmin();
+    }
+
+    // Deny everything else
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }
