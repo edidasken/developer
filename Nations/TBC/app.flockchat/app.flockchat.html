@@ -779,6 +779,113 @@
     }
     .fc-mgr-add-btn:disabled { opacity: 0.4; cursor: default; }
     .fc-mgr-add-btn:not(:disabled):hover { opacity: 0.88; }
+
+    /* ─── Info Channel Pins ──────────────────────────────────────────── */
+    .fc-pinned-bubble.info-flockchat { background: linear-gradient(145deg, #1e3a5f, #2563eb); }
+    .fc-pinned-bubble.info-flockos   { background: linear-gradient(145deg, #3b0764, #7c3aed); }
+    .fc-conv-icon.info-flockchat { background: linear-gradient(135deg, #1e3a5f, #2563eb); }
+    .fc-conv-icon.info-flockos   { background: linear-gradient(135deg, #3b0764, #7c3aed); }
+
+    /* ─── Info Card List (thread body) ──────────────────────────────── */
+    .fc-info-list {
+      padding: 16px 12px 32px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .fc-info-card {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--fc-surface);
+      border: 1px solid var(--fc-divider);
+      border-radius: 16px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.12s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .fc-info-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+    .fc-info-card:active { transform: scale(0.985); }
+    .fc-info-card-icon {
+      font-size: 1.75rem; line-height: 1;
+      flex-shrink: 0; width: 40px; text-align: center;
+    }
+    .fc-info-card-body { flex: 1; min-width: 0; }
+    .fc-info-card-title {
+      font-size: 0.9375rem; font-weight: 600;
+      color: var(--fc-text); margin-bottom: 3px;
+    }
+    .fc-info-card-preview {
+      font-size: 0.8125rem; color: var(--fc-text-muted, #6b7280);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fc-info-card-arrow {
+      font-size: 1.5rem; color: var(--fc-text-muted, #6b7280);
+      flex-shrink: 0; line-height: 1;
+    }
+
+    /* ─── Info Modal ─────────────────────────────────────────────────── */
+    .fc-info-modal {
+      position: absolute; inset: 0; z-index: 300;
+      background: var(--fc-bg);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .fc-info-modal[hidden] { display: none; }
+    .fc-info-modal-header {
+      display: flex; align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--fc-divider);
+      flex-shrink: 0;
+    }
+    .fc-info-modal-back {
+      display: flex; align-items: center; gap: 4px;
+      background: none; border: none; cursor: pointer;
+      color: #06b6d4; font-size: 0.9375rem; font-weight: 500;
+      padding: 4px 8px; border-radius: 8px;
+    }
+    .fc-info-modal-back:hover { background: rgba(6,182,212,0.1); }
+    .fc-info-modal-content {
+      flex: 1; overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px 20px 48px;
+    }
+    .fc-info-modal-title {
+      font-size: 1.25rem; font-weight: 700;
+      color: var(--fc-text); margin-bottom: 8px; line-height: 1.3;
+    }
+    .fc-info-modal-subtitle {
+      font-size: 0.9rem; color: var(--fc-text-muted, #6b7280);
+      margin-bottom: 20px; line-height: 1.5;
+      padding-bottom: 16px; border-bottom: 1px solid var(--fc-divider);
+    }
+    /* Rich content typography inside modal */
+    .fc-info-modal-body p {
+      font-size: 0.9375rem; line-height: 1.65;
+      color: var(--fc-text); margin-bottom: 14px;
+    }
+    .fc-info-modal-body h3 {
+      font-size: 1rem; font-weight: 700;
+      color: var(--fc-text); margin: 20px 0 8px;
+    }
+    .fc-info-modal-body ul {
+      margin: 0 0 14px 0; padding-left: 0;
+      list-style: none;
+    }
+    .fc-info-modal-body li {
+      font-size: 0.9125rem; line-height: 1.55;
+      color: var(--fc-text); padding: 6px 0 6px 22px;
+      border-bottom: 1px solid var(--fc-divider);
+      position: relative;
+    }
+    .fc-info-modal-body li::before {
+      content: '›'; position: absolute; left: 6px;
+      color: #06b6d4; font-weight: 700; font-size: 1rem;
+    }
+    .fc-info-modal-body li:last-child { border-bottom: none; }
+    .fc-info-modal-body strong { color: var(--fc-text); font-weight: 600; }
+    .fc-info-modal-body code {
+      font-family: monospace; font-size: 0.85em;
+      background: var(--fc-surface); border-radius: 4px;
+      padding: 1px 5px; color: #06b6d4;
+    }
     /* Admin delete button on messages */
     .fc-msg-admin-del {
       background: none; border: none; cursor: pointer;
@@ -1301,6 +1408,23 @@
           </div>
           <div class="fc-mgr-body" id="fc-mgr-body">
             <div class="fc-loading"><div class="fc-spinner"></div></div>
+          </div>
+        </div>
+
+        <!-- Info Modal (full-screen read-only guide) -->
+        <div class="fc-info-modal" id="fc-info-modal" hidden>
+          <div class="fc-info-modal-header">
+            <button class="fc-info-modal-back" onclick="window._closeInfoModal()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+              Back
+            </button>
+          </div>
+          <div class="fc-info-modal-content">
+            <div class="fc-info-modal-title" id="fc-info-modal-title"></div>
+            <div class="fc-info-modal-subtitle" id="fc-info-modal-subtitle"></div>
+            <div class="fc-info-modal-body" id="fc-info-modal-body"></div>
           </div>
         </div>
       </div>
