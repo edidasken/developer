@@ -459,6 +459,12 @@ function _renderOutline() {
           </div>
         ` : ''}
         <textarea class="bm-notes-textarea" placeholder="${_sectionPlaceholder(sec.type)}" data-field="notes" data-sid="${_e(sec.id)}">${_e(sec.notes)}</textarea>
+        <div class="bm-fmt-toolbar">
+          <button type="button" class="bm-fmt-btn" data-fmt-open="**" data-fmt-close="**" title="Bold — select text first"><strong>B</strong></button>
+          <button type="button" class="bm-fmt-btn" data-fmt-open="__" data-fmt-close="__" title="Underline — select text first"><u>U</u></button>
+          <button type="button" class="bm-fmt-btn" data-fmt-open="==" data-fmt-close="==" title="Highlight — select text first" style="color:rgba(232,168,56,0.85)">H</button>
+          <span class="bm-fmt-hint">Select text → B / U / H</span>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -480,6 +486,29 @@ function _sectionPlaceholder(type) {
     transition:   'Brief bridge sentence moving to the next section…',
   };
   return map[type] || 'Notes…';
+}
+
+// Wrap the currently-selected text in a textarea with open/close markers.
+// Clicking the same button again on a wrapped selection toggles the markers off.
+function _formatTag(el, open, close) {
+  const start = el.selectionStart;
+  const end   = el.selectionEnd;
+  const val   = el.value;
+  const sel   = val.slice(start, end);
+  if (!sel) return;
+  const before = val.slice(0, start);
+  const after  = val.slice(end);
+  if (sel.startsWith(open) && sel.endsWith(close) && sel.length > open.length + close.length) {
+    const inner = sel.slice(open.length, sel.length - close.length);
+    el.value = before + inner + after;
+    el.selectionStart = start;
+    el.selectionEnd   = start + inner.length;
+  } else {
+    el.value = before + open + sel + close + after;
+    el.selectionStart = start + open.length;
+    el.selectionEnd   = end   + open.length;
+  }
+  el.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
 function _bindOutlineEvents(container) {
@@ -563,6 +592,16 @@ function _bindOutlineEvents(container) {
         _renderOutline();
         _queueSave();
       }
+    });
+  });
+
+  // Inline format toolbar (B / U / H) — targets the notes textarea in the same section
+  container.querySelectorAll('.bm-fmt-btn').forEach(btn => {
+    btn.addEventListener('mousedown', e => {
+      e.preventDefault(); // keep textarea focused
+      const section = btn.closest('.bm-outline-section');
+      const ta = section?.querySelector('.bm-notes-textarea');
+      if (ta) _formatTag(ta, btn.dataset.fmtOpen, btn.dataset.fmtClose);
     });
   });
 

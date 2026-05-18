@@ -516,7 +516,22 @@
     .fs-prop-input:focus { border-color: var(--fs-accent); background: rgba(232,168,56,0.05); }
     .fs-prop-textarea { min-height: 90px; }
 
-    .fs-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    /* ── Inline format toolbar ── */
+    .fs-fmt-toolbar {
+      display: flex; align-items: center; gap: 3px; padding: 2px 0 3px;
+    }
+    .fs-fmt-btn {
+      width: 28px; height: 26px; border-radius: 6px; cursor: pointer;
+      background: var(--fs-bg-overlay); border: 1px solid var(--fs-border);
+      color: var(--fs-muted); font-size: 0.75rem; font-family: 'Plus Jakarta Sans', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.12s; flex-shrink: 0;
+    }
+    .fs-fmt-btn:hover { background: rgba(232,168,56,0.14); border-color: rgba(232,168,56,0.40); color: var(--fs-accent); }
+    .fs-fmt-hint {
+      font: 0.62rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted);
+      margin-left: 4px; opacity: 0.7;
+    }
     .fs-type-btn {
       padding: 7px 4px; border-radius: 7px; font: 500 0.70rem 'Plus Jakarta Sans', sans-serif;
       border: 1px solid var(--fs-border); background: var(--fs-bg-overlay);
@@ -887,6 +902,12 @@
 
         <div class="fs-prop-section" id="fs-prop-text-section">
           <div class="fs-prop-label">Text</div>
+          <div class="fs-fmt-toolbar">
+            <button type="button" class="fs-fmt-btn" data-fmt-open="**" data-fmt-close="**" title="Bold — select text first"><strong>B</strong></button>
+            <button type="button" class="fs-fmt-btn" data-fmt-open="__" data-fmt-close="__" title="Underline — select text first"><u>U</u></button>
+            <button type="button" class="fs-fmt-btn" data-fmt-open="==" data-fmt-close="==" title="Highlight — select text first" style="color:rgba(232,168,56,0.85)">H</button>
+            <span class="fs-fmt-hint">Select text → B / U / H</span>
+          </div>
           <textarea class="fs-prop-input fs-prop-textarea" id="fs-prop-text" placeholder="Type slide text…" rows="5"></textarea>
         </div>
 

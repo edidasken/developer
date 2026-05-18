@@ -303,6 +303,40 @@ function _slideFontSize(sl) {
   return '1rem';
 }
 
+// ── Inline formatting helpers ─────────────────────────────────────────────────
+// Converts lightweight markers to safe HTML: **bold**, __underline__, ==highlight==
+// HTML special chars are escaped first so no injection is possible.
+function _renderFormattedText(text) {
+  return (text || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>')
+    .replace(/__(.+?)__/gs,     '<u>$1</u>')
+    .replace(/==(.+?)==/gs,     '<mark style="background:rgba(232,168,56,0.38);color:inherit;border-radius:3px;padding:0 3px">$1</mark>');
+}
+
+// Wrap the currently-selected text in a textarea with open/close markers.
+// If the selection is already wrapped, toggle it off instead.
+function _formatTag(el, open, close) {
+  const start = el.selectionStart;
+  const end   = el.selectionEnd;
+  const val   = el.value;
+  const sel   = val.slice(start, end);
+  if (!sel) return;
+  const before = val.slice(0, start);
+  const after  = val.slice(end);
+  if (sel.startsWith(open) && sel.endsWith(close) && sel.length > open.length + close.length) {
+    const inner = sel.slice(open.length, sel.length - close.length);
+    el.value = before + inner + after;
+    el.selectionStart = start;
+    el.selectionEnd   = start + inner.length;
+  } else {
+    el.value = before + open + sel + close + after;
+    el.selectionStart = start + open.length;
+    el.selectionEnd   = end   + open.length;
+  }
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
 // ── Present window document generator ────────────────────────────────────────
 function _buildPresentDoc(show, idx) {
   const sl     = show.slides[idx];
@@ -310,7 +344,7 @@ function _buildPresentDoc(show, idx) {
   const bg     = _slideBg(sl, show);
   const col    = _slideCol(sl, show);
   const fs     = _slideFontSize(sl);
-  const body   = sl.type === 'blank' ? '' : _esc(sl.text || '');
+  const body   = sl.type === 'blank' ? '' : _renderFormattedText(sl.text || '');
   const refHtml = (sl.type === 'scripture' && sl.reference)
     ? `<div style="margin-top:1.2rem;font-size:.65em;opacity:.6;font-style:italic">${_esc(sl.reference)}</div>`
     : '';
@@ -606,7 +640,7 @@ function _renderPreview() {
   canvas.style.background = _slideBg(sl, show);
   textEl.style.color      = _slideCol(sl, show);
   textEl.style.fontSize   = _slideFontSize(sl);
-  textEl.textContent      = sl.type === 'blank' ? '' : (sl.text || '');
+  textEl.innerHTML        = sl.type === 'blank' ? '' : _renderFormattedText(sl.text || '');
 
   if (sl.type === 'scripture' && sl.reference) {
     refEl.textContent  = sl.reference;
@@ -1492,6 +1526,15 @@ function _wire() {
       _renderPreview();
       _renderProps();
       _pushToPresent();
+    });
+  });
+
+  /* ── Inline formatting toolbar (B / U / H) ── */
+  document.querySelectorAll('.fs-fmt-btn').forEach(btn => {
+    btn.addEventListener('mousedown', e => {
+      e.preventDefault(); // keep textarea focus
+      const ta = document.getElementById('fs-prop-text');
+      if (ta) _formatTag(ta, btn.dataset.fmtOpen, btn.dataset.fmtClose);
     });
   });
 
