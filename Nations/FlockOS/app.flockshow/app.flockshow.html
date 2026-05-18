@@ -429,7 +429,7 @@
 
     /* ── Slide list (left) ─────────────────────────────────────────────── */
     #fs-slide-list {
-      background: var(--fs-panel-alt); border-right: 1px solid var(--fs-border);
+      background: var(--fs-panel-alt); flex: 1;
       overflow-y: auto; padding: 6px 5px; display: flex; flex-direction: column; gap: 4px;
       scrollbar-width: thin; scrollbar-color: rgba(232,168,56,0.25) transparent;
     }
@@ -460,7 +460,17 @@
       background: rgba(0,0,0,0.45); border-radius: 3px; padding: 1px 3px; color: rgba(255,255,255,0.65);
     }
 
-    .fs-add-slide-wrap { padding: 5px 4px; position: relative; flex-shrink: 0; }
+    /* Pinned add-slide header above the scrollable slide list */
+    #fs-slide-list-col {
+      display: flex; flex-direction: column;
+      border-right: 1px solid var(--fs-border);
+      overflow: hidden;
+    }
+    .fs-add-slide-wrap {
+      padding: 6px 5px; position: relative; flex-shrink: 0;
+      border-bottom: 1px solid var(--fs-border);
+      background: var(--fs-panel-alt);
+    }
     .fs-add-slide-btn {
       width: 100%; padding: 7px; border-radius: 8px;
       font: 600 0.73rem 'Plus Jakarta Sans', sans-serif; background: rgba(232,168,56,0.07);
@@ -469,7 +479,7 @@
     .fs-add-slide-btn:hover { background: rgba(232,168,56,0.14); }
 
     .fs-add-type-menu {
-      position: absolute; bottom: calc(100% + 4px); left: 4px; right: 4px;
+      position: absolute; top: calc(100% + 4px); left: 4px; right: 4px;
       background: var(--fs-panel); border: 1px solid var(--fs-border); border-radius: 10px;
       overflow: hidden; z-index: 300; box-shadow: 0 8px 28px rgba(0,0,0,0.22);
     }
@@ -495,12 +505,18 @@
       text-align: center; line-height: 1.48;
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       font-weight: 500; letter-spacing: 0.01em;
-      white-space: pre-wrap; max-width: 100%; overflow-wrap: break-word;
+      white-space: pre-wrap; max-width: 100%; width: 100%; overflow-wrap: break-word;
     }
     .fs-canvas-ref {
       margin-top: 1rem; font-size: 0.68em; opacity: 0.65; font-style: italic;
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-      letter-spacing: 0.02em; text-align: center;
+      letter-spacing: 0.02em; text-align: center; width: 100%;
+    }
+    .fs-canvas-label {
+      position: absolute; top: 7%; left: 6%;
+      font: 700 0.38rem 'Plus Jakarta Sans', system-ui, sans-serif;
+      color: rgba(232,168,56,0.75); letter-spacing: .10em; text-transform: uppercase;
+      text-align: left; max-width: 80%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
 
     .fs-preview-nav {
@@ -550,6 +566,16 @@
       font: 0.62rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted);
       margin-left: 4px; opacity: 0.7;
     }
+    .fs-align-btn {
+      flex: 1; padding: 6px 4px; border-radius: 7px;
+      font: 600 0.72rem 'Plus Jakarta Sans', sans-serif;
+      border: 1px solid var(--fs-border); background: var(--fs-bg-overlay);
+      color: var(--fs-muted); cursor: pointer; transition: all 0.12s; text-align: center;
+    }
+    .fs-align-btn:hover { background: var(--fs-bg-hover); color: var(--fs-ink); }
+    .fs-align-btn--active { border-color: var(--fs-accent) !important; background: var(--fs-accent-dim) !important; color: var(--fs-accent) !important; }
+    .fs-align-row { display: flex; gap: 5px; }
+
     .fs-type-btn {
       padding: 7px 4px; border-radius: 7px; font: 500 0.70rem 'Plus Jakarta Sans', sans-serif;
       border: 1px solid var(--fs-border); background: var(--fs-bg-overlay);
@@ -557,13 +583,11 @@
     }
     .fs-type-btn:hover { background: var(--fs-bg-hover); color: var(--fs-ink); }
     .fs-type-btn.fs-type-btn--active { border-color: var(--fs-accent); background: var(--fs-accent-dim); color: var(--fs-accent); }
-
-    .fs-color-row { display: flex; align-items: center; gap: 8px; }
     .fs-color-input { width: 34px; height: 28px; padding: 1px 2px; border: 1px solid var(--fs-border); border-radius: 6px; cursor: pointer; background: none; }
     .fs-color-val { font: 0.75rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted); flex: 1; }
     .fs-color-reset { font: 0.70rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-accent); background: none; border: none; cursor: pointer; padding: 2px 4px; }
 
-    .fs-import-area {
+    .fs-color-row { display: flex; align-items: center; gap: 8px; }
       width: 100%; min-height: 70px; background: var(--fs-bg-input);
       border: 1px dashed rgba(232,168,56,0.25); border-radius: 8px;
       padding: 8px 10px; font: 0.78rem 'Plus Jakarta Sans', sans-serif;
@@ -576,16 +600,18 @@
     @media (max-width: 900px) {
       .fs-editor-body { grid-template-columns: 160px 1fr 220px; }
     }
-    /* 740px: hide props panel label text, shrink further */
+    /* 740px: compact further */
     @media (max-width: 740px) {
       .fs-editor-body { grid-template-columns: 140px 1fr 200px; }
       #fs-slide-props { padding: 10px 9px; gap: 10px; }
       .fs-prop-label { font-size: 0.62rem; }
     }
-    /* 600px: stack vertically — slide list as horizontal strip on top */
+    /* 600px: stack vertically — slide list col as horizontal strip on top */
     @media (max-width: 600px) {
-      .fs-editor-body { grid-template-columns: 1fr; grid-template-rows: 76px 1fr auto; }
-      #fs-slide-list { flex-direction: row; overflow-x: auto; overflow-y: hidden; border-right: none; border-bottom: 1px solid var(--fs-border); padding: 4px 5px; max-height: 76px; }
+      .fs-editor-body { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; }
+      #fs-slide-list-col { flex-direction: row; border-right: none; border-bottom: 1px solid var(--fs-border); max-height: 110px; }
+      #fs-slide-list-col .fs-add-slide-wrap { border-bottom: none; border-right: 1px solid var(--fs-border); width: 80px; flex-shrink: 0; }
+      #fs-slide-list { flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 4px 5px; }
       .fs-slide-item { flex-shrink: 0; width: 72px; }
       #fs-slide-props { border-left: none; border-top: 1px solid var(--fs-border); max-height: 280px; overflow-y: auto; }
     }
@@ -882,8 +908,8 @@
 
     <div class="fs-editor-body">
 
-      <!-- Left: slide list -->
-      <div id="fs-slide-list">
+      <!-- Left: slide list column (pinned add-slide header + scrollable list) -->
+      <div id="fs-slide-list-col">
         <div class="fs-add-slide-wrap" id="fs-add-slide-wrap">
           <button class="fs-add-slide-btn" id="fs-add-slide-btn">+ Add Slide</button>
           <div class="fs-add-type-menu" id="fs-add-type-menu" hidden>
@@ -893,12 +919,14 @@
             <div class="fs-add-type-item" data-type="blank">⬛ Blank Screen</div>
           </div>
         </div>
+        <div id="fs-slide-list"></div>
       </div>
 
       <!-- Center: slide preview -->
       <div id="fs-slide-preview">
         <div class="fs-preview-wrap">
           <div class="fs-slide-canvas" id="fs-slide-canvas">
+            <div class="fs-canvas-label" id="fs-canvas-label" hidden></div>
             <div class="fs-canvas-text" id="fs-canvas-text"></div>
             <div class="fs-canvas-ref" id="fs-canvas-ref" hidden></div>
           </div>
@@ -938,7 +966,17 @@
         <hr class="fs-prop-divider">
 
         <div class="fs-prop-section" id="fs-prop-text-section">
-          <div class="fs-prop-label">Text</div>
+          <div class="fs-prop-label">Slide Label <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.60rem;opacity:0.6">— shown top-left on slide</span></div>
+          <input class="fs-prop-input" id="fs-prop-slide-label" type="text" placeholder="e.g. Point 1, Chorus, Intro…" maxlength="60">
+
+          <div class="fs-prop-label" style="margin-top:8px">Text Alignment</div>
+          <div class="fs-align-row">
+            <button class="fs-align-btn" data-align="left">☰ Left</button>
+            <button class="fs-align-btn fs-align-btn--active" data-align="center">≡ Center</button>
+            <button class="fs-align-btn" data-align="right">Right ☰</button>
+          </div>
+
+          <div class="fs-prop-label" style="margin-top:8px">Text</div>
           <div class="fs-fmt-toolbar">
             <button type="button" class="fs-fmt-btn" data-fmt-open="**" data-fmt-close="**" title="Bold — select text first"><strong>B</strong></button>
             <button type="button" class="fs-fmt-btn" data-fmt-open="__" data-fmt-close="__" title="Underline — select text first"><u>U</u></button>

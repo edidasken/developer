@@ -254,7 +254,7 @@ async function _removeShow(show) {
 
 // ── Model factories ───────────────────────────────────────────────────────────
 function _makeSlide(type = 'lyrics', text = '') {
-  return { id: _uid(), type, text, reference: '', bgColor: '', textColor: '', notes: '' };
+  return { id: _uid(), type, text, label: '', align: 'center', reference: '', bgColor: '', textColor: '', notes: '' };
 }
 
 function _makeShow(name = 'New Show') {
@@ -264,7 +264,8 @@ function _makeShow(name = 'New Show') {
     name,
     speaker:     '',
     sermonTitle: '',
-    slides:      [_makeSlide('announce', name)],
+    slides:      [_makeSlide('blank', '')],
+
     theme:       { bg: 'linear-gradient(135deg,#0d1a2b,#0a2040)', tc: '#7dd3fc' },
     createdAt:   now,
     updatedAt:   now,
@@ -340,9 +341,14 @@ function _buildPresentDoc(show, idx) {
   const bg     = _slideBg(sl, show);
   const col    = _slideCol(sl, show);
   const fs     = _slideFontSize(sl);
+  const align   = sl.align || 'center';
+  const flexAlign = align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center';
   const body   = sl.type === 'blank' ? '' : _renderFormattedText(sl.text || '');
   const refHtml = (sl.type === 'scripture' && sl.reference)
-    ? `<div style="margin-top:1.2rem;font-size:28px;opacity:.65;font-style:italic;letter-spacing:.01em">${_esc(sl.reference)}</div>`
+    ? `<div style="margin-top:1.2rem;font-size:28px;opacity:.65;font-style:italic;letter-spacing:.01em;text-align:${align}">${_esc(sl.reference)}</div>`
+    : '';
+  const labelHtml = sl.label
+    ? `<div style="position:absolute;top:4%;left:5%;font:700 0.62rem 'Plus Jakarta Sans',system-ui,sans-serif;color:rgba(232,168,56,0.72);letter-spacing:.10em;text-transform:uppercase;text-align:left;pointer-events:none;user-select:none;max-width:80%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_esc(sl.label)}</div>`
     : '';
   const speakerLine = [show.sermonTitle, show.speaker].filter(Boolean).join('  ·  ');
   const infoHtml = speakerLine
@@ -380,14 +386,15 @@ html, body {
 }
 .slide {
   display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  align-items: ${flexAlign}; justify-content: center;
   width: 100%; height: 100%;
-  padding: 6vw 12vw; text-align: center;
-  color: ${col};
+  padding: 6vw 12vw; text-align: ${align};
+  color: ${col}; position: relative;
 }
 .slide-text {
   font-size: ${fs}; font-weight: 500; letter-spacing: 0.01em;
   white-space: pre-wrap; max-width: 960px; line-height: 1.52;
+  text-align: ${align}; width: 100%;
   animation: fi .25s ease;
 }
 @keyframes fi {
@@ -401,7 +408,7 @@ html, body {
   <div class="slide-text">${body}</div>
   ${refHtml}
 </div>
-${counter}${badgeHtml}${accentBar}${nextHtml}${noteHtml}${infoHtml}
+${labelHtml}${counter}${badgeHtml}${accentBar}${nextHtml}${noteHtml}${infoHtml}
 <script>
 var _bg = ${JSON.stringify(bg)};
 var _blacked = false;
@@ -600,8 +607,8 @@ function _renderSlideList() {
   if (!list) return;
   const show = _activeShow();
 
-  // Remove old slide items, keep the add-slide wrapper
-  list.querySelectorAll('.fs-slide-item').forEach(el => el.remove());
+  // Clear all slide items
+  list.innerHTML = '';
 
   if (!show) return;
 
@@ -619,9 +626,7 @@ function _renderSlideList() {
     fragment.appendChild(div);
   });
 
-  // Insert before the add-slide wrapper
-  const addWrap = list.querySelector('#fs-add-slide-wrap');
-  list.insertBefore(fragment, addWrap);
+  list.appendChild(fragment);
 }
 
 // ── Render: center preview ────────────────────────────────────────────────────
@@ -642,10 +647,22 @@ function _renderPreview() {
     return;
   }
 
+  const labelEl = document.getElementById('fs-canvas-label');
+  const align    = sl.align || 'center';
+  const flexAlign = align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center';
+
   canvas.style.background = _slideBg(sl, show);
+  canvas.style.alignItems = flexAlign;
+  canvas.style.textAlign  = align;
   textEl.style.color      = _slideCol(sl, show);
   textEl.style.fontSize   = _slideFontSize(sl);
+  textEl.style.textAlign  = align;
   textEl.innerHTML        = sl.type === 'blank' ? '' : _renderFormattedText(sl.text || '');
+
+  if (labelEl) {
+    labelEl.textContent = sl.label || '';
+    labelEl.hidden = !sl.label;
+  }
 
   if (sl.type === 'scripture' && sl.reference) {
     refEl.textContent  = sl.reference;
@@ -711,6 +728,16 @@ function _renderProps() {
   if (transEl && transEl !== document.activeElement) {
     transEl.value = _getBibleTranslation();
   }
+
+  // Slide label
+  const labelInput = document.getElementById('fs-prop-slide-label');
+  if (labelInput && labelInput !== document.activeElement) labelInput.value = sl.label || '';
+
+  // Text alignment
+  const alignVal = sl.align || 'center';
+  document.querySelectorAll('.fs-align-btn').forEach(btn => {
+    btn.classList.toggle('fs-align-btn--active', btn.dataset.align === alignVal);
+  });
 
   // Font size slider
   const fsSlider = document.getElementById('fs-prop-font-size');
@@ -1562,6 +1589,29 @@ function _wire() {
       e.preventDefault(); // keep textarea focus
       const ta = document.getElementById('fs-prop-text');
       if (ta) _formatTag(ta, btn.dataset.fmtOpen, btn.dataset.fmtClose);
+    });
+  });
+
+  /* ── Slide label ── */
+  document.getElementById('fs-prop-slide-label')?.addEventListener('input', e => {
+    const sl = _activeSlide(); const show = _activeShow();
+    if (!sl || !show) return;
+    sl.label = e.target.value;
+    _touch(show);
+    _renderPreview();
+    _pushToPresent();
+  });
+
+  /* ── Text alignment ── */
+  document.querySelectorAll('.fs-align-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sl = _activeSlide(); const show = _activeShow();
+      if (!sl || !show) return;
+      sl.align = btn.dataset.align;
+      _touch(show);
+      document.querySelectorAll('.fs-align-btn').forEach(b => b.classList.toggle('fs-align-btn--active', b.dataset.align === sl.align));
+      _renderPreview();
+      _pushToPresent();
     });
   });
 
