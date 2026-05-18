@@ -2355,46 +2355,89 @@
 
   /* Reading tab */
   async function _sctReading(pane) {
-    let row = null;
     const todayDay = _sctDayOfYear();
+
+    // Build last-7-days as day-of-year list (oldest → newest)
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = Math.max(1, todayDay - i);
+      days.push(d);
+    }
+
+    let allRows = [];
     try {
       const UR = window.UpperRoom;
       if (UR && typeof UR.listAppContent === 'function') {
-        const rows = await UR.listAppContent('reading', { skipDateFilter: true }) || [];
-        row = rows.find(r => +(r.day || r.Day || 0) === todayDay) || rows[todayDay - 1] || null;
+        allRows = await UR.listAppContent('reading', { skipDateFilter: true }) || [];
       }
     } catch (err) { console.warn('[Sanctuary] reading fetch', err); }
-    if (!row) {
+
+    // Match each day number to a reading row
+    const matched = days.map(dayNum => ({
+      dayNum,
+      row: allRows.find(r => +(r.day || r.Day || 0) === dayNum) || allRows[dayNum - 1] || null,
+    })).filter(x => x.row);
+
+    if (!matched.length) {
       pane.innerHTML = `
         <div class="fc-sct-section">
           <div class="fc-sct-word-empty">
             <div class="fc-sct-word-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
             </div>
-            <p>No reading plan found for Day ${todayDay}.</p>
+            <p>No reading plan found for the past 7 days.</p>
             <a class="fc-sct-grow-link" href="../app.grow/app.grow.html">Open GROW \u2192</a>
           </div>
         </div>`;
       return;
     }
-    const passages = [
-      { label: 'Old Testament', ref: row.ot || row.OT || row['Old Testament'] || '', color: '#7c3aed' },
-      { label: 'New Testament', ref: row.nt || row.NT || row['New Testament'] || '', color: '#0ea5e9' },
-      { label: 'Psalms',        ref: row.psalms  || row.Psalms  || row.ps || '', color: '#059669' },
-      { label: 'Proverbs',      ref: row.proverbs || row.Proverbs || row.pr || '', color: '#d97706' },
-    ].filter(p => p.ref);
+
+    function _dayLabel(dayNum) {
+      if (dayNum === todayDay)     return 'Today';
+      if (dayNum === todayDay - 1) return 'Yesterday';
+      // Convert day-of-year back to a calendar date label
+      const d = new Date(new Date().getFullYear(), 0, dayNum);
+      return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    }
+
+    function _readBubble({ dayNum, row }) {
+      const isToday   = dayNum === todayDay;
+      const passages  = [
+        { label: 'Old Testament', ref: row.ot || row.OT || row['Old Testament'] || '', color: 'fc-sct-read-ot' },
+        { label: 'New Testament', ref: row.nt || row.NT || row['New Testament'] || '', color: 'fc-sct-read-nt' },
+        { label: 'Psalms',        ref: row.psalms  || row.Psalms  || row.ps || '', color: 'fc-sct-read-ps' },
+        { label: 'Proverbs',      ref: row.proverbs || row.Proverbs || row.pr || '', color: 'fc-sct-read-pr' },
+      ].filter(p => p.ref);
+
+      return `
+        <div class="fc-sct-day-sep">${_dayLabel(dayNum)}</div>
+        <div class="fc-sct-word-msg${isToday ? ' fc-sct-word-today' : ''}">
+          <div class="fc-sct-word-avatar fc-sct-read-avatar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+          </div>
+          <div class="fc-sct-word-bubble">
+            <div class="fc-sct-word-bubble-sender">FlockOS \u2022 Reading Plan</div>
+            <div class="fc-sct-word-bubble-title">Day ${+(row.day || row.Day || dayNum)}</div>
+            <div class="fc-sct-passages">
+              ${passages.map(p => `
+                <div class="fc-sct-passage ${p.color}">
+                  <div class="fc-sct-passage-label">${_e(p.label)}</div>
+                  <div class="fc-sct-passage-ref">${_e(p.ref)}</div>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>`;
+    }
+
     pane.innerHTML = `
-      <div class="fc-sct-section fc-sct-reading">
-        <div class="fc-sct-word-date">Day ${+(row.day || row.Day || todayDay)} \u00b7 ${_sctPrettyDate(_sctToday())}</div>
-        <div class="fc-sct-passages">
-          ${passages.map(p => `
-            <div class="fc-sct-passage" style="--sct-accent:${p.color}">
-              <div class="fc-sct-passage-label">${_e(p.label)}</div>
-              <div class="fc-sct-passage-ref">${_e(p.ref)}</div>
-            </div>`).join('')}
+      <div class="fc-sct-section fc-sct-word-feed">
+        ${matched.map(_readBubble).join('')}
+        <div class="fc-sct-word-footer">
+          <a class="fc-sct-grow-link" href="../app.grow/app.grow.html">Open in GROW \u2192</a>
         </div>
-        <a class="fc-sct-grow-link" href="../app.grow/app.grow.html">Open in GROW \u2192</a>
       </div>`;
+
+    pane.scrollTop = pane.scrollHeight;
   }
 
   /* Date / time helpers for sanctuary */
