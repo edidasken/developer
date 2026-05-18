@@ -566,6 +566,7 @@
       font: 0.62rem 'Plus Jakarta Sans', sans-serif; color: var(--fs-muted);
       margin-left: 4px; opacity: 0.7;
     }
+    .fs-fmt-sep { width: 1px; height: 16px; background: var(--fs-border); flex-shrink: 0; margin: 0 2px; }
     .fs-align-btn {
       flex: 1; height: 32px; border-radius: 7px;
       border: 1px solid var(--fs-border); background: var(--fs-bg-overlay);
@@ -1079,7 +1080,11 @@
             <button type="button" class="fs-fmt-btn" data-fmt-open="_" data-fmt-close="_" title="Italic — select text first"><em>I</em></button>
             <button type="button" class="fs-fmt-btn" data-fmt-open="__" data-fmt-close="__" title="Underline — select text first"><u>U</u></button>
             <button type="button" class="fs-fmt-btn" data-fmt-open="==" data-fmt-close="==" title="Highlight — select text first" style="color:rgba(232,168,56,0.85)">H</button>
-            <span class="fs-fmt-hint">Select text → B / I / U / H</span>
+            <span class="fs-fmt-sep"></span>
+            <button type="button" class="fs-fmt-btn" data-line-align="l" title="This line: left align"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="17" y1="6" x2="3" y2="6"/><line x1="13" y1="12" x2="3" y2="12"/><line x1="15" y1="18" x2="3" y2="18"/></svg></button>
+            <button type="button" class="fs-fmt-btn" data-line-align="c" title="This line: center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="21" y1="6" x2="3" y2="6"/><line x1="17" y1="12" x2="7" y2="12"/><line x1="19" y1="18" x2="5" y2="18"/></svg></button>
+            <button type="button" class="fs-fmt-btn" data-line-align="r" title="This line: right align"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="12" x2="9" y2="12"/><line x1="21" y1="18" x2="7" y2="18"/></svg></button>
+            <span class="fs-fmt-hint">Sel: B/I/U/H · Line: ← ≡ →</span>
           </div>
           <textarea class="fs-prop-input fs-prop-textarea" id="fs-prop-text" placeholder="Type slide text…" rows="5"></textarea>
         </div>

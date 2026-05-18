@@ -302,14 +302,50 @@ function _slideFontSize(sl) {
 
 // ── Inline formatting helpers ─────────────────────────────────────────────────
 // Converts lightweight markers to safe HTML: **bold**, _italic_, __underline__, ==highlight==
+// Per-line alignment: prefix a line with [l], [c], or [r] to override slide alignment.
 // HTML special chars are escaped first so no injection is possible.
 function _renderFormattedText(text) {
-  return (text || '')
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>')
-    .replace(/_(.+?)_/gs,        '<em>$1</em>')
-    .replace(/__(.+?)__/gs,     '<u>$1</u>')
-    .replace(/==(.+?)==/gs,     '<mark style="background:rgba(232,168,56,0.38);color:inherit;border-radius:3px;padding:0 3px">$1</mark>');
+  const _inline = s =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+     .replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>')
+     .replace(/_(.+?)_/gs,       '<em>$1</em>')
+     .replace(/__(.+?)__/gs,     '<u>$1</u>')
+     .replace(/==(.+?)==/gs,     '<mark style="background:rgba(232,168,56,0.38);color:inherit;border-radius:3px;padding:0 3px">$1</mark>');
+  const _alignMap = { l: 'left', c: 'center', r: 'right' };
+  const _lineRx   = /^\[(l|c|r)\] ?/;
+  const lines = (text || '').split('\n');
+  const hasMixed = lines.some(l => _lineRx.test(l));
+  if (!hasMixed) return lines.map(_inline).join('<br>');
+  return lines.map(line => {
+    const m       = line.match(_lineRx);
+    const content = m ? line.slice(m[0].length) : line;
+    const align   = m ? `;text-align:${_alignMap[m[1]]}` : '';
+    return `<span style="display:block${align}">${_inline(content)}</span>`;
+  }).join('');
+}
+
+// Toggle a per-line alignment prefix ([l]/[c]/[r]) on the textarea line under the cursor.
+function _formatLineAlign(el, dir) {
+  const text  = el.value;
+  const pos   = el.selectionStart;
+  const ls    = text.lastIndexOf('\n', pos - 1) + 1;
+  const le    = text.indexOf('\n', pos);
+  const line  = text.slice(ls, le === -1 ? undefined : le);
+  const rx    = /^\[(l|c|r)\] ?/;
+  const pfx   = `[${dir}] `;
+  const m     = line.match(rx);
+  let newLine;
+  if (m && m[0].trimEnd() === `[${dir}]`) {
+    newLine = line.slice(m[0].length);           // same dir → toggle off
+  } else if (m) {
+    newLine = pfx + line.slice(m[0].length);     // different dir → replace
+  } else {
+    newLine = pfx + line;                        // no prefix → add
+  }
+  const after = le === -1 ? text.length : le;
+  el.value = text.slice(0, ls) + newLine + text.slice(after);
+  el.selectionStart = el.selectionEnd = ls + newLine.length;
+  el.dispatchEvent(new Event('input'));
 }
 
 // Wrap the currently-selected text in a textarea with open/close markers.
@@ -1629,7 +1665,12 @@ function _wire() {
     btn.addEventListener('mousedown', e => {
       e.preventDefault(); // keep textarea focus
       const ta = document.getElementById('fs-prop-text');
-      if (ta) _formatTag(ta, btn.dataset.fmtOpen, btn.dataset.fmtClose);
+      if (!ta) return;
+      if (btn.dataset.fmtOpen) {
+        _formatTag(ta, btn.dataset.fmtOpen, btn.dataset.fmtClose);
+      } else if (btn.dataset.lineAlign) {
+        _formatLineAlign(ta, btn.dataset.lineAlign);
+      }
     });
   });
 

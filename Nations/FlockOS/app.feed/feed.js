@@ -1290,6 +1290,63 @@ function _refreshSlideMeta(sec, container) {
   _refreshOutlineBanner();
 }
 
+// ---------------------------------------------------------------------------
+// Auto-format: add visual emphasis markers to sermon-generated slide text.
+// Applied to prose chunks (point bodies, illustrations, altar calls, etc.).
+// Never touches scripture quotes (those stay clean).
+// Markers used by FlockShow renderer:
+//   **text**  = bold   __text__  = underline   _text_  = italic   ==text==  = highlight
+// ---------------------------------------------------------------------------
+function _autoFormat(text) {
+  if (!text) return text;
+  const lines = text.split('\n');
+  const TRANSITION_WORDS = /^(Therefore|So then|But|Because|And so|For|However|Remember|Notice|Consider|In other words|Note:|Key:|Application:|The point is|Here['']s the thing|Think about|The truth is)\b/i;
+  const SCRIPTURE_REF    = /\b([1-3]?\s*[A-Z][a-z]+\.?\s+\d+[:\u2013\-]\d+[\u2013\-]?\d*)\b/g;
+  const POINT_PREFIX     = /^(Point\s+\d+[:.)]?\s*|\d+[:.]\s+|[A-Z][.)]\s+)/;
+  const ALLCAPS_WORD     = /\b([A-Z]{3,})\b/g;
+  const OPEN_QUOTE       = /[\u201c\u2018\u0022]/g;
+  const CLOSE_QUOTE      = /[\u201d\u2019\u0022]/g;
+
+  return lines.map(raw => {
+    let line = raw;
+
+    // 1. Point prefix → bold the heading label ("1. ", "Point 2:", "A. ")
+    const pmatch = line.match(POINT_PREFIX);
+    if (pmatch) {
+      const prefix = pmatch[0];
+      const rest   = line.slice(prefix.length);
+      // Only apply if not already formatted
+      if (!/^\*\*/.test(prefix.trim())) {
+        line = `**${prefix.trimEnd()}** ${rest}`;
+      }
+    }
+
+    // 2. Scripture references → underline (e.g. "John 3:16", "Romans 8:28-30")
+    line = line.replace(SCRIPTURE_REF, (m, ref) => `__${ref}__`);
+
+    // 3. ALL-CAPS emphasis words → bold (skip common filler and already-marked words)
+    const COMMON = /^(AND|THE|FOR|BUT|NOT|ARE|ALL|HIS|HER|ITS|OUR|WAS|HIM|YOU|GOD|LORD|TO|IN|OF|ON|AT|BY|BE|AS|OR|SO|IF|IT)$/;
+    line = line.replace(ALLCAPS_WORD, (m, word) => {
+      if (COMMON.test(word)) return m;             // keep as-is
+      if (line.indexOf(`**${word}**`) !== -1) return m;  // already bold
+      return `**${word}**`;
+    });
+
+    // 4. Transition words at start of line → italic
+    if (TRANSITION_WORDS.test(line)) {
+      const tmatch = line.match(TRANSITION_WORDS);
+      if (tmatch && !line.startsWith('_')) {
+        line = `_${tmatch[0]}_ ${line.slice(tmatch[0].length).trimStart()}`;
+      }
+    }
+
+    // 5. Quoted text → italic (simple open/close quote detection)
+    line = line.replace(/[\u201c\u2018](.*?)[\u201d\u2019]/g, (m, inner) => `_${inner.trim()}_`);
+
+    return line;
+  }).join('\n');
+}
+
 function _buildShowFromSermon(s) {
   const slides = [];
 
@@ -1353,7 +1410,9 @@ function _buildShowFromSermon(s) {
     // Auto-break long notes into slide-sized chunks
     const chunks = _chunkProseToSlides(notes);
     chunks.forEach((chunk, i) => {
-      const sl = _mkShowSlide(showType, chunk, {
+      // Apply auto-formatting to non-scripture prose slides
+      const formattedChunk = (showType !== 'scripture') ? _autoFormat(chunk) : chunk;
+      const sl = _mkShowSlide(showType, formattedChunk, {
         notes: chunks.length > 1
           ? `${heading} (${i + 1}/${chunks.length})`
           : heading,
@@ -1367,7 +1426,7 @@ function _buildShowFromSermon(s) {
   if (s.altarCall && s.altarCall.trim()) {
     const altarChunks = _chunkProseToSlides(s.altarCall.trim());
     altarChunks.forEach((chunk, i) => {
-      const sl = _mkShowSlide('announce', chunk, {
+      const sl = _mkShowSlide('announce', _autoFormat(chunk), {
         notes: altarChunks.length > 1
           ? `Altar Call (${i + 1}/${altarChunks.length})`
           : 'Altar Call',
