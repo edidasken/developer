@@ -30,7 +30,9 @@
   /* ── Constants ─────────────────────────────────────────────────────── */
   const VERSION = 'v3.0.0';
   const MSG_LIMIT = 100;
-  const ANNOUNCEMENTS_ID = 'announcements';
+  const ANNOUNCEMENTS_ID   = 'announcements';
+  const MENS_MINISTRY_ID   = 'mens-ministry';
+  const WOMENS_MINISTRY_ID = 'womens-ministry';
 
   /* ── State ─────────────────────────────────────────────────────────── */
   let _db = null;
@@ -43,6 +45,17 @@
   let _msgUnsub = null;
   let _showArchived = false;
   let _openMenuConvId = null;
+  // Church / member context (resolved during boot)
+  let _myGender      = '';    // 'Male' | 'Female' | '' — from member doc
+  let _meIsAllAccess = false; // Lead Pastor / admin — sees all pinned groups
+  let _pastorUid     = null;  // Firebase UID of Lead Pastor
+  // Ministry channel doc listeners
+  let _mensDocUnsub     = null;
+  let _womensDocUnsub   = null;
+  let _mensLastSnippet  = '';
+  let _mensLastAt       = null;
+  let _womensLastSnippet = '';
+  let _womensLastAt      = null;
 
   /* ── DOM Helpers ────────────────────────────────────────────────────── */
   const $ = id => document.getElementById(id);
@@ -159,9 +172,12 @@
       if (d.displayName) _me.displayName = d.displayName;
       ref.update({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
     }
-    // Mark this person's member doc as FlockChat-active so OTHER members
-    // know we can be reached in-app (vs SMS fallback).
+    // Grant all-access if role is admin / pastor
+    if (/^(admin|pastor|lead_pastor)$/i.test(_me.role || '')) _meIsAllAccess = true;
+    // Mark member as FlockChat-active AND capture gender
     _markMemberFlockchatActive().catch(err => console.warn('[FlockChat] flockchatActive flag failed:', err));
+    // Resolve Lead Pastor UID + confirm all-access for LP
+    await _resolveChurchConfig();
   }
 
   async function _markMemberFlockchatActive() {
@@ -177,6 +193,12 @@
         const snap = await q.get();
         if (!snap.empty) {
           const doc = snap.docs[0];
+          const mData = doc.data() || {};
+          // Capture gender for ministry channel filtering
+          if (mData.gender) _myGender = mData.gender;
+          // Member role may differ from auth role — union grants access
+          const mRole = (mData.role || mData.memberType || '').toLowerCase();
+          if (/admin|pastor/.test(mRole)) _meIsAllAccess = true;
           await doc.ref.update({
             flockchatActive: true,
             flockchatLastSeen: firebase.firestore.FieldValue.serverTimestamp()
@@ -184,6 +206,43 @@
           return;
         }
       } catch (_) { /* try next */ }
+    }
+  }
+
+  /* ── Church Config (Lead Pastor UID, etc.) ──────────────────────────── */
+  async function _resolveChurchConfig() {
+    if (!_db || !window.UpperRoom) return;
+    try {
+      const cfg = await window.UpperRoom.getAppConfig({ key: 'LEAD_PASTOR_MEMBER_ID' });
+      const pin = (cfg?.value || '').trim();
+      if (!pin) return;
+
+      // Get pastor's member doc → email
+      const memberSnap = await _db.collection('members').doc(pin).get();
+      if (!memberSnap.exists) return;
+      const mData = memberSnap.data() || {};
+      const pastorEmail = (mData.primaryEmail || mData.email || '').toLowerCase();
+      if (!pastorEmail) return;
+
+      const myEmail = (_me?.email || '').toLowerCase();
+
+      // If I am the Lead Pastor, grant all-access and we're done
+      if (myEmail && myEmail === pastorEmail) {
+        _meIsAllAccess = true;
+        _pastorUid = _me.uid;
+        console.log('[FlockChat] Identified as Lead Pastor — all-access granted');
+        return;
+      }
+
+      // Find pastor's Firebase UID so we can seed a pastoral DM
+      const usersSnap = await _db.collection('users')
+        .where('email', '==', pastorEmail).limit(1).get();
+      if (!usersSnap.empty) {
+        _pastorUid = usersSnap.docs[0].id;
+        console.log('[FlockChat] Lead Pastor UID resolved:', _pastorUid);
+      }
+    } catch (err) {
+      console.warn('[FlockChat] _resolveChurchConfig failed:', err);
     }
   }
 
@@ -266,6 +325,110 @@
       }
     } catch (err) {
       console.warn('[FlockChat] Prayer Chain seed failed:', err);
+    }
+
+    // "Message the Pastor" — per-user private pastoral DM.
+    // Seeded for every member who isn't the pastor themselves.
+    // The Lead Pastor sees inbound DMs in their regular list.
+    if (_pastorUid && _pastorUid !== _me.uid) {
+      try {
+        const pastorMine = await _db.collection('conversations')
+          .where('type', '==', 'pastoral')
+          .where('participants', 'array-contains', _me.uid)
+          .limit(1).get();
+        if (pastorMine.empty) {
+          console.log('[FlockChat] Seeding Message the Pastor for', _me.uid);
+          await _db.collection('conversations').add({
+            type: 'pastoral',
+            name: 'Message the Pastor',
+            icon: '✉️',
+            participants: [_me.uid, _pastorUid],
+            lastMessage: {
+              text: 'Send a private message to the Lead Pastor.',
+              author: 'system',
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            },
+            lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
+            unreadCount: 0,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdBy: _me.uid
+          });
+        }
+      } catch (err) {
+        console.warn('[FlockChat] Pastoral seed failed:', err);
+      }
+    }
+  }
+
+  /* ── Ministry Channels (Men's / Women's) ────────────────────────────── */
+  function _injectMinistryChannels() {
+    // Remove stale injected entries before re-injecting
+    _conversations = _conversations.filter(c =>
+      c.id !== MENS_MINISTRY_ID && c.id !== WOMENS_MINISTRY_ID
+    );
+
+    const showMens   = _meIsAllAccess || _myGender === 'Male';
+    const showWomens = _meIsAllAccess || _myGender === 'Female';
+
+    // Insert Women's first so Men's lands on top (unshift reverses order)
+    if (showWomens) {
+      _conversations.unshift({
+        id: WOMENS_MINISTRY_ID,
+        type: 'ministry-women',
+        name: "Women's Ministry",
+        icon: '🌸',
+        participants: [],
+        lastMessage: { text: _womensLastSnippet || "Welcome to Women\u2019s Ministry.", author: '', timestamp: _womensLastAt },
+        lastActivity: _womensLastAt,
+        unreadCount: 0,
+        _static: true
+      });
+      _startMinistryListener(WOMENS_MINISTRY_ID, 'womens');
+    }
+
+    if (showMens) {
+      _conversations.unshift({
+        id: MENS_MINISTRY_ID,
+        type: 'ministry-men',
+        name: "Men\u2019s Ministry",
+        icon: '\u2693',
+        participants: [],
+        lastMessage: { text: _mensLastSnippet || "Welcome to Men\u2019s Ministry.", author: '', timestamp: _mensLastAt },
+        lastActivity: _mensLastAt,
+        unreadCount: 0,
+        _static: true
+      });
+      _startMinistryListener(MENS_MINISTRY_ID, 'mens');
+    }
+  }
+
+  function _startMinistryListener(id, which) {
+    if (which === 'mens'   && _mensDocUnsub)   return; // already listening
+    if (which === 'womens' && _womensDocUnsub) return;
+    try {
+      const unsub = _db.collection('conversations').doc(id)
+        .onSnapshot(doc => {
+          const d = doc.exists ? doc.data() : null;
+          if (which === 'mens') {
+            _mensLastSnippet = d?.lastSnippet || '';
+            _mensLastAt      = d?.lastMessageAt || null;
+          } else {
+            _womensLastSnippet = d?.lastSnippet || '';
+            _womensLastAt      = d?.lastMessageAt || null;
+          }
+          const e = _conversations.find(c => c.id === id);
+          if (e) {
+            const snippet = (which === 'mens' ? _mensLastSnippet : _womensLastSnippet)
+              || `Welcome to ${which === 'mens' ? "Men\u2019s" : "Women\u2019s"} Ministry.`;
+            e.lastMessage  = { text: snippet, author: '', timestamp: which === 'mens' ? _mensLastAt : _womensLastAt };
+            e.lastActivity = which === 'mens' ? _mensLastAt : _womensLastAt;
+            _renderConversations();
+          }
+        }, err => console.warn(`[FlockChat] ${id} listen failed:`, err));
+      if (which === 'mens') _mensDocUnsub = unsub;
+      else                  _womensDocUnsub = unsub;
+    } catch (err) {
+      console.warn(`[FlockChat] ${id} listener setup failed:`, err);
     }
   }
 
@@ -627,6 +790,7 @@
     // still loading or fails outright.
     _conversations = [];
     _injectAnnouncements();
+    _injectMinistryChannels();
     _renderConversations();
 
     _convUnsub = _db.collection('conversations')
@@ -641,19 +805,22 @@
           // participants array → wouldn't match this query anyway, but
           // belt-and-suspenders).
           if (d.id === ANNOUNCEMENTS_ID) return;
+          // Ministry channels are static injections
+          if (d.id === MENS_MINISTRY_ID || d.id === WOMENS_MINISTRY_ID) return;
           // Per-user soft delete: if I removed this conversation from my
           // view, never show it again on this account.
           if (Array.isArray(d.deletedBy) && d.deletedBy.includes(_me.uid)) return;
           _conversations.push(d);
         });
         _injectAnnouncements();
+        _injectMinistryChannels();
         _renderConversations();
       }, err => {
         console.error('[FlockChat] Failed to load conversations:', err);
         _toast('Failed to load conversations', 'error');
-        // Even on error, keep statics visible so the user isn't stranded.
         _conversations = [];
         _injectAnnouncements();
+        _injectMinistryChannels();
         _renderConversations();
       });
   }
@@ -779,7 +946,14 @@
   }
 
   function _isStaticConv(c) {
-    return c && (c._static === true || c.type === 'announcement' || c.type === 'prayer' || c.id === ANNOUNCEMENTS_ID);
+    return c && (c._static === true
+      || c.type === 'announcement'
+      || c.type === 'prayer'
+      || c.type === 'ministry-men'
+      || c.type === 'ministry-women'
+      || c.id === ANNOUNCEMENTS_ID
+      || c.id === MENS_MINISTRY_ID
+      || c.id === WOMENS_MINISTRY_ID);
   }
   function _isArchivedForMe(c) {
     return c && Array.isArray(c.archivedBy) && c.archivedBy.includes(_me?.uid);
@@ -808,16 +982,17 @@
       return;
     }
 
-    // ── Pinned section (Church Announcements + Prayer Chain) ──────────────
-    const pinned  = visible.filter(c => c.type === 'announcement' || c.type === 'prayer');
-    const regular = visible.filter(c => c.type !== 'announcement' && c.type !== 'prayer');
+    // ── Pinned section (all channel types) ───────────────────────────────
+    const PINNED_TYPES = ['announcement', 'prayer', 'pastoral', 'ministry-men', 'ministry-women'];
+    const pinned  = visible.filter(c => PINNED_TYPES.includes(c.type));
+    const regular = visible.filter(c => !PINNED_TYPES.includes(c.type));
 
     let pinnedHtml = '';
     if (pinned.length > 0) {
       const bubbles = pinned.map(c => {
         const isActive  = c.id === _activeConvId;
         const unread    = c.unreadCount || 0;
-        const typeClass = c.type === 'announcement' ? 'announcement' : 'prayer';
+        const typeClass = c.type; // maps directly to CSS class
         const badge     = unread > 0
           ? `<div class="fc-pinned-badge">${unread > 9 ? '9+' : unread}</div>` : '';
         return `
@@ -1003,9 +1178,12 @@
     if (name) name.textContent = conv.name;
     if (meta) {
       const count = conv.participants?.length || 0;
-      if (conv.type === 'sms') meta.textContent = 'SMS • ' + (conv.smsPhone || 'no number');
-      else if (conv.type === 'prayer') meta.textContent = 'Prayer Chain • posts here become church prayer requests';
-      else if (conv.type === 'announcement') meta.textContent = 'Church-wide announcements';
+      if (conv.type === 'sms')           meta.textContent = 'SMS • ' + (conv.smsPhone || 'no number');
+      else if (conv.type === 'prayer')        meta.textContent = 'Prayer Chain • posts here become church prayer requests';
+      else if (conv.type === 'announcement')  meta.textContent = 'Church-wide announcements';
+      else if (conv.type === 'pastoral')      meta.textContent = 'Private message to the Lead Pastor';
+      else if (conv.type === 'ministry-men')  meta.textContent = "Men\u2019s Ministry \u2022 visible to men + pastoral staff";
+      else if (conv.type === 'ministry-women') meta.textContent = "Women\u2019s Ministry \u2022 visible to women + pastoral staff";
       else meta.textContent = conv.type === 'dm' ? 'Direct Message' : `${count} ${count === 1 ? 'member' : 'members'}`;
     }
 
@@ -1018,7 +1196,13 @@
           ? 'Share a prayer request…'
           : (conv.type === 'announcement')
             ? 'Post an announcement to the whole church…'
-            : 'FlockChat';
+            : (conv.type === 'pastoral')
+              ? 'Message the Pastor privately…'
+              : (conv.type === 'ministry-men')
+                ? "Post to Men\u2019s Ministry\u2026"
+                : (conv.type === 'ministry-women')
+                  ? "Post to Women\u2019s Ministry\u2026"
+                  : 'FlockChat';
     }
 
     // Show thread pane (mobile)
@@ -1030,9 +1214,10 @@
   };
 
   function _markAsRead(convId) {
-    // The shared announcements doc has no per-user unreadCount and members
-    // typically can't write to it — don't try.
+    // Static shared channels have no per-user unreadCount — skip.
     if (convId === ANNOUNCEMENTS_ID) return;
+    if (convId === MENS_MINISTRY_ID)  return;
+    if (convId === WOMENS_MINISTRY_ID) return;
     _db.collection('conversations').doc(convId).update({
       unreadCount: 0
     }).catch(() => {});
