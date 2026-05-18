@@ -1715,6 +1715,15 @@ function _wire() {
   });
 
   /* ── Text field ── */
+  document.getElementById('fs-prop-text')?.addEventListener('keydown', e => {
+    if (!(e.metaKey || e.ctrlKey)) return;
+    const map = { b: ['**','**'], i: ['_','_'], u: ['__','__'] };
+    const pair = map[e.key.toLowerCase()];
+    if (!pair) return;
+    e.preventDefault();
+    _formatTag(e.target, pair[0], pair[1]);
+  });
+
   document.getElementById('fs-prop-text')?.addEventListener('input', e => {
     const sl = _activeSlide(); const show = _activeShow();
     if (!sl || !show) return;
