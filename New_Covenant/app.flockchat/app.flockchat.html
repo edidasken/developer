@@ -866,6 +866,26 @@
     .fc-sct-word-bubble-p .fc-sct-word-bubble-label { color: #0891b2; }
     .fc-sct-word-bubble-p { background: rgba(8,145,178,0.06); border-radius: 10px; padding: 10px 12px; }
     .fc-sct-word-footer  { text-align: center; padding: 8px 0 4px; }
+
+    /* Bubble action row: Complete + Add Note */
+    .fc-sct-bubble-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .fc-sct-complete-btn   { flex: 1; min-width: 120px; padding: 7px 14px; border-radius: 20px; border: 1.5px solid #d97706; background: transparent; color: #d97706; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s; }
+    .fc-sct-complete-btn:hover:not(.done) { background: rgba(217,119,6,0.1); }
+    .fc-sct-complete-btn.done  { background: #d97706; color: #fff; border-color: #d97706; cursor: default; }
+    .fc-sct-complete-read      { border-color: #0ea5e9; color: #0ea5e9; }
+    .fc-sct-complete-read:hover:not(.done) { background: rgba(14,165,233,0.08); }
+    .fc-sct-complete-read.done { background: #0ea5e9; color: #fff; border-color: #0ea5e9; }
+    .fc-sct-reply-btn      { padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--fc-divider); background: transparent; color: var(--fc-text-muted, #6b7280); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .fc-sct-reply-btn:hover { background: rgba(0,0,0,0.05); }
+
+    /* Inline reply block */
+    .fc-sct-reply-block    { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .fc-sct-reply-area     { width: 100%; border-radius: 12px; border: 1.5px solid var(--fc-divider); padding: 10px 12px; font-size: 0.9rem; line-height: 1.5; color: var(--fc-text); background: var(--fc-bg); resize: vertical; font-family: inherit; box-sizing: border-box; }
+    .fc-sct-reply-area:focus { outline: none; border-color: #d97706; }
+    .fc-sct-reply-actions  { display: flex; gap: 8px; justify-content: flex-end; }
+    .fc-sct-reply-save     { padding: 6px 16px; border-radius: 16px; background: #d97706; color: #fff; border: none; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+    .fc-sct-reply-save:disabled { opacity: 0.6; cursor: default; }
+    .fc-sct-reply-cancel   { padding: 6px 14px; border-radius: 16px; background: transparent; color: var(--fc-text-muted, #6b7280); border: 1px solid var(--fc-divider); font-size: 0.82rem; cursor: pointer; }
     .fc-sct-word-empty   { text-align: center; padding: 32px 16px; }
     .fc-sct-word-icon    { margin-bottom: 12px; }
     .fc-sct-word-empty p { color: var(--fc-text-muted, #6b7280); font-size: 0.9rem; }

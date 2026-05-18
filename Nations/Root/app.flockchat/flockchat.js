@@ -1772,6 +1772,7 @@
     _sanctuaryTab = tabId;
     document.querySelectorAll('.fc-sct-tab').forEach(b =>
       b.classList.toggle('active', b.dataset.tab === tabId));
+    if (tabId === 'word' || tabId === 'reading') _sctMarkSeen(tabId);
     _loadSanctuaryPane(tabId);
   };
 
@@ -1781,8 +1782,8 @@
     pane.innerHTML = '<div class="fc-loading"><div class="fc-spinner"></div></div>';
     if      (tabId === 'journal') await _sctJournal(pane);
     else if (tabId === 'prayers') await _sctPrayers(pane);
-    else if (tabId === 'word')    await _sctWord(pane);
-    else if (tabId === 'reading') await _sctReading(pane);
+    else if (tabId === 'word')    { _sctMarkSeen('word');    await _sctWord(pane); }
+    else if (tabId === 'reading') { _sctMarkSeen('reading'); await _sctReading(pane); }
   }
 
   /* Journal tab */
@@ -2276,12 +2277,13 @@
       days.push(d.toISOString().slice(0, 10));
     }
 
-    let allRows = [];
+    let allRows = [], prefs = {};
     try {
       const UR = window.UpperRoom;
-      if (UR && typeof UR.listAppContent === 'function') {
+      if (UR && typeof UR.listAppContent === 'function')
         allRows = await UR.listAppContent('devotionals', { skipDateFilter: true }) || [];
-      }
+      if (UR && typeof UR.getUserPreferences === 'function')
+        prefs = await UR.getUserPreferences() || {};
     } catch (err) { console.warn('[Sanctuary] devotional fetch', err); }
 
     // Match each day to a devotional row
@@ -2322,6 +2324,7 @@
       const question   = row.question   || row.Question   || '';
       const prayer     = row.prayer     || row.Prayer     || '';
       const isToday    = key === today;
+      const done       = !!prefs['complete_devo_' + key];
 
       return `
         <div class="fc-sct-day-sep">${_dayLabel(key)}</div>
@@ -2337,6 +2340,17 @@
             ${reflection ? `<div class="fc-sct-word-bubble-section"><span class="fc-sct-word-bubble-label">Reflection</span><p>${_e(reflection)}</p></div>` : ''}
             ${question   ? `<div class="fc-sct-word-bubble-section fc-sct-word-bubble-q"><span class="fc-sct-word-bubble-label">Reflect</span><p>${_e(question)}</p></div>` : ''}
             ${prayer     ? `<div class="fc-sct-word-bubble-section fc-sct-word-bubble-p"><span class="fc-sct-word-bubble-label">Prayer</span><p>${_e(prayer)}</p></div>` : ''}
+            <div class="fc-sct-bubble-actions">
+              <button class="fc-sct-complete-btn${done ? ' done' : ''}" onclick="window._sctCompleteDevo('${key}',this)">${done ? '\u2713 Completed' : 'Mark Complete'}</button>
+              <button class="fc-sct-reply-btn" onclick="window._sctReplyOpen('devo','${key}')">+ Add Note</button>
+            </div>
+            <div class="fc-sct-reply-block" id="fc-sct-reply-devo-${key}" data-title="${_e(title)}" style="display:none">
+              <textarea class="fc-sct-reply-area" placeholder="Write your reflection for your journal..." rows="3"></textarea>
+              <div class="fc-sct-reply-actions">
+                <button class="fc-sct-reply-save" onclick="window._sctReplySave('devo','${key}')">Save to Journal</button>
+                <button class="fc-sct-reply-cancel" onclick="window._sctReplyCancel('devo','${key}')">Cancel</button>
+              </div>
+            </div>
           </div>
         </div>`;
     }
@@ -2364,12 +2378,13 @@
       days.push(d);
     }
 
-    let allRows = [];
+    let allRows = [], prefs = {};
     try {
       const UR = window.UpperRoom;
-      if (UR && typeof UR.listAppContent === 'function') {
+      if (UR && typeof UR.listAppContent === 'function')
         allRows = await UR.listAppContent('reading', { skipDateFilter: true }) || [];
-      }
+      if (UR && typeof UR.getUserPreferences === 'function')
+        prefs = await UR.getUserPreferences() || {};
     } catch (err) { console.warn('[Sanctuary] reading fetch', err); }
 
     // Match each day number to a reading row
@@ -2395,19 +2410,20 @@
     function _dayLabel(dayNum) {
       if (dayNum === todayDay)     return 'Today';
       if (dayNum === todayDay - 1) return 'Yesterday';
-      // Convert day-of-year back to a calendar date label
       const d = new Date(new Date().getFullYear(), 0, dayNum);
       return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
     }
 
     function _readBubble({ dayNum, row }) {
       const isToday   = dayNum === todayDay;
+      const done      = !!prefs['complete_read_' + dayNum];
       const passages  = [
         { label: 'Old Testament', ref: row.ot || row.OT || row['Old Testament'] || '', color: 'fc-sct-read-ot' },
         { label: 'New Testament', ref: row.nt || row.NT || row['New Testament'] || '', color: 'fc-sct-read-nt' },
         { label: 'Psalms',        ref: row.psalms  || row.Psalms  || row.ps || '', color: 'fc-sct-read-ps' },
         { label: 'Proverbs',      ref: row.proverbs || row.Proverbs || row.pr || '', color: 'fc-sct-read-pr' },
       ].filter(p => p.ref);
+      const dayLabel = 'Day ' + +(row.day || row.Day || dayNum);
 
       return `
         <div class="fc-sct-day-sep">${_dayLabel(dayNum)}</div>
@@ -2417,13 +2433,24 @@
           </div>
           <div class="fc-sct-word-bubble">
             <div class="fc-sct-word-bubble-sender">FlockOS \u2022 Reading Plan</div>
-            <div class="fc-sct-word-bubble-title">Day ${+(row.day || row.Day || dayNum)}</div>
+            <div class="fc-sct-word-bubble-title">${_e(dayLabel)}</div>
             <div class="fc-sct-passages">
               ${passages.map(p => `
                 <div class="fc-sct-passage ${p.color}">
                   <div class="fc-sct-passage-label">${_e(p.label)}</div>
                   <div class="fc-sct-passage-ref">${_e(p.ref)}</div>
                 </div>`).join('')}
+            </div>
+            <div class="fc-sct-bubble-actions">
+              <button class="fc-sct-complete-btn fc-sct-complete-read${done ? ' done' : ''}" onclick="window._sctCompleteRead(${dayNum},this)">${done ? '\u2713 Completed' : 'Mark Complete'}</button>
+              <button class="fc-sct-reply-btn" onclick="window._sctReplyOpen('read','${dayNum}')">+ Add Note</button>
+            </div>
+            <div class="fc-sct-reply-block" id="fc-sct-reply-read-${dayNum}" data-title="${_e(dayLabel)}" style="display:none">
+              <textarea class="fc-sct-reply-area" placeholder="Write your reading notes for your journal..." rows="3"></textarea>
+              <div class="fc-sct-reply-actions">
+                <button class="fc-sct-reply-save" onclick="window._sctReplySave('read','${dayNum}')">Save to Journal</button>
+                <button class="fc-sct-reply-cancel" onclick="window._sctReplyCancel('read','${dayNum}')">Cancel</button>
+              </div>
             </div>
           </div>
         </div>`;
@@ -2473,6 +2500,92 @@
     if (isNaN(d)) return '';
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
+
+  /* ── Sanctuary: seen tracking (daily badge) ────────────────────────── */
+  function _sctSeenKey() { return 'flock-sct-seen-' + _sctToday(); }
+  function _sctSeen() {
+    try { return JSON.parse(localStorage.getItem(_sctSeenKey())) || {}; } catch { return {}; }
+  }
+  function _sctMarkSeen(tab) {
+    const seen = _sctSeen();
+    if (seen[tab]) return; // already recorded
+    seen[tab] = true;
+    try { localStorage.setItem(_sctSeenKey(), JSON.stringify(seen)); } catch {}
+    // Live-update the pinned badge without full re-render
+    const sct = _conversations.find(c => c.id === SANCTUARY_ID);
+    if (sct) {
+      const n = (seen.word ? 0 : 1) + (seen.reading ? 0 : 1);
+      sct.unreadCount = n;
+      const bubble = document.querySelector('.fc-pinned-item[data-id="my-sanctuary"] .fc-pinned-bubble');
+      if (bubble) {
+        let badge = bubble.querySelector('.fc-pinned-badge');
+        if (n > 0) {
+          if (!badge) { badge = document.createElement('div'); badge.className = 'fc-pinned-badge'; bubble.appendChild(badge); }
+          badge.textContent = n;
+        } else { if (badge) badge.remove(); }
+      }
+    }
+  }
+
+  /* ── Sanctuary: Complete + Reply global handlers ─────────────────────── */
+  window._sctCompleteDevo = async function(key, btn) {
+    if (btn.classList.contains('done')) return;
+    btn.disabled = true;
+    try {
+      const UR = window.UpperRoom;
+      if (UR && typeof UR.updateUserPreferences === 'function')
+        await UR.updateUserPreferences({ ['complete_devo_' + key]: true });
+      btn.textContent = '\u2713 Completed'; btn.classList.add('done');
+    } catch (err) { console.warn('[Sanctuary] complete devo failed', err); btn.disabled = false; }
+  };
+
+  window._sctCompleteRead = async function(dayNum, btn) {
+    if (btn.classList.contains('done')) return;
+    btn.disabled = true;
+    try {
+      const UR = window.UpperRoom;
+      if (UR && typeof UR.updateUserPreferences === 'function')
+        await UR.updateUserPreferences({ ['complete_read_' + dayNum]: true });
+      btn.textContent = '\u2713 Completed'; btn.classList.add('done');
+    } catch (err) { console.warn('[Sanctuary] complete read failed', err); btn.disabled = false; }
+  };
+
+  window._sctReplyOpen = function(type, key) {
+    const block = document.getElementById('fc-sct-reply-' + type + '-' + key);
+    if (!block) return;
+    block.style.display = '';
+    block.querySelector('.fc-sct-reply-area').focus();
+  };
+
+  window._sctReplyCancel = function(type, key) {
+    const block = document.getElementById('fc-sct-reply-' + type + '-' + key);
+    if (!block) return;
+    block.style.display = 'none';
+    block.querySelector('.fc-sct-reply-area').value = '';
+  };
+
+  window._sctReplySave = async function(type, key) {
+    const block = document.getElementById('fc-sct-reply-' + type + '-' + key);
+    if (!block) return;
+    const title   = block.dataset.title || key;
+    const text    = block.querySelector('.fc-sct-reply-area').value.trim();
+    if (!text) return;
+    const prefix  = type === 'devo'
+      ? '\uD83D\uDCD6 Reflection on: ' + title + '\n\n'
+      : '\uD83D\uDCDA Reading Notes (' + title + '):\n\n';
+    const saveBtn = block.querySelector('.fc-sct-reply-save');
+    saveBtn.textContent = 'Saving\u2026'; saveBtn.disabled = true;
+    try {
+      const UR = window.UpperRoom;
+      if (UR && typeof UR.createJournal === 'function')
+        await UR.createJournal({ entry: prefix + text });
+      block.style.display = 'none';
+      block.querySelector('.fc-sct-reply-area').value = '';
+    } catch (err) {
+      console.warn('[Sanctuary] reply save failed', err);
+      saveBtn.textContent = 'Save to Journal'; saveBtn.disabled = false;
+    }
+  };
 
   /* ── End of My Sanctuary ────────────────────────────────────────────── */
 
