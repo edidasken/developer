@@ -871,6 +871,45 @@ for entry in "${CHURCHES[@]}"; do
 done
 echo ""
 
+# ── Firebase Deployments ──────────────────────────────────────────────
+# Deploy Firestore rules and FlockChat hosting
+echo "══════════════════════════════════════════════"
+echo "Deploying Firebase rules + hosting…"
+echo ""
+
+if ! $DRY_RUN; then
+  # Church Rules → truth, trinity, theforest, notify
+  CHURCH_RULES="$WORKSPACE/church.firestore.rules"
+  FLOCKCHAT_RULES="$WORKSPACE/FlockChat.Firestore.Rules"
+  CHURCH_CONFIG="$WORKSPACE/firebase-church.json"
+
+  if [ -f "$CHURCH_RULES" ] && [ -f "$CHURCH_CONFIG" ]; then
+    echo "Deploying comprehensive church rules…"
+    for PROJECT in flockos-truth flockos-trinity flockos-theforest flockos-notify; do
+      echo "  → $PROJECT"
+      firebase deploy --only firestore:rules --project "$PROJECT" --config "$CHURCH_CONFIG" --non-interactive 2>&1 | grep -E "Deploy complete|Error" || true
+    done
+    echo "  ✓ Church rules deployed"
+  else
+    echo "  ⚠  church.firestore.rules or firebase-church.json not found — skipping church deployments"
+  fi
+
+  echo ""
+
+  # FlockChat Rules + Hosting → comms
+  if [ -f "$FLOCKCHAT_RULES" ]; then
+    echo "Deploying standalone FlockChat rules + hosting…"
+    echo "  → flockos-comms (rules + hosting)"
+    firebase deploy --only firestore:rules,hosting --project flockos-comms --non-interactive 2>&1 | grep -E "Deploy complete|Error" || true
+    echo "  ✓ FlockChat deployed"
+  else
+    echo "  ⚠  FlockChat.Firestore.Rules not found — skipping comms deployment"
+  fi
+
+  echo ""
+  echo "══════════════════════════════════════════════"
+fi
+
 # ── Seed build event → flockos-notify Firestore /milestones ──────────
 # Records this build in The Generations (church build log).
 # Non-fatal: if gcloud isn't authenticated the build still succeeds.
