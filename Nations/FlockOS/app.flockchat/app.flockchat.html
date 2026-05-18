@@ -815,10 +815,19 @@
     .fc-sct-badge.private   { background: rgba(120,53,15,0.15); color: #d97706; }
     .fc-sct-badge.shared    { background: rgba(6,182,212,0.12); color: #06b6d4; }
     .fc-sct-badge.published { background: rgba(5,150,105,0.15); color: #10b981; }
-    .fc-sct-entry-del { margin-left: auto; background: none; border: none; cursor: pointer; color: transparent; padding: 3px; border-radius: 6px; transition: color 0.15s; }
-    .fc-sct-entry:hover .fc-sct-entry-del { color: #f43f5e; }
+    .fc-sct-entry-del  { margin-left: auto; background: none; border: none; cursor: pointer; color: transparent; padding: 3px; border-radius: 6px; transition: color 0.15s; }
+    .fc-sct-entry:hover .fc-sct-entry-del  { color: #f43f5e; }
+    .fc-sct-entry-edit { background: none; border: none; cursor: pointer; color: transparent; padding: 3px; border-radius: 6px; transition: color 0.15s; }
+    .fc-sct-entry:hover .fc-sct-entry-edit { color: #d97706; }
     .fc-sct-entry-title { font-size: 0.9rem; font-weight: 600; color: var(--fc-text); margin-bottom: 4px; }
-    .fc-sct-entry-text { font-size: 0.9rem; line-height: 1.6; color: var(--fc-text); white-space: pre-wrap; }
+    .fc-sct-entry-text  { font-size: 0.9rem; line-height: 1.6; color: var(--fc-text); white-space: pre-wrap; }
+    .fc-sct-edit-block  { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+    .fc-sct-edit-area   { width: 100%; box-sizing: border-box; background: var(--fc-bg, #f9fafb); border: 1px solid var(--fc-divider); border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; line-height: 1.6; color: var(--fc-text); font-family: inherit; resize: vertical; outline: none; }
+    .fc-sct-edit-area:focus { border-color: #d97706; }
+    .fc-sct-edit-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .fc-sct-edit-cancel { background: none; border: 1px solid var(--fc-divider); border-radius: 8px; padding: 5px 14px; font-size: 0.825rem; color: var(--fc-text-muted, #6b7280); cursor: pointer; }
+    .fc-sct-edit-save   { background: #d97706; color: #fff; border: none; border-radius: 8px; padding: 5px 14px; font-size: 0.825rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+    .fc-sct-edit-save:disabled { opacity: 0.5; cursor: default; }
     .fc-sct-publish-btn { background: rgba(6,182,212,0.12); color: #06b6d4; border: 1px solid rgba(6,182,212,0.3); border-radius: 20px; padding: 3px 10px; font-size: 0.775rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
     .fc-sct-publish-btn:hover { background: rgba(6,182,212,0.22); }
 

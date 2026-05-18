@@ -1814,10 +1814,13 @@
     const bodyText = e.entry || e.body || e.text || '';
     const titleText = e.title || '';
     return `
-      <div class="fc-sct-entry" data-entry-id="${_e(e.id)}">
+      <div class="fc-sct-entry" data-entry-id="${_e(e.id)}" data-entry-body="${_e(bodyText)}">
         <div class="fc-sct-entry-meta">
           <span class="fc-sct-entry-date">${date}</span>
           <span class="fc-sct-badge ${isPrivate ? 'private' : 'shared'}">${isPrivate ? 'Private' : 'Shared'}</span>
+          <button class="fc-sct-entry-edit" title="Edit" onclick="window._editJournalEntry('${_e(e.id)}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
           <button class="fc-sct-entry-del" title="Delete" onclick="window._deleteJournalEntry('${_e(e.id)}')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
@@ -1826,6 +1829,57 @@
         <div class="fc-sct-entry-text">${_e(bodyText)}</div>
       </div>`;
   }
+
+  window._editJournalEntry = function(id) {
+    const card = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
+    if (!card) return;
+    // Already in edit mode?
+    if (card.querySelector('.fc-sct-edit-area')) return;
+    const bodyText = card.dataset.entryBody || '';
+    const textEl = card.querySelector('.fc-sct-entry-text');
+    if (textEl) textEl.style.display = 'none';
+    const editEl = document.createElement('div');
+    editEl.className = 'fc-sct-edit-block';
+    editEl.innerHTML = `
+      <textarea class="fc-sct-edit-area" rows="5">${_e(bodyText)}</textarea>
+      <div class="fc-sct-edit-actions">
+        <button class="fc-sct-edit-cancel" onclick="window._cancelJournalEdit('${_e(id)}')">Cancel</button>
+        <button class="fc-sct-edit-save" onclick="window._saveJournalEdit('${_e(id)}')">Save</button>
+      </div>`;
+    card.appendChild(editEl);
+    editEl.querySelector('textarea').focus();
+  };
+
+  window._cancelJournalEdit = function(id) {
+    const card = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
+    if (!card) return;
+    const textEl = card.querySelector('.fc-sct-entry-text');
+    if (textEl) textEl.style.display = '';
+    const editEl = card.querySelector('.fc-sct-edit-block');
+    if (editEl) editEl.remove();
+  };
+
+  window._saveJournalEdit = async function(id) {
+    const card = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
+    if (!card) return;
+    const ta = card.querySelector('.fc-sct-edit-area');
+    if (!ta) return;
+    const newText = ta.value.trim();
+    if (!newText) return;
+    const saveBtn = card.querySelector('.fc-sct-edit-save');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
+    const UR = window.UpperRoom;
+    try {
+      if (!UR || typeof UR.updateJournal !== 'function') throw new Error('UpperRoom unavailable');
+      await UR.updateJournal({ id, entry: newText });
+    } catch (err) {
+      console.error('[Sanctuary] edit journal', err);
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
+      return;
+    }
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane) await _sctJournal(pane);
+  };
 
   window._saveJournalEntry = async function() {
     const ta = document.getElementById('fc-sct-jtext');
