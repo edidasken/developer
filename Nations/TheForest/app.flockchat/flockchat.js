@@ -2052,14 +2052,10 @@
 
     if (opts.forceRefetch !== false) {
       _pAllEntries = [];
-      if (_db && _me && _me.email) {
-        try {
-          const snap = await _db.collection('prayers')
-            .where('createdBy', '==', _me.email)
-            .orderBy('createdAt', 'desc')
-            .limit(500).get();
-          snap.forEach(d => { const o = d.data(); o.id = d.id; _pAllEntries.push(o); });
-        } catch (err) { console.warn('[Sanctuary] prayers fetch', err); }
+      const UR = window.UpperRoom;
+      if (UR && typeof UR.listPrayers === 'function') {
+        try { _pAllEntries = await UR.listPrayers({ limit: 500 }) || []; }
+        catch (err) { console.warn('[Sanctuary] prayers fetch', err); }
       }
     }
 
@@ -2137,18 +2133,20 @@
   window._savePrayer = async function() {
     const ta = document.getElementById('fc-sct-ptext');
     const privCb = document.getElementById('fc-sct-ppriv');
-    if (!ta || !_db || !_me) return;
+    if (!ta || !_me) return;
     const text = (ta.value || '').trim();
     if (!text) return;
     const btn = document.querySelector('#fc-sct-pane .fc-sct-save-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Saving\u2026'; }
+    const UR = window.UpperRoom;
     try {
-      await _db.collection('prayers').add({
-        text,
-        isConfidential: !!(privCb && privCb.checked),
-        createdBy:  _me.email,
-        createdAt:  firebase.firestore.FieldValue.serverTimestamp(),
-        published:  false,
+      if (!UR || typeof UR.createPrayer !== 'function') throw new Error('UpperRoom unavailable');
+      await UR.createPrayer({
+        prayerText:        text,
+        submitterName:     _me.name || _me.email,
+        submitterEmail:    _me.email,
+        isConfidential:    (privCb && privCb.checked) ? 'TRUE' : 'FALSE',
+        followUpRequested: 'FALSE',
       });
       ta.value = '';
     } catch (err) {
@@ -2164,11 +2162,9 @@
     if (!id || !_db || !_me) return;
     const entryEl = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
     const text = entryEl ? (entryEl.dataset.prayerText || '') : '';
+    const UR = window.UpperRoom;
     try {
-      await _db.collection('prayers').doc(id).update({
-        published:   true,
-        publishedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      });
+      // Post to the Prayer Chain conversation
       await _db.collection('conversations').doc('prayer').collection('messages').add({
         text,
         authorName:  _me.name || _me.email,
@@ -2176,6 +2172,10 @@
         authorEmail: _me.email,
         timestamp:   firebase.firestore.FieldValue.serverTimestamp(),
       });
+      // Mark the prayer record as published
+      if (UR && typeof UR.updatePrayer === 'function') {
+        await UR.updatePrayer(id, { published: true, publishedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      }
     } catch (err) { console.error('[Sanctuary] publish prayer', err); return; }
     const pane = document.getElementById('fc-sct-pane');
     if (pane) await _sctPrayers(pane);  // keep current page after publish
@@ -2196,9 +2196,15 @@
   };
 
   window._executePrayerDelete = async function(id) {
-    if (!id || !_db) return;
-    try { await _db.collection('prayers').doc(id).delete(); }
-    catch (err) { console.error('[Sanctuary] delete prayer', err); return; }
+    if (!id) return;
+    const UR = window.UpperRoom;
+    try {
+      if (UR && typeof UR.deletePrayer === 'function') {
+        await UR.deletePrayer(id);
+      } else if (_db) {
+        await _db.collection('prayers').doc(id).delete();
+      }
+    } catch (err) { console.error('[Sanctuary] delete prayer', err); return; }
     const pane = document.getElementById('fc-sct-pane');
     if (pane && _sanctuaryTab === 'prayers') await _sctPrayers(pane);  // keep current page
   };
