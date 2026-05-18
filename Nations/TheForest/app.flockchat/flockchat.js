@@ -2695,25 +2695,95 @@
     container.scrollTop = 0;
   };
 
-  function _sermonBubble(s) {
-    const title     = _e(s.title || s.Title || 'Untitled Sermon');
-    const preacher  = _e(s.preacher || s.preacherName || s.Preacher || s['Preacher Name'] || 'Pastor');
-    const rawDate   = s.date || s.Date || s.deliveredAt || s.createdAt || '';
-    let dateStr = '';
-    if (rawDate) {
-      try {
-        const d = rawDate.toDate ? rawDate.toDate() : new Date(rawDate);
-        dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-      } catch (_) {}
-    }
-    const series    = _e(s.seriesTitle || s.seriesName || s.series || s.Series || '');
-    const scripture = _e(s.scriptureRefs || s.scripture || s.passageRef || s['Scripture Refs'] || s.Scripture || '');
-    const summary   = _e(s.summary || s.Summary || s.description || '');
-    const rawTags   = Array.isArray(s.topicTags) ? s.topicTags
-                      : (s['Topic Tags'] ? String(s['Topic Tags']).split(',') : []);
-    const tags      = rawTags.slice(0, 5).map(t => t.trim()).filter(Boolean);
-    const serviceType = _e(s.serviceType || s['Service Type'] || '');
+  /* ── Sermon helper: parse a raw date value → human string ── */
+  function _srmDate(raw) {
+    if (!raw) return '';
+    try {
+      const d = raw.toDate ? raw.toDate() : new Date(raw);
+      return isNaN(d) ? '' : d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    } catch (_) { return ''; }
+  }
 
+  /* ── Sermon helper: build preview (collapsed) bubble header HTML ── */
+  function _srmBubbleHeader(s) {
+    const title       = _e(s.title || s.Title || 'Untitled Sermon');
+    const preacher    = _e(s.preacher || s.preacherName || s.Preacher || s['Preacher Name'] || 'Pastor');
+    const dateStr     = _srmDate(s.date || s.Date || s.deliveredAt || s.createdAt || '');
+    const series      = _e(s.seriesTitle || s.seriesName || s.series || s.Series || '');
+    const serviceType = _e(s.serviceType || s['Service Type'] || '');
+    return `
+      <div class="fc-sct-word-bubble-sender">FlockOS &bull; Sermon</div>
+      <div class="fc-srm-title">${title}</div>
+      <div class="fc-srm-meta-row">
+        <span class="fc-srm-preacher">${preacher}</span>
+        ${dateStr ? `<span class="fc-srm-dot">&middot;</span><span class="fc-srm-date">${dateStr}</span>` : ''}
+      </div>
+      ${serviceType ? `<div class="fc-srm-service-pill">${serviceType}</div>` : ''}
+      ${series ? `<div class="fc-srm-series-pill">Series &bull; ${series}</div>` : ''}`;
+  }
+
+  /* ── Sermon section renderer (used in expanded view) ── */
+  function _srmSection(sec, idx) {
+    const type    = sec.type || 'point';
+    const heading = _e(sec.title || sec.heading || {
+      intro: 'Introduction', scripture: 'Scripture', point: 'Main Point',
+      illustration: 'Illustration', explanation: 'Explanation',
+      application: 'Application', prayer: 'Prayer',
+      conclusion: 'Conclusion', transition: ''
+    }[type] || '');
+    const notes = _e(sec.notes || sec.body || '');
+    const ref   = _e(sec.scriptureRef || sec.reference || '');
+
+    if (type === 'transition') {
+      return `<div class="fc-srm-section-sep"></div>`;
+    }
+    if (type === 'scripture') {
+      return `
+        <div class="fc-srm-section fc-srm-sec-scripture">
+          ${heading ? `<div class="fc-srm-sec-label">${heading}</div>` : ''}
+          ${ref ? `<div class="fc-srm-sec-ref">${ref}</div>` : ''}
+          ${notes ? `<div class="fc-srm-sec-text">${notes}</div>` : ''}
+        </div>`;
+    }
+    if (type === 'prayer') {
+      return `
+        <div class="fc-srm-section fc-srm-sec-prayer">
+          <div class="fc-srm-sec-label">&#9901; ${heading || 'Prayer'}</div>
+          ${notes ? `<div class="fc-srm-sec-text">${notes}</div>` : ''}
+        </div>`;
+    }
+    if (type === 'illustration') {
+      return `
+        <div class="fc-srm-section fc-srm-sec-illustration">
+          ${heading ? `<div class="fc-srm-sec-label">${heading}</div>` : ''}
+          ${notes ? `<div class="fc-srm-sec-text fc-srm-sec-italic">${notes}</div>` : ''}
+        </div>`;
+    }
+    if (type === 'application') {
+      return `
+        <div class="fc-srm-section fc-srm-sec-application">
+          ${heading ? `<div class="fc-srm-sec-label">&#10003; ${heading}</div>` : ''}
+          ${notes ? `<div class="fc-srm-sec-text">${notes}</div>` : ''}
+        </div>`;
+    }
+    if (type === 'point') {
+      return `
+        <div class="fc-srm-section fc-srm-sec-point">
+          ${heading ? `<div class="fc-srm-sec-point-heading"><span class="fc-srm-sec-point-num">${idx + 1}</span>${heading}</div>` : ''}
+          ${notes ? `<div class="fc-srm-sec-text">${notes}</div>` : ''}
+        </div>`;
+    }
+    // intro / explanation / conclusion / default
+    return `
+      <div class="fc-srm-section fc-srm-sec-default">
+        ${heading ? `<div class="fc-srm-sec-label">${heading}</div>` : ''}
+        ${notes ? `<div class="fc-srm-sec-text">${notes}</div>` : ''}
+      </div>`;
+  }
+
+  /* ── Build collapsed sermon bubble ── */
+  function _sermonBubble(s) {
+    const sid = s.id || '';
     return `
       <div class="fc-sct-word-msg fc-srm-msg">
         <div class="fc-sct-word-avatar fc-srm-avatar">
@@ -2724,22 +2794,220 @@
             <line x1="8" y1="23" x2="16" y2="23"/>
           </svg>
         </div>
-        <div class="fc-sct-word-bubble fc-srm-bubble">
+        <div class="fc-sct-word-bubble fc-srm-bubble" id="fc-srm-b-${_e(sid)}">
           <div class="fc-srm-accent-bar"></div>
-          <div class="fc-sct-word-bubble-sender">FlockOS &bull; Sermon</div>
-          <div class="fc-srm-title">${title}</div>
-          <div class="fc-srm-meta-row">
-            <span class="fc-srm-preacher">${preacher}</span>
-            ${dateStr ? `<span class="fc-srm-dot">&middot;</span><span class="fc-srm-date">${dateStr}</span>` : ''}
+          <div class="fc-srm-body">
+            ${_srmBubbleHeader(s)}
+            <button class="fc-srm-view-btn" onclick="window._srmExpand('${_e(sid)}')">Click to View &nbsp;&#9660;</button>
           </div>
-          ${serviceType ? `<div class="fc-srm-service-pill">${serviceType}</div>` : ''}
-          ${series ? `<div class="fc-srm-series-pill">Series &bull; ${series}</div>` : ''}
-          ${scripture ? `<div class="fc-srm-scripture">${scripture}</div>` : ''}
-          ${summary ? `<div class="fc-srm-summary">${summary}</div>` : ''}
-          ${tags.length ? `<div class="fc-srm-tags">${tags.map(t => `<span class="fc-srm-tag">${_e(t)}</span>`).join('')}</div>` : ''}
         </div>
       </div>`;
   }
+
+  /* ── Expand a sermon bubble ── */
+  window._srmExpand = function(sid) {
+    const s = _srmAllRows.find(r => r.id === sid);
+    if (!s) return;
+
+    const scripture = _e(s.scriptureRefs || s.scripture || s.passageRef || s['Scripture Refs'] || s.Scripture || '');
+    const summary   = _e(s.summary || s.Summary || s.description || '');
+    const sections  = Array.isArray(s.sections) ? s.sections : [];
+    const altarCall = _e(s.altarCall || s.altar_call || '');
+    const rawTags   = Array.isArray(s.topicTags) ? s.topicTags
+                      : (s['Topic Tags'] ? String(s['Topic Tags']).split(',') : []);
+    const tags      = rawTags.map(t => t.trim()).filter(Boolean);
+
+    // Count only 'point' sections for numbering
+    let pointIdx = 0;
+    const sectionsHtml = sections.map(sec => {
+      const html = _srmSection(sec, sec.type === 'point' ? pointIdx : 0);
+      if (sec.type === 'point') pointIdx++;
+      return html;
+    }).join('');
+
+    const altarHtml = altarCall ? `
+      <div class="fc-srm-section fc-srm-sec-altar">
+        <div class="fc-srm-sec-label">&#9829; Altar Call</div>
+        <div class="fc-srm-sec-text">${altarCall}</div>
+      </div>` : '';
+
+    const body = document.getElementById('fc-srm-b-' + sid)?.querySelector('.fc-srm-body');
+    if (!body) return;
+    body.innerHTML = `
+      ${_srmBubbleHeader(s)}
+      ${scripture ? `<div class="fc-srm-scripture">${scripture}</div>` : ''}
+      ${summary ? `<div class="fc-srm-summary-block"><div class="fc-srm-sec-label">Summary</div><div class="fc-srm-sec-text">${summary}</div></div>` : ''}
+      ${sectionsHtml}
+      ${altarHtml}
+      ${tags.length ? `<div class="fc-srm-tags">${tags.map(t => `<span class="fc-srm-tag">${_e(t)}</span>`).join('')}</div>` : ''}
+      <div class="fc-srm-actions">
+        <button class="fc-srm-action-btn fc-srm-slides-btn" onclick="window._srmViewSlides('${_e(sid)}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          View Slides
+        </button>
+        <button class="fc-srm-action-btn fc-srm-journal-btn" onclick="window._srmSaveJournal('${_e(sid)}', this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          Save to Journal
+        </button>
+      </div>
+      <button class="fc-srm-collapse-btn" onclick="window._srmCollapse('${_e(sid)}')">&#9650; Collapse</button>`;
+  };
+
+  /* ── Collapse a sermon bubble back ── */
+  window._srmCollapse = function(sid) {
+    const s = _srmAllRows.find(r => r.id === sid);
+    if (!s) return;
+    const body = document.getElementById('fc-srm-b-' + sid)?.querySelector('.fc-srm-body');
+    if (!body) return;
+    body.innerHTML = `
+      ${_srmBubbleHeader(s)}
+      <button class="fc-srm-view-btn" onclick="window._srmExpand('${_e(sid)}')">Click to View &nbsp;&#9660;</button>`;
+  };
+
+  /* ── Save sermon outline to journal ── */
+  window._srmSaveJournal = async function(sid, btn) {
+    const s = _srmAllRows.find(r => r.id === sid);
+    if (!s) return;
+    const UR = window.UpperRoom;
+    if (!UR || typeof UR.createJournal !== 'function') { _toast('Journal unavailable', 'error'); return; }
+
+    btn.disabled = true; btn.textContent = 'Saving\u2026';
+
+    const dateStr   = _srmDate(s.date || s.Date || '');
+    const preacher  = s.preacher || s.preacherName || s.Preacher || s['Preacher Name'] || 'Pastor';
+    const series    = s.seriesTitle || s.series || '';
+    const scripture = s.scriptureRefs || s.scripture || s.passageRef || '';
+    const sections  = Array.isArray(s.sections) ? s.sections : [];
+    let text = `\uD83C\uDFDB\uFE0F Sermon Notes\n`;
+    text += `\uD83D\uDCD6 ${s.title || 'Untitled Sermon'}\n`;
+    if (preacher) text += `Pastor: ${preacher}\n`;
+    if (dateStr)  text += `Date: ${dateStr}\n`;
+    if (series)   text += `Series: ${series}\n`;
+    if (scripture) text += `Scripture: ${scripture}\n`;
+    text += '\n';
+    let pointNum = 1;
+    sections.forEach(sec => {
+      const heading = sec.title || sec.heading || '';
+      const notes   = sec.notes || sec.body || '';
+      if (sec.type === 'transition') { text += '\u2015\n'; return; }
+      if (sec.type === 'point') {
+        if (heading) text += `\n${pointNum}. ${heading}\n`;
+        if (notes)   text += `${notes}\n`;
+        pointNum++;
+      } else {
+        const label = { intro: 'Introduction', scripture: 'Scripture', illustration: 'Illustration',
+          explanation: 'Explanation', application: 'Application', prayer: 'Prayer',
+          conclusion: 'Conclusion' }[sec.type] || sec.type || '';
+        if (label) text += `\n[${label}]${heading ? ' ' + heading : ''}\n`;
+        if (notes) text += `${notes}\n`;
+      }
+    });
+    if (s.altarCall) text += `\n[Altar Call]\n${s.altarCall}\n`;
+
+    try {
+      await UR.createJournal({ entry: text.trim(), private: false });
+      btn.textContent = '\u2713 Saved!';
+      setTimeout(() => { btn.disabled = false; btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Save to Journal`; }, 2500);
+    } catch (err) {
+      console.error('[Sermons] save journal failed', err);
+      btn.disabled = false; btn.textContent = 'Try Again';
+    }
+  };
+
+  /* ── Inline slides viewer ── */
+  let _srmSlides  = [];
+  let _srmSlideIdx = 0;
+
+  function _buildSermonSlidesArray(s) {
+    const slides = [];
+    const preacher = s.preacher || s.preacherName || s.Preacher || s['Preacher Name'] || '';
+    const dateStr  = _srmDate(s.date || s.Date || '');
+    const series   = s.seriesTitle || s.series || '';
+    const scripture = s.scriptureRefs || s.scripture || s.passageRef || '';
+    // Title slide
+    slides.push({ type: 'title', heading: '', text: (s.title || 'Untitled Sermon') + (preacher ? '\n' + preacher : '') });
+    // Series / date
+    if (series || dateStr) slides.push({ type: 'series', heading: '', text: [series, dateStr].filter(Boolean).join('\n') });
+    // Top-level passage
+    if (scripture) slides.push({ type: 'scripture', heading: 'Scripture', text: scripture });
+    // Sections
+    let pointNum = 1;
+    (Array.isArray(s.sections) ? s.sections : []).forEach(sec => {
+      if (sec.type === 'transition') return;
+      const heading = sec.title || sec.heading || ({ intro:'Introduction', scripture:'Scripture', point:'Main Point', illustration:'Illustration', explanation:'Explanation', application:'Application', prayer:'Prayer', conclusion:'Conclusion' }[sec.type] || '');
+      const text    = sec.type === 'scripture' ? (sec.scriptureRef || '') + (sec.notes ? '\n' + sec.notes : '') : (sec.notes || sec.body || '');
+      if (sec.type === 'point') {
+        slides.push({ type: 'point', heading: `${pointNum}. ${heading}`, text });
+        pointNum++;
+      } else {
+        if (heading || text) slides.push({ type: sec.type, heading, text });
+      }
+    });
+    if (s.altarCall && s.altarCall.trim()) slides.push({ type: 'altar', heading: 'Altar Call', text: s.altarCall.trim() });
+    return slides;
+  }
+
+  window._srmViewSlides = function(sid) {
+    const s = _srmAllRows.find(r => r.id === sid);
+    if (!s) return;
+    _srmSlides   = _buildSermonSlidesArray(s);
+    _srmSlideIdx = 0;
+    _srmRenderSlideModal();
+  };
+
+  function _srmRenderSlideModal() {
+    let modal = document.getElementById('fc-srm-slides-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'fc-srm-slides-modal';
+      document.body.appendChild(modal);
+    }
+    const sl    = _srmSlides[_srmSlideIdx] || { type: 'title', heading: '', text: '' };
+    const total = _srmSlides.length;
+    const typeClass = `fc-srm-slide-${sl.type}`;
+    modal.innerHTML = `
+      <div class="fc-srm-slide-overlay" onclick="window._srmCloseSlides()"></div>
+      <div class="fc-srm-slide-box">
+        <div class="fc-srm-slide-topbar">
+          <span class="fc-srm-slide-counter">${_srmSlideIdx + 1} / ${total}</span>
+          <button class="fc-srm-slide-close" onclick="window._srmCloseSlides()" aria-label="Close">&times;</button>
+        </div>
+        <div class="fc-srm-slide-stage ${typeClass}">
+          ${sl.heading ? `<div class="fc-srm-slide-heading">${_e(sl.heading)}</div>` : ''}
+          <div class="fc-srm-slide-text">${_e(sl.text).replace(/\n/g, '<br>')}</div>
+        </div>
+        <div class="fc-srm-slide-nav">
+          <button class="fc-srm-slide-nav-btn" ${_srmSlideIdx === 0 ? 'disabled' : ''} onclick="window._srmSlidePrev()">&#8592;</button>
+          <div class="fc-srm-slide-dots">${_srmSlides.map((_, i) => `<span class="fc-srm-slide-dot${i === _srmSlideIdx ? ' active' : ''}" onclick="window._srmSlideGo(${i})"></span>`).join('')}</div>
+          <button class="fc-srm-slide-nav-btn" ${_srmSlideIdx >= total - 1 ? 'disabled' : ''} onclick="window._srmSlideNext()">&#8594;</button>
+        </div>
+      </div>`;
+    modal.style.display = 'flex';
+    modal.setAttribute('data-srm-id', _srmSlides[0]?.text || '');
+    // Keyboard support
+    modal._keyHandler = function(e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') window._srmSlideNext();
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   window._srmSlidePrev();
+      if (e.key === 'Escape') window._srmCloseSlides();
+    };
+    document.addEventListener('keydown', modal._keyHandler);
+  }
+
+  window._srmSlideNext = function() {
+    if (_srmSlideIdx < _srmSlides.length - 1) { _srmSlideIdx++; _srmRenderSlideModal(); }
+  };
+  window._srmSlidePrev = function() {
+    if (_srmSlideIdx > 0) { _srmSlideIdx--; _srmRenderSlideModal(); }
+  };
+  window._srmSlideGo = function(i) {
+    _srmSlideIdx = i; _srmRenderSlideModal();
+  };
+  window._srmCloseSlides = function() {
+    const modal = document.getElementById('fc-srm-slides-modal');
+    if (!modal) return;
+    if (modal._keyHandler) document.removeEventListener('keydown', modal._keyHandler);
+    modal.style.display = 'none';
+  };
 
   /* ── End of My Sanctuary ────────────────────────────────────────────── */
 
