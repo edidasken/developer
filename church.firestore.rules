@@ -1,1253 +1,231 @@
 rules_version = '2';
-
-// ═══════════════════════════════════════════════════════════════════════
-// FlockOS — Firestore Security Rules (Church Deployments)
-//
-// Each church has its OWN Firebase project. Collections live at the root
-// of that project — no churches/{churchId}/ nesting needed.
-// The project itself IS the church boundary.
-//
-// Deploy via:
-//   firebase deploy --only firestore:rules --project <church-project-id>
-//
-// SOURCE: Architechtural Docs/New Covenant/Architecture/B-Master Firestore.md
-// DEPLOYED TO: flockos-notify, flockos-trinity, flockos-the forest, flockos-truth
-// ═══════════════════════════════════════════════════════════════════════
-
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // ── Helper functions ────────────────────────────────────────────────
+    
+    // ═══════════════════════════════════════════════════════════
+    // DEMO MODE - ALL PERMISSIONS OPEN FOR SIGNED-IN USERS
+    // ═══════════════════════════════════════════════════════════
+    
+    // Helper function: Check if user is signed in
     function isSignedIn() {
       return request.auth != null;
     }
-
-    function userEmail() {
-      return request.auth.token.email;
+    
+    // ── Church Settings ────────────────────────────────────────
+    match /church/{docId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    function userRole() {
-      // Check Firestore permissions collection (source of truth for roles)
-      // Returns null if no permissions doc exists (user defaults to member)
-      let permPath = /databases/$(database)/documents/permissions/$(userEmail());
-      return exists(permPath) ? get(permPath).data.role : null;
+    
+    // ── Members ────────────────────────────────────────────────
+    match /members/{memberId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    function isPastorOrAdmin() {
-      // Check if permissions doc exists and has pastor/admin/seed role
-      let role = userRole();
-      return role != null && role in ['pastor', 'admin', 'seed'];
+    
+    // ── Households ─────────────────────────────────────────────
+    match /households/{householdId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    function isLeaderOrAbove() {
-      let role = userRole();
-      return role != null && role in ['leader', 'pastor', 'admin', 'seed'];
+    
+    // ── Users (AuthUsers) ──────────────────────────────────────
+    match /users/{userId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    function isPastorTimothyOrAbove() {
-      // Quarterly planner access: pastor, admin, seed, timothy (pastoral assistant)
-      let role = userRole();
-      return role != null && role in ['timothy', 'pastor', 'admin', 'seed'];
+    
+    // ── Permissions ────────────────────────────────────────────
+    match /permissions/{userId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    // ── Conversations (DMs, Rooms, Threads, Channels) ───────────────
-      match /conversations/{convoId} {
-
-        // LIST: allow queries for any signed-in user (client-side filters by participant/type)
-        allow list: if isSignedIn();
-
-        // GET: participant/subscriber, creator, or room/channel (browsable)
-        // resource == null guard: allows get() on non-existent docs (e.g. DM
-        // existence check in createDM) — there is no data to protect.
-        allow get: if isSignedIn() && (
-          resource == null
-          || resource.data.type == 'room'
-          || resource.data.type == 'channel'
-          || userEmail() in resource.data.participants
-          || userEmail() in resource.data.subscribers
-          || resource.data.createdBy == userEmail()
-        );
-
-        // CREATE: any church member can start a conversation
-        allow create: if isSignedIn();
-
-        // UPDATE: participants, subscribers, creator, or pastor/admin
-        allow update: if isSignedIn() && (
-          userEmail() in resource.data.participants
-          || userEmail() in resource.data.subscribers
-          || resource.data.createdBy == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // DELETE: creator or pastor/admin only
-        allow delete: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // ── Messages sub-collection ─────────────────────────────────
-        match /messages/{msgId} {
-          // Read: any church member (they already navigated to the convo)
-          allow read: if isSignedIn();
-
-          // Create: any church member
-          allow create: if isSignedIn();
-
-          // Update: sender or pastor/admin
-          allow update: if isSignedIn() && (
-            resource.data.senderEmail == userEmail()
-            || isPastorOrAdmin()
-          );
-
-          // Delete: sender or pastor/admin
-          allow delete: if isSignedIn() && (
-            resource.data.senderEmail == userEmail()
-            || isPastorOrAdmin()
-          );
-        }
-
-        // ── Typing indicators (ephemeral) ───────────────────────────
-        match /typing/{userId} {
-          allow read, write: if isSignedIn();
-        }
-      }
-
-      // ── Notifications ─────────────────────────────────────────────────
-      match /notifications/{notifId} {
-        // Read own notifications
-        allow read: if isSignedIn()
-          && resource.data.recipientEmail == userEmail();
-
-        // Create: any church member (system-generated via client or admin)
-        allow create: if isSignedIn();
-
-        // Update own (mark read)
-        allow update: if isSignedIn()
-          && resource.data.recipientEmail == userEmail();
-
-        // Delete own
-        allow delete: if isSignedIn()
-          && (resource.data.recipientEmail == userEmail() || isPastorOrAdmin());
-      }
-
-      // ── App Settings ──────────────────────────────────────────────────
-      match /settings/{settingId} {
-        // Read: any member; Write app-level settings: pastor/admin only
-        allow read: if isSignedIn();
-
-        // notifPrefs_* docs are writeable by the owning user
-        allow write: if isSignedIn() && (
-          isPastorOrAdmin()
-          || settingId.matches('notifPrefs_.*')
-        );
-      }
-
-      // ── Templates ─────────────────────────────────────────────────────
-      match /templates/{templateId} {
-        // Read: any member
-        allow read: if isSignedIn();
-
-        // Create/Update: leader+ or pastor/admin
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-
-        // Delete: pastor/admin or creator
-        allow delete: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isPastorOrAdmin()
-        );
-      }
-
-      // ── Broadcasts ────────────────────────────────────────────────────
-      match /broadcasts/{broadcastId} {
-        // Read: any member
-        allow read: if isSignedIn();
-
-        // Create: leader+ can send broadcasts
-        allow create: if isSignedIn() && isLeaderOrAbove();
-
-        // Update: only pastor/admin (adjust delivery stats, etc.)
-        allow update: if isSignedIn() && isPastorOrAdmin();
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Prayers ─────────────────────────────────────────────────────
-      match /prayers/{prayerId} {
-        // Read: any member can see non-confidential prayers;
-        //        confidential prayers visible only to submitter or pastor/admin
-        allow read: if isSignedIn() && (
-          resource.data.isConfidential != true
-          || resource.data.createdBy == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Create: any church member can submit a prayer
-        allow create: if isSignedIn();
-
-        // Update: submitter can edit own prayer, pastor/admin can manage all
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-
-        // ── Prayer Interactions sub-collection ──────────────────────
-        match /interactions/{ixId} {
-          // Read: any church member (they already have access to the prayer)
-          allow read: if isSignedIn();
-
-          // Create: any church member can log an interaction
-          allow create: if isSignedIn();
-
-          // Update: creator or pastor/admin
-          allow update: if isSignedIn() && (
-            resource.data.createdBy == userEmail()
-            || isPastorOrAdmin()
-          );
-
-          // Delete: pastor/admin only
-          allow delete: if isSignedIn() && isPastorOrAdmin();
-        }
-      }
-
-      // ── Todos ───────────────────────────────────────────────────────
-      match /todos/{todoId} {
-        // Read: creator, assignee, or pastor/admin
-        allow read: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || resource.data.assignedTo == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Create: any church member can create a task
-        allow create: if isSignedIn();
-
-        // Update: creator, assignee, or pastor/admin
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || resource.data.assignedTo == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Delete: creator or pastor/admin
-        allow delete: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isPastorOrAdmin()
-        );
-      }
-
-      // ── Users (AuthUsers) ──────────────────────────────────────────
-      match /users/{uid} {
-        // Read own profile or pastor/admin can read all
-        allow read: if isSignedIn() && (
-          uid == request.auth.uid
-          || isPastorOrAdmin()
-        );
-
-        // Create: any signed-in user can create their own profile
-        allow create: if isSignedIn() && uid == request.auth.uid;
-
-        // Update: own profile or pastor/admin
-        allow update: if isSignedIn() && (
-          uid == request.auth.uid
-          || isPastorOrAdmin()
-        );
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Members ─────────────────────────────────────────────────────
-      match /members/{memberId} {
-        // Read: any signed-in member can read any member (directory is browsable)
-        // or leader+ for administrative access
-        allow read: if isSignedIn();
-
-        // Create: leader+ can add members
-        allow create: if isSignedIn() && isLeaderOrAbove();
-
-        // Update: own record or pastor/admin
-        allow update: if isSignedIn() && (
-          resource.data.primaryEmail == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Member Cards (directory/public profile) ─────────────────────
-      match /memberCards/{cardId} {
-        // Read: any church member (directory is browsable)
-        allow read: if isSignedIn();
-
-        // Create: leader+ can create cards
-        allow create: if isSignedIn() && isLeaderOrAbove();
-
-        // Update: own card or pastor/admin
-        allow update: if isSignedIn() && (
-          resource.data.primaryEmail == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Permissions ─────────────────────────────────────────────────
-      match /permissions/{email} {
-        // Read: own permissions or pastor/admin
-        allow read: if isSignedIn() && (
-          email == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Write: pastor/admin only
-        allow write: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Care Cases ──────────────────────────────────────────────────
-      match /careCases/{caseId} {
-        // Read: creator, assigned caregiver, or leader+
-        allow read: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || resource.data.primaryCaregiverId == userEmail()
-          || isLeaderOrAbove()
-        );
-
-        // Create: any church member can submit a care case
-        allow create: if isSignedIn();
-
-        // Update: creator, assigned caregiver, or leader+
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || resource.data.primaryCaregiverId == userEmail()
-          || isLeaderOrAbove()
-        );
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Care Interactions ───────────────────────────────────────────
-      match /careInteractions/{interactionId} {
-        // Read: church member with care role (leader+)
-        allow read: if isSignedIn() && isLeaderOrAbove();
-
-        // Create: any church member (logging interactions)
-        allow create: if isSignedIn();
-
-        // Update: creator or leader+
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isLeaderOrAbove()
-        );
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Care Assignments ────────────────────────────────────────────
-      match /careAssignments/{assignmentId} {
-        // Read: assigned caregiver or leader+
-        allow read: if isSignedIn() && (
-          resource.data.caregiverId == userEmail()
-          || isLeaderOrAbove()
-        );
-
-        // Create: leader+ can assign care
-        allow create: if isSignedIn() && isLeaderOrAbove();
-
-        // Update: assigned caregiver or pastor/admin (reassignment)
-        allow update: if isSignedIn() && (
-          resource.data.caregiverId == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Compassion Requests ─────────────────────────────────────────
-      match /compassionRequests/{requestId} {
-        // Read: creator, assigned person, or leader+
-        allow read: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || resource.data.assignedTo == userEmail()
-          || isLeaderOrAbove()
-        );
-
-        // Create: any church member
-        allow create: if isSignedIn();
-
-        // Update: creator, assignee, or leader+
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || resource.data.assignedTo == userEmail()
-          || isLeaderOrAbove()
-        );
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Compassion Logs ─────────────────────────────────────────────
-      match /compassionLogs/{logId} {
-        // Read: leader+
-        allow read: if isSignedIn() && isLeaderOrAbove();
-
-        // Create: any church member
-        allow create: if isSignedIn();
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Compassion Resources ────────────────────────────────────────
-      match /compassionResources/{resourceId} {
-        // Read: any church member
-        allow read: if isSignedIn();
-
-        // Create/Update: leader+
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Outreach Contacts ──────────────────────────────────────────
-      match /outreachContacts/{contactId} {
-        // Read: leader+
-        allow read: if isSignedIn() && isLeaderOrAbove();
-
-        // Create: any church member (public form submissions too)
-        allow create: if isSignedIn();
-
-        // Update: creator, assignee, or leader+
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || resource.data.assignedTo == userEmail()
-          || isLeaderOrAbove()
-        );
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Outreach Campaigns ─────────────────────────────────────────
-      match /outreachCampaigns/{campaignId} {
-        // Read: any church member
-        allow read: if isSignedIn();
-
-        // Create: leader+
-        allow create: if isSignedIn() && isLeaderOrAbove();
-
-        // Update: creator or pastor/admin
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Outreach Follow-Ups ────────────────────────────────────────
-      match /outreachFollowUps/{followUpId} {
-        // Read: leader+
-        allow read: if isSignedIn() && isLeaderOrAbove();
-
-        // Create: any church member
-        allow create: if isSignedIn();
-
-        // Update: creator or leader+
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isLeaderOrAbove()
-        );
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Events ────────────────────────────────────────────────────────
-      match /events/{eventId} {
-        // Read: any church member (public events visible to all members)
-        allow read: if isSignedIn();
-
-        // Create: leader+ can create events
-        allow create: if isSignedIn() && isLeaderOrAbove();
-
-        // Update: creator or leader+
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isLeaderOrAbove()
-        );
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Event RSVPs ─────────────────────────────────────────────────
-      match /rsvps/{rsvpId} {
-        // Read: any church member
-        allow read: if isSignedIn();
-
-        // Create: any church member can RSVP
-        allow create: if isSignedIn();
-
-        // Update: own RSVP or pastor/admin
-        allow update: if isSignedIn() && (
-          resource.data.memberId == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Delete: own RSVP or pastor/admin
-        allow delete: if isSignedIn() && (
-          resource.data.memberId == userEmail()
-          || isPastorOrAdmin()
-        );
-      }
-
-      // ── Personal Calendar Events ────────────────────────────────────
-      match /calendarEvents/{calEventId} {
-        // Read: own events, delegated-to, or pastor/admin
-        allow read: if isSignedIn() && (
-          resource.data.email == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Create: any church member can create personal events
-        allow create: if isSignedIn();
-
-        // Update: own events or pastor/admin
-        allow update: if isSignedIn() && (
-          resource.data.email == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Delete: own events or pastor/admin
-        allow delete: if isSignedIn() && (
-          resource.data.email == userEmail()
-          || isPastorOrAdmin()
-        );
-      }
-
-      // ── Groups ──────────────────────────────────────────────────────
-      match /groups/{groupId} {
-        // Read: any church member
-        allow read: if isSignedIn();
-
-        // Create/Update: leader or above
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-
-        // ── Group Members (subcollection) ───────────────────────────
-        match /members/{memberId} {
-          allow read: if isSignedIn();
-          allow create, update: if isSignedIn() && isLeaderOrAbove();
-          allow delete: if isSignedIn() && isLeaderOrAbove();
-        }
-      }
-
-      // ── Attendance ──────────────────────────────────────────────────
-      match /attendance/{attendanceId} {
-        // Read: any church member
-        allow read: if isSignedIn();
-
-        // Create: leader or above
-        allow create: if isSignedIn() && isLeaderOrAbove();
-
-        // Update: leader or above
-        allow update: if isSignedIn() && isLeaderOrAbove();
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Check-In Sessions ──────────────────────────────────────────
-      match /checkinSessions/{sessionId} {
-        // Read: any church member
-        allow read: if isSignedIn();
-
-        // Create (open session): leader or above
-        allow create: if isSignedIn() && isLeaderOrAbove();
-
-        // Update (close session, add checkins): leader or above
-        allow update: if isSignedIn() && isLeaderOrAbove();
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Volunteers ──────────────────────────────────────────────────
-      match /volunteers/{volunteerId} {
-        // Read: any church member
-        allow read: if isSignedIn();
-
-        // Create/Update: leader or above
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Ministries ─────────────────────────────────────────────────
-      match /ministries/{ministryId} {
-        // Read: any church member
-        allow read: if isSignedIn();
-
-        // Create/Update: leader or above
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Service Plans ──────────────────────────────────────────────
-      match /servicePlans/{planId} {
-        // Read: any church member
-        allow read: if isSignedIn();
-
-        // Create/Update: leader or above
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Quarterly Worship Plans (draft data for the quarterly planner) ─
-      match /quarterlyPlans/{planId} {
-        allow read: if isSignedIn() && isLeaderOrAbove();
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Songs ──────────────────────────────────────────────────────
-      match /songs/{songId} {
-        // Read: any church member
-        allow read: if isSignedIn();
-
-        // Create/Update: leader or above
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Sermons ────────────────────────────────────────────────────
-      match /sermons/{sermonId} {
-        // Read: any church member
-        allow read: if isSignedIn();
-
-        // Create: leader or above
-        allow create: if isSignedIn() && isLeaderOrAbove();
-
-        // Update: leader or above (submit/approve/deliver/upload)
-        allow update: if isSignedIn() && isLeaderOrAbove();
-
-        // Delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Sermon Series ──────────────────────────────────────────────
-      match /sermonSeries/{seriesId} {
-        allow read: if isSignedIn();
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Sermon Reviews ─────────────────────────────────────────────
-      match /sermonReviews/{reviewId} {
-        // Read: leader or above (reviews may contain private notes)
-        allow read: if isSignedIn() && isLeaderOrAbove();
-
-        // Create: any church member can write a review
-        allow create: if isSignedIn();
-
-        // Update/Delete: pastor/admin only
-        allow update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Giving ──────────────────────────────────────────────────────
-      match /giving/{giftId} {
-        // Read: own records or leader+
-        allow read: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || resource.data.memberId == request.auth.uid
-          || isLeaderOrAbove()
-        );
-
-        // Create: leader or above
-        allow create: if isSignedIn() && isLeaderOrAbove();
-
-        // Update/Delete: leader or above
-        allow update, delete: if isSignedIn() && isLeaderOrAbove();
-      }
-
-      // ── Pledges ────────────────────────────────────────────────────
-      match /pledges/{pledgeId} {
-        // Read: own records or leader+
-        allow read: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || resource.data.memberId == request.auth.uid
-          || isLeaderOrAbove()
-        );
-
-        // Create: leader or above
-        allow create: if isSignedIn() && isLeaderOrAbove();
-
-        // Update/Delete: leader or above
-        allow update, delete: if isSignedIn() && isLeaderOrAbove();
-      }
-
-      // ── Journal ───────────────────────────────────────────────────
-      match /journal/{entryId} {
-        // Read: own entries or pastor/admin
-        allow read: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Create: any church member
-        allow create: if isSignedIn();
-
-        // Update/Delete: owner or pastor/admin
-        allow update, delete: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isPastorOrAdmin()
-        );
-      }
-
-      // ── Strategic Plan — Goals ─────────────────────────────────────
-      // Used by views/the_weavers_plan. Visible to all members; mutable
-      // by leader+ (creator can edit own; pastor/admin manage all).
-      match /strategicGoals/{goalId} {
-        allow read: if isSignedIn();
-        allow create: if isSignedIn() && isLeaderOrAbove();
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isLeaderOrAbove()
-        );
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Strategic Plan — Initiatives ───────────────────────────────
-      match /strategicInitiatives/{initId} {
-        allow read: if isSignedIn();
-        allow create: if isSignedIn() && isLeaderOrAbove();
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isLeaderOrAbove()
-        );
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Strategic Plan — Key Dates ─────────────────────────────────
-      match /strategicKeyDates/{kdId} {
-        allow read: if isSignedIn();
-        allow create: if isSignedIn() && isLeaderOrAbove();
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isLeaderOrAbove()
-        );
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Discipleship Paths ─────────────────────────────────────────
-      match /discipleshipPaths/{pathId} {
-        allow read: if isSignedIn();
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Discipleship Steps ─────────────────────────────────────────
-      match /discipleshipSteps/{stepId} {
-        allow read: if isSignedIn();
-        allow create, update, delete: if isSignedIn() && isLeaderOrAbove();
-      }
-
-      // ── Discipleship Enrollments ───────────────────────────────────
-      match /discipleshipEnrollments/{enrollId} {
-        allow read: if isSignedIn();
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Discipleship Mentoring ─────────────────────────────────────
-      match /discipleshipMentoring/{pairId} {
-        allow read: if isSignedIn();
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Discipleship Meetings ──────────────────────────────────────
-      match /discipleshipMeetings/{meetingId} {
-        allow read: if isSignedIn();
-        allow create: if isSignedIn();
-        allow update, delete: if isSignedIn() && isLeaderOrAbove();
-      }
-
-      // ── Discipleship Goals ─────────────────────────────────────────
-      match /discipleshipGoals/{goalId} {
-        allow read: if isSignedIn();
-        allow create: if isSignedIn();
-        allow update: if isSignedIn() && (
-          resource.data.createdBy == userEmail()
-          || isLeaderOrAbove()
-        );
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Discipleship Assessments ───────────────────────────────────
-      match /discipleshipAssessments/{assessId} {
-        allow read: if isSignedIn();
-        allow create: if isSignedIn() && isLeaderOrAbove();
-        allow update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Discipleship Milestones ────────────────────────────────────
-      match /discipleshipMilestones/{milestoneId} {
-        allow read: if isSignedIn();
-        allow create: if isSignedIn() && isLeaderOrAbove();
-        allow update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Discipleship Certificates ──────────────────────────────────
-      match /discipleshipCertificates/{certId} {
-        allow read: if isSignedIn();
-        allow create: if isSignedIn() && isLeaderOrAbove();
-        allow update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ═════════════════════════════════════════════════════════════════
-      // LEARNING
-      // ═══════════════════════════════════════════════════════════════════
-
-      // ── Learning Topics ────────────────────────────────────────────
-      match /learningTopics/{topicId} {
-        allow read: if isSignedIn();
-        allow create, update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Learning Playlists ─────────────────────────────────────────
-      match /learningPlaylists/{playlistId} {
-        allow read: if isSignedIn();
-        allow create, update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Learning Playlist Items ────────────────────────────────────
-      match /learningPlaylistItems/{itemId} {
-        allow read: if isSignedIn();
-        allow create, update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Learning Quizzes ───────────────────────────────────────────
-      match /learningQuizzes/{quizId} {
-        allow read: if isSignedIn();
-        allow create, update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Learning Quiz Results ──────────────────────────────────────
-      match /learningQuizResults/{resultId} {
-        allow read: if isSignedIn()
-                    && (resource.data.memberId == request.auth.uid || isPastorOrAdmin());
-        allow create: if isSignedIn();
-        allow update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Learning Recommendations ───────────────────────────────────
-      match /learningRecommendations/{recId} {
-        allow read: if isSignedIn();
-        allow create, update: if isSignedIn() && isPastorOrAdmin();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Learning Progress ──────────────────────────────────────────
-      match /learningProgress/{progressId} {
-        allow read: if isSignedIn()
-                    && (resource.data.memberId == request.auth.uid || isPastorOrAdmin());
-        allow create: if isSignedIn();
-        allow update: if isSignedIn()
-                      && (resource.data.memberId == request.auth.uid || isPastorOrAdmin());
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Learning Notes ─────────────────────────────────────────────
-      match /learningNotes/{noteId} {
-        allow read: if isSignedIn()
-                    && (resource.data.memberId == request.auth.uid || isPastorOrAdmin());
-        allow create: if isSignedIn();
-        allow update, delete: if isSignedIn()
-                              && (resource.data.memberId == request.auth.uid || isPastorOrAdmin());
-      }
-
-      // ── Learning Certificates ──────────────────────────────────────
-      match /learningCertificates/{certId} {
-        allow read: if isSignedIn();
-        allow create: if isSignedIn();
-        allow update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ═════════════════════════════════════════════════════════════════
-      // THEOLOGY
-      // ═════════════════════════════════════════════════════════════════
-
-      // ── Theology Categories ────────────────────────────────────────
-      match /theologyCategories/{catId} {
-        allow read: if isSignedIn();
-        allow create, update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Theology Sections ──────────────────────────────────────────
-      match /theologySections/{secId} {
-        allow read: if isSignedIn();
-        allow create, update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Albums ─────────────────────────────────────────────────────
-      match /albums/{albumId} {
-        allow read: if isSignedIn();
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Statistics Config ──────────────────────────────────────────
-      match /statisticsConfig/{configId} {
-        allow read: if isSignedIn() && isLeaderOrAbove();
-        allow create, update, delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Statistics Snapshots ───────────────────────────────────────
-      match /statisticsSnapshots/{snapId} {
-        allow read: if isSignedIn() && isLeaderOrAbove();
-        allow create: if isSignedIn() && isLeaderOrAbove();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Statistics Views ───────────────────────────────────────────
-      match /statisticsViews/{viewId} {
-        allow read: if isSignedIn() && isLeaderOrAbove();
-        allow create, update, delete: if isSignedIn() && isLeaderOrAbove();
-      }
-
-      // ── Missions Registry ──────────────────────────────────────────
-      match /missionsRegistry/{docId} {
-        allow read: if isSignedIn();
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Missions Partners ─────────────────────────────────────────
-      match /missionsPartners/{docId} {
-        allow read: if isSignedIn();
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Missions Prayer Focus ─────────────────────────────────────
-      match /missionsPrayerFocus/{docId} {
-        allow read: if isSignedIn();
-        allow create, update: if isSignedIn();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Missions Updates ──────────────────────────────────────────
-      match /missionsUpdates/{docId} {
-        allow read: if isSignedIn();
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── Missions Teams ────────────────────────────────────────────
-      match /missionsTeams/{docId} {
-        allow read: if isSignedIn();
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── App Config ─────────────────────────────────────────────────
-      match /appConfig/{configKey} {
-        allow read: if isSignedIn();
-        allow create, update: if isSignedIn() && isPastorOrAdmin();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ── User Preferences ──────────────────────────────────────────
-      match /preferences/{prefDocId} {
-        allow read: if isSignedIn() && prefDocId == userEmail().replace('[^a-zA-Z0-9@._-]', '_');
-        allow write: if isSignedIn() && prefDocId == userEmail().replace('[^a-zA-Z0-9@._-]', '_');
-      }
-
-      // ── Contact Log ───────────────────────────────────────────────
-      match /contactLog/{docId} {
-        allow read: if isLeaderOrAbove();
-        allow create: if isLeaderOrAbove();
-        allow update: if isLeaderOrAbove();
-        allow delete: if isPastorOrAdmin();
-      }
-
-      // ── Pastoral Notes ────────────────────────────────────────────
-      match /pastoralNotes/{docId} {
-        allow read: if isPastorOrAdmin();
-        allow create: if isLeaderOrAbove();
-        allow update: if isPastorOrAdmin();
-        allow delete: if isPastorOrAdmin();
-      }
-
-      // ── Milestones ────────────────────────────────────────────────
-      match /milestones/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isLeaderOrAbove();
-      }
-
-      // ── Households ────────────────────────────────────────────────
-      match /households/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isLeaderOrAbove();
-      }
-
-      // ── Audit Log ─────────────────────────────────────────────────
-      match /auditLog/{docId} {
-        allow read: if isPastorOrAdmin();
-        allow write: if false;  // written by Cloud Functions / admin only
-      }
-
-      // ── Access Control ────────────────────────────────────────────
-      match /accessControl/{docId} {
-        allow read: if isPastorOrAdmin();
-        allow write: if isPastorOrAdmin();
-      }
-
-      // ── Member Card Views ─────────────────────────────────────────
-      match /memberCardViews/{docId} {
-        allow read: if isLeaderOrAbove();
-        allow create: if isSignedIn();
-      }
-
-      // ── Member Card Links (subcollection) ─────────────────────────
-      match /memberCards/{cardId}/links/{linkId} {
-        allow read: if isSignedIn();
-        allow create, update: if isLeaderOrAbove();
-        allow delete: if isLeaderOrAbove();
-      }
-
-      // ── Problems (Software Issue Tracker) ─────────────────────────
-      // Internal admin tool — syncs to GitHub Issues via Cloud Function.
-      // Only pastor/admin can read or write problems.
-      match /problems/{problemId} {
-        allow read: if isSignedIn() && isPastorOrAdmin();
-        allow create: if isSignedIn() && isPastorOrAdmin();
-        allow update: if isSignedIn() && isPastorOrAdmin();
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
-
-      // ═════════════════════════════════════════════════════════════════
-      // TRUTH CONTENT (edited via TheTruth — Firestore-backed)
-      // Collections: theology, devotionals, apologetics, counseling,
-      //              genealogy, words, heart, reading, quiz, books, mirror
-      // Read: any signed-in user (anonymous included for seed DB)
-      // Write: any signed-in user (pastor/admin gated in app layer)
-      // ═════════════════════════════════════════════════════════════════
-
-      match /theology/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /devotionals/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /apologetics/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /counseling/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /genealogy/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /words/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /heart/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /reading/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /quiz/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /books/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /mirror/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /teachingPlans/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /lexiconGreek/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-      match /lexiconHebrew/{docId} {
-        allow read: if isSignedIn();
-        allow write: if isSignedIn();
-      }
-
-    // ════════════════════════════════════════════════════════════════
-    // GLOBAL COLLECTIONS
-    // ═══════════════════════════════════════════════════════════════════
-
-    // ── App Config (maintenance flag) ──────────────────────────────────
-    // Public read so the maintenance check works before auth.
-    // Only pastor/admin can toggle maintenance mode.
-    match /appConfig/{docId} {
-      allow read: if true;
-      allow write: if isSignedIn() && isPastorOrAdmin();
+    
+    // ── Service Plans ──────────────────────────────────────────
+    match /servicePlans/{planId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    // ── Master Config ──────────────────────────────────────────────────
-    // Cross-church config defaults editable by admin/pastor.
-    // Written locally and fanned out to all church GAS endpoints.
-    match /masterConfig/{configKey} {
-      allow read: if isSignedIn();
-      allow write: if isSignedIn() && isPastorOrAdmin();
+    
+    // ── Quarterly Plans ────────────────────────────────────────
+    match /quarterlyPlans/{planId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    // ── Deployment Configs (bezalel.html — seed admin only) ───────────
-    // Non-secret deployment config snapshots saved from the Script
-    // Properties Generator. Secrets (SYNC_SECRET, FIREBASE_SA, etc.)
-    // are NEVER written here — filtered client-side before save.
-    match /deployConfigs/{configId} {
-      allow read, write: if isSignedIn() && isPastorOrAdmin();
+    
+    // ── Songs ──────────────────────────────────────────────────
+    match /songs/{songId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    // ── Church Vault (bezalel + Great Commission) ─────────────────────
-    // Per-church deployment notes and credential pairs.
-    // Accessible to pastors, admins, and seed admins (Master group is
-    // resolved client-side; the token carries the 'pastor' role).
-    match /churchVault/{churchId} {
-      allow read, write: if isSignedIn() && isPastorOrAdmin();
+    
+    // ── Sermons ────────────────────────────────────────────────
+    match /sermons/{sermonId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    // ── App Content / Devotionals ──────────────────────────────────────
-    // Static reference data (books, devotionals, genealogy, etc.)
-    // shared across all churches – read-only for authenticated users.
-    match /appContent/{type}/items/{itemId} {
-      allow read: if isSignedIn();
-      allow write: if false;          // seeded by admin scripts only
+    
+    // ── Sermon Series ──────────────────────────────────────────
+    match /sermonSeries/{seriesId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    // ── FlockChat Rooms ─────────────────────────────────────────────────
-    match /flockchat_rooms/{roomId} {
-      // Read: any member (room list is browsable; DMs filtered client-side)
-      allow read: if isSignedIn();
-
-      // Create: any church member can create a room or DM
-      allow create: if isSignedIn();
-
-      // Update: members, creator, or pastor/admin
-      allow update: if isSignedIn() && (
-        userEmail() in resource.data.members
-        || resource.data.createdBy == userEmail()
-        || isPastorOrAdmin()
-      );
-
-      // Delete: creator or pastor/admin only
-      allow delete: if isSignedIn() && (
-        resource.data.createdBy == userEmail()
-        || isPastorOrAdmin()
-      );
-
-      // ── FlockChat Messages sub-collection ─────────────────────────
-      match /messages/{msgId} {
-        // Read: any church member who can access the room
-        allow read: if isSignedIn();
-
-        // Create: any church member
-        allow create: if isSignedIn();
-
-        // Update (soft-delete): sender can mark _deleted, or pastor/admin
-        allow update: if isSignedIn() && (
-          resource.data.sender == userEmail()
-          || isPastorOrAdmin()
-        );
-
-        // Hard delete: pastor/admin only
-        allow delete: if isSignedIn() && isPastorOrAdmin();
-      }
+    
+    // ── Sermon Reviews ─────────────────────────────────────────
+    match /sermonReviews/{reviewId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    // ── FlockChat Presence ──────────────────────────────────────────────
-    match /flockchat_presence/{uid} {
-      // Read: any member can see who's online
-      allow read: if isSignedIn();
-
-      // Write: own presence only
-      allow write: if isSignedIn() && uid == userEmail();
+    
+    // ── Giving ─────────────────────────────────────────────────
+    match /giving/{recordId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    // ── FlockChat Announcements ─────────────────────────────────────────
-    match /flockchat_announcements/{annId} {
-      // Read: any church member
-      allow read: if isSignedIn();
-
-      // Create: leader+ can post announcements
-      allow create: if isSignedIn() && isLeaderOrAbove();
-
-      // Update: sender (mark read) or pastor/admin
-      allow update: if isSignedIn() && (
-        resource.data.sender == userEmail()
-        || isPastorOrAdmin()
-      );
-
-      // Delete: pastor/admin only
-      allow delete: if isSignedIn() && isPastorOrAdmin();
+    
+    // ── Pledges ────────────────────────────────────────────────
+    match /pledges/{pledgeId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    // ── Phase 4: Counter Documents ──────────────────────────────────────
-    // Written only by Cloud Functions via Admin SDK; clients read only.
-    match /_counters/{counterId} {
-      allow read: if isSignedIn();
-      allow write: if false;  // Admin SDK bypasses rules
+    
+    // ── Events ─────────────────────────────────────────────────
+    match /events/{eventId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    // ── Phase 4: Aggregations ──────────────────────────────────────────
-    // Pre-computed rollups (giving summary, etc.)
-    match /_aggregations/{aggId} {
-      allow read: if isSignedIn();
-      allow write: if false;  // Admin SDK bypasses rules
+    
+    // ── Attendance ─────────────────────────────────────────────
+    match /attendance/{recordId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    // ── Phase 4: Delete Requests ────────────────────────────────────────
-    // Pastor/admin writes a request; Cloud Function handles cascade
-    match /_deleteRequests/{requestId} {
-      allow read: if isSignedIn() && isPastorOrAdmin();
-      allow create: if isSignedIn() && isPastorOrAdmin();
-      allow update, delete: if false;  // Only Cloud Functions update these
+    
+    // ── Conversations ──────────────────────────────────────────
+    match /conversations/{conversationId} {
+      allow read, create, update, delete: if isSignedIn();
     }
-
-    // Deny everything else
+    
+    // ── Messages ───────────────────────────────────────────────
+    match /messages/{messageId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    // ── Care Notes ─────────────────────────────────────────────
+    match /care/{noteId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    // ── Compassion ─────────────────────────────────────────────
+    match /compassion/{recordId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    // ── Outreach ───────────────────────────────────────────────
+    match /outreach/{recordId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    // ── Touches ────────────────────────────────────────────────
+    match /touches/{touchId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    // ── Prayer Requests ────────────────────────────────────────
+    match /prayers/{prayerId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    // ── Strategic Planning ─────────────────────────────────────
+    match /strategicGoals/{goalId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /strategicInitiatives/{initiativeId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /strategicDates/{dateId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    // ── Discipleship ───────────────────────────────────────────
+    match /discipleshipPaths/{pathId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /discipleshipSteps/{stepId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /discipleshipEnrollments/{enrollmentId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    // ── Teaching & Growth ──────────────────────────────────────
+    match /devotionals/{devotionalId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /readingPlans/{planId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /teachingPlans/{planId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    // ── Missions ───────────────────────────────────────────────
+    match /missionTrips/{tripId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /missionPartners/{partnerId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /missionProjects/{projectId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /missionUpdates/{updateId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    // ── Library ────────────────────────────────────────────────
+    match /theology/{docId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /apologetics/{docId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /counseling/{docId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /books/{bookId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /psalms/{psalmId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /words/{wordId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /library/{docId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    // ── System & Stats ─────────────────────────────────────────
+    match /todos/{todoId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /journal/{entryId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /stats/{statId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    match /settings/{settingId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+    
+    // ── Catch-all for any other collections ────────────────────
     match /{document=**} {
-      allow read, write: if false;
+      allow read, create, update, delete: if isSignedIn();
     }
   }
 }
