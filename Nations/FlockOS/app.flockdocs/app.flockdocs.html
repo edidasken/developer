@@ -448,6 +448,9 @@
     .fd-doc-icon.fd-doc-sheet {
       background: linear-gradient(135deg, #16a34a, #15803d);
     }
+    .fd-doc-icon.fd-doc-pres {
+      background: linear-gradient(135deg, #ea580c, #dc2626);
+    }
 
     /* ── Spreadsheet editor view ─────────────────────────────────────────── */
     .fd-sheet-view {
@@ -1754,6 +1757,315 @@
     @keyframes fd-spin {
       to { transform: rotate(360deg); }
     }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       SESSION 8: FLOCKSLIDES
+       ══════════════════════════════════════════════════════════════════════ */
+
+    /* ── Slides view layout ───────────────────────────────────────────────── */
+    .fd-slides-view {
+      display: flex; flex-direction: column;
+      flex: 1; overflow: hidden;
+    }
+    .fd-slides-toolbar {
+      display: flex; align-items: center; gap: 4px;
+      padding: 6px 12px;
+      background: var(--bg-raised);
+      border-bottom: 1px solid var(--line);
+      flex-shrink: 0; flex-wrap: wrap;
+      min-height: 46px;
+    }
+    .fd-slides-name-input {
+      border: none; outline: none;
+      background: transparent;
+      font: 600 0.9rem var(--font-ui);
+      color: var(--ink);
+      min-width: 160px; max-width: 260px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: background 150ms;
+    }
+    .fd-slides-name-input:hover, .fd-slides-name-input:focus {
+      background: rgba(255,255,255,0.06);
+    }
+    .fd-slides-body {
+      display: flex; flex: 1; overflow: hidden;
+    }
+
+    /* ── Thumbnail sidebar ─────────────────────────────────────────────────── */
+    .fd-slides-sidebar {
+      width: 172px; flex-shrink: 0;
+      overflow-y: auto; overflow-x: hidden;
+      border-right: 1px solid var(--line);
+      padding: 10px 8px;
+      display: flex; flex-direction: column; gap: 8px;
+      background: var(--bg-raised);
+    }
+    .fd-slide-thumb-wrap {
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .fd-slide-thumb-num {
+      font: 500 0.625rem var(--font-ui);
+      color: var(--ink-muted);
+      text-align: center;
+      margin-bottom: 3px;
+      line-height: 1;
+    }
+    .fd-slide-thumb {
+      width: 156px; height: 88px;
+      border-radius: 6px;
+      border: 2px solid var(--line);
+      overflow: hidden;
+      position: relative;
+      transition: border-color 150ms;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+    .fd-slide-thumb.is-active {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.25);
+    }
+    .fd-slide-thumb:hover:not(.is-active) {
+      border-color: var(--ink-muted);
+    }
+    .fd-slide-thumb-inner {
+      width: 960px; height: 540px;
+      transform: scale(0.1625);
+      transform-origin: 0 0;
+      pointer-events: none;
+    }
+    .fd-slides-add-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      width: 156px;
+      padding: 7px 0;
+      background: transparent;
+      border: 1.5px dashed var(--line);
+      border-radius: 6px;
+      font: 500 0.813rem var(--font-ui);
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: border-color 150ms, color 150ms;
+    }
+    .fd-slides-add-btn:hover {
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    /* ── Canvas area ───────────────────────────────────────────────────────── */
+    .fd-slides-canvas-wrap {
+      flex: 1; display: flex;
+      align-items: center; justify-content: center;
+      overflow: hidden;
+      background: #e2e8f0;
+      position: relative;
+    }
+    .fd-slides-canvas {
+      position: relative;
+      width: 960px; height: 540px;
+      overflow: hidden;
+      transform-origin: center center;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.3);
+      cursor: default;
+    }
+    .fd-slide-bg {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* ── Slide elements ────────────────────────────────────────────────────── */
+    .fd-slide-element {
+      position: absolute;
+      cursor: move;
+      box-sizing: border-box;
+    }
+    .fd-slide-element.is-selected {
+      outline: 2px solid #3b82f6;
+      outline-offset: 1px;
+    }
+    .fd-slide-element.is-selected::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      pointer-events: none;
+    }
+    .fd-slide-text-el {
+      overflow: hidden;
+      padding: 4px 6px;
+    }
+    .fd-slide-text-el[contenteditable="true"] {
+      cursor: text;
+      outline: 2px solid #3b82f6;
+    }
+    .fd-slide-img-el {
+      overflow: hidden;
+    }
+    .fd-slide-img-el img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+
+    /* Resize handles */
+    .fd-resize-handle {
+      position: absolute;
+      width: 10px; height: 10px;
+      background: #fff;
+      border: 2px solid #3b82f6;
+      border-radius: 2px;
+      z-index: 10;
+    }
+    .fd-resize-handle[data-handle="nw"] { top:-5px; left:-5px; cursor:nw-resize; }
+    .fd-resize-handle[data-handle="ne"] { top:-5px; right:-5px; cursor:ne-resize; }
+    .fd-resize-handle[data-handle="sw"] { bottom:-5px; left:-5px; cursor:sw-resize; }
+    .fd-resize-handle[data-handle="se"] { bottom:-5px; right:-5px; cursor:se-resize; }
+
+    /* ── Toolbar popups ────────────────────────────────────────────────────── */
+    .fd-slides-popup {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      z-index: 600;
+      background: var(--bg-raised);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+    }
+    .fd-theme-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .fd-theme-btn {
+      width: 72px; height: 50px;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding-bottom: 5px;
+      font: 600 0.688rem var(--font-ui);
+      transition: border-color 150ms;
+      overflow: hidden;
+      position: relative;
+    }
+    .fd-theme-btn.is-active {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.25);
+    }
+    .fd-theme-btn span {
+      position: relative; z-index: 1;
+    }
+    .fd-transition-list {
+      display: flex; flex-direction: column; gap: 4px;
+      min-width: 150px;
+    }
+    .fd-transition-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 10px;
+      background: transparent;
+      border: 0; border-radius: 7px;
+      font: 500 0.875rem var(--font-ui);
+      color: var(--ink);
+      cursor: pointer; text-align: left;
+      transition: background 150ms;
+    }
+    .fd-transition-item:hover, .fd-transition-item.is-active {
+      background: rgba(59,130,246,0.08);
+      color: #3b82f6;
+    }
+
+    /* ── Slide save status ─────────────────────────────────────────────────── */
+    #fd-slides-save-status {
+      font: 500 0.813rem var(--font-ui);
+      color: var(--ink-muted);
+      padding: 0 8px;
+    }
+
+    /* ── Presenter mode overlay ────────────────────────────────────────────── */
+    .fd-presenter-overlay {
+      position: fixed; inset: 0; z-index: 9500;
+      background: #000;
+      display: flex; flex-direction: column;
+    }
+    .fd-presenter-slide-wrap {
+      flex: 1; display: flex;
+      align-items: center; justify-content: center;
+      overflow: hidden;
+      padding: 24px;
+    }
+    .fd-presenter-canvas {
+      position: relative;
+      transform-origin: center center;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    .fd-presenter-controls {
+      display: flex; align-items: center; justify-content: center;
+      gap: 16px;
+      padding: 14px 24px;
+      background: rgba(0,0,0,0.8);
+      flex-shrink: 0;
+    }
+    .fd-presenter-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      color: #fff;
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .fd-presenter-btn:hover { background: rgba(255,255,255,0.2); }
+    .fd-presenter-btn:disabled { opacity: 0.3; cursor: default; }
+    .fd-presenter-counter {
+      font: 500 1rem var(--font-ui);
+      color: rgba(255,255,255,0.7);
+      min-width: 80px; text-align: center;
+    }
+    .fd-presenter-exit-btn {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font: 600 0.813rem var(--font-ui);
+      color: #fff;
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .fd-presenter-exit-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* ── Print: each slide = one page ──────────────────────────────────────── */
+    @media print {
+      body > *:not(.fd-slides-print-root) { display: none !important; }
+      .fd-slides-print-root {
+        display: block !important;
+      }
+      .fd-slides-print-page {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        page-break-after: always;
+        overflow: hidden;
+        position: relative;
+      }
+      .fd-slides-print-page:last-child { page-break-after: avoid; }
+    }
+
+    /* ── Presenter transition animations ───────────────────────────────────── */
+    @keyframes fd-slide-fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes fd-slide-slide-in {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    @keyframes fd-slide-zoom-in {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -1802,6 +2114,12 @@
                 <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-2h2v2zm0-4H7v-2h2v2zm0-4H7V7h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
               </svg>
               Spreadsheet
+            </button>
+            <button class="fd-new-menu-item" onclick="FlockDocs.createNewPresentation()">
+              <svg fill="white" viewBox="0 0 24 24" width="20" height="20" style="background:linear-gradient(135deg,#ea580c,#dc2626);border-radius:4px;padding:2px">
+                <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/>
+              </svg>
+              Presentation
             </button>
             <button class="fd-new-menu-item" onclick="FlockDocs.showTemplatePicker()">
               <svg fill="white" viewBox="0 0 24 24" width="20" height="20" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);border-radius:4px;padding:2px">
@@ -2612,6 +2930,164 @@
       </div><!-- /#fd-chart-modal-overlay -->
 
     </div><!-- /#fd-main -->
+
+      <!-- ════════════════════════════════════════════════════════════════
+           SESSION 8: FLOCKSLIDES VIEW
+           ════════════════════════════════════════════════════════════════ -->
+
+      <!-- Slides editor view -->
+      <div class="fd-slides-view hidden" id="fd-slides-view">
+
+        <!-- Slides toolbar -->
+        <div class="fd-slides-toolbar">
+          <!-- Back -->
+          <button class="fd-toolbar-btn" id="fd-slides-back-btn" title="Back to library">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+          </button>
+          <div class="fd-toolbar-divider"></div>
+          <input type="text" class="fd-slides-name-input" id="fd-slides-name" value="Untitled Presentation" placeholder="Presentation name">
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Add text box -->
+          <button class="fd-toolbar-btn" id="fd-slides-add-text-btn" title="Add text box">
+            <svg fill="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path d="M5 4v3h5.5v12h3V7H19V4H5z"/>
+            </svg>
+          </button>
+
+          <!-- Add image -->
+          <button class="fd-toolbar-btn" id="fd-slides-add-image-btn" title="Add image">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </button>
+          <input type="file" id="fd-slide-img-input" accept="image/*" class="hidden">
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Theme picker -->
+          <div class="fd-popup-anchor" id="fd-slides-theme-wrap">
+            <button class="fd-toolbar-btn" id="fd-slides-theme-btn" title="Change theme" style="gap:5px;padding:5px 10px;font:600 0.813rem var(--font-ui)">
+              🎨 Theme
+            </button>
+            <div class="fd-slides-popup hidden" id="fd-slides-theme-popup" style="min-width:260px">
+              <div style="font:600 0.75rem var(--font-ui);color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Choose Theme</div>
+              <div class="fd-theme-grid" id="fd-theme-grid">
+                <button class="fd-theme-btn" data-theme="default" style="background:#ffffff;color:#1f2937"><span>Default</span></button>
+                <button class="fd-theme-btn" data-theme="midnight" style="background:#1e1b4b;color:#e0e7ff"><span>Midnight</span></button>
+                <button class="fd-theme-btn" data-theme="ocean" style="background:#0c4a6e;color:#e0f2fe"><span>Ocean</span></button>
+                <button class="fd-theme-btn" data-theme="forest" style="background:#14532d;color:#dcfce7"><span>Forest</span></button>
+                <button class="fd-theme-btn" data-theme="sunset" style="background:#7c2d12;color:#ffedd5"><span>Sunset</span></button>
+                <button class="fd-theme-btn" data-theme="slate" style="background:#f8fafc;color:#334155"><span>Slate</span></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transition picker -->
+          <div class="fd-popup-anchor" id="fd-slides-trans-wrap">
+            <button class="fd-toolbar-btn" id="fd-slides-trans-btn" title="Slide transition" style="gap:5px;padding:5px 10px;font:600 0.813rem var(--font-ui)">
+              ✨ Transition
+            </button>
+            <div class="fd-slides-popup hidden" id="fd-slides-trans-popup">
+              <div style="font:600 0.75rem var(--font-ui);color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">Slide Transition</div>
+              <div class="fd-transition-list">
+                <button class="fd-transition-item" data-transition="none">⬜ None</button>
+                <button class="fd-transition-item" data-transition="fade">🌫 Fade</button>
+                <button class="fd-transition-item" data-transition="slide">➡ Slide</button>
+                <button class="fd-transition-item" data-transition="zoom">🔍 Zoom</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Add slide -->
+          <button class="fd-toolbar-btn" id="fd-slides-add-slide-btn" title="Add new slide">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+          </button>
+
+          <!-- Delete slide -->
+          <button class="fd-toolbar-btn" id="fd-slides-del-slide-btn" title="Delete current slide">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </button>
+
+          <!-- Duplicate slide -->
+          <button class="fd-toolbar-btn" id="fd-slides-dup-slide-btn" title="Duplicate slide">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+          </button>
+
+          <div class="fd-spacer"></div>
+
+          <span id="fd-slides-save-status">All changes saved</span>
+
+          <!-- Export PDF -->
+          <button class="fd-io-btn" id="fd-slides-export-pdf-btn" style="padding:5px 12px">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4"/>
+            </svg>
+            Export PDF
+          </button>
+
+          <!-- Present -->
+          <button class="fd-btn" id="fd-slides-present-btn" style="padding:6px 14px;font-size:0.813rem;gap:5px">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Present
+          </button>
+        </div>
+
+        <!-- Slides body -->
+        <div class="fd-slides-body">
+
+          <!-- Thumbnail sidebar -->
+          <div class="fd-slides-sidebar" id="fd-slides-sidebar">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Canvas area -->
+          <div class="fd-slides-canvas-wrap" id="fd-slides-canvas-wrap">
+            <div class="fd-slides-canvas" id="fd-slides-canvas">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+        </div><!-- /.fd-slides-body -->
+      </div><!-- /#fd-slides-view -->
+
+      <!-- Presenter mode overlay (hidden by default) -->
+      <div class="fd-presenter-overlay hidden" id="fd-presenter-overlay" style="position:fixed;inset:0;z-index:9500">
+        <div class="fd-presenter-slide-wrap" id="fd-presenter-slide-wrap">
+          <div class="fd-presenter-canvas" id="fd-presenter-canvas" style="width:960px;height:540px;position:relative;overflow:hidden">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        <div class="fd-presenter-controls">
+          <button class="fd-presenter-btn" id="fd-presenter-prev-btn" title="Previous slide (←)" disabled>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="22" height="22">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <span class="fd-presenter-counter" id="fd-presenter-counter">1 / 1</span>
+          <button class="fd-presenter-btn" id="fd-presenter-next-btn" title="Next slide (→)">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="22" height="22">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+        <button class="fd-presenter-exit-btn" id="fd-presenter-exit-btn">✕ Exit (Esc)</button>
+      </div>
     <div id="fd-footer">
       <div>FlockDocs — Productivity Suite for Your Church</div>
       <div id="fd-save-status">All changes saved</div>
