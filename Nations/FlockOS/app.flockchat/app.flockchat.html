@@ -256,10 +256,15 @@
     }
     .fc-pinned-grid {
       display: flex; gap: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 4px;
     }
+    .fc-pinned-grid::-webkit-scrollbar { display: none; }
     .fc-pinned-item {
       display: flex; flex-direction: column; align-items: center;
-      flex: 1; max-width: 88px; gap: 7px;
+      flex: 0 0 auto; width: 72px; gap: 7px;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
     .fc-pinned-bubble {
@@ -298,6 +303,30 @@
     .fc-pinned-bubble.ministry-women {
       background: linear-gradient(145deg, #2d1b69, #a78bfa);
       box-shadow: 0 2px 8px rgba(167,139,250,0.3);
+    }
+    .fc-pinned-bubble.servant-team {
+      background: linear-gradient(145deg, #0c4a6e, #0891b2);
+      box-shadow: 0 2px 8px rgba(8,145,178,0.3);
+    }
+    .fc-pinned-bubble.worship-team {
+      background: linear-gradient(145deg, #1e1b4b, #818cf8);
+      box-shadow: 0 2px 8px rgba(129,140,248,0.3);
+    }
+    .fc-pinned-bubble.missions-team {
+      background: linear-gradient(145deg, #0f3820, #22c55e);
+      box-shadow: 0 2px 8px rgba(34,197,94,0.3);
+    }
+    .fc-pinned-bubble.church-life {
+      background: linear-gradient(145deg, #3b0d1e, #f43f5e);
+      box-shadow: 0 2px 8px rgba(244,63,94,0.3);
+    }
+    .fc-pinned-bubble.stewardship {
+      background: linear-gradient(145deg, #1c1200, #f59e0b);
+      box-shadow: 0 2px 8px rgba(245,158,11,0.3);
+    }
+    .fc-pinned-bubble.outreach {
+      background: linear-gradient(145deg, #0f2d5e, #60a5fa);
+      box-shadow: 0 2px 8px rgba(96,165,250,0.3);
     }
     .fc-pinned-badge {
       position: absolute; top: -1px; right: -1px;
@@ -365,6 +394,30 @@
     .fc-conv-icon.ministry-women {
       background: linear-gradient(135deg, #2d1b69, #a78bfa);
       box-shadow: 0 2px 6px rgba(167,139,250,0.28);
+    }
+    .fc-conv-icon.servant-team {
+      background: linear-gradient(135deg, #0c4a6e, #0891b2);
+      box-shadow: 0 2px 6px rgba(8,145,178,0.28);
+    }
+    .fc-conv-icon.worship-team {
+      background: linear-gradient(135deg, #1e1b4b, #818cf8);
+      box-shadow: 0 2px 6px rgba(129,140,248,0.28);
+    }
+    .fc-conv-icon.missions-team {
+      background: linear-gradient(135deg, #0f3820, #22c55e);
+      box-shadow: 0 2px 6px rgba(34,197,94,0.28);
+    }
+    .fc-conv-icon.church-life {
+      background: linear-gradient(135deg, #3b0d1e, #f43f5e);
+      box-shadow: 0 2px 6px rgba(244,63,94,0.28);
+    }
+    .fc-conv-icon.stewardship {
+      background: linear-gradient(135deg, #1c1200, #f59e0b);
+      box-shadow: 0 2px 6px rgba(245,158,11,0.28);
+    }
+    .fc-conv-icon.outreach {
+      background: linear-gradient(135deg, #0f2d5e, #60a5fa);
+      box-shadow: 0 2px 6px rgba(96,165,250,0.28);
     }
     .fc-user-item.sms .fc-user-avatar {
       background: linear-gradient(135deg, #34d399, #10b981);

@@ -34,6 +34,22 @@
   const MENS_MINISTRY_ID   = 'mens-ministry';
   const WOMENS_MINISTRY_ID = 'womens-ministry';
 
+  // All-member group channels — displayed to every authenticated member,
+  // visible to Lead Pastor + admins by default. Order here = display order.
+  const ALL_MEMBER_GROUPS = [
+    { id: 'servant-team',  type: 'servant-team',  name: 'Servant Team',  welcome: 'Servant Team (Deacons) channel.' },
+    { id: 'worship-team',  type: 'worship-team',  name: 'Worship Team',  welcome: 'Worship Team coordination channel.' },
+    { id: 'missions-team', type: 'missions-team', name: 'Missions Team', welcome: 'Missions Team channel.' },
+    { id: 'church-life',   type: 'church-life',   name: 'Church Life',   welcome: 'Church Life & fellowship channel.' },
+    { id: 'stewardship',   type: 'stewardship',   name: 'Stewardship',   welcome: 'Stewardship & giving channel.' },
+    { id: 'outreach',      type: 'outreach',      name: 'Outreach',      welcome: 'Outreach & evangelism channel. Outreach contacts arrive here.' },
+  ];
+  // Quick-lookup Set of all static group IDs
+  const ALL_GROUP_IDS = new Set([
+    ANNOUNCEMENTS_ID, MENS_MINISTRY_ID, WOMENS_MINISTRY_ID,
+    ...ALL_MEMBER_GROUPS.map(g => g.id)
+  ]);
+
   /* ── State ─────────────────────────────────────────────────────────── */
   let _db = null;
   let _messaging = null;
@@ -56,6 +72,9 @@
   let _mensLastAt       = null;
   let _womensLastSnippet = '';
   let _womensLastAt      = null;
+  // Generic group channel state: id → { snippet, lastAt, unsub }
+  const _grpState = {};
+  ALL_MEMBER_GROUPS.forEach(g => { _grpState[g.id] = { snippet: '', lastAt: null, unsub: null }; });
 
   /* ── DOM Helpers ────────────────────────────────────────────────────── */
   const $ = id => document.getElementById(id);
@@ -358,6 +377,9 @@
         console.warn('[FlockChat] Pastoral seed failed:', err);
       }
     }
+
+    // Ensure all group channel docs exist in Firestore (admin-only)
+    await _ensureGroupDocs();
   }
 
   /* ── Ministry Channels (Men's / Women's) ────────────────────────────── */
@@ -429,6 +451,74 @@
       else                  _womensDocUnsub = unsub;
     } catch (err) {
       console.warn(`[FlockChat] ${id} listener setup failed:`, err);
+    }
+  }
+
+  /* ── All-Member Group Channels (Servant Team, Worship, Missions, etc.) ─ */
+  function _injectGroupChannels() {
+    // Remove stale entries
+    _conversations = _conversations.filter(c => !ALL_MEMBER_GROUPS.some(g => g.id === c.id));
+
+    // Unshift in reverse so the first group in ALL_MEMBER_GROUPS ends up first
+    [...ALL_MEMBER_GROUPS].reverse().forEach(g => {
+      const st = _grpState[g.id];
+      _conversations.unshift({
+        id: g.id,
+        type: g.type,
+        name: g.name,
+        participants: [],
+        lastMessage: { text: st.snippet || g.welcome, author: '', timestamp: st.lastAt },
+        lastActivity: st.lastAt,
+        unreadCount: 0,
+        _static: true
+      });
+      _startGroupListener(g.id, g.welcome);
+    });
+  }
+
+  function _startGroupListener(id, welcomeText) {
+    const st = _grpState[id];
+    if (st.unsub) return; // already listening
+    try {
+      st.unsub = _db.collection('conversations').doc(id)
+        .onSnapshot(doc => {
+          const d = doc.exists ? doc.data() : null;
+          st.snippet = d?.lastSnippet || '';
+          st.lastAt  = d?.lastMessageAt || null;
+          const e = _conversations.find(c => c.id === id);
+          if (e) {
+            e.lastMessage  = { text: st.snippet || welcomeText, author: '', timestamp: st.lastAt };
+            e.lastActivity = st.lastAt;
+            _renderConversations();
+          }
+        }, err => console.warn(`[FlockChat] ${id} listener failed:`, err));
+    } catch (err) {
+      console.warn(`[FlockChat] ${id} listener setup failed:`, err);
+    }
+  }
+
+  // Creates Firestore conversation docs for all group channels if they don't
+  // exist yet. Called once on boot for admin / Lead Pastor users.
+  async function _ensureGroupDocs() {
+    if (!_db || !_meIsAllAccess) return;
+    for (const g of ALL_MEMBER_GROUPS) {
+      try {
+        const ref  = _db.collection('conversations').doc(g.id);
+        const snap = await ref.get();
+        if (!snap.exists) {
+          await ref.set({
+            type: g.type,
+            name: g.name,
+            participants: [],
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastSnippet: '',
+            lastMessageAt: null
+          });
+          console.log('[FlockChat] Created group channel:', g.id);
+        }
+      } catch (err) {
+        console.warn(`[FlockChat] Could not ensure doc for ${g.id}:`, err);
+      }
     }
   }
 
@@ -789,8 +879,9 @@
     // so the list never looks empty — even if the conversations query is
     // still loading or fails outright.
     _conversations = [];
-    _injectAnnouncements();
+    _injectGroupChannels();
     _injectMinistryChannels();
+    _injectAnnouncements();
     _renderConversations();
 
     _convUnsub = _db.collection('conversations')
@@ -805,22 +896,24 @@
           // participants array → wouldn't match this query anyway, but
           // belt-and-suspenders).
           if (d.id === ANNOUNCEMENTS_ID) return;
-          // Ministry channels are static injections
-          if (d.id === MENS_MINISTRY_ID || d.id === WOMENS_MINISTRY_ID) return;
+          // All static group channels are injected separately
+          if (ALL_GROUP_IDS.has(d.id)) return;
           // Per-user soft delete: if I removed this conversation from my
           // view, never show it again on this account.
           if (Array.isArray(d.deletedBy) && d.deletedBy.includes(_me.uid)) return;
           _conversations.push(d);
         });
-        _injectAnnouncements();
+        _injectGroupChannels();
         _injectMinistryChannels();
+        _injectAnnouncements();
         _renderConversations();
       }, err => {
         console.error('[FlockChat] Failed to load conversations:', err);
         _toast('Failed to load conversations', 'error');
         _conversations = [];
-        _injectAnnouncements();
+        _injectGroupChannels();
         _injectMinistryChannels();
+        _injectAnnouncements();
         _renderConversations();
       });
   }
@@ -893,6 +986,18 @@
         return `<svg ${sz} ${S}><circle cx="12" cy="5" r="3"/><line x1="12" y1="8" x2="12" y2="22"/><path d="M5 15H2a10 10 0 0 0 20 0h-3"/><line x1="5" y1="8" x2="19" y2="8"/></svg>`;
       case 'ministry-women':
         return `<svg ${sz} ${S}><path d="M12 22V12"/><path d="M12 12c0 0-4-3-4-6a4 4 0 0 1 8 0c0 3-4 6-4 6z"/><path d="M12 12c0 0-4 1-6 4a4 4 0 0 0 6 0"/><path d="M12 12c0 0 4 1 6 4a4 4 0 0 1-6 0"/></svg>`;
+      case 'servant-team':
+        return `<svg ${sz} ${S}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+      case 'worship-team':
+        return `<svg ${sz} ${S}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`;
+      case 'missions-team':
+        return `<svg ${sz} ${S}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
+      case 'church-life':
+        return `<svg ${sz} ${S}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+      case 'stewardship':
+        return `<svg ${sz} ${S}><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>`;
+      case 'outreach':
+        return `<svg ${sz} ${S}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
       default:
         return `<svg ${sz} ${S}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
     }
@@ -937,6 +1042,43 @@
           <path d="M12 12c0 0-4 1-6 4a4 4 0 0 0 6 0"/>
           <path d="M12 12c0 0 4 1 6 4a4 4 0 0 1-6 0"/>
         </svg>`;
+      case 'servant-team':
+        // Shield — protection & service
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>`;
+      case 'worship-team':
+        // Music note
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <path d="M9 18V5l12-2v13"/>
+          <circle cx="6" cy="18" r="3"/>
+          <circle cx="18" cy="16" r="3"/>
+        </svg>`;
+      case 'missions-team':
+        // Globe
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>`;
+      case 'church-life':
+        // Heart
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>`;
+      case 'stewardship':
+        // Key
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+        </svg>`;
+      case 'outreach':
+        // Group with outward arrow
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>`;
       default:
         // Generic chat bubble
         return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
@@ -946,14 +1088,12 @@
   }
 
   function _isStaticConv(c) {
-    return c && (c._static === true
+    return c && (c._static === true || ALL_GROUP_IDS.has(c.id)
       || c.type === 'announcement'
       || c.type === 'prayer'
       || c.type === 'ministry-men'
       || c.type === 'ministry-women'
-      || c.id === ANNOUNCEMENTS_ID
-      || c.id === MENS_MINISTRY_ID
-      || c.id === WOMENS_MINISTRY_ID);
+      || ALL_MEMBER_GROUPS.some(g => g.type === c.type));
   }
   function _isArchivedForMe(c) {
     return c && Array.isArray(c.archivedBy) && c.archivedBy.includes(_me?.uid);
@@ -983,7 +1123,12 @@
     }
 
     // ── Pinned section (all channel types) ───────────────────────────────
-    const PINNED_TYPES = ['announcement', 'prayer', 'pastoral', 'ministry-men', 'ministry-women'];
+    const PINNED_TYPES = [
+      'announcement', 'prayer', 'pastoral',
+      'ministry-men', 'ministry-women',
+      'servant-team', 'worship-team', 'missions-team',
+      'church-life', 'stewardship', 'outreach'
+    ];
     const pinned  = visible.filter(c => PINNED_TYPES.includes(c.type));
     const regular = visible.filter(c => !PINNED_TYPES.includes(c.type));
 
@@ -1184,6 +1329,12 @@
       else if (conv.type === 'pastoral')      meta.textContent = 'Private message to the Lead Pastor';
       else if (conv.type === 'ministry-men')  meta.textContent = "Men\u2019s Ministry \u2022 visible to men + pastoral staff";
       else if (conv.type === 'ministry-women') meta.textContent = "Women\u2019s Ministry \u2022 visible to women + pastoral staff";
+      else if (conv.type === 'servant-team')  meta.textContent = 'Servant Team (Deacons) \u2022 group channel';
+      else if (conv.type === 'worship-team')  meta.textContent = 'Worship Team \u2022 group channel';
+      else if (conv.type === 'missions-team') meta.textContent = 'Missions Team \u2022 group channel';
+      else if (conv.type === 'church-life')   meta.textContent = 'Church Life \u2022 fellowship & community';
+      else if (conv.type === 'stewardship')   meta.textContent = 'Stewardship \u2022 giving & resources';
+      else if (conv.type === 'outreach')      meta.textContent = 'Outreach \u2022 evangelism & outreach contacts';
       else meta.textContent = conv.type === 'dm' ? 'Direct Message' : `${count} ${count === 1 ? 'member' : 'members'}`;
     }
 
@@ -1202,6 +1353,12 @@
                 ? "Post to Men\u2019s Ministry\u2026"
                 : (conv.type === 'ministry-women')
                   ? "Post to Women\u2019s Ministry\u2026"
+                  : (conv.type === 'servant-team') ? 'Post to Servant Team\u2026'
+                  : (conv.type === 'worship-team') ? 'Post to Worship Team\u2026'
+                  : (conv.type === 'missions-team') ? 'Post to Missions Team\u2026'
+                  : (conv.type === 'church-life') ? 'Post to Church Life\u2026'
+                  : (conv.type === 'stewardship') ? 'Post to Stewardship\u2026'
+                  : (conv.type === 'outreach') ? 'Post to Outreach\u2026'
                   : 'FlockChat';
     }
 
@@ -1215,9 +1372,7 @@
 
   function _markAsRead(convId) {
     // Static shared channels have no per-user unreadCount — skip.
-    if (convId === ANNOUNCEMENTS_ID) return;
-    if (convId === MENS_MINISTRY_ID)  return;
-    if (convId === WOMENS_MINISTRY_ID) return;
+    if (ALL_GROUP_IDS.has(convId)) return;
     _db.collection('conversations').doc(convId).update({
       unreadCount: 0
     }).catch(() => {});
