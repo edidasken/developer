@@ -2269,45 +2269,88 @@
 
   /* Today's Word tab */
   async function _sctWord(pane) {
-    let row = null;
-    const today = _sctToday();
+    // Build last-7-days YYYY-MM-DD list (oldest → newest, so newest scrolls to bottom)
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      days.push(d.toISOString().slice(0, 10));
+    }
+
+    let allRows = [];
     try {
       const UR = window.UpperRoom;
       if (UR && typeof UR.listAppContent === 'function') {
-        const rows = await UR.listAppContent('devotionals', { skipDateFilter: true }) || [];
-        row = rows.find(r => _sctNorm(r.date || r.Date || '') === today) || rows[0] || null;
+        allRows = await UR.listAppContent('devotionals', { skipDateFilter: true }) || [];
       }
     } catch (err) { console.warn('[Sanctuary] devotional fetch', err); }
-    if (!row) {
+
+    // Match each day to a devotional row
+    const matched = days.map(d => ({
+      key: d,
+      row: allRows.find(r => _sctNorm(r.date || r.Date || '') === d) || null,
+    })).filter(x => x.row);
+
+    if (!matched.length) {
       pane.innerHTML = `
         <div class="fc-sct-section">
           <div class="fc-sct-word-empty">
             <div class="fc-sct-word-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
             </div>
-            <p>No devotional found for today.</p>
+            <p>No devotionals found for the past 7 days.</p>
             <a class="fc-sct-grow-link" href="../app.grow/app.grow.html">Open GROW \u2192</a>
           </div>
         </div>`;
       return;
     }
-    const title      = _e(row.title      || row.Title      || 'Today\u2019s Reflection');
-    const theme      = row.theme      || row.Theme      || '';
-    const scripture  = row.scripture  || row.Scripture  || '';
-    const reflection = row.reflection || row.Reflection || '';
-    const question   = row.question   || row.Question   || '';
-    const prayer     = row.prayer     || row.Prayer     || '';
+
+    const today     = _sctToday();
+    const yesterday = (() => { const d = new Date(); d.setDate(d.getDate() - 1); return d.toISOString().slice(0, 10); })();
+
+    function _dayLabel(key) {
+      if (key === today)     return 'Today';
+      if (key === yesterday) return 'Yesterday';
+      const d = new Date(key + 'T00:00:00');
+      return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    }
+
+    function _wordBubble({ key, row }) {
+      const title      = row.title      || row.Title      || 'Daily Reflection';
+      const theme      = row.theme      || row.Theme      || '';
+      const scripture  = row.scripture  || row.Scripture  || '';
+      const reflection = row.reflection || row.Reflection || '';
+      const question   = row.question   || row.Question   || '';
+      const prayer     = row.prayer     || row.Prayer     || '';
+      const isToday    = key === today;
+
+      return `
+        <div class="fc-sct-day-sep">${_dayLabel(key)}</div>
+        <div class="fc-sct-word-msg${isToday ? ' fc-sct-word-today' : ''}">
+          <div class="fc-sct-word-avatar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+          </div>
+          <div class="fc-sct-word-bubble">
+            <div class="fc-sct-word-bubble-sender">FlockOS \u2022 Today\u2019s Word</div>
+            <div class="fc-sct-word-bubble-title">${_e(title)}</div>
+            ${theme      ? `<div class="fc-sct-word-bubble-theme">${_e(theme)}</div>` : ''}
+            ${scripture  ? `<div class="fc-sct-word-bubble-scripture">${_e(scripture)}</div>` : ''}
+            ${reflection ? `<div class="fc-sct-word-bubble-section"><span class="fc-sct-word-bubble-label">Reflection</span><p>${_e(reflection)}</p></div>` : ''}
+            ${question   ? `<div class="fc-sct-word-bubble-section fc-sct-word-bubble-q"><span class="fc-sct-word-bubble-label">Reflect</span><p>${_e(question)}</p></div>` : ''}
+            ${prayer     ? `<div class="fc-sct-word-bubble-section fc-sct-word-bubble-p"><span class="fc-sct-word-bubble-label">Prayer</span><p>${_e(prayer)}</p></div>` : ''}
+          </div>
+        </div>`;
+    }
+
     pane.innerHTML = `
-      <div class="fc-sct-section fc-sct-word">
-        <div class="fc-sct-word-date">${_sctPrettyDate(today)}</div>
-        <h2 class="fc-sct-word-title">${title}</h2>
-        ${theme      ? `<div class="fc-sct-word-theme">${_e(theme)}</div>` : ''}
-        ${scripture  ? `<div class="fc-sct-word-scripture">${_e(scripture)}</div>` : ''}
-        ${reflection ? `<div class="fc-sct-word-body"><strong>Reflection</strong><p>${_e(reflection)}</p></div>` : ''}
-        ${question   ? `<div class="fc-sct-word-body fc-sct-word-question"><strong>Reflect</strong><p>${_e(question)}</p></div>` : ''}
-        ${prayer     ? `<div class="fc-sct-word-body fc-sct-word-pray"><strong>Prayer</strong><p>${_e(prayer)}</p></div>` : ''}
-        <a class="fc-sct-grow-link" href="../app.grow/app.grow.html">Open in GROW \u2192</a>
+      <div class="fc-sct-section fc-sct-word-feed">
+        ${matched.map(_wordBubble).join('')}
+        <div class="fc-sct-word-footer">
+          <a class="fc-sct-grow-link" href="../app.grow/app.grow.html">Open in GROW \u2192</a>
+        </div>
       </div>`;
+
+    // Scroll to bottom so today's entry is visible first
+    pane.scrollTop = pane.scrollHeight;
   }
 
   /* Reading tab */
