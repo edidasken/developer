@@ -1811,6 +1811,8 @@
   function _sctJournalEntryHTML(e) {
     const date = _sctDate(e.createdAt);
     const isPrivate = e.private !== false;
+    const bodyText = e.entry || e.body || e.text || '';
+    const titleText = e.title || '';
     return `
       <div class="fc-sct-entry" data-entry-id="${_e(e.id)}">
         <div class="fc-sct-entry-meta">
@@ -1820,7 +1822,8 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
         </div>
-        <div class="fc-sct-entry-text">${_e(e.text || '')}</div>
+        ${titleText ? `<div class="fc-sct-entry-title">${_e(titleText)}</div>` : ''}
+        <div class="fc-sct-entry-text">${_e(bodyText)}</div>
       </div>`;
   }
 
@@ -1835,7 +1838,7 @@
     const UR = window.UpperRoom;
     try {
       if (!UR || typeof UR.createJournal !== 'function') throw new Error('UpperRoom unavailable');
-      await UR.createJournal({ text, private: !!(privCb && privCb.checked) });
+      await UR.createJournal({ entry: text, private: !!(privCb && privCb.checked) });
       ta.value = '';
     } catch (err) {
       console.error('[Sanctuary] save journal', err);
