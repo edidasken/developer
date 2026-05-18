@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Absolute base so all relative URLs resolve to GitHub Pages regardless of embed host -->
+  <base href="https://flock-os.github.io/FlockOS/New_Covenant/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <title>FlockDocs — Productivity Suite</title>
+
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="Images/icon-flockos.svg">
+  <link rel="apple-touch-icon" href="Images/FlockIcon-512.webp">
+  <link rel="manifest" href="app.flockdocs/manifest.json">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Firebase preconnect -->
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+  <link rel="preconnect" href="https://securetoken.googleapis.com">
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com">
+
+  <!-- App CSS — new_covenant.css (includes all shared styles) -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { 
+      height: 100%; 
+      overflow: hidden; 
+      overscroll-behavior: none;
+      background: var(--bg);
+    }
+
+    /* Boot splash */
+    #fd-boot {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      z-index: 9999;
+      transition: opacity 400ms, visibility 400ms;
+    }
+    #fd-boot.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .fd-boot-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      animation: fd-pulse 2s ease-in-out infinite;
+    }
+    @keyframes fd-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.05); opacity: 1; }
+    }
+    .fd-boot-label {
+      font: 700 1.5rem var(--font-ui);
+      color: var(--ink);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+  </style>
+
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Boot splash -->
+  <div id="fd-boot">
+    <div class="fd-boot-icon">📄</div>
+    <div class="fd-boot-label">FlockDocs</div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase Config — Church-specific via template variables -->
+  <script>
+    (function() {
+      // Template variables will be replaced by B-Build script
+      var config = {
+        apiKey: "{{FIREBASE_API_KEY}}",
+        authDomain: "{{FIREBASE_AUTH_DOMAIN}}",
+        projectId: "{{FIREBASE_PROJECT_ID}}",
+        storageBucket: "{{FIREBASE_STORAGE_BUCKET}}",
+        messagingSenderId: "{{FIREBASE_MESSAGING_SENDER_ID}}",
+        appId: "{{FIREBASE_APP_ID}}"
+      };
+
+      // Fallback to default (flockos-notify) if templates not replaced
+      if (config.apiKey.indexOf('{{') === 0) {
+        config = {
+          apiKey: "AIzaSyA5Wbdny-jBXnNxU2PpNDU2_wzhaDHu6r8",
+          authDomain: "flockos-notify.firebaseapp.com",
+          projectId: "flockos-notify",
+          storageBucket: "flockos-notify.firebasestorage.app",
+          messagingSenderId: "994573568718",
+          appId: "1:994573568718:web:e6d3f2e8c9b5a4f3c8e9d2"
+        };
+      }
+
+      firebase.initializeApp(config);
+      console.log('[FlockDocs Embed] Firebase initialized:', config.projectId);
+    })();
+  </script>
+
+  <!-- FlockOS auth (Nehemiah gate) -->
+  <script src="Scripts/the_foundation/firm_foundation.js"></script>
+
+  <!-- FlockDocs app logic -->
+  <script src="app.flockdocs/flockdocs.js" type="module"></script>
+
+  <!-- Hide boot splash after app loads -->
+  <script>
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        var boot = document.getElementById('fd-boot');
+        if (boot) boot.classList.add('hidden');
+      }, 800);
+    });
+  </script>
+
+</body>
+</html>

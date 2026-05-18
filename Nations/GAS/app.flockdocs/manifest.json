@@ -1,0 +1,29 @@
+{
+  "name": "FlockDocs — Productivity Suite",
+  "short_name": "FlockDocs",
+  "description": "Document editor, spreadsheets, and productivity tools for your church",
+  "start_url": "../app.flockdocs/index.html",
+  "scope": "../",
+  "display": "standalone",
+  "background_color": "#0e1320",
+  "theme_color": "#3b82f6",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "../Images/FlockIcon-512.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "business", "utilities"],
+  "shortcuts": [
+    {
+      "name": "New Document",
+      "short_name": "New Doc",
+      "description": "Create a new document",
+      "url": "../app.flockdocs/app.flockdocs.html?action=new",
+      "icons": [{ "src": "../Images/FlockIcon-512.webp", "sizes": "512x512" }]
+    }
+  ]
+}
