@@ -331,24 +331,40 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #0c4a6e, #06b6d4);
+      box-shadow: 0 2px 6px rgba(6,182,212,0.22);
       color: white;
-      font-weight: 600;
-    }
-    .fc-conv-icon.prayer {
-      background: linear-gradient(135deg, var(--fc-prayer), #7c3aed);
-    }
-    .fc-conv-icon.announcement {
-      background: linear-gradient(135deg, var(--fc-announcement), #d97706);
-    }
-    .fc-conv-icon.dm {
-      background: linear-gradient(135deg, #38bdf8, #0ea5e9);
       font-size: 1.125rem;
       font-weight: 700;
     }
+    .fc-conv-icon svg { display: block; flex-shrink: 0; }
+    .fc-conv-icon.prayer {
+      background: linear-gradient(135deg, #1e1b4b, #6366f1);
+      box-shadow: 0 2px 6px rgba(99,102,241,0.28);
+    }
+    .fc-conv-icon.announcement {
+      background: linear-gradient(135deg, #0c4a6e, #0ea5e9);
+      box-shadow: 0 2px 6px rgba(14,165,233,0.26);
+    }
+    .fc-conv-icon.dm {
+      background: linear-gradient(135deg, #0f2d5e, #3b82f6);
+      box-shadow: 0 2px 6px rgba(59,130,246,0.28);
+    }
     .fc-conv-icon.sms {
-      background: linear-gradient(135deg, #34d399, #10b981);
+      background: linear-gradient(135deg, #065f46, #10b981);
+      box-shadow: 0 2px 6px rgba(16,185,129,0.26);
+    }
+    .fc-conv-icon.pastoral {
+      background: linear-gradient(135deg, #0c4a6e, #06b6d4);
+      box-shadow: 0 2px 6px rgba(6,182,212,0.28);
+    }
+    .fc-conv-icon.ministry-men {
+      background: linear-gradient(135deg, #0f2d5e, #3b82f6);
+      box-shadow: 0 2px 6px rgba(59,130,246,0.28);
+    }
+    .fc-conv-icon.ministry-women {
+      background: linear-gradient(135deg, #2d1b69, #a78bfa);
+      box-shadow: 0 2px 6px rgba(167,139,250,0.28);
     }
     .fc-user-item.sms .fc-user-avatar {
       background: linear-gradient(135deg, #34d399, #10b981);
@@ -545,10 +561,12 @@
       align-items: center;
       justify-content: center;
       font-size: 1.125rem;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-weight: 700;
+      background: linear-gradient(135deg, #0c4a6e, #06b6d4);
       color: white;
       flex-shrink: 0;
     }
+    .fc-thread-icon svg { display: block; flex-shrink: 0; }
     .fc-thread-info {
       flex: 1;
       min-width: 0;

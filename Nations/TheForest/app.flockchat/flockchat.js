@@ -707,6 +707,30 @@
     });
   }
 
+  /* ── Conversation-row + thread-header SVG icons ────────────────── */
+  function _convIcon(c) {
+    // DMs show text initials (meaningful identity cue)
+    if (c.type === 'dm') return _e(c.icon || '?');
+    const S = 'fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+    const sz = 'width="24" height="24" viewBox="0 0 24 24"';
+    switch (c.type) {
+      case 'announcement':
+        return `<svg ${sz} ${S}><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`;
+      case 'prayer':
+        return `<svg ${sz} ${S}><line x1="12" y1="2" x2="12" y2="22"/><line x1="4" y1="8" x2="20" y2="8"/></svg>`;
+      case 'sms':
+        return `<svg ${sz} ${S}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.18 15.22 19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+      case 'pastoral':
+        return `<svg ${sz} ${S}><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`;
+      case 'ministry-men':
+        return `<svg ${sz} ${S}><circle cx="12" cy="5" r="3"/><line x1="12" y1="8" x2="12" y2="22"/><path d="M5 15H2a10 10 0 0 0 20 0h-3"/><line x1="5" y1="8" x2="19" y2="8"/></svg>`;
+      case 'ministry-women':
+        return `<svg ${sz} ${S}><path d="M12 22V12"/><path d="M12 12c0 0-4-3-4-6a4 4 0 0 1 8 0c0 3-4 6-4 6z"/><path d="M12 12c0 0-4 1-6 4a4 4 0 0 0 6 0"/><path d="M12 12c0 0 4 1 6 4a4 4 0 0 1-6 0"/></svg>`;
+      default:
+        return `<svg ${sz} ${S}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+    }
+  }
+
   /* ── Pinned-bubble SVG icons (consistent FlockChat colour palette) ──── */
   function _pinnedIcon(type) {
     const S = 'fill="none" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"';
@@ -827,10 +851,13 @@
       const menuOpen = _openMenuConvId === c.id;
 
       let iconClass = 'fc-conv-icon';
-      if (c.type === 'prayer') iconClass += ' prayer';
+      if (c.type === 'prayer')       iconClass += ' prayer';
       if (c.type === 'announcement') iconClass += ' announcement';
-      if (c.type === 'dm') iconClass += ' dm';
-      if (c.type === 'sms') iconClass += ' sms';
+      if (c.type === 'dm')           iconClass += ' dm';
+      if (c.type === 'sms')          iconClass += ' sms';
+      if (c.type === 'pastoral')     iconClass += ' pastoral';
+      if (c.type === 'ministry-men') iconClass += ' ministry-men';
+      if (c.type === 'ministry-women') iconClass += ' ministry-women';
 
       const actionsBtn = isStatic ? '' : `
           <button class="fc-conv-actions-btn ${menuOpen ? 'open' : ''}"
@@ -849,7 +876,7 @@
              data-id="${c.id}"
              data-name="${_e(c.name)}"
              onclick="window._openConversation('${c.id}')">
-          <div class="${iconClass}">${_e(c.icon || '👥')}</div>
+          <div class="${iconClass}">${_convIcon(c)}</div>
           <div class="fc-conv-content">
             <div class="fc-conv-header">
               <div class="fc-conv-name">${_e(c.name)}</div>
@@ -972,7 +999,7 @@
     const icon = $('fc-thread-icon');
     const name = $('fc-thread-name');
     const meta = $('fc-thread-meta');
-    if (icon) icon.textContent = conv.icon || '👥';
+    if (icon) icon.innerHTML = _convIcon(conv);
     if (name) name.textContent = conv.name;
     if (meta) {
       const count = conv.participants?.length || 0;
