@@ -1786,13 +1786,42 @@
   }
 
   /* Journal tab */
-  async function _sctJournal(pane) {
-    let entries = [];
-    const UR = window.UpperRoom;
-    if (UR && typeof UR.listJournal === 'function') {
-      try { entries = await UR.listJournal({ limit: 100 }) || []; }
-      catch (err) { console.warn('[Sanctuary] journal fetch', err); }
+  let _jAllEntries = [];
+  let _jPage      = 0;
+  let _jPageSize  = 25;
+
+  async function _sctJournal(pane, opts = {}) {
+    // Allow callers to change page / page size without re-fetching
+    if (opts.page     !== undefined) _jPage     = opts.page;
+    if (opts.pageSize !== undefined) { _jPageSize = opts.pageSize; _jPage = 0; }
+
+    // Fetch only when called fresh (no forceRefetch = false flag)
+    if (opts.forceRefetch !== false) {
+      const UR = window.UpperRoom;
+      _jAllEntries = [];
+      if (UR && typeof UR.listJournal === 'function') {
+        try { _jAllEntries = await UR.listJournal({ limit: 500 }) || []; }
+        catch (err) { console.warn('[Sanctuary] journal fetch', err); }
+      }
     }
+
+    const total   = _jAllEntries.length;
+    const pages   = Math.max(1, Math.ceil(total / _jPageSize));
+    _jPage        = Math.min(_jPage, pages - 1);
+    const start   = _jPage * _jPageSize;
+    const slice   = _jAllEntries.slice(start, start + _jPageSize);
+    const end     = Math.min(start + _jPageSize, total);
+
+    const pageSizeOpts = [25, 50, 75, 100].map(n =>
+      `<option value="${n}"${n === _jPageSize ? ' selected' : ''}>${n}</option>`).join('');
+
+    const paginationBar = total > _jPageSize ? `
+      <div class="fc-sct-pagination">
+        <button class="fc-sct-pg-btn" onclick="window._jChangePage(${_jPage - 1})" ${_jPage === 0 ? 'disabled' : ''}>&lsaquo; Prev</button>
+        <span class="fc-sct-pg-info">${start + 1}&ndash;${end} of ${total}</span>
+        <button class="fc-sct-pg-btn" onclick="window._jChangePage(${_jPage + 1})" ${_jPage >= pages - 1 ? 'disabled' : ''}>Next &rsaquo;</button>
+      </div>` : '';
+
     pane.innerHTML = `
       <div class="fc-sct-section">
         <div class="fc-sct-compose">
@@ -1802,11 +1831,30 @@
             <button class="fc-sct-save-btn" onclick="window._saveJournalEntry()">Save Entry</button>
           </div>
         </div>
+        ${total > 0 ? `
+        <div class="fc-sct-list-header">
+          <span class="fc-sct-list-count">${total} entr${total === 1 ? 'y' : 'ies'}</span>
+          <label class="fc-sct-per-page">
+            Per page:
+            <select class="fc-sct-per-page-sel" onchange="window._jChangePageSize(+this.value)">${pageSizeOpts}</select>
+          </label>
+        </div>` : ''}
         <div class="fc-sct-list" id="fc-sct-jlist">
-          ${entries.length ? entries.map(e => _sctJournalEntryHTML(e)).join('') : '<div class="fc-sct-empty">No journal entries yet. Write your first one above.</div>'}
+          ${slice.length ? slice.map(e => _sctJournalEntryHTML(e)).join('') : '<div class="fc-sct-empty">No journal entries yet. Write your first one above.</div>'}
         </div>
+        ${paginationBar}
       </div>`;
   }
+
+  window._jChangePage = function(page) {
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane) _sctJournal(pane, { page, forceRefetch: false });
+  };
+
+  window._jChangePageSize = function(size) {
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane) _sctJournal(pane, { pageSize: size, forceRefetch: false });
+  };
 
   function _sctJournalEntryHTML(e) {
     const date = _sctDate(e.createdAt);
@@ -1987,7 +2035,7 @@
       return;
     }
     const pane = document.getElementById('fc-sct-pane');
-    if (pane) await _sctJournal(pane);
+    if (pane) { _jPage = 0; await _sctJournal(pane); }
   };
 
   // _deleteJournalEntry kept for legacy callers; UI now goes through _confirmJournalDelete
