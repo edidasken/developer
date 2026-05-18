@@ -592,6 +592,7 @@
       flex-direction: column;
       background: var(--fc-bg);
       overflow: hidden;
+      position: relative; /* needed for manager drawer positioning */
     }
 
     .fc-thread-header {
@@ -628,6 +629,115 @@
       font-size: 0.8125rem;
       color: var(--fc-text-muted);
     }
+    /* Admin manage button in thread header */
+    .fc-manage-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--fc-text-muted);
+      display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 8px;
+      flex-shrink: 0;
+      transition: background 0.15s, color 0.15s;
+    }
+    .fc-manage-btn:hover { background: var(--fc-divider); color: var(--fc-text); }
+
+    /* ─── Channel Manager Drawer ─────────────────────────────────────── */
+    .fc-mgr-overlay {
+      position: absolute; inset: 0; z-index: 40;
+      background: rgba(0,0,0,0.35);
+    }
+    .fc-mgr-drawer {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 50;
+      background: var(--fc-surface);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -4px 32px rgba(0,0,0,0.18);
+      max-height: 75%;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      animation: fc-mgr-slide-up 0.22s ease;
+    }
+    @keyframes fc-mgr-slide-up {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+    .fc-mgr-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--fc-divider);
+      flex-shrink: 0;
+    }
+    .fc-mgr-title {
+      font-size: 1.0625rem; font-weight: 700; color: var(--fc-text);
+    }
+    .fc-mgr-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--fc-text-muted); font-size: 1rem;
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .fc-mgr-close:hover { background: var(--fc-divider); }
+    .fc-mgr-body {
+      flex: 1; overflow-y: auto; padding: 0 0 24px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .fc-mgr-section {
+      padding: 14px 20px 6px;
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--fc-text-muted);
+    }
+    .fc-mgr-empty {
+      padding: 12px 20px;
+      font-size: 0.875rem; color: var(--fc-text-muted);
+      font-style: italic;
+    }
+    .fc-mgr-member {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--fc-divider);
+    }
+    .fc-mgr-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, #0c4a6e, #06b6d4);
+      color: white; font-size: 0.8125rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .fc-mgr-member-info { flex: 1; min-width: 0; }
+    .fc-mgr-member-name {
+      font-size: 0.9375rem; font-weight: 600; color: var(--fc-text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fc-mgr-member-sub {
+      font-size: 0.75rem; color: var(--fc-text-muted);
+    }
+    .fc-mgr-ban-btn {
+      background: none; border: 1px solid #f43f5e;
+      color: #f43f5e; border-radius: 8px;
+      padding: 4px 10px; font-size: 0.75rem; font-weight: 600;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: background 0.15s, color 0.15s;
+    }
+    .fc-mgr-ban-btn:hover { background: #f43f5e; color: white; }
+    .fc-mgr-restore-btn {
+      background: none; border: 1px solid #22c55e;
+      color: #22c55e; border-radius: 8px;
+      padding: 4px 10px; font-size: 0.75rem; font-weight: 600;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: background 0.15s, color 0.15s;
+    }
+    .fc-mgr-restore-btn:hover { background: #22c55e; color: white; }
+    /* Admin delete button on messages */
+    .fc-msg-admin-del {
+      background: none; border: none; cursor: pointer;
+      color: transparent; padding: 2px 4px;
+      border-radius: 4px; font-size: 0.875rem;
+      transition: color 0.15s;
+      flex-shrink: 0; align-self: flex-end;
+    }
+    .fc-message:hover .fc-msg-admin-del,
+    .fc-card:hover .fc-msg-admin-del { color: #f43f5e; }
+    .fc-msg-admin-del:hover { background: rgba(244,63,94,0.1); }
 
     /* ─── Message List ───────────────────────────────────────────────── */
     .fc-messages {
@@ -1109,6 +1219,15 @@
             <div class="fc-thread-name" id="fc-thread-name">Select a conversation</div>
             <div class="fc-thread-meta" id="fc-thread-meta"></div>
           </div>
+          <!-- Admin-only channel management button -->
+          <button class="fc-manage-btn" id="fc-manage-btn" hidden
+                  onclick="window._openChannelManager()" title="Manage channel">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
         </div>
         <div class="fc-messages" id="fc-messages">
           <!-- Messages populated by JS -->
@@ -1118,6 +1237,19 @@
             <textarea class="fc-input" id="fc-input" placeholder="FlockChat" rows="1"></textarea>
           </div>
           <button class="fc-send-btn" id="fc-send" disabled>↑</button>
+        </div>
+
+        <!-- Channel Manager Drawer (admin only) -->
+        <div class="fc-mgr-overlay" id="fc-mgr-overlay" hidden
+             onclick="window._closeChannelManager()"></div>
+        <div class="fc-mgr-drawer" id="fc-mgr-drawer" hidden>
+          <div class="fc-mgr-header">
+            <div class="fc-mgr-title" id="fc-mgr-title">Manage Channel</div>
+            <button class="fc-mgr-close" onclick="window._closeChannelManager()">✕</button>
+          </div>
+          <div class="fc-mgr-body" id="fc-mgr-body">
+            <div class="fc-loading"><div class="fc-spinner"></div></div>
+          </div>
         </div>
       </div>
 

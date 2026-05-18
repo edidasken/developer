@@ -485,6 +485,15 @@
           const d = doc.exists ? doc.data() : null;
           st.snippet = d?.lastSnippet || '';
           st.lastAt  = d?.lastMessageAt || null;
+
+          // If this user was banned from the channel, remove it and re-render
+          const banned = d?.bannedMembers || [];
+          if (!_meIsAllAccess && _me?.uid && banned.includes(_me.uid)) {
+            _conversations = _conversations.filter(c => c.id !== id);
+            _renderConversations();
+            return;
+          }
+
           const e = _conversations.find(c => c.id === id);
           if (e) {
             e.lastMessage  = { text: st.snippet || welcomeText, author: '', timestamp: st.lastAt };
@@ -1338,6 +1347,20 @@
       else meta.textContent = conv.type === 'dm' ? 'Direct Message' : `${count} ${count === 1 ? 'member' : 'members'}`;
     }
 
+    // Show manage button for admin on group/ministry channels
+    const manageBtn = $('fc-manage-btn');
+    if (manageBtn) {
+      const MANAGEABLE = [
+        'announcement', 'prayer', 'ministry-men', 'ministry-women',
+        ...ALL_MEMBER_GROUPS.map(g => g.type)
+      ];
+      if (_meIsAllAccess && MANAGEABLE.includes(conv.type)) {
+        manageBtn.removeAttribute('hidden');
+      } else {
+        manageBtn.setAttribute('hidden', '');
+      }
+    }
+
     // Composer hint for SMS threads
     const inputEl = $('fc-input');
     if (inputEl) {
@@ -1487,6 +1510,7 @@
               <span class="fc-card-icon">🙏</span>
               <span class="fc-card-author">${_e(authorName)}</span>
               <span class="fc-card-time">${time}</span>
+              ${_meIsAllAccess ? `<button class="fc-msg-admin-del" onclick="window._adminDeleteMessage('${_e(m.id)}')" title="Delete message">🗑</button>` : ''}
             </div>
             <div class="fc-card-text">${_e(m.text)}</div>
             <button class="fc-card-btn" onclick="window._prayFor('${m.id}')">
@@ -1503,6 +1527,7 @@
               <span class="fc-card-icon">📢</span>
               <span class="fc-card-author">${_e(authorName)}</span>
               <span class="fc-card-time">${time}</span>
+              ${_meIsAllAccess ? `<button class="fc-msg-admin-del" onclick="window._adminDeleteMessage('${_e(m.id)}')" title="Delete message">🗑</button>` : ''}
             </div>
             <div class="fc-card-text">${_e(m.text)}</div>
           </div>
@@ -1518,6 +1543,7 @@
             <div class="fc-message-text">${_e(m.text)}</div>
             <div class="fc-message-time">${time}</div>
           </div>
+          ${_meIsAllAccess && !isMine ? `<button class="fc-msg-admin-del" onclick="window._adminDeleteMessage('${_e(m.id)}')" title="Delete message">🗑</button>` : ''}
         </div>
       `;
     }).join('');
@@ -1530,6 +1556,161 @@
       msgContainer.scrollTop = msgContainer.scrollHeight;
     }, 100);
   }
+
+  /* ── Admin: Delete Any Message ──────────────────────────────────────── */
+  window._adminDeleteMessage = async function(msgId) {
+    if (!_meIsAllAccess || !_activeConvId || !msgId) return;
+    if (!confirm('Delete this message for everyone?')) return;
+    try {
+      await _db.collection('conversations').doc(_activeConvId)
+        .collection('messages').doc(msgId).delete();
+      _toast('Message deleted', 'success');
+    } catch (err) {
+      console.error('[FlockChat] Admin delete failed:', err);
+      _toast('Failed to delete message', 'error');
+    }
+  };
+
+  /* ── Admin: Channel Manager ─────────────────────────────────────────── */
+  // Cache uid → { name, email } to avoid redundant Firestore reads
+  const _userCache = {};
+
+  async function _fetchUserName(uid) {
+    if (_userCache[uid]) return _userCache[uid];
+    try {
+      const snap = await _db.collection('users').doc(uid).get();
+      const d = snap.exists ? snap.data() : {};
+      const entry = { name: d.displayName || d.email || uid, email: d.email || '' };
+      _userCache[uid] = entry;
+      return entry;
+    } catch { return { name: uid, email: '' }; }
+  }
+
+  window._openChannelManager = async function() {
+    if (!_meIsAllAccess || !_activeConvId) return;
+    const overlay  = $('fc-mgr-overlay');
+    const drawer   = $('fc-mgr-drawer');
+    const title    = $('fc-mgr-title');
+    const body     = $('fc-mgr-body');
+    if (!overlay || !drawer || !body) return;
+
+    const conv = _conversations.find(c => c.id === _activeConvId);
+    if (title) title.textContent = `Manage: ${conv?.name || _activeConvId}`;
+    body.innerHTML = '<div class="fc-loading"><div class="fc-spinner"></div></div>';
+
+    overlay.removeAttribute('hidden');
+    drawer.removeAttribute('hidden');
+
+    // Load banned list from Firestore, then render
+    try {
+      const snap = await _db.collection('conversations').doc(_activeConvId).get();
+      const banned = (snap.exists ? snap.data()?.bannedMembers : null) || [];
+
+      // Unique active participants from current message list (exclude banned)
+      const activeUids = [...new Set(
+        _messages
+          .filter(m => m.author && m.author !== _me.uid && !banned.includes(m.author))
+          .map(m => m.author)
+      )];
+
+      // Fetch names concurrently
+      const [activeUsers, bannedUsers] = await Promise.all([
+        Promise.all(activeUids.map(uid => _fetchUserName(uid).then(u => ({ uid, ...u })))),
+        Promise.all(banned.map(uid     => _fetchUserName(uid).then(u => ({ uid, ...u }))))
+      ]);
+
+      _renderChannelManager(body, activeUsers, bannedUsers);
+    } catch (err) {
+      console.error('[FlockChat] Channel manager load failed:', err);
+      body.innerHTML = `<div class="fc-mgr-empty">Failed to load channel data.</div>`;
+    }
+  };
+
+  window._closeChannelManager = function() {
+    const overlay = $('fc-mgr-overlay');
+    const drawer  = $('fc-mgr-drawer');
+    if (overlay) overlay.setAttribute('hidden', '');
+    if (drawer)  drawer.setAttribute('hidden', '');
+  };
+
+  function _renderChannelManager(body, activeUsers, bannedUsers) {
+    let html = '';
+
+    html += `<div class="fc-mgr-section">Recent Participants</div>`;
+    if (activeUsers.length === 0) {
+      html += `<div class="fc-mgr-empty">No recent message senders.</div>`;
+    } else {
+      activeUsers.forEach(u => {
+        html += `
+          <div class="fc-mgr-member">
+            <div class="fc-mgr-avatar">${_initials(u.name)}</div>
+            <div class="fc-mgr-member-info">
+              <div class="fc-mgr-member-name">${_e(u.name)}</div>
+              ${u.email ? `<div class="fc-mgr-member-sub">${_e(u.email)}</div>` : ''}
+            </div>
+            <button class="fc-mgr-ban-btn"
+                    onclick="window._adminBanMember('${_e(u.uid)}','${_e(u.name)}')">
+              Remove
+            </button>
+          </div>`;
+      });
+    }
+
+    html += `<div class="fc-mgr-section" style="margin-top:8px">Removed Members</div>`;
+    if (bannedUsers.length === 0) {
+      html += `<div class="fc-mgr-empty">No one has been removed.</div>`;
+    } else {
+      bannedUsers.forEach(u => {
+        html += `
+          <div class="fc-mgr-member">
+            <div class="fc-mgr-avatar" style="background:linear-gradient(135deg,#3b0d1e,#f43f5e)">${_initials(u.name)}</div>
+            <div class="fc-mgr-member-info">
+              <div class="fc-mgr-member-name">${_e(u.name)}</div>
+              ${u.email ? `<div class="fc-mgr-member-sub">${_e(u.email)}</div>` : ''}
+            </div>
+            <button class="fc-mgr-restore-btn"
+                    onclick="window._adminRestoreMember('${_e(u.uid)}','${_e(u.name)}')">
+              Restore
+            </button>
+          </div>`;
+      });
+    }
+
+    body.innerHTML = html;
+  }
+
+  window._adminBanMember = async function(uid, displayName) {
+    if (!_meIsAllAccess || !_activeConvId || !uid) return;
+    if (!confirm(`Remove ${displayName || uid} from this channel?`)) return;
+    try {
+      await _db.collection('conversations').doc(_activeConvId).update({
+        bannedMembers: firebase.firestore.FieldValue.arrayUnion(uid)
+      });
+      // Evict from cache so name refetch works
+      delete _userCache[uid];
+      _toast(`${displayName || 'Member'} removed from channel`, 'success');
+      // Re-open manager to refresh list
+      window._openChannelManager();
+    } catch (err) {
+      console.error('[FlockChat] Ban member failed:', err);
+      _toast('Failed to remove member', 'error');
+    }
+  };
+
+  window._adminRestoreMember = async function(uid, displayName) {
+    if (!_meIsAllAccess || !_activeConvId || !uid) return;
+    try {
+      await _db.collection('conversations').doc(_activeConvId).update({
+        bannedMembers: firebase.firestore.FieldValue.arrayRemove(uid)
+      });
+      delete _userCache[uid];
+      _toast(`${displayName || 'Member'} restored to channel`, 'success');
+      window._openChannelManager();
+    } catch (err) {
+      console.error('[FlockChat] Restore member failed:', err);
+      _toast('Failed to restore member', 'error');
+    }
+  };
 
   /* ── Send Message ────────────────────────────────────────────────────── */
   async function _sendMessage() {
