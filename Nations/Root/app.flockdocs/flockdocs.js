@@ -638,11 +638,19 @@ function _openSpreadsheetEditor() {
   // Render the grid
   _renderGrid();
 
+  // Bind grid mouse events once via the persistent wrap element (not the table)
+  const wrap = document.getElementById('fd-grid-wrap');
+  if (wrap && !wrap._sheetBound) {
+    wrap.addEventListener('mousedown', _onGridMousedown);
+    wrap.addEventListener('dblclick', _onGridDblclick);
+    wrap._sheetBound = true;
+  }
+
   // Select A1 by default
   _selectCell('A1');
 
   // Focus the grid for keyboard events
-  document.getElementById('fd-grid-wrap')?.focus();
+  wrap?.focus();
 }
 
 function _closeSpreadsheetEditor() {
@@ -703,11 +711,7 @@ function _renderGrid() {
   const wrap = document.getElementById('fd-grid-wrap');
   if (!wrap) return;
   wrap.innerHTML = parts.join('');
-
-  // Bind grid mouse events via delegation
-  const grid = document.getElementById('fd-grid');
-  grid.addEventListener('mousedown', _onGridMousedown);
-  grid.addEventListener('dblclick', _onGridDblclick);
+  // Note: grid mouse events are bound once in _openSpreadsheetEditor via the wrap element
 }
 
 /* ── Cell Selection ───────────────────────────────────────────────────────── */
@@ -1086,12 +1090,15 @@ function _applyFormat(val, fmt) {
     case 'currency':
       return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(num);
     case 'percent':
-      return new Intl.NumberFormat('en-US', { style: 'percent', maximumFractionDigits: 2 }).format(num / 100);
+      // Standard spreadsheet behaviour: 0.5 → 50%, 1 → 100% (no pre-division)
+      return new Intl.NumberFormat('en-US', { style: 'percent', maximumFractionDigits: 2 }).format(num);
     case 'decimal':
       return num.toFixed(2);
     default:
-      // Trim trailing zeros for whole numbers
-      return Number.isInteger(num) ? String(num) : String(parseFloat(num.toFixed(10)));
+      // Display whole numbers without decimal point; avoid floating-point noise
+      if (Number.isInteger(num)) return String(num);
+      // Round to 9 significant digits to eliminate floating-point artefacts
+      return parseFloat(num.toPrecision(9)).toString();
   }
 }
 
