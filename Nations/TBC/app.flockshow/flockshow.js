@@ -346,18 +346,20 @@ function _buildPresentDoc(show, idx) {
     : '';
   const speakerLine = [show.sermonTitle, show.speaker].filter(Boolean).join('  ·  ');
   const infoHtml = speakerLine
-    ? `<div style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);font:500 0.60rem system-ui,sans-serif;color:rgba(255,255,255,.28);letter-spacing:.05em;white-space:nowrap;pointer-events:none;user-select:none">${_esc(speakerLine)}</div>`
+    ? `<div style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);font:500 0.60rem 'Plus Jakarta Sans',system-ui,sans-serif;color:rgba(255,255,255,.28);letter-spacing:.06em;white-space:nowrap;pointer-events:none;user-select:none;text-transform:uppercase">${_esc(speakerLine)}</div>`
     : '';
   const next    = show.slides[idx + 1];
   const nextHtml = next
-    ? `<div style="position:fixed;bottom:14px;left:14px;font:0.68rem system-ui,sans-serif;color:rgba(255,255,255,.38);background:rgba(255,255,255,.07);padding:4px 10px;border-radius:6px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">NEXT: ${_esc((next.text || 'Blank').slice(0, 42))}</div>`
+    ? `<div style="position:fixed;bottom:14px;left:14px;font:500 0.65rem 'Plus Jakarta Sans',system-ui,sans-serif;color:rgba(255,255,255,.40);background:rgba(255,255,255,.08);padding:4px 11px;border-radius:6px;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.02em">NEXT&nbsp;&nbsp;${_esc((next.text || 'Blank').slice(0, 44))}</div>`
     : '';
   const noteHtml = sl.notes
-    ? `<div style="position:fixed;bottom:14px;right:14px;font:0.68rem system-ui,sans-serif;color:rgba(255,255,255,.45);background:rgba(255,255,255,.08);padding:4px 10px;border-radius:6px;max-width:260px;text-align:right">${_esc(sl.notes)}</div>`
+    ? `<div style="position:fixed;bottom:14px;right:14px;font:400 0.65rem 'Plus Jakarta Sans',system-ui,sans-serif;color:rgba(255,255,255,.48);background:rgba(255,255,255,.09);padding:4px 11px;border-radius:6px;max-width:280px;text-align:right;line-height:1.4">${_esc(sl.notes)}</div>`
     : '';
-  const counter = `<div style="position:fixed;top:12px;right:14px;font:0.65rem system-ui,sans-serif;color:rgba(255,255,255,.22)">${idx + 1}&thinsp;/&thinsp;${show.slides.length}</div>`;
+  const counter = `<div style="position:fixed;top:13px;right:16px;font:600 0.62rem 'Plus Jakarta Sans',system-ui,sans-serif;color:rgba(255,255,255,.25);letter-spacing:.04em">${idx + 1}&thinsp;/&thinsp;${show.slides.length}</div>`;
   const _bdef = _SOURCE_BADGE[sl.sourceType];
-  const badgeHtml = _bdef ? `<div style="position:fixed;top:12px;left:14px;font:600 0.60rem system-ui,sans-serif;color:${_bdef.ink};background:${_bdef.bg};padding:3px 10px;border-radius:12px;letter-spacing:.04em">${_bdef.label}</div>` : '';
+  const badgeHtml = _bdef ? `<div style="position:fixed;top:13px;left:16px;font:700 0.58rem 'Plus Jakarta Sans',system-ui,sans-serif;color:${_bdef.ink};background:${_bdef.bg};padding:3px 10px;border-radius:12px;letter-spacing:.06em;text-transform:uppercase">${_bdef.label}</div>` : '';
+  /* Subtle gold top accent line — brand touch without overpowering */
+  const accentBar = `<div style="position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(232,168,56,.55) 20%,rgba(232,168,56,.55) 80%,transparent);pointer-events:none"></div>`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -384,12 +386,12 @@ html, body {
   color: ${col};
 }
 .slide-text {
-  font-size: ${fs}; font-weight: 400;
-  white-space: pre-wrap; max-width: 960px; line-height: 1.48;
-  animation: fi .22s ease;
+  font-size: ${fs}; font-weight: 500; letter-spacing: 0.01em;
+  white-space: pre-wrap; max-width: 960px; line-height: 1.52;
+  animation: fi .25s ease;
 }
 @keyframes fi {
-  from { opacity: 0; transform: translateY(7px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
 }
 </style>
@@ -399,7 +401,7 @@ html, body {
   <div class="slide-text">${body}</div>
   ${refHtml}
 </div>
-${counter}${badgeHtml}${nextHtml}${noteHtml}${infoHtml}
+${counter}${badgeHtml}${accentBar}${nextHtml}${noteHtml}${infoHtml}
 <script>
 var _bg = ${JSON.stringify(bg)};
 var _blacked = false;
