@@ -1957,6 +1957,22 @@ const _SECTION_DEFAULT_TITLE = {
 };
 
 // Split a long block of prose into slide-sized chunks (paragraph → sentence).
+// Break a long string at word boundaries, never mid-word.
+function _wordBoundaryWrap(str, maxLen) {
+  const out = [];
+  str = str.trim();
+  while (str.length > maxLen) {
+    let cut = maxLen;
+    // Walk back to the nearest space so we don't slice a word in half
+    while (cut > 0 && str[cut] !== ' ') cut--;
+    if (cut === 0) cut = maxLen; // no space found — force break at limit
+    out.push(str.slice(0, cut).trim());
+    str = str.slice(cut).trim();
+  }
+  if (str) out.push(str);
+  return out;
+}
+
 function _chunkProseToSlides(text, targetLen) {
   targetLen = targetLen || _SLIDE_CHAR_TARGET;
   const out = [];
@@ -1970,16 +1986,18 @@ function _chunkProseToSlides(text, targetLen) {
 
   paragraphs.forEach(para => {
     if (para.length <= targetLen) { out.push(para); return; }
+
+    // Split on sentence-ending punctuation so we never break mid-sentence.
     const sentences = para.match(/[^.!?]+[.!?]+[")'\]]*\s*|[^.!?]+$/g) || [para];
     let bucket = '';
     sentences.forEach(raw => {
       const s = raw.trim();
       if (!s) return;
+      // A single sentence longer than the hard cap — split at word boundaries,
+      // never at an arbitrary character position.
       if (s.length > _SLIDE_CHAR_HARD) {
         if (bucket) { out.push(bucket.trim()); bucket = ''; }
-        for (let i = 0; i < s.length; i += _SLIDE_CHAR_HARD) {
-          out.push(s.slice(i, i + _SLIDE_CHAR_HARD).trim());
-        }
+        _wordBoundaryWrap(s, _SLIDE_CHAR_HARD).forEach(chunk => out.push(chunk));
         return;
       }
       if (bucket && (bucket.length + 1 + s.length) > targetLen) {

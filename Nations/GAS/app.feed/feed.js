@@ -1106,6 +1106,22 @@ function _mkShowSlide(type, text, opts) {
 // paragraph boundaries (blank lines); paragraphs that are still too long
 // are re-split on sentence boundaries, with sentences packed onto the
 // same slide until SLIDE_CHAR_TARGET is reached.
+// Break a long string at word boundaries, never mid-word.
+function _wordBoundaryWrap(str, maxLen) {
+  const out = [];
+  str = str.trim();
+  while (str.length > maxLen) {
+    let cut = maxLen;
+    // Walk back to the nearest space so we don't slice a word in half
+    while (cut > 0 && str[cut] !== ' ') cut--;
+    if (cut === 0) cut = maxLen; // no space found — force break at limit
+    out.push(str.slice(0, cut).trim());
+    str = str.slice(cut).trim();
+  }
+  if (str) out.push(str);
+  return out;
+}
+
 function _chunkProseToSlides(text, targetLen) {
   targetLen = targetLen || SLIDE_CHAR_TARGET;
   const out = [];
@@ -1120,22 +1136,21 @@ function _chunkProseToSlides(text, targetLen) {
   paragraphs.forEach(para => {
     if (para.length <= targetLen) { out.push(para); return; }
 
-    // Long paragraph — split on sentence boundaries.  Keeps the
-    // punctuation attached to the sentence so it doesn't read awkwardly.
+    // Split on sentence-ending punctuation so we never break mid-sentence.
+    // Keeps punctuation attached to the sentence it belongs to.
     const sentences = para.match(/[^.!?]+[.!?]+[")'\]]*\s*|[^.!?]+$/g) || [para];
     let bucket = '';
     sentences.forEach(raw => {
       const s = raw.trim();
       if (!s) return;
-      // If this single sentence alone is huge, hard-wrap it
+      // A single sentence longer than the hard cap — split at word boundaries,
+      // never at an arbitrary character position.
       if (s.length > SLIDE_CHAR_HARD) {
         if (bucket) { out.push(bucket.trim()); bucket = ''; }
-        for (let i = 0; i < s.length; i += SLIDE_CHAR_HARD) {
-          out.push(s.slice(i, i + SLIDE_CHAR_HARD).trim());
-        }
+        _wordBoundaryWrap(s, SLIDE_CHAR_HARD).forEach(chunk => out.push(chunk));
         return;
       }
-      // Pack until we exceed target
+      // Pack sentences together until we exceed the target length
       if (bucket && (bucket.length + 1 + s.length) > targetLen) {
         out.push(bucket.trim());
         bucket = s;
