@@ -1665,12 +1665,9 @@
     </div>
   </div>
 
-  <!-- FCM Web Push VAPID key (flockos-notify project)
-       Get from Firebase Console → Project Settings → Cloud Messaging → Web Push certificates → Key pair
-       Paste the ~88-char public key string below. -->
-  <script>
-    window.FLOCK_VAPID_KEY = '';  // ← PASTE VAPID KEY HERE
-  </script>
+  <!-- FCM VAPID key is stored in Firestore: settings/notifications → { vapidKey: "B..." }
+       Get from Firebase Console → Project Settings → Cloud Messaging → Web Push certificates
+       This keeps the key out of source control and makes it per-church configurable. -->
 
   <!-- Firebase Config -->
   <script>

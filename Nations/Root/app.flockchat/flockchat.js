@@ -407,10 +407,19 @@
 
     _messaging = firebase.messaging();
 
-    // Check for VAPID key configuration
-    const vapidKey = (typeof window !== 'undefined') ? window.FLOCK_VAPID_KEY : null;
+    // VAPID key — fetched from Firestore settings/notifications so it is
+    // never committed to source control and is per-church configurable.
+    // Admins add it via Firebase Console or the FlockOS admin panel:
+    //   Firestore → settings → notifications → { vapidKey: "B..." }
+    let vapidKey = '';
+    try {
+      const settingsSnap = await _db.collection('settings').doc('notifications').get();
+      vapidKey = (settingsSnap.exists && settingsSnap.data()?.vapidKey) || '';
+    } catch (fetchErr) {
+      console.warn('[FlockChat] Could not fetch VAPID key from Firestore:', fetchErr);
+    }
     if (!vapidKey) {
-      console.log('[FlockChat] FCM VAPID key not configured (window.FLOCK_VAPID_KEY)');
+      console.log('[FlockChat] FCM VAPID key not configured (settings/notifications.vapidKey)');
       return;
     }
 
