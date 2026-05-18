@@ -49,10 +49,13 @@
   const INFO_FLOCKOS_ID   = 'info-flockos';
   const INFO_IDS = new Set([INFO_FLOCKCHAT_ID, INFO_FLOCKOS_ID]);
 
-  // Quick-lookup Set of all static group IDs (includes info channels)
+  // Personal sanctuary channel (journal, prayers, devotional, reading)
+  const SANCTUARY_ID = 'my-sanctuary';
+
+  // Quick-lookup Set of all static group IDs (includes info + sanctuary)
   const ALL_GROUP_IDS = new Set([
     ANNOUNCEMENTS_ID, MENS_MINISTRY_ID, WOMENS_MINISTRY_ID,
-    INFO_FLOCKCHAT_ID, INFO_FLOCKOS_ID,
+    INFO_FLOCKCHAT_ID, INFO_FLOCKOS_ID, SANCTUARY_ID,
     ...ALL_MEMBER_GROUPS.map(g => g.id)
   ]);
 
@@ -67,6 +70,7 @@
   let _msgUnsub = null;
   let _showArchived = false;
   let _openMenuConvId = null;
+  let _sanctuaryTab = 'journal'; // active tab inside personal sanctuary hub
   // Church / member context (resolved during boot)
   let _myGender      = '';    // 'Male' | 'Female' | '' — from member doc
   let _meIsAllAccess = false; // Lead Pastor / admin — sees all pinned groups
@@ -1026,6 +1030,7 @@
     _injectMinistryChannels();
     _injectAnnouncements();
     _injectInfoChannels();
+    _injectSanctuary();
     _renderConversations();
 
     _convUnsub = _db.collection('conversations')
@@ -1045,6 +1050,7 @@
         _injectMinistryChannels();
         _injectAnnouncements();
         _injectInfoChannels();
+        _injectSanctuary();
         _renderConversations();
       }, err => {
         console.error('[FlockChat] Failed to load conversations:', err);
@@ -1054,6 +1060,7 @@
         _injectMinistryChannels();
         _injectAnnouncements();
         _injectInfoChannels();
+        _injectSanctuary();
         _renderConversations();
       });
   }
@@ -1123,6 +1130,21 @@
     });
   }
 
+  function _injectSanctuary() {
+    _conversations = _conversations.filter(c => c.id !== SANCTUARY_ID);
+    // Unshift last so it lands at the very top of the list
+    _conversations.unshift({
+      id:           SANCTUARY_ID,
+      type:         'my-sanctuary',
+      name:         'My Sanctuary',
+      participants: [],
+      lastMessage:  { text: 'Journal · Prayers · Today\u2019s Word · Reading Plan', author: '', timestamp: null },
+      lastActivity: null,
+      unreadCount:  0,
+      _static:      true
+    });
+  }
+
   function _filterConversations(query) {
     const list = $('fc-list');
     if (!list) return;
@@ -1168,6 +1190,8 @@
         return `<svg ${sz} ${S}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="12" y1="9" x2="12" y2="9"/><line x1="12" y1="13" x2="12" y2="17"/></svg>`;
       case 'info-flockos':
         return `<svg ${sz} ${S}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>`;
+      case 'my-sanctuary':
+        return `<svg ${sz} ${S}><line x1="12" y1="2" x2="12" y2="8"/><path d="M9 8c0 1.66 1.34 3 3 3s3-1.34 3-3c0-2-3-5-3-5S9 6 9 8z"/><rect x="10" y="11" width="4" height="11" rx="1"/><line x1="9" y1="14" x2="15" y2="14"/></svg>`;
       default:
         return `<svg ${sz} ${S}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
     }
@@ -1261,6 +1285,13 @@
           <line x1="12" y1="8" x2="12" y2="8"/>
           <line x1="12" y1="12" x2="12" y2="16"/>
         </svg>`;
+      case 'my-sanctuary':
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <line x1="12" y1="2" x2="12" y2="8"/>
+          <path d="M9 8c0 1.66 1.34 3 3 3s3-1.34 3-3c0-2-3-5-3-5S9 6 9 8z"/>
+          <rect x="10" y="11" width="4" height="11" rx="1"/>
+          <line x1="9" y1="14" x2="15" y2="14"/>
+        </svg>`;
       default:
         // Generic chat bubble
         return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
@@ -1277,6 +1308,7 @@
       || c.type === 'ministry-women'
       || c.type === 'info-flockchat'
       || c.type === 'info-flockos'
+      || c.type === 'my-sanctuary'
       || ALL_MEMBER_GROUPS.some(g => g.type === c.type));
   }
   function _isArchivedForMe(c) {
@@ -1308,6 +1340,7 @@
 
     // ── Pinned section (all channel types) ───────────────────────────────
     const PINNED_TYPES = [
+      'my-sanctuary',
       'announcement', 'prayer', 'pastoral',
       'ministry-men', 'ministry-women',
       'servant-team', 'worship-team', 'missions-team',
@@ -1567,11 +1600,11 @@
     const thread = $('fc-thread');
     if (thread) thread.classList.add('active');
 
-    // Hide composer for read-only info channels
+    // Hide composer for read-only info channels and sanctuary (has its own input)
     const composer = document.querySelector('.fc-composer');
     if (composer) {
-      const isInfo = INFO_IDS.has(convId);
-      composer.style.display = isInfo ? 'none' : '';
+      const hideComposer = INFO_IDS.has(convId) || convId === SANCTUARY_ID;
+      composer.style.display = hideComposer ? 'none' : '';
     }
 
     // Load messages
@@ -1596,6 +1629,12 @@
     // Info channels are fully static — render cards immediately, no Firestore
     if (INFO_IDS.has(convId)) {
       _renderInfoMessages(convId, msgContainer);
+      return;
+    }
+
+    // Personal sanctuary hub — journal, prayers, devotional, reading
+    if (convId === SANCTUARY_ID) {
+      _renderSanctuary(msgContainer);
       return;
     }
 
@@ -1709,6 +1748,338 @@
   window._closeInfoModal = function() {
     $('fc-info-modal')?.setAttribute('hidden', '');
   };
+
+  /* ── My Sanctuary — Personal Hub ─────────────────────────────────────── */
+
+  function _renderSanctuary(container) {
+    const tabs = [
+      { id: 'journal', label: 'Journal'       },
+      { id: 'prayers', label: 'Prayers'        },
+      { id: 'word',    label: 'Today\u2019s Word' },
+      { id: 'reading', label: 'Reading'        },
+    ];
+    container.innerHTML = `
+      <div class="fc-sanctuary">
+        <div class="fc-sct-tabs" role="tablist">
+          ${tabs.map(t => `<button class="fc-sct-tab${_sanctuaryTab === t.id ? ' active' : ''}" data-tab="${_e(t.id)}" role="tab" onclick="window._switchSanctuaryTab('${_e(t.id)}')">${_e(t.label)}</button>`).join('')}
+        </div>
+        <div class="fc-sct-pane" id="fc-sct-pane"></div>
+      </div>`;
+    _loadSanctuaryPane(_sanctuaryTab);
+  }
+
+  window._switchSanctuaryTab = function(tabId) {
+    _sanctuaryTab = tabId;
+    document.querySelectorAll('.fc-sct-tab').forEach(b =>
+      b.classList.toggle('active', b.dataset.tab === tabId));
+    _loadSanctuaryPane(tabId);
+  };
+
+  async function _loadSanctuaryPane(tabId) {
+    const pane = document.getElementById('fc-sct-pane');
+    if (!pane) return;
+    pane.innerHTML = '<div class="fc-loading"><div class="fc-spinner"></div></div>';
+    if      (tabId === 'journal') await _sctJournal(pane);
+    else if (tabId === 'prayers') await _sctPrayers(pane);
+    else if (tabId === 'word')    await _sctWord(pane);
+    else if (tabId === 'reading') await _sctReading(pane);
+  }
+
+  /* Journal tab */
+  async function _sctJournal(pane) {
+    let entries = [];
+    const UR = window.UpperRoom;
+    if (UR && typeof UR.listJournal === 'function') {
+      try { entries = await UR.listJournal({ limit: 100 }) || []; }
+      catch (err) { console.warn('[Sanctuary] journal fetch', err); }
+    }
+    pane.innerHTML = `
+      <div class="fc-sct-section">
+        <div class="fc-sct-compose">
+          <textarea class="fc-sct-compose-text" id="fc-sct-jtext" placeholder="Write your thoughts, reflections, or anything on your heart\u2026"></textarea>
+          <div class="fc-sct-compose-footer">
+            <label class="fc-sct-priv-label"><input type="checkbox" id="fc-sct-jpriv" checked><span>Private</span></label>
+            <button class="fc-sct-save-btn" onclick="window._saveJournalEntry()">Save Entry</button>
+          </div>
+        </div>
+        <div class="fc-sct-list" id="fc-sct-jlist">
+          ${entries.length ? entries.map(e => _sctJournalEntryHTML(e)).join('') : '<div class="fc-sct-empty">No journal entries yet. Write your first one above.</div>'}
+        </div>
+      </div>`;
+  }
+
+  function _sctJournalEntryHTML(e) {
+    const date = _sctDate(e.createdAt);
+    const isPrivate = e.private !== false;
+    return `
+      <div class="fc-sct-entry" data-entry-id="${_e(e.id)}">
+        <div class="fc-sct-entry-meta">
+          <span class="fc-sct-entry-date">${date}</span>
+          <span class="fc-sct-badge ${isPrivate ? 'private' : 'shared'}">${isPrivate ? 'Private' : 'Shared'}</span>
+          <button class="fc-sct-entry-del" title="Delete" onclick="window._deleteJournalEntry('${_e(e.id)}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+        <div class="fc-sct-entry-text">${_e(e.text || '')}</div>
+      </div>`;
+  }
+
+  window._saveJournalEntry = async function() {
+    const ta = document.getElementById('fc-sct-jtext');
+    const privCb = document.getElementById('fc-sct-jpriv');
+    if (!ta) return;
+    const text = (ta.value || '').trim();
+    if (!text) return;
+    const btn = document.querySelector('#fc-sct-pane .fc-sct-save-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving\u2026'; }
+    const UR = window.UpperRoom;
+    try {
+      if (!UR || typeof UR.createJournal !== 'function') throw new Error('UpperRoom unavailable');
+      await UR.createJournal({ text, private: !!(privCb && privCb.checked) });
+      ta.value = '';
+    } catch (err) {
+      console.error('[Sanctuary] save journal', err);
+      if (btn) { btn.disabled = false; btn.textContent = 'Save Entry'; }
+      return;
+    }
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane) await _sctJournal(pane);
+  };
+
+  window._deleteJournalEntry = async function(id) {
+    if (!id) return;
+    const UR = window.UpperRoom;
+    if (!UR || typeof UR.deleteJournal !== 'function') return;
+    try { await UR.deleteJournal({ id }); }
+    catch (err) { console.error('[Sanctuary] delete journal', err); return; }
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane && _sanctuaryTab === 'journal') await _sctJournal(pane);
+  };
+
+  /* Prayers tab */
+  async function _sctPrayers(pane) {
+    let entries = [];
+    if (_db && _me && _me.email) {
+      try {
+        const snap = await _db.collection('prayers')
+          .where('createdBy', '==', _me.email)
+          .orderBy('createdAt', 'desc')
+          .limit(50).get();
+        snap.forEach(d => { const o = d.data(); o.id = d.id; entries.push(o); });
+      } catch (err) { console.warn('[Sanctuary] prayers fetch', err); }
+    }
+    pane.innerHTML = `
+      <div class="fc-sct-section">
+        <div class="fc-sct-compose">
+          <textarea class="fc-sct-compose-text" id="fc-sct-ptext" placeholder="Write a prayer request, a praise, or an intercession\u2026"></textarea>
+          <div class="fc-sct-compose-footer">
+            <label class="fc-sct-priv-label"><input type="checkbox" id="fc-sct-ppriv" checked><span>Keep private</span></label>
+            <button class="fc-sct-save-btn" onclick="window._savePrayer()">Save Prayer</button>
+          </div>
+        </div>
+        <div class="fc-sct-list" id="fc-sct-plist">
+          ${entries.length ? entries.map(e => _sctPrayerEntryHTML(e)).join('') : '<div class="fc-sct-empty">No prayer entries yet. Write your first one above.</div>'}
+        </div>
+      </div>`;
+  }
+
+  function _sctPrayerEntryHTML(e) {
+    const date = _sctDate(e.createdAt);
+    const isPrivate = e.isConfidential !== false;
+    const isPublished = !!e.published;
+    return `
+      <div class="fc-sct-entry" data-entry-id="${_e(e.id)}" data-prayer-text="${_e(e.text || '')}">
+        <div class="fc-sct-entry-meta">
+          <span class="fc-sct-entry-date">${date}</span>
+          <span class="fc-sct-badge ${isPrivate ? 'private' : 'shared'}">${isPrivate ? 'Private' : 'Shared'}</span>
+          ${isPublished
+            ? '<span class="fc-sct-badge published">Shared to Prayer Chain \u2713</span>'
+            : `<button class="fc-sct-publish-btn" onclick="window._publishPrayer('${_e(e.id)}')">Share to Prayer Chain</button>`}
+          <button class="fc-sct-entry-del" title="Delete" onclick="window._deletePrayer('${_e(e.id)}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+        <div class="fc-sct-entry-text">${_e(e.text || '')}</div>
+      </div>`;
+  }
+
+  window._savePrayer = async function() {
+    const ta = document.getElementById('fc-sct-ptext');
+    const privCb = document.getElementById('fc-sct-ppriv');
+    if (!ta || !_db || !_me) return;
+    const text = (ta.value || '').trim();
+    if (!text) return;
+    const btn = document.querySelector('#fc-sct-pane .fc-sct-save-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving\u2026'; }
+    try {
+      await _db.collection('prayers').add({
+        text,
+        isConfidential: !!(privCb && privCb.checked),
+        createdBy:  _me.email,
+        createdAt:  firebase.firestore.FieldValue.serverTimestamp(),
+        published:  false,
+      });
+      ta.value = '';
+    } catch (err) {
+      console.error('[Sanctuary] save prayer', err);
+      if (btn) { btn.disabled = false; btn.textContent = 'Save Prayer'; }
+      return;
+    }
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane) await _sctPrayers(pane);
+  };
+
+  window._publishPrayer = async function(id) {
+    if (!id || !_db || !_me) return;
+    const entryEl = document.querySelector(`.fc-sct-entry[data-entry-id="${id}"]`);
+    const text = entryEl ? (entryEl.dataset.prayerText || '') : '';
+    try {
+      await _db.collection('prayers').doc(id).update({
+        published:   true,
+        publishedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      await _db.collection('conversations').doc('prayer').collection('messages').add({
+        text,
+        authorName:  _me.name || _me.email,
+        author:      _me.uid,
+        authorEmail: _me.email,
+        timestamp:   firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    } catch (err) { console.error('[Sanctuary] publish prayer', err); return; }
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane) await _sctPrayers(pane);
+  };
+
+  window._deletePrayer = async function(id) {
+    if (!id || !_db) return;
+    try { await _db.collection('prayers').doc(id).delete(); }
+    catch (err) { console.error('[Sanctuary] delete prayer', err); return; }
+    const pane = document.getElementById('fc-sct-pane');
+    if (pane && _sanctuaryTab === 'prayers') await _sctPrayers(pane);
+  };
+
+  /* Today's Word tab */
+  async function _sctWord(pane) {
+    let row = null;
+    const today = _sctToday();
+    try {
+      const UR = window.UpperRoom;
+      if (UR && typeof UR.listAppContent === 'function') {
+        const rows = await UR.listAppContent('devotionals', { skipDateFilter: true }) || [];
+        row = rows.find(r => _sctNorm(r.date || r.Date || '') === today) || rows[0] || null;
+      }
+    } catch (err) { console.warn('[Sanctuary] devotional fetch', err); }
+    if (!row) {
+      pane.innerHTML = `
+        <div class="fc-sct-section">
+          <div class="fc-sct-word-empty">
+            <div class="fc-sct-word-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+            </div>
+            <p>No devotional found for today.</p>
+            <a class="fc-sct-grow-link" href="../app.grow/app.grow.html">Open GROW \u2192</a>
+          </div>
+        </div>`;
+      return;
+    }
+    const title      = _e(row.title      || row.Title      || 'Today\u2019s Reflection');
+    const theme      = row.theme      || row.Theme      || '';
+    const scripture  = row.scripture  || row.Scripture  || '';
+    const reflection = row.reflection || row.Reflection || '';
+    const question   = row.question   || row.Question   || '';
+    const prayer     = row.prayer     || row.Prayer     || '';
+    pane.innerHTML = `
+      <div class="fc-sct-section fc-sct-word">
+        <div class="fc-sct-word-date">${_sctPrettyDate(today)}</div>
+        <h2 class="fc-sct-word-title">${title}</h2>
+        ${theme      ? `<div class="fc-sct-word-theme">${_e(theme)}</div>` : ''}
+        ${scripture  ? `<div class="fc-sct-word-scripture">${_e(scripture)}</div>` : ''}
+        ${reflection ? `<div class="fc-sct-word-body"><strong>Reflection</strong><p>${_e(reflection)}</p></div>` : ''}
+        ${question   ? `<div class="fc-sct-word-body fc-sct-word-question"><strong>Reflect</strong><p>${_e(question)}</p></div>` : ''}
+        ${prayer     ? `<div class="fc-sct-word-body fc-sct-word-pray"><strong>Prayer</strong><p>${_e(prayer)}</p></div>` : ''}
+        <a class="fc-sct-grow-link" href="../app.grow/app.grow.html">Open in GROW \u2192</a>
+      </div>`;
+  }
+
+  /* Reading tab */
+  async function _sctReading(pane) {
+    let row = null;
+    const todayDay = _sctDayOfYear();
+    try {
+      const UR = window.UpperRoom;
+      if (UR && typeof UR.listAppContent === 'function') {
+        const rows = await UR.listAppContent('reading', { skipDateFilter: true }) || [];
+        row = rows.find(r => +(r.day || r.Day || 0) === todayDay) || rows[todayDay - 1] || null;
+      }
+    } catch (err) { console.warn('[Sanctuary] reading fetch', err); }
+    if (!row) {
+      pane.innerHTML = `
+        <div class="fc-sct-section">
+          <div class="fc-sct-word-empty">
+            <div class="fc-sct-word-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+            </div>
+            <p>No reading plan found for Day ${todayDay}.</p>
+            <a class="fc-sct-grow-link" href="../app.grow/app.grow.html">Open GROW \u2192</a>
+          </div>
+        </div>`;
+      return;
+    }
+    const passages = [
+      { label: 'Old Testament', ref: row.ot || row.OT || row['Old Testament'] || '', color: '#7c3aed' },
+      { label: 'New Testament', ref: row.nt || row.NT || row['New Testament'] || '', color: '#0ea5e9' },
+      { label: 'Psalms',        ref: row.psalms  || row.Psalms  || row.ps || '', color: '#059669' },
+      { label: 'Proverbs',      ref: row.proverbs || row.Proverbs || row.pr || '', color: '#d97706' },
+    ].filter(p => p.ref);
+    pane.innerHTML = `
+      <div class="fc-sct-section fc-sct-reading">
+        <div class="fc-sct-word-date">Day ${+(row.day || row.Day || todayDay)} \u00b7 ${_sctPrettyDate(_sctToday())}</div>
+        <div class="fc-sct-passages">
+          ${passages.map(p => `
+            <div class="fc-sct-passage" style="--sct-accent:${p.color}">
+              <div class="fc-sct-passage-label">${_e(p.label)}</div>
+              <div class="fc-sct-passage-ref">${_e(p.ref)}</div>
+            </div>`).join('')}
+        </div>
+        <a class="fc-sct-grow-link" href="../app.grow/app.grow.html">Open in GROW \u2192</a>
+      </div>`;
+  }
+
+  /* Date / time helpers for sanctuary */
+  function _sctToday() {
+    const d = new Date(), p = n => n < 10 ? '0' + n : '' + n;
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+  function _sctNorm(s) {
+    if (!s) return '';
+    if (s && s.toDate) s = s.toDate();
+    if (s instanceof Date) {
+      const p = n => n < 10 ? '0' + n : '' + n;
+      return s.getFullYear() + '-' + p(s.getMonth() + 1) + '-' + p(s.getDate());
+    }
+    const str = String(s).trim();
+    if (/^\d{4}-\d{2}-\d{2}/.test(str)) return str.slice(0, 10);
+    const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (m) return m[3] + '-' + m[1].padStart(2, '0') + '-' + m[2].padStart(2, '0');
+    return str.slice(0, 10);
+  }
+  function _sctDayOfYear() {
+    const now = new Date(), start = new Date(now.getFullYear(), 0, 0);
+    return Math.floor((now - start) / 86400000);
+  }
+  function _sctPrettyDate(ymd) {
+    if (!ymd) return '';
+    const [y, m, d] = String(ymd).split('-').map(Number);
+    return new Date(y, (m || 1) - 1, d || 1).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  }
+  function _sctDate(ts) {
+    if (!ts) return '';
+    let d = (ts && ts.toDate) ? ts.toDate() : (ts instanceof Date ? ts : new Date(ts));
+    if (isNaN(d)) return '';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  /* ── End of My Sanctuary ────────────────────────────────────────────── */
 
   function _renderMessages() {
     const msgContainer = $('fc-messages');
