@@ -1475,6 +1475,8 @@ function _cancelCellEdit() {
 
 function _setCellValue(ref, val) {
   if (!ref) return;
+  // Session 10: snapshot before mutation for undo/redo
+  if (typeof _sheetHistorySnapshot === 'function') _sheetHistorySnapshot();
   if (!S.sheet.data[ref]) S.sheet.data[ref] = { v: '', f: '', s: {} };
 
   if (val === '' || val === null || val === undefined) {
@@ -5650,3 +5652,237 @@ async function _submitPublicFormResponse() {
     _toast('Failed to submit response', 'error');
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SESSION 10: POLISH & PERFORMANCE
+   "Whatever you do, do it heartily, as to the Lord." — Colossians 3:23
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Full-text search helpers ────────────────────────────────────────────── */
+
+function _textSnippet(html) {
+  try {
+    const div = document.createElement('div');
+    div.innerHTML = html || '';
+    return (div.textContent || '').toLowerCase().slice(0, 300);
+  } catch (_) { return ''; }
+}
+
+function _docSearchText(doc) {
+  const parts = [
+    (doc.name || '').toLowerCase(),
+    (doc.type || '').toLowerCase(),
+    (doc.ownerName || '').toLowerCase(),
+  ];
+  if (doc.type === 'document' && doc.content) parts.push(_textSnippet(doc.content));
+  return parts.join(' ');
+}
+
+/* ── Undo/Redo stack for FlockSheets ─────────────────────────────────────── */
+
+const _sheetUndoStack = [];
+const _sheetRedoStack = [];
+let _sheetHistoryLock = false;
+const SHEET_HISTORY_LIMIT = 50;
+
+function _sheetHistorySnapshot() {
+  if (_sheetHistoryLock) return;
+  try {
+    const snap = JSON.stringify(S.sheet.data);
+    _sheetUndoStack.push(snap);
+    if (_sheetUndoStack.length > SHEET_HISTORY_LIMIT) _sheetUndoStack.shift();
+    _sheetRedoStack.length = 0;
+  } catch (_) { /* ignore */ }
+}
+
+function _sheetUndo() {
+  if (_sheetUndoStack.length === 0) { _toast('Nothing to undo', 'info', 1200); return; }
+  _sheetRedoStack.push(JSON.stringify(S.sheet.data));
+  if (_sheetRedoStack.length > SHEET_HISTORY_LIMIT) _sheetRedoStack.shift();
+  _sheetHistoryLock = true;
+  try { S.sheet.data = JSON.parse(_sheetUndoStack.pop()); } catch (_) {}
+  _sheetHistoryLock = false;
+  _renderGrid?.();
+  _autoSaveSheet?.();
+  _toast('Undo', 'info', 1200);
+}
+
+function _sheetRedo() {
+  if (_sheetRedoStack.length === 0) { _toast('Nothing to redo', 'info', 1200); return; }
+  _sheetUndoStack.push(JSON.stringify(S.sheet.data));
+  _sheetHistoryLock = true;
+  try { S.sheet.data = JSON.parse(_sheetRedoStack.pop()); } catch (_) {}
+  _sheetHistoryLock = false;
+  _renderGrid?.();
+  _autoSaveSheet?.();
+  _toast('Redo', 'info', 1200);
+}
+
+/* ── Progressive card loading with IntersectionObserver ──────────────────── */
+
+let _cardObserver = null;
+
+function _initCardObserver() {
+  if (!('IntersectionObserver' in window)) return;
+  if (_cardObserver) { _cardObserver.disconnect(); }
+  _cardObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('fd-card-appear');
+        _cardObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.04, rootMargin: '0px 0px 80px 0px' });
+}
+
+function _observeDocCards() {
+  if (!_cardObserver) return;
+  document.querySelectorAll('.fd-doc-card:not(.fd-card-appear)').forEach(card => {
+    _cardObserver.observe(card);
+  });
+}
+
+/* ── Global keyboard shortcuts ───────────────────────────────────────────── */
+
+function _viewId(id) {
+  const el = document.getElementById(id);
+  return el && !el.classList.contains('hidden');
+}
+
+function _bindGlobalKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    const ctrl = e.ctrlKey || e.metaKey;
+    const key = e.key.toLowerCase();
+
+    // ── Escape: close modals / go back ──────────────────────────────────
+    if (e.key === 'Escape') {
+      const popupIds = [
+        'fd-new-menu', 'fd-writer-io-dropdown', 'fd-sheet-io-dropdown',
+        'fs-bg-popup', 'fs-tc-popup', 'fs-border-popup',
+        'fd-table-popup', 'fd-layout-popup',
+        'fd-slides-theme-popup', 'fd-slides-trans-popup',
+        'fd-chart-modal-overlay',
+      ];
+      let closed = false;
+      for (const id of popupIds) {
+        const el = document.getElementById(id);
+        if (el && !el.classList.contains('hidden')) { el.classList.add('hidden'); closed = true; }
+      }
+      if (closed) return;
+
+      // Modals
+      const modalIds = ['fd-share-overlay', 'fd-template-overlay', 'fd-version-preview-overlay'];
+      for (const id of modalIds) {
+        const el = document.getElementById(id);
+        if (el && !el.classList.contains('hidden')) { el.classList.add('hidden'); return; }
+      }
+
+      const collabPanel = document.getElementById('fd-collab-panel');
+      if (collabPanel?.classList.contains('is-open')) {
+        collabPanel.classList.remove('is-open');
+        return;
+      }
+
+      if (_viewId('fd-editor-view'))  { _closeEditor?.(); return; }
+      if (_viewId('fd-sheet-view'))   { _closeSpreadsheetEditor?.(); return; }
+      if (_viewId('fd-slides-view'))  { _closeSlidesEditor?.(); return; }
+      if (_viewId('fd-form-view'))    { _closeFormEditor?.(); return; }
+      return;
+    }
+
+    // ── Ctrl+F: focus search (library) ──────────────────────────────────
+    if (ctrl && key === 'f' && _viewId('fd-library-view')) {
+      e.preventDefault();
+      document.getElementById('fd-search-input')?.focus();
+      return;
+    }
+
+    // ── Ctrl+S: save ────────────────────────────────────────────────────
+    if (ctrl && key === 's') {
+      e.preventDefault();
+      if (_viewId('fd-editor-view'))  { saveDocument?.(); return; }
+      if (_viewId('fd-sheet-view'))   { _saveSpreadsheet?.(); return; }
+      if (_viewId('fd-slides-view'))  { _saveSlides?.(); return; }
+      if (_viewId('fd-form-view'))    { _saveForm?.(); return; }
+      return;
+    }
+
+    // ── Ctrl+N: new document (library only) ─────────────────────────────
+    if (ctrl && key === 'n' && _viewId('fd-library-view')) {
+      e.preventDefault();
+      createNewDocument?.();
+      return;
+    }
+
+    // ── Writer: Ctrl+B / Ctrl+I / Ctrl+U ────────────────────────────────
+    if (_viewId('fd-editor-view')) {
+      const editor = document.getElementById('fd-editor-content');
+      const inEditor = editor && (editor === document.activeElement || editor.contains(document.activeElement));
+      if (ctrl && key === 'b' && inEditor) { e.preventDefault(); _execCommand?.('bold'); return; }
+      if (ctrl && key === 'i' && inEditor) { e.preventDefault(); _execCommand?.('italic'); return; }
+      if (ctrl && key === 'u' && inEditor) { e.preventDefault(); _execCommand?.('underline'); return; }
+    }
+
+    // ── Sheet: Ctrl+Z / Ctrl+Y (only when not in formula bar / input) ────
+    if (_viewId('fd-sheet-view')) {
+      const activeTag = document.activeElement?.tagName;
+      const inInputField = activeTag === 'INPUT' || activeTag === 'TEXTAREA';
+      if (ctrl && key === 'z' && !e.shiftKey && !inInputField && !S.sheet.isEditing) {
+        e.preventDefault(); _sheetUndo(); return;
+      }
+      if (ctrl && (key === 'y' || (key === 'z' && e.shiftKey)) && !inInputField && !S.sheet.isEditing) {
+        e.preventDefault(); _sheetRedo(); return;
+      }
+    }
+  });
+}
+
+/* ── Enhanced _renderDocuments with full-text search + progressive loading ── */
+// Shadow the earlier module-level declaration with a new one that wraps it
+const _renderDocumentsBase = _renderDocuments;
+_renderDocuments = function _renderDocumentsPolished() {
+  const container = document.getElementById('fd-doc-list');
+  if (!container) return;
+
+  let docs = S.documents;
+  if (S.searchQuery) {
+    docs = docs.filter(doc => _docSearchText(doc).includes(S.searchQuery));
+  }
+
+  if (docs.length === 0) {
+    container.innerHTML = `
+      <div class="fd-empty-state">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3>${S.searchQuery ? 'No documents found' : 'No documents yet'}</h3>
+        <p>${S.searchQuery ? 'Try a different search term' : 'Create your first document to get started'}</p>
+        ${!S.searchQuery ? `<button class="fd-btn" onclick="FlockDocs.createNewDocument()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Create Document
+        </button>` : ''}
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `<div class="fd-doc-grid">${docs.map(_renderDocCard).join('')}</div>`;
+  _observeDocCards();
+};
+
+/* ── Session 10 init (runs after DOM is ready) ───────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  _initCardObserver();
+  _bindGlobalKeyboardShortcuts();
+
+  // Expose undo/redo to global scope for HTML onclick use
+  if (window.FlockDocs) {
+    window.FlockDocs.sheetUndo = _sheetUndo;
+    window.FlockDocs.sheetRedo = _sheetRedo;
+  }
+}, { once: true });
+
+// Expose _sheetHistorySnapshot so _setCellValue (defined earlier) can call it
+window._fdSheetHistorySnapshot = _sheetHistorySnapshot;

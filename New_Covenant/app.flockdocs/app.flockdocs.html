@@ -401,6 +401,36 @@
     /* Hidden utility */
     .hidden { display: none !important; }
 
+    /* ── Session 10: Progressive card animation ──────────────────────────── */
+    .fd-doc-card.fd-card-appear {
+      animation: fdCardIn 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    @keyframes fdCardIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.97); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ── Session 10: Mobile touch optimizations ──────────────────────────── */
+    @media (max-width: 768px) {
+      /* Larger touch targets */
+      .fd-btn-icon { width: 44px; height: 44px; }
+      .fd-sidebar-btn { padding: 12px 14px; min-height: 48px; }
+      .fd-new-menu-item { min-height: 48px; }
+
+      /* Prevent iOS input zoom (font-size must be >= 16px) */
+      input, select, textarea { font-size: max(16px, 0.875rem) !important; }
+
+      /* Better scrolling on touch */
+      .fd-doc-grid { gap: 14px; }
+      .fd-library-view { padding: 20px 16px; }
+
+      /* Sheet toolbar — allow wrapping on small screens */
+      .fd-sheet-toolbar { gap: 3px; padding: 6px 10px; }
+
+      /* Editor toolbar wrapping */
+      .fd-toolbar { gap: 2px; padding: 6px 10px; flex-wrap: wrap; }
+    }
+
     /* Footer */
     #fd-footer {
       display: flex; align-items: center; justify-content: space-between;
@@ -3442,6 +3472,28 @@
 
   <!-- Toast container (outside fd-wrap so it's always on top) -->
   <div id="fd-toast-container"></div>
+
+  <!-- Session 10: Service Worker registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('app.flockdocs/sw.js', { scope: 'app.flockdocs/' })
+          .then(reg => {
+            // If a new SW is waiting, tell it to take over immediately
+            if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              newWorker?.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  newWorker.postMessage({ type: 'SKIP_WAITING' });
+                }
+              });
+            });
+          })
+          .catch(() => { /* SW not critical; silently ignore */ });
+      });
+    }
+  </script>
 
 </body>
 </html>
