@@ -1,9 +1,96 @@
 const {onCall, HttpsError} = require('firebase-functions/v2/https');
+const {onDocumentCreated}  = require('firebase-functions/v2/firestore');
 const admin = require('firebase-admin');
 const puppeteer = require('puppeteer-core');
 const chromium = require('@sparticuz/chromium');
 
 admin.initializeApp();
+
+// ── FlockChat Push Notifications ──────────────────────────────────────────
+// Fires on every new message. Sends an FCM push to each other participant
+// whose user doc has a valid fcmToken stored.
+exports.onFlockChatMessage = onDocumentCreated(
+  'conversations/{convId}/messages/{msgId}',
+  async (event) => {
+    const msg   = event.data.data();
+    const db    = admin.firestore();
+
+    const senderId   = msg.sender   || msg.uid || '';
+    const senderName = msg.senderName || msg.displayName || 'Someone';
+    const body       = (msg.body || msg.text || '').slice(0, 140);
+    const convId     = event.params.convId;
+
+    if (!body) return null;
+
+    // Fetch the conversation to get participant list
+    const convSnap = await db.collection('conversations').doc(convId).get();
+    if (!convSnap.exists) return null;
+    const participants = convSnap.data().participants || [];
+    const convName     = convSnap.data().name || convSnap.data().title || 'FlockChat';
+
+    // Collect FCM tokens for all participants except the sender
+    const recipients = participants.filter(uid => uid !== senderId);
+    if (!recipients.length) return null;
+
+    const tokenDocs = await Promise.all(
+      recipients.map(uid => db.collection('users').doc(uid).get())
+    );
+
+    const tokens = [];
+    const uidByToken = {};
+    for (const doc of tokenDocs) {
+      if (!doc.exists) continue;
+      const token = doc.data()?.fcmToken;
+      if (token && typeof token === 'string') {
+        tokens.push(token);
+        uidByToken[token] = doc.id;
+      }
+    }
+    if (!tokens.length) return null;
+
+    const message = {
+      notification: {
+        title: `${convName}`,
+        body:  `${senderName}: ${body}`,
+      },
+      data: {
+        conversationId: convId,
+        channelId:      convId,
+        sender:         senderId,
+      },
+      tokens,
+    };
+
+    const response = await admin.messaging().sendEachForMulticast(message);
+
+    // Clean up invalid tokens so we don't waste FCM quota
+    const stale = [];
+    response.responses.forEach((res, idx) => {
+      if (!res.success) {
+        const code = res.error?.code || '';
+        if (
+          code === 'messaging/invalid-registration-token' ||
+          code === 'messaging/registration-token-not-registered'
+        ) {
+          stale.push(tokens[idx]);
+        }
+      }
+    });
+    if (stale.length) {
+      const batch = db.batch();
+      for (const token of stale) {
+        const uid = uidByToken[token];
+        if (uid) batch.update(db.collection('users').doc(uid), { fcmToken: admin.firestore.FieldValue.delete() });
+      }
+      await batch.commit();
+    }
+
+    console.log(`[FCM] sent=${response.successCount} failed=${response.failureCount} conv=${convId}`);
+    return null;
+  }
+);
+
+
 
 /**
  * Helper function to log in to SongSelect

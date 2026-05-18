@@ -421,8 +421,21 @@
       return;
     }
 
+    // Register the FCM service worker explicitly (needed for sub-path PWA)
+    let swReg;
+    try {
+      swReg = await navigator.serviceWorker.register(
+        new URL('./firebase-messaging-sw.js', location.href).toString(),
+        { scope: new URL('./', location.href).toString() }
+      );
+    } catch (swErr) {
+      console.warn('[FlockChat] FCM SW registration failed:', swErr);
+    }
+
     // Get token
-    const token = await _messaging.getToken({ vapidKey });
+    const tokenOpts = { vapidKey };
+    if (swReg) tokenOpts.serviceWorkerRegistration = swReg;
+    const token = await _messaging.getToken(tokenOpts);
     console.log('[FlockChat] FCM token:', token);
 
     // Save token to user doc
