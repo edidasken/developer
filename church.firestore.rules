@@ -44,6 +44,12 @@ service cloud.firestore {
       return role != null && role in ['leader', 'pastor', 'admin', 'seed'];
     }
 
+    function isPastorTimothyOrAbove() {
+      // Quarterly planner access: pastor, admin, seed, timothy (pastoral assistant)
+      let role = userRole();
+      return role != null && role in ['timothy', 'pastor', 'admin', 'seed'];
+    }
+
     // ── Conversations (DMs, Rooms, Threads, Channels) ───────────────
       match /conversations/{convoId} {
 
@@ -617,8 +623,8 @@ service cloud.firestore {
 
       // ── Quarterly Worship Plans (draft data for the quarterly planner) ─
       match /quarterlyPlans/{planId} {
-        allow read: if isSignedIn() && isLeaderOrAbove();
-        allow create, update: if isSignedIn() && isLeaderOrAbove();
+        allow read: if isSignedIn() && isPastorTimothyOrAbove();
+        allow create, update: if isSignedIn() && isPastorTimothyOrAbove();
         allow delete: if isSignedIn() && isPastorOrAdmin();
       }
 
