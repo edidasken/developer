@@ -871,6 +871,38 @@ for entry in "${CHURCHES[@]}"; do
 done
 echo ""
 
+# ── Check seed_database.json freshness ────────────────────────────────
+# Alert if source data files are newer than seed_database.json
+if ! $DRY_RUN; then
+  SEED_DB="$WORKSPACE/New_Covenant/Data/seed_database.json"
+  SOURCE_FILES=(
+    "$WORKSPACE/New_Covenant/Data/strongs-greek.js"
+    "$WORKSPACE/New_Covenant/Data/strongs-hebrew.js"
+    "$WORKSPACE/New_Covenant/Data/teaching_plans.js"
+  )
+  
+  if [ -f "$SEED_DB" ]; then
+    SEED_DB_TIME=$(stat -f %m "$SEED_DB" 2>/dev/null || stat -c %Y "$SEED_DB" 2>/dev/null)
+    NEEDS_UPDATE=false
+    
+    for SOURCE in "${SOURCE_FILES[@]}"; do
+      if [ -f "$SOURCE" ]; then
+        SOURCE_TIME=$(stat -f %m "$SOURCE" 2>/dev/null || stat -c %Y "$SOURCE" 2>/dev/null)
+        if [ "$SOURCE_TIME" -gt "$SEED_DB_TIME" ]; then
+          NEEDS_UPDATE=true
+          break
+        fi
+      fi
+    done
+    
+    if [ "$NEEDS_UPDATE" = true ]; then
+      echo "⚠️  NOTICE: Source data files are newer than seed_database.json"
+      echo "   Run: python3 Iris/Shepherds/Build/update_seed_database.py"
+      echo ""
+    fi
+  fi
+fi
+
 # ── Firebase Deployments ──────────────────────────────────────────────
 # Deploy Firestore rules and FlockChat hosting
 echo "══════════════════════════════════════════════"

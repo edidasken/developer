@@ -6,11 +6,32 @@ Updates New_Covenant/Data/seed_database.json to match church.firestore.rules:
 - Adds missing collections as empty arrays
 - Removes deprecated collections
 - Renames collections (wordsGreek → lexiconGreek, etc.)
-- Adds teachingPlans data from teaching_plans.js
+- Loads data from source files (teaching_plans.js, strongs-greek.js, strongs-hebrew.js)
 - Updates metadata
 
 NO personal data (prayers, conversations, journal, etc.) — collections exist but are empty.
-VALUE-ADDED data (books, theology, devotionals, teachingPlans, etc.) is preserved/added.
+VALUE-ADDED data (books, theology, devotionals, teachingPlans, lexicons, etc.) is preserved/added.
+
+WHEN TO RUN:
+  1. After adding/updating content in New_Covenant/Data/ folder
+  2. When B-Build warns "Source data files are newer than seed_database.json"
+  3. Before creating a new church deployment
+  4. As part of monthly/quarterly maintenance
+  5. After updating firestore rules (church.firestore.rules)
+
+USAGE:
+  Direct:     python3 Iris/Shepherds/Build/update_seed_database.py
+  Helper:     bash Iris/Shepherds/Build/refresh_seed_database.sh
+  
+SOURCE FILES MONITORED:
+  - New_Covenant/Data/strongs-greek.js (5,523 Greek lexicon entries)
+  - New_Covenant/Data/strongs-hebrew.js (8,674 Hebrew lexicon entries)
+  - New_Covenant/Data/teaching_plans.js (teaching session data)
+  - church.firestore.rules (collection definitions)
+  
+OUTPUT:
+  - Updates New_Covenant/Data/seed_database.json (5.9 MB, 17,443+ docs)
+  - B-Build auto-syncs to all Nations/ folders
 """
 
 import json
