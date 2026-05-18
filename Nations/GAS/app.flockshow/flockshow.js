@@ -364,12 +364,15 @@ function _buildPresentDoc(show, idx) {
 <head>
 <meta charset="UTF-8">
 <title>FlockShow — ${_esc(show.name)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
   width: 100%; height: 100%; overflow: hidden;
   background: ${bg};
-  font-family: Georgia, 'Noto Serif', serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   user-select: none; cursor: none;
 }
