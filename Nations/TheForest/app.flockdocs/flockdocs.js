@@ -65,6 +65,7 @@ window.FlockDocs = {
   init,
   createNewDocument,
   createNewSpreadsheet,
+  showTemplatePicker,
   openDocument,
   saveDocument,
   deleteDocument,
@@ -290,6 +291,77 @@ function _bindEvents() {
     if (!document.getElementById('fs-border-wrap')?.contains(e.target)) {
       document.getElementById('fs-border-popup')?.classList.add('hidden');
     }
+    // Writer table popup
+    if (!document.getElementById('fd-table-btn-wrap')?.contains(e.target)) {
+      document.getElementById('fd-table-popup')?.classList.add('hidden');
+    }
+    // Writer page layout popup
+    if (!document.getElementById('fd-layout-btn-wrap')?.contains(e.target)) {
+      document.getElementById('fd-layout-popup')?.classList.add('hidden');
+    }
+  });
+
+  // ── Session 5: Document Enhancement bindings ───────────────────────────
+  // Insert Image button
+  document.getElementById('fd-insert-image-btn')?.addEventListener('click', () => {
+    // Show sub-menu or directly open file dialog
+    document.getElementById('fd-image-file-input')?.click();
+  });
+  document.getElementById('fd-image-file-input')?.addEventListener('change', _insertImageFromFile);
+
+  // Insert Table popup
+  document.getElementById('fd-insert-table-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const popup = document.getElementById('fd-table-popup');
+    if (popup) {
+      popup.classList.toggle('hidden');
+      if (!popup.classList.contains('hidden')) _buildTableGrid();
+    }
+  });
+
+  // Insert Page Break
+  document.getElementById('fd-insert-break-btn')?.addEventListener('click', _insertPageBreak);
+
+  // Page Layout popup
+  document.getElementById('fd-page-layout-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('fd-layout-popup')?.classList.toggle('hidden');
+  });
+
+  // Page layout margin buttons (delegated)
+  document.getElementById('fd-layout-popup')?.addEventListener('click', (e) => {
+    const marginBtn = e.target.closest('[data-margin]');
+    const orientBtn = e.target.closest('[data-orient]');
+    if (marginBtn) {
+      _applyPageMargin(marginBtn.dataset.margin);
+      document.getElementById('fd-layout-popup')?.classList.add('hidden');
+    }
+    if (orientBtn) {
+      _applyPageOrientation(orientBtn.dataset.orient);
+      document.getElementById('fd-layout-popup')?.classList.add('hidden');
+    }
+  });
+
+  // Print button
+  document.getElementById('fd-print-btn')?.addEventListener('click', _printDocument);
+
+  // Header/footer auto-save on input
+  document.getElementById('fd-doc-header')?.addEventListener('input', _autoSave);
+  document.getElementById('fd-doc-footer')?.addEventListener('input', _autoSave);
+
+  // Template picker close
+  document.getElementById('fd-template-close-btn')?.addEventListener('click', () => {
+    document.getElementById('fd-template-overlay')?.classList.add('hidden');
+  });
+  document.getElementById('fd-template-overlay')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('fd-template-overlay')) {
+      document.getElementById('fd-template-overlay')?.classList.add('hidden');
+    }
+  });
+  // Template grid (delegated, injected by showTemplatePicker)
+  document.getElementById('fd-template-grid')?.addEventListener('click', (e) => {
+    const card = e.target.closest('[data-template]');
+    if (card) _applyTemplate(card.dataset.template);
   });
 }
 
@@ -402,6 +474,12 @@ async function openDocument(docId) {
       id: docRef.id,
       ...docRef.data(),
     };
+    // Session 5: stash Firestore 'pageLayout' (JSON string) as pageLayout_raw;
+    // always set it so _openEditor can safely JSON.parse it.
+    S.currentDoc.pageLayout_raw = (typeof S.currentDoc.pageLayout === 'string')
+      ? S.currentDoc.pageLayout
+      : '';
+    delete S.currentDoc.pageLayout;
 
     if (S.currentDoc.type === 'spreadsheet') {
       _openSpreadsheetEditor();
@@ -424,6 +502,11 @@ async function saveDocument() {
   S.currentDoc.content = editor.innerHTML;
   S.currentDoc.updatedAt = new Date();
 
+  // Collect header / footer / pageLayout (Session 5)
+  S.currentDoc.docHeader   = document.getElementById('fd-doc-header')?.innerHTML  || '';
+  S.currentDoc.docFooter   = document.getElementById('fd-doc-footer')?.innerHTML  || '';
+  S.currentDoc.pageLayout  = S.currentDoc.pageLayout || {};
+
   // Extract document name from first heading
   const firstHeading = editor.querySelector('h1, h2, h3');
   if (firstHeading) {
@@ -436,26 +519,29 @@ async function saveDocument() {
     
     if (saveStatus) saveStatus.textContent = 'Saving...';
 
+    const docPayload = {
+      name: S.currentDoc.name,
+      content: S.currentDoc.content,
+      docHeader:  S.currentDoc.docHeader,
+      docFooter:  S.currentDoc.docFooter,
+      pageLayout: JSON.stringify(S.currentDoc.pageLayout),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+
     if (S.currentDoc.id) {
       // Update existing document
-      await db.collection(COLLECTION_DOCS).doc(S.currentDoc.id).update({
-        name: S.currentDoc.name,
-        content: S.currentDoc.content,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      });
+      await db.collection(COLLECTION_DOCS).doc(S.currentDoc.id).update(docPayload);
     } else {
       // Create new document
       const docRef = await db.collection(COLLECTION_DOCS).add({
-        name: S.currentDoc.name,
+        ...docPayload,
         type: S.currentDoc.type,
-        content: S.currentDoc.content,
         ownerId: S.currentDoc.ownerId,
         ownerName: S.currentDoc.ownerName,
         shared: S.currentDoc.shared,
         folderId: S.currentDoc.folderId,
         deleted: false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
       S.currentDoc.id = docRef.id;
     }
@@ -601,6 +687,19 @@ function _openEditor() {
     editor.innerHTML = S.currentDoc.content;
     editor.focus();
   }
+
+  // Restore header and footer (Session 5)
+  const headerEl = document.getElementById('fd-doc-header');
+  const footerEl = document.getElementById('fd-doc-footer');
+  if (headerEl) headerEl.innerHTML = S.currentDoc.docHeader || '';
+  if (footerEl) footerEl.innerHTML = S.currentDoc.docFooter || '';
+
+  // Restore page layout (Session 5)
+  S.currentDoc.pageLayout = {};
+  if (S.currentDoc.pageLayout_raw) {
+    try { S.currentDoc.pageLayout = JSON.parse(S.currentDoc.pageLayout_raw); } catch (_) { /* */ }
+  }
+  _applyStoredPageLayout();
 }
 
 function _closeEditor() {
@@ -2364,3 +2463,308 @@ function _fsDeleteChart(chartId) {
   _autoSaveSheet();
 }
 window._fsDeleteChart = _fsDeleteChart;
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SESSION 5: DOCUMENT ENHANCEMENTS
+   "Write the vision and make it plain on tablets." — Habakkuk 2:2
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Template definitions ─────────────────────────────────────────────────── */
+const FD_TEMPLATES = [
+  {
+    key: 'sermon',
+    name: 'Sermon Notes',
+    preview: `<h1>Sermon Title</h1><p><strong>Scripture:</strong> John 3:16</p><p><strong>Date:</strong> Sunday, May 2026</p><hr><h2>Introduction</h2><p>Opening thought...</p><h2>Main Points</h2><p>1. First point...</p>`,
+    content: `<h1>Sermon Title</h1>
+<p><strong>Scripture:</strong> [Book Chapter:Verse]</p>
+<p><strong>Speaker:</strong> [Name]</p>
+<p><strong>Date:</strong> [Date]</p>
+<hr>
+<h2>Introduction</h2>
+<p>Opening hook, illustration, or question that draws the congregation in.</p>
+<h2>Main Point 1: [Title]</h2>
+<p>Supporting scripture and explanation.</p>
+<ul><li>Key insight</li><li>Application</li></ul>
+<h2>Main Point 2: [Title]</h2>
+<p>Supporting scripture and explanation.</p>
+<ul><li>Key insight</li><li>Application</li></ul>
+<h2>Main Point 3: [Title]</h2>
+<p>Supporting scripture and explanation.</p>
+<ul><li>Key insight</li><li>Application</li></ul>
+<h2>Conclusion</h2>
+<p>Call to action and closing prayer.</p>
+<h2>Response</h2>
+<p>How can the congregation apply this message this week?</p>`,
+  },
+  {
+    key: 'bulletin',
+    name: 'Church Bulletin',
+    preview: `<h1>Weekly Bulletin</h1><p style="text-align:center"><strong>Sunday, May 2026</strong></p><hr><h2>Order of Service</h2><p>10:00 AM – Welcome &amp; Announcements</p><p>10:10 AM – Worship</p>`,
+    content: `<h1 style="text-align:center">[Church Name]</h1>
+<h2 style="text-align:center">Weekly Bulletin</h2>
+<p style="text-align:center"><strong>Sunday, [Date]</strong> &middot; [Time] AM</p>
+<hr>
+<h2>Order of Service</h2>
+<table><tbody>
+<tr><td><strong>10:00 AM</strong></td><td>Welcome &amp; Announcements</td></tr>
+<tr><td><strong>10:10 AM</strong></td><td>Worship &amp; Praise</td></tr>
+<tr><td><strong>10:35 AM</strong></td><td>Scripture Reading</td></tr>
+<tr><td><strong>10:40 AM</strong></td><td>Message</td></tr>
+<tr><td><strong>11:15 AM</strong></td><td>Response &amp; Prayer</td></tr>
+<tr><td><strong>11:30 AM</strong></td><td>Benediction</td></tr>
+</tbody></table>
+<h2>Announcements</h2>
+<ul>
+<li><strong>[Event Name]</strong> &mdash; [Date], [Time], [Location]</li>
+<li><strong>[Event Name]</strong> &mdash; [Date], [Time], [Location]</li>
+</ul>
+<h2>Prayer Requests</h2>
+<ul><li>[Name] &mdash; [Prayer request]</li></ul>
+<h2>This Week&rsquo;s Scripture</h2>
+<p>[Scripture reference and text]</p>
+<h2>Giving</h2>
+<p>Thank you for your faithful generosity. You may give online at [website] or in the offering boxes.</p>`,
+  },
+  {
+    key: 'meeting',
+    name: 'Meeting Agenda',
+    preview: `<h1>Meeting Agenda</h1><p><strong>Date:</strong> May 2026</p><p><strong>Location:</strong> Church Office</p><hr><h2>Agenda Items</h2><p>1. Opening prayer</p>`,
+    content: `<h1>Meeting Agenda</h1>
+<p><strong>Meeting:</strong> [Name of Meeting]</p>
+<p><strong>Date:</strong> [Date]</p>
+<p><strong>Time:</strong> [Start Time] &ndash; [End Time]</p>
+<p><strong>Location:</strong> [Location]</p>
+<p><strong>Facilitator:</strong> [Name]</p>
+<hr>
+<h2>Attendees</h2>
+<ul><li>[Name], [Role]</li><li>[Name], [Role]</li></ul>
+<h2>Agenda</h2>
+<table><tbody>
+<tr><th>Time</th><th>Item</th><th>Lead</th></tr>
+<tr><td>5 min</td><td>Opening prayer</td><td>[Name]</td></tr>
+<tr><td>10 min</td><td>Review previous minutes</td><td>[Name]</td></tr>
+<tr><td>20 min</td><td>[Discussion Topic 1]</td><td>[Name]</td></tr>
+<tr><td>20 min</td><td>[Discussion Topic 2]</td><td>[Name]</td></tr>
+<tr><td>10 min</td><td>Action items &amp; next steps</td><td>All</td></tr>
+<tr><td>5 min</td><td>Closing prayer</td><td>[Name]</td></tr>
+</tbody></table>
+<h2>Action Items</h2>
+<table><tbody>
+<tr><th>Item</th><th>Owner</th><th>Due</th></tr>
+<tr><td>[Action]</td><td>[Name]</td><td>[Date]</td></tr>
+</tbody></table>
+<h2>Notes</h2>
+<p>[Space for notes during meeting]</p>`,
+  },
+  {
+    key: 'letter',
+    name: 'Church Letter',
+    preview: `<p>[Church Name]<br>[Address]</p><p>[Date]</p><p>Dear [Recipient],</p><p>We are writing to you regarding...</p>`,
+    content: `<p>[Church Name]<br>[Street Address]<br>[City, State, ZIP]<br>[Phone] &middot; [Email]</p>
+<p>&nbsp;</p>
+<p>[Date]</p>
+<p>&nbsp;</p>
+<p>[Recipient Name]<br>[Title]<br>[Organization]<br>[Address]</p>
+<p>&nbsp;</p>
+<p>Dear [Recipient Name],</p>
+<p>&nbsp;</p>
+<p>We are writing to you regarding [subject]. [Opening paragraph &mdash; state the purpose of the letter clearly and warmly].</p>
+<p>[Body paragraph &mdash; provide details, context, or information relevant to the purpose].</p>
+<p>[Closing paragraph &mdash; summarize, provide next steps, and express gratitude or encouragement].</p>
+<p>&nbsp;</p>
+<p>In His service,</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>[Sender Name]<br>[Title]<br>[Church Name]</p>`,
+  },
+];
+
+/* ── Template Picker ──────────────────────────────────────────────────────── */
+function showTemplatePicker() {
+  document.getElementById('fd-new-menu')?.classList.add('hidden');
+
+  const grid = document.getElementById('fd-template-grid');
+  if (grid && !grid._built) {
+    grid._built = true;
+    grid.innerHTML = FD_TEMPLATES.map(t => `
+      <div class="fd-template-card" data-template="${t.key}">
+        <div class="fd-template-preview">${t.preview}</div>
+        <div class="fd-template-name">${_e(t.name)}</div>
+      </div>
+    `).join('');
+  }
+  document.getElementById('fd-template-overlay')?.classList.remove('hidden');
+}
+
+function _applyTemplate(key) {
+  const tpl = FD_TEMPLATES.find(t => t.key === key);
+  if (!tpl) return;
+  document.getElementById('fd-template-overlay')?.classList.add('hidden');
+
+  S.currentDoc = {
+    id: null,
+    name: tpl.name,
+    type: 'document',
+    content: tpl.content,
+    docHeader: '', docFooter: '', pageLayout: {},
+    ownerId: S.user.uid,
+    ownerName: S.user.displayName,
+    shared: false, folderId: null, deleted: false,
+    createdAt: new Date(), updatedAt: new Date(),
+  };
+  _openEditor();
+}
+
+/* ── Insert Image ─────────────────────────────────────────────────────────── */
+function _insertImageFromFile(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    _insertImageDataUrl(ev.target.result, file.name);
+  };
+  reader.readAsDataURL(file);
+  // Reset so same file can be re-selected
+  e.target.value = '';
+}
+
+function _insertImageDataUrl(dataUrl, altText) {
+  const editor = document.getElementById('fd-editor-content');
+  if (!editor) return;
+  editor.focus();
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount) {
+    const range = sel.getRangeAt(0);
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    img.alt = altText || 'Image';
+    range.deleteContents();
+    range.insertNode(img);
+    range.setStartAfter(img);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    document.execCommand('insertHTML', false, `<img src="${dataUrl}" alt="${_e(altText || 'Image')}">`);
+  }
+  _autoSave();
+}
+
+/* ── Insert Table ─────────────────────────────────────────────────────────── */
+const FD_TABLE_MAX = 10;
+
+function _buildTableGrid() {
+  const grid = document.getElementById('fd-table-grid');
+  if (!grid || grid._built) return;
+  grid._built = true;
+
+  let html = '';
+  for (let r = 1; r <= FD_TABLE_MAX; r++) {
+    for (let c = 1; c <= FD_TABLE_MAX; c++) {
+      html += `<button class="fd-table-cell-btn" data-row="${r}" data-col="${c}"></button>`;
+    }
+  }
+  grid.innerHTML = html;
+
+  grid.addEventListener('mouseover', function(e) {
+    const btn = e.target.closest('.fd-table-cell-btn');
+    if (!btn) return;
+    const maxR = parseInt(btn.dataset.row, 10);
+    const maxC = parseInt(btn.dataset.col, 10);
+    grid.querySelectorAll('.fd-table-cell-btn').forEach(function(b) {
+      b.classList.toggle('hovered',
+        parseInt(b.dataset.row, 10) <= maxR && parseInt(b.dataset.col, 10) <= maxC);
+    });
+    const label = document.getElementById('fd-table-grid-label');
+    if (label) label.textContent = maxR + ' \u00d7 ' + maxC + ' table';
+  });
+
+  grid.addEventListener('mouseleave', function() {
+    grid.querySelectorAll('.fd-table-cell-btn').forEach(function(b) { b.classList.remove('hovered'); });
+    const label = document.getElementById('fd-table-grid-label');
+    if (label) label.textContent = 'Select table size';
+  });
+
+  grid.addEventListener('click', function(e) {
+    const btn = e.target.closest('.fd-table-cell-btn');
+    if (!btn) return;
+    _insertTable(parseInt(btn.dataset.row, 10), parseInt(btn.dataset.col, 10));
+    document.getElementById('fd-table-popup')?.classList.add('hidden');
+  });
+}
+
+function _insertTable(rows, cols) {
+  const editor = document.getElementById('fd-editor-content');
+  if (!editor) return;
+  editor.focus();
+
+  let html = '<table><tbody>';
+  // header row
+  html += '<tr>' + Array.from({ length: cols }, function() { return '<th><br></th>'; }).join('') + '</tr>';
+  // data rows
+  for (let r = 1; r < rows; r++) {
+    html += '<tr>' + Array.from({ length: cols }, function() { return '<td><br></td>'; }).join('') + '</tr>';
+  }
+  html += '</tbody></table><p><br></p>';
+
+  document.execCommand('insertHTML', false, html);
+  _autoSave();
+}
+
+/* ── Insert Page Break ────────────────────────────────────────────────────── */
+function _insertPageBreak() {
+  document.execCommand('insertHTML', false, '<hr class="fd-page-break"><p><br></p>');
+  _autoSave();
+}
+
+/* ── Page Layout ──────────────────────────────────────────────────────────── */
+function _applyPageMargin(margin) {
+  const page = document.getElementById('fd-editor-page');
+  if (!page) return;
+  ['layout-margins-narrow','layout-margins-normal','layout-margins-wide'].forEach(function(c) { page.classList.remove(c); });
+  page.classList.add('layout-margins-' + margin);
+  document.querySelectorAll('[data-margin]').forEach(function(b) {
+    b.classList.toggle('is-active', b.dataset.margin === margin);
+  });
+  if (!S.currentDoc) return;
+  S.currentDoc.pageLayout = S.currentDoc.pageLayout || {};
+  S.currentDoc.pageLayout.margin = margin;
+  _autoSave();
+}
+
+function _applyPageOrientation(orient) {
+  const page = document.getElementById('fd-editor-page');
+  if (!page) return;
+  page.classList.toggle('layout-orient-landscape', orient === 'landscape');
+  document.querySelectorAll('[data-orient]').forEach(function(b) {
+    b.classList.toggle('is-active', b.dataset.orient === orient);
+  });
+  if (!S.currentDoc) return;
+  S.currentDoc.pageLayout = S.currentDoc.pageLayout || {};
+  S.currentDoc.pageLayout.orient = orient;
+  _autoSave();
+}
+
+function _applyStoredPageLayout() {
+  const layout = (S.currentDoc && S.currentDoc.pageLayout) || {};
+  const page = document.getElementById('fd-editor-page');
+  if (!page) return;
+  ['narrow','normal','wide'].forEach(function(m) { page.classList.remove('layout-margins-' + m); });
+  page.classList.add('layout-margins-' + (layout.margin || 'normal'));
+  document.querySelectorAll('[data-margin]').forEach(function(b) {
+    b.classList.toggle('is-active', b.dataset.margin === (layout.margin || 'normal'));
+  });
+  page.classList.toggle('layout-orient-landscape', layout.orient === 'landscape');
+  document.querySelectorAll('[data-orient]').forEach(function(b) {
+    b.classList.toggle('is-active', b.dataset.orient === (layout.orient || 'portrait'));
+  });
+}
+
+/* ── Print ────────────────────────────────────────────────────────────────── */
+function _printDocument() {
+  if (S.currentDoc) {
+    const editor = document.getElementById('fd-editor-content');
+    if (editor) S.currentDoc.content = editor.innerHTML;
+  }
+  window.print();
+}
