@@ -1076,6 +1076,596 @@
       .fd-doc-hf-label { display: none !important; }
       .fd-page-break { page-break-after: always; }
     }
+
+    /* ══════════════════════════════════════════════════════════════════════
+       SESSION 6: COLLABORATION & SHARING
+       ══════════════════════════════════════════════════════════════════════ */
+
+    /* ── Toast notifications ─────────────────────────────────────────────── */
+    #fd-toast-container {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px;
+      pointer-events: none;
+    }
+    .fd-toast {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 18px;
+      background: #1f2937;
+      color: white;
+      border-radius: 10px;
+      font: 500 0.875rem var(--font-ui);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+      pointer-events: auto;
+      animation: fd-toast-in 250ms ease-out;
+      min-width: 240px; max-width: 380px;
+    }
+    .fd-toast.success { background: #166534; }
+    .fd-toast.error   { background: #991b1b; }
+    .fd-toast.warning { background: #92400e; }
+    @keyframes fd-toast-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fd-toast-fade { animation: fd-toast-out 300ms ease-in forwards; }
+    @keyframes fd-toast-out {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-8px); }
+    }
+
+    /* ── Editor body layout (main + collab panel) ─────────────────────────── */
+    .fd-editor-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .fd-editor-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    /* ── Presence bar ────────────────────────────────────────────────────── */
+    #fd-presence-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 20px;
+      background: var(--bg-raised);
+      border-bottom: 1px solid var(--line);
+      min-height: 36px;
+    }
+    #fd-presence-bar:empty { display: none; }
+    .fd-presence-label {
+      font: 500 0.75rem var(--font-ui);
+      color: var(--ink-muted);
+      flex-shrink: 0;
+    }
+    .fd-presence-avatars {
+      display: flex; gap: 4px; align-items: center;
+    }
+    .fd-presence-avatar {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-raised);
+      display: flex; align-items: center; justify-content: center;
+      font: 700 0.6875rem var(--font-ui);
+      color: white;
+      cursor: default;
+      position: relative;
+    }
+    .fd-presence-avatar[title]:hover::after {
+      content: attr(title);
+      position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+      background: #1f2937; color: white;
+      padding: 4px 8px; border-radius: 5px;
+      font: 500 0.75rem var(--font-ui);
+      white-space: nowrap; pointer-events: none;
+      z-index: 500;
+    }
+    .fd-realtime-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #16a34a;
+      margin-left: auto;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .fd-realtime-dot::after {
+      content: '';
+      position: absolute; inset: -3px;
+      border-radius: 50%;
+      border: 2px solid #16a34a;
+      opacity: 0.4;
+      animation: fd-pulse 2s ease-in-out infinite;
+    }
+    @keyframes fd-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.4; }
+      50% { transform: scale(1.5); opacity: 0; }
+    }
+    .fd-realtime-label {
+      font: 500 0.7rem var(--font-ui);
+      color: #16a34a;
+      margin-left: 4px;
+    }
+
+    /* ── Collab right panel ──────────────────────────────────────────────── */
+    .fd-collab-panel {
+      width: 0;
+      overflow: hidden;
+      transition: width 250ms ease;
+      background: var(--bg-raised);
+      border-left: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .fd-collab-panel.is-open {
+      width: 320px;
+    }
+    .fd-collab-panel-inner {
+      width: 320px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .fd-collab-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .fd-collab-tab {
+      flex: 1;
+      padding: 12px 8px;
+      background: transparent;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      font: 600 0.813rem var(--font-ui);
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: color 150ms, border-color 150ms;
+      text-align: center;
+    }
+    .fd-collab-tab.is-active {
+      color: #3b82f6;
+      border-bottom-color: #3b82f6;
+    }
+    .fd-collab-tab-content {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      flex-direction: column;
+    }
+    .fd-collab-tab-content.is-active {
+      display: flex;
+    }
+
+    /* ── Comments tab ────────────────────────────────────────────────────── */
+    .fd-comments-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .fd-comment-item {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .fd-comment-item.resolved {
+      opacity: 0.55;
+    }
+    .fd-comment-header {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 6px;
+    }
+    .fd-comment-avatar {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font: 700 0.6875rem var(--font-ui);
+      color: white;
+      flex-shrink: 0;
+    }
+    .fd-comment-meta {
+      flex: 1; min-width: 0;
+    }
+    .fd-comment-author {
+      font: 600 0.8125rem var(--font-ui);
+      color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fd-comment-time {
+      font: 400 0.7rem var(--font-ui);
+      color: var(--ink-muted);
+    }
+    .fd-comment-text {
+      font: 400 0.875rem/1.5 var(--font-ui);
+      color: var(--ink);
+      word-break: break-word;
+    }
+    .fd-comment-actions {
+      display: flex; gap: 8px; margin-top: 8px;
+    }
+    .fd-comment-action-btn {
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: transparent;
+      font: 500 0.7rem var(--font-ui);
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: background 150ms, color 150ms;
+    }
+    .fd-comment-action-btn:hover {
+      background: rgba(59,130,246,0.1); color: #3b82f6;
+    }
+    .fd-comment-add-form {
+      padding: 12px;
+      border-top: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .fd-comment-textarea {
+      width: 100%;
+      min-height: 72px;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font: 400 0.875rem/1.5 var(--font-ui);
+      color: var(--ink);
+      resize: vertical;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .fd-comment-textarea:focus { border-color: #3b82f6; }
+    .fd-comment-submit {
+      width: 100%;
+      margin-top: 8px;
+      padding: 8px;
+      background: #3b82f6;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      font: 600 0.875rem var(--font-ui);
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .fd-comment-submit:hover { background: #2563eb; }
+
+    /* ── History tab ─────────────────────────────────────────────────────── */
+    .fd-history-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .fd-history-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 150ms;
+    }
+    .fd-history-item:hover { border-color: #3b82f6; }
+    .fd-history-icon {
+      width: 28px; height: 28px;
+      background: rgba(59,130,246,0.12);
+      color: #3b82f6;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .fd-history-icon svg { width: 14px; height: 14px; }
+    .fd-history-meta { flex: 1; min-width: 0; }
+    .fd-history-author {
+      font: 600 0.8125rem var(--font-ui);
+      color: var(--ink);
+    }
+    .fd-history-time {
+      font: 400 0.7rem var(--font-ui);
+      color: var(--ink-muted);
+    }
+    .fd-history-restore-btn {
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: transparent;
+      font: 500 0.7rem var(--font-ui);
+      color: var(--ink-muted);
+      cursor: pointer;
+      transition: background 150ms, color 150ms;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+    .fd-history-restore-btn:hover { background: rgba(59,130,246,0.1); color: #3b82f6; }
+    .fd-history-empty {
+      text-align: center;
+      padding: 40px 20px;
+      font: 500 0.875rem var(--font-ui);
+      color: var(--ink-muted);
+    }
+
+    /* ── Share modal ─────────────────────────────────────────────────────── */
+    .fd-share-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,0.45);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .fd-share-modal {
+      background: var(--bg-raised);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      width: 100%; max-width: 480px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.32);
+      display: flex; flex-direction: column;
+    }
+    .fd-share-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .fd-share-title {
+      font: 700 1.0625rem var(--font-ui); color: var(--ink);
+    }
+    .fd-share-body { padding: 20px; }
+    .fd-share-section {
+      margin-bottom: 20px;
+    }
+    .fd-share-section-label {
+      font: 600 0.75rem var(--font-ui);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      display: block;
+      margin-bottom: 10px;
+    }
+    .fd-share-toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .fd-share-toggle-info { flex: 1; min-width: 0; }
+    .fd-share-toggle-name {
+      font: 600 0.875rem var(--font-ui);
+      color: var(--ink);
+    }
+    .fd-share-toggle-desc {
+      font: 400 0.75rem var(--font-ui);
+      color: var(--ink-muted);
+    }
+    /* Toggle switch */
+    .fd-toggle {
+      position: relative;
+      width: 42px; height: 24px;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+    .fd-toggle input {
+      opacity: 0; width: 0; height: 0; position: absolute;
+    }
+    .fd-toggle-slider {
+      position: absolute; inset: 0;
+      background: var(--line);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background 200ms;
+    }
+    .fd-toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      left: 3px; top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 200ms;
+    }
+    .fd-toggle input:checked + .fd-toggle-slider { background: #3b82f6; }
+    .fd-toggle input:checked + .fd-toggle-slider::before { transform: translateX(18px); }
+
+    .fd-share-permission-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 10px;
+    }
+    .fd-share-permission-label {
+      font: 500 0.875rem var(--font-ui);
+      color: var(--ink);
+    }
+    .fd-share-permission-select {
+      padding: 4px 8px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font: 500 0.813rem var(--font-ui);
+      color: var(--ink);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .fd-share-add-row {
+      display: flex; gap: 8px; margin-top: 4px;
+    }
+    .fd-share-email-input {
+      flex: 1;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font: 400 0.875rem var(--font-ui);
+      color: var(--ink);
+      outline: none;
+    }
+    .fd-share-email-input:focus { border-color: #3b82f6; }
+    .fd-share-add-btn {
+      padding: 8px 16px;
+      background: #3b82f6;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      font: 600 0.875rem var(--font-ui);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 150ms;
+    }
+    .fd-share-add-btn:hover { background: #2563eb; }
+
+    .fd-shared-users-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .fd-shared-user-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .fd-shared-user-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font: 700 0.7rem var(--font-ui);
+      color: white;
+      flex-shrink: 0;
+    }
+    .fd-shared-user-info { flex: 1; min-width: 0; }
+    .fd-shared-user-name {
+      font: 600 0.813rem var(--font-ui);
+      color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fd-shared-user-email {
+      font: 400 0.7rem var(--font-ui);
+      color: var(--ink-muted);
+    }
+    .fd-shared-user-perm {
+      font: 500 0.75rem var(--font-ui);
+      color: var(--ink-muted);
+      padding: 3px 8px;
+      background: rgba(59,130,246,0.1);
+      border-radius: 20px;
+      border: 1px solid rgba(59,130,246,0.2);
+      color: #3b82f6;
+    }
+    .fd-shared-user-remove {
+      width: 20px; height: 20px;
+      border: 0; background: transparent;
+      color: var(--ink-muted);
+      cursor: pointer; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 150ms;
+    }
+    .fd-shared-user-remove:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
+    .fd-share-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--line);
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+    .fd-share-save-btn {
+      padding: 8px 20px;
+      background: #3b82f6;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      font: 600 0.875rem var(--font-ui);
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .fd-share-save-btn:hover { background: #2563eb; }
+    .fd-share-copy-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font: 500 0.875rem var(--font-ui);
+      color: var(--ink);
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .fd-share-copy-btn:hover { background: rgba(255,255,255,0.05); }
+
+    /* ── Version preview modal ───────────────────────────────────────────── */
+    .fd-version-preview-overlay {
+      position: fixed; inset: 0; z-index: 2100;
+      background: rgba(0,0,0,0.55);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .fd-version-preview-modal {
+      background: var(--bg-raised);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      width: 100%; max-width: 780px;
+      max-height: 80vh;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    }
+    .fd-version-preview-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .fd-version-preview-title {
+      font: 600 0.9375rem var(--font-ui); color: var(--ink);
+    }
+    .fd-version-preview-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 40px;
+      background: var(--bg);
+    }
+    .fd-version-preview-doc {
+      max-width: 640px;
+      margin: 0 auto;
+      font: 400 14px/1.6 'Noto Serif', Georgia, serif;
+      color: #1f2937;
+      background: white;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .fd-version-preview-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--line);
+      display: flex; justify-content: flex-end; gap: 10px;
+      flex-shrink: 0;
+    }
+    .fd-version-restore-btn {
+      padding: 8px 20px;
+      background: #3b82f6;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      font: 600 0.875rem var(--font-ui);
+      cursor: pointer;
+      transition: background 150ms;
+    }
+    .fd-version-restore-btn:hover { background: #2563eb; }
+    .fd-version-cancel-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font: 500 0.875rem var(--font-ui);
+      color: var(--ink);
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -1374,36 +1964,181 @@
 
           <div class="fd-spacer"></div>
 
+          <!-- Share button -->
+          <button class="fd-btn" id="fd-share-btn" style="padding:6px 14px;font-size:0.813rem;gap:5px" title="Share document">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+            </svg>
+            Share
+          </button>
+
+          <!-- Comments toggle -->
+          <button class="fd-toolbar-btn" id="fd-comments-btn" title="Comments">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+            </svg>
+          </button>
+
+          <!-- History toggle -->
+          <button class="fd-toolbar-btn" id="fd-history-btn" title="Version history">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </button>
+
           <button class="fd-btn fd-btn--ghost" id="fd-save-btn">Save</button>
         </div>
 
-        <!-- Print root wraps header + page + footer -->
-        <div id="fd-print-root" class="fd-editor-container">
+        <!-- Presence bar -->
+        <div id="fd-presence-bar"></div>
 
-          <!-- Document Header -->
-          <div class="fd-doc-header-area" id="fd-doc-header-area">
-            <div class="fd-doc-hf-label">Header</div>
-            <div class="fd-doc-hf-content" contenteditable="true" id="fd-doc-header"
-              data-placeholder="Click to add header…"></div>
-          </div>
+        <!-- Editor body: main content + collab panel side-by-side -->
+        <div class="fd-editor-body">
+          <div class="fd-editor-main">
+            <!-- Print root wraps header + page + footer -->
+            <div id="fd-print-root" class="fd-editor-container">
 
-          <div class="fd-editor-page layout-margins-normal" id="fd-editor-page">
-            <div class="fd-editor-content" contenteditable="true" id="fd-editor-content">
-              <h1>Untitled Document</h1>
-              <p>Start typing...</p>
+              <!-- Document Header -->
+              <div class="fd-doc-header-area" id="fd-doc-header-area">
+                <div class="fd-doc-hf-label">Header</div>
+                <div class="fd-doc-hf-content" contenteditable="true" id="fd-doc-header"
+                  data-placeholder="Click to add header…"></div>
+              </div>
+
+              <div class="fd-editor-page layout-margins-normal" id="fd-editor-page">
+                <div class="fd-editor-content" contenteditable="true" id="fd-editor-content">
+                  <h1>Untitled Document</h1>
+                  <p>Start typing...</p>
+                </div>
+              </div>
+
+              <!-- Document Footer -->
+              <div class="fd-doc-footer-area" id="fd-doc-footer-area">
+                <div class="fd-doc-hf-content" contenteditable="true" id="fd-doc-footer"
+                  data-placeholder="Click to add footer…"></div>
+              </div>
+
             </div>
           </div>
 
-          <!-- Document Footer -->
-          <div class="fd-doc-footer-area" id="fd-doc-footer-area">
-            <div class="fd-doc-hf-content" contenteditable="true" id="fd-doc-footer"
-              data-placeholder="Click to add footer…"></div>
-          </div>
+          <!-- Collab panel (Comments + History) -->
+          <div class="fd-collab-panel" id="fd-collab-panel">
+            <div class="fd-collab-panel-inner">
+              <div class="fd-collab-tabs">
+                <button class="fd-collab-tab is-active" data-tab="comments" id="fd-tab-comments">
+                  Comments
+                </button>
+                <button class="fd-collab-tab" data-tab="history" id="fd-tab-history">
+                  History
+                </button>
+              </div>
 
+              <!-- Comments tab -->
+              <div class="fd-collab-tab-content is-active" id="fd-tab-content-comments">
+                <div class="fd-comments-list" id="fd-comments-list">
+                  <!-- Injected by JS -->
+                </div>
+                <div class="fd-comment-add-form">
+                  <textarea class="fd-comment-textarea" id="fd-comment-textarea"
+                    placeholder="Add a comment…" rows="3"></textarea>
+                  <button class="fd-comment-submit" id="fd-comment-submit">Post Comment</button>
+                </div>
+              </div>
+
+              <!-- History tab -->
+              <div class="fd-collab-tab-content" id="fd-tab-content-history">
+                <div class="fd-history-list" id="fd-history-list">
+                  <!-- Injected by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Template Picker Modal -->
+      <!-- Share Modal -->
+      <div class="fd-share-overlay hidden" id="fd-share-overlay">
+        <div class="fd-share-modal" role="dialog" aria-modal="true" aria-label="Share document">
+          <div class="fd-share-header">
+            <div class="fd-share-title">Share Document</div>
+            <button class="fd-btn-icon" id="fd-share-close-btn" aria-label="Close">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="fd-share-body">
+            <!-- Church-wide access -->
+            <div class="fd-share-section">
+              <span class="fd-share-section-label">Church Access</span>
+              <div class="fd-share-toggle-row">
+                <div class="fd-share-toggle-info">
+                  <div class="fd-share-toggle-name">Share with entire church</div>
+                  <div class="fd-share-toggle-desc">Anyone in your church can find and view this document</div>
+                </div>
+                <label class="fd-toggle">
+                  <input type="checkbox" id="fd-share-church-toggle">
+                  <span class="fd-toggle-slider"></span>
+                </label>
+              </div>
+              <div class="fd-share-permission-row" id="fd-share-church-perm-row" style="display:none">
+                <span class="fd-share-permission-label">Church members can:</span>
+                <select class="fd-share-permission-select" id="fd-share-church-perm">
+                  <option value="view">View only</option>
+                  <option value="comment">View &amp; Comment</option>
+                  <option value="edit">Edit</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Specific users -->
+            <div class="fd-share-section">
+              <span class="fd-share-section-label">Share with specific people</span>
+              <div class="fd-share-add-row">
+                <input type="email" class="fd-share-email-input" id="fd-share-email-input"
+                  placeholder="Enter email address…">
+                <select class="fd-share-permission-select" id="fd-share-user-perm">
+                  <option value="view">View</option>
+                  <option value="comment">Comment</option>
+                  <option value="edit" selected>Edit</option>
+                </select>
+                <button class="fd-share-add-btn" id="fd-share-add-user-btn">Add</button>
+              </div>
+              <div class="fd-shared-users-list" id="fd-shared-users-list">
+                <!-- Injected by JS -->
+              </div>
+            </div>
+          </div>
+          <div class="fd-share-footer">
+            <button class="fd-share-copy-btn" id="fd-share-copy-link-btn">Copy Link</button>
+            <button class="fd-share-save-btn" id="fd-share-save-btn">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Version Preview Modal -->
+      <div class="fd-version-preview-overlay hidden" id="fd-version-preview-overlay">
+        <div class="fd-version-preview-modal" role="dialog" aria-modal="true">
+          <div class="fd-version-preview-header">
+            <div class="fd-version-preview-title" id="fd-version-preview-title">Version Preview</div>
+            <button class="fd-btn-icon" id="fd-version-preview-close" aria-label="Close">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="fd-version-preview-body">
+            <div class="fd-version-preview-doc" id="fd-version-preview-doc"></div>
+          </div>
+          <div class="fd-version-preview-footer">
+            <button class="fd-version-cancel-btn" id="fd-version-cancel-btn">Cancel</button>
+            <button class="fd-version-restore-btn" id="fd-version-restore-btn">Restore This Version</button>
+          </div>
+        </div>
+      </div>
       <div class="fd-template-overlay hidden" id="fd-template-overlay">
         <div class="fd-template-modal" role="dialog" aria-modal="true" aria-label="Choose a template">
           <div class="fd-template-modal-header">
@@ -1705,6 +2440,9 @@
 
   <!-- FlockDocs app logic -->
   <script src="app.flockdocs/flockdocs.js" type="module"></script>
+
+  <!-- Toast container (outside fd-wrap so it's always on top) -->
+  <div id="fd-toast-container"></div>
 
 </body>
 </html>

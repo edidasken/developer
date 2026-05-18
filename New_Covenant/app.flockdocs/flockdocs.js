@@ -33,6 +33,19 @@ const S = {
     defaultFontSize: 16,
     defaultFont: 'Noto Serif',
   },
+  // Session 6: Collaboration state
+  collab: {
+    realtimeUnsub: null,   // Firestore onSnapshot unsubscribe function
+    presenceUnsub: null,   // Presence onSnapshot unsubscribe
+    presenceDocRef: null,  // Ref to our own presence entry
+    activeTab: 'comments', // 'comments' | 'history'
+    comments: [],          // Loaded comments
+    versions: [],          // Loaded versions
+    pendingVersion: null,  // Version object awaiting preview/restore
+    lastSaveVersion: 0,    // Timestamp of last auto-versioned save
+    shareData: null,       // Pending share dialog state
+    sharedWith: [],        // Pending list of specific users for share dialog
+  },
   sheet: {                 // FlockSheets editor state
     data: {},              // { 'A1': { v: '', f: '', s: { bold, fmt, bg, color, border } } }
     selected: null,        // Currently selected cell ref e.g. 'A1'
@@ -66,6 +79,7 @@ window.FlockDocs = {
   createNewDocument,
   createNewSpreadsheet,
   showTemplatePicker,
+  showShareDialog,
   openDocument,
   saveDocument,
   deleteDocument,
@@ -363,6 +377,64 @@ function _bindEvents() {
     const card = e.target.closest('[data-template]');
     if (card) _applyTemplate(card.dataset.template);
   });
+
+  // ── Session 6: Collaboration bindings ─────────────────────────────────
+  // Share button
+  document.getElementById('fd-share-btn')?.addEventListener('click', showShareDialog);
+
+  // Comments panel toggle
+  document.getElementById('fd-comments-btn')?.addEventListener('click', () => {
+    _toggleCollabPanel('comments');
+  });
+
+  // History panel toggle
+  document.getElementById('fd-history-btn')?.addEventListener('click', () => {
+    _toggleCollabPanel('history');
+  });
+
+  // Collab panel tab switching
+  document.getElementById('fd-collab-panel')?.addEventListener('click', (e) => {
+    const tab = e.target.closest('[data-tab]');
+    if (tab) _switchCollabTab(tab.dataset.tab);
+  });
+
+  // Comment submit
+  document.getElementById('fd-comment-submit')?.addEventListener('click', _addComment);
+  document.getElementById('fd-comment-textarea')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) _addComment();
+  });
+
+  // Share modal close
+  document.getElementById('fd-share-close-btn')?.addEventListener('click', _closeShareDialog);
+  document.getElementById('fd-share-overlay')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('fd-share-overlay')) _closeShareDialog();
+  });
+
+  // Share church toggle shows/hides permission row
+  document.getElementById('fd-share-church-toggle')?.addEventListener('change', (e) => {
+    const row = document.getElementById('fd-share-church-perm-row');
+    if (row) row.style.display = e.target.checked ? 'flex' : 'none';
+  });
+
+  // Share: add user
+  document.getElementById('fd-share-add-user-btn')?.addEventListener('click', _addSharedUser);
+  document.getElementById('fd-share-email-input')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') _addSharedUser();
+  });
+
+  // Share: save
+  document.getElementById('fd-share-save-btn')?.addEventListener('click', _saveShareSettings);
+
+  // Share: copy link
+  document.getElementById('fd-share-copy-link-btn')?.addEventListener('click', _copyShareLink);
+
+  // Version preview close/cancel/restore
+  document.getElementById('fd-version-preview-close')?.addEventListener('click', _closeVersionPreview);
+  document.getElementById('fd-version-cancel-btn')?.addEventListener('click', _closeVersionPreview);
+  document.getElementById('fd-version-restore-btn')?.addEventListener('click', _restoreVersion);
+  document.getElementById('fd-version-preview-overlay')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('fd-version-preview-overlay')) _closeVersionPreview();
+  });
 }
 
 /* ── Documents CRUD ───────────────────────────────────────────────────────── */
@@ -526,6 +598,8 @@ async function saveDocument() {
       docFooter:  S.currentDoc.docFooter,
       pageLayout: JSON.stringify(S.currentDoc.pageLayout),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy: S.user.uid,
+      updatedByName: S.user.displayName || 'Anonymous',
     };
 
     if (S.currentDoc.id) {
@@ -538,16 +612,24 @@ async function saveDocument() {
         type: S.currentDoc.type,
         ownerId: S.currentDoc.ownerId,
         ownerName: S.currentDoc.ownerName,
-        shared: S.currentDoc.shared,
+        shared: S.currentDoc.shared || false,
+        sharedWith: S.currentDoc.sharedWith || [],
+        churchPermission: S.currentDoc.churchPermission || 'view',
         folderId: S.currentDoc.folderId,
         deleted: false,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
       S.currentDoc.id = docRef.id;
+      // Start realtime + presence now that doc has an ID
+      _startRealtimeSync();
+      _startPresence();
     }
 
     if (saveStatus) saveStatus.textContent = 'All changes saved';
     console.log('[FlockDocs] Document saved:', S.currentDoc.id);
+
+    // Session 6: save a version (rate-limited to 1 per minute)
+    _saveVersion();
   } catch (err) {
     console.error('[FlockDocs] Error saving document:', err);
     _toast('Failed to save document', 'error');
@@ -700,9 +782,24 @@ function _openEditor() {
     try { S.currentDoc.pageLayout = JSON.parse(S.currentDoc.pageLayout_raw); } catch (_) { /* */ }
   }
   _applyStoredPageLayout();
+
+  // Session 6: start realtime sync + presence (only for saved docs)
+  if (S.currentDoc.id) {
+    _startRealtimeSync();
+    _startPresence();
+    _loadComments();
+    _loadVersionHistory();
+  }
 }
 
 function _closeEditor() {
+  // Session 6: tear down realtime + presence
+  _stopRealtimeSync();
+  _stopPresence();
+
+  // Close collab panel if open
+  document.getElementById('fd-collab-panel')?.classList.remove('is-open');
+
   const libraryView = document.getElementById('fd-library-view');
   const editorView = document.getElementById('fd-editor-view');
 
@@ -775,9 +872,22 @@ function _e(str) {
     ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 
-function _toast(msg, type = 'info') {
-  console.log(`[FlockDocs] ${type.toUpperCase()}: ${msg}`);
-  // TODO: Implement toast UI
+function _toast(msg, type = 'info', durationMs = 3500) {
+  const container = document.getElementById('fd-toast-container');
+  if (!container) {
+    console.log(`[FlockDocs] ${type.toUpperCase()}: ${msg}`);
+    return;
+  }
+  const el = document.createElement('div');
+  el.className = 'fd-toast' + (type !== 'info' ? ' ' + type : '');
+  el.textContent = msg;
+  container.appendChild(el);
+  const remove = () => {
+    el.classList.add('fd-toast-fade');
+    el.addEventListener('animationend', () => el.remove(), { once: true });
+  };
+  const timer = setTimeout(remove, durationMs);
+  el.addEventListener('click', () => { clearTimeout(timer); remove(); });
 }
 
 function _showDocMenu(docId) {
@@ -2767,4 +2877,540 @@ function _printDocument() {
     if (editor) S.currentDoc.content = editor.innerHTML;
   }
   window.print();
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SESSION 6: COLLABORATION & SHARING
+   "Two are better than one, because they have a good return for their labor."
+   — Ecclesiastes 4:9
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Constants ───────────────────────────────────────────────────────────── */
+const COLLECTION_COMMENTS = 'flockDocComments';
+const COLLECTION_VERSIONS = 'flockDocVersions';
+const COLLECTION_PRESENCE = 'flockDocPresence';
+const VERSION_MIN_INTERVAL = 60 * 1000; // 1 minute between auto-versions
+
+/* ── Avatar colour palette ───────────────────────────────────────────────── */
+const AVATAR_COLORS = [
+  '#3b82f6','#10b981','#f59e0b','#ef4444',
+  '#8b5cf6','#ec4899','#14b8a6','#f97316',
+];
+function _avatarColor(uid) {
+  var h = 0;
+  for (var i = 0; i < (uid || '').length; i++) h = (h * 31 + uid.charCodeAt(i)) | 0;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+function _initials(name) {
+  var parts = (name || 'U').trim().split(/\s+/);
+  return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   REAL-TIME SYNC
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+function _startRealtimeSync() {
+  if (!S.currentDoc || !S.currentDoc.id) return;
+  _stopRealtimeSync();
+  if (!_checkFirebase()) return;
+
+  var db = firebase.firestore();
+  var docRef = db.collection(COLLECTION_DOCS).doc(S.currentDoc.id);
+  var myLastSave = Date.now();
+
+  S.collab.realtimeUnsub = docRef.onSnapshot(function(snapshot) {
+    if (!snapshot.exists || !S.currentDoc) return;
+    var data = snapshot.data();
+
+    // Ignore changes triggered by our own save (within 2 seconds)
+    var updatedAt = data.updatedAt && typeof data.updatedAt.toMillis === 'function'
+      ? data.updatedAt.toMillis() : 0;
+    var isOursave = (updatedAt - myLastSave) < 2500 || data.updatedBy === S.user.uid;
+
+    // Update realtime indicator
+    var dot = document.getElementById('fd-realtime-dot');
+    if (dot) {
+      dot.style.background = '#16a34a';
+    }
+
+    if (!isOursave && data.content !== undefined) {
+      // Another user has edited — update editor if not actively typing
+      var editor = document.getElementById('fd-editor-content');
+      if (editor && document.activeElement !== editor) {
+        editor.innerHTML = data.content;
+        _toast('Document updated by ' + (data.updatedByName || 'someone else'), 'info', 2500);
+      }
+    }
+    myLastSave = Date.now();
+  }, function(err) {
+    console.warn('[FlockDocs] Realtime sync error:', err);
+  });
+}
+
+function _stopRealtimeSync() {
+  if (S.collab.realtimeUnsub) {
+    S.collab.realtimeUnsub();
+    S.collab.realtimeUnsub = null;
+  }
+  var bar = document.getElementById('fd-presence-bar');
+  if (bar) bar.innerHTML = '';
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   PRESENCE
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+function _startPresence() {
+  if (!S.currentDoc || !S.currentDoc.id || !S.user) return;
+  _stopPresence();
+  if (!_checkFirebase()) return;
+
+  var db = firebase.firestore();
+  var presenceId = S.currentDoc.id + '_' + S.user.uid;
+  var ref = db.collection(COLLECTION_PRESENCE).doc(presenceId);
+  S.collab.presenceDocRef = ref;
+
+  // Write our presence
+  ref.set({
+    docId: S.currentDoc.id,
+    uid: S.user.uid,
+    displayName: S.user.displayName || 'Anonymous',
+    initials: _initials(S.user.displayName || S.user.email),
+    color: _avatarColor(S.user.uid),
+    lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(function(e) { console.warn('[FlockDocs] Presence write error:', e); });
+
+  // Heartbeat every 20 seconds
+  S.collab._presenceHeartbeat = setInterval(function() {
+    ref.update({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() })
+      .catch(function() {});
+  }, 20000);
+
+  // Listen to all presence for this doc (within the last 90 seconds)
+  S.collab.presenceUnsub = db.collection(COLLECTION_PRESENCE)
+    .where('docId', '==', S.currentDoc.id)
+    .onSnapshot(function(snapshot) {
+      var now = Date.now();
+      var active = snapshot.docs
+        .map(function(d) { return d.data(); })
+        .filter(function(p) {
+          var ms = p.lastSeen && p.lastSeen.toMillis ? p.lastSeen.toMillis() : 0;
+          return (now - ms) < 90000;
+        });
+      _renderPresence(active);
+    }, function(err) { console.warn('[FlockDocs] Presence error:', err); });
+}
+
+function _stopPresence() {
+  clearInterval(S.collab._presenceHeartbeat);
+  S.collab._presenceHeartbeat = null;
+  if (S.collab.presenceDocRef) {
+    S.collab.presenceDocRef.delete().catch(function() {});
+    S.collab.presenceDocRef = null;
+  }
+  if (S.collab.presenceUnsub) {
+    S.collab.presenceUnsub();
+    S.collab.presenceUnsub = null;
+  }
+}
+
+function _renderPresence(people) {
+  var bar = document.getElementById('fd-presence-bar');
+  if (!bar) return;
+  // Show others (not ourselves)
+  var others = people.filter(function(p) { return p.uid !== S.user.uid; });
+  if (others.length === 0) {
+    bar.innerHTML = '<span class="fd-realtime-dot" id="fd-realtime-dot"></span><span class="fd-realtime-label">Live</span>';
+    return;
+  }
+  var avatars = others.map(function(p) {
+    return '<span class="fd-presence-avatar" style="background:' + p.color + '" title="' + _e(p.displayName) + ' is editing">' + _e(p.initials) + '</span>';
+  }).join('');
+  bar.innerHTML = '<span class="fd-presence-label">Also editing:</span><span class="fd-presence-avatars">' + avatars + '</span>'
+    + '<span class="fd-realtime-dot" id="fd-realtime-dot"></span><span class="fd-realtime-label">Live</span>';
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   COLLAB PANEL
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+function _toggleCollabPanel(tab) {
+  var panel = document.getElementById('fd-collab-panel');
+  if (!panel) return;
+  var isOpen = panel.classList.contains('is-open');
+  if (!isOpen) {
+    panel.classList.add('is-open');
+    _switchCollabTab(tab || S.collab.activeTab || 'comments');
+  } else if (S.collab.activeTab === tab) {
+    // Clicking the same tab button closes the panel
+    panel.classList.remove('is-open');
+  } else {
+    _switchCollabTab(tab);
+  }
+}
+
+function _switchCollabTab(tab) {
+  S.collab.activeTab = tab;
+  document.querySelectorAll('.fd-collab-tab').forEach(function(btn) {
+    btn.classList.toggle('is-active', btn.dataset.tab === tab);
+  });
+  document.querySelectorAll('.fd-collab-tab-content').forEach(function(el) {
+    el.classList.toggle('is-active', el.id === 'fd-tab-content-' + tab);
+  });
+  if (tab === 'history') _loadVersionHistory();
+  if (tab === 'comments') _loadComments();
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   COMMENTS
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+async function _loadComments() {
+  if (!S.currentDoc || !S.currentDoc.id) return;
+  if (!_checkFirebase()) return;
+  try {
+    var db = firebase.firestore();
+    var snapshot = await db.collection(COLLECTION_COMMENTS)
+      .where('docId', '==', S.currentDoc.id)
+      .orderBy('createdAt', 'asc')
+      .get();
+    S.collab.comments = snapshot.docs.map(function(d) {
+      return Object.assign({ id: d.id }, d.data());
+    });
+    _renderComments();
+  } catch (err) {
+    console.error('[FlockDocs] Error loading comments:', err);
+  }
+}
+
+function _renderComments() {
+  var list = document.getElementById('fd-comments-list');
+  if (!list) return;
+  if (S.collab.comments.length === 0) {
+    list.innerHTML = '<div style="padding:24px;text-align:center;font:500 0.875rem var(--font-ui);color:var(--ink-muted)">No comments yet.<br>Add the first one below.</div>';
+    return;
+  }
+  list.innerHTML = S.collab.comments.map(function(c) {
+    var color = _avatarColor(c.authorId);
+    var initials = c.authorInitials || _initials(c.authorName || 'U');
+    var time = _formatDate(c.createdAt);
+    var resolvedClass = c.resolved ? ' resolved' : '';
+    var resolveLabel = c.resolved ? 'Resolved' : 'Resolve';
+    return '<div class="fd-comment-item' + resolvedClass + '" id="fd-comment-' + c.id + '">'
+      + '<div class="fd-comment-header">'
+      + '<div class="fd-comment-avatar" style="background:' + color + '">' + _e(initials) + '</div>'
+      + '<div class="fd-comment-meta">'
+      + '<div class="fd-comment-author">' + _e(c.authorName || 'Unknown') + '</div>'
+      + '<div class="fd-comment-time">' + time + '</div>'
+      + '</div></div>'
+      + '<div class="fd-comment-text">' + _e(c.text) + '</div>'
+      + '<div class="fd-comment-actions">'
+      + (c.resolved ? '' : '<button class="fd-comment-action-btn" onclick="_resolveComment(\'' + c.id + '\')">' + resolveLabel + '</button>')
+      + (c.authorId === (S.user && S.user.uid) ? '<button class="fd-comment-action-btn" onclick="_deleteComment(\'' + c.id + '\')" style="color:var(--ink-muted)">Delete</button>' : '')
+      + '</div></div>';
+  }).join('');
+}
+
+async function _addComment() {
+  var textarea = document.getElementById('fd-comment-textarea');
+  var text = textarea ? textarea.value.trim() : '';
+  if (!text || !S.currentDoc || !S.currentDoc.id) return;
+  if (!_checkFirebase()) return;
+  try {
+    var db = firebase.firestore();
+    await db.collection(COLLECTION_COMMENTS).add({
+      docId: S.currentDoc.id,
+      text: text,
+      authorId: S.user.uid,
+      authorName: S.user.displayName || 'Anonymous',
+      authorInitials: _initials(S.user.displayName || S.user.email),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      resolved: false,
+    });
+    if (textarea) textarea.value = '';
+    _loadComments();
+    _toast('Comment added', 'success');
+  } catch (err) {
+    console.error('[FlockDocs] Error adding comment:', err);
+    _toast('Failed to add comment', 'error');
+  }
+}
+
+async function _resolveComment(commentId) {
+  if (!_checkFirebase()) return;
+  try {
+    var db = firebase.firestore();
+    await db.collection(COLLECTION_COMMENTS).doc(commentId).update({ resolved: true });
+    _loadComments();
+  } catch (err) {
+    _toast('Failed to resolve comment', 'error');
+  }
+}
+
+async function _deleteComment(commentId) {
+  if (!_checkFirebase()) return;
+  try {
+    var db = firebase.firestore();
+    await db.collection(COLLECTION_COMMENTS).doc(commentId).delete();
+    _loadComments();
+  } catch (err) {
+    _toast('Failed to delete comment', 'error');
+  }
+}
+window._resolveComment = _resolveComment;
+window._deleteComment = _deleteComment;
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   VERSION HISTORY
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+async function _saveVersion() {
+  if (!S.currentDoc || !S.currentDoc.id) return;
+  if (!_checkFirebase()) return;
+
+  var now = Date.now();
+  if (now - S.collab.lastSaveVersion < VERSION_MIN_INTERVAL) return;
+  S.collab.lastSaveVersion = now;
+
+  try {
+    var db = firebase.firestore();
+    await db.collection(COLLECTION_VERSIONS).add({
+      docId: S.currentDoc.id,
+      name: S.currentDoc.name,
+      content: S.currentDoc.content,
+      docHeader: S.currentDoc.docHeader || '',
+      docFooter: S.currentDoc.docFooter || '',
+      pageLayout: JSON.stringify(S.currentDoc.pageLayout || {}),
+      savedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      savedBy: S.user.uid,
+      savedByName: S.user.displayName || 'Anonymous',
+    });
+    // Refresh history list if panel is open on history tab
+    if (document.getElementById('fd-collab-panel')?.classList.contains('is-open')
+        && S.collab.activeTab === 'history') {
+      _loadVersionHistory();
+    }
+  } catch (err) {
+    console.warn('[FlockDocs] Version save error:', err);
+  }
+}
+
+async function _loadVersionHistory() {
+  var list = document.getElementById('fd-history-list');
+  if (!S.currentDoc || !S.currentDoc.id) {
+    if (list) list.innerHTML = '<div class="fd-history-empty">Open a saved document to view its version history.</div>';
+    return;
+  }
+  if (!_checkFirebase()) return;
+  if (list) list.innerHTML = '<div class="fd-history-empty">Loading history…</div>';
+  try {
+    var db = firebase.firestore();
+    var snapshot = await db.collection(COLLECTION_VERSIONS)
+      .where('docId', '==', S.currentDoc.id)
+      .orderBy('savedAt', 'desc')
+      .limit(50)
+      .get();
+    S.collab.versions = snapshot.docs.map(function(d) {
+      return Object.assign({ id: d.id }, d.data());
+    });
+    _renderVersionHistory();
+  } catch (err) {
+    console.error('[FlockDocs] Error loading version history:', err);
+    if (list) list.innerHTML = '<div class="fd-history-empty">Could not load history.</div>';
+  }
+}
+
+function _renderVersionHistory() {
+  var list = document.getElementById('fd-history-list');
+  if (!list) return;
+  if (S.collab.versions.length === 0) {
+    list.innerHTML = '<div class="fd-history-empty">No version history yet.<br>Versions are saved automatically as you edit.</div>';
+    return;
+  }
+  list.innerHTML = S.collab.versions.map(function(v) {
+    var time = _formatDate(v.savedAt);
+    var histSvg = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+    return '<div class="fd-history-item" id="fd-version-' + v.id + '">'
+      + '<div class="fd-history-icon">' + histSvg + '</div>'
+      + '<div class="fd-history-meta">'
+      + '<div class="fd-history-author">' + _e(v.savedByName || 'Unknown') + '</div>'
+      + '<div class="fd-history-time">' + time + '</div>'
+      + '<button class="fd-history-restore-btn" onclick="_previewVersion(\'' + v.id + '\')">Preview &amp; Restore</button>'
+      + '</div></div>';
+  }).join('');
+}
+
+function _previewVersion(versionId) {
+  var version = S.collab.versions.find(function(v) { return v.id === versionId; });
+  if (!version) return;
+  S.collab.pendingVersion = version;
+
+  var title = document.getElementById('fd-version-preview-title');
+  var doc = document.getElementById('fd-version-preview-doc');
+  var overlay = document.getElementById('fd-version-preview-overlay');
+
+  if (title) title.textContent = 'Version by ' + (version.savedByName || 'Unknown') + ' \u2014 ' + _formatDate(version.savedAt);
+  if (doc) doc.innerHTML = version.content;
+  if (overlay) overlay.classList.remove('hidden');
+}
+
+function _closeVersionPreview() {
+  S.collab.pendingVersion = null;
+  document.getElementById('fd-version-preview-overlay')?.classList.add('hidden');
+}
+
+function _restoreVersion() {
+  var version = S.collab.pendingVersion;
+  if (!version) return;
+
+  var editor = document.getElementById('fd-editor-content');
+  if (editor) editor.innerHTML = version.content;
+
+  var headerEl = document.getElementById('fd-doc-header');
+  var footerEl = document.getElementById('fd-doc-footer');
+  if (headerEl) headerEl.innerHTML = version.docHeader || '';
+  if (footerEl) footerEl.innerHTML = version.docFooter || '';
+
+  _closeVersionPreview();
+  _toast('Version restored \u2014 save to keep it', 'success');
+  _autoSave();
+}
+window._previewVersion = _previewVersion;
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   SHARE DIALOG
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+function showShareDialog() {
+  if (!S.currentDoc) {
+    _toast('Please open a document first', 'warning');
+    return;
+  }
+  // Populate current share state
+  var sharedWith = Array.isArray(S.currentDoc.sharedWith) ? S.currentDoc.sharedWith : [];
+  S.collab.sharedWith = sharedWith.map(function(u) { return Object.assign({}, u); });
+
+  var churchToggle = document.getElementById('fd-share-church-toggle');
+  var churchPermRow = document.getElementById('fd-share-church-perm-row');
+  var churchPerm = document.getElementById('fd-share-church-perm');
+
+  if (churchToggle) churchToggle.checked = !!S.currentDoc.shared;
+  if (churchPermRow) churchPermRow.style.display = S.currentDoc.shared ? 'flex' : 'none';
+  if (churchPerm) churchPerm.value = S.currentDoc.churchPermission || 'view';
+
+  _renderSharedUsersList();
+  document.getElementById('fd-share-overlay')?.classList.remove('hidden');
+  document.getElementById('fd-share-email-input')?.focus();
+}
+
+function _closeShareDialog() {
+  document.getElementById('fd-share-overlay')?.classList.add('hidden');
+}
+
+function _renderSharedUsersList() {
+  var container = document.getElementById('fd-shared-users-list');
+  if (!container) return;
+  if (S.collab.sharedWith.length === 0) {
+    container.innerHTML = '<div style="font:400 0.813rem var(--font-ui);color:var(--ink-muted);padding:8px 0">No specific users added yet.</div>';
+    return;
+  }
+  container.innerHTML = S.collab.sharedWith.map(function(u, idx) {
+    var color = _avatarColor(u.uid || u.email);
+    var initials = _initials(u.name || u.email);
+    return '<div class="fd-shared-user-item">'
+      + '<div class="fd-shared-user-avatar" style="background:' + color + '">' + _e(initials) + '</div>'
+      + '<div class="fd-shared-user-info">'
+      + '<div class="fd-shared-user-name">' + _e(u.name || u.email) + '</div>'
+      + '<div class="fd-shared-user-email">' + _e(u.email) + '</div>'
+      + '</div>'
+      + '<span class="fd-shared-user-perm">' + _e(u.permission || 'view') + '</span>'
+      + '<button class="fd-shared-user-remove" onclick="_removeSharedUser(' + idx + ')" aria-label="Remove">'
+      + '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="12" height="12"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>'
+      + '</button>'
+      + '</div>';
+  }).join('');
+}
+
+function _addSharedUser() {
+  var emailInput = document.getElementById('fd-share-email-input');
+  var permSelect = document.getElementById('fd-share-user-perm');
+  var email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+  var perm = permSelect ? permSelect.value : 'view';
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    _toast('Please enter a valid email address', 'warning');
+    return;
+  }
+  // Prevent duplicates
+  if (S.collab.sharedWith.find(function(u) { return u.email === email; })) {
+    _toast('This person is already in the list', 'warning');
+    return;
+  }
+  S.collab.sharedWith.push({ email: email, name: email, permission: perm });
+  if (emailInput) emailInput.value = '';
+  _renderSharedUsersList();
+}
+
+function _removeSharedUser(idx) {
+  S.collab.sharedWith.splice(idx, 1);
+  _renderSharedUsersList();
+}
+window._removeSharedUser = _removeSharedUser;
+
+async function _saveShareSettings() {
+  if (!S.currentDoc || !_checkFirebase()) return;
+  var churchToggle = document.getElementById('fd-share-church-toggle');
+  var churchPerm = document.getElementById('fd-share-church-perm');
+
+  var shared = churchToggle ? churchToggle.checked : false;
+  var churchPermission = churchPerm ? churchPerm.value : 'view';
+
+  try {
+    var db = firebase.firestore();
+    var update = {
+      shared: shared,
+      churchPermission: churchPermission,
+      sharedWith: S.collab.sharedWith,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+
+    if (S.currentDoc.id) {
+      await db.collection(COLLECTION_DOCS).doc(S.currentDoc.id).update(update);
+      Object.assign(S.currentDoc, update);
+      _closeShareDialog();
+      _toast('Sharing settings saved', 'success');
+    } else {
+      // Doc not saved yet - apply to in-memory state only
+      Object.assign(S.currentDoc, update);
+      _closeShareDialog();
+      _toast('Sharing settings will be saved with the document', 'info');
+    }
+  } catch (err) {
+    console.error('[FlockDocs] Error saving share settings:', err);
+    _toast('Failed to save sharing settings', 'error');
+  }
+}
+
+function _copyShareLink() {
+  var url = window.location.href.split('?')[0];
+  if (S.currentDoc && S.currentDoc.id) {
+    url += '?doc=' + S.currentDoc.id;
+  }
+  navigator.clipboard.writeText(url).then(function() {
+    _toast('Link copied to clipboard', 'success');
+  }).catch(function() {
+    // Fallback for non-HTTPS
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = url;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      _toast('Link copied to clipboard', 'success');
+    } catch (_) {
+      _toast('Could not copy link automatically', 'warning');
+    }
+  });
 }
