@@ -1,4 +1,316 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8">
-<meta http-equiv="refresh" content="0;url=app.flockdocs.html">
-<script>location.replace('app.flockdocs.html'+(location.search||'')+(location.hash||''));</script>
-</head><body></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Resolve all relative paths from the parent New_Covenant/ directory -->
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>FlockDocs — Sign In</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="app.flockdocs/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="Images/icon-flockdocs.svg">
+  <link rel="apple-touch-icon" href="Images/FlockIcon-512.webp">
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="FlockDocs">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- One CSS file: american_garments is merged into new_covenant.css -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-page:  #0e1320;
+      --bg-card:  #181b29;
+      --border:   rgba(255,255,255,.09);
+      --ink:      #f0f2f8;
+      --muted:    rgba(240,242,248,.55);
+      --blue:     #3b82f6;
+      --blue-dark:#2563eb;
+      --danger:   #f87171;
+      --radius:   18px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg-page);
+      color: var(--ink);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    /* ── Background glow ──────────────────────────────────── */
+    .bg-glow {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 15% 10%,  rgba(59,130,246,.13)  0%, transparent 55%),
+        radial-gradient(ellipse 60% 50% at 85% 85%,  rgba(99,102,241,.12)  0%, transparent 55%),
+        radial-gradient(ellipse 100% 60% at 50% 50%, rgba(30,41,90,.6)     0%, transparent 80%);
+    }
+
+    /* ── Card ─────────────────────────────────────────────── */
+    .card {
+      position: relative; z-index: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 44px 40px 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.04),
+        0 24px 64px rgba(0,0,0,.55),
+        0 4px 16px rgba(0,0,0,.3);
+    }
+
+    /* ── Brand ────────────────────────────────────────────── */
+    .brand {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 36px;
+    }
+    .brand-icon {
+      width: 54px; height: 54px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #1e40af, #3b82f6);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,.4), 0 0 24px rgba(59,130,246,.25);
+    }
+    .brand-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--ink);
+    }
+    .brand-sub {
+      font-size: .75rem;
+      color: var(--muted);
+      margin-top: 3px;
+      letter-spacing: .01em;
+    }
+
+    /* ── Section label ───────────────────────────────────── */
+    .form-title {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 22px;
+    }
+
+    /* ── Fields ──────────────────────────────────────────── */
+    .field-group { margin-bottom: 18px; }
+    label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 7px;
+      letter-spacing: .02em;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: .9rem;
+      padding: 12px 15px;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      -webkit-appearance: none;
+    }
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.18);
+    }
+    input::placeholder { color: rgba(240,242,248,.3); }
+
+    /* ── Button ──────────────────────────────────────────── */
+    .btn-signin {
+      width: 100%;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: .9rem;
+      font-weight: 800;
+      padding: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+      letter-spacing: .02em;
+      transition: opacity .15s, transform .1s, box-shadow .15s;
+      box-shadow: 0 4px 20px rgba(59,130,246,.35);
+    }
+    .btn-signin:hover  { opacity: .92; box-shadow: 0 6px 24px rgba(59,130,246,.45); }
+    .btn-signin:active { transform: scale(.98); }
+    .btn-signin:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+
+    /* ── Error ───────────────────────────────────────────── */
+    .error-msg {
+      display: none;
+      background: rgba(248,113,113,.08);
+      border: 1px solid rgba(248,113,113,.25);
+      border-radius: 8px;
+      color: var(--danger);
+      font-size: .82rem;
+      padding: 10px 14px;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+    .error-msg.visible { display: block; }
+
+    /* ── Spinner ─────────────────────────────────────────── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block;
+      width: 15px; height: 15px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .foot-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: .73rem;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow"></div>
+
+  <div class="card">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">FlockDocs</div>
+        <div class="brand-sub">FlockOS Productivity Suite</div>
+      </div>
+    </div>
+
+    <div class="form-title">Sign in to continue</div>
+
+    <form id="signin-form" method="post" autocomplete="on" novalidate>
+      <div class="field-group">
+        <label for="fd-email">Email</label>
+        <input type="email" id="fd-email" name="email" placeholder="you@church.com" autocomplete="email" required>
+      </div>
+
+      <div class="field-group">
+        <label for="fd-pass">Passcode</label>
+        <input type="password" id="fd-pass" name="password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+
+      <button type="submit" class="btn-signin" id="fd-submit">Sign In</button>
+    </form>
+
+    <div class="error-msg" id="fd-error"></div>
+
+    <p class="foot-note">Use your FlockOS church account credentials.</p>
+  </div>
+
+  <!-- Firebase & auth dependencies -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js" defer></script>
+  <script defer src="Scripts/firm_foundation.js"></script>
+  <script defer src="Scripts/the_upper_room.js"></script>
+  <script defer src="Scripts/the_true_vine.js"></script>
+
+  <script>
+    (function () {
+      var DOCS_URL = 'app.flockdocs/app.flockdocs.html';
+
+      function ready(fn) {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', fn);
+        } else {
+          fn();
+        }
+      }
+
+      ready(function () {
+        // If already authenticated, jump straight to the app
+        if (typeof Nehemiah !== 'undefined' && Nehemiah.isAuthenticated()) {
+          window.location.replace(DOCS_URL);
+          return;
+        }
+
+        var form   = document.getElementById('signin-form');
+        var btn    = document.getElementById('fd-submit');
+        var errBox = document.getElementById('fd-error');
+
+        function showError(msg) {
+          errBox.textContent = msg;
+          errBox.classList.add('visible');
+        }
+        function clearError() {
+          errBox.classList.remove('visible');
+        }
+        function setLoading(on) {
+          btn.disabled = on;
+          btn.innerHTML = on
+            ? '<span class="spinner"></span>Signing in…'
+            : 'Sign In';
+        }
+
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          clearError();
+
+          var email = document.getElementById('fd-email').value.trim();
+          var pass  = document.getElementById('fd-pass').value;
+
+          if (!email || !pass) {
+            showError('Please enter your email and passcode.');
+            return;
+          }
+
+          if (typeof Nehemiah === 'undefined') {
+            showError('Auth system not loaded yet. Please refresh and try again.');
+            return;
+          }
+
+          setLoading(true);
+          try {
+            await Nehemiah.login(email, pass);
+            window.location.replace(DOCS_URL);
+          } catch (err) {
+            setLoading(false);
+            showError(err.message || 'Sign in failed. Check your credentials and try again.');
+          }
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>
