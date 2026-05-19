@@ -54,8 +54,9 @@
       color: var(--ink);
       overflow: hidden;
       overscroll-behavior: none;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     }
-    body { background: var(--bg); }
+    body { background: var(--fd-bg, #f5f0e4); }
 
     /* ── Shell grid ──────────────────────────────────────────────────────── */
     .fd-wrap {
@@ -68,7 +69,7 @@
     }
     #fd-topbar       { grid-area: top; }
     #fd-sidebar-wrap { grid-area: side; overflow-y: auto; overflow-x: hidden; }
-    #fd-main         { grid-area: main; overflow-y: auto; overflow-x: hidden; position: relative; }
+    #fd-main         { grid-area: main; overflow-y: auto; overflow-x: hidden; position: relative; background: var(--fd-bg); }
     #fd-footer       { grid-area: foot; }
 
     /* Mobile: collapse sidebar */
@@ -80,8 +81,8 @@
       #fd-sidebar-wrap {
         position: fixed; top: calc(var(--topbar-h, 60px) + var(--safe-top, 0px));
         left: 0; bottom: 0; width: 280px;
-        background: var(--bg-raised);
-        border-right: 1px solid var(--line);
+        background: var(--fd-side-bg);
+        border-right: 1px solid var(--fd-side-line);
         z-index: 300;
         transform: translateX(-100%);
         transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -91,116 +92,170 @@
 
     /* ── Topbar (handled by unity-header; no custom styling needed) ──── */
 
-    /* ── Sidebar ─────────────────────────────────────────────────────────── */
-    #fd-sidebar {
-      padding: 20px 16px;
-      background: var(--bg-raised);
-      border-right: 1px solid var(--line);
-      height: 100%;
+    /* ── FlockDocs design tokens — matching FlockStand/FlockShow pattern ── */
+    :root {
+      --fd-sidebar-w:   220px;
+      --fd-gold:        #e8a838;
+      --fd-gold-soft:   rgba(232,168,56,0.13);
+      --fd-side-bg:     linear-gradient(90deg, #0c1445 0%, #14103a 60%, #0a1128 100%);
+      --fd-side-line:   rgba(255,255,255,0.08);
+      --fd-side-ink:    rgba(255,255,255,0.62);
+      --fd-side-ink-hi: rgba(255,255,255,0.92);
+      --fd-panel:       linear-gradient(135deg, #0f1735 0%, #1b264f 100%);
+      --fd-border:      rgba(255,255,255,0.10);
+      --fd-bg:          #f5f0e4;  /* Cream page background */
+      --sidebar-w:      var(--fd-sidebar-w);
     }
 
-    .fd-sidebar-section {
-      margin-bottom: 24px;
+    /* ── Sidebar — canonical FlockOS dark navy chrome ──── */
+    #fd-sidebar {
+      width: 100%;
+      background: var(--fd-side-bg) !important;
+      border-right: 1px solid var(--fd-side-line);
+      color: var(--fd-side-ink);
+      overflow-y: auto; overflow-x: hidden;
+      display: flex; flex-direction: column;
+      padding: 12px 8px;
+      gap: 4px;
+      height: 100%;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.10) transparent;
+    }
+    #fd-sidebar::-webkit-scrollbar { width: 4px; }
+    #fd-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+    .fd-sidebar-section { display: flex; flex-direction: column; gap: 2px; margin-bottom: 16px; }
+    .fd-sidebar-section--bottom {
+      margin-top: auto;
+      border-top: 1px solid var(--fd-side-line);
+      padding-top: 12px;
     }
 
     .fd-sidebar-title {
-      font: 600 0.75rem var(--font-ui);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--ink-muted);
-      margin: 0 0 8px 8px;
+      font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.28); padding: 10px 10px 4px; user-select: none;
     }
 
     .fd-sidebar-btn {
       display: flex; align-items: center; gap: 10px;
-      width: 100%; padding: 10px 12px;
-      background: transparent; border: 0; border-radius: 8px;
-      color: var(--ink); font: 500 0.875rem var(--font-ui);
-      text-align: left; cursor: pointer;
-      transition: background 150ms;
+      padding: 9px 12px; border-radius: 10px;
+      background: none; border: none; cursor: pointer;
+      color: var(--fd-side-ink);
+      font-size: .88rem; font-weight: 500; font-family: var(--font-ui);
+      text-align: left; width: 100%; transition: all .15s;
+      white-space: nowrap;
     }
-    .fd-sidebar-btn:hover { background: rgba(255,255,255,0.05); }
-    .fd-sidebar-btn.is-active { background: rgba(59,130,246,0.15); color: #3b82f6; }
+    .fd-sidebar-btn:hover {
+      background: rgba(255,255,255,0.07);
+      color: var(--fd-side-ink-hi);
+    }
+    .fd-sidebar-btn.is-active {
+      background: var(--fd-gold-soft);
+      color: var(--fd-gold);
+      font-weight: 600;
+    }
     .fd-sidebar-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 
     .fd-folder-item {
       display: flex; align-items: center; gap: 8px;
       padding: 8px 12px 8px 28px;
-      color: var(--ink); font: 500 0.875rem var(--font-ui);
-      cursor: pointer; border-radius: 6px;
-      transition: background 150ms;
+      color: var(--fd-side-ink); font: 500 0.875rem var(--font-ui);
+      cursor: pointer; border-radius: 8px;
+      transition: all .15s;
     }
-    .fd-folder-item:hover { background: rgba(255,255,255,0.05); }
+    .fd-folder-item:hover { 
+      background: rgba(255,255,255,0.07); 
+      color: var(--fd-side-ink-hi);
+    }
     .fd-folder-item svg { width: 16px; height: 16px; }
 
     /* ── Main content area ───────────────────────────────────────────────── */
     .fd-library-view {
-      padding: 32px 40px;
+      padding: 28px 32px 80px;
       max-width: 1400px;
       margin: 0 auto;
     }
 
     .fd-library-header {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 32px;
+      gap: 16px; flex-wrap: wrap;
+      margin-bottom: 28px;
+      padding: 18px 22px;
+      background: var(--fd-panel);
+      border: 1px solid var(--fd-border);
+      border-radius: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+    .fd-library-header::before {
+      content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2.5px;
+      background: linear-gradient(90deg, #38bdf8 0%, #818cf8 28%, #a78bfa 52%, #e8a838 78%, #34d399 100%);
+      opacity: 0.92;
     }
 
     .fd-library-title {
-      font: 700 1.75rem var(--font-ui);
-      color: var(--ink);
+      font: 800 1.5rem var(--font-ui);
+      color: #ffffff;
       margin: 0;
+      letter-spacing: -.02em;
     }
 
     .fd-search-box {
       display: flex; align-items: center; gap: 8px;
-      padding: 10px 14px;
-      background: var(--bg-raised);
-      border: 1px solid var(--line);
+      padding: 9px 14px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 10px;
       width: 300px;
+      transition: all .15s;
     }
-    .fd-search-box svg { width: 18px; height: 18px; color: var(--ink-muted); }
+    .fd-search-box:focus-within {
+      background: rgba(255,255,255,0.12);
+      border-color: var(--fd-gold);
+    }
+    .fd-search-box svg { width: 18px; height: 18px; color: rgba(255,255,255,0.45); }
     .fd-search-box input {
       flex: 1; border: 0; background: transparent;
-      color: var(--ink); font: 500 0.875rem var(--font-ui);
+      color: #ffffff; font: 500 0.875rem var(--font-ui);
       outline: none;
     }
-    .fd-search-box input::placeholder { color: var(--ink-muted); }
+    .fd-search-box input::placeholder { color: rgba(255,255,255,0.45); }
 
     /* Document grid */
     .fd-doc-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 20px;
+      gap: 18px;
     }
 
     .fd-doc-card {
-      background: var(--bg-raised);
-      border: 1px solid var(--line);
+      background: var(--fd-panel);
+      border: 1px solid var(--fd-border);
       border-radius: 12px;
-      padding: 20px;
+      padding: 18px;
       cursor: pointer;
-      transition: all 150ms;
+      transition: all .15s;
       position: relative;
     }
     .fd-doc-card:hover {
-      border-color: #3b82f6;
-      box-shadow: 0 4px 16px rgba(59,130,246,0.15);
+      border-color: var(--fd-gold);
+      box-shadow: 0 8px 24px rgba(232,168,56,0.15);
       transform: translateY(-2px);
     }
 
     .fd-doc-icon {
       width: 48px; height: 48px;
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      background: linear-gradient(135deg, var(--fd-gold), #c48a20);
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(232,168,56,0.25);
     }
-    .fd-doc-icon svg { width: 24px; height: 24px; color: white; }
+    .fd-doc-icon svg { width: 24px; height: 24px; color: #1a1208; }
 
     .fd-doc-name {
       font: 600 0.938rem var(--font-ui);
-      color: var(--ink);
+      color: #ffffff;
       margin: 0 0 4px;
       white-space: nowrap;
       overflow: hidden;
@@ -209,7 +264,7 @@
 
     .fd-doc-meta {
       font: 500 0.75rem var(--font-ui);
-      color: var(--ink-muted);
+      color: rgba(255,255,255,0.55);
     }
 
     .fd-doc-menu-btn {
@@ -219,13 +274,13 @@
       display: flex; align-items: center; justify-content: center;
       background: transparent;
       border: 0; border-radius: 6px;
-      color: var(--ink-muted);
+      color: rgba(255,255,255,0.45);
       cursor: pointer;
       opacity: 0;
-      transition: opacity 150ms, background 150ms;
+      transition: opacity .15s, background .15s;
     }
     .fd-doc-card:hover .fd-doc-menu-btn { opacity: 1; }
-    .fd-doc-menu-btn:hover { background: rgba(255,255,255,0.08); }
+    .fd-doc-menu-btn:hover { background: rgba(255,255,255,0.10); color: #ffffff; }
 
     /* Empty state */
     .fd-empty-state {
@@ -234,20 +289,49 @@
     }
     .fd-empty-state svg {
       width: 80px; height: 80px;
-      color: var(--ink-muted);
+      color: rgba(255,255,255,0.35);
       opacity: 0.5;
-      margin-bottom: 20px;
+      margin: 0 auto 20px;
     }
     .fd-empty-state h3 {
       font: 600 1.25rem var(--font-ui);
-      color: var(--ink);
+      color: #ffffff;
       margin: 0 0 8px;
     }
     .fd-empty-state p {
       font: 500 0.938rem var(--font-ui);
-      color: var(--ink-muted);
+      color: rgba(255,255,255,0.55);
       margin: 0 0 24px;
     }
+
+    /* Buttons — matching FlockStand/FlockShow pattern */
+    .fd-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 10px;
+      border: none; cursor: pointer; font-family: var(--font-ui);
+      font-size: .85rem; font-weight: 600; text-decoration: none;
+      transition: all .15s; white-space: nowrap;
+    }
+    .fd-btn--primary {
+      background: var(--fd-gold); color: #1a1208;
+      box-shadow: 0 4px 12px rgba(232,168,56,0.25);
+    }
+    .fd-btn--primary:hover { background: #f0b845; }
+    .fd-btn--ghost {
+      background: rgba(255,255,255,0.07); color: #ffffff;
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+    .fd-btn--ghost:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.25);
+    }
+    .fd-btn--danger {
+      background: rgba(248,113,113,0.15); color: #ef4444;
+      border: 1px solid rgba(248,113,113,0.25);
+    }
+    .fd-btn--danger:hover { background: rgba(248,113,113,0.25); }
+    .fd-btn--sm { padding: 6px 12px; font-size: .8rem; }
+    .fd-btn:disabled { opacity: 0.35; pointer-events: none; }
 
     /* ── Editor view ─────────────────────────────────────────────────────── */
     .fd-editor-view {
@@ -260,40 +344,50 @@
     .fd-editor-toolbar {
       display: flex; align-items: center; gap: 4px;
       padding: 12px 20px;
-      background: var(--bg-raised);
-      border-bottom: 1px solid var(--line);
+      background: var(--fd-panel);
+      border-bottom: 1px solid var(--fd-border);
       flex-wrap: wrap;
     }
 
     .fd-toolbar-btn {
       display: inline-flex; align-items: center; justify-content: center;
       width: 36px; height: 36px;
-      background: transparent; border: 0; border-radius: 6px;
-      color: var(--ink);
+      background: transparent; border: 0; border-radius: 8px;
+      color: rgba(255,255,255,0.62);
       cursor: pointer;
-      transition: background 150ms;
+      transition: all .15s;
     }
-    .fd-toolbar-btn:hover { background: rgba(255,255,255,0.08); }
-    .fd-toolbar-btn.is-active { background: rgba(59,130,246,0.2); color: #3b82f6; }
+    .fd-toolbar-btn:hover {
+      background: rgba(255,255,255,0.10);
+      color: #ffffff;
+    }
+    .fd-toolbar-btn.is-active {
+      background: var(--fd-gold-soft);
+      color: var(--fd-gold);
+    }
     .fd-toolbar-btn svg { width: 18px; height: 18px; }
 
     .fd-toolbar-divider {
       width: 1px; height: 24px;
-      background: var(--line);
+      background: rgba(255,255,255,0.10);
       margin: 0 8px;
     }
 
     .fd-toolbar-select {
       padding: 6px 10px;
-      background: var(--bg);
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      color: var(--ink);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      color: #ffffff;
       font: 500 0.875rem var(--font-ui);
       cursor: pointer;
       outline: none;
+      transition: all .15s;
     }
-    .fd-toolbar-select:hover { border-color: var(--ink-muted); }
+    .fd-toolbar-select:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.22);
+    }
 
     .fd-editor-container {
       flex: 1;

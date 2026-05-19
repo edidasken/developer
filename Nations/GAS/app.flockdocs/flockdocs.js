@@ -112,8 +112,8 @@ function _mountHeader() {
     appId: 'flockdocs',
     appName: 'FlockDocs',
     appIconSvg,
-    appAccent: '#3b82f6',
-    appAccentDk: '#1e3a8a',
+    appAccent: '#e8a838',
+    appAccentDk: '#c48a20',
     homeHref: 'app.flockdocs/app.flockdocs.html',
     user: S.user,
     onSignOut: async () => {
