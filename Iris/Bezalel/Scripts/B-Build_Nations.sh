@@ -919,7 +919,7 @@ if ! $DRY_RUN; then
     echo "Deploying comprehensive church rules…"
     for PROJECT in flockos-truth flockos-trinity flockos-theforest flockos-notify; do
       echo "  → $PROJECT"
-      firebase deploy --only firestore:rules --project "$PROJECT" --config "$CHURCH_CONFIG" --non-interactive 2>&1 | grep -E "Deploy complete|Error" || true
+      firebase deploy --only firestore:rules,firestore:indexes --project "$PROJECT" --config "$CHURCH_CONFIG" --non-interactive 2>&1 | grep -E "Deploy complete|Error" || true
     done
     echo "  ✓ Church rules deployed"
   else
