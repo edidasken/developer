@@ -70,6 +70,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    // Wait for Firebase Auth token to be fully restored before any Firestore reads
+    await new Promise(resolve => {
+      const unsub = window.firebase?.auth?.().onAuthStateChanged(user => {
+        unsub?.();
+        resolve(user);
+      });
+      if (!window.firebase?.auth) resolve(null); // no-op if firebase not ready
+    });
+
     // Mount app
     document.getElementById('melch-boot').style.display = 'none';
     document.getElementById('melch-app').hidden = false;
@@ -173,31 +182,17 @@ function _wireNav() {
 
 /* ── Data loading ───────────────────────────────────────────────────────── */
 async function _loadData() {
-  const V   = window.TheVine;
-  const db  = window.firebase?.firestore?.();
+  const db = window.firebase?.firestore?.();
 
-  // Load members
-  if (V) {
-    try {
-      const res = await (window.TheScrolls
-        ? window.TheScrolls.listMembers({ limit: 500 })
-        : Promise.resolve([]));
-      _allMembers = _normalizeRows(res);
-    } catch (_) {
-      _allMembers = [];
-    }
-    // Fallback: try Firestore members collection
-    if (!_allMembers.length && db) {
-      try {
-        const snap = await db.collection('members').limit(500).get();
-        _allMembers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      } catch (_) {}
-    }
-  } else if (db) {
+  // Load members directly from Firestore
+  if (db) {
     try {
       const snap = await db.collection('members').limit(500).get();
       _allMembers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    } catch (_) {}
+    } catch (err) {
+      console.warn('[Melchizedek] members load error', err);
+      _allMembers = [];
+    }
   }
 
   // Filter inactive
@@ -215,13 +210,6 @@ async function _loadData() {
       snap.docs.forEach(d => { _checksMap[d.id] = d.data(); });
     } catch (_) {}
   }
-}
-
-function _normalizeRows(res) {
-  if (Array.isArray(res)) return res;
-  if (res && Array.isArray(res.rows)) return res.rows;
-  if (res && Array.isArray(res.data)) return res.data;
-  return [];
 }
 
 /* ── Live subscription ───────────────────────────────────────────────────── */
