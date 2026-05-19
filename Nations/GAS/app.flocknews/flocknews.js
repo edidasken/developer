@@ -88,6 +88,16 @@ function _checkEditPermissions() {
             role: profile.role || 'member',
           };
           FlockNewsState.isPastorPlus = (profile.role === 'pastor' || profile.role === 'admin');
+          // Authenticate with Firebase so Firestore reads work
+          if (typeof UpperRoom !== 'undefined') {
+            try {
+              await UpperRoom.init(window.FLOCK_FIREBASE_CONFIG || window.FIREBASE_CONFIG || null);
+              await UpperRoom.authenticate();
+              console.log('[FlockNews] UpperRoom authenticated for editor');
+            } catch (e) {
+              console.warn('[FlockNews] UpperRoom authenticate failed:', e);
+            }
+          }
           if (FlockNewsState.isPastorPlus) {
             const editBtn = document.getElementById('fn-edit-toggle');
             if (editBtn) editBtn.style.display = 'flex';
