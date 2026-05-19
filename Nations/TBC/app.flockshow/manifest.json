@@ -1,5 +1,5 @@
 {
-  "name": "Trinity Baptist Church \u00b7 FlockShow",
+  "name": "{{CHURCH_NAME}} \u00b7 FlockShow",
   "short_name": "FlockShow",
   "description": "Church presentation and worship display \u2014 build and present slides for your service.",
   "start_url": "./app.flockshow.html",

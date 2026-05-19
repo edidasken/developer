@@ -101,12 +101,7 @@ function init() {
 function _mountHeader() {
   const appIconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>';
   
-  const newDocHtml = `
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-    </svg>
-    <span>New Document</span>
-  `;
+  const newDocHtml = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="15" height="15" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg><span style="white-space:nowrap">New</span>`;
 
   mountUnityHeader(document.getElementById('fd-topbar'), {
     appId: 'flockdocs',
@@ -129,7 +124,7 @@ function _mountHeader() {
     },
     extras: [
       {
-        html: `<span style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:#e8a838;color:#0c1445;font:600 0.875rem var(--font-ui);cursor:pointer;transition:background .15s">${newDocHtml}</span>`,
+        html: `<button style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;background:#e8a838;color:#0c1445;font:600 0.82rem 'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:background .15s;border:none;white-space:nowrap;box-shadow:0 2px 8px rgba(232,168,56,0.25)" onmouseover="this.style.background='#f0b845'" onmouseout="this.style.background='#e8a838'">${newDocHtml}</button>`,
         onClick: createNewDocument,
         aria: 'New Document',
         title: 'Create a new document',
@@ -423,8 +418,8 @@ function _renderDocuments() {
         </svg>
         <h3>${S.searchQuery ? 'No documents found' : 'No documents yet'}</h3>
         <p>${S.searchQuery ? 'Try a different search term' : 'Create your first document to get started'}</p>
-        ${!S.searchQuery ? `<button class="fd-btn" onclick="FlockDocs.createNewDocument()">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        ${!S.searchQuery ? `<button style="display:inline-flex !important;align-items:center !important;gap:6px !important;padding:9px 18px !important;border-radius:10px !important;background:#e8a838 !important;color:#1a1208 !important;font:600 0.875rem 'Plus Jakarta Sans',sans-serif !important;cursor:pointer !important;transition:background .15s !important;border:none !important;box-shadow:0 4px 12px rgba(232,168,56,0.25) !important;margin-top:8px !important" onclick="FlockDocs.createNewDocument()" onmouseover="this.style.background='#f0b845'" onmouseout="this.style.background='#e8a838'">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18" style="flex-shrink:0">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
           Create Document

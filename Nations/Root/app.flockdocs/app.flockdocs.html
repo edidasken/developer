@@ -105,6 +105,7 @@
       --fd-border:      rgba(255,255,255,0.10);
       --fd-bg:          #f5f0e4;  /* Cream page background */
       --sidebar-w:      var(--fd-sidebar-w);
+      --font-ui:        'Plus Jakarta Sans', system-ui, sans-serif;
     }
 
     /* ── Sidebar — canonical FlockOS dark navy chrome ──── */
@@ -194,7 +195,7 @@
     }
 
     .fd-library-title {
-      font: 800 1.5rem var(--font-ui);
+      font: 800 1.5rem 'Plus Jakarta Sans', system-ui, sans-serif;
       color: #ffffff;
       margin: 0;
       letter-spacing: -.02em;
@@ -307,11 +308,12 @@
     /* Buttons — matching FlockStand/FlockShow pattern */
     .fd-btn {
       display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 16px; border-radius: 10px;
-      border: none; cursor: pointer; font-family: var(--font-ui);
-      font-size: .85rem; font-weight: 600; text-decoration: none;
+      padding: 9px 18px; border-radius: 10px;
+      border: none; cursor: pointer; font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: .875rem; font-weight: 600; text-decoration: none;
       transition: all .15s; white-space: nowrap;
     }
+    .fd-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
     .fd-btn--primary {
       background: var(--fd-gold); color: #1a1208;
       box-shadow: 0 4px 12px rgba(232,168,56,0.25);

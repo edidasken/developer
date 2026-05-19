@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <title>Trinity Baptist Church</title>
+  <title>{{CHURCH_NAME}}</title>
   <link rel="icon" type="image/png" href="Images/FlockIcon.png">
   <link rel="apple-touch-icon" href="Images/FlockIcon-512.webp">
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Trinity Baptist Church">
+  <meta name="apple-mobile-web-app-title" content="{{CHURCH_NAME}}">
   <meta name="theme-color" content="#0c1445">
-  <meta name="description" content="Trinity Baptist Church — FlockOS church management and GROW discipleship tools. Free forever. 210 countries.">
+  <meta name="description" content="{{CHURCH_NAME}} — FlockOS church management and GROW discipleship tools. Free forever. 210 countries.">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Trinity Baptist Church">
+  <meta property="og:title" content="{{CHURCH_NAME}}">
   <meta property="og:description" content="Complete pastoral care, member management, discipleship, and outreach. Free forever. 210 countries. 256-bit encrypted.">
   <meta property="og:image" content="Images/FlockIcon-512.webp">
   <meta property="og:type" content="website">
@@ -634,9 +634,9 @@
   <div class="launcher">
 
     <div class="church-id">
-      <img src="Images/FlockIcon-512.webp" alt="Trinity Baptist Church" width="80" height="80" fetchpriority="high">
+      <img src="Images/FlockIcon-512.webp" alt="{{CHURCH_NAME}}" width="80" height="80" fetchpriority="high">
       <div class="church-id-text">
-        <h1>Trinity Baptist Church</h1>
+        <h1>{{CHURCH_NAME}}</h1>
         <p class="tagline">Built to be Shared.</p>
       </div>
     </div>
@@ -1054,7 +1054,7 @@
 
     const headerCtrl = mountUnityHeader(document.getElementById('launcher-header'), {
       appId:       'launcher',
-      appName:     'Trinity Baptist Church',
+      appName:     '{{CHURCH_NAME}}',
       appIconSvg:  CHURCH_ICON,
       appAccent:   '#e8a838',
       appAccentDk: '#1e3a8a',
@@ -1062,7 +1062,7 @@
       user,
       onAccount:   () => {
         if (user) {
-          openUnityProfile({ appId: 'launcher', appName: 'Trinity Baptist Church', user, onSignOut: _signOut });
+          openUnityProfile({ appId: 'launcher', appName: '{{CHURCH_NAME}}', user, onSignOut: _signOut });
         } else {
           _openSignInModal();
         }
@@ -1159,7 +1159,7 @@
 
         // Open Unity Profile immediately to welcome the user
         if (user) {
-          openUnityProfile({ appId: 'launcher', appName: 'Trinity Baptist Church', user, onSignOut: _signOut });
+          openUnityProfile({ appId: 'launcher', appName: '{{CHURCH_NAME}}', user, onSignOut: _signOut });
         }
       } catch (err) {
         errEl.textContent = err.message || 'Sign-in failed. Please check your email and passcode.';

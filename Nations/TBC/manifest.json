@@ -1,14 +1,14 @@
 {
-  "name": "Trinity Baptist Church",
-  "short_name": "Trinity Baptist Church",
+  "name": "{{CHURCH_NAME}}",
+  "short_name": "{{CHURCH_NAME}}",
   "description": "Church management, discipleship, and pastoral care tools. Free forever. 210 countries. 256-bit encrypted.",
   "start_url": "./index.html",
   "id": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#1a1a2e",
-  "theme_color": "#e8a838",
+  "background_color": "#09102e",
+  "theme_color": "#0c1445",
   "lang": "en",
   "dir": "ltr",
   "categories": [
