@@ -11,14 +11,15 @@
 }
 
 .fs-note-card {
-  background: #202124;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--fs-color-default, #ffffff);
+  border: 1px solid var(--fs-gray-mid, #e0e0e0);
   border-radius: 8px;
   padding: 12px 16px;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  color: var(--fs-text-primary, #202124);
 }
 
 .fs-note-card:hover {
@@ -40,7 +41,7 @@
 .fs-note-title {
   font-size: 16px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--fs-text-primary, #202124);
   margin: 0;
   flex: 1;
 }
@@ -64,7 +65,7 @@
 }
 
 .fs-note-content {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--fs-text-secondary, #5f6368);
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 12px;
@@ -83,7 +84,7 @@
   align-items: flex-start;
   gap: 8px;
   padding: 4px 0;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--fs-text-secondary, #5f6368);
   font-size: 14px;
 }
 
