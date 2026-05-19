@@ -75,7 +75,7 @@ function _checkEditPermissions() {
   let attempts = 0;
   const maxAttempts = 80; // 8 seconds — plenty of time after render
 
-  const poll = () => {
+  const poll = async () => {
     attempts++;
     if (typeof Nehemiah !== 'undefined') {
       if (Nehemiah.isAuthenticated()) {
