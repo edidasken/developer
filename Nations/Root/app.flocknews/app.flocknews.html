@@ -87,8 +87,7 @@
 
     /* Magazine layout sections */
     [data-section="introduction"] { grid-column: span 12; }
-    [data-section="pastorHeart"] { grid-column: span 8; }
-    [data-section="prayercast"] { grid-column: span 4; }
+    [data-section="pastorHeart"] { grid-column: span 12; }
     [data-section="announcements"] { grid-column: span 12; }
     [data-section="mission"] { grid-column: span 12; }
     [data-section="reading"] { grid-column: span 6; }
@@ -99,7 +98,6 @@
     /* Tablet: 2-column */
     @media (max-width: 1024px) {
       [data-section="pastorHeart"] { grid-column: span 12; }
-      [data-section="prayercast"] { grid-column: span 12; }
       [data-section="announcements"] { grid-column: span 12; }
       [data-section="reading"] { grid-column: span 12; }
       [data-section="devotional"] { grid-column: span 12; }
@@ -1240,20 +1238,6 @@
         </div>
         <div class="card-body" id="fn-pastorHeart-content">
           <p>Loading pastor's message...</p>
-        </div>
-      </div>
-
-      <!-- Prayercast Video -->
-      <div class="card" data-section="prayercast" style="margin-bottom: 24px;">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-          <div style="display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 700; color: var(--fn-gold);">
-            <span class="fn-section-icon">🙏</span>
-            Prayercast: This Week's Nation
-          </div>
-          <button class="btn btn-sm fn-section-edit-btn" onclick="FlockNews.editSection('prayercast')">Edit</button>
-        </div>
-        <div class="card-body" id="fn-prayercast-content">
-          <p>Loading prayer video...</p>
         </div>
       </div>
 

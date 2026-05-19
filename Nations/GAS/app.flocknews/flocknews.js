@@ -11,7 +11,6 @@ import oneYearBibleData from '../Data/one_year_bible.js';
 import strongsGreekData from '../Data/strongs-greek.js';
 import strongsHebrewData from '../Data/strongs-hebrew.js';
 import booksOfBibleData from '../Data/books-of-the-bible.js';
-import { getPrayercastVideoForWeek, getDefaultPrayercastVideo } from '../Data/prayercast.js';
 
 // Joshua Project API configuration
 const JP_API_BASE = 'https://api.joshuaproject.net/v1';
@@ -31,7 +30,6 @@ const FlockNewsState = {
   newsData: {
     introduction: { title: '', content: '', lastUpdated: null },
     pastorHeart: { title: '', content: '', lastUpdated: null },
-    prayercast: { videoId: '', customVideoUrl: '', lastUpdated: null },
     announcements: { title: '', content: '', lastUpdated: null },
     mission: { title: '', content: '', lastUpdated: null },
     reading: { passage: '', reference: '', content: '', lastUpdated: null },
@@ -353,7 +351,6 @@ async function loadNewsContent() {
     // Render all sections
     renderIntroduction();
     renderPastorHeart();
-    renderPrayercast();
     renderAnnouncements();
     renderMission();
     renderReading();
@@ -985,42 +982,6 @@ function renderCardReactions(sectionId) {
   `;
 }
 
-// Render Prayercast section
-function renderPrayercast() {
-  const customUrl = FlockNewsState.newsData.prayercast?.customVideoUrl;
-  let video;
-  
-  if (customUrl) {
-    // Use custom URL if set by pastor
-    video = { name: 'Custom Video', embedUrl: customUrl };
-  } else {
-    // Auto-rotate based on week of year, fallback to Afghanistan
-    try {
-      video = getPrayercastVideoForWeek(new Date());
-    } catch (err) {
-      console.warn('Failed to get weekly video, using Afghanistan default:', err);
-      video = getDefaultPrayercastVideo();
-    }
-  }
-  
-  const content = `
-    <h2>Pray for ${video.name} This Week</h2>
-    <div class="fn-prayercast-video" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin: 20px 0;">
-      <iframe 
-        src="${video.embedUrl}" 
-        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
-        allowfullscreen
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        title="Prayercast: ${video.name}"
-      ></iframe>
-    </div>
-    <p style="color: var(--fn-muted); font-size: 14px; text-align: center; margin-top: 12px;">
-      Join us in praying for the people of ${video.name}. Watch this Prayercast video to learn how to pray effectively for this nation.
-    </p>
-  `;
-  document.getElementById('fn-prayercast-content').innerHTML = content;
-}
-
 // Render Announcements section
 function renderAnnouncements() {
   const content = FlockNewsState.newsData.announcements?.content || `
@@ -1643,7 +1604,6 @@ async function saveSection() {
     switch (sectionId) {
       case 'introduction': renderIntroduction(); break;
       case 'pastorHeart': renderPastorHeart(); break;
-      case 'prayercast': renderPrayercast(); break;
       case 'announcements': renderAnnouncements(); break;
       case 'mission': renderMission(); break;
       case 'reading': renderReading(); break;
