@@ -28,25 +28,25 @@ const TheVine = (() => {
   const _config = {
 
     APP_ENDPOINTS: [
-      'https://script.google.com/macros/s/AKfycbx2pemG039LB609OlVY-OcqLWK75qRV2ZgZNyf4Oc7dGogCR2HC4C__iWUqlG9JfYLt/exec', // PRIMARY (unified)
+      'https://script.google.com/macros/s/AKfycbwAFp0BQvt0DiDJBjzBrycMripfUHOkP0PwiB_DSXgGVezP_y8jCOVxZWweTp58gai7/exec', // PRIMARY (unified)
       '', // SECONDARY
       '', // TERTIARY
     ],
 
     FLOCK_ENDPOINTS: [
-      'https://script.google.com/macros/s/AKfycbx2pemG039LB609OlVY-OcqLWK75qRV2ZgZNyf4Oc7dGogCR2HC4C__iWUqlG9JfYLt/exec', // PRIMARY (unified)
+      'https://script.google.com/macros/s/AKfycbwAFp0BQvt0DiDJBjzBrycMripfUHOkP0PwiB_DSXgGVezP_y8jCOVxZWweTp58gai7/exec', // PRIMARY (unified)
       '', // SECONDARY
       '', // TERTIARY
     ],
 
     MISSIONS_ENDPOINTS: [
-      'https://script.google.com/macros/s/AKfycbx2pemG039LB609OlVY-OcqLWK75qRV2ZgZNyf4Oc7dGogCR2HC4C__iWUqlG9JfYLt/exec', // PRIMARY (unified)
+      'https://script.google.com/macros/s/AKfycbwAFp0BQvt0DiDJBjzBrycMripfUHOkP0PwiB_DSXgGVezP_y8jCOVxZWweTp58gai7/exec', // PRIMARY (unified)
       '', // SECONDARY
       '', // TERTIARY
     ],
 
     EXTRA_ENDPOINTS: [
-      'https://script.google.com/macros/s/AKfycbx2pemG039LB609OlVY-OcqLWK75qRV2ZgZNyf4Oc7dGogCR2HC4C__iWUqlG9JfYLt/exec', // PRIMARY (unified)
+      'https://script.google.com/macros/s/AKfycbwAFp0BQvt0DiDJBjzBrycMripfUHOkP0PwiB_DSXgGVezP_y8jCOVxZWweTp58gai7/exec', // PRIMARY (unified)
       '', // SECONDARY
       '', // TERTIARY
     ],

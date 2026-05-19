@@ -1,13 +1,13 @@
 {
-  "name": "FlockOS",
-  "short_name": "FlockOS",
+  "name": "Trinity Baptist Church",
+  "short_name": "TBC",
   "description": "Complete church management and pastoral care platform. Google Sheets, Firebase, or fully offline via The Wellspring. 30+ modules. 210 countries. 256-bit encrypted. Free forever.",
   "start_url": "./app.flockos.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0c1445",
-  "theme_color": "#3b82f6",
+  "background_color": "#1a1a2e",
+  "theme_color": "#e8a838",
   "lang": "en",
   "dir": "ltr",
   "categories": [
