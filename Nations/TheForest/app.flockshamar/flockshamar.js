@@ -100,7 +100,7 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
       mountUnityHeader(document.getElementById('fs-topbar'), {
         appId: 'flockshamar',
         appName: 'FlockShamar',
-        appIconSvg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H3v9h18v-9h-6M7 21V8h10v13"/><rect x="9" y="3" width="6" height="5" rx="1"/></svg>',
+        appIconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg>',
         appAccent: '#fbbf24',
         appAccentDk: '#a16207',
         homeHref: 'app.flockshamar/app.flockshamar.html',
