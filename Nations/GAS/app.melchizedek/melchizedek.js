@@ -378,21 +378,32 @@ function _viewAbout() {
 
   <!-- Section 1 -->
   ${_aboutSection('1', 'The Legal Imperative — California AB-506',
-    `<p>Enacted under the California Business and Professions Code, <strong>Assembly Bill 506 (AB-506)</strong>
-    mandates strict child abuse prevention protocols for all youth-serving organizations. Compliance is not
-    optional — it is a legal requirement to protect children and limit organizational liability.</p>
+    `<p>Originally enacted in 2021 and <strong>fully in force as of January 1, 2024</strong> (amended by AB 1754,
+    Stats. 2023, Ch. 131), <strong>Assembly Bill 506</strong> — codified at Cal. Bus. &amp; Prof. Code §18975 —
+    requires every qualifying youth-serving organization to implement a comprehensive child abuse prevention
+    program. The transitional exemption previously granted to legacy organizations has expired. Full compliance
+    is now mandatory with no exceptions.</p>
     <div style="display:grid;gap:10px;margin-top:16px">
       ${_aboutCallout('⏱ The Regular Volunteer Threshold',
-        'Under Cal. Bus. &amp; Prof. Code §18975(e)(1), a "regular volunteer" is any person 18 or older who has direct contact with, or supervision of, children for more than <strong>16 hours per month</strong> or <strong>32 hours per year</strong>. Administrators and employees are covered regardless of hours.')}
+        '<strong>§18975(e)(1):</strong> A &ldquo;regular volunteer&rdquo; is any person <strong>18 or older</strong> who has direct contact with, or supervision of, children for more than <strong>16 hours per month</strong> or <strong>32 hours per year</strong>. Administrators and paid employees are subject to all requirements regardless of hours.')}
       ${_aboutCallout('📋 Mandated Reporter Training',
-        'Every administrator, employee, and regular volunteer must complete training in child abuse and neglect <em>identification</em> and <em>reporting</em> before serving. The requirement is satisfied by completing the free online training provided by the California Office of Child Abuse Prevention (OCAP) within the State Department of Social Services.')}
-      ${_aboutCallout('🔍 LiveScan Fingerprinting',
-        'Every qualifying person must submit to a fingerprint-based background check pursuant to Cal. Penal Code §11105.3, processed through the California Department of Justice (DOJ). The check searches state and federal criminal history records and is tied to the organization\'s unique DOJ-issued ORI number.')}
+        '<strong>§18975(a):</strong> Every administrator, employee, and regular volunteer must complete state-approved training in child abuse and neglect <em>identification</em> and child abuse and neglect <em>reporting</em> before beginning service. These workers are legally designated mandated reporters under Pen. Code §11165.7(a)(7). The requirement may be satisfied by the free online course offered by the California Office of Child Abuse Prevention (OCAP) at the State Department of Social Services.')}
+      ${_aboutCallout('🔍 Fingerprint Background Check &amp; Annual Waiver',
+        '<strong>§18975(b) / Pen. Code §11105.3:</strong> Every qualifying person must submit to a state and federal fingerprint-based criminal history background check processed through the California Department of Justice. <strong>DOJ processing is free for nonprofits</strong> (§11105.3(b)(1)). Organizations must also maintain a signed annual waiver from each worker authorizing release of their criminal history — this waiver must be renewed every year (§11105.3(b)(2)(C)).')}
       ${_aboutCallout('👥 Two Mandated Reporters Policy',
-        '§18975(c)(2) requires organizations to establish policies ensuring, <em>to the greatest extent possible</em>, that at least two mandated reporters are present whenever staff or volunteers are in contact with or supervising children. This eliminates unsupervised one-on-one access.')}
-      ${_aboutCallout('🔒 Non-Transferability',
-        'LiveScan results are issued exclusively to the requesting organization\'s ORI and cannot be reused or transferred. A volunteer fingerprinted for a school, another church, or any other ministry <em>must</em> submit new prints tied specifically to Little Flock\'s ORI — even if they were cleared elsewhere last week.')}
-    </div>`
+        '<strong>§18975(c)(2)(A):</strong> Organizations must adopt written policies requiring, <em>to the greatest extent possible</em>, the presence of at least two mandated reporters whenever staff or volunteers are in contact with or supervising children. <em>Narrow exception (§18975(c)(2)(B)):</em> one-to-one mentoring programs may substitute this requirement by adopting comprehensive screening, volunteer and parent training, and regular parent contact policies.')}
+      ${_aboutCallout('📢 Mandatory Parent Notification',
+        '<strong>Pen. Code §11105.3(c)(1):</strong> If a background check reveals a disqualifying conviction — including sex offenses under §290, child abuse offenses under §§273a or 273d, or assault under §220 — and the organization still places that person in a role supervising minors, it <em>must</em> notify the parents or guardians of affected children at least <strong>10 days before that person begins duties</strong>. This obligation cannot be waived.')}
+      ${_aboutCallout('🔒 Non-Transferability of Criminal History Records',
+        '<strong>Pen. Code §11105.3(g):</strong> DOJ criminal history records are confidential to the specific requesting agency and may not be transferred, shared, or relied upon by any other organization. A volunteer cleared by a school, another church, or any other ministry must submit new fingerprints tied to Little Flock\'s own ORI — prior clearances have no legal standing here.')}
+    </div>
+    ${_aboutRefPills([
+      { label: 'BPC §18975 — Full Text', url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=18975.&lawCode=BPC' },
+      { label: 'Pen. Code §11105.3', url: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=11105.3.&lawCode=PEN' },
+      { label: 'OCAP Mandated Reporter Training', url: 'https://www.cdss.ca.gov/inforesources/ocap' },
+      { label: 'DOJ Agency Authorization', url: 'https://oag.ca.gov/fingerprints/agencies' },
+      { label: 'LiveScan Locations', url: 'https://oag.ca.gov/fingerprints/locations' }
+    ])}`
   )}
 
   <!-- Section 2 -->
@@ -448,9 +459,10 @@ function _viewAbout() {
         border-top:3px solid #4a7fa5">
         <div style="font:700 0.9rem/1 var(--font-ui,sans-serif);text-transform:uppercase;
           letter-spacing:.07em;color:#4a7fa5;margin-bottom:10px">LiveScan Workflow</div>
-        ${_aboutBullet('ORI Integration', 'Little Flock\'s DOJ-issued ORI is stored securely; every initiated check outputs a customized Request for Live Scan Service form.')}
-        ${_aboutBullet('Applicant Tracking', 'Volunteers visit a local fingerprint roller with provided documentation. The ATI (Applicant Tracking Identifier) is logged securely.')}
-        ${_aboutBullet('DOJ Clearance Syncing', 'Once the DOJ issues a clearance (SCN/OSCN), Melchizedek updates the worker\'s internal risk status, unlocking youth-event scheduling.')}
+        ${_aboutBullet('ORI Integration', 'Little Flock\'s DOJ-issued ORI is stored securely; every initiated check outputs a customized BCIA 8016 Request for Live Scan Service form pre-filled with the correct agency data.')}
+        ${_aboutBullet('Applicant Tracking', 'Volunteers visit an authorized Live Scan operator with provided documentation. The ATI (Applicant Tracking Identifier) is logged in the Melchizedek record.')}
+        ${_aboutBullet('DOJ Clearance Syncing', 'Once the DOJ issues a clearance, Melchizedek updates the worker\'s compliance status, unlocking youth-event scheduling assignments.')}
+        ${_aboutBullet('Subsequent Arrest Notification', 'Per Pen. Code §11105.3(i)(2), organizations may enroll cleared workers in the DOJ\'s ongoing <em>Subsequent Arrest Notification</em> service — the California equivalent of continuous monitoring. Melchizedek manages enrollment and routes any future notifications to leadership automatically.')}
       </div>
     </div>`
   )}
@@ -469,6 +481,28 @@ function _viewAbout() {
         'As Checkr completes screening, it sends a secure <code>check.completed</code> webhook to FlockOS, automatically updating the member\'s dashboard record in real time.')}
       ${_aboutStep('5', '#1b264f', 'Final Adjudication',
         'Leadership reviews the consolidated Melchizedek dashboard — Checkr result and DOJ LiveScan clearance in one view — and approves or flags the worker for follow-up.')}
+    </div>`
+  )}
+
+  <!-- Section 5 -->
+  ${_aboutSection('5', 'Going Further — How FlockOS Cares for the Little Flock',
+    `<p>AB-506 sets the legal floor. Melchizedek is built to go well beyond it — transforming compliance
+    from a checklist into a living, breathing layer of pastoral care for every person who serves.</p>
+    <div style="display:grid;gap:10px;margin-top:16px">
+      ${_aboutCallout('📡 Hour Threshold Watchdog',
+        'FlockOS tracks every member\'s ministry involvement hours in real time. When a volunteer approaches the 16 hr/month or 32 hr/year threshold, Melchizedek flags the profile and opens the compliance workflow — <em>before</em> the legal line is crossed, not after.')}
+      ${_aboutCallout('🔔 Dual Continuous Monitoring',
+        'Cleared workers are enrolled in both the California DOJ\'s Subsequent Arrest Notification service (§11105.3(i)(2)) and Checkr\'s national Continuous Criminal monitoring simultaneously — providing state-level and national-level post-clearance surveillance in a single dashboard.')}
+      ${_aboutCallout('📅 Annual Waiver Auto-Renewal',
+        'California law requires a fresh signed waiver from each worker every year (§11105.3(b)(2)(C)). Melchizedek auto-generates and routes renewal requests 30 days before expiry, tracks completion, and locks the worker\'s scheduling access until the waiver is re-signed.')}
+      ${_aboutCallout('📜 OCAP Training Certificate Vault',
+        'Every worker\'s OCAP completion certificate is uploaded, stored, and tracked within their Melchizedek profile. The system flags certificates as they age and resurfaces the renewal workflow — because mandated reporter training is not a one-time event.')}
+      ${_aboutCallout('🗓 Two-Reporter Scheduling Guard',
+        'When a youth-event shift is being scheduled in FlockOS, Melchizedek cross-references §18975(c)(2)(A) and blocks any assignment that would leave a single worker alone with children. The scheduling UI surfaces the policy requirement and prompts leadership to add a second cleared reporter before saving.')}
+      ${_aboutCallout('📣 Parent Notification Workflow',
+        'If a background check returns a Review result that leadership chooses to manually override, Melchizedek immediately surfaces the §11105.3(c)(1) parent notification obligation — generates the required written notice, tracks the 10-day window, and records confirmation of delivery in the audit log.')}
+      ${_aboutCallout('📊 Insurance Compliance Record',
+        'Under §18975(d), insurers may request proof of compliance before writing liability coverage for a youth-serving organization. Melchizedek generates a complete compliance report on demand — training completions, background check dates, waiver status, and policy acknowledgments — providing everything needed to satisfy an insurer\'s loss control audit.')}
     </div>`
   )}
 
@@ -542,6 +576,24 @@ function _aboutStep(num, color, label, text) {
         <div style="font:400 0.95rem/1.6 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">${text}</div>
       </div>
     </div>`;
+}
+
+function _aboutRefPills(refs) {
+  return `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:18px">
+    ${refs.map(r =>
+      `<a href="${r.url}" target="_blank" rel="noopener"
+        style="display:inline-flex;align-items:center;gap:5px;padding:6px 13px;
+          background:var(--bg-raised,#f5f6fa);border:1px solid var(--line,#e5e7ef);
+          border-radius:20px;font:500 0.85rem/1 var(--font-ui,sans-serif);
+          color:#4a7fa5;text-decoration:none;white-space:nowrap">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        ${_e(r.label)}</a>`
+    ).join('')}
+  </div>`;
 }
 
 function _sortedMembers(members) {
