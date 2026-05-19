@@ -383,13 +383,15 @@ function _viewAbout() {
     optional — it is a legal requirement to protect children and limit organizational liability.</p>
     <div style="display:grid;gap:10px;margin-top:16px">
       ${_aboutCallout('⏱ The Regular Volunteer Threshold',
-        'AB-506 applies to administrators, employees, and any "regular volunteer" (18+) who has direct contact with, or supervision of, children for more than <strong>16 hours a month</strong> or <strong>32 hours per year</strong>.')}
+        'Under Cal. Bus. &amp; Prof. Code §18975(e)(1), a "regular volunteer" is any person 18 or older who has direct contact with, or supervision of, children for more than <strong>16 hours per month</strong> or <strong>32 hours per year</strong>. Administrators and employees are covered regardless of hours.')}
       ${_aboutCallout('📋 Mandated Reporter Training',
-        'Qualifying workers must complete an official, state-approved child abuse and neglect prevention training program before serving.')}
+        'Every administrator, employee, and regular volunteer must complete training in child abuse and neglect <em>identification</em> and <em>reporting</em> before serving. The requirement is satisfied by completing the free online training provided by the California Office of Child Abuse Prevention (OCAP) within the State Department of Social Services.')}
       ${_aboutCallout('🔍 LiveScan Fingerprinting',
-        'A one-time fingerprint-based background check through the California Department of Justice (DOJ) is required for all qualifying workers.')}
+        'Every qualifying person must submit to a fingerprint-based background check pursuant to Cal. Penal Code §11105.3, processed through the California Department of Justice (DOJ). The check searches state and federal criminal history records and is tied to the organization\'s unique DOJ-issued ORI number.')}
+      ${_aboutCallout('👥 Two Mandated Reporters Policy',
+        '§18975(c)(2) requires organizations to establish policies ensuring, <em>to the greatest extent possible</em>, that at least two mandated reporters are present whenever staff or volunteers are in contact with or supervising children. This eliminates unsupervised one-on-one access.')}
       ${_aboutCallout('🔒 Non-Transferability',
-        'Under Cal. Penal Code §11142, LiveScan results cannot be transferred between organizations. A volunteer fingerprinted for a school or another ministry <em>must</em> submit new prints tied specifically to Little Flock\'s unique ORI number.')}
+        'LiveScan results are issued exclusively to the requesting organization\'s ORI and cannot be reused or transferred. A volunteer fingerprinted for a school, another church, or any other ministry <em>must</em> submit new prints tied specifically to Little Flock\'s ORI — even if they were cleared elsewhere last week.')}
     </div>`
   )}
 
