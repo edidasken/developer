@@ -343,8 +343,8 @@ function _viewAbout() {
           stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/></svg>
       </div>
       <div>
-        <div style="font:700 1.6rem/1.1 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">Melchizedek</div>
-        <div style="font:500 0.9rem/1.4 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">
+        <div style="font:700 1.9rem/1.1 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">Melchizedek</div>
+        <div style="font:500 1.05rem/1.4 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">
           Background Check &amp; AB-506 Compliance Management
         </div>
       </div>
@@ -354,21 +354,21 @@ function _viewAbout() {
   <!-- Scripture origin -->
   <div style="background:linear-gradient(135deg,#1b264f 0%,#2d3a6b 100%);border-radius:14px;
     padding:22px 24px;margin-bottom:28px;border-left:4px solid #e8a838">
-    <div style="font:700 0.72rem/1 var(--font-ui,sans-serif);text-transform:uppercase;
+    <div style="font:700 0.88rem/1 var(--font-ui,sans-serif);text-transform:uppercase;
       letter-spacing:.1em;color:#e8a838;margin-bottom:10px">The Name · Genesis 14:18–20 &amp; Hebrews 7:1–3</div>
-    <p style="font:400 1rem/1.7 Georgia,serif;color:#f0f2f8;margin:0 0 12px">
+    <p style="font:400 1.15rem/1.75 Georgia,serif;color:#f0f2f8;margin:0 0 12px">
       "And Melchizedek king of Salem brought out bread and wine. He was priest of God Most High.
       And he blessed him and said, 'Blessed be Abram by God Most High, Possessor of heaven and earth;
       and blessed be God Most High, who has delivered your enemies into your hand!'"
     </p>
-    <p style="font:400 0.88rem/1.6 Georgia,serif;color:#c9cde0;margin:0">
+    <p style="font:400 1.05rem/1.7 Georgia,serif;color:#c9cde0;margin:0">
       "For this Melchizedek, king of Salem, priest of the Most High God, met Abraham returning from the slaughter
       of the kings and blessed him… He is first, by translation of his name, king of righteousness, and then
       he is also king of Salem, that is, king of peace. He is without father or mother or genealogy, having
       neither beginning of days nor end of life, but resembling the Son of God he continues a priest forever."
       — Hebrews 7:1–3
     </p>
-    <div style="margin-top:14px;font:400 0.8rem/1.5 var(--font-ui,sans-serif);color:#8892b0">
+    <div style="margin-top:14px;font:400 0.95rem/1.6 var(--font-ui,sans-serif);color:#8892b0">
       <strong style="color:#e8a838">Why this name?</strong> Melchizedek appeared without a recorded past,
       vouched for by God alone — a priest whose legitimacy required no human credentials, only righteousness.
       This module applies that same principle to those who serve the Little Flock's children: every worker's
@@ -398,7 +398,7 @@ function _viewAbout() {
     `<p>Manually tracking AB-506 compliance introduces serious operational and legal risk. Melchizedek
     eliminates that risk by converting every manual step into an automated, auditable workflow.</p>
     <div style="overflow-x:auto;margin-top:16px">
-      <table style="width:100%;border-collapse:collapse;font:400 0.85rem/1.5 var(--font-ui,sans-serif)">
+      <table style="width:100%;border-collapse:collapse;font:400 0.95rem/1.6 var(--font-ui,sans-serif)">
         <thead>
           <tr style="background:var(--bg-raised,#f5f6fa)">
             <th style="padding:10px 14px;text-align:left;font-weight:700;color:var(--ink,#1b264f);
@@ -436,7 +436,7 @@ function _viewAbout() {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px">
       <div style="background:var(--bg-raised,#f5f6fa);border-radius:10px;padding:16px;
         border-top:3px solid #e8a838">
-        <div style="font:700 0.78rem/1 var(--font-ui,sans-serif);text-transform:uppercase;
+        <div style="font:700 0.9rem/1 var(--font-ui,sans-serif);text-transform:uppercase;
           letter-spacing:.07em;color:#e8a838;margin-bottom:10px">Checkr API</div>
         ${_aboutBullet('Instant Initiation', 'Only a candidate email address is needed to kickstart screening natively from the FlockOS dashboard.')}
         ${_aboutBullet('Continuous Monitoring', 'Checkr\'s data network monitors for post-hire offenses and pushes real-time webhook updates back to FlockOS.')}
@@ -444,7 +444,7 @@ function _viewAbout() {
       </div>
       <div style="background:var(--bg-raised,#f5f6fa);border-radius:10px;padding:16px;
         border-top:3px solid #4a7fa5">
-        <div style="font:700 0.78rem/1 var(--font-ui,sans-serif);text-transform:uppercase;
+        <div style="font:700 0.9rem/1 var(--font-ui,sans-serif);text-transform:uppercase;
           letter-spacing:.07em;color:#4a7fa5;margin-bottom:10px">LiveScan Workflow</div>
         ${_aboutBullet('ORI Integration', 'Little Flock\'s DOJ-issued ORI is stored securely; every initiated check outputs a customized Request for Live Scan Service form.')}
         ${_aboutBullet('Applicant Tracking', 'Volunteers visit a local fingerprint roller with provided documentation. The ATI (Applicant Tracking Identifier) is logged securely.')}
@@ -473,7 +473,7 @@ function _viewAbout() {
   <!-- Footer note -->
   <div style="margin-top:32px;padding:18px 20px;background:var(--bg-raised,#f5f6fa);
     border-radius:10px;border-left:3px solid #e8a838;
-    font:400 0.85rem/1.6 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">
+    font:400 0.95rem/1.7 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">
     <strong style="color:var(--ink,#1b264f)">A note on security:</strong> The Checkr API key is
     <em>never</em> called client-side. All Checkr API calls route through a Firebase Cloud Function
     that reads the key server-side, ensuring credentials are never exposed in the browser.
@@ -487,12 +487,12 @@ function _aboutSection(num, title, body) {
   return `
     <div style="margin-bottom:28px">
       <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px">
-        <span style="font:700 0.78rem/1 var(--font-ui,sans-serif);background:#e8a838;color:#1b264f;
-          border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;
+        <span style="font:700 0.88rem/1 var(--font-ui,sans-serif);background:#e8a838;color:#1b264f;
+          border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;
           justify-content:center;flex-shrink:0">${_e(num)}</span>
-        <span style="font:700 1.05rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${title}</span>
+        <span style="font:700 1.2rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${title}</span>
       </div>
-      <div style="font:400 0.9rem/1.65 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${body}</div>
+      <div style="font:400 1rem/1.7 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${body}</div>
     </div>`;
 }
 
@@ -502,10 +502,10 @@ function _aboutCallout(label, text) {
       display:flex;gap:10px;align-items:flex-start">
       <span style="font-size:1rem;flex-shrink:0">${label.split(' ')[0]}</span>
       <div>
-        <div style="font:600 0.85rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:3px">
+        <div style="font:600 0.95rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:4px">
           ${_e(label.split(' ').slice(1).join(' '))}
         </div>
-        <div style="font:400 0.82rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">${text}</div>
+        <div style="font:400 0.92rem/1.55 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">${text}</div>
       </div>
     </div>`;
 }
@@ -520,8 +520,8 @@ function _aboutTableRow(challenge, solution) {
 
 function _aboutBullet(label, text) {
   return `<div style="margin-bottom:9px">
-    <div style="font:600 0.82rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${_e(label)}</div>
-    <div style="font:400 0.8rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">${text}</div>
+    <div style="font:600 0.95rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${_e(label)}</div>
+    <div style="font:400 0.92rem/1.55 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">${text}</div>
   </div>`;
 }
 
@@ -532,12 +532,12 @@ function _aboutStep(num, color, label, text) {
       <div style="display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0">
         <div style="width:36px;height:36px;border-radius:50%;background:${color};
           display:flex;align-items:center;justify-content:center;flex-shrink:0;
-          font:700 0.82rem var(--font-ui,sans-serif);color:#fff;z-index:1">${_e(num)}</div>
+          font:700 0.92rem var(--font-ui,sans-serif);color:#fff;z-index:1">${_e(num)}</div>
         ${last ? '' : `<div style="width:2px;flex:1;background:var(--line,#e5e7ef);margin:4px 0"></div>`}
       </div>
       <div style="padding:4px 0 ${last ? '0' : '20px'};flex:1">
-        <div style="font:700 0.88rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:3px">${_e(label)}</div>
-        <div style="font:400 0.83rem/1.55 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">${text}</div>
+        <div style="font:700 1rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:4px">${_e(label)}</div>
+        <div style="font:400 0.95rem/1.6 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">${text}</div>
       </div>
     </div>`;
 }
