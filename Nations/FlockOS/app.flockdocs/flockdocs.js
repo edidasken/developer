@@ -56,40 +56,23 @@ window.FlockDocs = {
   shareDocument,
 };
 
-// Wait for Firebase and Nehemiah to be ready
+// Wait for Firebase and Nehemiah to be ready.
+// FlockDocs allows guest (read-only) access — never redirect on missing auth.
 function _waitForReady() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let attempts = 0;
     const maxAttempts = 50; // 5 seconds max
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    
+
     const checkReady = () => {
       attempts++;
-      
       if (typeof firebase !== 'undefined' && typeof Nehemiah !== 'undefined') {
-        // Nehemiah loaded - check if authenticated
-        if (Nehemiah.isAuthenticated()) {
-          resolve();
-        } else if (!isLocalhost) {
-          // Not authenticated in DEPLOYED environment - redirect to login
-          console.warn('[FlockDocs] User not authenticated, redirecting to login');
-          window.location.replace('index.html');
-          reject(new Error('Not authenticated'));
-        } else {
-          // Localhost - warn but don't redirect (for development)
-          console.warn('[FlockDocs] User not authenticated (localhost - allowing for development)');
-          resolve();
+        if (!Nehemiah.isAuthenticated()) {
+          console.warn('[FlockDocs] No authenticated user — continuing as guest (read-only).');
         }
+        resolve();
       } else if (attempts >= maxAttempts) {
-        // Timeout
-        if (!isLocalhost) {
-          console.error('[FlockDocs] Timeout waiting for auth, redirecting to login');
-          window.location.replace('index.html');
-          reject(new Error('Timeout'));
-        } else {
-          console.warn('[FlockDocs] Timeout waiting for auth (localhost - continuing anyway)');
-          resolve();
-        }
+        console.warn('[FlockDocs] Timeout waiting for firebase/Nehemiah — continuing as guest.');
+        resolve();
       } else {
         setTimeout(checkReady, 100);
       }
@@ -110,33 +93,33 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 function init() {
   console.log('[FlockDocs] Initializing...');
-  
+
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  
-  // Get authenticated user from Nehemiah
-  const profile = Nehemiah.getProfile();
-  if (!profile) {
-    if (!isLocalhost) {
-      // Deployed environment - require authentication
-      console.error('[FlockDocs] No authenticated user found');
-      window.location.replace('index.html');
-      return;
-    } else {
-      // Localhost - create mock user for development
-      console.warn('[FlockDocs] No authenticated user (localhost - using mock user)');
-      S.user = {
-        uid: 'dev-user',
-        displayName: 'Dev User',
-        email: 'dev@localhost',
-        role: 'admin'
-      };
-    }
-  } else {
+
+  // Get authenticated user from Nehemiah (may be null — FlockDocs allows guest read-only)
+  const profile = (typeof Nehemiah !== 'undefined' && Nehemiah.getProfile) ? Nehemiah.getProfile() : null;
+  if (profile) {
     S.user = {
       uid: profile.uid,
       displayName: profile.displayName || profile.email,
       email: profile.email,
       role: profile.role || 'member',
+    };
+  } else if (isLocalhost) {
+    console.warn('[FlockDocs] No authenticated user (localhost - using mock user)');
+    S.user = {
+      uid: 'dev-user',
+      displayName: 'Dev User',
+      email: 'dev@localhost',
+      role: 'admin'
+    };
+  } else {
+    console.warn('[FlockDocs] No authenticated user — guest mode (read-only)');
+    S.user = {
+      uid: 'guest',
+      displayName: 'Guest',
+      email: '',
+      role: 'guest'
     };
   }
 
@@ -1494,7 +1477,9 @@ function _checkFirebase() {
 }
 
 function _isMockUser() {
-  return S.user && S.user.uid === 'dev-user';
+  // Treat dev-user (localhost) and guest (unauthenticated live) as mock so
+  // FlockDocs uses localStorage instead of Firestore (which rejects guest writes).
+  return S.user && (S.user.uid === 'dev-user' || S.user.uid === 'guest');
 }
 
 function _loadFromLocalStorage() {

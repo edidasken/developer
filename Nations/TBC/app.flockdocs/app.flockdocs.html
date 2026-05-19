@@ -817,37 +817,7 @@
 </head>
 <body>
 
-  <!-- Auth guard - redirect to login if not authenticated (deployed environments only) -->
-  <script>
-    (function() {
-      // Check if running in deployed environment (not localhost)
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      
-      // Only enforce auth gate in deployed environments
-      if (!isLocalhost) {
-        // Early auth check - redirect before page renders if not authenticated
-        function checkAuth() {
-          try {
-            // Check if Firebase Auth has a current user
-            if (typeof firebase !== 'undefined' && firebase.auth) {
-              const user = firebase.auth().currentUser;
-              if (!user) {
-                console.warn('[FlockDocs] No authenticated user in deployed environment, redirecting to login');
-                window.location.replace('index.html');
-                return false;
-              }
-            }
-          } catch (err) {
-            console.error('[FlockDocs] Auth check error:', err);
-          }
-          return true;
-        }
-        
-        // Run check after a brief delay to let Firebase initialize
-        setTimeout(checkAuth, 200);
-      }
-    })();
-  </script>
+  <!-- FlockDocs is guest-accessible (read-only for unauthenticated users); no redirect on missing auth -->
 
   <!-- Auth gate placeholder (will be injected by firm_foundation.js) -->
   <div id="auth-gate"></div>
