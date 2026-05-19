@@ -69,40 +69,19 @@ const FlockNewsState = {
   dateKey: '' // Format: YYYY-MM-DD
 };
 
-// Wait for Firebase and Nehemiah to be ready
+// Wait for Firebase to be ready (no auth required — FlockNews is public)
 function _waitForReady() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let attempts = 0;
     const maxAttempts = 50; // 5 seconds max
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
     const checkReady = () => {
       attempts++;
-
-      if (typeof firebase !== 'undefined' && typeof Nehemiah !== 'undefined') {
-        if (!Nehemiah.isAuthenticated()) {
-          if (!isLocalhost) {
-            // Auth required — redirect to per-app sign-in page
-            console.warn('[FlockNews] No authenticated user — redirecting to sign-in.');
-            window.location.replace('app.flocknews/index.html');
-            reject(new Error('Not authenticated'));
-          } else {
-            // Localhost dev — warn but allow
-            console.warn('[FlockNews] No authenticated user (localhost — allowing for development).');
-            resolve();
-          }
-        } else {
-          resolve();
-        }
+      if (typeof firebase !== 'undefined') {
+        resolve();
       } else if (attempts >= maxAttempts) {
-        if (!isLocalhost) {
-          console.error('[FlockNews] Timeout waiting for auth — redirecting to sign-in.');
-          window.location.replace('app.flocknews/index.html');
-          reject(new Error('Timeout'));
-        } else {
-          console.warn('[FlockNews] Timeout waiting for firebase/Nehemiah (localhost — continuing anyway).');
-          resolve();
-        }
+        console.warn('[FlockNews] Firebase not available — continuing without it.');
+        resolve();
       } else {
         setTimeout(checkReady, 100);
       }
@@ -115,37 +94,21 @@ function _waitForReady() {
 async function initFlockNews() {
   console.log('🚀 FlockNews: Initializing...');
 
-  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
   try {
-    // Get authenticated user from Nehemiah
-    const profile = (typeof Nehemiah !== 'undefined') ? Nehemiah.getProfile() : null;
-    if (!profile) {
-      if (isLocalhost) {
-        // Localhost - create mock pastor user for development
-        console.warn('[FlockNews] No authenticated user (localhost - using mock pastor user)');
-        FlockNewsState.currentUser = {
-          uid: 'dev-user',
-          displayName: 'Dev Pastor',
-          email: 'pastor@localhost',
-          role: 'pastor'
-        };
-        FlockNewsState.isPastorPlus = true;
-      } else {
-        // Should not reach here — _waitForReady() already redirected. Failsafe.
-        console.error('[FlockNews] No session after auth guard passed — redirecting.');
-        window.location.replace('app.flocknews/index.html');
-        return;
-      }
-    } else {
+    // FlockNews is public — no auth required. Optionally pick up signed-in user for edit mode.
+    const profile = (typeof Nehemiah !== 'undefined' && Nehemiah.isAuthenticated()) ? Nehemiah.getProfile() : null;
+    if (profile) {
       FlockNewsState.currentUser = {
         uid: profile.uid,
         displayName: profile.displayName || profile.email,
         email: profile.email,
         role: profile.role || 'member',
       };
-      // Check if user is pastor or admin
       FlockNewsState.isPastorPlus = (profile.role === 'pastor' || profile.role === 'admin');
+    } else {
+      // Guest / unauthenticated — full read access, no edit mode
+      FlockNewsState.currentUser = null;
+      FlockNewsState.isPastorPlus = false;
     }
 
     console.log('✅ User:', FlockNewsState.currentUser.displayName, '| Pastor+:', FlockNewsState.isPastorPlus);
@@ -1821,13 +1784,8 @@ window.FlockNews = {
 
 // Initialize on DOM ready
 window.addEventListener('DOMContentLoaded', async () => {
-  try {
-    await _waitForReady();
-    initFlockNews();
-  } catch (err) {
-    // Already redirected in _waitForReady
-    console.error('[FlockNews] Auth check failed:', err.message);
-  }
+  await _waitForReady();
+  initFlockNews();
 });
 
 export { FlockNewsState, initFlockNews };
