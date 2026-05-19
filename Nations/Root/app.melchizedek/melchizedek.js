@@ -243,6 +243,7 @@ function _renderView(view) {
     case 'pending':     content.innerHTML = _viewFiltered('pending',     'Pending Checks',  'Checks sent and awaiting results.'); break;
     case 'approved':    content.innerHTML = _viewFiltered('clear',       'Approved',        'Members whose background check came back clear.'); break;
     case 'not-approved': content.innerHTML = _viewFiltered('consider',   'Not Approved',    'Members whose background check requires further review.'); break;
+    case 'about':        content.innerHTML = _viewAbout();       break;
     default:            content.innerHTML = _viewOverview();
   }
   _wireContentActions(content);
@@ -328,6 +329,219 @@ function _viewFiltered(status, title, subtitle) {
 
 /* ── Member list renderer ────────────────────────────────────────────────── */
 const _AVATAR_COLORS = ['#7c3aed','#0ea5e9','#059669','#c05818','#db2777','#6366f1','#0891b2','#b45309','#be185d','#4f46e5'];
+
+function _viewAbout() {
+  return `
+<div style="max-width:780px;padding-bottom:48px">
+
+  <!-- Header -->
+  <div style="margin-bottom:28px">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+      <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#92400e,#e8a838);
+        display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/></svg>
+      </div>
+      <div>
+        <div style="font:700 1.6rem/1.1 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">Melchizedek</div>
+        <div style="font:500 0.9rem/1.4 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">
+          Background Check &amp; AB-506 Compliance Management
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripture origin -->
+  <div style="background:linear-gradient(135deg,#1b264f 0%,#2d3a6b 100%);border-radius:14px;
+    padding:22px 24px;margin-bottom:28px;border-left:4px solid #e8a838">
+    <div style="font:700 0.72rem/1 var(--font-ui,sans-serif);text-transform:uppercase;
+      letter-spacing:.1em;color:#e8a838;margin-bottom:10px">The Name · Genesis 14:18–20 &amp; Hebrews 7:1–3</div>
+    <p style="font:400 1rem/1.7 Georgia,serif;color:#f0f2f8;margin:0 0 12px">
+      "And Melchizedek king of Salem brought out bread and wine. He was priest of God Most High.
+      And he blessed him and said, 'Blessed be Abram by God Most High, Possessor of heaven and earth;
+      and blessed be God Most High, who has delivered your enemies into your hand!'"
+    </p>
+    <p style="font:400 0.88rem/1.6 Georgia,serif;color:#c9cde0;margin:0">
+      "For this Melchizedek, king of Salem, priest of the Most High God, met Abraham returning from the slaughter
+      of the kings and blessed him… He is first, by translation of his name, king of righteousness, and then
+      he is also king of Salem, that is, king of peace. He is without father or mother or genealogy, having
+      neither beginning of days nor end of life, but resembling the Son of God he continues a priest forever."
+      — Hebrews 7:1–3
+    </p>
+    <div style="margin-top:14px;font:400 0.8rem/1.5 var(--font-ui,sans-serif);color:#8892b0">
+      <strong style="color:#e8a838">Why this name?</strong> Melchizedek appeared without a recorded past,
+      vouched for by God alone — a priest whose legitimacy required no human credentials, only righteousness.
+      This module applies that same principle to those who serve the Little Flock's children: every worker's
+      fitness to serve is verified through objective, documented evidence, not assumption.
+    </div>
+  </div>
+
+  <!-- Section 1 -->
+  ${_aboutSection('1', 'The Legal Imperative — California AB-506',
+    `<p>Enacted under the California Business and Professions Code, <strong>Assembly Bill 506 (AB-506)</strong>
+    mandates strict child abuse prevention protocols for all youth-serving organizations. Compliance is not
+    optional — it is a legal requirement to protect children and limit organizational liability.</p>
+    <div style="display:grid;gap:10px;margin-top:16px">
+      ${_aboutCallout('⏱ The Regular Volunteer Threshold',
+        'AB-506 applies to administrators, employees, and any "regular volunteer" (18+) who has direct contact with, or supervision of, children for more than <strong>16 hours a month</strong> or <strong>32 hours per year</strong>.')}
+      ${_aboutCallout('📋 Mandated Reporter Training',
+        'Qualifying workers must complete an official, state-approved child abuse and neglect prevention training program before serving.')}
+      ${_aboutCallout('🔍 LiveScan Fingerprinting',
+        'A one-time fingerprint-based background check through the California Department of Justice (DOJ) is required for all qualifying workers.')}
+      ${_aboutCallout('🔒 Non-Transferability',
+        'Under Cal. Penal Code §11142, LiveScan results cannot be transferred between organizations. A volunteer fingerprinted for a school or another ministry <em>must</em> submit new prints tied specifically to Little Flock\'s unique ORI number.')}
+    </div>`
+  )}
+
+  <!-- Section 2 -->
+  ${_aboutSection('2', 'Why Automation — The Case for Melchizedek',
+    `<p>Manually tracking AB-506 compliance introduces serious operational and legal risk. Melchizedek
+    eliminates that risk by converting every manual step into an automated, auditable workflow.</p>
+    <div style="overflow-x:auto;margin-top:16px">
+      <table style="width:100%;border-collapse:collapse;font:400 0.85rem/1.5 var(--font-ui,sans-serif)">
+        <thead>
+          <tr style="background:var(--bg-raised,#f5f6fa)">
+            <th style="padding:10px 14px;text-align:left;font-weight:700;color:var(--ink,#1b264f);
+              border-bottom:2px solid var(--line,#e5e7ef);width:50%">Manual Challenge</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:700;color:var(--ink,#1b264f);
+              border-bottom:2px solid var(--line,#e5e7ef)">Melchizedek Solution</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${_aboutTableRow(
+            'Tracking volunteer hours to identify who crosses the 16 hrs/month or 32 hrs/year threshold.',
+            'FlockOS tracks shift schedules, flags profiles approaching the threshold, and triggers the check workflow <em>before</em> limits are breached.'
+          )}
+          ${_aboutTableRow(
+            'Managing DOJ LiveScan paperwork and matching Form 8016 data to volunteer profiles.',
+            'Automatically generates pre-filled BCIA 8016 forms with Little Flock\'s ORI, ensuring exact name and demographic matching to prevent DOJ rejection.'
+          )}
+          ${_aboutTableRow(
+            'Validating static background checks that quickly become outdated.',
+            'Checkr Continuous Criminal (Continuous Crim) monitoring alerts leadership instantly if a cleared worker has a subsequent arrest.'
+          )}
+          ${_aboutTableRow(
+            'Chasing volunteers via email to complete Mandated Reporter Training.',
+            'Automated email sequences, in-app notifications, and certificate upload tracking within the FlockOS dashboard.'
+          )}
+        </tbody>
+      </table>
+    </div>`
+  )}
+
+  <!-- Section 3 -->
+  ${_aboutSection('3', 'Checkr API &amp; LiveScan Integration',
+    `<p>LiveScan satisfies California\'s DOJ fingerprint requirement. Pairing it with the Checkr API delivers
+    a comprehensive, modern trust-and-safety framework that goes far beyond a one-time check.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px">
+      <div style="background:var(--bg-raised,#f5f6fa);border-radius:10px;padding:16px;
+        border-top:3px solid #e8a838">
+        <div style="font:700 0.78rem/1 var(--font-ui,sans-serif);text-transform:uppercase;
+          letter-spacing:.07em;color:#e8a838;margin-bottom:10px">Checkr API</div>
+        ${_aboutBullet('Instant Initiation', 'Only a candidate email address is needed to kickstart screening natively from the FlockOS dashboard.')}
+        ${_aboutBullet('Continuous Monitoring', 'Checkr\'s data network monitors for post-hire offenses and pushes real-time webhook updates back to FlockOS.')}
+        ${_aboutBullet('AI-Powered Adjudication', 'Machine learning classifiers filter non-reportable information per local law, delivering clean Clear / Review statuses.')}
+      </div>
+      <div style="background:var(--bg-raised,#f5f6fa);border-radius:10px;padding:16px;
+        border-top:3px solid #4a7fa5">
+        <div style="font:700 0.78rem/1 var(--font-ui,sans-serif);text-transform:uppercase;
+          letter-spacing:.07em;color:#4a7fa5;margin-bottom:10px">LiveScan Workflow</div>
+        ${_aboutBullet('ORI Integration', 'Little Flock\'s DOJ-issued ORI is stored securely; every initiated check outputs a customized Request for Live Scan Service form.')}
+        ${_aboutBullet('Applicant Tracking', 'Volunteers visit a local fingerprint roller with provided documentation. The ATI (Applicant Tracking Identifier) is logged securely.')}
+        ${_aboutBullet('DOJ Clearance Syncing', 'Once the DOJ issues a clearance (SCN/OSCN), Melchizedek updates the worker\'s internal risk status, unlocking youth-event scheduling.')}
+      </div>
+    </div>`
+  )}
+
+  <!-- Section 4 -->
+  ${_aboutSection('4', 'Technical Architecture — The Onboarding Pipeline',
+    `<p>Melchizedek transforms a high-risk administrative chore into a seamless, fully auditable pipeline.</p>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:0">
+      ${_aboutStep('1', '#e8a838', 'Trigger',
+        'A FlockOS member is assigned to a youth ministry role, or their attendance tracking hits the AB-506 hour threshold. Melchizedek flags the profile automatically.')}
+      ${_aboutStep('2', '#4a7fa5', 'API Call',
+        'Melchizedek pings the Checkr API via <code>/v1/candidates</code> to initiate the national check and enroll the candidate in continuous monitoring.')}
+      ${_aboutStep('3', '#059669', 'Document Generation',
+        'A pre-filled LiveScan Form 8016 is generated with Little Flock\'s ORI. Instructions and a link to the California state Mandated Reporter Training portal are sent to the candidate.')}
+      ${_aboutStep('4', '#7c3aed', 'Status Webhooks',
+        'As Checkr completes screening, it sends a secure <code>check.completed</code> webhook to FlockOS, automatically updating the member\'s dashboard record in real time.')}
+      ${_aboutStep('5', '#1b264f', 'Final Adjudication',
+        'Leadership reviews the consolidated Melchizedek dashboard — Checkr result and DOJ LiveScan clearance in one view — and approves or flags the worker for follow-up.')}
+    </div>`
+  )}
+
+  <!-- Footer note -->
+  <div style="margin-top:32px;padding:18px 20px;background:var(--bg-raised,#f5f6fa);
+    border-radius:10px;border-left:3px solid #e8a838;
+    font:400 0.85rem/1.6 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">
+    <strong style="color:var(--ink,#1b264f)">A note on security:</strong> The Checkr API key is
+    <em>never</em> called client-side. All Checkr API calls route through a Firebase Cloud Function
+    that reads the key server-side, ensuring credentials are never exposed in the browser.
+    All member data is scoped to your church\'s Firebase project and protected by role-based
+    Firestore security rules — only pastor and admin roles can access this module.
+  </div>
+
+</div>`;
+}
+
+function _aboutSection(num, title, body) {
+  return `
+    <div style="margin-bottom:28px">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px">
+        <span style="font:700 0.78rem/1 var(--font-ui,sans-serif);background:#e8a838;color:#1b264f;
+          border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;
+          justify-content:center;flex-shrink:0">${_e(num)}</span>
+        <span style="font:700 1.05rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${title}</span>
+      </div>
+      <div style="font:400 0.9rem/1.65 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${body}</div>
+    </div>`;
+}
+
+function _aboutCallout(label, text) {
+  return `
+    <div style="background:var(--bg-raised,#f5f6fa);border-radius:8px;padding:12px 14px;
+      display:flex;gap:10px;align-items:flex-start">
+      <span style="font-size:1rem;flex-shrink:0">${label.split(' ')[0]}</span>
+      <div>
+        <div style="font:600 0.85rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:3px">
+          ${_e(label.split(' ').slice(1).join(' '))}
+        </div>
+        <div style="font:400 0.82rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">${text}</div>
+      </div>
+    </div>`;
+}
+
+function _aboutTableRow(challenge, solution) {
+  return `
+    <tr style="border-bottom:1px solid var(--line,#e5e7ef)">
+      <td style="padding:10px 14px;color:var(--ink-muted,#7a7f96);vertical-align:top">${challenge}</td>
+      <td style="padding:10px 14px;color:var(--ink,#1b264f);vertical-align:top">${solution}</td>
+    </tr>`;
+}
+
+function _aboutBullet(label, text) {
+  return `<div style="margin-bottom:9px">
+    <div style="font:600 0.82rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${_e(label)}</div>
+    <div style="font:400 0.8rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">${text}</div>
+  </div>`;
+}
+
+function _aboutStep(num, color, label, text) {
+  const last = num === '5';
+  return `
+    <div style="display:flex;gap:14px;align-items:stretch">
+      <div style="display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0">
+        <div style="width:36px;height:36px;border-radius:50%;background:${color};
+          display:flex;align-items:center;justify-content:center;flex-shrink:0;
+          font:700 0.82rem var(--font-ui,sans-serif);color:#fff;z-index:1">${_e(num)}</div>
+        ${last ? '' : `<div style="width:2px;flex:1;background:var(--line,#e5e7ef);margin:4px 0"></div>`}
+      </div>
+      <div style="padding:4px 0 ${last ? '0' : '20px'};flex:1">
+        <div style="font:700 0.88rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:3px">${_e(label)}</div>
+        <div style="font:400 0.83rem/1.55 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">${text}</div>
+      </div>
+    </div>`;
+}
 
 function _sortedMembers(members) {
   const STATUS_ORDER = { clear: 0, pending: 1, consider: 2, '': 3 };
