@@ -477,8 +477,7 @@ function _viewAbout() {
     <strong style="color:var(--ink,#1b264f)">A note on security:</strong> The Checkr API key is
     <em>never</em> called client-side. All Checkr API calls route through a Firebase Cloud Function
     that reads the key server-side, ensuring credentials are never exposed in the browser.
-    All member data is scoped to your church\'s Firebase project and protected by role-based
-    Firestore security rules — only pastor and admin roles can access this module.
+    Access to this module is restricted to pastor and admin roles only.
   </div>
 
 </div>`;
