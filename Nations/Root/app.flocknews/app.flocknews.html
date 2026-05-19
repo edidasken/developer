@@ -124,55 +124,75 @@
       overflow: hidden;
     }
 
-    .fn-header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--fn-gold) 0%, var(--fn-gold-dk) 100%);
+    .fn-header::before { display: none; }   /* replaced by masthead rules */
+
+    /* ── Newspaper Masthead ── */
+    .fn-header {
+      padding: 36px 48px 32px;
+    }
+
+    .fn-masthead-rule {
+      border: none;
+      margin: 0;
+    }
+    .fn-masthead-rule--top {
+      border-top: 4px double var(--fn-gold);
+      margin-bottom: 14px;
+    }
+    .fn-masthead-rule--mid {
+      border-top: 1px solid rgba(232,168,56,0.4);
+      margin: 10px 0 14px;
+    }
+    .fn-masthead-rule--bot {
+      border-top: 4px double var(--fn-gold);
+      margin-top: 18px;
+    }
+
+    .fn-masthead-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .fn-masthead-edition {
+      font-family: 'Noto Serif', Georgia, serif;
+      font-style: italic;
+      font-size: 12px;
+      color: var(--fn-muted);
+      letter-spacing: 0.5px;
     }
 
     .fn-header h1 {
-      font-size: clamp(32px, 5vw, 48px);
+      font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
+      font-size: clamp(52px, 10vw, 96px);
       font-weight: 700;
       color: var(--fn-ink);
-      margin-bottom: 12px;
-      letter-spacing: 1px;
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      gap: 16px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      display: block;
+      margin: 10px 0 0;
+      line-height: 1;
     }
 
-    .fn-header h1::before {
-      content: '✝️';
-      font-size: 0.9em;
-      filter: drop-shadow(0 2px 4px rgba(232,168,56,0.3));
-    }
-
-    .fn-header h1::after {
-      content: '📖';
-      font-size: 0.9em;
-      filter: drop-shadow(0 2px 4px rgba(232,168,56,0.3));
-    }
+    .fn-header h1::before { content: none; }
+    .fn-header h1::after  { content: none; }
 
     .fn-date {
-      font-size: 16px;
+      font-size: 11px;
       color: var(--fn-gold);
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 2px;
-      margin-top: 8px;
+      margin-top: 0;
     }
 
     .fn-tagline {
-      font-size: 15px;
+      font-family: 'Noto Serif', Georgia, serif;
+      font-size: 14px;
       color: var(--fn-muted);
       font-style: italic;
-      margin-top: 12px;
+      margin-top: 10px;
       font-weight: 400;
+      letter-spacing: 0.03em;
     }
 
     .fn-edit-toggle {
@@ -344,22 +364,34 @@
     }
 
     #fn-news-feed .card-header {
-      padding: 28px 36px;
+      padding: 20px 36px 16px;
       border-bottom: 1px solid var(--fn-border);
       background: rgba(255,255,255,0.04);
     }
 
+    /* Section flag: thin gold bar + small-caps label above title */
+    #fn-news-feed .card-header::before {
+      content: '';
+      display: block;
+      width: 48px;
+      height: 2px;
+      background: var(--fn-gold);
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
+
     #fn-news-feed .card-header div[style*="font-weight: 700"] {
+      font-family: 'Noto Serif', Georgia, serif !important;
       color: var(--fn-gold) !important;
-      font-size: 26px !important;
-      font-weight: 800 !important;
-      letter-spacing: -0.5px;
+      font-size: 22px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.01em !important;
     }
 
     /* Larger headers for featured sections */
     [data-section="introduction"] .card-header div[style*="font-weight: 700"],
     [data-section="mission"] .card-header div[style*="font-weight: 700"] {
-      font-size: 32px !important;
+      font-size: 28px !important;
     }
 
     #fn-news-feed .card-body {
@@ -1188,6 +1220,61 @@
     @media print {
       .fn-edit-toggle, .fn-section-edit-btn, .fn-card-reaction-bar { display: none !important; }
     }
+
+    /* ── Newspaper: serif body text for editorial sections ── */
+    [data-section="reading"] .card-body p,
+    [data-section="devotional"] .card-body p,
+    [data-section="introduction"] .card-body p,
+    [data-section="pastorHeart"] .card-body p {
+      font-family: 'Noto Serif', Georgia, serif;
+      line-height: 1.95;
+      font-size: 15px;
+    }
+    [data-section="reading"] .card-body h2,
+    [data-section="devotional"] .card-body h2,
+    [data-section="introduction"] .card-body h2,
+    [data-section="pastorHeart"] .card-body h2 {
+      font-family: 'Noto Serif', Georgia, serif;
+    }
+
+    /* ── Drop caps for lead editorial paragraphs ── */
+    [data-section="introduction"] .card-body > p:first-of-type::first-letter,
+    [data-section="pastorHeart"] .card-body > p:first-of-type::first-letter,
+    [data-section="devotional"] .card-body > p:first-of-type::first-letter {
+      float: left;
+      font-family: 'Noto Serif', Georgia, serif;
+      font-size: 4.2em;
+      font-weight: 700;
+      color: var(--fn-gold);
+      line-height: 0.72;
+      margin-right: 6px;
+      margin-top: 6px;
+      padding-right: 2px;
+    }
+
+    /* ── Column rule between reading + devotional ── */
+    @media (min-width: 768px) {
+      [data-section="devotional"].card {
+        border-left: 1px solid rgba(232,168,56,0.2) !important;
+        border-radius: 0 20px 20px 0 !important;
+      }
+      [data-section="reading"].card {
+        border-radius: 20px 0 0 20px !important;
+      }
+    }
+
+    /* ── Newspaper: section icons stay but reduced ── */
+    #fn-news-feed .fn-section-icon {
+      font-size: 20px;
+      opacity: 0.85;
+    }
+
+    /* ── Masthead responsive ── */
+    @media (max-width: 640px) {
+      .fn-masthead-edition { display: none; }
+      .fn-masthead-meta { justify-content: center; }
+      .fn-header { padding: 28px 24px 24px; }
+    }
   </style>
 </head>
 <body>
@@ -1198,11 +1285,17 @@
   <!-- Main Container -->
   <div class="fn-container" id="fn-app">
     
-    <!-- Header -->
+    <!-- Header — Newspaper Masthead -->
     <div class="fn-header">
+      <div class="fn-masthead-rule fn-masthead-rule--top"></div>
+      <div class="fn-masthead-meta">
+        <span class="fn-date" id="fn-current-date">Loading...</span>
+        <span class="fn-masthead-edition">The Church's Daily Edition</span>
+      </div>
+      <div class="fn-masthead-rule fn-masthead-rule--mid"></div>
       <h1>FlockNews</h1>
-      <div class="fn-tagline" style="font-size: 14px; color: var(--fn-muted); margin-top: 8px; font-style: italic;">Daily Spiritual Nourishment for God's Flock</div>
-      <div class="fn-date" id="fn-current-date">Loading...</div>
+      <div class="fn-tagline">Daily Spiritual Nourishment for God's Flock</div>
+      <div class="fn-masthead-rule fn-masthead-rule--bot"></div>
     </div>
 
     <!-- Loading State -->

@@ -27,8 +27,9 @@ let _allMembers  = [];
 let _checksMap   = {}; // memberId → { status, checkrCandidateId, checkrReportId, invitationSentAt, updatedAt }
 let _currentView = 'overview';
 let _unsubChecks = null;
-let _sortField   = 'lastName';  // 'lastName' | 'firstName' | 'role' | 'status'
+let _sortField   = 'firstName'; // 'lastName' | 'firstName' | 'role' | 'status'
 let _sortDir     = 'asc';       // 'asc' | 'desc'
+let _orgName     = '';          // loaded from Firestore appConfig/church_name
 
 /* ── Helpers ────────────────────────────────────────────────────────────── */
 const _e = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -211,6 +212,14 @@ async function _loadData() {
       const snap = await db.collection(BG_COLLECTION).get();
       _checksMap = {};
       snap.docs.forEach(d => { _checksMap[d.id] = d.data(); });
+    } catch (_) {}
+  }
+
+  // Load org name from appConfig
+  if (db) {
+    try {
+      const cfgDoc = await db.collection('appConfig').doc('church_name').get();
+      _orgName = cfgDoc.exists ? (cfgDoc.data()?.value || '') : '';
     } catch (_) {}
   }
 }
@@ -793,6 +802,10 @@ function _wireContentActions(root) {
     btn.addEventListener('click', () => window.print());
   });
 
+  root.querySelectorAll('[data-act="generate-waiver"]').forEach(btn => {
+    btn.addEventListener('click', () => _generateWaiver(btn.dataset.memberId, btn.dataset.name));
+  });
+
   // In-content navigation links (e.g. compliance alert cards)
   root.querySelectorAll('[data-melch-view]').forEach(el => {
     el.addEventListener('click', () => _wireNavTo(el.dataset.melchView));
@@ -1110,6 +1123,9 @@ function _viewCompliance() {
       <td style="padding:10px 12px;white-space:nowrap">
         <button class="flock-btn flock-btn--sm flock-btn--ghost" data-act="edit-compliance"
           data-member-id="${_e(uid)}" data-name="${_e(dname)}">Edit</button>
+        <button class="flock-btn flock-btn--sm flock-btn--ghost" data-act="generate-waiver"
+          data-member-id="${_e(uid)}" data-name="${_e(dname)}"
+          style="margin-left:6px;color:#059669;border-color:#bbf7d0">Waiver ↓</button>
       </td>
     </tr>`;
   }).join('');
@@ -1141,6 +1157,8 @@ function _viewCompliance() {
           color:${(_allMembers.length - cntSan) > 0 ? '#d97706' : '#7a7f96'}">${_allMembers.length - cntSan} not enrolled</div>
       </div>
     </div>
+
+    ${_sortBar()}
 
     <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border,#e8eaf6)">
       <table style="width:100%;border-collapse:collapse;font:400 0.85rem/1.4 var(--font-ui,sans-serif)">
@@ -1413,6 +1431,329 @@ function _showParentNotifModal(memberId, name) {
       btn.disabled = false; btn.textContent = 'Save Record';
     }
   });
+}
+
+/* ── Generate AB-506 Annual Waiver Form ─────────────────────────────────── */
+function _generateWaiver(memberId, displayName) {
+  const check  = _checksMap[memberId] || {};
+  const member = _allMembers.find(m => (m.id || m.memberNumber || m.email || '') === memberId) || {};
+  const org    = _orgName || '[Organization Name]';
+  const today  = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  const dob    = check.dateOfBirth || member.dateOfBirth || member.dob || '';
+  const dobLine = dob ? `<strong>Date of Birth:</strong> ${_e(dob)}<br>` : '';
+  const memberNo = member.memberNumber || member.id || '';
+  const memberNoLine = memberNo ? `<strong>Member ID:</strong> ${_e(memberNo)}<br>` : '';
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AB-506 Annual Waiver — ${_e(displayName)}</title>
+  <style>
+    @page { margin: 0.85in 1in; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 11pt;
+      line-height: 1.55;
+      color: #111;
+      background: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    .page { max-width: 7.5in; margin: 0 auto; }
+    .header {
+      text-align: center;
+      border-bottom: 2px solid #111;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
+    .org-name {
+      font-size: 16pt;
+      font-weight: bold;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .doc-title {
+      font-size: 13pt;
+      font-weight: bold;
+      margin-top: 6px;
+    }
+    .doc-subtitle {
+      font-size: 10pt;
+      color: #444;
+      margin-top: 2px;
+    }
+    .section {
+      margin-bottom: 18px;
+    }
+    .section-title {
+      font-weight: bold;
+      font-size: 11pt;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid #aaa;
+      margin-bottom: 8px;
+      padding-bottom: 3px;
+    }
+    .member-info {
+      background: #f8f8f8;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      font-size: 11pt;
+      line-height: 1.8;
+    }
+    .indent {
+      margin-left: 24px;
+    }
+    .sign-block {
+      margin-top: 10px;
+    }
+    .sign-line {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .sign-label {
+      flex-shrink: 0;
+      min-width: 160px;
+      font-size: 10pt;
+    }
+    .sign-rule {
+      flex: 1;
+      border-bottom: 1px solid #111;
+      margin-bottom: 2px;
+    }
+    .admin-box {
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin-top: 6px;
+      background: #fcfcfc;
+    }
+    .admin-row {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 10px;
+    }
+    .admin-field {
+      flex: 1;
+      border-bottom: 1px solid #aaa;
+      min-height: 22px;
+    }
+    .admin-label {
+      font-size: 9pt;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .statutory {
+      font-size: 9.5pt;
+      color: #333;
+      background: #f4f4f4;
+      border-left: 3px solid #aaa;
+      padding: 8px 12px;
+      margin: 10px 0;
+      line-height: 1.6;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 8.5pt;
+      color: #666;
+      text-align: center;
+      border-top: 1px solid #ccc;
+      padding-top: 8px;
+    }
+    @media print {
+      body { font-size: 10.5pt; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- PRINT BUTTON (hidden when printing) -->
+  <div class="no-print" style="text-align:right;margin-bottom:14px">
+    <button onclick="window.print()" style="padding:8px 20px;font:bold 11pt sans-serif;background:#1b264f;color:#fff;border:none;border-radius:6px;cursor:pointer">Print / Save PDF</button>
+  </div>
+
+  <div class="header">
+    <div class="org-name">${_e(org)}</div>
+    <div class="doc-title">Annual Authorization for Background Check</div>
+    <div class="doc-subtitle">Pursuant to California Business &amp; Professions Code §18975 (AB 506)</div>
+  </div>
+
+  <!-- MEMBER INFO -->
+  <div class="member-info">
+    <strong>Member Name:</strong> ${_e(displayName)}<br>
+    ${dobLine}
+    ${memberNoLine}
+    <strong>Date of Form:</strong> ${_e(today)}
+  </div>
+
+  <!-- SECTION 1 — CONSENT -->
+  <div class="section">
+    <div class="section-title">1. Consent &amp; Authorization</div>
+    <p>
+      I, <strong>${_e(displayName)}</strong>, hereby voluntarily authorize <strong>${_e(org)}</strong>
+      (the &ldquo;Organization&rdquo;) and its authorized agents to obtain a background investigation
+      report concerning me from one or more consumer reporting agencies, law enforcement databases,
+      the California Department of Justice (DOJ), and/or other authorized sources.
+    </p>
+    <p>
+      I understand that this authorization is required under California AB 506 (Business &amp; Professions
+      Code §18975) for any person who has direct contact with minors in a youth-serving organization
+      and who is not required to obtain a criminal background check under any other law.
+    </p>
+    <p>
+      I understand that this authorization is valid for one (1) year from the date signed, and that
+      I may be asked to re-authorize annually in accordance with the Organization&rsquo;s child
+      safety policy.
+    </p>
+  </div>
+
+  <!-- SECTION 2 — STATUTORY DISCLOSURE -->
+  <div class="section">
+    <div class="section-title">2. Statutory Disclosure (BPC §18975)</div>
+    <div class="statutory">
+      California Business &amp; Professions Code §18975 requires youth-serving organizations to
+      obtain criminal background checks on employees and volunteers who have direct contact with
+      minors. A &ldquo;youth-serving organization&rdquo; means any organization that provides
+      services to, is organized for, or has as one of its primary purposes the provision of
+      programs or activities for persons under 18 years of age. The required check includes
+      a search of DOJ records and, where applicable, an FBI check. A disqualifying offense may
+      result in the individual being prohibited from having direct contact with minors.
+    </div>
+    <p class="indent">
+      I understand and acknowledge the above disclosure and consent to the background check
+      described herein.
+    </p>
+  </div>
+
+  <!-- SECTION 3 — DOJ SAN ENROLLMENT -->
+  <div class="section">
+    <div class="section-title">3. DOJ Subsequent Arrest Notification (SAN) Enrollment</div>
+    <p>
+      I acknowledge that the Organization may elect to enroll me in the California Department of
+      Justice Subsequent Arrest Notification (SAN) program, which provides ongoing notifications
+      to the Organization if I am arrested for a qualifying offense after my initial background
+      check is complete. By signing this form, I consent to such enrollment for the duration of
+      my service with the Organization.
+    </p>
+  </div>
+
+  <!-- SECTION 4 — CHILD SAFETY POLICY ACKNOWLEDGMENT -->
+  <div class="section">
+    <div class="section-title">4. Child Safety Policy Acknowledgment</div>
+    <p>
+      I confirm that I have received, read, and agree to comply with the Organization&rsquo;s
+      Child Safety Policy (the &ldquo;Policy&rdquo;). I understand that any violation of the
+      Policy may result in immediate removal from ministry and, where applicable, reporting to
+      law enforcement.
+    </p>
+  </div>
+
+  <!-- SECTION 5 — ANNUAL RENEWAL -->
+  <div class="section">
+    <div class="section-title">5. Annual Renewal</div>
+    <p>
+      I understand that this authorization expires one (1) year from the date of my signature
+      below and that continued service in a role that involves direct contact with minors requires
+      annual renewal. I agree to re-sign this form each program year upon request.
+    </p>
+  </div>
+
+  <!-- SIGNATURE -->
+  <div class="section">
+    <div class="section-title">6. Signature</div>
+    <div class="sign-block">
+      <div class="sign-line">
+        <span class="sign-label">Volunteer/Staff Signature:</span>
+        <span class="sign-rule"></span>
+      </div>
+      <div class="sign-line">
+        <span class="sign-label">Printed Name:</span>
+        <span class="sign-rule"></span>
+      </div>
+      <div class="sign-line">
+        <span class="sign-label">Date:</span>
+        <span class="sign-rule"></span>
+      </div>
+      <div class="sign-line">
+        <span class="sign-label">Witness Signature:</span>
+        <span class="sign-rule"></span>
+      </div>
+      <div class="sign-line">
+        <span class="sign-label">Witness Printed Name:</span>
+        <span class="sign-rule"></span>
+      </div>
+      <div class="sign-line">
+        <span class="sign-label">Witness Date:</span>
+        <span class="sign-rule"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN USE ONLY -->
+  <div class="section">
+    <div class="section-title">For Office Use Only</div>
+    <div class="admin-box">
+      <div class="admin-row">
+        <div>
+          <div class="admin-field"></div>
+          <div class="admin-label">Background Check Submitted Date</div>
+        </div>
+        <div>
+          <div class="admin-field"></div>
+          <div class="admin-label">Result Received Date</div>
+        </div>
+        <div>
+          <div class="admin-field"></div>
+          <div class="admin-label">Result (Clear / Pending / Disqualified)</div>
+        </div>
+      </div>
+      <div class="admin-row">
+        <div>
+          <div class="admin-field"></div>
+          <div class="admin-label">SAN Enrolled (Y/N) &amp; Date</div>
+        </div>
+        <div>
+          <div class="admin-field"></div>
+          <div class="admin-label">Reviewed By (Staff Initials)</div>
+        </div>
+        <div>
+          <div class="admin-field"></div>
+          <div class="admin-label">Next Renewal Due</div>
+        </div>
+      </div>
+      <div class="admin-row">
+        <div style="flex:1">
+          <div class="admin-field"></div>
+          <div class="admin-label">Notes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    ${_e(org)} &nbsp;|&nbsp; AB-506 Annual Authorization Form &nbsp;|&nbsp; Generated ${_e(today)}
+    &nbsp;|&nbsp; Retain in personnel/volunteer file for a minimum of 7 years.
+  </div>
+
+</div>
+</body>
+</html>`;
+
+  const win = window.open('', '_blank', 'width=850,height=1100,scrollbars=yes,resizable=yes');
+  if (!win) { alert('Pop-up blocked — please allow pop-ups for this site and try again.'); return; }
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+  win.focus();
 }
 
 async function _saveParentNotif({ memberId, sent, sentDate, method, confirmedDate }) {
