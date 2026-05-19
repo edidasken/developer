@@ -2,7 +2,7 @@
   "name": "Melchizedek — Background Checks",
   "short_name": "Melchizedek",
   "description": "Church background check management via Checkr",
-  "start_url": "./app.melchizedek.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
