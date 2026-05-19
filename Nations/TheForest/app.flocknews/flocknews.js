@@ -82,29 +82,15 @@ function _waitForReady() {
       attempts++;
       
       if (typeof firebase !== 'undefined' && typeof Nehemiah !== 'undefined') {
-        // Nehemiah loaded - check if authenticated
-        if (Nehemiah.isAuthenticated()) {
-          resolve();
-        } else if (!isLocalhost) {
-          // Not authenticated in DEPLOYED environment - redirect to login
-          console.warn('[FlockNews] User not authenticated, redirecting to login');
-          window.location.replace('index.html');
-          reject(new Error('Not authenticated'));
-        } else {
-          // Localhost - warn but don't redirect (for development)
-          console.warn('[FlockNews] User not authenticated (localhost - allowing for development)');
-          resolve();
+        // FlockNews is a PUBLIC app — guests are allowed (read-only).
+        if (!Nehemiah.isAuthenticated()) {
+          console.warn('[FlockNews] No authenticated user — continuing as guest (read-only).');
         }
+        resolve();
       } else if (attempts >= maxAttempts) {
-        // Timeout
-        if (!isLocalhost) {
-          console.error('[FlockNews] Timeout waiting for auth, redirecting to login');
-          window.location.replace('index.html');
-          reject(new Error('Timeout'));
-        } else {
-          console.warn('[FlockNews] Timeout waiting for auth (localhost - continuing anyway)');
-          resolve();
-        }
+        // Firebase/Nehemiah failed to load — continue anyway as guest, content can still render.
+        console.warn('[FlockNews] Timeout waiting for firebase/Nehemiah — continuing as guest.');
+        resolve();
       } else {
         setTimeout(checkReady, 100);
       }
@@ -120,16 +106,11 @@ async function initFlockNews() {
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
   try {
-    // Get authenticated user from Nehemiah
-    const profile = Nehemiah.getProfile();
+    // Get authenticated user from Nehemiah (may be null — FlockNews is public/guest-accessible)
+    const profile = (typeof Nehemiah !== 'undefined') ? Nehemiah.getProfile() : null;
     if (!profile) {
-      if (!isLocalhost) {
-        // Deployed environment - require authentication
-        console.error('[FlockNews] No authenticated user found');
-        window.location.replace('index.html');
-        return;
-      } else {
-        // Localhost - create mock user for development with pastor+ role
+      if (isLocalhost) {
+        // Localhost - create mock pastor user for development
         console.warn('[FlockNews] No authenticated user (localhost - using mock pastor user)');
         FlockNewsState.currentUser = {
           uid: 'dev-user',
@@ -138,6 +119,16 @@ async function initFlockNews() {
           role: 'pastor'
         };
         FlockNewsState.isPastorPlus = true;
+      } else {
+        // Live guest — read-only access to public content
+        console.warn('[FlockNews] No authenticated user — guest mode (read-only)');
+        FlockNewsState.currentUser = {
+          uid: 'guest',
+          displayName: 'Guest',
+          email: '',
+          role: 'guest'
+        };
+        FlockNewsState.isPastorPlus = false;
       }
     } else {
       FlockNewsState.currentUser = {
