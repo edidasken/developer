@@ -992,12 +992,18 @@ function _ocapStatus(check) {
 }
 
 function _hoursStatus(check) {
-  const mo = Number(check?.monthlyHours || 0);
-  const yr = Number(check?.yearlyHours  || 0);
+  const mo = Number(check?.monthlyHours ?? 0);
+  const yr = Number(check?.yearlyHours  ?? 0);
   if (mo > 16 || yr > 32) return { status: 'over',    label: `${mo}h/mo · ${yr}h/yr`, color: '#dc2626' };
   if (mo >= 12 || yr >= 26) return { status: 'near',  label: `${mo}h/mo · ${yr}h/yr`, color: '#d97706' };
   if (mo === 0 && yr === 0) return { status: 'unknown', label: '—',                    color: '#7a7f96' };
   return { status: 'ok', label: `${mo}h/mo · ${yr}h/yr`, color: '#059669' };
+}
+
+function _memberDisplayName(m) {
+  const first = m.firstName || '';
+  const last  = m.lastName  || '';
+  return m.displayName || m.name || `${first} ${last}`.trim() || '(Unknown)';
 }
 
 function _statusPill(label, color) {
@@ -1010,25 +1016,31 @@ function _statusPill(label, color) {
 function _complianceAlerts() {
   const expiring = [], missingOcap = [], overHours = [], notSan = [], needsNotif = [];
 
-  for (const m of _allMembers) {
+  // Only alert on members who have a background check record (tracked volunteers)
+  const tracked = _allMembers.filter(m => {
+    const uid = m.id || m.memberNumber || m.email || '';
+    return !!_checksMap[uid];
+  });
+
+  for (const m of tracked) {
     const uid   = m.id || m.memberNumber || m.email || '';
     const check = _checksMap[uid];
     const ws = _waiverStatus(check);
     const os = _ocapStatus(check);
     const hs = _hoursStatus(check);
-    if (ws.status === 'expired' || ws.status === 'expiring') expiring.push(m.name || uid);
-    if (os.status === 'expired' || os.status === 'missing') missingOcap.push(m.name || uid);
-    if (hs.status === 'over' || hs.status === 'near')       overHours.push(m.name || uid);
-    if (!check?.sanEnrolled) notSan.push(m.name || uid);
-    if (check?.status === 'consider' && !check?.parentNotif?.sent) needsNotif.push(m.name || uid);
+    if (ws.status === 'expired' || ws.status === 'expiring') expiring.push(_memberDisplayName(m));
+    if (os.status === 'expired' || os.status === 'missing') missingOcap.push(_memberDisplayName(m));
+    if (hs.status === 'over' || hs.status === 'near')       overHours.push(_memberDisplayName(m));
+    if (!check?.sanEnrolled) notSan.push(_memberDisplayName(m));
+    if (check?.status === 'consider' && !check?.parentNotif?.sent) needsNotif.push(_memberDisplayName(m));
   }
 
   const alerts = [];
-  if (expiring.length)   alerts.push({ icon: '📋', color: '#d97706', bg: '#fffbeb', text: `<strong>${expiring.length} member${expiring.length > 1 ? 's' : ''}</strong> ha${expiring.length > 1 ? 've' : 's'} an annual waiver expiring or already expired.`, link: 'compliance' });
-  if (missingOcap.length) alerts.push({ icon: '📚', color: '#d97706', bg: '#fffbeb', text: `<strong>${missingOcap.length} member${missingOcap.length > 1 ? 's' : ''}</strong> ${missingOcap.length > 1 ? 'are' : 'is'} missing a current OCAP mandated reporter certification.`, link: 'compliance' });
-  if (overHours.length)  alerts.push({ icon: '⏱', color: '#dc2626', bg: '#fef2f2', text: `<strong>${overHours.length} member${overHours.length > 1 ? 's' : ''}</strong> ${overHours.length > 1 ? 'are' : 'is'} at or above the volunteer hour threshold for enhanced screening.`, link: 'compliance' });
-  if (needsNotif.length) alerts.push({ icon: '📬', color: '#dc2626', bg: '#fef2f2', text: `<strong>${needsNotif.length} member${needsNotif.length > 1 ? 's' : ''}</strong> with "Consider" status require documented parent notification (§11105.3(c)(1)).`, link: 'not-approved' });
-  if (notSan.length === _allMembers.length && _allMembers.length > 0) alerts.push({ icon: '🔔', color: '#7a7f96', bg: '#f8f9ff', text: `No members are enrolled in DOJ Subsequent Arrest Notification (SAN). Enroll via the Compliance view.`, link: 'compliance' });
+  if (expiring.length)    alerts.push({ icon: '📋', color: '#d97706', bg: '#fffbeb', text: `<strong>${expiring.length} volunteer${expiring.length > 1 ? 's' : ''}</strong> ha${expiring.length > 1 ? 've' : 's'} an annual waiver expiring or already expired.`, link: 'compliance' });
+  if (missingOcap.length) alerts.push({ icon: '📚', color: '#d97706', bg: '#fffbeb', text: `<strong>${missingOcap.length} volunteer${missingOcap.length > 1 ? 's' : ''}</strong> ${missingOcap.length > 1 ? 'are' : 'is'} missing a current OCAP mandated reporter certification.`, link: 'compliance' });
+  if (overHours.length)   alerts.push({ icon: '⏱', color: '#dc2626', bg: '#fef2f2', text: `<strong>${overHours.length} volunteer${overHours.length > 1 ? 's' : ''}</strong> ${overHours.length > 1 ? 'are' : 'is'} at or above the volunteer hour threshold — enhanced screening required.`, link: 'compliance' });
+  if (needsNotif.length)  alerts.push({ icon: '📬', color: '#dc2626', bg: '#fef2f2', text: `<strong>${needsNotif.length} volunteer${needsNotif.length > 1 ? 's' : ''}</strong> with "Consider" status require documented parent/guardian notification (§11105.3(c)(1)).`, link: 'not-approved' });
+  if (notSan.length > 0 && tracked.length > 0) alerts.push({ icon: '🔔', color: '#7a7f96', bg: '#f8f9ff', text: `<strong>${notSan.length} volunteer${notSan.length > 1 ? 's' : ''}</strong> ${notSan.length > 1 ? 'are' : 'is'} not enrolled in DOJ Subsequent Arrest Notification (SAN).`, link: 'compliance' });
 
   if (!alerts.length) return '';
 
@@ -1077,6 +1089,7 @@ function _viewCompliance() {
 
   const rows = sorted.map(m => {
     const uid    = m.id || m.memberNumber || m.email || '';
+    const dname  = _memberDisplayName(m);
     const check  = _checksMap[uid] || {};
     const ws     = _waiverStatus(check);
     const os     = _ocapStatus(check);
@@ -1085,7 +1098,7 @@ function _viewCompliance() {
     const pn     = check.parentNotif?.sent ? _statusPill('Sent ' + _fmtDate(check.parentNotif.sentDate), '#059669') : '';
     return `<tr style="border-bottom:1px solid var(--border,#e8eaf6)">
       <td style="padding:10px 12px;min-width:160px">
-        <div style="font:600 0.9rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${_e(m.name || uid)}</div>
+        <div style="font:600 0.9rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${_e(dname)}</div>
         ${m.role ? `<div style="font:400 0.76rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-top:3px">${_e(m.role)}</div>` : ''}
       </td>
       <td style="padding:10px 12px">${_statusBadge(check.status)}</td>
@@ -1096,7 +1109,7 @@ function _viewCompliance() {
       <td style="padding:10px 12px">${san}${pn ? '<br><span style="font:400 0.73rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">Parent notif:</span> ' + pn : ''}</td>
       <td style="padding:10px 12px;white-space:nowrap">
         <button class="flock-btn flock-btn--sm flock-btn--ghost" data-act="edit-compliance"
-          data-member-id="${_e(uid)}" data-name="${_e(m.name || uid)}">Edit</button>
+          data-member-id="${_e(uid)}" data-name="${_e(dname)}">Edit</button>
       </td>
     </tr>`;
   }).join('');
@@ -1168,130 +1181,120 @@ function _viewCompliance() {
 
 function _showComplianceModal(memberId, name) {
   const check = _checksMap[memberId] || {};
-  const wrap  = document.getElementById('melch-modal-wrap');
-  if (!wrap) return;
 
-  wrap.innerHTML = `
-    <div class="melch-modal" role="dialog" aria-modal="true" aria-label="Edit Compliance — ${_e(name)}">
-      <div class="melch-modal-header">
-        <span class="melch-modal-title">Compliance Record</span>
-        <span style="font:400 0.85rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-left:8px">${_e(name)}</span>
-        <button class="melch-modal-close" data-act="close-modal" aria-label="Close">✕</button>
+  document.getElementById('melch-compliance-modal')?.remove();
+  const modal = document.createElement('div');
+  modal.id = 'melch-compliance-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:20px';
+
+  const fieldLabel = (text) =>
+    `<div style="font:600 0.78rem var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-bottom:4px">${text}</div>`;
+  const inputStyle = 'width:100%;padding:8px 10px;border:1px solid var(--line,#e5e7ef);border-radius:7px;font:0.88rem var(--font-ui,sans-serif);background:var(--bg,#fff);color:var(--ink,#1b264f);box-sizing:border-box';
+  const fieldWrap  = 'margin-bottom:16px';
+
+  modal.innerHTML = `
+    <div style="background:var(--bg-raised,#fff);border-radius:14px;padding:28px 24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 48px rgba(0,0,0,.22)">
+      <div style="font:700 1rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:4px">Compliance Record</div>
+      <div style="font:400 0.82rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-bottom:20px">${_e(name)}</div>
+
+      <label style="display:block;${fieldWrap}">
+        ${fieldLabel('Annual Waiver Signed Date — BPC §18975(b)(2)(C)')}
+        <input type="date" id="mc-waiver-date" style="${inputStyle}" value="${_isoDate(check.waiverSignedDate) || ''}">
+        <div id="mc-waiver-status" style="margin-top:4px;font:400 0.8rem/1 var(--font-ui,sans-serif)"></div>
+      </label>
+
+      <label style="display:block;${fieldWrap}">
+        ${fieldLabel('OCAP Mandated Reporter Cert Date')}
+        <input type="date" id="mc-ocap-date" style="${inputStyle}" value="${_isoDate(check.ocapCertDate) || ''}">
+        <div id="mc-ocap-status" style="margin-top:4px;font:400 0.8rem/1 var(--font-ui,sans-serif)"></div>
+      </label>
+
+      <div style="display:flex;gap:14px;${fieldWrap}">
+        <label style="flex:1;display:block">
+          ${fieldLabel('Monthly Hours (this month)')}
+          <input type="number" id="mc-monthly-hours" min="0" max="744" placeholder="0"
+            style="${inputStyle}" value="${check.monthlyHours ?? ''}">
+        </label>
+        <label style="flex:1;display:block">
+          ${fieldLabel('Yearly Hours (this year)')}
+          <input type="number" id="mc-yearly-hours" min="0" max="8784" placeholder="0"
+            style="${inputStyle}" value="${check.yearlyHours ?? ''}">
+        </label>
       </div>
-      <div class="melch-modal-body">
 
-        <div class="melch-field-group">
-          <label class="melch-label">Annual Waiver Signed Date
-            <span style="font-weight:400;color:var(--ink-muted,#7a7f96)"> — BPC §18975(b)(2)(C)</span>
-          </label>
-          <input id="mc-waiver-date" type="date" class="melch-input"
-            value="${_isoDate(check.waiverSignedDate) || ''}">
-          <div id="mc-waiver-status" style="margin-top:4px;font:400 0.8rem/1 var(--font-ui,sans-serif)"></div>
+      <div style="${fieldWrap}">
+        ${fieldLabel('DOJ Subsequent Arrest Notification (SAN)')}
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="mc-san-enrolled" style="width:16px;height:16px"
+            ${check.sanEnrolled ? 'checked' : ''}>
+          <span style="font:400 0.88rem/1 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">Enrolled in DOJ SAN</span>
+        </label>
+        <div id="mc-san-date-row" style="margin-top:10px;display:${check.sanEnrolled ? 'block' : 'none'}">
+          ${fieldLabel('SAN Enrollment Date')}
+          <input type="date" id="mc-san-date" style="${inputStyle}" value="${_isoDate(check.sanEnrolledDate) || ''}">
         </div>
-
-        <div class="melch-field-group">
-          <label class="melch-label">OCAP Mandated Reporter Cert Date</label>
-          <input id="mc-ocap-date" type="date" class="melch-input"
-            value="${_isoDate(check.ocapCertDate) || ''}">
-          <div id="mc-ocap-status" style="margin-top:4px;font:400 0.8rem/1 var(--font-ui,sans-serif)"></div>
-        </div>
-
-        <div style="display:flex;gap:14px;flex-wrap:wrap">
-          <div class="melch-field-group" style="flex:1;min-width:120px">
-            <label class="melch-label">Monthly Hours (this month)</label>
-            <input id="mc-monthly-hours" type="number" min="0" max="744" class="melch-input"
-              placeholder="0" value="${check.monthlyHours ?? ''}">
-          </div>
-          <div class="melch-field-group" style="flex:1;min-width:120px">
-            <label class="melch-label">Yearly Hours (this year)</label>
-            <input id="mc-yearly-hours" type="number" min="0" max="8784" class="melch-input"
-              placeholder="0" value="${check.yearlyHours ?? ''}">
-          </div>
-        </div>
-
-        <div class="melch-field-group">
-          <label class="melch-label">DOJ Subsequent Arrest Notification (SAN)</label>
-          <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
-            <input id="mc-san-enrolled" type="checkbox" style="width:18px;height:18px;cursor:pointer"
-              ${check.sanEnrolled ? 'checked' : ''}>
-            <span style="font:400 0.88rem/1 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">Enrolled in DOJ SAN</span>
-          </div>
-          <div id="mc-san-date-row" style="margin-top:10px;display:${check.sanEnrolled ? 'block' : 'none'}">
-            <label class="melch-label">SAN Enrollment Date</label>
-            <input id="mc-san-date" type="date" class="melch-input"
-              value="${_isoDate(check.sanEnrolledDate) || ''}">
-          </div>
-        </div>
-
-        <div class="melch-field-group">
-          <label class="melch-label">Compliance Notes</label>
-          <textarea id="mc-notes" class="melch-input" rows="3" placeholder="Internal compliance notes…"
-            style="resize:vertical">${_e(check.complianceNotes || '')}</textarea>
-        </div>
-
-        <div id="mc-error" style="display:none;padding:10px;background:#fef2f2;border-radius:6px;
-          font:400 0.85rem/1.5 var(--font-ui,sans-serif);color:#dc2626;margin-top:8px"></div>
       </div>
-      <div class="melch-modal-footer">
-        <button class="flock-btn flock-btn--ghost" data-act="close-modal">Cancel</button>
-        <button class="flock-btn flock-btn--primary" id="mc-save-btn">Save Record</button>
+
+      <label style="display:block;${fieldWrap}">
+        ${fieldLabel('Compliance Notes')}
+        <textarea id="mc-notes" rows="3" placeholder="Internal notes…"
+          style="${inputStyle};resize:vertical">${_e(check.complianceNotes || '')}</textarea>
+      </label>
+
+      <div id="mc-error" style="display:none;padding:10px;background:#fef2f2;border-radius:6px;
+        font:400 0.85rem/1.5 var(--font-ui,sans-serif);color:#dc2626;margin-bottom:14px"></div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button id="mc-cancel" class="flock-btn flock-btn--ghost flock-btn--sm">Cancel</button>
+        <button id="mc-save"   class="flock-btn flock-btn--primary flock-btn--sm">Save Record</button>
       </div>
     </div>`;
-  wrap.style.display = 'flex';
 
-  // Live waiver / OCAP status preview
-  const waiverIn = wrap.querySelector('#mc-waiver-date');
-  const ocapIn   = wrap.querySelector('#mc-ocap-date');
-  const sanCb    = wrap.querySelector('#mc-san-enrolled');
-  const sanRow   = wrap.querySelector('#mc-san-date-row');
-  const hoursWire = () => {};
+  document.body.appendChild(modal);
+
+  const waiverIn = modal.querySelector('#mc-waiver-date');
+  const ocapIn   = modal.querySelector('#mc-ocap-date');
+  const sanCb    = modal.querySelector('#mc-san-enrolled');
+  const sanRow   = modal.querySelector('#mc-san-date-row');
 
   const updateWaiverStatus = () => {
-    const el = wrap.querySelector('#mc-waiver-status');
-    if (!el) return;
+    const el = modal.querySelector('#mc-waiver-status');
     const ws = _waiverStatus({ waiverSignedDate: waiverIn.value });
-    el.textContent = ws.label;
-    el.style.color = ws.color;
+    el.textContent = ws.label; el.style.color = ws.color;
   };
   const updateOcapStatus = () => {
-    const el = wrap.querySelector('#mc-ocap-status');
-    if (!el) return;
+    const el = modal.querySelector('#mc-ocap-status');
     const os = _ocapStatus({ ocapCertDate: ocapIn.value });
-    el.textContent = os.label;
-    el.style.color = os.color;
+    el.textContent = os.label; el.style.color = os.color;
   };
   waiverIn.addEventListener('change', updateWaiverStatus);
   ocapIn.addEventListener('change', updateOcapStatus);
-  updateWaiverStatus();
-  updateOcapStatus();
+  updateWaiverStatus(); updateOcapStatus();
 
-  sanCb.addEventListener('change', () => {
-    sanRow.style.display = sanCb.checked ? 'block' : 'none';
-  });
+  sanCb.addEventListener('change', () => { sanRow.style.display = sanCb.checked ? 'block' : 'none'; });
 
-  wrap.querySelector('#mc-save-btn').addEventListener('click', async () => {
-    const btn = wrap.querySelector('#mc-save-btn');
-    btn.disabled = true;
-    btn.textContent = 'Saving…';
+  modal.querySelector('#mc-cancel').addEventListener('click', () => modal.remove());
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+
+  modal.querySelector('#mc-save').addEventListener('click', async () => {
+    const btn = modal.querySelector('#mc-save');
+    btn.disabled = true; btn.textContent = 'Saving…';
     try {
       await _saveComplianceFields({
-        memberId,
-        name,
-        waiverDate:     waiverIn.value    || null,
-        ocapDate:       wrap.querySelector('#mc-ocap-date').value  || null,
-        monthlyHours:   Number(wrap.querySelector('#mc-monthly-hours').value) || 0,
-        yearlyHours:    Number(wrap.querySelector('#mc-yearly-hours').value)  || 0,
+        memberId, name,
+        waiverDate:     waiverIn.value   || null,
+        ocapDate:       ocapIn.value     || null,
+        monthlyHours:   Number(modal.querySelector('#mc-monthly-hours').value) || 0,
+        yearlyHours:    Number(modal.querySelector('#mc-yearly-hours').value)  || 0,
         sanEnrolled:    sanCb.checked,
-        sanEnrolledDate: sanCb.checked ? (wrap.querySelector('#mc-san-date').value || null) : null,
-        notes:          wrap.querySelector('#mc-notes').value.trim() || null,
+        sanEnrolledDate: sanCb.checked ? (modal.querySelector('#mc-san-date').value || null) : null,
+        notes:          modal.querySelector('#mc-notes').value.trim() || null,
       });
-      wrap.style.display = 'none';
-      wrap.innerHTML = '';
+      modal.remove();
     } catch (err) {
-      const errEl = wrap.querySelector('#mc-error');
-      if (errEl) { errEl.textContent = err.message; errEl.style.display = 'block'; }
-      btn.disabled = false;
-      btn.textContent = 'Save Record';
+      const errEl = modal.querySelector('#mc-error');
+      errEl.textContent = err.message; errEl.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Save Record';
     }
   });
 }
@@ -1322,90 +1325,92 @@ async function _saveComplianceFields({ memberId, name, waiverDate, ocapDate, mon
 function _showParentNotifModal(memberId, name) {
   const check = _checksMap[memberId] || {};
   const pn    = check.parentNotif   || {};
-  const wrap  = document.getElementById('melch-modal-wrap');
-  if (!wrap) return;
 
-  wrap.innerHTML = `
-    <div class="melch-modal" role="dialog" aria-modal="true" aria-label="Parent Notification — ${_e(name)}">
-      <div class="melch-modal-header">
-        <span class="melch-modal-title">Parent / Guardian Notification</span>
-        <span style="font:400 0.85rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-left:8px">${_e(name)}</span>
-        <button class="melch-modal-close" data-act="close-modal" aria-label="Close">✕</button>
+  document.getElementById('melch-parentnotif-modal')?.remove();
+  const modal = document.createElement('div');
+  modal.id = 'melch-parentnotif-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:20px';
+
+  const inputStyle = 'width:100%;padding:8px 10px;border:1px solid var(--line,#e5e7ef);border-radius:7px;font:0.88rem var(--font-ui,sans-serif);background:var(--bg,#fff);color:var(--ink,#1b264f);box-sizing:border-box';
+  const fieldLabel = (text) =>
+    `<div style="font:600 0.78rem var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-bottom:4px">${text}</div>`;
+
+  modal.innerHTML = `
+    <div style="background:var(--bg-raised,#fff);border-radius:14px;padding:28px 24px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 48px rgba(0,0,0,.22)">
+      <div style="font:700 1rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:4px">Parent / Guardian Notification</div>
+      <div style="font:400 0.82rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-bottom:16px">${_e(name)}</div>
+
+      <div style="padding:12px 14px;background:#fff7ed;border-radius:8px;border-left:4px solid #d97706;
+        margin-bottom:20px;font:400 0.82rem/1.5 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">
+        <strong>Pen. Code §11105.3(c)(1)</strong> — If this individual will supervise minors, affected
+        parents/guardians must receive written notification at least
+        <strong>10 days before they begin duties</strong>.
       </div>
-      <div class="melch-modal-body">
-        <div style="padding:12px 14px;background:#fff7ed;border-radius:8px;border-left:4px solid #d97706;
-          margin-bottom:18px;font:400 0.85rem/1.5 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">
-          <strong>Pen. Code §11105.3(c)(1)</strong> — If this individual will supervise minors, affected
-          parents/guardians must be notified in writing at least <strong>10 days before they begin duties</strong>.
-          Document that notification here.
+
+      <label style="display:block;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="pn-sent" style="width:16px;height:16px"
+            ${pn.sent ? 'checked' : ''}>
+          <span style="font:600 0.88rem/1 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">Written notification was sent</span>
         </div>
+      </label>
 
-        <div class="melch-field-group">
-          <label class="melch-label">Notification Sent?</label>
-          <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
-            <input id="pn-sent" type="checkbox" style="width:18px;height:18px;cursor:pointer"
-              ${pn.sent ? 'checked' : ''}>
-            <span style="font:400 0.88rem/1 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">Written notification was sent</span>
-          </div>
-        </div>
+      <div id="pn-details-row" style="display:${pn.sent ? 'block' : 'none'}">
+        <label style="display:block;margin-bottom:14px">
+          ${fieldLabel('Date Sent')}
+          <input type="date" id="pn-sent-date" style="${inputStyle}" value="${_isoDate(pn.sentDate) || ''}">
+        </label>
 
-        <div id="pn-details-row" style="display:${pn.sent ? 'block' : 'none'}">
-          <div class="melch-field-group">
-            <label class="melch-label">Date Sent</label>
-            <input id="pn-sent-date" type="date" class="melch-input"
-              value="${_isoDate(pn.sentDate) || ''}">
-          </div>
+        <label style="display:block;margin-bottom:14px">
+          ${fieldLabel('Method')}
+          <select id="pn-method" style="${inputStyle}">
+            <option value="">— select —</option>
+            <option value="written-mail"  ${pn.method === 'written-mail'  ? 'selected' : ''}>Written letter (mail)</option>
+            <option value="written-email" ${pn.method === 'written-email' ? 'selected' : ''}>Written letter (email)</option>
+            <option value="in-person"     ${pn.method === 'in-person'     ? 'selected' : ''}>In-person delivery</option>
+          </select>
+        </label>
 
-          <div class="melch-field-group">
-            <label class="melch-label">Method</label>
-            <select id="pn-method" class="melch-input">
-              <option value="">— select —</option>
-              <option value="written-mail"  ${pn.method === 'written-mail'  ? 'selected' : ''}>Written letter (mail)</option>
-              <option value="written-email" ${pn.method === 'written-email' ? 'selected' : ''}>Written letter (email)</option>
-              <option value="in-person"     ${pn.method === 'in-person'     ? 'selected' : ''}>In-person delivery</option>
-            </select>
-          </div>
-
-          <div class="melch-field-group">
-            <label class="melch-label">Date Confirmed / Acknowledged (optional)</label>
-            <input id="pn-confirmed-date" type="date" class="melch-input"
-              value="${_isoDate(pn.confirmedDate) || ''}">
-          </div>
-        </div>
-
-        <div id="pn-error" style="display:none;padding:10px;background:#fef2f2;border-radius:6px;
-          font:400 0.85rem/1.5 var(--font-ui,sans-serif);color:#dc2626;margin-top:8px"></div>
+        <label style="display:block;margin-bottom:14px">
+          ${fieldLabel('Date Confirmed / Acknowledged (optional)')}
+          <input type="date" id="pn-confirmed-date" style="${inputStyle}" value="${_isoDate(pn.confirmedDate) || ''}">
+        </label>
       </div>
-      <div class="melch-modal-footer">
-        <button class="flock-btn flock-btn--ghost" data-act="close-modal">Cancel</button>
-        <button class="flock-btn flock-btn--primary" id="pn-save-btn">Save Record</button>
+
+      <div id="pn-error" style="display:none;padding:10px;background:#fef2f2;border-radius:6px;
+        font:400 0.85rem/1.5 var(--font-ui,sans-serif);color:#dc2626;margin-bottom:14px"></div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button id="pn-cancel" class="flock-btn flock-btn--ghost flock-btn--sm">Cancel</button>
+        <button id="pn-save"   class="flock-btn flock-btn--primary flock-btn--sm">Save Record</button>
       </div>
     </div>`;
-  wrap.style.display = 'flex';
 
-  const sentCb   = wrap.querySelector('#pn-sent');
-  const detRow   = wrap.querySelector('#pn-details-row');
+  document.body.appendChild(modal);
+
+  const sentCb = modal.querySelector('#pn-sent');
+  const detRow = modal.querySelector('#pn-details-row');
   sentCb.addEventListener('change', () => { detRow.style.display = sentCb.checked ? 'block' : 'none'; });
 
-  wrap.querySelector('#pn-save-btn').addEventListener('click', async () => {
-    const btn = wrap.querySelector('#pn-save-btn');
-    btn.disabled = true;
-    btn.textContent = 'Saving…';
+  modal.querySelector('#pn-cancel').addEventListener('click', () => modal.remove());
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+
+  modal.querySelector('#pn-save').addEventListener('click', async () => {
+    const btn = modal.querySelector('#pn-save');
+    btn.disabled = true; btn.textContent = 'Saving…';
     try {
       await _saveParentNotif({
         memberId,
         sent:          sentCb.checked,
-        sentDate:      wrap.querySelector('#pn-sent-date').value     || null,
-        method:        wrap.querySelector('#pn-method').value        || null,
-        confirmedDate: wrap.querySelector('#pn-confirmed-date').value || null,
+        sentDate:      modal.querySelector('#pn-sent-date').value      || null,
+        method:        modal.querySelector('#pn-method').value         || null,
+        confirmedDate: modal.querySelector('#pn-confirmed-date').value || null,
       });
-      wrap.style.display = 'none';
-      wrap.innerHTML = '';
+      modal.remove();
     } catch (err) {
-      const errEl = wrap.querySelector('#pn-error');
-      if (errEl) { errEl.textContent = err.message; errEl.style.display = 'block'; }
-      btn.disabled = false;
-      btn.textContent = 'Save Record';
+      const errEl = modal.querySelector('#pn-error');
+      errEl.textContent = err.message; errEl.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'Save Record';
     }
   });
 }
