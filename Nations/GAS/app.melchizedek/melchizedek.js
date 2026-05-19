@@ -27,6 +27,8 @@ let _allMembers  = [];
 let _checksMap   = {}; // memberId → { status, checkrCandidateId, checkrReportId, invitationSentAt, updatedAt }
 let _currentView = 'overview';
 let _unsubChecks = null;
+let _sortField   = 'lastName';  // 'lastName' | 'firstName' | 'role' | 'status'
+let _sortDir     = 'asc';       // 'asc' | 'desc'
 
 /* ── Helpers ────────────────────────────────────────────────────────────── */
 const _e = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -327,9 +329,60 @@ function _viewFiltered(status, title, subtitle) {
 /* ── Member list renderer ────────────────────────────────────────────────── */
 const _AVATAR_COLORS = ['#7c3aed','#0ea5e9','#059669','#c05818','#db2777','#6366f1','#0891b2','#b45309','#be185d','#4f46e5'];
 
+function _sortedMembers(members) {
+  const STATUS_ORDER = { clear: 0, pending: 1, consider: 2, '': 3 };
+  return [...members].sort((a, b) => {
+    const uid_a = a.id || a.memberNumber || a.email || '';
+    const uid_b = b.id || b.memberNumber || b.email || '';
+    let av, bv;
+    switch (_sortField) {
+      case 'firstName':
+        av = (a.firstName || a.displayName || a.name || '').toLowerCase();
+        bv = (b.firstName || b.displayName || b.name || '').toLowerCase();
+        break;
+      case 'role':
+        av = (a.role || a.memberType || '').toLowerCase();
+        bv = (b.role || b.memberType || '').toLowerCase();
+        break;
+      case 'status': {
+        const sa = _checksMap[uid_a]?.status || '';
+        const sb = _checksMap[uid_b]?.status || '';
+        av = STATUS_ORDER[sa] ?? 3;
+        bv = STATUS_ORDER[sb] ?? 3;
+        break;
+      }
+      default: // lastName
+        av = (a.lastName || a.displayName || a.name || '').toLowerCase();
+        bv = (b.lastName || b.displayName || b.name || '').toLowerCase();
+    }
+    if (av < bv) return _sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return _sortDir === 'asc' ?  1 : -1;
+    return 0;
+  });
+}
+
+function _sortBar() {
+  const fields = [
+    { key: 'lastName',  label: 'Last Name' },
+    { key: 'firstName', label: 'First Name' },
+    { key: 'role',      label: 'Role' },
+    { key: 'status',    label: 'Check Status' },
+  ];
+  const pills = fields.map(f => {
+    const active = f.key === _sortField;
+    const arrow  = active ? (_sortDir === 'asc' ? ' ↑' : ' ↓') : '';
+    return `<button class="flock-btn flock-btn--sm${active ? ' flock-btn--primary' : ' flock-btn--ghost'}" data-act="sort" data-sort-field="${f.key}" style="min-width:0">${_e(f.label)}${arrow}</button>`;
+  }).join('');
+  return `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+    <span style="font:600 0.75rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);text-transform:uppercase;letter-spacing:.05em;margin-right:4px">Sort:</span>
+    ${pills}
+  </div>`;
+}
+
 function _renderMemberList(members, opts = {}) {
   if (!members.length) return '<div class="life-empty">No members found.</div>';
-  return `<div style="display:flex;flex-direction:column;gap:8px">${members.map(m => _memberRow(m, opts)).join('')}</div>`;
+  const sorted = _sortedMembers(members);
+  return `${_sortBar()}<div style="display:flex;flex-direction:column;gap:8px">${sorted.map(m => _memberRow(m, opts)).join('')}</div>`;
 }
 
 function _memberRow(p, opts = {}) {
@@ -419,6 +472,19 @@ function _fmtDate(val) {
 
 /* ── Action wiring ───────────────────────────────────────────────────────── */
 function _wireContentActions(root) {
+  root.querySelectorAll('[data-act="sort"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const field = btn.dataset.sortField;
+      if (_sortField === field) {
+        _sortDir = _sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        _sortField = field;
+        _sortDir   = 'asc';
+      }
+      _renderView(_currentView);
+    });
+  });
+
   root.querySelectorAll('[data-act="record-livescan"]').forEach(btn => {
     btn.addEventListener('click', () => {
       _showLiveScanModal(btn.dataset.memberId, btn.dataset.name);
