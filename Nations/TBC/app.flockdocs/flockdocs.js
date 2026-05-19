@@ -413,8 +413,8 @@ function _renderDocuments() {
         </svg>
         <h3>${S.searchQuery ? 'No documents found' : 'No documents yet'}</h3>
         <p>${S.searchQuery ? 'Try a different search term' : 'Create your first document to get started'}</p>
-        ${!S.searchQuery ? `<button style="display:inline-flex !important;align-items:center !important;gap:6px !important;padding:9px 18px !important;border-radius:10px !important;background:#e8a838 !important;color:#1a1208 !important;font:600 0.875rem 'Plus Jakarta Sans',sans-serif !important;cursor:pointer !important;transition:background .15s !important;border:none !important;box-shadow:0 4px 12px rgba(232,168,56,0.25) !important;margin-top:8px !important" onclick="FlockDocs.createNewDocument()" onmouseover="this.style.background='#f0b845'" onmouseout="this.style.background='#e8a838'">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18" style="flex-shrink:0">
+        ${!S.searchQuery ? `<button class="fd-btn fd-btn--primary" onclick="FlockDocs.createNewDocument()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
           Create Document
