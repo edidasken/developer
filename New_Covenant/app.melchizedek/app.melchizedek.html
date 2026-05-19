@@ -70,6 +70,9 @@
       color: var(--ink-muted, #7a7f96);
     }
 
+    /* Unity header — must span full grid width inside veil-wrap */
+    .veil-wrap > .unity-header { grid-area: top !important; }
+
     /* Pull-to-refresh */
     .ptr-indicator {
       position: sticky; top: 0; z-index: 100;
