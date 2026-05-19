@@ -29,10 +29,10 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
   // Initialize
   async function init() {
     console.log('[FlockShamar] Initializing...');
-    
+
     // Wait for auth to be ready
     await _waitForReady();
-    
+
     // Initialize Firebase
     try {
       if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
@@ -40,28 +40,59 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
         firebase.initializeApp(window.FIREBASE_CONFIG || {});
       }
       S.db = firebase.firestore();
-      
-      // Auth state
+
+      // Mint UpperRoom custom token so Firebase Auth resolves with the correct user
+      const UR = window.UpperRoom;
+      if (UR) {
+        try {
+          const cfg = window.FLOCK_FIREBASE_CONFIG || window.FIREBASE_CONFIG || null;
+          if (typeof UR.init === 'function') {
+            try { await UR.init(cfg); } catch (_) { /* may already be initialized */ }
+          }
+          if (typeof UR.authenticate === 'function') {
+            await UR.authenticate();
+            console.log('[FlockShamar] UpperRoom authenticated');
+          }
+        } catch (e) {
+          console.warn('[FlockShamar] UpperRoom authenticate failed (continuing):', e);
+        }
+      }
+
+      // Auth state — by now UpperRoom has signed in; user should be present
       firebase.auth().onAuthStateChanged(async (user) => {
         if (user) {
           S.user = user;
           console.log('[FlockShamar] User authenticated:', user.uid);
           await loadNotes();
         } else {
-          // Development mode - use localStorage
-          S.user = { uid: 'dev-user', displayName: 'Dev User', email: 'dev@flockos.church' };
-          console.log('[FlockShamar] Development mode - using localStorage');
-          loadNotesFromLocalStorage();
+          const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+          if (isLocalhost) {
+            // Development mode - use localStorage
+            S.user = { uid: 'dev-user', displayName: 'Dev User', email: 'dev@flockos.church' };
+            console.log('[FlockShamar] Development mode - using localStorage');
+            loadNotesFromLocalStorage();
+          } else {
+            // Firebase not signed in after UpperRoom attempt — redirect to sign-in
+            console.warn('[FlockShamar] Firebase user null after UpperRoom auth — redirecting to sign-in.');
+            window.location.replace('app.flockshamar/index.html');
+            return;
+          }
         }
         render();
         checkDeepLink(); // Open deep-linked note if present in URL
       });
     } catch (err) {
-      console.warn('[FlockShamar] Firebase init failed, using localStorage:', err);
-      S.user = { uid: 'dev-user', displayName: 'Dev User', email: 'dev@flockos.church' };
-      loadNotesFromLocalStorage();
-      render();
-      checkDeepLink(); // Open deep-linked note if present in URL
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (isLocalhost) {
+        console.warn('[FlockShamar] Firebase init failed, using localStorage:', err);
+        S.user = { uid: 'dev-user', displayName: 'Dev User', email: 'dev@flockos.church' };
+        loadNotesFromLocalStorage();
+        render();
+        checkDeepLink();
+      } else {
+        console.error('[FlockShamar] Firebase init failed — redirecting to sign-in:', err);
+        window.location.replace('app.flockshamar/index.html');
+      }
     }
     
     // Mount Unity Header

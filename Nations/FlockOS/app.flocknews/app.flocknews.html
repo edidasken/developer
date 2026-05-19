@@ -8,7 +8,12 @@
   <title>FlockNews — Daily Spiritual Content</title>
   <link rel="manifest" href="app.flocknews/manifest.json">
   <meta name="theme-color" content="#3b82f6">
-  <link rel="icon" href="Images/FlockIcon-512.webp">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="FlockNews">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/svg+xml" href="Images/icon-flockos.svg">
+  <link rel="apple-touch-icon" href="Images/FlockIcon-512.webp">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,10 +34,6 @@
 
   <!-- Styles — new_covenant.css contains all shared styles -->
   <link rel="stylesheet" href="Styles/new_covenant.css">
-  <!-- Google Docs feature styles -->
-  <link rel="stylesheet" href="app.flockdocs/flockdocs-gdocs-styles.css">
-  <!-- Google Sheets feature styles -->
-  <link rel="stylesheet" href="app.flockdocs/flockdocs-gsheets-styles.css">
 
   <!-- FlockNews app-specific branding -->
   <style>
@@ -1406,20 +1407,15 @@
   </div>
 
   <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" defer></script>
 
   <!-- FlockOS Core -->
   <script defer src="Scripts/firm_foundation.js"></script>
   <script defer src="Scripts/the_upper_room.js"></script>
   <script defer src="Scripts/the_true_vine.js"></script>
   <script defer src="Scripts/the_unity_header.js"></script>
-
-  <!-- Google Docs features (for rich text editing) -->
-  <script defer src="app.flockdocs/flockdocs-gdocs-features.js"></script>
-  <!-- Google Sheets features (for table insertion) -->
-  <script defer src="app.flockdocs/flockdocs-gsheets-features.js"></script>
 
   <!-- FlockNews app logic -->
   <script src="app.flocknews/flocknews.js" type="module"></script>

@@ -8,7 +8,12 @@
   <title>FlockShamar — Keep & Guard Your Notes</title>
   <link rel="manifest" href="app.flockshamar/manifest.json">
   <meta name="theme-color" content="#e8a838">
-  <link rel="icon" href="Images/FlockIcon-512.webp">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="FlockShamar">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/svg+xml" href="Images/icon-flockos.svg">
+  <link rel="apple-touch-icon" href="Images/FlockIcon-512.webp">
   
   <!-- Flash prevention: apply saved FlockOS theme before first paint -->
   <script>
@@ -1004,10 +1009,10 @@
   </div>
   
   <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js" defer></script>
   
   <!-- FlockOS Core -->
   <script defer src="Scripts/firm_foundation.js"></script>

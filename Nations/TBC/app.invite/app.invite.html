@@ -334,7 +334,7 @@
 
     /* ── Service worker ─────────────────────────────────────────── */
     if ('serviceWorker' in navigator) {
-      import('https://flock-os.github.io/FlockOS/New_Covenant/Scripts/the_living_water_register.js')
+      import('Scripts/the_living_water_register.js')
         .then(m => m.register())
         .catch(() => {});
     }
