@@ -3336,6 +3336,14 @@ function _settingRow(s) {
           </div>
           <a href="https://dashboard.checkr.com/account/developer_settings" target="_blank" rel="noopener noreferrer"
             style="font-size:.75rem;color:var(--accent,#4a7fa5);text-decoration:none">Get your key at Checkr Dashboard ↗</a>
+          <div style="margin-top:8px;padding:10px 12px;border-radius:8px;background:var(--bg-alt,#f5f6fa);border:1px solid var(--line,#e5e7ef);font-size:.77rem;line-height:1.55;color:var(--ink-muted,#7a7f96);max-width:320px;text-align:left">
+            <strong style="color:var(--ink,#1b264f);display:block;margin-bottom:4px">After saving your key:</strong>
+            1. Deploy Cloud Functions:<br>
+            <code style="font-size:.73rem;background:var(--bg,#fff);padding:1px 4px;border-radius:3px;border:1px solid var(--line,#e5e7ef)">firebase deploy --only functions</code><br><br>
+            2. In your <a href="https://dashboard.checkr.com/webhooks" target="_blank" rel="noopener noreferrer" style="color:var(--accent,#4a7fa5)">Checkr Webhook Settings ↗</a>, add:<br>
+            <code style="font-size:.72rem;background:var(--bg,#fff);padding:1px 4px;border-radius:3px;border:1px solid var(--line,#e5e7ef);word-break:break-all">https://&lt;region&gt;-&lt;projectId&gt;.cloudfunctions.net/checkrWebhook</code><br><br>
+            Subscribe to <strong style="color:var(--ink,#1b264f)">report.completed</strong> events.
+          </div>
         </div>
       </div>`;
   }
