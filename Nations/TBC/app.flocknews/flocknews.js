@@ -219,8 +219,8 @@ function mountHeader() {
     appId: 'flocknews',
     appName: 'FlockNews',
     appIconSvg,
-    appAccent: '#e8a838',
-    appAccentDk: '#c48a20',
+    appAccent: '#1b264f',
+    appAccentDk: '#0f1735',
     homeHref: 'app.flocknews/app.flocknews.html',
     user: FlockNewsState.currentUser,
     onSignOut: async () => {

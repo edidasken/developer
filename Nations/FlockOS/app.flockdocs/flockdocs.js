@@ -119,6 +119,11 @@ function _waitForReady() {
 window.addEventListener('DOMContentLoaded', async () => {
   try {
     await _waitForReady();
+    // Mint Firebase custom token so Firestore reads are authenticated
+    if (typeof UpperRoom !== 'undefined') {
+      await UpperRoom.init();
+      await UpperRoom.authenticate();
+    }
     init();
   } catch (err) {
     // Already redirected in _waitForReady
@@ -187,8 +192,8 @@ function _mountHeader() {
     appId: 'flockdocs',
     appName: 'FlockDocs',
     appIconSvg,
-    appAccent: '#e8a838',
-    appAccentDk: '#c48a20',
+    appAccent: '#3b82f6',
+    appAccentDk: '#1e3a8a',
     homeHref: 'app.flockdocs/app.flockdocs.html',
     user: S.user,
     onSignOut: async () => {
