@@ -97,25 +97,8 @@
   <div id="melch-app" hidden>
     <div class="veil-wrap">
 
-      <!-- Topbar -->
-      <header class="veil-top">
-        <a class="veil-brand" href="../" aria-label="Back to FlockOS Launcher">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold,#e8a838)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/>
-            <polyline points="9,12 11,14 15,10"/>
-          </svg>
-          <span class="veil-brand-text">Melchizedek</span>
-        </a>
-        <span class="veil-spacer"></span>
-        <!-- Hamburger — shown on mobile by CSS, hidden on desktop -->
-        <button class="veil-menu veil-action" data-act="menu" aria-label="Open navigation" aria-expanded="false">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </button>
-      </header>
+      <!-- Unity Header -->
+      <header class="unity-header" id="melch-topbar" role="banner"></header>
 
       <!-- Sidebar -->
       <nav id="the-veil-side" class="veil-side" aria-label="Navigation">
@@ -186,28 +169,6 @@
   <script defer src="Scripts/the_true_vine.js"></script>
   <!-- App logic -->
   <script type="module" src="app.melchizedek/melchizedek.js"></script>
-
-  <!-- Hamburger toggle -->
-  <script>
-  (function () {
-    document.addEventListener('click', function (e) {
-      var menuBtn = e.target.closest('[data-act="menu"]');
-      if (menuBtn) {
-        var open = document.body.classList.toggle('veil-side-open');
-        menuBtn.setAttribute('aria-expanded', String(open));
-        return;
-      }
-      // Close sidebar when backdrop (outside sidebar) is clicked
-      if (document.body.classList.contains('veil-side-open') &&
-          !e.target.closest('#the-veil-side') &&
-          !e.target.closest('[data-act="menu"]')) {
-        document.body.classList.remove('veil-side-open');
-        var btn = document.querySelector('[data-act="menu"]');
-        if (btn) btn.setAttribute('aria-expanded', 'false');
-      }
-    });
-  })();
-  </script>
 
   <!-- Pull-to-Refresh -->
   <script>

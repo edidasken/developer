@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('melch-app').hidden = false;
 
     _wireNav();
+    _wireHeader(profile);
     await _loadData();
     _renderView('overview');
     _subscribeChecks();
@@ -99,6 +100,60 @@ function _showBootError(err) {
     </div>`);
 }
 
+/* ── Header ─────────────────────────────────────────────────────────────── */
+const MELCH_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/><polyline points="9,12 11,14 15,10"/></svg>';
+
+function _wireHeader(profile) {
+  const host = document.getElementById('melch-topbar');
+  if (!host) return;
+
+  import('../Scripts/the_unity_header.js').then(({ mountUnityHeader }) => {
+    const ctrl = mountUnityHeader(host, {
+      appId:       'melchizedek',
+      appName:     'Melchizedek',
+      appIconSvg:  MELCH_ICON,
+      appAccent:   '#e8a838',
+      appAccentDk: '#92400e',
+      homeHref:    'app.melchizedek/',
+      user:        profile || null,
+      onSignOut:   async () => {
+        try { await window.Nehemiah?.signOut?.(); } catch (_) {}
+        window.location.replace('app.melchizedek/index.html');
+      },
+      onHamburger: () => {
+        document.body.classList.toggle('veil-side-open');
+      },
+      features: [
+        { id: 'view-overview',     label: 'Overview',     hint: 'Navigate', run: () => _wireNavTo('overview') },
+        { id: 'view-members',      label: 'All Members',  hint: 'Navigate', run: () => _wireNavTo('members') },
+        { id: 'view-pending',      label: 'Pending',      hint: 'Navigate', run: () => _wireNavTo('pending') },
+        { id: 'view-approved',     label: 'Approved',     hint: 'Navigate', run: () => _wireNavTo('approved') },
+        { id: 'view-not-approved', label: 'Not Approved', hint: 'Navigate', run: () => _wireNavTo('not-approved') },
+      ],
+    });
+    setTimeout(() => { try { ctrl?.update?.({ user: profile || null }); } catch (_) {} }, 1200);
+  }).catch(err => console.warn('[Melchizedek] Unity header mount failed:', err));
+
+  // Close sidebar when clicking outside on mobile
+  document.addEventListener('click', (e) => {
+    const side = document.getElementById('the-veil-side');
+    if (side && document.body.classList.contains('veil-side-open') &&
+        !side.contains(e.target) && !e.target.closest('.unity-header')) {
+      document.body.classList.remove('veil-side-open');
+    }
+  });
+}
+
+function _wireNavTo(view) {
+  document.querySelectorAll('[data-melch-view]').forEach(b => {
+    b.classList.toggle('is-active', b.dataset.melchView === view);
+    b.setAttribute('aria-current', b.dataset.melchView === view ? 'page' : 'false');
+  });
+  _currentView = view;
+  _renderView(view);
+  document.body.classList.remove('veil-side-open');
+}
+
 /* ── Navigation ─────────────────────────────────────────────────────────── */
 function _wireNav() {
   document.querySelectorAll('[data-melch-view]').forEach(btn => {
@@ -112,8 +167,6 @@ function _wireNav() {
       _renderView(view);
       // Close mobile sidebar after nav
       document.body.classList.remove('veil-side-open');
-      const menuBtn = document.querySelector('[data-act="menu"]');
-      if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
     });
   });
 }
