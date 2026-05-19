@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Absolute base so all relative URLs resolve to GitHub Pages regardless of embed host -->
+  <base href="https://flock-os.github.io/FlockOS/New_Covenant/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <title>Melchizedek — Background Checks — FlockOS</title>
+
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="Images/icon-melchizedek.svg">
+  <link rel="apple-touch-icon" href="Images/icon-melchizedek.svg">
+  <link rel="manifest" href="app.melchizedek/manifest.json">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Firebase preconnect -->
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+  <link rel="preconnect" href="https://securetoken.googleapis.com">
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com">
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      height: 100dvh; margin: 0; padding: 0;
+      color: var(--ink); overflow: hidden; overscroll-behavior: none;
+    }
+    body { background: var(--bg); }
+    .gp-wrap {
+      display: grid;
+      grid-template-areas: "top top" "side main" "foot foot";
+      grid-template-columns: var(--sidebar-w, 256px) 1fr;
+      grid-template-rows: calc(var(--topbar-h, 60px) + var(--safe-top, 0px)) 1fr auto;
+      height: 100dvh; position: relative;
+    }
+    .gp-topbar  { grid-area: top; }
+    .gp-sidebar { grid-area: side; overflow-y: auto; }
+    .gp-main    { grid-area: main; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+    .gp-footer  { grid-area: foot; }
+    @media (max-width: 860px) {
+      .gp-wrap { grid-template-areas: "top" "main" "foot"; grid-template-columns: 1fr; grid-template-rows: calc(var(--topbar-h, 60px) + var(--safe-top, 0px)) 1fr auto; }
+      .gp-sidebar { display: none; }
+    }
+    #melch-boot {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: var(--bg, #0e1628); gap: 14px;
+    }
+    #melch-boot .boot-label { font: 700 0.72rem/1 var(--font-ui,'Plus Jakarta Sans',sans-serif); letter-spacing:.14em; text-transform:uppercase; color:var(--gold,#d4a843); opacity:0.7; }
+    #melch-boot .boot-sub   { font: 400 0.78rem/1 var(--font-ui,'Plus Jakarta Sans',sans-serif); color:var(--ink-muted,#7a7f96); }
+    #melch-auth-overlay { position:fixed; inset:0; z-index:9000; display:flex; align-items:center; justify-content:center; background:var(--bg,#0e1628); }
+    .melch-auth-card { background:var(--bg-raised,#fff); border-radius:16px; padding:36px 28px; max-width:360px; width:90%; text-align:center; box-shadow:0 4px 32px rgba(0,0,0,.18); }
+    .melch-auth-icon  { font-size:2.4rem; margin-bottom:12px; }
+    .melch-auth-title { font:700 1.1rem/1.3 var(--font-ui,sans-serif); color:var(--ink,#1b264f); margin-bottom:8px; }
+    .melch-auth-msg   { font:400 0.87rem/1.5 var(--font-ui,sans-serif); color:var(--ink-muted,#7a7f96); margin-bottom:20px; }
+  </style>
+</head>
+<body>
+
+  <!-- Boot splash -->
+  <div id="melch-boot">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--gold,#d4a843)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/>
+      <polyline points="9,12 11,14 15,10"/>
+    </svg>
+    <div class="boot-label">Melchizedek</div>
+    <div class="boot-sub">Background Checks</div>
+  </div>
+
+  <!-- Auth error overlay -->
+  <div id="melch-auth-overlay" hidden></div>
+
+  <!-- App root -->
+  <div id="melch-app" hidden>
+    <div class="gp-wrap" id="gp-wrap">
+
+      <header class="gp-topbar nc-topbar" id="gp-topbar">
+        <div class="nc-topbar-brand">
+          <a class="nc-topbar-home" href="index.html" aria-label="Back to FlockOS Launcher">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/>
+              <polyline points="9,12 11,14 15,10"/>
+            </svg>
+          </a>
+          <span class="nc-topbar-title">Melchizedek</span>
+        </div>
+        <div class="nc-topbar-actions" id="melch-topbar-actions"></div>
+      </header>
+
+      <nav class="gp-sidebar nc-sidebar" id="gp-sidebar" aria-label="Navigation">
+        <div class="nc-sidebar-inner">
+          <button class="nc-nav-item is-active" data-melch-view="overview" aria-current="page">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            Overview
+          </button>
+          <button class="nc-nav-item" data-melch-view="members">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            All Members
+          </button>
+          <button class="nc-nav-item" data-melch-view="pending">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            Pending
+          </button>
+          <button class="nc-nav-item" data-melch-view="approved">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/><polyline points="9,12 11,14 15,10"/></svg>
+            Approved
+          </button>
+          <button class="nc-nav-item" data-melch-view="not-approved">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/><line x1="10" y1="10" x2="14" y2="14"/><line x1="14" y1="10" x2="10" y2="14"/></svg>
+            Not Approved
+          </button>
+        </div>
+      </nav>
+
+      <main class="gp-main" id="gp-main" tabindex="-1">
+        <div id="melch-content" style="padding: 24px 20px 48px;">
+          <!-- Populated by melchizedek.js -->
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Firebase config (patched by B-Build per church) -->
+  <script>
+        window.FLOCK_FIREBASE_CONFIG = {
+      apiKey:  'AIzaSyCnIbShg2ra1t4EiP3CffsivwvIK-bNu8M',
+      authDomain:  'flockos-theforest.firebaseapp.com',
+      projectId:  'flockos-theforest',
+      storageBucket:  'flockos-theforest.firebasestorage.app',
+      messagingSenderId:  '476522944133',
+      appId:  '1:476522944133:web:29ad5d19cf5a84c11b7bec',
+      measurementId:  'G-WMGPRHXP0Q',
+    };
+  </script>
+
+  <!-- Firebase compat SDKs -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+
+  <script defer src="Scripts/firm_foundation.js"></script>
+  <script defer src="Scripts/the_upper_room.js"></script>
+
+  <script type="module" src="app.melchizedek/melchizedek.js"></script>
+
+</body>
+</html>

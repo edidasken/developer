@@ -896,3 +896,172 @@ ${song.attributes.ccli_number ? `{ccli: ${song.attributes.ccli_number}}` : ''}
     throw new HttpsError('internal', error.message || 'Import failed');
   }
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MELCHIZEDEK — Checkr Background Check Proxy
+   "And Melchizedek king of Salem brought out bread and wine." — Genesis 14:18
+
+   Security: The Checkr Secret API key is NEVER exposed to the client.
+   This function reads it from Firestore (admin-only), calls Checkr server-side,
+   and stores only metadata (candidateId, invitationSentAt) in Firestore.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+exports.initiateBackgroundCheck = onCall(async (request) => {
+  const { memberId, email, name, packageSlug = 'tasker_standard' } = request.data || {};
+
+  if (!memberId || !email) {
+    throw new HttpsError('invalid-argument', 'memberId and email are required.');
+  }
+
+  // Validate email format
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new HttpsError('invalid-argument', 'Invalid email address.');
+  }
+
+  const db = admin.firestore();
+
+  // ── Read Checkr API key from Firestore (admin-only doc) ─────────────────
+  // Key is stored via Admin → Integrations → Checkr in the church's appConfig.
+  // This path mirrors UpperRoom.setAppConfig: churchId root → appConfig/{key}
+  let apiKey = '';
+  try {
+    const cfgSnap = await db.collection('appConfig').doc('checkr_api_key').get();
+    apiKey = (cfgSnap.exists && cfgSnap.data()?.value) || '';
+  } catch (err) {
+    console.error('[melchizedek] Failed to read Checkr API key:', err);
+  }
+
+  if (!apiKey) {
+    throw new HttpsError('failed-precondition', 'Checkr API key not configured. Go to Admin → Integrations → Checkr to add your key.');
+  }
+
+  const auth = Buffer.from(`${apiKey}:`).toString('base64');
+
+  try {
+    // ── Step 1: Create or find Checkr candidate ──────────────────────────
+    const candidateRes = await fetch('https://api.checkr.com/v1/candidates', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!candidateRes.ok) {
+      const errBody = await candidateRes.text();
+      console.error('[melchizedek] Candidate creation failed:', candidateRes.status, errBody);
+      throw new HttpsError('internal', `Checkr candidate creation failed: ${candidateRes.status}`);
+    }
+
+    const candidate = await candidateRes.json();
+    const candidateId = candidate.id;
+
+    // ── Step 2: Create invitation (sends email to candidate) ─────────────
+    const inviteRes = await fetch('https://api.checkr.com/v1/invitations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        candidate_id: candidateId,
+        package: packageSlug,
+      }),
+    });
+
+    let invitationUrl = '';
+    if (inviteRes.ok) {
+      const inv = await inviteRes.json();
+      invitationUrl = inv.invitation_url || inv.url || '';
+    } else {
+      console.warn('[melchizedek] Invitation creation warning:', inviteRes.status, await inviteRes.text());
+      // Non-fatal — candidate created, email may still be sent via Checkr dashboard
+    }
+
+    // ── Step 3: Record in Firestore backgroundChecks/{memberId} ─────────
+    await db.collection('backgroundChecks').doc(memberId).set({
+      memberId,
+      email,
+      name: name || email,
+      checkrCandidateId: candidateId,
+      status: 'pending',
+      invitationUrl: invitationUrl || '',
+      invitationSentAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    return {
+      ok: true,
+      candidateId,
+      invitationUrl: invitationUrl || '',
+    };
+
+  } catch (err) {
+    if (err instanceof HttpsError) throw err;
+    console.error('[melchizedek] Checkr API error:', err);
+    throw new HttpsError('internal', err.message || 'Background check service error.');
+  }
+});
+
+/* ── Checkr webhook receiver ────────────────────────────────────────────── */
+// When a background check report completes, Checkr sends a webhook.
+// This function updates the member's status in Firestore.
+// Configure this as an HTTPS trigger in Checkr Dashboard:
+//   https://<region>-<project>.cloudfunctions.net/checkrWebhook
+const { onRequest } = require('firebase-functions/v2/https');
+
+exports.checkrWebhook = onRequest(async (req, res) => {
+  if (req.method !== 'POST') {
+    res.status(405).send('Method Not Allowed');
+    return;
+  }
+
+  const event = req.body;
+  const type  = event?.type;
+
+  if (type !== 'report.completed' && type !== 'report.updated') {
+    res.status(200).send('ok');
+    return;
+  }
+
+  const report     = event?.data?.object;
+  const reportId   = report?.id;
+  const candidateId = report?.candidate_id;
+  const result     = report?.result; // 'clear' | 'consider' | 'suspended'
+
+  if (!reportId || !candidateId || !result) {
+    res.status(200).send('ok');
+    return;
+  }
+
+  const db = admin.firestore();
+
+  try {
+    // Find the backgroundChecks doc by candidateId
+    const snap = await db.collection('backgroundChecks')
+      .where('checkrCandidateId', '==', candidateId)
+      .limit(1)
+      .get();
+
+    if (snap.empty) {
+      console.warn('[melchizedek/webhook] No backgroundChecks doc for candidateId', candidateId);
+      res.status(200).send('ok');
+      return;
+    }
+
+    const docRef = snap.docs[0].ref;
+    await docRef.set({
+      status: result,           // 'clear' → APPROVED, 'consider' → NOT APPROVED
+      checkrReportId: reportId,
+      reportResult: result,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    console.log(`[melchizedek/webhook] Updated ${docRef.id}: status=${result}`);
+  } catch (err) {
+    console.error('[melchizedek/webhook] Error updating Firestore:', err);
+  }
+
+  res.status(200).send('ok');
+});

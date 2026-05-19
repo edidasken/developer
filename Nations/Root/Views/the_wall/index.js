@@ -53,6 +53,7 @@ const SECTIONS = [
         { type: 'missions-source', id: 'ms-src-flock', label: 'Flock Network Status', desc: 'Core Flock platform connectivity', url: 'https://www.yhwh.one' },
         { label: 'Joshua Project API', type: 'jp-api' },
         { label: 'api.bible',           type: 'bible-api' },
+        { label: 'Checkr',              type: 'checkr-api' },
         { type: 'missions-sources-heading' },
         { type: 'missions-source', id: 'ms-src-jp',  label: 'Joshua Project',       desc: 'Unreached people groups & country profiles', url: 'https://joshuaproject.net' },
         { type: 'missions-source', id: 'ms-src-od',  label: 'Open Doors USA',        desc: 'World Watch List · Persecution data',          url: 'https://www.opendoorsusa.org' },
@@ -188,6 +189,7 @@ export function mount(root) {
       btn.addEventListener('click', () => {
         _loadJpStatus(root);
         _loadBibleApiStatus(root);
+        _loadCheckrStatus(root);
         _pollMissionsSources(root);
       });
     }
@@ -891,6 +893,11 @@ function _wireIntegrationsPanel(root) {
       const key = input?.value.trim();
       if (key) await _saveAndTestBibleApiKey(root, key);
     }
+    if (btn.dataset.act === 'checkr-save') {
+      const input = panel.querySelector('[data-bind="checkr-key-input"]');
+      const key = input?.value.trim();
+      if (key) await _saveCheckrKey(root, key);
+    }
     if (btn.dataset.act === 'vapid-save') {
       const input = panel.querySelector('[data-bind="vapid-key-input"]');
       const key = input?.value.trim();
@@ -901,6 +908,7 @@ function _wireIntegrationsPanel(root) {
   _loadJpStatus(root);
   _loadBibleApiStatus(root);
   _loadVapidStatus(root);
+  _loadCheckrStatus(root);
   _pollMissionsSources(root);
 }
 
@@ -952,6 +960,65 @@ function _setVapidBadge(badge, state) {
     ok:           { status: 'ok',    text: 'Key set'        },
     'not-set':    { status: 'warn',  text: 'Not configured' },
     'save-error': { status: 'warn',  text: 'Save failed'   },
+  };
+  const { status, text } = map[state] || map['not-set'];
+  badge.className = `wall-status-badge wall-status--${status}`;
+  badge.textContent = text;
+}
+
+/* ── Checkr API key ─────────────────────────────────────────────────────── */
+
+const CHECKR_CONFIG_KEY = 'checkr_api_key';
+
+async function _loadCheckrStatus(root) {
+  const badge = root.querySelector('[data-bind="checkr-status"]');
+  const input = root.querySelector('[data-bind="checkr-key-input"]');
+  if (!badge) return;
+  _setCheckrBadge(badge, 'checking');
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR) { _setCheckrBadge(badge, 'not-set'); return; }
+  try {
+    const cfg = await UR.getAppConfig({ key: CHECKR_CONFIG_KEY });
+    if (cfg && cfg.value) {
+      if (input) input.placeholder = '••••••••  (key saved — paste new to replace)';
+      _setCheckrBadge(badge, 'ok');
+    } else {
+      _setCheckrBadge(badge, 'not-set');
+    }
+  } catch (err) {
+    console.warn('[wall/checkr] load failed', err);
+    _setCheckrBadge(badge, 'not-set');
+  }
+}
+
+async function _saveCheckrKey(root, key) {
+  const badge = root.querySelector('[data-bind="checkr-status"]');
+  const input = root.querySelector('[data-bind="checkr-key-input"]');
+  if (!badge) return;
+  _setCheckrBadge(badge, 'saving');
+  const UR = await _waitForUpperRoom(10000);
+  if (!UR) { _setCheckrBadge(badge, 'not-set'); return; }
+  try {
+    await UR.setAppConfig({ key: CHECKR_CONFIG_KEY, value: key, category: 'integrations',
+      description: 'Checkr Secret API key — api.checkr.com' });
+    if (input) {
+      input.value = '';
+      input.placeholder = '••••••••  (key saved — paste new to replace)';
+    }
+    _setCheckrBadge(badge, 'ok');
+  } catch (err) {
+    console.warn('[wall/checkr] save failed', err);
+    _setCheckrBadge(badge, 'save-error');
+  }
+}
+
+function _setCheckrBadge(badge, state) {
+  const map = {
+    checking:     { status: 'muted', text: 'Checking…'     },
+    saving:       { status: 'muted', text: 'Saving…'       },
+    ok:           { status: 'ok',    text: 'Key saved'      },
+    'not-set':    { status: 'warn',  text: 'Not configured' },
+    'save-error': { status: 'error', text: 'Save failed'    },
   };
   const { status, text } = map[state] || map['not-set'];
   badge.className = `wall-status-badge wall-status--${status}`;
@@ -3251,6 +3318,24 @@ function _settingRow(s) {
             target="_blank" rel="noopener noreferrer"
             style="font-size:.75rem;color:var(--accent,#4a7fa5);text-decoration:none"
             >Firebase Console → Cloud Messaging → Web Push certificates ↗</a>
+        </div>
+      </div>`;
+  }
+  if (s.type === 'checkr-api') {
+    return /* html */`
+      <div class="wall-setting-row" style="align-items:flex-start;gap:12px">
+        <div class="wall-setting-label" style="padding-top:6px">Checkr Background Checks</div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+          <span class="wall-status-badge wall-status--muted" data-bind="checkr-status">Loading…</span>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+            <input type="password" class="wall-jp-key-input" data-bind="checkr-key-input"
+              placeholder="Paste Checkr Secret API key…"
+              autocomplete="off" spellcheck="false"
+              style="font-size:.82rem;padding:5px 8px;border:1px solid var(--line,#e5e7ef);border-radius:6px;width:260px;background:var(--bg-raised,#fff);color:var(--ink,#1b264f)" />
+            <button class="flock-btn flock-btn--primary flock-btn--sm" data-act="checkr-save" type="button">Save</button>
+          </div>
+          <a href="https://dashboard.checkr.com/account/developer_settings" target="_blank" rel="noopener noreferrer"
+            style="font-size:.75rem;color:var(--accent,#4a7fa5);text-decoration:none">Get your key at Checkr Dashboard ↗</a>
         </div>
       </div>`;
   }

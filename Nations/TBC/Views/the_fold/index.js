@@ -111,6 +111,7 @@ export function mount(root) {
 
 let _personMap = {};
 let _activeFoldSheet = null;
+let _bgCheckMap = {}; // memberId → { status } — populated from backgroundChecks collection
 
 // ── Touch logging ─────────────────────────────────────────────────────────────
 // Fire-and-forget — never blocks UI or raises visible errors.
@@ -247,6 +248,11 @@ async function _loadMembers(root) {
     grid.innerHTML = sorted.map(_liveCard).join('');
     if (stats) stats.innerHTML = _liveStats(rows);
     _wireCards(grid, root);
+    // Load background check statuses (non-blocking — re-renders cards with badges when ready)
+    _loadBgChecks().then(() => {
+      grid.innerHTML = sorted.map(_liveCard).join('');
+      _wireCards(grid, root);
+    }).catch(() => {});
   } catch (err) {
     console.error('[TheFold] members.list error:', err);
     grid.innerHTML = '<div class="life-empty">Could not load members right now.</div>';
@@ -258,6 +264,16 @@ function _rows(res) {
   if (res && Array.isArray(res.rows)) return res.rows;
   if (res && Array.isArray(res.data)) return res.data;
   return [];
+}
+
+async function _loadBgChecks() {
+  const db = window.firebase?.firestore?.();
+  if (!db) return;
+  try {
+    const snap = await db.collection('backgroundChecks').get();
+    _bgCheckMap = {};
+    snap.docs.forEach(d => { _bgCheckMap[d.id] = d.data(); });
+  } catch (_) {}
 }
 
 const _AVATAR_COLORS = ['#7c3aed','#0ea5e9','#059669','#c05818','#db2777','#6366f1','#0891b2','#b45309','#be185d','#4f46e5'];
@@ -274,6 +290,14 @@ function _liveCard(p) {
   const email    = (p.email || p.primaryEmail || '').trim();
   const phoneRaw = (p.phone || p.primaryPhone || p.mobilePhone || '').trim();
   const phoneTel = phoneRaw.replace(/[^\d+]/g, '');
+  const bgCheck  = _bgCheckMap[uid] || null;
+  const bgBadge  = bgCheck?.status === 'clear'
+    ? `<span class="wall-status-badge wall-status--ok" style="font-size:.66rem;padding:2px 7px">APPROVED</span>`
+    : bgCheck?.status === 'consider'
+      ? `<span class="wall-status-badge wall-status--error" style="font-size:.66rem;padding:2px 7px">NOT APPROVED</span>`
+      : bgCheck?.status === 'pending'
+        ? `<span class="wall-status-badge wall-status--warn" style="font-size:.66rem;padding:2px 7px">BG PENDING</span>`
+        : '';
   return `
     <article class="fold-card" role="listitem" tabindex="0"
              data-name="${_e(name.toLowerCase())}" data-role="${_e(role)}" data-id="${_e(uid)}">
@@ -283,6 +307,7 @@ function _liveCard(p) {
         <div class="fold-meta">
           <span class="fold-role-badge fold-role-${_e(role)}">${_e(role)}</span>
           ${yr ? `<span class="fold-joined">Since ${yr}</span>` : ''}
+          ${bgBadge}
         </div>
       </div>
       ${(phoneTel || email) ? `

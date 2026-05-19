@@ -288,6 +288,7 @@
     .app-btn--feed       { border-color: rgba(232,168,56,0.20); }
     .app-btn--news       { border-color: rgba(232,168,56,0.20); }
     .app-btn--wellspring { border-color: rgba(34,197,94,0.20);  }
+    .app-btn--melchizedek { border-color: rgba(74,127,165,0.20); }
     .app-btn:hover.app-btn--grow       { border-color: rgba(232,168,56,0.50); }
     .app-btn:hover.app-btn--invite     { border-color: rgba(61,179,79,0.50);  }
     .app-btn:hover.app-btn--flock      { border-color: rgba(91,141,238,0.50); }
@@ -299,6 +300,7 @@
     .app-btn:hover.app-btn--feed       { border-color: rgba(232,168,56,0.50); }
     .app-btn:hover.app-btn--news       { border-color: rgba(232,168,56,0.50); }
     .app-btn:hover.app-btn--wellspring { border-color: rgba(34,197,94,0.50);  }
+    .app-btn:hover.app-btn--melchizedek { border-color: rgba(74,127,165,0.50); }
 
     .app-icon {
       width: 48px; height: 48px;
@@ -317,7 +319,8 @@
     .app-icon--shamar     { background: linear-gradient(135deg,#a16207,#fbbf24); }
     .app-icon--feed       { background: linear-gradient(135deg,#c48a20,#e8a838); }
     .app-icon--news       { background: linear-gradient(135deg,#0f1735,#1b264f); }
-    .app-icon--wellspring { background: linear-gradient(135deg,#15803d,#22c55e); }
+    .app-icon--wellspring   { background: linear-gradient(135deg,#15803d,#22c55e); }
+    .app-icon--melchizedek { background: linear-gradient(135deg,#1e3a8a,#4a7fa5); }
     .app-label { flex: 1; }
     .app-label strong {
       display: block;
@@ -335,7 +338,8 @@
     .app-btn--docs       .app-label strong { color: #a0beff; }
     .app-btn--shamar     .app-label strong { color: #fde68a; }
     .app-btn--feed       .app-label strong { color: var(--gold); }
-    .app-btn--wellspring .app-label strong { color: #86efac; }
+    .app-btn--wellspring   .app-label strong { color: #86efac; }
+    .app-btn--melchizedek .app-label strong { color: #93c5fd; }
     .app-label span {
       display: block;
       font-size: 0.77rem;
@@ -796,6 +800,17 @@
             <div class="app-label">
               <strong>The Wellspring</strong>
               <span>Offline data &amp; local database</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
+          <a class="app-btn app-btn--melchizedek" href="app.melchizedek/app.melchizedek.html">
+            <div class="app-icon app-icon--melchizedek" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/><polyline points="9,12 11,14 15,10"/></svg>
+            </div>
+            <div class="app-label">
+              <strong>Melchizedek</strong>
+              <span>Background checks — powered by Checkr</span>
             </div>
             <span class="app-arrow" aria-hidden="true">&#8594;</span>
           </a>
