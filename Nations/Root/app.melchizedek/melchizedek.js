@@ -371,7 +371,7 @@ function _viewAbout() {
     <div style="margin-top:14px;font:400 0.95rem/1.6 var(--font-ui,sans-serif);color:#8892b0">
       <strong style="color:#e8a838">Why this name?</strong> Melchizedek appeared without a recorded past,
       vouched for by God alone — a priest whose legitimacy required no human credentials, only righteousness.
-      This module applies that same principle to those who serve Little Flock: every worker's
+      This module applies that same principle to those who serve the Little Flock: every worker's
       fitness to serve is verified through objective, documented evidence, not assumption.
     </div>
   </div>
