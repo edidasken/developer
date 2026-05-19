@@ -1,0 +1,719 @@
+/* FlockShamar Google Keep Feature Styles */
+
+/* Note Cards */
+.fs-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.fs-note-card {
+  background: #202124;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.fs-note-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.fs-note-card.pinned {
+  border-top: 3px solid #fbbf24;
+}
+
+.fs-note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.fs-note-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  flex: 1;
+}
+
+.fs-note-pin {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0.3;
+  padding: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.fs-note-card:hover .fs-note-pin {
+  opacity: 0.7;
+}
+
+.fs-note-pin.pinned {
+  opacity: 1;
+}
+
+.fs-note-content {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  word-wrap: break-word;
+}
+
+/* List Notes */
+.fs-note-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+}
+
+.fs-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+}
+
+.fs-list-item input[type="checkbox"] {
+  margin-top: 3px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.fs-list-item span.checked {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* Image Notes */
+.fs-note-image {
+  width: 100%;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Audio Notes */
+.fs-note-card audio {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+/* Drawing Notes */
+.fs-note-drawing {
+  width: 100%;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  background: white;
+}
+
+/* Labels */
+.fs-note-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.fs-label-chip {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 11px;
+  color: #60a5fa;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fs-label-chip:hover {
+  background: rgba(59, 130, 246, 0.3);
+}
+
+/* Reminders */
+.fs-note-reminders {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.fs-reminder-chip {
+  background: rgba(251, 191, 36, 0.2);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: #fbbf24;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Note Footer */
+.fs-note-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.fs-note-card:hover .fs-note-footer {
+  opacity: 1;
+}
+
+.fs-note-footer button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background 0.15s ease;
+}
+
+.fs-note-footer button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Color Picker Menu */
+.fs-color-picker-menu {
+  position: fixed;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  z-index: 1000;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.fs-color-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.fs-color-btn:hover {
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Note Input Area */
+.fs-note-input-area {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 24px auto;
+  max-width: 600px;
+  cursor: text;
+  transition: all 0.2s ease;
+}
+
+.fs-note-input-area.expanded {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+#fs-note-title-input {
+  display: none;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  outline: none;
+}
+
+#fs-note-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  padding: 8px 0;
+  outline: none;
+  resize: none;
+  min-height: 40px;
+}
+
+#fs-note-input-actions {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.fs-note-type-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.fs-note-type-btns button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s ease;
+}
+
+.fs-note-type-btns button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Sections */
+.fs-notes-section {
+  margin-bottom: 32px;
+}
+
+.fs-notes-section h2 {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  padding: 0 16px;
+}
+
+/* Drawing Modal */
+.fs-drawing-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.fs-drawing-container {
+  background: #1e293b;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.fs-drawing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.fs-drawing-header h3 {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+.fs-drawing-header button {
+  background: #3b82f6;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#fs-drawing-canvas {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  background: #202124;
+  cursor: crosshair;
+  display: block;
+}
+
+.fs-drawing-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fs-drawing-toolbar button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fs-drawing-toolbar button:hover,
+.fs-drawing-toolbar button.active {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: #3b82f6;
+}
+
+#fs-pen-color {
+  width: 40px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#fs-pen-width {
+  width: 100px;
+}
+
+/* Recording Indicator */
+.fs-recording-indicator {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Sidebar Panel */
+.fs-sidebar-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 320px;
+  background: #1e293b;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(0);
+  transition: transform 0.3s ease;
+}
+
+.fs-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fs-sidebar-header h3 {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-size: 18px;
+}
+
+.fs-sidebar-header button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: all 0.15s ease;
+}
+
+.fs-sidebar-header button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.fs-sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.fs-sidebar-note {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fs-sidebar-note:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-4px);
+}
+
+.fs-sidebar-note-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 4px;
+}
+
+.fs-sidebar-note-preview {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fs-sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fs-sidebar-footer button {
+  width: 100%;
+  background: #3b82f6;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.fs-sidebar-footer button:hover {
+  background: #2563eb;
+}
+
+/* Search Bar */
+#fs-search-input {
+  width: 100%;
+  max-width: 600px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 12px 20px;
+  font-size: 14px;
+  margin: 16px auto;
+  display: block;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+#fs-search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Labels Sidebar */
+.fs-labels-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fs-label-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fs-label-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.fs-label-item.active {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+/* Empty State */
+.fs-empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.fs-empty-state-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.fs-empty-state h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.fs-empty-state p {
+  font-size: 14px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fs-note-card {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .fs-notes-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .fs-sidebar-panel {
+    width: 100%;
+  }
+
+  .fs-note-input-area {
+    margin: 16px 12px;
+  }
+}
+
+/* Archive View */
+.fs-archive-view {
+  padding: 16px;
+}
+
+.fs-archive-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 0 16px;
+}
+
+.fs-archive-header h2 {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+.fs-archive-header button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fs-archive-header button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Shared Notes Indicator */
+.fs-note-card.shared::after {
+  content: '👥';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 16px;
+  opacity: 0.6;
+}
+
+/* Loading State */
+.fs-loading {
+  text-align: center;
+  padding: 40px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.fs-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Notification Toast */
+.fs-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 12px 20px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  z-index: 3000;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

@@ -1,0 +1,233 @@
+<!-- FlockDocs Rich Text Editor Toolbar - Google Docs Features -->
+<!-- This file contains the comprehensive toolbar HTML to be inserted into app.flockdocs.html -->
+
+<!-- Flash prevention: apply saved FlockOS theme before first paint -->
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('flock_theme') || 'america';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (_) {
+      document.documentElement.setAttribute('data-theme', 'america');
+    }
+  })();
+</script>
+
+        <!-- Main Toolbar -->
+        <div class="fd-editor-toolbar">
+          <button class="fd-toolbar-btn" data-action="back" title="Back to library">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+          </button>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Font Family -->
+          <select class="fd-toolbar-select" id="fd-font-select" title="Font">
+            <option value="Arial">Arial</option>
+            <option value="Calibri">Calibri</option>
+            <option value="Comic Sans MS">Comic Sans MS</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Helvetica">Helvetica</option>
+            <option value="Impact">Impact</option>
+            <option value="Roboto">Roboto</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Trebuchet MS">Trebuchet MS</option>
+            <option value="Verdana">Verdana</option>
+          </select>
+
+          <!-- Font Size -->
+          <select class="fd-toolbar-select fd-toolbar-select--small" id="fd-font-size-select" title="Font size">
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="14">14</option>
+            <option value="16" selected>16</option>
+            <option value="18">18</option>
+            <option value="20">20</option>
+            <option value="24">24</option>
+            <option value="30">30</option>
+            <option value="36">36</option>
+            <option value="48">48</option>
+            <option value="60">60</option>
+            <option value="72">72</option>
+            <option value="96">96</option>
+          </select>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Text Style -->
+          <button class="fd-toolbar-btn" data-format="bold" title="Bold (Ctrl+B)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>
+            </svg>
+          </button>
+
+          <button class="fd-toolbar-btn" data-format="italic" title="Italic (Ctrl+I)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/>
+            </svg>
+          </button>
+
+          <button class="fd-toolbar-btn" data-format="underline" title="Underline (Ctrl+U)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/>
+            </svg>
+          </button>
+
+          <!-- Text Color -->
+          <div class="fd-color-picker-wrap">
+            <button class="fd-toolbar-btn fd-color-btn" id="fd-text-color-btn" title="Text color">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11 3L5.5 17h2.25l1.12-3h6.25l1.12 3h2.25L13 3h-2zm-1.38 9L12 5.67 14.38 12H9.62z"/>
+                <rect id="fd-text-color-bar" x="3" y="20" width="18" height="3" fill="#000000"/>
+              </svg>
+            </button>
+            <input type="color" class="fd-color-input" id="fd-text-color-input" value="#000000">
+          </div>
+
+          <!-- Highlight Color -->
+          <div class="fd-color-picker-wrap">
+            <button class="fd-toolbar-btn fd-color-btn" id="fd-highlight-btn" title="Highlight color">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.75 7L14 3.25l-10 10V17h3.75l10-10zm2.96-2.96c.39-.39.39-1.02 0-1.41L18.37.29c-.39-.39-1.02-.39-1.41 0L15 2.25 18.75 6l1.96-1.96z"/>
+                <rect id="fd-highlight-color-bar" x="0" y="18" width="24" height="6" fill="#ffff00"/>
+              </svg>
+            </button>
+            <input type="color" class="fd-color-input" id="fd-highlight-color-input" value="#ffff00">
+          </div>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Paragraph Style -->
+          <select class="fd-toolbar-select" id="fd-format-select" title="Paragraph style">
+            <option value="p">Normal text</option>
+            <option value="h1">Heading 1</option>
+            <option value="h2">Heading 2</option>
+            <option value="h3">Heading 3</option>
+            <option value="h4">Heading 4</option>
+            <option value="h5">Heading 5</option>
+            <option value="h6">Heading 6</option>
+            <option value="blockquote">Quote</option>
+            <option value="pre">Code block</option>
+          </select>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Lists -->
+          <button class="fd-toolbar-btn" data-format="insertUnorderedList" title="Bulleted list">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <circle cx="4" cy="7" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="4" cy="17" r="2"/>
+              <path d="M7 6h14v2H7V6zm0 5h14v2H7v-2zm0 5h14v2H7v-2z"/>
+            </svg>
+          </button>
+
+          <button class="fd-toolbar-btn" data-format="insertOrderedList" title="Numbered list">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/>
+            </svg>
+          </button>
+
+          <!-- Checklist -->
+          <button class="fd-toolbar-btn" id="fd-checklist-btn" title="Checklist">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M22 5.18L10.59 16.6l-4.24-4.24 1.41-1.41 2.83 2.83 10-10L22 5.18zM12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8c1.57 0 3.04.46 4.28 1.25l1.45-1.45C16.1 2.67 14.13 2 12 2 6.48 2 2 6.48 2 12s4.48 10 10 10c1.73 0 3.36-.44 4.78-1.22l-1.5-1.5c-1 .46-2.11.72-3.28.72z"/>
+            </svg>
+          </button>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Indent -->
+          <button class="fd-toolbar-btn" data-format="outdent" title="Decrease indent">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M11 17h10v-2H11v2zm-8-5l4 4V8l-4 4zm0 9h18v-2H3v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/>
+            </svg>
+          </button>
+
+          <button class="fd-toolbar-btn" data-format="indent" title="Increase indent">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 9h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/>
+            </svg>
+          </button>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Alignment -->
+          <button class="fd-toolbar-btn" data-format="justifyLeft" title="Align left (Ctrl+Shift+L)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 3h18v2H3V3zm0 8h12v2H3v-2zm0 8h18v2H3v-2zm0-4h12v2H3v-2zm0-8h18v2H3V7z"/>
+            </svg>
+          </button>
+
+          <button class="fd-toolbar-btn" data-format="justifyCenter" title="Align center (Ctrl+Shift+E)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 3h18v2H3V3zm4 8h10v2H7v-2zm-4 8h18v2H3v-2zm4-4h10v2H7v-2zm-4-8h18v2H3V7z"/>
+            </svg>
+          </button>
+
+          <button class="fd-toolbar-btn" data-format="justifyRight" title="Align right (Ctrl+Shift+R)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 3h18v2H3V3zm6 8h12v2H9v-2zm-6 8h18v2H3v-2zm6-4h12v2H9v-2zm-6-8h18v2H3V7z"/>
+            </svg>
+          </button>
+
+          <button class="fd-toolbar-btn" data-format="justifyFull" title="Justify">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 3h18v2H3V3zm0 8h18v2H3v-2zm0 8h18v2H3v-2zm0-4h18v2H3v-2zm0-8h18v2H3V7z"/>
+            </svg>
+          </button>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Line Spacing -->
+          <button class="fd-toolbar-btn" id="fd-line-spacing-btn" title="Line & paragraph spacing">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6 7h2.5L5 3.5 1.5 7H4v10H1.5L5 20.5 8.5 17H6V7zm4-2v2h12V5H10zm0 14h12v-2H10v2zm0-6h12v-2H10v2z"/>
+            </svg>
+          </button>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Insert Link -->
+          <button class="fd-toolbar-btn" id="fd-link-btn" title="Insert link (Ctrl+K)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+            </svg>
+          </button>
+
+          <!-- Insert Image -->
+          <button class="fd-toolbar-btn" id="fd-image-btn" title="Insert image">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+            </svg>
+          </button>
+
+          <!-- Insert Table -->
+          <button class="fd-toolbar-btn" id="fd-table-btn" title="Insert table">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 10.02h5V21h-5zM17 21h3c1.1 0 2-.9 2-2v-9h-5v11zm3-18H5c-1.1 0-2 .9-2 2v3h19V5c0-1.1-.9-2-2-2zM3 19c0 1.1.9 2 2 2h3V10.02H3V19z"/>
+            </svg>
+          </button>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- More Tools -->
+          <button class="fd-toolbar-btn" id="fd-more-btn" title="More options">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+          </button>
+
+          <div class="fd-spacer"></div>
+
+          <!-- Auto-save status -->
+          <span id="fd-save-status" class="fd-save-status">Saved</span>
+
+          <!-- Comments / Share -->
+          <button class="fd-btn fd-btn--ghost" id="fd-comments-btn" title="Comments">💬</button>
+          <button class="fd-btn fd-btn--primary" id="fd-share-doc-btn">Share</button>
+        </div>

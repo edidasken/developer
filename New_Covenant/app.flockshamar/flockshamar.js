@@ -1,0 +1,756 @@
+/**
+ * FlockShamar - Keep & Guard Your Notes
+ * "The Lord bless you and keep you" - Numbers 6:24
+ * 
+ * A Google Keep-style note-taking app for FlockOS
+ */
+
+import { mountUnityHeader } from '../Scripts/the_unity_header.js';
+
+(function() {
+  'use strict';
+  
+  // State
+  const S = {
+    notes: [],
+    currentNote: null,
+    currentView: 'notes',
+    user: null,
+    db: null,
+    isExpanded: false,
+    searchQuery: '',
+    colorPickerTarget: null,
+  };
+  
+  // Initialize
+  async function init() {
+    console.log('[FlockShamar] Initializing...');
+    
+    // Wait for auth to be ready
+    await _waitForReady();
+    
+    // Initialize Firebase
+    try {
+      if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
+        // Firebase config loaded by firm_foundation.js
+        firebase.initializeApp(window.FIREBASE_CONFIG || {});
+      }
+      S.db = firebase.firestore();
+      
+      // Auth state
+      firebase.auth().onAuthStateChanged(async (user) => {
+        if (user) {
+          S.user = user;
+          console.log('[FlockShamar] User authenticated:', user.uid);
+          await loadNotes();
+        } else {
+          // Development mode - use localStorage
+          S.user = { uid: 'dev-user', displayName: 'Dev User', email: 'dev@flockos.church' };
+          console.log('[FlockShamar] Development mode - using localStorage');
+          loadNotesFromLocalStorage();
+        }
+        render();
+        checkDeepLink(); // Open deep-linked note if present in URL
+      });
+    } catch (err) {
+      console.warn('[FlockShamar] Firebase init failed, using localStorage:', err);
+      S.user = { uid: 'dev-user', displayName: 'Dev User', email: 'dev@flockos.church' };
+      loadNotesFromLocalStorage();
+      render();
+      checkDeepLink(); // Open deep-linked note if present in URL
+    }
+    
+    // Mount Unity Header
+    if (typeof mountUnityHeader === 'function') {
+      mountUnityHeader(document.getElementById('fs-topbar'), {
+        appId: 'flockshamar',
+        appName: 'FlockShamar',
+        appIconSvg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H3v9h18v-9h-6M7 21V8h10v13"/><rect x="9" y="3" width="6" height="5" rx="1"/></svg>',
+        appAccent: '#fbbf24',
+        appAccentDk: '#a16207',
+        homeHref: 'app.flockshamar/app.flockshamar.html',
+        onHamburger: () => {
+          const sidebar = document.getElementById('fs-sidebar');
+          if (sidebar) {
+            sidebar.classList.toggle('show');
+          }
+        }
+      });
+    }
+    
+    // Event Listeners
+    setupEventListeners();
+  }
+  
+  // Wait for Nehemiah auth to be ready
+  function _waitForReady() {
+    return new Promise((resolve, reject) => {
+      let attempts = 0;
+      const maxAttempts = 50; // 5 seconds max
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      
+      const checkReady = () => {
+        attempts++;
+        
+        if (typeof firebase !== 'undefined' && typeof Nehemiah !== 'undefined') {
+          // Nehemiah loaded - check if authenticated
+          if (Nehemiah.isAuthenticated()) {
+            resolve();
+          } else if (!isLocalhost) {
+            // Not authenticated in DEPLOYED environment - redirect to login
+            console.warn('[FlockShamar] User not authenticated, redirecting to login');
+            window.location.replace('app.flockshamar/index.html');
+            reject(new Error('Not authenticated'));
+          } else {
+            // Localhost - warn but don't redirect (for development)
+            console.warn('[FlockShamar] User not authenticated (localhost - allowing for development)');
+            resolve();
+          }
+        } else if (attempts >= maxAttempts) {
+          // Timeout
+          if (!isLocalhost) {
+            console.error('[FlockShamar] Timeout waiting for auth, redirecting to login');
+            window.location.replace('app.flockshamar/index.html');
+            reject(new Error('Timeout'));
+          } else {
+            console.warn('[FlockShamar] Timeout waiting for auth (localhost - continuing anyway)');
+            resolve();
+          }
+        } else {
+          setTimeout(checkReady, 100);
+        }
+      };
+      checkReady();
+    });
+  }
+  
+  function setupEventListeners() {
+    // Quick add note
+    const quickAdd = document.getElementById('fs-quick-add');
+    const quickNote = document.getElementById('fs-quick-note');
+    const quickTitle = document.getElementById('fs-quick-title');
+    
+    quickNote.addEventListener('focus', () => {
+      quickAdd.classList.add('expanded');
+      S.isExpanded = true;
+    });
+    
+    quickNote.addEventListener('input', autoResizeTextarea);
+    
+    document.getElementById('fs-btn-close').addEventListener('click', () => {
+      saveQuickNote();
+      quickAdd.classList.remove('expanded');
+      S.isExpanded = false;
+      quickNote.value = '';
+      quickTitle.value = '';
+    });
+    
+    // Close quick add when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!quickAdd.contains(e.target) && S.isExpanded) {
+        saveQuickNote();
+        quickAdd.classList.remove('expanded');
+        S.isExpanded = false;
+        quickNote.value = '';
+        quickTitle.value = '';
+      }
+    });
+    
+    // Quick add color picker
+    document.getElementById('fs-btn-color').addEventListener('click', (e) => {
+      e.stopPropagation();
+      S.colorPickerTarget = 'quick-add';
+      showColorPicker(e.target);
+    });
+    
+    // Color picker options
+    document.querySelectorAll('.fs-color-option').forEach(option => {
+      option.addEventListener('click', (e) => {
+        const color = e.target.dataset.color;
+        if (S.colorPickerTarget === 'quick-add') {
+          quickAdd.style.background = getColorValue(color);
+        } else if (S.currentNote) {
+          S.currentNote.color = color;
+          saveNote(S.currentNote);
+          render();
+        }
+        hideColorPicker();
+      });
+    });
+    
+    // Search
+    document.getElementById('fs-search').addEventListener('input', (e) => {
+      S.searchQuery = e.target.value.toLowerCase();
+      render();
+    });
+    
+    // Sidebar navigation
+    document.querySelectorAll('.fs-sidebar-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.fs-sidebar-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        S.currentView = item.dataset.view;
+        render();
+      });
+    });
+    
+    // Edit modal
+    document.getElementById('fs-edit-btn-close').addEventListener('click', () => {
+      if (S.currentNote) {
+        S.currentNote.title = document.getElementById('fs-edit-title').value;
+        S.currentNote.content = document.getElementById('fs-edit-content').value;
+        S.currentNote.updatedAt = new Date();
+        saveNote(S.currentNote);
+        S.currentNote = null;
+        hideEditModal();
+      }
+    });
+    
+    document.getElementById('fs-edit-btn-pin').addEventListener('click', () => {
+      if (S.currentNote) {
+        S.currentNote.pinned = !S.currentNote.pinned;
+        saveNote(S.currentNote);
+        render();
+      }
+    });
+    
+    document.getElementById('fs-edit-btn-archive').addEventListener('click', () => {
+      if (S.currentNote) {
+        S.currentNote.archived = !S.currentNote.archived;
+        saveNote(S.currentNote);
+        S.currentNote = null;
+        hideEditModal();
+      }
+    });
+    
+    document.getElementById('fs-edit-btn-delete').addEventListener('click', async () => {
+      if (S.currentNote) {
+        if (S.currentNote.deleted) {
+          // Permanently delete
+          if (confirm('Permanently delete this note? This cannot be undone.')) {
+            await deleteNotePermanently(S.currentNote.id);
+            S.currentNote = null;
+            hideEditModal();
+          }
+        } else {
+          // Move to trash
+          S.currentNote.deleted = true;
+          S.currentNote.deletedAt = new Date();
+          saveNote(S.currentNote);
+          S.currentNote = null;
+          hideEditModal();
+        }
+      }
+    });
+    
+    document.getElementById('fs-edit-btn-color').addEventListener('click', (e) => {
+      e.stopPropagation();
+      S.colorPickerTarget = 'edit-modal';
+      showColorPicker(e.target);
+    });
+    
+    // Close modal when clicking outside
+    document.getElementById('fs-edit-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'fs-edit-modal') {
+        if (S.currentNote) {
+          S.currentNote.title = document.getElementById('fs-edit-title').value;
+          S.currentNote.content = document.getElementById('fs-edit-content').value;
+          S.currentNote.updatedAt = new Date();
+          saveNote(S.currentNote);
+          S.currentNote = null;
+          hideEditModal();
+        }
+      }
+    });
+  }
+  
+  // Save quick note
+  function saveQuickNote() {
+    const title = document.getElementById('fs-quick-title').value.trim();
+    const content = document.getElementById('fs-quick-note').value.trim();
+    
+    if (!title && !content) return;
+    
+    const note = {
+      id: generateId(),
+      title,
+      content,
+      type: 'text',
+      color: 'default',
+      pinned: false,
+      archived: false,
+      deleted: false,
+      labels: [],
+      checklist: [],
+      ownerId: S.user.uid,
+      ownerName: S.user.displayName || S.user.email,
+      shared: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    S.notes.unshift(note);
+    saveNote(note);
+  }
+  
+  // Save note to storage
+  async function saveNote(note) {
+    if (S.db && S.user.uid !== 'dev-user') {
+      try {
+        await S.db.collection('notes').doc(note.id).set({
+          ...note,
+          createdAt: firebase.firestore.Timestamp.fromDate(note.createdAt),
+          updatedAt: firebase.firestore.Timestamp.fromDate(note.updatedAt),
+          deletedAt: note.deletedAt ? firebase.firestore.Timestamp.fromDate(note.deletedAt) : null
+        });
+      } catch (err) {
+        console.error('[FlockShamar] Error saving note:', err);
+      }
+    } else {
+      saveNotesToLocalStorage();
+    }
+    render();
+  }
+  
+  // Load notes from Firestore
+  async function loadNotes() {
+    if (!S.db) return;
+    
+    try {
+      const snapshot = await S.db.collection('notes')
+        .where('ownerId', '==', S.user.uid)
+        .orderBy('updatedAt', 'desc')
+        .get();
+      
+      S.notes = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          ...data,
+          id: doc.id,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date(),
+          deletedAt: data.deletedAt?.toDate() || null
+        };
+      });
+      
+      render();
+    } catch (err) {
+      console.error('[FlockShamar] Error loading notes:', err);
+    }
+  }
+  
+  // LocalStorage methods
+  function saveNotesToLocalStorage() {
+    localStorage.setItem('fs_notes', JSON.stringify(S.notes));
+  }
+  
+  function loadNotesFromLocalStorage() {
+    const stored = localStorage.getItem('fs_notes');
+    if (stored) {
+      S.notes = JSON.parse(stored).map(note => ({
+        ...note,
+        createdAt: new Date(note.createdAt),
+        updatedAt: new Date(note.updatedAt),
+        deletedAt: note.deletedAt ? new Date(note.deletedAt) : null
+      }));
+    }
+  }
+  
+  // Delete note permanently
+  async function deleteNotePermanently(noteId) {
+    if (S.db && S.user.uid !== 'dev-user') {
+      try {
+        await S.db.collection('notes').doc(noteId).delete();
+      } catch (err) {
+        console.error('[FlockShamar] Error deleting note:', err);
+      }
+    }
+    
+    S.notes = S.notes.filter(n => n.id !== noteId);
+    saveNotesToLocalStorage();
+    render();
+  }
+  
+  // Render notes
+  function render() {
+    const pinnedContainer = document.getElementById('fs-pinned-notes');
+    const otherContainer = document.getElementById('fs-other-notes');
+    const pinnedSection = document.getElementById('fs-pinned-section');
+    const othersSection = document.getElementById('fs-others-section');
+    const quickAdd = document.getElementById('fs-quick-add');
+    const viewTitle = document.getElementById('fs-view-title');
+    const pinnedTitle = document.getElementById('fs-pinned-title');
+    const othersTitle = document.getElementById('fs-others-title');
+    const emptyState = document.getElementById('fs-empty-state');
+    const emptyIcon = document.getElementById('fs-empty-icon');
+    const emptyText = document.getElementById('fs-empty-text');
+    
+    // Update view title and quick-add visibility
+    const viewConfig = {
+      notes: { title: 'Notes', showQuickAdd: true, othersLabel: 'OTHERS', emptyIcon: '📝', emptyText: 'Take a note to get started' },
+      archive: { title: 'Archive', showQuickAdd: false, othersLabel: 'ARCHIVED', emptyIcon: '📦', emptyText: 'Your archived notes appear here' },
+      trash: { title: 'Trash', showQuickAdd: false, othersLabel: 'IN TRASH', emptyIcon: '🗑️', emptyText: 'Trash is empty' },
+      reminders: { title: 'Reminders', showQuickAdd: false, othersLabel: 'REMINDERS', emptyIcon: '🔔', emptyText: 'No reminders yet' }
+    };
+    
+    const config = viewConfig[S.currentView] || viewConfig.notes;
+    viewTitle.textContent = config.title;
+    othersTitle.textContent = config.othersLabel;
+    
+    if (config.showQuickAdd) {
+      quickAdd.classList.remove('hidden');
+    } else {
+      quickAdd.classList.add('hidden');
+    }
+    
+    // Filter notes based on view and search
+    let filteredNotes = S.notes.filter(note => {
+      if (S.searchQuery) {
+        const matchesSearch = note.title.toLowerCase().includes(S.searchQuery) ||
+                            note.content.toLowerCase().includes(S.searchQuery) ||
+                            note.labels.some(l => l.toLowerCase().includes(S.searchQuery));
+        if (!matchesSearch) return false;
+      }
+      
+      if (S.currentView === 'notes') {
+        return !note.archived && !note.deleted;
+      } else if (S.currentView === 'archive') {
+        return note.archived && !note.deleted;
+      } else if (S.currentView === 'trash') {
+        return note.deleted;
+      } else if (S.currentView === 'reminders') {
+        return note.hasReminder && !note.archived && !note.deleted;
+      }
+      return true;
+    });
+    
+    // Separate pinned and other notes
+    const pinnedNotes = filteredNotes.filter(n => n.pinned);
+    const otherNotes = filteredNotes.filter(n => !n.pinned);
+    
+    // Render pinned notes
+    if (pinnedNotes.length > 0) {
+      pinnedSection.classList.remove('hidden');
+      pinnedContainer.innerHTML = pinnedNotes.map(renderNoteCard).join('');
+    } else {
+      pinnedSection.classList.add('hidden');
+    }
+    
+    // Render other notes
+    if (otherNotes.length > 0) {
+      othersSection.classList.remove('hidden');
+      otherContainer.innerHTML = otherNotes.map(renderNoteCard).join('');
+    } else {
+      othersSection.classList.add('hidden');
+    }
+    
+    // Show empty state if no notes at all
+    if (filteredNotes.length === 0) {
+      emptyState.classList.remove('hidden');
+      emptyIcon.textContent = config.emptyIcon;
+      emptyText.textContent = config.emptyText;
+    } else {
+      emptyState.classList.add('hidden');
+    }
+    
+    // Attach event listeners to note cards
+    attachNoteCardListeners();
+  }
+  
+  // Render individual note card
+  function renderNoteCard(note) {
+    const labels = note.labels && note.labels.length > 0
+      ? `<div class="fs-note-labels">
+          ${note.labels.map(label => `<span class="fs-label-tag">${label}</span>`).join('')}
+         </div>`
+      : '';
+    
+    const checklist = note.type === 'checklist' && note.checklist && note.checklist.length > 0
+      ? `<ul class="fs-checklist">
+          ${note.checklist.slice(0, 5).map(item => `
+            <li class="fs-checklist-item">
+              <div class="fs-checkbox ${item.checked ? 'checked' : ''}"></div>
+              <span class="fs-checklist-text ${item.checked ? 'checked' : ''}">${item.text}</span>
+            </li>
+          `).join('')}
+          ${note.checklist.length > 5 ? `<li class="fs-checklist-item">+${note.checklist.length - 5} more</li>` : ''}
+         </ul>`
+      : '';
+    
+    return `
+      <div class="fs-note-card ${note.pinned ? 'pinned' : ''}" 
+           data-note-id="${note.id}" 
+           data-color="${note.color || 'default'}">
+        <button class="fs-icon-btn fs-note-pin" data-action="pin">
+          ${note.pinned ? '📌' : '📍'}
+        </button>
+        
+        ${note.title ? `<div class="fs-note-title">${escapeHtml(note.title)}</div>` : ''}
+        ${checklist || `<div class="fs-note-content">${escapeHtml(note.content || '')}</div>`}
+        ${labels}
+        
+        <div class="fs-note-actions">
+          <button class="fs-icon-btn" data-action="share" title="Share & Link">🔗</button>
+          <button class="fs-icon-btn" data-action="archive" title="${note.archived ? 'Unarchive' : 'Archive'}">
+            ${note.archived ? '📤' : '📦'}
+          </button>
+          <button class="fs-icon-btn" data-action="color" title="Change color">🎨</button>
+          <button class="fs-icon-btn" data-action="delete" title="${note.deleted ? 'Delete forever' : 'Delete'}">
+            🗑️
+          </button>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Attach event listeners to note cards
+  function attachNoteCardListeners() {
+    document.querySelectorAll('.fs-note-card').forEach(card => {
+      const noteId = card.dataset.noteId;
+      const note = S.notes.find(n => n.id === noteId);
+      
+      if (!note) return;
+      
+      // Click to edit
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('[data-action]')) return;
+        openEditModal(note);
+      });
+      
+      // Pin button
+      const pinBtn = card.querySelector('[data-action="pin"]');
+      if (pinBtn) {
+        pinBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          note.pinned = !note.pinned;
+          saveNote(note);
+        });
+      }
+      
+      // Archive button
+      const archiveBtn = card.querySelector('[data-action="archive"]');
+      if (archiveBtn) {
+        archiveBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          note.archived = !note.archived;
+          saveNote(note);
+        });
+      }
+      
+      // Color button
+      const colorBtn = card.querySelector('[data-action="color"]');
+      if (colorBtn) {
+        colorBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          S.currentNote = note;
+          S.colorPickerTarget = 'note-card';
+          showColorPicker(e.target);
+        });
+      }
+      
+      // Share button
+      const shareBtn = card.querySelector('[data-action="share"]');
+      if (shareBtn) {
+        shareBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openShareModal(note);
+        });
+      }
+      
+      // Delete button
+      const deleteBtn = card.querySelector('[data-action="delete"]');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          if (note.deleted) {
+            if (confirm('Permanently delete this note? This cannot be undone.')) {
+              await deleteNotePermanently(note.id);
+            }
+          } else {
+            note.deleted = true;
+            note.deletedAt = new Date();
+            saveNote(note);
+          }
+        });
+      }
+    });
+  }
+  
+  // Open edit modal
+  function openEditModal(note) {
+    S.currentNote = note;
+    document.getElementById('fs-edit-title').value = note.title || '';
+    document.getElementById('fs-edit-content').value = note.content || '';
+    document.getElementById('fs-edit-modal').classList.add('show');
+    
+    // Update modal background color
+    const modalContent = document.querySelector('.fs-modal-content');
+    modalContent.style.background = getColorValue(note.color || 'default');
+    
+    // Update pin button
+    const pinBtn = document.getElementById('fs-edit-btn-pin');
+    pinBtn.textContent = note.pinned ? '📌' : '📍';
+    
+    // Update archive button
+    const archiveBtn = document.getElementById('fs-edit-btn-archive');
+    archiveBtn.textContent = note.archived ? '📤' : '📦';
+    archiveBtn.title = note.archived ? 'Unarchive' : 'Archive';
+    
+    // Update delete button
+    const deleteBtn = document.getElementById('fs-edit-btn-delete');
+    deleteBtn.textContent = note.deleted ? '⚠️' : '🗑️';
+    deleteBtn.title = note.deleted ? 'Delete forever' : 'Delete';
+  }
+  
+  // Hide edit modal
+  function hideEditModal() {
+    document.getElementById('fs-edit-modal').classList.remove('show');
+    render();
+  }
+  
+  // Open share modal
+  function openShareModal(note) {
+    const modal = document.getElementById('fs-share-modal');
+    const linkInput = document.getElementById('fs-share-link');
+    
+    // Generate shareable link (proper web URL with query parameter)
+    const baseUrl = window.location.origin + window.location.pathname;
+    const noteLink = `${baseUrl}?note=${encodeURIComponent(note.id)}`;
+    linkInput.value = noteLink;
+    
+    modal.classList.add('show');
+    
+    // Copy link button
+    document.getElementById('fs-copy-link-btn').onclick = () => {
+      linkInput.select();
+      document.execCommand('copy');
+      
+      // Show feedback
+      const btn = document.getElementById('fs-copy-link-btn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.style.background = '#10b981';
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+      }, 2000);
+    };
+    
+    // Close button
+    document.getElementById('fs-share-close-btn').onclick = () => {
+      modal.classList.remove('show');
+    };
+    
+    // Close when clicking outside
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('show');
+      }
+    };
+    
+    // Add collaborator button (future: integrate with FlockOS user system)
+    document.getElementById('fs-add-collaborator-btn').onclick = () => {
+      const email = document.getElementById('fs-share-email').value.trim();
+      if (email) {
+        // TODO: Add collaborator to note (requires FlockOS user integration)
+        alert('Collaboration feature coming soon! For now, copy the link and share it in FlockChat.');
+        document.getElementById('fs-share-email').value = '';
+      }
+    };
+  }
+  
+  // Color picker
+  function showColorPicker(target) {
+    const picker = document.getElementById('fs-color-picker');
+    const rect = target.getBoundingClientRect();
+    picker.style.top = (rect.bottom + 8) + 'px';
+    picker.style.left = rect.left + 'px';
+    picker.classList.add('show');
+    
+    // Close when clicking outside
+    setTimeout(() => {
+      document.addEventListener('click', hideColorPicker);
+    }, 0);
+  }
+  
+  function hideColorPicker() {
+    document.getElementById('fs-color-picker').classList.remove('show');
+    document.removeEventListener('click', hideColorPicker);
+  }
+  
+  function getColorValue(colorName) {
+    const colors = {
+      default: '#ffffff',
+      red: '#f28b82',
+      orange: '#fbbc04',
+      yellow: '#fff475',
+      green: '#ccff90',
+      teal: '#a7ffeb',
+      blue: '#cbf0f8',
+      darkblue: '#aecbfa',
+      purple: '#d7aefb',
+      pink: '#fdcfe8',
+      brown: '#e6c9a8',
+      gray: '#e8eaed'
+    };
+    return colors[colorName] || colors.default;
+  }
+  
+  // Utilities
+  function generateId() {
+    return 'note_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  }
+  
+  // Check for deep-linked note in URL
+  function checkDeepLink() {
+    const params = new URLSearchParams(window.location.search);
+    const noteId = params.get('note');
+    
+    if (noteId) {
+      console.log('[FlockShamar] Opening deep-linked note:', noteId);
+      
+      // Wait a bit for notes to load
+      setTimeout(() => {
+        const note = S.notes.find(n => n.id === decodeURIComponent(noteId));
+        if (note) {
+          openEditModal(note);
+          // Clean URL (remove query params)
+          window.history.replaceState({}, '', window.location.pathname);
+        } else {
+          alert('Note not found. It may have been deleted or you may not have access.');
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+      }, 500);
+    }
+  }
+  
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  function autoResizeTextarea(e) {
+    e.target.style.height = 'auto';
+    e.target.style.height = e.target.scrollHeight + 'px';
+  }
+  
+  // Global API
+  window.FlockShamar = {
+    init,
+    createNote: saveQuickNote,
+    openNote: openEditModal,
+    deleteNote: deleteNotePermanently,
+    searchNotes: (query) => {
+      S.searchQuery = query.toLowerCase();
+      render();
+    }
+  };
+  
+  // Auto-initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();

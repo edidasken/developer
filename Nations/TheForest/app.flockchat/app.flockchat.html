@@ -794,6 +794,101 @@
     .fc-pinned-bubble.recent-sermons { background: linear-gradient(145deg, #4c1d95, #7c3aed); }
     .fc-conv-icon.recent-sermons     { background: linear-gradient(135deg, #4c1d95, #7c3aed); }
 
+    /* ─── FlockNews Channel Pin ─────────────────────────────────────── */
+    .fc-pinned-bubble.flocknews { background: linear-gradient(145deg, #854d0e, #e8a838); }
+    .fc-conv-icon.flocknews     { background: linear-gradient(135deg, #854d0e, #e8a838); }
+
+    /* ─── FlockNews Feed ────────────────────────────────────────────── */
+    .fc-flocknews-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 16px;
+    }
+    .fc-flocknews-intro {
+      text-align: center;
+      padding: 24px 20px;
+      background: rgba(232,168,56,0.08);
+      border-radius: 12px;
+      border: 1px solid rgba(232,168,56,0.2);
+    }
+    .fc-flocknews-intro h3 {
+      margin: 0 0 8px 0;
+      font-size: 22px;
+      font-weight: 700;
+      color: #e8a838;
+    }
+    .fc-flocknews-intro p {
+      margin: 0;
+      color: var(--ink-muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .fc-flocknews-card {
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .fc-flocknews-card.fc-flocknews-empty {
+      opacity: 0.6;
+    }
+    .fc-flocknews-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px;
+      background: rgba(232,168,56,0.1);
+      border-bottom: 1px solid rgba(232,168,56,0.2);
+      font-weight: 700;
+      font-size: 14px;
+      color: #e8a838;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .fc-flocknews-date {
+      padding: 16px 20px 12px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+      border-bottom: 1px solid var(--border);
+    }
+    .fc-flocknews-section {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .fc-flocknews-section:last-of-type {
+      border-bottom: none;
+    }
+    .fc-flocknews-section h4 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: #e8a838;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .fc-flocknews-content {
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .fc-flocknews-link {
+      display: block;
+      padding: 14px 20px;
+      text-align: center;
+      background: rgba(232,168,56,0.1);
+      color: #e8a838;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      border-top: 1px solid rgba(232,168,56,0.2);
+      transition: background 0.2s;
+    }
+    .fc-flocknews-link:hover {
+      background: rgba(232,168,56,0.15);
+    }
+
     /* ─── Recent Sermons Feed ───────────────────────────────────────── */
     .fc-srm-feed       { gap: 20px; }
     .fc-srm-avatar     { background: linear-gradient(135deg, #4c1d95, #7c3aed); }
@@ -1203,6 +1298,85 @@
     }
     .fc-message.received .fc-message-time {
       text-align: left;
+    }
+
+    /* ─── Message Reactions ───────────────────────────────────────────── */
+    .fc-reactions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 4px;
+      padding: 0 12px;
+    }
+    .fc-reaction-bubble {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .fc-reaction-bubble:hover {
+      background: var(--hover);
+      transform: scale(1.05);
+    }
+    .fc-reaction-bubble.active {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(59, 130, 246, 0.15));
+      border-color: #3b82f6;
+      font-weight: 600;
+    }
+    .fc-reaction-add {
+      display: flex;
+      align-items: center;
+      padding: 4px 12px;
+      margin-top: 4px;
+    }
+    .fc-reaction-add-btn {
+      padding: 4px 8px;
+      background: transparent;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: all 0.2s;
+    }
+    .fc-reaction-add-btn:hover {
+      opacity: 1;
+      background: var(--hover);
+      border-style: solid;
+    }
+    .fc-reaction-picker {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      padding: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      margin-bottom: 8px;
+    }
+    .fc-reaction-picker-btn {
+      padding: 6px;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .fc-reaction-picker-btn:hover {
+      background: var(--hover);
+      transform: scale(1.2);
     }
 
     /* ─── Prayer/Announcement Cards ──────────────────────────────────── */

@@ -33,6 +33,8 @@ export const NC_APP_ICONS = {
   flockshow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8" fill="currentColor" stroke="none"/></svg>',
   flockchat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
   flockdocs: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>',
+  flockshamar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H3v9h18v-9h-6M7 21V8h10v13"/><rect x="9" y="3" width="6" height="5" rx="1"/></svg>',
+  flocknews: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
   feed:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
   wellspring: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>',
 };
@@ -47,6 +49,8 @@ export const NC_APPS = [
   { id: 'flockshow', name: 'FlockShow',      sub: 'Worship slides & service',       href: 'app.flockshow/app.flockshow.html', tone: 'red'  },
   { id: 'flockchat', name: 'FlockChat',      sub: 'Messaging & prayer chain',       href: 'app.flockchat/app.flockchat.html', tone: 'cyan' },
   { id: 'flockdocs', name: 'FlockDocs',      sub: 'Documents & productivity',       href: 'app.flockdocs/app.flockdocs.html', tone: 'blue' },
+  { id: 'flockshamar', name: 'FlockShamar',  sub: 'Keep & guard your notes',        href: 'app.flockshamar/app.flockshamar.html', tone: 'gold' },
+  { id: 'flocknews', name: 'FlockNews',      sub: 'Daily spiritual content',        href: 'app.flocknews/app.flocknews.html', tone: 'gold' },
   { id: 'feed',      name: 'FEED',           sub: 'Sermon prep & study tools',      href: 'app.feed/',                      tone: 'gold'   },
   { id: 'wellspring', name: 'The Wellspring', sub: 'Offline data & local database',  href: 'app.wellspring/app.wellspring.html', tone: 'green' },
 ];
@@ -129,7 +133,7 @@ function ensureStyles() {
   color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.30);
 }
 .nc-switcher-icon svg { width: 18px; height: 18px; }
-.nc-switcher-icon.tone-gold   { background: linear-gradient(135deg,#78350f,#d97706); }
+.nc-switcher-icon.tone-gold   { background: linear-gradient(135deg,#c48a20,#e8a838); }
 .nc-switcher-icon.tone-green  { background: linear-gradient(135deg,#14532d,#22c55e); }
 .nc-switcher-icon.tone-blue   { background: linear-gradient(135deg,#1e3a8a,#3b82f6); }
 .nc-switcher-icon.tone-purple { background: linear-gradient(135deg,#4c1d95,#a855f7); }

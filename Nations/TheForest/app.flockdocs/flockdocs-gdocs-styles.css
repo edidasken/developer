@@ -1,0 +1,432 @@
+/* FlockDocs Google Docs Feature Styles */
+
+/* Enhanced Toolbar */
+.fd-toolbar-select--small {
+  width: 60px;
+  padding: 4px 6px;
+}
+
+.fd-color-picker-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.fd-color-btn {
+  position: relative;
+  overflow: visible;
+}
+
+.fd-color-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.fd-save-status {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  padding: 0 12px;
+}
+
+/* Dropdown Menus */
+.fd-dropdown-menu {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  padding: 8px 0;
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.fd-menu-section {
+  padding: 4px 0;
+}
+
+.fd-menu-label {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 16px 4px;
+}
+
+.fd-menu-item {
+  color: rgba(255, 255, 255, 0.9);
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.15s ease;
+}
+
+.fd-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.fd-menu-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
+}
+
+/* Checklist Styles */
+.fd-checklist {
+  list-style: none;
+  padding-left: 0;
+}
+
+.fd-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.fd-checkbox {
+  margin-top: 4px;
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+.fd-checkbox:checked + span {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* Table Styles in Editor */
+.fd-editor-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+}
+
+.fd-editor-content table td,
+.fd-editor-content table th {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 12px;
+  min-width: 80px;
+}
+
+.fd-editor-content table th {
+  background: rgba(59, 130, 246, 0.2);
+  font-weight: 600;
+}
+
+/* Quote Styles */
+.fd-editor-content blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 16px;
+  margin: 16px 0;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Code Block Styles */
+.fd-editor-content pre {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 16px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Heading Anchor Links for TOC */
+.fd-editor-content h1[id],
+.fd-editor-content h2[id],
+.fd-editor-content h3[id],
+.fd-editor-content h4[id],
+.fd-editor-content h5[id],
+.fd-editor-content h6[id] {
+  scroll-margin-top: 80px; /* Account for fixed toolbar */
+}
+
+/* Comments Panel */
+.fd-comments-panel {
+  position: fixed;
+  right: 0;
+  top: 60px;
+  bottom: 0;
+  width: 300px;
+  background: #1e293b;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.fd-comments-panel.visible {
+  transform: translateX(0);
+}
+
+.fd-comment {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px;
+  border-left: 3px solid #3b82f6;
+}
+
+.fd-comment-author {
+  font-weight: 600;
+  font-size: 13px;
+  color: #3b82f6;
+  margin-bottom: 4px;
+}
+
+.fd-comment-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+}
+
+.fd-comment-date {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 6px;
+}
+
+/* Version History Panel */
+.fd-version-panel {
+  position: fixed;
+  right: 0;
+  top: 60px;
+  bottom: 0;
+  width: 320px;
+  background: #1e293b;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.fd-version-panel.visible {
+  transform: translateX(0);
+}
+
+.fd-version-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.fd-version-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.fd-version-date {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 4px;
+}
+
+.fd-version-user {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Smart Chips */
+.fd-smart-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: #60a5fa;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fd-smart-chip:hover {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.fd-smart-chip-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Suggestion/Track Changes Styles */
+.fd-suggestion-insert {
+  background: rgba(34, 197, 94, 0.2);
+  border-bottom: 2px solid #22c55e;
+  text-decoration: none;
+}
+
+.fd-suggestion-delete {
+  background: rgba(239, 68, 68, 0.2);
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.fd-suggestion-badge {
+  position: absolute;
+  right: -30px;
+  top: 0;
+  background: #3b82f6;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Building Blocks / Templates */
+.fd-templates-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.fd-template-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fd-template-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.fd-template-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.fd-template-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Dropdown Status Tracking */
+.fd-status-dropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid;
+  user-select: none;
+}
+
+.fd-status-dropdown.status-not-started {
+  background: rgba(100, 116, 139, 0.2);
+  border-color: #64748b;
+  color: #94a3b8;
+}
+
+.fd-status-dropdown.status-in-progress {
+  background: rgba(251, 191, 36, 0.2);
+  border-color: #fbbf24;
+  color: #fcd34d;
+}
+
+.fd-status-dropdown.status-done {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22c55e;
+  color: #4ade80;
+}
+
+/* Equation Editor */
+.fd-equation {
+  display: inline-block;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+  cursor: pointer;
+}
+
+/* Media Embeds */
+.fd-editor-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+/* Column Layout */
+.fd-editor-content.fd-columns-2 {
+  column-count: 2;
+  column-gap: 32px;
+}
+
+.fd-editor-content.fd-columns-3 {
+  column-count: 3;
+  column-gap: 24px;
+}
+
+/* Headers & Footers (would need page-based layout) */
+.fd-editor-header,
+.fd-editor-footer {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  padding: 16px;
+  margin: 8px 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+/* Page Setup Options */
+.fd-page-landscape {
+  max-width: 11in;
+  min-height: 8.5in;
+}
+
+.fd-page-portrait {
+  max-width: 8.5in;
+  min-height: 11in;
+}
+
+.fd-page-pageless {
+  max-width: 100%;
+  min-height: auto;
+}
+
+/* Spell Check Styles */
+.fd-spell-error {
+  text-decoration: wavy underline red;
+}
+
+.fd-grammar-suggestion {
+  text-decoration: wavy underline blue;
+}
+
+/* Link Styles */
+.fd-editor-content a {
+  color: #60a5fa;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.fd-editor-content a:hover {
+  color: #93c5fd;
+}

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Resolve all relative paths from the parent New_Covenant/ directory -->
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlockShamar — Keep & Guard Your Notes</title>
+  <link rel="manifest" href="app.flockshamar/manifest.json">
+  <meta name="theme-color" content="#e8a838">
+  <link rel="icon" href="Images/FlockIcon-512.webp">
+  
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+  
+  <!-- FlockOS Core Styles -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+  <!-- Google Keep feature styles -->
+  <link rel="stylesheet" href="app.flockshamar/flockshamar-gkeep-styles.css">
+  
+  <!-- FlockShamar Styles -->
+  <style>
+    :root {
+      --fs-navy-dark: #0f1735;
+      --fs-navy-mid: #1b264f;
+      --fs-gold: #e8a838;
+      --fs-white: #ffffff;
+      --fs-gray-light: #f5f5f5;
+      --fs-gray-mid: #e0e0e0;
+      --fs-gray-dark: #5f6368;
+      --fs-text-primary: #202124;
+      --fs-text-secondary: #5f6368;
+      
+      /* Note Colors */
+      --fs-color-default: #ffffff;
+      --fs-color-red: #f28b82;
+      --fs-color-orange: #fbbc04;
+      --fs-color-yellow: #fff475;
+      --fs-color-green: #ccff90;
+      --fs-color-teal: #a7ffeb;
+      --fs-color-blue: #cbf0f8;
+      --fs-color-darkblue: #aecbfa;
+      --fs-color-purple: #d7aefb;
+      --fs-color-pink: #fdcfe8;
+      --fs-color-brown: #e6c9a8;
+      --fs-color-gray: #e8eaed;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, var(--fs-navy-dark) 0%, var(--fs-navy-mid) 100%);
+      min-height: 100vh;
+      color: var(--fs-text-primary);
+    }
+    
+    /* Main Container */
+    .fs-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 80px 20px 40px;
+    }
+    
+    /* Quick Add Note */
+    .fs-quick-add {
+      max-width: 600px;
+      margin: 0 auto 40px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15);
+      padding: 16px;
+      cursor: text;
+      transition: box-shadow 0.2s;
+    }
+    
+    .fs-quick-add:hover {
+      box-shadow: 0 1px 3px 0 rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
+    }
+    
+    .fs-quick-add.expanded {
+      cursor: default;
+    }
+    
+    .fs-quick-input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      min-height: 20px;
+    }
+    
+    .fs-quick-input::placeholder {
+      color: var(--fs-gray-dark);
+    }
+    
+    .fs-quick-title {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      font-weight: 500;
+      font-family: inherit;
+      margin-bottom: 12px;
+      display: none;
+    }
+    
+    .fs-quick-add.expanded .fs-quick-title {
+      display: block;
+    }
+    
+    .fs-quick-toolbar {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--fs-gray-mid);
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .fs-quick-add.expanded .fs-quick-toolbar {
+      display: flex;
+    }
+    
+    .fs-quick-actions {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+    }
+    
+    .fs-icon-btn {
+      background: none;
+      border: none;
+      padding: 8px;
+      border-radius: 50%;
+      cursor: pointer;
+      color: var(--fs-text-secondary);
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+    }
+    
+    .fs-icon-btn:hover {
+      background: rgba(95, 99, 104, 0.1);
+    }
+    
+    .fs-btn-primary {
+      background: var(--fs-gold);
+      color: var(--fs-navy-dark);
+      border: none;
+      padding: 8px 24px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .fs-btn-primary:hover {
+      background: #d99830;
+    }
+    
+    /* Notes Grid (Masonry) */
+    .fs-notes-section {
+      margin-bottom: 40px;
+    }
+    
+    .fs-section-title {
+      color: var(--fs-gray-dark);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 16px;
+      padding-left: 4px;
+    }
+    
+    .fs-notes-grid {
+      column-count: 5;
+      column-gap: 16px;
+    }
+    
+    @media (max-width: 1600px) {
+      .fs-notes-grid {
+        column-count: 4;
+      }
+    }
+    
+    @media (max-width: 1200px) {
+      .fs-notes-grid {
+        column-count: 3;
+      }
+    }
+    
+    @media (max-width: 900px) {
+      .fs-notes-grid {
+        column-count: 2;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .fs-notes-grid {
+        column-count: 1;
+      }
+    }
+    
+    /* Note Card */
+    .fs-note-card {
+      background: var(--fs-color-default);
+      border: 1px solid var(--fs-gray-mid);
+      border-radius: 8px;
+      padding: 16px;
+      cursor: pointer;
+      position: relative;
+      transition: box-shadow 0.2s;
+      break-inside: avoid;
+      display: inline-block;
+      width: 100%;
+      margin-bottom: 16px;
+      vertical-align: top;
+    }
+    
+    .fs-note-card:hover {
+      box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+    }
+    
+    .fs-note-card:hover .fs-note-actions {
+      opacity: 1;
+    }
+    
+    /* Note Colors */
+    .fs-note-card[data-color="red"] { background: var(--fs-color-red); border-color: #e8796c; }
+    .fs-note-card[data-color="orange"] { background: var(--fs-color-orange); border-color: #efa200; }
+    .fs-note-card[data-color="yellow"] { background: var(--fs-color-yellow); border-color: #f4e765; }
+    .fs-note-card[data-color="green"] { background: var(--fs-color-green); border-color: #b8f180; }
+    .fs-note-card[data-color="teal"] { background: var(--fs-color-teal); border-color: #97f5db; }
+    .fs-note-card[data-color="blue"] { background: var(--fs-color-blue); border-color: #bbe0e8; }
+    .fs-note-card[data-color="darkblue"] { background: var(--fs-color-darkblue); border-color: #9ebbea; }
+    .fs-note-card[data-color="purple"] { background: var(--fs-color-purple); border-color: #c79eeb; }
+    .fs-note-card[data-color="pink"] { background: var(--fs-color-pink); border-color: #edbfd8; }
+    .fs-note-card[data-color="brown"] { background: var(--fs-color-brown); border-color: #d6b998; }
+    .fs-note-card[data-color="gray"] { background: var(--fs-color-gray); border-color: #d8dadd; }
+    
+    .fs-note-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      word-wrap: break-word;
+    }
+    
+    .fs-note-content {
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      flex: 1;
+      margin-bottom: 8px;
+    }
+    
+    /* Checklist */
+    .fs-checklist {
+      list-style: none;
+      margin-bottom: 8px;
+    }
+    
+    .fs-checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 4px 0;
+    }
+    
+    .fs-checkbox {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--fs-gray-dark);
+      border-radius: 3px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 2px;
+      position: relative;
+      transition: all 0.2s;
+    }
+    
+    .fs-checkbox.checked {
+      background: var(--fs-gold);
+      border-color: var(--fs-gold);
+    }
+    
+    .fs-checkbox.checked::after {
+      content: '✓';
+      position: absolute;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      top: -2px;
+      left: 2px;
+    }
+    
+    .fs-checklist-text {
+      flex: 1;
+      line-height: 1.5;
+    }
+    
+    .fs-checklist-text.checked {
+      text-decoration: line-through;
+      color: var(--fs-gray-dark);
+    }
+    
+    /* Note Labels */
+    .fs-note-labels {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    
+    .fs-label-tag {
+      background: rgba(0, 0, 0, 0.1);
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--fs-text-primary);
+    }
+    
+    /* Note Actions */
+    .fs-note-actions {
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .fs-note-pin {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .fs-note-card:hover .fs-note-pin {
+      opacity: 1;
+    }
+    
+    .fs-note-card.pinned .fs-note-pin {
+      opacity: 1;
+      color: var(--fs-gold);
+    }
+    
+    /* Color Picker Popup */
+    .fs-color-picker {
+      position: absolute;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15);
+      padding: 8px;
+      display: none;
+      z-index: 1000;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    
+    .fs-color-picker.show {
+      display: grid;
+    }
+    
+    .fs-color-option {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    
+    .fs-color-option:hover {
+      transform: scale(1.15);
+      border-color: var(--fs-gray-dark);
+    }
+    
+    .fs-color-option[data-color="default"] { background: var(--fs-color-default); border-color: var(--fs-gray-mid); }
+    .fs-color-option[data-color="red"] { background: var(--fs-color-red); }
+    .fs-color-option[data-color="orange"] { background: var(--fs-color-orange); }
+    .fs-color-option[data-color="yellow"] { background: var(--fs-color-yellow); }
+    .fs-color-option[data-color="green"] { background: var(--fs-color-green); }
+    .fs-color-option[data-color="teal"] { background: var(--fs-color-teal); }
+    .fs-color-option[data-color="blue"] { background: var(--fs-color-blue); }
+    .fs-color-option[data-color="darkblue"] { background: var(--fs-color-darkblue); }
+    .fs-color-option[data-color="purple"] { background: var(--fs-color-purple); }
+    .fs-color-option[data-color="pink"] { background: var(--fs-color-pink); }
+    .fs-color-option[data-color="brown"] { background: var(--fs-color-brown); }
+    .fs-color-option[data-color="gray"] { background: var(--fs-color-gray); }
+    
+    /* Edit Modal */
+    .fs-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .fs-modal.show {
+      display: flex;
+    }
+    
+    .fs-modal-content {
+      background: white;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 1px 3px 0 rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
+      padding: 20px;
+    }
+    
+    .fs-modal-title-input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 20px;
+      font-weight: 500;
+      font-family: inherit;
+      margin-bottom: 16px;
+    }
+    
+    .fs-modal-content-input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      min-height: 150px;
+      line-height: 1.5;
+    }
+    
+    .fs-modal-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--fs-gray-mid);
+    }
+    
+    .fs-modal-actions {
+      flex: 1;
+      display: flex;
+      gap: 8px;
+    }
+    
+    /* Share Modal */
+    .fs-share-content {
+      max-width: 500px;
+    }
+    
+    .fs-modal-header {
+      font-size: 20px;
+      font-weight: 500;
+      margin: 0 0 24px 0;
+      color: var(--fs-navy-dark);
+    }
+    
+    .fs-share-section {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--fs-gray-mid);
+    }
+    
+    .fs-share-section:last-of-type {
+      border-bottom: none;
+    }
+    
+    .fs-share-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--fs-navy-dark);
+    }
+    
+    .fs-share-desc {
+      font-size: 13px;
+      color: var(--fs-gray-dark);
+      margin: 0 0 12px 0;
+    }
+    
+    .fs-share-link-box {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .fs-share-link-input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid var(--fs-gray-mid);
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'SF Mono', Monaco, monospace;
+      background: var(--fs-gray-light);
+    }
+    
+    .fs-share-users {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .fs-share-user-input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid var(--fs-gray-mid);
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    
+    .fs-collaborators-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .fs-collaborator-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--fs-gray-light);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .fs-modal-footer {
+      margin-top: 24px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    
+    /* Sidebar */
+    .fs-sidebar {
+      position: fixed;
+      left: 0;
+      top: 60px;
+      bottom: 0;
+      width: 280px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      padding: 20px 12px;
+      z-index: 100;
+      overflow-y: auto;
+    }
+    
+    .fs-sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 0 24px 24px 0;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 4px;
+    }
+    
+    .fs-sidebar-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .fs-sidebar-item.active {
+      background: var(--fs-gold);
+      color: var(--fs-navy-dark);
+    }
+    
+    .fs-sidebar-label {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .fs-sidebar-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 16px 0;
+    }
+    
+    /* Search Bar */
+    .fs-view-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .fs-view-title {
+      font-size: 32px;
+      font-weight: 300;
+      color: white;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+    
+    .fs-search-bar {
+      max-width: 720px;
+      margin: 0 auto 24px;
+      position: relative;
+    }
+    
+    .fs-search-input {
+      width: 100%;
+      padding: 12px 48px 12px 48px;
+      border: none;
+      border-radius: 8px;
+      background: white;
+      font-size: 14px;
+      box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+    }
+    
+    .fs-search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--fs-gray-dark);
+    }
+    
+    /* Empty State */
+    .fs-empty-state {
+      text-align: center;
+      padding: 64px 24px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .fs-empty-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+    
+    .fs-empty-text {
+      font-size: 18px;
+      font-weight: 300;
+    }
+    
+    /* Utilities */
+    .hidden {
+      display: none !important;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .fs-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+      }
+      
+      .fs-sidebar.show {
+        transform: translateX(0);
+      }
+    }
+    
+    @media (min-width: 769px) {
+      .fs-container {
+        margin-left: 280px;
+        padding-top: 60px;
+      }
+      
+      .fs-notes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Unity Header -->
+  <header class="unity-header" id="fs-topbar" role="banner"></header>
+  
+  <!-- Sidebar -->
+  <aside class="fs-sidebar" id="fs-sidebar">
+    <div class="fs-sidebar-item active" data-view="notes">
+      <span>💡</span>
+      <span class="fs-sidebar-label">Notes</span>
+    </div>
+    <div class="fs-sidebar-item" data-view="reminders">
+      <span>🔔</span>
+      <span class="fs-sidebar-label">Reminders</span>
+    </div>
+    <div class="fs-sidebar-divider"></div>
+    <div class="fs-sidebar-item" data-view="archive">
+      <span>📦</span>
+      <span class="fs-sidebar-label">Archive</span>
+    </div>
+    <div class="fs-sidebar-item" data-view="trash">
+      <span>🗑️</span>
+      <span class="fs-sidebar-label">Trash</span>
+    </div>
+  </aside>
+  
+  <!-- Main Content -->
+  <div class="fs-container">
+    <!-- View Title -->
+    <div class="fs-view-header" id="fs-view-header">
+      <h1 class="fs-view-title" id="fs-view-title">Notes</h1>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="fs-search-bar">
+      <span class="fs-search-icon">🔍</span>
+      <input type="text" class="fs-search-input" id="fs-search" placeholder="Search your notes...">
+    </div>
+    
+    <!-- Quick Add Note -->
+    <div class="fs-quick-add" id="fs-quick-add">
+      <input type="text" class="fs-quick-title" placeholder="Title" id="fs-quick-title">
+      <textarea class="fs-quick-input" placeholder="Take a note..." id="fs-quick-note" rows="1"></textarea>
+      
+      <div class="fs-quick-toolbar">
+        <div class="fs-quick-actions">
+          <button class="fs-icon-btn" id="fs-btn-checklist" title="Show checkboxes">☑️</button>
+          <button class="fs-icon-btn" id="fs-btn-color" title="Change color">🎨</button>
+          <button class="fs-icon-btn" id="fs-btn-label" title="Add label">🏷️</button>
+        </div>
+        <button class="fs-btn-primary" id="fs-btn-close">Close</button>
+      </div>
+    </div>
+    
+    <!-- Pinned Notes -->
+    <div class="fs-notes-section" id="fs-pinned-section">
+      <div class="fs-section-title" id="fs-pinned-title">PINNED</div>
+      <div class="fs-notes-grid" id="fs-pinned-notes"></div>
+    </div>
+    
+    <!-- Other Notes -->
+    <div class="fs-notes-section" id="fs-others-section">
+      <div class="fs-section-title" id="fs-others-title">OTHERS</div>
+      <div class="fs-notes-grid" id="fs-other-notes"></div>
+    </div>
+    
+    <!-- Empty State -->
+    <div class="fs-empty-state hidden" id="fs-empty-state">
+      <div class="fs-empty-icon" id="fs-empty-icon">📝</div>
+      <div class="fs-empty-text" id="fs-empty-text">No notes yet</div>
+    </div>
+  </div>
+  
+  <!-- Color Picker Popup -->
+  <div class="fs-color-picker" id="fs-color-picker">
+    <div class="fs-color-option" data-color="default" title="Default"></div>
+    <div class="fs-color-option" data-color="red" title="Red"></div>
+    <div class="fs-color-option" data-color="orange" title="Orange"></div>
+    <div class="fs-color-option" data-color="yellow" title="Yellow"></div>
+    <div class="fs-color-option" data-color="green" title="Green"></div>
+    <div class="fs-color-option" data-color="teal" title="Teal"></div>
+    <div class="fs-color-option" data-color="blue" title="Blue"></div>
+    <div class="fs-color-option" data-color="darkblue" title="Dark Blue"></div>
+    <div class="fs-color-option" data-color="purple" title="Purple"></div>
+    <div class="fs-color-option" data-color="pink" title="Pink"></div>
+    <div class="fs-color-option" data-color="brown" title="Brown"></div>
+    <div class="fs-color-option" data-color="gray" title="Gray"></div>
+  </div>
+  
+  <!-- Share Modal -->
+  <div class="fs-modal" id="fs-share-modal">
+    <div class="fs-modal-content fs-share-content">
+      <h3 class="fs-modal-header">Share & Link</h3>
+      
+      <div class="fs-share-section">
+        <label class="fs-share-label">📋 Copy Link</label>
+        <p class="fs-share-desc">Share this note in FlockChat, FlockDocs, or anywhere in FlockOS</p>
+        <div class="fs-share-link-box">
+          <input type="text" readonly class="fs-share-link-input" id="fs-share-link" value="">
+          <button class="fs-btn-primary" id="fs-copy-link-btn">Copy</button>
+        </div>
+      </div>
+      
+      <div class="fs-share-section">
+        <label class="fs-share-label">👥 Collaborate</label>
+        <p class="fs-share-desc">Share with specific FlockOS users</p>
+        <div class="fs-share-users">
+          <input type="email" class="fs-share-user-input" id="fs-share-email" placeholder="Enter email address...">
+          <button class="fs-btn-primary" id="fs-add-collaborator-btn">Add</button>
+        </div>
+        <div class="fs-collaborators-list" id="fs-collaborators-list"></div>
+      </div>
+      
+      <div class="fs-modal-footer">
+        <button class="fs-btn-primary" id="fs-share-close-btn">Done</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Edit Modal -->
+  <div class="fs-modal" id="fs-edit-modal">
+    <div class="fs-modal-content">
+      <input type="text" class="fs-modal-title-input" id="fs-edit-title" placeholder="Title">
+      <textarea class="fs-modal-content-input" id="fs-edit-content" placeholder="Take a note..."></textarea>
+      
+      <div class="fs-modal-toolbar">
+        <div class="fs-modal-actions">
+          <button class="fs-icon-btn" id="fs-edit-btn-pin" title="Pin note">📌</button>
+          <button class="fs-icon-btn" id="fs-edit-btn-color" title="Change color">🎨</button>
+          <button class="fs-icon-btn" id="fs-edit-btn-archive" title="Archive">📦</button>
+          <button class="fs-icon-btn" id="fs-edit-btn-delete" title="Delete">🗑️</button>
+        </div>
+        <button class="fs-btn-primary" id="fs-edit-btn-close">Close</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js" defer></script>
+  
+  <!-- FlockOS Core -->
+  <script defer src="Scripts/firm_foundation.js"></script>
+  <script defer src="Scripts/the_upper_room.js"></script>
+  <script defer src="Scripts/the_true_vine.js"></script>
+  <script defer src="Scripts/the_unity_header.js"></script>
+  
+  <!-- FlockShamar App -->
+  <script src="app.flockshamar/flockshamar.js" type="module"></script>
+  <!-- Google Keep features -->
+  <script defer src="app.flockshamar/flockshamar-gkeep-features.js"></script>
+</body>
+</html>

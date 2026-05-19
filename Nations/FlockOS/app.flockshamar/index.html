@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Resolve all relative paths from the parent New_Covenant/ directory -->
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>FlockShamar — Sign In</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="app.flockshamar/manifest.json">
+  <link rel="icon" href="Images/FlockIcon-512.webp">
+  <link rel="apple-touch-icon" href="Images/FlockIcon-512.webp">
+  <meta name="theme-color" content="#fbbf24">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="FlockShamar">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy-start: #0f1735;
+      --navy-end:   #1b264f;
+      --gold:       #fbbf24;
+      --gold-dark:  #f59e0b;
+      --ink:        #ffffff;
+      --muted:      rgba(255,255,255,.65);
+      --danger:     #f87171;
+    }
+
+    html, body {
+      height: 100%;
+      background: linear-gradient(135deg, var(--navy-start) 0%, var(--navy-end) 100%);
+      color: var(--ink);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    /* ── Card ─────────────────────────────────────────────── */
+    .card {
+      position: relative;
+      background: rgba(255,255,255,.98);
+      border-radius: 16px;
+      padding: 40px 36px 36px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.25);
+    }
+
+    /* ── Brand ────────────────────────────────────────────── */
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 32px;
+    }
+    .brand-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #a16207, #fbbf24);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(161,98,7,.25);
+    }
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      color: var(--navy-start);
+    }
+    .brand-sub {
+      font-size: .75rem;
+      color: rgba(15,23,53,.6);
+      margin-top: 2px;
+      letter-spacing: 0;
+    }
+
+    /* ── Section label ───────────────────────────────────── */
+    .form-title {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      margin-bottom: 20px;
+    }
+
+    /* ── Fields ──────────────────────────────────────────── */
+    .field-group { margin-bottom: 16px; }
+    label {
+      display: block;
+      font-size: .813rem;
+      font-weight: 600;
+      color: rgba(15,23,53,.75);
+      margin-bottom: 6px;
+      letter-spacing: 0;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      background: #ffffff;
+      border: 1.5px solid rgba(15,23,53,.15);
+      border-radius: 8px;
+      color: var(--navy-start);
+      font-family: inherit;
+      font-size: .875rem;
+      padding: 10px 13px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      -webkit-appearance: none;
+    }
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(251,191,36,.12);
+    }
+    input::placeholder { color: rgba(15,23,53,.35); }
+
+    /* ── Button ──────────────────────────────────────────── */
+    .btn-signin {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+      color: #0f1735;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .875rem;
+      font-weight: 700;
+      padding: 11px;
+      cursor: pointer;
+      margin-top: 8px;
+      letter-spacing: .01em;
+      transition: opacity .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 2px 8px rgba(251,191,36,.3);
+    }
+    .btn-signin:hover  { opacity: .92; box-shadow: 0 4px 12px rgba(251,191,36,.4); transform: translateY(-1px); }
+    .btn-signin:active { transform: scale(.98) translateY(0); }
+    .btn-signin:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+
+    /* ── Error ───────────────────────────────────────────── */
+    .error-msg {
+      display: none;
+      background: rgba(248,113,113,.08);
+      border: 1px solid rgba(248,113,113,.22);
+      border-radius: 8px;
+      color: #dc2626;
+      font-size: .813rem;
+      padding: 10px 13px;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+    .error-msg.visible { display: block; }
+
+    /* ── Spinner ─────────────────────────────────────────── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(15,23,53,.25);
+      border-top-color: #0f1735;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .foot-note {
+      text-align: center;
+      color: rgba(15,23,53,.55);
+      font-size: .75rem;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H3v9h18v-9h-6M7 21V8h10v13"/><rect x="9" y="3" width="6" height="5" rx="1"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">FlockShamar</div>
+        <div class="brand-sub">Keep & Guard Your Notes</div>
+      </div>
+    </div>
+
+    <div class="form-title">Sign in to continue</div>
+
+    <form id="signin-form" method="post" autocomplete="on" novalidate>
+      <div class="field-group">
+        <label for="fs-email">Email</label>
+        <input type="email" id="fs-email" name="email" placeholder="you@church.com" autocomplete="email" required>
+      </div>
+
+      <div class="field-group">
+        <label for="fs-pass">Passcode</label>
+        <input type="password" id="fs-pass" name="password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+
+      <button type="submit" class="btn-signin" id="fs-submit">Sign In</button>
+    </form>
+
+    <div class="error-msg" id="fs-error"></div>
+
+    <p class="foot-note">"The Lord bless you and keep you" — Numbers 6:24</p>
+  </div>
+
+  <!-- Firebase & auth dependencies -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js" defer></script>
+  <script defer src="Scripts/firm_foundation.js"></script>
+  <script defer src="Scripts/the_upper_room.js"></script>
+  <script defer src="Scripts/the_true_vine.js"></script>
+
+  <script>
+    (function () {
+      var APP_URL = 'app.flockshamar/app.flockshamar.html';
+
+      function ready(fn) {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', fn);
+        } else {
+          fn();
+        }
+      }
+
+      ready(function () {
+        // If already authenticated, jump straight to the app
+        if (typeof Nehemiah !== 'undefined' && Nehemiah.isAuthenticated()) {
+          window.location.replace(APP_URL);
+          return;
+        }
+
+        var form   = document.getElementById('signin-form');
+        var btn    = document.getElementById('fs-submit');
+        var errBox = document.getElementById('fs-error');
+
+        function showError(msg) {
+          errBox.textContent = msg;
+          errBox.classList.add('visible');
+        }
+        function clearError() {
+          errBox.classList.remove('visible');
+        }
+        function setLoading(on) {
+          btn.disabled = on;
+          btn.innerHTML = on
+            ? '<span class="spinner"></span>Signing in…'
+            : 'Sign In';
+        }
+
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          clearError();
+
+          var email = document.getElementById('fs-email').value.trim();
+          var pass  = document.getElementById('fs-pass').value;
+
+          if (!email || !pass) {
+            showError('Please enter your email and passcode.');
+            return;
+          }
+
+          if (typeof Nehemiah === 'undefined') {
+            showError('Auth system not loaded yet. Please refresh and try again.');
+            return;
+          }
+
+          setLoading(true);
+          try {
+            await Nehemiah.login(email, pass);
+            window.location.replace(APP_URL);
+          } catch (err) {
+            setLoading(false);
+            showError(err.message || 'Sign in failed. Check your credentials and try again.');
+          }
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>

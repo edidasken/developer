@@ -44,6 +44,10 @@
 
   <!-- Styles — new_covenant.css contains all shared styles -->
   <link rel="stylesheet" href="Styles/new_covenant.css">
+  <!-- Google Docs feature styles -->
+  <link rel="stylesheet" href="app.flockdocs/flockdocs-gdocs-styles.css">
+  <!-- Google Sheets feature styles -->
+  <link rel="stylesheet" href="app.flockdocs/flockdocs-gsheets-styles.css">
 
   <!-- App-specific styles -->
   <style>
@@ -266,6 +270,26 @@
     .fd-doc-meta {
       font: 500 0.75rem var(--font-ui);
       color: rgba(255,255,255,0.55);
+      line-height: 1.5;
+    }
+
+    .fd-doc-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .fd-doc-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .fd-doc-meta-item svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0.7;
     }
 
     .fd-doc-menu-btn {
@@ -303,6 +327,191 @@
       color: rgba(15, 23, 53, 0.65);
       margin: 0 0 24px;
     }
+    /* Modal Dialogs */
+    .fd-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .fd-modal-overlay.is-open {
+      display: flex;
+    }
+
+    .fd-modal {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      animation: fdModalSlideIn 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @keyframes fdModalSlideIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fd-modal-header {
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .fd-modal-header h3 {
+      margin: 0;
+      font: 600 1.125rem var(--font-ui);
+      color: #0f1735;
+    }
+
+    .fd-modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      font-size: 28px;
+      color: #6b7280;
+      cursor: pointer;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      line-height: 1;
+    }
+
+    .fd-modal-close:hover {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .fd-modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .fd-modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .fd-modal-text {
+      font: 400 0.938rem var(--font-ui);
+      color: #374151;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .fd-form-group {
+      margin-bottom: 16px;
+    }
+
+    .fd-form-label {
+      display: block;
+      font: 600 0.875rem var(--font-ui);
+      color: #374151;
+      margin-bottom: 6px;
+    }
+
+    .fd-form-input, .fd-form-select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font: 400 0.938rem var(--font-ui);
+      color: #1f2937;
+      background: white;
+      transition: all 0.15s;
+    }
+
+    .fd-form-input:focus, .fd-form-select:focus {
+      outline: none;
+      border-color: var(--fd-gold);
+      box-shadow: 0 0 0 3px rgba(232, 168, 56, 0.1);
+    }
+
+    /* Context Menu */
+    .fd-context-menu {
+      display: none;
+      position: fixed;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      min-width: 200px;
+      z-index: 9999;
+      overflow: hidden;
+      animation: fdContextSlideIn 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .fd-context-menu.is-open {
+      display: block;
+    }
+
+    @keyframes fdContextSlideIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .fd-context-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font: 500 0.875rem var(--font-ui);
+      color: #1f2937;
+      transition: background 0.15s;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .fd-context-item:hover {
+      background: #f3f4f6;
+    }
+
+    .fd-context-item svg {
+      width: 16px;
+      height: 16px;
+      color: #6b7280;
+    }
+
+    .fd-context-item.is-danger {
+      color: #dc2626;
+    }
+
+    .fd-context-item.is-danger svg {
+      color: #dc2626;
+    }
+
+    .fd-context-divider {
+      height: 1px;
+      background: #e5e7eb;
+      margin: 4px 0;
+    }    .fd-empty-state .fd-btn svg {
+      width: 18px; height: 18px;
+      margin: 0;
+      color: currentColor;
+      stroke: currentColor;
+    }
 
     /* Buttons — matching FlockStand/FlockShow pattern */
     .fd-btn {
@@ -312,7 +521,7 @@
       font-size: .875rem; font-weight: 600; text-decoration: none;
       transition: all .15s; white-space: nowrap;
     }
-    .fd-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .fd-btn svg { width: 18px; height: 18px; flex-shrink: 0; stroke: currentColor; }
     .fd-btn--primary {
       background: var(--fd-gold); color: #1a1208;
       box-shadow: 0 4px 12px rgba(232,168,56,0.25);
@@ -447,6 +656,154 @@
     /* Hidden utility */
     .hidden { display: none !important; }
 
+    /* ── Spreadsheet view ────────────────────────────────────────────────── */
+    .fd-spreadsheet-view {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: var(--bg);
+    }
+
+    .fd-spreadsheet-toolbar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 20px;
+      background: var(--fd-panel);
+      border-bottom: 1px solid var(--fd-border);
+    }
+
+    .fd-cell-ref-box {
+      display: flex; align-items: center;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      min-width: 60px;
+    }
+
+    .fd-cell-ref {
+      font: 600 0.875rem 'Plus Jakarta Sans', monospace;
+      color: var(--fd-gold);
+    }
+
+    .fd-formula-bar-wrap {
+      display: flex; align-items: center; gap: 8px;
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 6px 12px;
+    }
+
+    .fd-formula-label {
+      font: 600 0.875rem var(--font-ui);
+      color: rgba(255,255,255,0.5);
+    }
+
+    .fd-formula-bar {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font: 500 0.875rem 'Plus Jakarta Sans', monospace;
+      padding: 0;
+    }
+
+    .fd-formula-bar::placeholder {
+      color: rgba(255,255,255,0.3);
+    }
+
+    .fd-spreadsheet-header {
+      padding: 16px 24px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .fd-spreadsheet-header h2 {
+      font: 700 1.5rem var(--font-ui);
+      color: var(--ink);
+      margin: 0;
+    }
+
+    .fd-spreadsheet-container-wrap {
+      flex: 1;
+      overflow: auto;
+      background: var(--bg);
+    }
+
+    .fd-spreadsheet-container {
+      min-width: 100%;
+      padding: 0;
+    }
+
+    .fd-spreadsheet-table {
+      border-collapse: collapse;
+      background: white;
+      width: auto;
+      table-layout: fixed;
+    }
+
+    .fd-cell-header {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border: 1px solid #dee2e6;
+      padding: 8px;
+      font: 600 0.75rem var(--font-ui);
+      color: #495057;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      left: 0;
+      z-index: 10;
+      min-width: 40px;
+      width: 100px;
+    }
+
+    .fd-cell-header:first-child {
+      width: 40px;
+      min-width: 40px;
+    }
+
+    .fd-cell {
+      border: 1px solid #dee2e6;
+      padding: 0;
+      min-width: 100px;
+      width: 100px;
+      height: 28px;
+      background: white;
+      cursor: cell;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fd-cell.is-selected {
+      outline: 2px solid var(--fd-gold);
+      outline-offset: -2px;
+      z-index: 5;
+    }
+
+    .fd-cell-content {
+      padding: 4px 8px;
+      font: 400 0.875rem var(--font-ui);
+      color: #1f2937;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .fd-cell-input {
+      width: 100%;
+      height: 100%;
+      border: none;
+      outline: none;
+      padding: 4px 8px;
+      font: 400 0.875rem var(--font-ui);
+      color: #1f2937;
+      background: white;
+    }
+
     /* Footer */
     #fd-footer {
       display: flex; align-items: center; justify-content: space-between;
@@ -459,6 +816,38 @@
   </style>
 </head>
 <body>
+
+  <!-- Auth guard - redirect to login if not authenticated (deployed environments only) -->
+  <script>
+    (function() {
+      // Check if running in deployed environment (not localhost)
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      
+      // Only enforce auth gate in deployed environments
+      if (!isLocalhost) {
+        // Early auth check - redirect before page renders if not authenticated
+        function checkAuth() {
+          try {
+            // Check if Firebase Auth has a current user
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+              const user = firebase.auth().currentUser;
+              if (!user) {
+                console.warn('[FlockDocs] No authenticated user in deployed environment, redirecting to login');
+                window.location.replace('index.html');
+                return false;
+              }
+            }
+          } catch (err) {
+            console.error('[FlockDocs] Auth check error:', err);
+          }
+          return true;
+        }
+        
+        // Run check after a brief delay to let Firebase initialize
+        setTimeout(checkAuth, 200);
+      }
+    })();
+  </script>
 
   <!-- Auth gate placeholder (will be injected by firm_foundation.js) -->
   <div id="auth-gate"></div>
@@ -502,7 +891,10 @@
         </div>
 
         <div class="fd-sidebar-section">
-          <div class="fd-sidebar-title">Folders</div>
+          <div class="fd-sidebar-title">
+            Folders
+            <button onclick="FlockDocs.createFolder()" style="float:right;background:transparent;border:none;color:var(--fd-gold);cursor:pointer;font-size:18px;padding:0;margin:-2px 0 0;line-height:1" title="Create new folder">+</button>
+          </div>
           <div id="fd-folders-list">
             <!-- Folders will be injected here -->
           </div>
@@ -544,7 +936,7 @@
             <h3>No documents yet</h3>
             <p>Create your first document to get started</p>
             <button class="fd-btn fd-btn--primary" onclick="FlockDocs.createNewDocument()">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
               </svg>
               Create Document
@@ -555,6 +947,7 @@
 
       <!-- Editor view -->
       <div class="fd-editor-view hidden" id="fd-editor-view">
+        <!-- Main Toolbar -->
         <div class="fd-editor-toolbar">
           <button class="fd-toolbar-btn" data-action="back" title="Back to library">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -564,70 +957,213 @@
 
           <div class="fd-toolbar-divider"></div>
 
-          <select class="fd-toolbar-select" id="fd-format-select">
-            <option value="p">Paragraph</option>
-            <option value="h1">Heading 1</option>
-            <option value="h2">Heading 2</option>
-            <option value="h3">Heading 3</option>
+          <!-- Font Family -->
+          <select class="fd-toolbar-select" id="fd-font-select" title="Font">
+            <option value="Arial">Arial</option>
+            <option value="Calibri">Calibri</option>
+            <option value="Comic Sans MS">Comic Sans MS</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Helvetica">Helvetica</option>
+            <option value="Impact">Impact</option>
+            <option value="Roboto">Roboto</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Trebuchet MS">Trebuchet MS</option>
+            <option value="Verdana">Verdana</option>
+          </select>
+
+          <!-- Font Size -->
+          <select class="fd-toolbar-select fd-toolbar-select--small" id="fd-font-size-select" title="Font size">
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="14">14</option>
+            <option value="16" selected>16</option>
+            <option value="18">18</option>
+            <option value="20">20</option>
+            <option value="24">24</option>
+            <option value="30">30</option>
+            <option value="36">36</option>
+            <option value="48">48</option>
+            <option value="60">60</option>
+            <option value="72">72</option>
+            <option value="96">96</option>
           </select>
 
           <div class="fd-toolbar-divider"></div>
 
-          <button class="fd-toolbar-btn" data-format="bold" title="Bold">
-            <svg fill="currentColor" viewBox="0 0 24 24">
+          <!-- Text Style -->
+          <button class="fd-toolbar-btn" data-format="bold" title="Bold (Ctrl+B)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
               <path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/>
             </svg>
           </button>
 
-          <button class="fd-toolbar-btn" data-format="italic" title="Italic">
-            <svg fill="currentColor" viewBox="0 0 24 24">
+          <button class="fd-toolbar-btn" data-format="italic" title="Italic (Ctrl+I)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
               <path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/>
             </svg>
           </button>
 
-          <button class="fd-toolbar-btn" data-format="underline" title="Underline">
-            <svg fill="currentColor" viewBox="0 0 24 24">
+          <button class="fd-toolbar-btn" data-format="underline" title="Underline (Ctrl+U)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/>
             </svg>
           </button>
 
+          <!-- Text Color -->
+          <div class="fd-color-picker-wrap">
+            <button class="fd-toolbar-btn fd-color-btn" id="fd-text-color-btn" title="Text color">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11 3L5.5 17h2.25l1.12-3h6.25l1.12 3h2.25L13 3h-2zm-1.38 9L12 5.67 14.38 12H9.62z"/>
+                <rect id="fd-text-color-bar" x="3" y="20" width="18" height="3" fill="#000000"/>
+              </svg>
+            </button>
+            <input type="color" class="fd-color-input" id="fd-text-color-input" value="#000000">
+          </div>
+
+          <!-- Highlight Color -->
+          <div class="fd-color-picker-wrap">
+            <button class="fd-toolbar-btn fd-color-btn" id="fd-highlight-btn" title="Highlight color">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.75 7L14 3.25l-10 10V17h3.75l10-10zm2.96-2.96c.39-.39.39-1.02 0-1.41L18.37.29c-.39-.39-1.02-.39-1.41 0L15 2.25 18.75 6l1.96-1.96z"/>
+                <rect id="fd-highlight-color-bar" x="0" y="18" width="24" height="6" fill="#ffff00"/>
+              </svg>
+            </button>
+            <input type="color" class="fd-color-input" id="fd-highlight-color-input" value="#ffff00">
+          </div>
+
           <div class="fd-toolbar-divider"></div>
 
-          <button class="fd-toolbar-btn" data-format="insertUnorderedList" title="Bullet list">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          <!-- Paragraph Style -->
+          <select class="fd-toolbar-select" id="fd-format-select" title="Paragraph style">
+            <option value="p">Normal text</option>
+            <option value="h1">Heading 1</option>
+            <option value="h2">Heading 2</option>
+            <option value="h3">Heading 3</option>
+            <option value="h4">Heading 4</option>
+            <option value="h5">Heading 5</option>
+            <option value="h6">Heading 6</option>
+            <option value="blockquote">Quote</option>
+            <option value="pre">Code block</option>
+          </select>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Lists -->
+          <button class="fd-toolbar-btn" data-format="insertUnorderedList" title="Bulleted list">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <circle cx="4" cy="7" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="4" cy="17" r="2"/>
+              <path d="M7 6h14v2H7V6zm0 5h14v2H7v-2zm0 5h14v2H7v-2z"/>
             </svg>
           </button>
 
           <button class="fd-toolbar-btn" data-format="insertOrderedList" title="Numbered list">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20h10M7 16h10M7 12h10M7 8h10M3 20h1m0 0v-2m0 2v2m0-8h1m0 0V8m0 4v4m0-8h1m0 0V3m0 1v1"/>
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/>
+            </svg>
+          </button>
+
+          <!-- Checklist -->
+          <button class="fd-toolbar-btn" id="fd-checklist-btn" title="Checklist">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M22 5.18L10.59 16.6l-4.24-4.24 1.41-1.41 2.83 2.83 10-10L22 5.18zM12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8c1.57 0 3.04.46 4.28 1.25l1.45-1.45C16.1 2.67 14.13 2 12 2 6.48 2 2 6.48 2 12s4.48 10 10 10c1.73 0 3.36-.44 4.78-1.22l-1.5-1.5c-1 .46-2.11.72-3.28.72z"/>
             </svg>
           </button>
 
           <div class="fd-toolbar-divider"></div>
 
-          <button class="fd-toolbar-btn" data-format="justifyLeft" title="Align left">
-            <svg fill="currentColor" viewBox="0 0 24 24">
+          <!-- Indent -->
+          <button class="fd-toolbar-btn" data-format="outdent" title="Decrease indent">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M11 17h10v-2H11v2zm-8-5l4 4V8l-4 4zm0 9h18v-2H3v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/>
+            </svg>
+          </button>
+
+          <button class="fd-toolbar-btn" data-format="indent" title="Increase indent">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 9h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/>
+            </svg>
+          </button>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Alignment -->
+          <button class="fd-toolbar-btn" data-format="justifyLeft" title="Align left (Ctrl+Shift+L)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
               <path d="M3 3h18v2H3V3zm0 8h12v2H3v-2zm0 8h18v2H3v-2zm0-4h12v2H3v-2zm0-8h18v2H3V7z"/>
             </svg>
           </button>
 
-          <button class="fd-toolbar-btn" data-format="justifyCenter" title="Align center">
-            <svg fill="currentColor" viewBox="0 0 24 24">
+          <button class="fd-toolbar-btn" data-format="justifyCenter" title="Align center (Ctrl+Shift+E)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
               <path d="M3 3h18v2H3V3zm4 8h10v2H7v-2zm-4 8h18v2H3v-2zm4-4h10v2H7v-2zm-4-8h18v2H3V7z"/>
             </svg>
           </button>
 
-          <button class="fd-toolbar-btn" data-format="justifyRight" title="Align right">
-            <svg fill="currentColor" viewBox="0 0 24 24">
+          <button class="fd-toolbar-btn" data-format="justifyRight" title="Align right (Ctrl+Shift+R)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
               <path d="M3 3h18v2H3V3zm6 8h12v2H9v-2zm-6 8h18v2H3v-2zm6-4h12v2H9v-2zm-6-8h18v2H3V7z"/>
+            </svg>
+          </button>
+
+          <button class="fd-toolbar-btn" data-format="justifyFull" title="Justify">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 3h18v2H3V3zm0 8h18v2H3v-2zm0 8h18v2H3v-2zm0-4h18v2H3v-2zm0-8h18v2H3V7z"/>
+            </svg>
+          </button>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Line Spacing -->
+          <button class="fd-toolbar-btn" id="fd-line-spacing-btn" title="Line & paragraph spacing">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6 7h2.5L5 3.5 1.5 7H4v10H1.5L5 20.5 8.5 17H6V7zm4-2v2h12V5H10zm0 14h12v-2H10v2zm0-6h12v-2H10v2z"/>
+            </svg>
+          </button>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- Insert Link -->
+          <button class="fd-toolbar-btn" id="fd-link-btn" title="Insert link (Ctrl+K)">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+            </svg>
+          </button>
+
+          <!-- Insert Image -->
+          <button class="fd-toolbar-btn" id="fd-image-btn" title="Insert image">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+            </svg>
+          </button>
+
+          <!-- Insert Table -->
+          <button class="fd-toolbar-btn" id="fd-table-btn" title="Insert table">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 10.02h5V21h-5zM17 21h3c1.1 0 2-.9 2-2v-9h-5v11zm3-18H5c-1.1 0-2 .9-2 2v3h19V5c0-1.1-.9-2-2-2zM3 19c0 1.1.9 2 2 2h3V10.02H3V19z"/>
+            </svg>
+          </button>
+
+          <div class="fd-toolbar-divider"></div>
+
+          <!-- More Tools -->
+          <button class="fd-toolbar-btn" id="fd-more-btn" title="More options">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
             </svg>
           </button>
 
           <div class="fd-spacer"></div>
 
-          <button class="fd-btn fd-btn--ghost" id="fd-save-btn">Save</button>
+          <!-- Auto-save status -->
+          <span id="fd-save-status" class="fd-save-status">Saved</span>
+
+          <!-- Comments / Share -->
+          <button class="fd-btn fd-btn--ghost" id="fd-comments-btn" title="Comments">💬</button>
+          <button class="fd-btn fd-btn--primary" id="fd-share-doc-btn">Share</button>
         </div>
 
         <div class="fd-editor-container">
@@ -640,6 +1176,119 @@
         </div>
       </div>
 
+      <!-- Spreadsheet view -->
+      <div class="fd-spreadsheet-view hidden" id="fd-spreadsheet-view">
+        <!-- Formatting Toolbar -->
+        <div class="fd-ss-format-bar" id="fd-ss-format-bar">
+          <button class="fd-toolbar-btn" data-action="back" title="Back to library">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+          </button>
+
+          <div class="fd-ss-toolbar-divider"></div>
+
+          <!-- Number Format -->
+          <select class="fd-ss-format-select" id="fd-ss-number-format" title="Number format">
+            <option value="general">Automatic</option>
+            <option value="number">Number</option>
+            <option value="currency">Currency</option>
+            <option value="percent">Percent</option>
+            <option value="date">Date</option>
+            <option value="time">Time</option>
+            <option value="text">Plain text</option>
+          </select>
+
+          <div class="fd-ss-toolbar-divider"></div>
+
+          <!-- Font Styling -->
+          <button class="fd-ss-toolbar-btn" data-format="bold" title="Bold">
+            <b>B</b>
+          </button>
+          <button class="fd-ss-toolbar-btn" data-format="italic" title="Italic">
+            <i>I</i>
+          </button>
+          <button class="fd-ss-toolbar-btn" data-format="underline" title="Underline">
+            <u>U</u>
+          </button>
+
+          <div class="fd-ss-toolbar-divider"></div>
+
+          <!-- Alignment -->
+          <button class="fd-ss-toolbar-btn" data-action="align-left" title="Align left">
+            ≡
+          </button>
+          <button class="fd-ss-toolbar-btn" data-action="align-center" title="Align center">
+            ≣
+          </button>
+          <button class="fd-ss-toolbar-btn" data-action="align-right" title="Align right">
+            ≢
+          </button>
+
+          <div class="fd-ss-toolbar-divider"></div>
+
+          <!-- Data Tools -->
+          <button class="fd-ss-toolbar-btn" id="fd-ss-merge-cells" title="Merge cells">
+            ⊞
+          </button>
+          <button class="fd-ss-toolbar-btn" id="fd-ss-wrap-text" title="Wrap text">
+            ↩
+          </button>
+
+          <div class="fd-ss-toolbar-divider"></div>
+
+          <!-- Insert Tools -->
+          <button class="fd-ss-toolbar-btn" id="fd-ss-insert-chart" title="Insert chart">
+            📊
+          </button>
+          <button class="fd-ss-toolbar-btn" id="fd-ss-add-filter" title="Create a filter">
+            🔽
+          </button>
+          <button class="fd-ss-toolbar-btn" id="fd-ss-pivot-table" title="Pivot table">
+            🎯
+          </button>
+
+          <div class="fd-ss-toolbar-divider"></div>
+
+          <!-- Protection & More -->
+          <button class="fd-ss-toolbar-btn" id="fd-ss-protect-range" title="Protect range">
+            🔒
+          </button>
+          <button class="fd-ss-toolbar-btn" id="fd-ss-data-validation" title="Data validation">
+            ✓
+          </button>
+          <button class="fd-ss-toolbar-btn" id="fd-ss-conditional-format" title="Conditional formatting">
+            🎨
+          </button>
+
+          <div class="fd-spacer"></div>
+
+          <!-- Import/Export -->
+          <input type="file" id="fd-excel-import" accept=".xlsx,.xls" style="display:none">
+          <button class="fd-btn fd-btn--ghost" onclick="document.getElementById('fd-excel-import').click()" title="Import Excel">
+            Import
+          </button>
+          <button class="fd-btn fd-btn--ghost" onclick="FlockDocs.exportToExcel()" title="Export Excel">
+            Export
+          </button>
+          <button class="fd-btn fd-btn--primary" onclick="FlockDocs.saveDocument()">Save</button>
+        </div>
+
+        <!-- Formula Bar -->
+        <div class="fd-ss-formula-bar">
+          <div class="fd-ss-cell-ref" id="fd-ss-cell-ref">A1</div>
+          <input type="text" class="fd-ss-formula-input" id="fd-ss-formula-bar" placeholder="Enter a value or formula">
+        </div>
+
+        <div class="fd-spreadsheet-header">
+          <h2 id="fd-spreadsheet-title">Untitled Spreadsheet</h2>
+        </div>
+
+        <div class="fd-ss-grid-container" id="fd-spreadsheet-container">
+          <!-- Spreadsheet grid will be rendered here -->
+        </div>
+      </div>
+
     </div>
 
     <!-- Footer -->
@@ -649,6 +1298,30 @@
     </div>
 
   </div>
+
+  <!-- Modal Dialogs -->
+  <div id="fd-modal-overlay" class="fd-modal-overlay" onclick="_closeModal()">
+    <div class="fd-modal" onclick="event.stopPropagation()">
+      <div class="fd-modal-header">
+        <h3 id="fd-modal-title">Confirm Action</h3>
+        <button class="fd-modal-close" onclick="_closeModal()">&times;</button>
+      </div>
+      <div class="fd-modal-body" id="fd-modal-body">
+        <!-- Dynamic content -->
+      </div>
+      <div class="fd-modal-footer" id="fd-modal-footer">
+        <!-- Dynamic buttons -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div id="fd-context-menu" class="fd-context-menu">
+    <!-- Dynamic menu items -->
+  </div>
+
+  <!-- SheetJS for Excel import/export -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 
   <!-- Firebase & Auth -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
@@ -663,6 +1336,10 @@
 
   <!-- FlockDocs app logic -->
   <script src="app.flockdocs/flockdocs.js" type="module"></script>
+  <!-- Google Docs features -->
+  <script defer src="app.flockdocs/flockdocs-gdocs-features.js"></script>
+  <!-- Google Sheets features -->
+  <script defer src="app.flockdocs/flockdocs-gsheets-features.js"></script>
 
 </body>
 </html>

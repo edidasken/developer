@@ -55,10 +55,13 @@
   // Recent Sermons feed channel
   const SERMONS_ID = 'recent-sermons';
 
-  // Quick-lookup Set of all static group IDs (includes info + sanctuary)
+  // FlockNews feed channel (last 7 days)
+  const FLOCKNEWS_ID = 'flocknews';
+
+  // Quick-lookup Set of all static group IDs (includes info + sanctuary + news)
   const ALL_GROUP_IDS = new Set([
     ANNOUNCEMENTS_ID, MENS_MINISTRY_ID, WOMENS_MINISTRY_ID,
-    INFO_FLOCKCHAT_ID, INFO_FLOCKOS_ID, SANCTUARY_ID, SERMONS_ID,
+    INFO_FLOCKCHAT_ID, INFO_FLOCKOS_ID, SANCTUARY_ID, SERMONS_ID, FLOCKNEWS_ID,
     ...ALL_MEMBER_GROUPS.map(g => g.id)
   ]);
 
@@ -1057,6 +1060,7 @@
     _injectInfoChannels();
     _injectSanctuary();
     _injectSermons();
+    _injectFlockNews();
     _renderConversations();
     _srmCheckNewBadge();
 
@@ -1079,6 +1083,7 @@
         _injectInfoChannels();
         _injectSanctuary();
         _injectSermons();
+        _injectFlockNews();
         _renderConversations();
       }, err => {
         console.error('[FlockChat] Failed to load conversations:', err);
@@ -1090,6 +1095,7 @@
         _injectInfoChannels();
         _injectSanctuary();
         _injectSermons();
+        _injectFlockNews();
         _renderConversations();
       });
   }
@@ -1182,6 +1188,20 @@
       name:         'Recent Sermons',
       participants: [],
       lastMessage:  { text: 'Last 12 preached messages from your church', author: '', timestamp: null },
+      lastActivity: null,
+      unreadCount:  0,
+      _static:      true
+    });
+  }
+
+  function _injectFlockNews() {
+    _conversations = _conversations.filter(c => c.id !== FLOCKNEWS_ID);
+    _conversations.unshift({
+      id:           FLOCKNEWS_ID,
+      type:         'flocknews',
+      name:         'FlockNews',
+      participants: [],
+      lastMessage:  { text: 'Daily spiritual content & bulletin — last 7 days', author: '', timestamp: null },
       lastActivity: null,
       unreadCount:  0,
       _static:      true
@@ -1344,6 +1364,13 @@
           <line x1="12" y1="19" x2="12" y2="23"/>
           <line x1="8" y1="23" x2="16" y2="23"/>
         </svg>`;
+      case 'flocknews':
+        // Stacked layers icon matching the launcher
+        return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>`;
       default:
         // Generic chat bubble
         return `<svg width="28" height="28" viewBox="0 0 24 24" ${S}>
@@ -1362,6 +1389,7 @@
       || c.type === 'info-flockos'
       || c.type === 'my-sanctuary'
       || c.type === 'recent-sermons'
+      || c.type === 'flocknews'
       || ALL_MEMBER_GROUPS.some(g => g.type === c.type));
   }
   function _isArchivedForMe(c) {
@@ -1393,7 +1421,7 @@
 
     // ── Pinned section (all channel types) ───────────────────────────────
     const PINNED_TYPES = [
-      'my-sanctuary', 'recent-sermons',
+      'my-sanctuary', 'recent-sermons', 'flocknews',
       'announcement', 'prayer', 'pastoral',
       'ministry-men', 'ministry-women',
       'servant-team', 'worship-team', 'missions-team',
@@ -1658,7 +1686,7 @@
     // Hide composer for read-only info channels and sanctuary (has its own input)
     const composer = document.querySelector('.fc-composer');
     if (composer) {
-      const hideComposer = INFO_IDS.has(convId) || convId === SANCTUARY_ID || convId === SERMONS_ID;
+      const hideComposer = INFO_IDS.has(convId) || convId === SANCTUARY_ID || convId === SERMONS_ID || convId === FLOCKNEWS_ID;
       composer.style.display = hideComposer ? 'none' : '';
     }
 
@@ -1696,6 +1724,12 @@
     // Recent Sermons feed
     if (convId === SERMONS_ID) {
       _renderSermons(msgContainer);
+      return;
+    }
+
+    // FlockNews feed — last 7 days
+    if (convId === FLOCKNEWS_ID) {
+      _renderFlockNews(msgContainer);
       return;
     }
 
@@ -3171,6 +3205,84 @@
     }
   };
 
+  /* ── Reactions System ───────────────────────────────────────────────── */
+  const REACTION_EMOJIS = ['❤️', '👍', '🙏', '😊', '🎉', '👏', '🔥', '💯'];
+
+  window._showReactionPicker = function(msgId) {
+    // Remove existing picker if any
+    const existing = document.querySelector('.fc-reaction-picker');
+    if (existing) existing.remove();
+
+    // Find message element
+    const msgEl = document.querySelector(`[data-msg-id="${msgId}"]`);
+    if (!msgEl) return;
+
+    // Create picker
+    const picker = document.createElement('div');
+    picker.className = 'fc-reaction-picker';
+    picker.innerHTML = REACTION_EMOJIS.map(emoji => 
+      `<button class="fc-reaction-picker-btn" onclick="window._addReaction('${msgId}', '${emoji}'); this.parentElement.remove();">${emoji}</button>`
+    ).join('');
+
+    // Position near message
+    msgEl.style.position = 'relative';
+    msgEl.appendChild(picker);
+
+    // Close on outside click
+    setTimeout(() => {
+      document.addEventListener('click', function closeReactionPicker(e) {
+        if (!picker.contains(e.target) && !e.target.classList.contains('fc-reaction-add-btn')) {
+          picker.remove();
+          document.removeEventListener('click', closeReactionPicker);
+        }
+      });
+    }, 100);
+  };
+
+  window._addReaction = async function(msgId, emoji) {
+    if (!_activeConvId || !msgId) return;
+    try {
+      const msgRef = _db.collection('conversations').doc(_activeConvId)
+        .collection('messages').doc(msgId);
+      await msgRef.update({
+        [`reactions.${emoji}`]: firebase.firestore.FieldValue.arrayUnion(_me.uid)
+      });
+    } catch (err) {
+      console.error('[FlockChat] Add reaction failed:', err);
+      _toast('Failed to add reaction', 'error');
+    }
+  };
+
+  window._toggleReaction = async function(msgId, emoji) {
+    if (!_activeConvId || !msgId) return;
+    try {
+      const msg = _messages.find(m => m.id === msgId);
+      if (!msg) return;
+      
+      const reactions = msg.reactions || {};
+      const users = reactions[emoji] || [];
+      const hasReacted = users.includes(_me.uid);
+
+      const msgRef = _db.collection('conversations').doc(_activeConvId)
+        .collection('messages').doc(msgId);
+      
+      if (hasReacted) {
+        // Remove reaction
+        await msgRef.update({
+          [`reactions.${emoji}`]: firebase.firestore.FieldValue.arrayRemove(_me.uid)
+        });
+      } else {
+        // Add reaction
+        await msgRef.update({
+          [`reactions.${emoji}`]: firebase.firestore.FieldValue.arrayUnion(_me.uid)
+        });
+      }
+    } catch (err) {
+      console.error('[FlockChat] Toggle reaction failed:', err);
+      _toast('Failed to update reaction', 'error');
+    }
+  };
+
   /* ── Admin: Channel Manager ─────────────────────────────────────────── */
   // Cache uid → { name, email } to avoid redundant Firestore reads
   const _userCache = {};
@@ -3681,6 +3793,118 @@
       el.classList.remove('show');
       setTimeout(() => el.remove(), 300);
     }, 3800);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     FlockNews Feed Renderer — Last 7 Days
+   ══════════════════════════════════════════════════════════════════════ */
+
+  async function _renderFlockNews(container) {
+    container.innerHTML = '<div class="fc-loading"><div class="fc-spinner"></div></div>';
+    
+    // Calculate last 7 days
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().split('T')[0]; // YYYY-MM-DD
+      days.push({ key, date: d });
+    }
+
+    // Fetch FlockNews data from Firestore for each day
+    const newsCards = [];
+    try {
+      for (const day of days) {
+        const docSnap = await _db.collection('news').doc(day.key).get();
+        if (docSnap.exists) {
+          const data = docSnap.data();
+          newsCards.push({ ...data, dateKey: day.key, date: day.date });
+        } else {
+          // Add placeholder for missing days
+          newsCards.push({ dateKey: day.key, date: day.date, empty: true });
+        }
+      }
+    } catch (err) {
+      console.error('[FlockNews] Failed to fetch news data:', err);
+    }
+
+    if (newsCards.length === 0 || newsCards.every(n => n.empty)) {
+      container.innerHTML = `
+        <div class="fc-sct-section">
+          <div class="fc-sct-word-empty">
+            <div class="fc-sct-word-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e8a838" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <p>No FlockNews content available for the last 7 days.</p>
+            <p style="font-size: 14px; color: var(--ink-muted); margin-top: 8px;">
+              Check back later for daily spiritual content.
+            </p>
+          </div>
+        </div>`;
+      return;
+    }
+
+    const cardsHtml = newsCards.map(news => {
+      const dateStr = news.date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+      
+      if (news.empty) {
+        return `
+          <div class="fc-flocknews-card fc-flocknews-empty">
+            <div class="fc-flocknews-date">${dateStr}</div>
+            <p style="color: var(--ink-muted); font-size: 14px; padding: 20px;">No content available for this day.</p>
+          </div>`;
+      }
+
+      const intro = news.introduction?.content || '';
+      const pastor = news.pastorHeart?.content || '';
+      const announce = news.announcements?.content || '';
+      
+      return `
+        <div class="fc-flocknews-card">
+          <div class="fc-flocknews-header">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e8a838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+            </svg>
+            <span>FlockNews</span>
+          </div>
+          <div class="fc-flocknews-date">${dateStr}</div>
+          ${intro ? `<div class="fc-flocknews-section">
+            <h4>Welcome</h4>
+            <div class="fc-flocknews-content">${intro.substring(0, 200)}${intro.length > 200 ? '...' : ''}</div>
+          </div>` : ''}
+          ${pastor ? `<div class="fc-flocknews-section">
+            <h4>Pastor's Heart</h4>
+            <div class="fc-flocknews-content">${pastor.substring(0, 200)}${pastor.length > 200 ? '...' : ''}</div>
+          </div>` : ''}
+          ${announce ? `<div class="fc-flocknews-section">
+            <h4>Announcements</h4>
+            <div class="fc-flocknews-content">${announce.substring(0, 150)}${announce.length > 150 ? '...' : ''}</div>
+          </div>` : ''}
+          <a href="../app.flocknews/app.flocknews.html#${news.dateKey}" target="_blank" class="fc-flocknews-link">
+            View Full Day ↗
+          </a>
+        </div>`;
+    }).join('');
+
+    container.innerHTML = `
+      <div class="fc-flocknews-feed">
+        <div class="fc-flocknews-intro">
+          <h3>📰 FlockNews — Last 7 Days</h3>
+          <p>Daily spiritual content, Bible readings, devotionals, and church bulletin updates.</p>
+        </div>
+        ${cardsHtml}
+      </div>`;
   }
 
   console.log('[FlockChat]', VERSION, 'loaded');

@@ -1,0 +1,24 @@
+{
+  "name": "FlockNews",
+  "short_name": "FlockNews",
+  "description": "Daily spiritual content, word studies, and missions updates for your church",
+  "start_url": "/app.flocknews/app.flocknews.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/Images/FlockIcon-192.webp",
+      "sizes": "192x192",
+      "type": "image/webp"
+    },
+    {
+      "src": "/Images/FlockIcon-512.webp",
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ],
+  "categories": ["productivity", "news", "education"],
+  "screenshots": []
+}

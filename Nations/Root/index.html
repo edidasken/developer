@@ -283,7 +283,10 @@
     .app-btn--stand      { border-color: rgba(168,85,247,0.20); }
     .app-btn--show       { border-color: rgba(239,68,68,0.20);  }
     .app-btn--chat       { border-color: rgba(34,211,238,0.20); }
+    .app-btn--docs       { border-color: rgba(91,141,238,0.20); }
+    .app-btn--shamar     { border-color: rgba(251,191,36,0.20); }
     .app-btn--feed       { border-color: rgba(232,168,56,0.20); }
+    .app-btn--news       { border-color: rgba(232,168,56,0.20); }
     .app-btn--wellspring { border-color: rgba(34,197,94,0.20);  }
     .app-btn:hover.app-btn--grow       { border-color: rgba(232,168,56,0.50); }
     .app-btn:hover.app-btn--invite     { border-color: rgba(61,179,79,0.50);  }
@@ -291,7 +294,10 @@
     .app-btn:hover.app-btn--stand      { border-color: rgba(168,85,247,0.50); }
     .app-btn:hover.app-btn--show       { border-color: rgba(239,68,68,0.50);  }
     .app-btn:hover.app-btn--chat       { border-color: rgba(34,211,238,0.50); }
+    .app-btn:hover.app-btn--docs       { border-color: rgba(91,141,238,0.50); }
+    .app-btn:hover.app-btn--shamar     { border-color: rgba(251,191,36,0.50); }
     .app-btn:hover.app-btn--feed       { border-color: rgba(232,168,56,0.50); }
+    .app-btn:hover.app-btn--news       { border-color: rgba(232,168,56,0.50); }
     .app-btn:hover.app-btn--wellspring { border-color: rgba(34,197,94,0.50);  }
 
     .app-icon {
@@ -307,7 +313,10 @@
     .app-icon--stand      { background: linear-gradient(135deg,#4c1d95,#a855f7); }
     .app-icon--chat       { background: linear-gradient(135deg,#0c4a6e,#06b6d4); }
     .app-icon--show       { background: linear-gradient(135deg,#7f1d1d,#ef4444); }
+    .app-icon--docs       { background: linear-gradient(135deg,#1e3a8a,#3b82f6); }
+    .app-icon--shamar     { background: linear-gradient(135deg,#a16207,#fbbf24); }
     .app-icon--feed       { background: linear-gradient(135deg,#c48a20,#e8a838); }
+    .app-icon--news       { background: linear-gradient(135deg,#0f1735,#1b264f); }
     .app-icon--wellspring { background: linear-gradient(135deg,#15803d,#22c55e); }
     .app-label { flex: 1; }
     .app-label strong {
@@ -318,10 +327,13 @@
     }
     .app-btn--grow       .app-label strong { color: var(--gold); }
     .app-btn--invite     .app-label strong { color: #6ee7b7; }
+    .app-btn--news       .app-label strong { color: var(--gold); }
     .app-btn--flock      .app-label strong { color: #a0beff; }
     .app-btn--stand      .app-label strong { color: #d8b4fe; }
     .app-btn--show       .app-label strong { color: #fca5a5; }
     .app-btn--chat       .app-label strong { color: #67e8f9; }
+    .app-btn--docs       .app-label strong { color: #a0beff; }
+    .app-btn--shamar     .app-label strong { color: #fde68a; }
     .app-btn--feed       .app-label strong { color: var(--gold); }
     .app-btn--wellspring .app-label strong { color: #86efac; }
     .app-label span {
@@ -673,6 +685,21 @@
             <span class="app-arrow" aria-hidden="true">&#8594;</span>
           </a>
 
+          <a class="app-btn app-btn--news" href="app.flocknews/app.flocknews.html">
+            <div class="app-icon app-icon--news" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div class="app-label">
+              <strong>FlockNews</strong>
+              <span>Daily spiritual content & church bulletin</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
         </nav>
       </div>
 
@@ -735,6 +762,17 @@
             <div class="app-label">
               <strong>FlockDocs</strong>
               <span>Documents, word processing &amp; productivity</span>
+            </div>
+            <span class="app-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+
+          <a class="app-btn app-btn--shamar" href="app.flockshamar/app.flockshamar.html">
+            <div class="app-icon app-icon--shamar" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H3v9h18v-9h-6M7 21V8h10v13"/><rect x="9" y="3" width="6" height="5" rx="1"/></svg>
+            </div>
+            <div class="app-label">
+              <strong>FlockShamar</strong>
+              <span>Keep &amp; guard your notes — Numbers 6:24</span>
             </div>
             <span class="app-arrow" aria-hidden="true">&#8594;</span>
           </a>
