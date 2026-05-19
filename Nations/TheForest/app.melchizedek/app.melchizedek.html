@@ -52,36 +52,6 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body {
-      height: 100dvh; margin: 0; padding: 0;
-      color: var(--ink);
-      overflow: hidden;
-      overscroll-behavior: none;
-    }
-    body { background: var(--bg); }
-
-    /* Shell grid */
-    .gp-wrap {
-      display: grid;
-      grid-template-areas: "top top" "side main" "foot foot";
-      grid-template-columns: var(--sidebar-w, 256px) 1fr;
-      grid-template-rows: calc(var(--topbar-h, 60px) + var(--safe-top, 0px)) 1fr auto;
-      height: 100dvh;
-      position: relative;
-    }
-    .gp-topbar  { grid-area: top; }
-    .gp-sidebar { grid-area: side; overflow-y: auto; }
-    .gp-main    { grid-area: main; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
-    .gp-footer  { grid-area: foot; }
-
-    @media (max-width: 860px) {
-      .gp-wrap {
-        grid-template-areas: "top" "main" "foot";
-        grid-template-columns: 1fr;
-        grid-template-rows: calc(var(--topbar-h, 60px) + var(--safe-top, 0px)) 1fr auto;
-      }
-      .gp-sidebar { display: none; }
-    }
 
     /* Boot splash */
     #melch-boot {
@@ -89,41 +59,15 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       background: var(--bg, #0e1628); gap: 14px;
     }
-    #melch-boot .boot-icon {
-      width: 52px; height: 52px; opacity: 0.85;
-    }
+    #melch-boot .boot-icon { width: 52px; height: 52px; opacity: 0.85; }
     #melch-boot .boot-label {
       font: 700 0.72rem/1 var(--font-ui, 'Plus Jakarta Sans', sans-serif);
       letter-spacing: .14em; text-transform: uppercase;
-      color: var(--gold, #d4a843); opacity: 0.7;
+      color: var(--gold, #e8a838); opacity: 0.7;
     }
     #melch-boot .boot-sub {
       font: 400 0.78rem/1 var(--font-ui, 'Plus Jakarta Sans', sans-serif);
       color: var(--ink-muted, #7a7f96);
-    }
-
-    /* Auth overlay */
-    #melch-auth-overlay {
-      position: fixed; inset: 0; z-index: 9000;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--bg, #0e1628);
-    }
-    .melch-auth-card {
-      background: var(--bg-raised, #fff);
-      border-radius: 16px; padding: 36px 28px;
-      max-width: 360px; width: 90%;
-      text-align: center; box-shadow: 0 4px 32px rgba(0,0,0,.18);
-    }
-    .melch-auth-icon {
-      font-size: 2.4rem; margin-bottom: 12px;
-    }
-    .melch-auth-title {
-      font: 700 1.1rem/1.3 var(--font-ui, sans-serif);
-      color: var(--ink, #1b264f); margin-bottom: 8px;
-    }
-    .melch-auth-msg {
-      font: 400 0.87rem/1.5 var(--font-ui, sans-serif);
-      color: var(--ink-muted, #7a7f96); margin-bottom: 20px;
     }
 
     /* Pull-to-refresh */
@@ -131,13 +75,13 @@
       position: sticky; top: 0; z-index: 100;
       text-align: center; padding: 8px;
       font: 600 0.78rem var(--font-ui, sans-serif);
-      color: var(--gold, #d4a843); background: var(--bg, #0e1628);
+      color: var(--gold, #e8a838); background: var(--bg, #0e1628);
       opacity: 0; pointer-events: none; transition: opacity .2s;
     }
     .ptr-indicator.visible { opacity: 1; }
   </style>
 </head>
-<body>
+<body class="veil-app">
 
   <!-- Boot splash -->
   <div id="melch-boot">
@@ -149,57 +93,68 @@
     <div class="boot-sub">Background Checks</div>
   </div>
 
-  <!-- Auth error overlay (populated by melchizedek.js if access denied) -->
-  <div id="melch-auth-overlay" hidden></div>
-
   <!-- App root -->
   <div id="melch-app" hidden>
-    <div class="gp-wrap" id="gp-wrap">
+    <div class="veil-wrap">
 
       <!-- Topbar -->
-      <header class="gp-topbar nc-topbar" id="gp-topbar">
-        <div class="nc-topbar-brand">
-          <a class="nc-topbar-home" href="../" aria-label="Back to FlockOS Launcher">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/>
-              <polyline points="9,12 11,14 15,10"/>
-            </svg>
-          </a>
-          <span class="nc-topbar-title">Melchizedek</span>
-        </div>
-        <div class="nc-topbar-actions" id="melch-topbar-actions"></div>
+      <header class="veil-top">
+        <a class="veil-brand" href="../" aria-label="Back to FlockOS Launcher">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold,#e8a838)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/>
+            <polyline points="9,12 11,14 15,10"/>
+          </svg>
+          <span class="veil-brand-text">Melchizedek</span>
+        </a>
+        <span class="veil-spacer"></span>
+        <!-- Hamburger — shown on mobile by CSS, hidden on desktop -->
+        <button class="veil-menu veil-action" data-act="menu" aria-label="Open navigation" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
       </header>
 
       <!-- Sidebar -->
-      <nav class="gp-sidebar nc-sidebar" id="gp-sidebar" aria-label="Navigation">
-        <div class="nc-sidebar-inner">
-          <button class="nc-nav-item is-active" data-melch-view="overview" aria-current="page">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-            Overview
-          </button>
-          <button class="nc-nav-item" data-melch-view="members">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            All Members
-          </button>
-          <button class="nc-nav-item" data-melch-view="pending">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-            Pending
-          </button>
-          <button class="nc-nav-item" data-melch-view="approved">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/><polyline points="9,12 11,14 15,10"/></svg>
-            Approved
-          </button>
-          <button class="nc-nav-item" data-melch-view="not-approved">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/><line x1="10" y1="10" x2="14" y2="14"/><line x1="14" y1="10" x2="10" y2="14"/></svg>
-            Not Approved
-          </button>
-        </div>
+      <nav id="the-veil-side" class="veil-side" aria-label="Navigation">
+        <button class="pillars-item is-active" data-melch-view="overview" aria-current="page">
+          <span class="pillars-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          </span>
+          <span class="pillars-label">Overview</span>
+        </button>
+        <button class="pillars-item" data-melch-view="members">
+          <span class="pillars-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
+          <span class="pillars-label">All Members</span>
+        </button>
+        <button class="pillars-item" data-melch-view="pending">
+          <span class="pillars-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+          </span>
+          <span class="pillars-label">Pending</span>
+        </button>
+        <button class="pillars-item" data-melch-view="approved">
+          <span class="pillars-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/><polyline points="9,12 11,14 15,10"/></svg>
+          </span>
+          <span class="pillars-label">Approved</span>
+        </button>
+        <button class="pillars-item" data-melch-view="not-approved">
+          <span class="pillars-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/><line x1="10" y1="10" x2="14" y2="14"/><line x1="14" y1="10" x2="10" y2="14"/></svg>
+          </span>
+          <span class="pillars-label">Not Approved</span>
+        </button>
       </nav>
 
       <!-- Main content -->
-      <main class="gp-main" id="gp-main" tabindex="-1">
+      <main class="veil-main" id="gp-main" tabindex="-1">
         <div class="ptr-indicator" id="ptrIndicator">&#8635; Release to refresh</div>
-        <div id="melch-content" style="padding: 24px 20px 48px;">
+        <div id="melch-content" style="padding: 4px 0 48px;">
           <!-- Populated by melchizedek.js -->
         </div>
       </main>
@@ -227,9 +182,32 @@
 
   <!-- FlockOS auth + session layer -->
   <script defer src="Scripts/firm_foundation.js"></script>
-  <script defer src="Scripts/the_upper_room.js"></script>  <script defer src="../Scripts/the_true_vine.js"></script>
+  <script defer src="Scripts/the_upper_room.js"></script>
+  <script defer src="Scripts/the_true_vine.js"></script>
   <!-- App logic -->
   <script type="module" src="app.melchizedek/melchizedek.js"></script>
+
+  <!-- Hamburger toggle -->
+  <script>
+  (function () {
+    document.addEventListener('click', function (e) {
+      var menuBtn = e.target.closest('[data-act="menu"]');
+      if (menuBtn) {
+        var open = document.body.classList.toggle('veil-side-open');
+        menuBtn.setAttribute('aria-expanded', String(open));
+        return;
+      }
+      // Close sidebar when backdrop (outside sidebar) is clicked
+      if (document.body.classList.contains('veil-side-open') &&
+          !e.target.closest('#the-veil-side') &&
+          !e.target.closest('[data-act="menu"]')) {
+        document.body.classList.remove('veil-side-open');
+        var btn = document.querySelector('[data-act="menu"]');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  })();
+  </script>
 
   <!-- Pull-to-Refresh -->
   <script>
@@ -250,7 +228,7 @@
       else if (dy < 30) { triggered = false; ptr.classList.remove('visible'); }
     }, { passive: true });
     mainEl.addEventListener('touchend', function () {
-      if (triggered) { ptr.textContent = 'Refreshing\u2026'; setTimeout(function () { location.reload(); }, 300); }
+      if (triggered) { ptr.textContent = 'Refreshing…'; setTimeout(function () { location.reload(); }, 300); }
       else { ptr.classList.remove('visible'); }
       pulling = false; triggered = false;
     }, { passive: true });

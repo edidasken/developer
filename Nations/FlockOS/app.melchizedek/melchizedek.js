@@ -56,16 +56,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const UR = window.UpperRoom;
     const N  = window.Nehemiah;
 
-    // Authenticate
+    // Auth guard — redirect to sign-in if no active session
     if (!N.isAuthenticated()) {
-      await UR.authenticate();
+      window.location.replace('app.melchizedek/index.html');
+      return;
     }
 
-    // Role check — pastor+ only
+    // Role check — pastor+ only; redirect to sign-in if insufficient
     const profile  = N.getProfile ? N.getProfile() : null;
     const role     = (profile?.role || '').toLowerCase();
     if (_roleLevel(role) < 4) {
-      _showAccessDenied(profile);
+      window.location.replace('app.melchizedek/index.html');
       return;
     }
 
@@ -84,34 +85,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-/* ── Auth / Access ──────────────────────────────────────────────────────── */
-function _showAccessDenied(profile) {
-  document.getElementById('melch-boot').style.display = 'none';
-  const overlay = document.getElementById('melch-auth-overlay');
-  overlay.hidden = false;
-  overlay.innerHTML = `
-    <div class="melch-auth-card">
-      <div class="melch-auth-icon">🛡️</div>
-      <div class="melch-auth-title">Access Restricted</div>
-      <div class="melch-auth-msg">
-        Background check management requires Pastor or Admin access.
-        ${profile?.displayName ? `Signed in as <strong>${_e(profile.displayName)}</strong>.` : ''}
-      </div>
-      <a href="../" class="flock-btn flock-btn--primary" style="display:inline-block;text-decoration:none;">← Back to Launcher</a>
-    </div>`;
-}
-
+/* ── Boot error ─────────────────────────────────────────────────────────── */
 function _showBootError(err) {
   document.getElementById('melch-boot').style.display = 'none';
-  const overlay = document.getElementById('melch-auth-overlay');
-  overlay.hidden = false;
-  overlay.innerHTML = `
-    <div class="melch-auth-card">
-      <div class="melch-auth-icon">⚠️</div>
-      <div class="melch-auth-title">Could not load app</div>
-      <div class="melch-auth-msg">${_e(err?.message || String(err))}</div>
-      <button class="flock-btn flock-btn--primary" onclick="location.reload()">Try Again</button>
-    </div>`;
+  document.body.insertAdjacentHTML('beforeend', `
+    <div style="position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:var(--bg,#0e1628);padding:24px">
+      <div style="background:var(--bg-raised,#fff);border-radius:16px;padding:36px 28px;max-width:360px;width:100%;text-align:center;box-shadow:0 4px 32px rgba(0,0,0,.18)">
+        <div style="font-size:2.4rem;margin-bottom:12px">⚠️</div>
+        <div style="font:700 1.1rem/1.3 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:8px">Could not load app</div>
+        <div style="font:400 0.87rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-bottom:20px">${_e(err?.message || String(err))}</div>
+        <button class="flock-btn flock-btn--primary" onclick="location.reload()">Try Again</button>
+      </div>
+    </div>`);
 }
 
 /* ── Navigation ─────────────────────────────────────────────────────────── */
@@ -125,6 +110,10 @@ function _wireNav() {
       });
       _currentView = view;
       _renderView(view);
+      // Close mobile sidebar after nav
+      document.body.classList.remove('veil-side-open');
+      const menuBtn = document.querySelector('[data-act="menu"]');
+      if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false');
     });
   });
 }
@@ -335,19 +324,17 @@ function _memberRow(p, opts = {}) {
         ${badge}
         ${_liveScanBadge(check?.liveScan)}
         ${opts.showInitiateBtn && email ? `
-          <button class="flock-btn flock-btn--sm" data-act="initiate-check"
-            data-member-id="${_e(uid)}" data-email="${_e(email)}" data-name="${_e(name)}"
-            style="white-space:nowrap">
+          <button class="flock-btn flock-btn--primary flock-btn--sm" data-act="initiate-check"
+            data-member-id="${_e(uid)}" data-email="${_e(email)}" data-name="${_e(name)}">
             ${check ? 'Re-check' : 'Initiate Check'}
           </button>` : ''}
-        <button class="flock-btn flock-btn--sm" data-act="record-livescan"
-          data-member-id="${_e(uid)}" data-name="${_e(name)}"
-          style="white-space:nowrap;background:var(--bg-alt,#f5f6fa);color:var(--ink,#1b264f);border:1px solid var(--line,#e5e7ef)">
+        <button class="flock-btn flock-btn--ghost flock-btn--sm" data-act="record-livescan"
+          data-member-id="${_e(uid)}" data-name="${_e(name)}">
           ${check?.liveScan ? 'Update LS' : '+ Live Scan'}
         </button>
         ${check?.invitationUrl ? `
           <a href="${_e(check.invitationUrl)}" target="_blank" rel="noopener noreferrer"
-            class="flock-btn flock-btn--sm" style="text-decoration:none;white-space:nowrap">
+            class="flock-btn flock-btn--sm" style="text-decoration:none">
             View Report ↗
           </a>` : ''}
       </div>
@@ -470,7 +457,7 @@ function _showLiveScanModal(memberId, name) {
       </div>
 
       <div style="display:flex;gap:10px;justify-content:flex-end">
-        <button id="ls-cancel" class="flock-btn flock-btn--sm" style="background:var(--bg-alt,#f5f6fa);color:var(--ink,#1b264f);border:1px solid var(--line,#e5e7ef)">Cancel</button>
+        <button id="ls-cancel" class="flock-btn flock-btn--ghost flock-btn--sm">Cancel</button>
         <button id="ls-save"   class="flock-btn flock-btn--primary flock-btn--sm">Save Record</button>
       </div>
     </div>`;
