@@ -140,6 +140,7 @@ function _wireHeader(profile) {
         { id: 'view-pending',      label: 'Pending',      hint: 'Navigate', run: () => _wireNavTo('pending') },
         { id: 'view-approved',     label: 'Approved',     hint: 'Navigate', run: () => _wireNavTo('approved') },
         { id: 'view-not-approved', label: 'Not Approved', hint: 'Navigate', run: () => _wireNavTo('not-approved') },
+        { id: 'view-compliance',   label: 'Compliance',   hint: 'Navigate', run: () => _wireNavTo('compliance') },
       ],
     });
     setTimeout(() => { try { ctrl?.update?.({ user: profile || null }); } catch (_) {} }, 1200);
@@ -243,6 +244,7 @@ function _renderView(view) {
     case 'pending':     content.innerHTML = _viewFiltered('pending',     'Pending Checks',  'Checks sent and awaiting results.'); break;
     case 'approved':    content.innerHTML = _viewFiltered('clear',       'Approved',        'Members whose background check came back clear.'); break;
     case 'not-approved': content.innerHTML = _viewFiltered('consider',   'Not Approved',    'Members whose background check requires further review.'); break;
+    case 'compliance':   content.innerHTML = _viewCompliance(); break;
     case 'about':        content.innerHTML = _viewAbout();       break;
     default:            content.innerHTML = _viewOverview();
   }
@@ -293,6 +295,7 @@ function _viewOverview() {
       const uid = m.id || m.memberNumber || m.email || '';
       return !_checksMap[uid];
     }), { showInitiateBtn: true })}
+    ${_complianceAlerts()}
   `;
 }
 
@@ -316,13 +319,23 @@ function _viewFiltered(status, title, subtitle) {
     const uid = m.id || m.memberNumber || m.email || '';
     return (_checksMap[uid]?.status || '') === status;
   });
+  const parentNotifBanner = status === 'consider' && members.length ? `
+    <div style="padding:14px 16px;background:#fff7ed;border-radius:10px;border-left:4px solid #d97706;
+      margin-bottom:18px;font:400 0.9rem/1.6 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">
+      <strong style="color:#92400e">⚠ Pen. Code §11105.3(c)(1) — Mandatory Parent Notification</strong><br>
+      If your organization proceeds with placing any of these individuals in a role supervising minors,
+      you are legally required to notify affected parents/guardians in writing at least
+      <strong>10 days before that person begins duties</strong>. Use the "Document Notification" button
+      on each record to log compliance.
+    </div>` : '';
   return `
     <div style="margin-bottom:20px">
       <div style="font:700 1.2rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:4px">${_e(title)}</div>
       <div style="font:400 0.85rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">${_e(subtitle)}</div>
     </div>
+    ${parentNotifBanner}
     ${members.length
-      ? _renderMemberList(members, { showInitiateBtn: status === 'consider' })
+      ? _renderMemberList(members, { showInitiateBtn: status === 'consider', showParentNotif: status === 'consider' })
       : `<div class="life-empty">No members in this category.</div>`}
   `;
 }
@@ -693,6 +706,12 @@ function _memberRow(p, opts = {}) {
           data-member-id="${_e(uid)}" data-name="${_e(name)}">
           ${check?.liveScan ? 'Update LS' : '+ Live Scan'}
         </button>
+        ${opts.showParentNotif ? `
+          <button class="flock-btn flock-btn--sm" data-act="document-parent-notif"
+            data-member-id="${_e(uid)}" data-name="${_e(name)}"
+            style="background:${check?.parentNotif?.sent ? '#dcfce7' : '#fff7ed'};color:${check?.parentNotif?.sent ? '#059669' : '#92400e'};border:1px solid ${check?.parentNotif?.sent ? '#bbf7d0' : '#fde68a'}">
+            ${check?.parentNotif?.sent ? '✓ Notified ' + _fmtDate(check.parentNotif.sentDate) : '§ Document Notification'}
+          </button>` : ''}
         ${check?.invitationUrl ? `
           <a href="${_e(check.invitationUrl)}" target="_blank" rel="noopener noreferrer"
             class="flock-btn flock-btn--sm" style="text-decoration:none">
@@ -756,6 +775,27 @@ function _wireContentActions(root) {
     btn.addEventListener('click', () => {
       _showLiveScanModal(btn.dataset.memberId, btn.dataset.name);
     });
+  });
+
+  root.querySelectorAll('[data-act="edit-compliance"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _showComplianceModal(btn.dataset.memberId, btn.dataset.name);
+    });
+  });
+
+  root.querySelectorAll('[data-act="document-parent-notif"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _showParentNotifModal(btn.dataset.memberId, btn.dataset.name);
+    });
+  });
+
+  root.querySelectorAll('[data-act="print-compliance"]').forEach(btn => {
+    btn.addEventListener('click', () => window.print());
+  });
+
+  // In-content navigation links (e.g. compliance alert cards)
+  root.querySelectorAll('[data-melch-view]').forEach(el => {
+    el.addEventListener('click', () => _wireNavTo(el.dataset.melchView));
   });
 
   root.querySelectorAll('[data-act="initiate-check"]').forEach(btn => {
@@ -918,5 +958,467 @@ async function _initiateCheck({ memberId, email, name, packageSlug = DEFAULT_PAC
     updatedAt: new Date().toISOString(),
     ...(result.data.candidateId ? { checkrCandidateId: result.data.candidateId } : {}),
   };
+  _renderView(_currentView);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ── COMPLIANCE TRACKING ──────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── Status helpers ─────────────────────────────────────────────────────── //
+
+function _waiverStatus(check) {
+  const d = check?.waiverSignedDate;
+  if (!d) return { status: 'missing', label: 'Not Signed', color: '#7a7f96' };
+  const signed   = new Date(d);
+  const expires  = new Date(signed);
+  expires.setFullYear(expires.getFullYear() + 1);
+  const daysLeft = Math.floor((expires - new Date()) / 86400000);
+  if (daysLeft <   0) return { status: 'expired',  label: `Expired`,                          color: '#dc2626' };
+  if (daysLeft <= 30) return { status: 'expiring', label: `Expires ${_fmtDate(expires.toISOString())}`, color: '#d97706' };
+  return { status: 'current',  label: `Current · Exp ${_fmtDate(expires.toISOString())}`,     color: '#059669' };
+}
+
+function _ocapStatus(check) {
+  const d = check?.ocapCertDate;
+  if (!d) return { status: 'missing', label: 'Not on File', color: '#7a7f96' };
+  const cert    = new Date(d);
+  const expires = new Date(cert);
+  expires.setFullYear(expires.getFullYear() + 2); // 2-year renewal cycle
+  const daysLeft = Math.floor((expires - new Date()) / 86400000);
+  if (daysLeft <   0) return { status: 'expired',  label: `Cert Expired`,  color: '#dc2626' };
+  if (daysLeft <= 60) return { status: 'expiring', label: `Renew Soon`,    color: '#d97706' };
+  return { status: 'current',  label: `Current · ${_fmtDate(d)}`,         color: '#059669' };
+}
+
+function _hoursStatus(check) {
+  const mo = Number(check?.monthlyHours || 0);
+  const yr = Number(check?.yearlyHours  || 0);
+  if (mo > 16 || yr > 32) return { status: 'over',    label: `${mo}h/mo · ${yr}h/yr`, color: '#dc2626' };
+  if (mo >= 12 || yr >= 26) return { status: 'near',  label: `${mo}h/mo · ${yr}h/yr`, color: '#d97706' };
+  if (mo === 0 && yr === 0) return { status: 'unknown', label: '—',                    color: '#7a7f96' };
+  return { status: 'ok', label: `${mo}h/mo · ${yr}h/yr`, color: '#059669' };
+}
+
+function _statusPill(label, color) {
+  return `<span style="display:inline-block;padding:2px 9px;border-radius:999px;font:600 0.76rem/1.4 var(--font-ui,sans-serif);
+    background:${color}18;color:${color};white-space:nowrap">${_e(label)}</span>`;
+}
+
+// ── Compliance alerts (used in Overview) ──────────────────────────────── //
+
+function _complianceAlerts() {
+  const expiring = [], missingOcap = [], overHours = [], notSan = [], needsNotif = [];
+
+  for (const m of _allMembers) {
+    const uid   = m.id || m.memberNumber || m.email || '';
+    const check = _checksMap[uid];
+    const ws = _waiverStatus(check);
+    const os = _ocapStatus(check);
+    const hs = _hoursStatus(check);
+    if (ws.status === 'expired' || ws.status === 'expiring') expiring.push(m.name || uid);
+    if (os.status === 'expired' || os.status === 'missing') missingOcap.push(m.name || uid);
+    if (hs.status === 'over' || hs.status === 'near')       overHours.push(m.name || uid);
+    if (!check?.sanEnrolled) notSan.push(m.name || uid);
+    if (check?.status === 'consider' && !check?.parentNotif?.sent) needsNotif.push(m.name || uid);
+  }
+
+  const alerts = [];
+  if (expiring.length)   alerts.push({ icon: '📋', color: '#d97706', bg: '#fffbeb', text: `<strong>${expiring.length} member${expiring.length > 1 ? 's' : ''}</strong> ha${expiring.length > 1 ? 've' : 's'} an annual waiver expiring or already expired.`, link: 'compliance' });
+  if (missingOcap.length) alerts.push({ icon: '📚', color: '#d97706', bg: '#fffbeb', text: `<strong>${missingOcap.length} member${missingOcap.length > 1 ? 's' : ''}</strong> ${missingOcap.length > 1 ? 'are' : 'is'} missing a current OCAP mandated reporter certification.`, link: 'compliance' });
+  if (overHours.length)  alerts.push({ icon: '⏱', color: '#dc2626', bg: '#fef2f2', text: `<strong>${overHours.length} member${overHours.length > 1 ? 's' : ''}</strong> ${overHours.length > 1 ? 'are' : 'is'} at or above the volunteer hour threshold for enhanced screening.`, link: 'compliance' });
+  if (needsNotif.length) alerts.push({ icon: '📬', color: '#dc2626', bg: '#fef2f2', text: `<strong>${needsNotif.length} member${needsNotif.length > 1 ? 's' : ''}</strong> with "Consider" status require documented parent notification (§11105.3(c)(1)).`, link: 'not-approved' });
+  if (notSan.length === _allMembers.length && _allMembers.length > 0) alerts.push({ icon: '🔔', color: '#7a7f96', bg: '#f8f9ff', text: `No members are enrolled in DOJ Subsequent Arrest Notification (SAN). Enroll via the Compliance view.`, link: 'compliance' });
+
+  if (!alerts.length) return '';
+
+  return `
+    <div style="margin-top:28px">
+      <div style="font:600 0.82rem/1 var(--font-ui,sans-serif);text-transform:uppercase;letter-spacing:.07em;
+        color:var(--ink-muted,#7a7f96);margin-bottom:12px">Compliance Alerts</div>
+      ${alerts.map(a => `
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;
+          background:${a.bg};border-left:4px solid ${a.color};border-radius:8px;margin-bottom:10px;cursor:pointer"
+          data-melch-view="${a.link}">
+          <span style="font-size:1.1rem;line-height:1.4">${a.icon}</span>
+          <span style="font:400 0.88rem/1.5 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${a.text}
+            <span style="color:${a.color};font-weight:600;margin-left:4px">View →</span>
+          </span>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── Compliance view ────────────────────────────────────────────────────── //
+
+function _viewCompliance() {
+  const sorted = _sortedMembers(_allMembers);
+
+  // Aggregate stats
+  let cntWaiverOk = 0, cntWaiverWarn = 0, cntOcapOk = 0, cntOcapWarn = 0, cntSan = 0;
+  for (const m of _allMembers) {
+    const uid   = m.id || m.memberNumber || m.email || '';
+    const check = _checksMap[uid];
+    const ws = _waiverStatus(check);
+    const os = _ocapStatus(check);
+    if (ws.status === 'current')  cntWaiverOk++;   else cntWaiverWarn++;
+    if (os.status === 'current')  cntOcapOk++;     else cntOcapWarn++;
+    if (check?.sanEnrolled)       cntSan++;
+  }
+
+  const statCard = (label, ok, warn, icon) => `
+    <div style="flex:1;min-width:130px;padding:14px 16px;background:var(--surface,#fff);
+      border-radius:10px;border:1px solid var(--border,#e8eaf6)">
+      <div style="font:600 0.78rem/1 var(--font-ui,sans-serif);text-transform:uppercase;
+        letter-spacing:.06em;color:var(--ink-muted,#7a7f96);margin-bottom:8px">${icon} ${label}</div>
+      <div style="font:700 1.4rem/1 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${ok}</div>
+      <div style="font:400 0.8rem/1 var(--font-ui,sans-serif);margin-top:4px;
+        color:${warn > 0 ? '#d97706' : '#7a7f96'}">${warn} need attention</div>
+    </div>`;
+
+  const rows = sorted.map(m => {
+    const uid    = m.id || m.memberNumber || m.email || '';
+    const check  = _checksMap[uid] || {};
+    const ws     = _waiverStatus(check);
+    const os     = _ocapStatus(check);
+    const hs     = _hoursStatus(check);
+    const san    = check.sanEnrolled ? _statusPill('Enrolled', '#059669') : _statusPill('Not Enrolled', '#7a7f96');
+    const pn     = check.parentNotif?.sent ? _statusPill('Sent ' + _fmtDate(check.parentNotif.sentDate), '#059669') : '';
+    return `<tr style="border-bottom:1px solid var(--border,#e8eaf6)">
+      <td style="padding:10px 12px;min-width:160px">
+        <div style="font:600 0.9rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${_e(m.name || uid)}</div>
+        ${m.role ? `<div style="font:400 0.76rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-top:3px">${_e(m.role)}</div>` : ''}
+      </td>
+      <td style="padding:10px 12px">${_statusBadge(check.status)}</td>
+      <td style="padding:10px 12px">${_liveScanBadge(check.liveScan)}</td>
+      <td style="padding:10px 12px">${_statusPill(ws.label, ws.color)}</td>
+      <td style="padding:10px 12px">${_statusPill(os.label, os.color)}</td>
+      <td style="padding:10px 12px">${_statusPill(hs.label, hs.color)}</td>
+      <td style="padding:10px 12px">${san}${pn ? '<br><span style="font:400 0.73rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">Parent notif:</span> ' + pn : ''}</td>
+      <td style="padding:10px 12px;white-space:nowrap">
+        <button class="flock-btn flock-btn--sm flock-btn--ghost" data-act="edit-compliance"
+          data-member-id="${_e(uid)}" data-name="${_e(m.name || uid)}">Edit</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+      <div>
+        <div style="font:700 1.2rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:4px">Compliance Tracker</div>
+        <div style="font:400 0.85rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">
+          Annual waivers · OCAP certifications · Hour thresholds · DOJ SAN enrollment · Parent notification records
+        </div>
+      </div>
+      <button class="flock-btn flock-btn--ghost flock-btn--sm" data-act="print-compliance"
+        style="display:flex;align-items:center;gap:6px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print Report
+      </button>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px">
+      ${statCard('Annual Waivers', cntWaiverOk, cntWaiverWarn, '📋')}
+      ${statCard('OCAP Certs', cntOcapOk, cntOcapWarn, '📚')}
+      <div style="flex:1;min-width:130px;padding:14px 16px;background:var(--surface,#fff);
+        border-radius:10px;border:1px solid var(--border,#e8eaf6)">
+        <div style="font:600 0.78rem/1 var(--font-ui,sans-serif);text-transform:uppercase;
+          letter-spacing:.06em;color:var(--ink-muted,#7a7f96);margin-bottom:8px">🔔 DOJ SAN</div>
+        <div style="font:700 1.4rem/1 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${cntSan}</div>
+        <div style="font:400 0.8rem/1 var(--font-ui,sans-serif);margin-top:4px;
+          color:${(_allMembers.length - cntSan) > 0 ? '#d97706' : '#7a7f96'}">${_allMembers.length - cntSan} not enrolled</div>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border,#e8eaf6)">
+      <table style="width:100%;border-collapse:collapse;font:400 0.85rem/1.4 var(--font-ui,sans-serif)">
+        <thead>
+          <tr style="background:var(--surface,#f8f9ff)">
+            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
+              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">Member</th>
+            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
+              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">Checkr</th>
+            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
+              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">LiveScan</th>
+            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
+              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">Annual Waiver</th>
+            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
+              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">OCAP Cert</th>
+            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
+              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">Volunteer Hours</th>
+            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
+              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">SAN / Parent Notif</th>
+            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
+              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows || '<tr><td colspan="8" style="padding:20px;text-align:center;color:var(--ink-muted,#7a7f96)">No members loaded.</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:14px;font:400 0.78rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">
+      Hour thresholds: ≥12 hrs/month or ≥26 hrs/year = near threshold (enhanced screening advised);
+      >16 hrs/month or >32 hrs/year = over threshold (required).
+      Annual waiver expires 1 year from signing (BPC §18975). OCAP cert renewal: 2-year cycle.
+    </div>`;
+}
+
+// ── Compliance edit modal ──────────────────────────────────────────────── //
+
+function _showComplianceModal(memberId, name) {
+  const check = _checksMap[memberId] || {};
+  const wrap  = document.getElementById('melch-modal-wrap');
+  if (!wrap) return;
+
+  wrap.innerHTML = `
+    <div class="melch-modal" role="dialog" aria-modal="true" aria-label="Edit Compliance — ${_e(name)}">
+      <div class="melch-modal-header">
+        <span class="melch-modal-title">Compliance Record</span>
+        <span style="font:400 0.85rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-left:8px">${_e(name)}</span>
+        <button class="melch-modal-close" data-act="close-modal" aria-label="Close">✕</button>
+      </div>
+      <div class="melch-modal-body">
+
+        <div class="melch-field-group">
+          <label class="melch-label">Annual Waiver Signed Date
+            <span style="font-weight:400;color:var(--ink-muted,#7a7f96)"> — BPC §18975(b)(2)(C)</span>
+          </label>
+          <input id="mc-waiver-date" type="date" class="melch-input"
+            value="${_isoDate(check.waiverSignedDate) || ''}">
+          <div id="mc-waiver-status" style="margin-top:4px;font:400 0.8rem/1 var(--font-ui,sans-serif)"></div>
+        </div>
+
+        <div class="melch-field-group">
+          <label class="melch-label">OCAP Mandated Reporter Cert Date</label>
+          <input id="mc-ocap-date" type="date" class="melch-input"
+            value="${_isoDate(check.ocapCertDate) || ''}">
+          <div id="mc-ocap-status" style="margin-top:4px;font:400 0.8rem/1 var(--font-ui,sans-serif)"></div>
+        </div>
+
+        <div style="display:flex;gap:14px;flex-wrap:wrap">
+          <div class="melch-field-group" style="flex:1;min-width:120px">
+            <label class="melch-label">Monthly Hours (this month)</label>
+            <input id="mc-monthly-hours" type="number" min="0" max="744" class="melch-input"
+              placeholder="0" value="${check.monthlyHours ?? ''}">
+          </div>
+          <div class="melch-field-group" style="flex:1;min-width:120px">
+            <label class="melch-label">Yearly Hours (this year)</label>
+            <input id="mc-yearly-hours" type="number" min="0" max="8784" class="melch-input"
+              placeholder="0" value="${check.yearlyHours ?? ''}">
+          </div>
+        </div>
+
+        <div class="melch-field-group">
+          <label class="melch-label">DOJ Subsequent Arrest Notification (SAN)</label>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+            <input id="mc-san-enrolled" type="checkbox" style="width:18px;height:18px;cursor:pointer"
+              ${check.sanEnrolled ? 'checked' : ''}>
+            <span style="font:400 0.88rem/1 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">Enrolled in DOJ SAN</span>
+          </div>
+          <div id="mc-san-date-row" style="margin-top:10px;display:${check.sanEnrolled ? 'block' : 'none'}">
+            <label class="melch-label">SAN Enrollment Date</label>
+            <input id="mc-san-date" type="date" class="melch-input"
+              value="${_isoDate(check.sanEnrolledDate) || ''}">
+          </div>
+        </div>
+
+        <div class="melch-field-group">
+          <label class="melch-label">Compliance Notes</label>
+          <textarea id="mc-notes" class="melch-input" rows="3" placeholder="Internal compliance notes…"
+            style="resize:vertical">${_e(check.complianceNotes || '')}</textarea>
+        </div>
+
+        <div id="mc-error" style="display:none;padding:10px;background:#fef2f2;border-radius:6px;
+          font:400 0.85rem/1.5 var(--font-ui,sans-serif);color:#dc2626;margin-top:8px"></div>
+      </div>
+      <div class="melch-modal-footer">
+        <button class="flock-btn flock-btn--ghost" data-act="close-modal">Cancel</button>
+        <button class="flock-btn flock-btn--primary" id="mc-save-btn">Save Record</button>
+      </div>
+    </div>`;
+  wrap.style.display = 'flex';
+
+  // Live waiver / OCAP status preview
+  const waiverIn = wrap.querySelector('#mc-waiver-date');
+  const ocapIn   = wrap.querySelector('#mc-ocap-date');
+  const sanCb    = wrap.querySelector('#mc-san-enrolled');
+  const sanRow   = wrap.querySelector('#mc-san-date-row');
+  const hoursWire = () => {};
+
+  const updateWaiverStatus = () => {
+    const el = wrap.querySelector('#mc-waiver-status');
+    if (!el) return;
+    const ws = _waiverStatus({ waiverSignedDate: waiverIn.value });
+    el.textContent = ws.label;
+    el.style.color = ws.color;
+  };
+  const updateOcapStatus = () => {
+    const el = wrap.querySelector('#mc-ocap-status');
+    if (!el) return;
+    const os = _ocapStatus({ ocapCertDate: ocapIn.value });
+    el.textContent = os.label;
+    el.style.color = os.color;
+  };
+  waiverIn.addEventListener('change', updateWaiverStatus);
+  ocapIn.addEventListener('change', updateOcapStatus);
+  updateWaiverStatus();
+  updateOcapStatus();
+
+  sanCb.addEventListener('change', () => {
+    sanRow.style.display = sanCb.checked ? 'block' : 'none';
+  });
+
+  wrap.querySelector('#mc-save-btn').addEventListener('click', async () => {
+    const btn = wrap.querySelector('#mc-save-btn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    try {
+      await _saveComplianceFields({
+        memberId,
+        name,
+        waiverDate:     waiverIn.value    || null,
+        ocapDate:       wrap.querySelector('#mc-ocap-date').value  || null,
+        monthlyHours:   Number(wrap.querySelector('#mc-monthly-hours').value) || 0,
+        yearlyHours:    Number(wrap.querySelector('#mc-yearly-hours').value)  || 0,
+        sanEnrolled:    sanCb.checked,
+        sanEnrolledDate: sanCb.checked ? (wrap.querySelector('#mc-san-date').value || null) : null,
+        notes:          wrap.querySelector('#mc-notes').value.trim() || null,
+      });
+      wrap.style.display = 'none';
+      wrap.innerHTML = '';
+    } catch (err) {
+      const errEl = wrap.querySelector('#mc-error');
+      if (errEl) { errEl.textContent = err.message; errEl.style.display = 'block'; }
+      btn.disabled = false;
+      btn.textContent = 'Save Record';
+    }
+  });
+}
+
+async function _saveComplianceFields({ memberId, name, waiverDate, ocapDate, monthlyHours, yearlyHours, sanEnrolled, sanEnrolledDate, notes }) {
+  const db = window.firebase?.firestore?.();
+  if (!db) throw new Error('Firestore not available.');
+  const payload = {
+    memberId,
+    name,
+    updatedAt: new Date().toISOString(),
+    ...(waiverDate      != null ? { waiverSignedDate: waiverDate }    : {}),
+    ...(ocapDate        != null ? { ocapCertDate: ocapDate }          : {}),
+    ...(monthlyHours    != null ? { monthlyHours }                    : {}),
+    ...(yearlyHours     != null ? { yearlyHours }                     : {}),
+    ...(sanEnrolled     != null ? { sanEnrolled }                     : {}),
+    ...(sanEnrolledDate != null ? { sanEnrolledDate }                 : {}),
+    ...(notes           != null ? { complianceNotes: notes }          : {}),
+  };
+  await db.collection(BG_COLLECTION).doc(memberId).set(payload, { merge: true });
+  // Optimistic local update
+  _checksMap[memberId] = { ...(_checksMap[memberId] || {}), ...payload };
+  _renderView(_currentView);
+}
+
+// ── Parent notification modal (§11105.3(c)(1)) ────────────────────────── //
+
+function _showParentNotifModal(memberId, name) {
+  const check = _checksMap[memberId] || {};
+  const pn    = check.parentNotif   || {};
+  const wrap  = document.getElementById('melch-modal-wrap');
+  if (!wrap) return;
+
+  wrap.innerHTML = `
+    <div class="melch-modal" role="dialog" aria-modal="true" aria-label="Parent Notification — ${_e(name)}">
+      <div class="melch-modal-header">
+        <span class="melch-modal-title">Parent / Guardian Notification</span>
+        <span style="font:400 0.85rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-left:8px">${_e(name)}</span>
+        <button class="melch-modal-close" data-act="close-modal" aria-label="Close">✕</button>
+      </div>
+      <div class="melch-modal-body">
+        <div style="padding:12px 14px;background:#fff7ed;border-radius:8px;border-left:4px solid #d97706;
+          margin-bottom:18px;font:400 0.85rem/1.5 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">
+          <strong>Pen. Code §11105.3(c)(1)</strong> — If this individual will supervise minors, affected
+          parents/guardians must be notified in writing at least <strong>10 days before they begin duties</strong>.
+          Document that notification here.
+        </div>
+
+        <div class="melch-field-group">
+          <label class="melch-label">Notification Sent?</label>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+            <input id="pn-sent" type="checkbox" style="width:18px;height:18px;cursor:pointer"
+              ${pn.sent ? 'checked' : ''}>
+            <span style="font:400 0.88rem/1 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">Written notification was sent</span>
+          </div>
+        </div>
+
+        <div id="pn-details-row" style="display:${pn.sent ? 'block' : 'none'}">
+          <div class="melch-field-group">
+            <label class="melch-label">Date Sent</label>
+            <input id="pn-sent-date" type="date" class="melch-input"
+              value="${_isoDate(pn.sentDate) || ''}">
+          </div>
+
+          <div class="melch-field-group">
+            <label class="melch-label">Method</label>
+            <select id="pn-method" class="melch-input">
+              <option value="">— select —</option>
+              <option value="written-mail"  ${pn.method === 'written-mail'  ? 'selected' : ''}>Written letter (mail)</option>
+              <option value="written-email" ${pn.method === 'written-email' ? 'selected' : ''}>Written letter (email)</option>
+              <option value="in-person"     ${pn.method === 'in-person'     ? 'selected' : ''}>In-person delivery</option>
+            </select>
+          </div>
+
+          <div class="melch-field-group">
+            <label class="melch-label">Date Confirmed / Acknowledged (optional)</label>
+            <input id="pn-confirmed-date" type="date" class="melch-input"
+              value="${_isoDate(pn.confirmedDate) || ''}">
+          </div>
+        </div>
+
+        <div id="pn-error" style="display:none;padding:10px;background:#fef2f2;border-radius:6px;
+          font:400 0.85rem/1.5 var(--font-ui,sans-serif);color:#dc2626;margin-top:8px"></div>
+      </div>
+      <div class="melch-modal-footer">
+        <button class="flock-btn flock-btn--ghost" data-act="close-modal">Cancel</button>
+        <button class="flock-btn flock-btn--primary" id="pn-save-btn">Save Record</button>
+      </div>
+    </div>`;
+  wrap.style.display = 'flex';
+
+  const sentCb   = wrap.querySelector('#pn-sent');
+  const detRow   = wrap.querySelector('#pn-details-row');
+  sentCb.addEventListener('change', () => { detRow.style.display = sentCb.checked ? 'block' : 'none'; });
+
+  wrap.querySelector('#pn-save-btn').addEventListener('click', async () => {
+    const btn = wrap.querySelector('#pn-save-btn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    try {
+      await _saveParentNotif({
+        memberId,
+        sent:          sentCb.checked,
+        sentDate:      wrap.querySelector('#pn-sent-date').value     || null,
+        method:        wrap.querySelector('#pn-method').value        || null,
+        confirmedDate: wrap.querySelector('#pn-confirmed-date').value || null,
+      });
+      wrap.style.display = 'none';
+      wrap.innerHTML = '';
+    } catch (err) {
+      const errEl = wrap.querySelector('#pn-error');
+      if (errEl) { errEl.textContent = err.message; errEl.style.display = 'block'; }
+      btn.disabled = false;
+      btn.textContent = 'Save Record';
+    }
+  });
+}
+
+async function _saveParentNotif({ memberId, sent, sentDate, method, confirmedDate }) {
+  const db = window.firebase?.firestore?.();
+  if (!db) throw new Error('Firestore not available.');
+  const payload = {
+    memberId,
+    updatedAt: new Date().toISOString(),
+    parentNotif: { sent: !!sent, sentDate: sentDate || null, method: method || null, confirmedDate: confirmedDate || null },
+  };
+  await db.collection(BG_COLLECTION).doc(memberId).set(payload, { merge: true });
+  _checksMap[memberId] = { ...(_checksMap[memberId] || {}), ...payload };
   _renderView(_currentView);
 }
