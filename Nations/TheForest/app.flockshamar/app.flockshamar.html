@@ -688,6 +688,127 @@
     .hidden {
       display: none !important;
     }
+
+    /* ── Todos (synced with FlockOS) ─────────────────────────────────── */
+    .fs-todos-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 0 4px;
+    }
+    .fs-todo-add-btn {
+      background: var(--fs-gold);
+      color: var(--fs-navy-dark);
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 36px;
+    }
+    .fs-todo-add-btn:hover { filter: brightness(1.05); }
+    .fs-todo-form {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto auto;
+      gap: 8px;
+      margin-bottom: 16px;
+      background: white;
+      padding: 12px;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+    @media (max-width: 640px) {
+      .fs-todo-form { grid-template-columns: 1fr 1fr; }
+      .fs-todo-form > input[type="text"] { grid-column: 1 / -1; }
+    }
+    .fs-todo-input {
+      padding: 8px 12px;
+      border: 1px solid var(--fs-gray-mid);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--fs-text-primary);
+      background: white;
+      min-height: 36px;
+    }
+    .fs-todo-save-btn,
+    .fs-todo-cancel-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      min-height: 36px;
+    }
+    .fs-todo-save-btn { background: var(--fs-gold); color: var(--fs-navy-dark); }
+    .fs-todo-cancel-btn { background: var(--fs-gray-mid); color: var(--fs-text-primary); }
+    .fs-todo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .fs-todo-card {
+      background: white;
+      border: 1px solid var(--fs-gray-mid);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: var(--fs-text-primary);
+    }
+    .fs-todo-card.is-done { opacity: 0.6; }
+    .fs-todo-card.is-done .fs-todo-title { text-decoration: line-through; color: var(--fs-gray-dark); }
+    .fs-todo-emoji { font-size: 22px; flex-shrink: 0; line-height: 1; }
+    .fs-todo-main { flex: 1; min-width: 0; }
+    .fs-todo-row1 {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 6px;
+    }
+    .fs-todo-title { font-size: 16px; font-weight: 600; word-wrap: break-word; }
+    .fs-todo-chip {
+      display: inline-flex; align-items: center;
+      padding: 2px 10px; border-radius: 999px;
+      font-size: 12px; font-weight: 500;
+      background: var(--fs-gray-light); color: var(--fs-text-primary);
+    }
+    .fs-todo-chip--pri-high   { background: #fde0e0; color: #b42318; }
+    .fs-todo-chip--pri-medium { background: #d9f0ff; color: #0b6eb3; }
+    .fs-todo-chip--pri-low    { background: #e7f7e1; color: #3a7d2a; }
+    .fs-todo-chip--status     { background: #eef0f4; color: #344054; }
+    .fs-todo-chip--status-done { background: #d6f5d6; color: #2f7a2f; }
+    .fs-todo-desc {
+      font-size: 14px; line-height: 1.45;
+      color: var(--fs-text-primary);
+      margin: 4px 0 6px;
+      word-wrap: break-word;
+    }
+    .fs-todo-meta {
+      display: flex; flex-wrap: wrap; gap: 12px;
+      font-size: 12px; color: var(--fs-gray-dark);
+    }
+    .fs-todo-check {
+      width: 28px; height: 28px;
+      border: 1.5px solid var(--fs-gray-mid);
+      border-radius: 8px;
+      background: white;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      color: var(--fs-text-secondary);
+      font-size: 16px;
+      transition: all 0.15s;
+    }
+    .fs-todo-check:hover { border-color: var(--fs-gold); }
+    .fs-todo-card.is-done .fs-todo-check {
+      background: #4caf50; border-color: #4caf50; color: white;
+    }
+    .fs-todo-empty {
+      text-align: center; padding: 40px 20px;
+      color: rgba(255,255,255,0.6);
+    }
     
     /* Responsive */
     @media (max-width: 768px) {
@@ -735,6 +856,10 @@
     <div class="fs-sidebar-item" data-view="reminders">
       <span>🔔</span>
       <span class="fs-sidebar-label">Reminders</span>
+    </div>
+    <div class="fs-sidebar-item" data-view="todos">
+      <span>✅</span>
+      <span class="fs-sidebar-label">Todos</span>
     </div>
     <div class="fs-sidebar-divider"></div>
     <div class="fs-sidebar-item" data-view="archive">
@@ -785,6 +910,26 @@
     <div class="fs-notes-section" id="fs-others-section">
       <div class="fs-section-title" id="fs-others-title">OTHERS</div>
       <div class="fs-notes-grid" id="fs-other-notes"></div>
+    </div>
+
+    <!-- Todos (synced with FlockOS) -->
+    <div class="fs-notes-section hidden" id="fs-todos-section">
+      <div class="fs-todos-header">
+        <div class="fs-section-title">SHARED TODOS</div>
+        <button class="fs-todo-add-btn" id="fs-todo-add-btn">+ Add Todo</button>
+      </div>
+      <div id="fs-todo-form" class="fs-todo-form hidden">
+        <input type="text" id="fs-todo-title" placeholder="Title" class="fs-todo-input">
+        <input type="date" id="fs-todo-due" class="fs-todo-input fs-todo-input--sm">
+        <select id="fs-todo-priority" class="fs-todo-input fs-todo-input--sm">
+          <option value="Low">Low</option>
+          <option value="Medium" selected>Medium</option>
+          <option value="High">High</option>
+        </select>
+        <button class="fs-todo-save-btn" id="fs-todo-save-btn">Save</button>
+        <button class="fs-todo-cancel-btn" id="fs-todo-cancel-btn">Cancel</button>
+      </div>
+      <div id="fs-todo-list" class="fs-todo-list"></div>
     </div>
     
     <!-- Empty State -->

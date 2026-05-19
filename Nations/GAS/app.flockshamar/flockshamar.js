@@ -20,6 +20,10 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
     isExpanded: false,
     searchQuery: '',
     colorPickerTarget: null,
+    todos: [],
+    todosLoaded: false,
+    todosLoading: false,
+    upperRoomReady: false,
   };
   
   // Initialize
@@ -390,7 +394,8 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
       notes: { title: 'Notes', showQuickAdd: true, othersLabel: 'OTHERS', emptyIcon: '📝', emptyText: 'Take a note to get started' },
       archive: { title: 'Archive', showQuickAdd: false, othersLabel: 'ARCHIVED', emptyIcon: '📦', emptyText: 'Your archived notes appear here' },
       trash: { title: 'Trash', showQuickAdd: false, othersLabel: 'IN TRASH', emptyIcon: '🗑️', emptyText: 'Trash is empty' },
-      reminders: { title: 'Reminders', showQuickAdd: false, othersLabel: 'REMINDERS', emptyIcon: '🔔', emptyText: 'No reminders yet' }
+      reminders: { title: 'Reminders', showQuickAdd: false, othersLabel: 'REMINDERS', emptyIcon: '🔔', emptyText: 'No reminders yet' },
+      todos: { title: 'Todos', showQuickAdd: false, othersLabel: 'SHARED TODOS', emptyIcon: '✅', emptyText: 'No open todos. Tap + Add Todo.' }
     };
     
     const config = viewConfig[S.currentView] || viewConfig.notes;
@@ -401,6 +406,19 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
       quickAdd.classList.remove('hidden');
     } else {
       quickAdd.classList.add('hidden');
+    }
+
+    // Todos view: hide note sections, show todos section, load + render todos
+    const todosSection = document.getElementById('fs-todos-section');
+    if (S.currentView === 'todos') {
+      pinnedSection.classList.add('hidden');
+      othersSection.classList.add('hidden');
+      emptyState.classList.add('hidden');
+      if (todosSection) todosSection.classList.remove('hidden');
+      _renderTodosView();
+      return;
+    } else if (todosSection) {
+      todosSection.classList.add('hidden');
     }
     
     // Filter notes based on view and search
@@ -736,7 +754,210 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
     e.target.style.height = 'auto';
     e.target.style.height = e.target.scrollHeight + 'px';
   }
-  
+
+  // ── Todos integration (synced with FlockOS via UpperRoom) ──────────
+  async function _ensureUpperRoom() {
+    if (S.upperRoomReady) return true;
+    const UR = window.UpperRoom;
+    if (!UR) {
+      console.warn('[FlockShamar] UpperRoom not loaded; cannot sync Todos.');
+      return false;
+    }
+    try {
+      const cfg = window.FLOCK_FIREBASE_CONFIG || window.FIREBASE_CONFIG || null;
+      if (typeof UR.init === 'function') {
+        try { await UR.init(cfg); } catch (e) { /* may already be initialized */ }
+      }
+      if (typeof UR.authenticate === 'function') {
+        try { await UR.authenticate(); } catch (e) { /* may already be authed */ }
+      }
+      S.upperRoomReady = true;
+      return true;
+    } catch (e) {
+      console.warn('[FlockShamar] UpperRoom init failed', e);
+      return false;
+    }
+  }
+
+  function _todoEscape(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function _formatTodoDate(d) {
+    if (!d) return '';
+    try {
+      const dt = (d && typeof d.toDate === 'function') ? d.toDate() : new Date(d);
+      if (isNaN(dt.getTime())) return '';
+      return dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch { return ''; }
+  }
+
+  async function _loadTodos() {
+    if (S.todosLoading) return;
+    S.todosLoading = true;
+    const ok = await _ensureUpperRoom();
+    if (!ok) { S.todosLoading = false; _paintTodos([]); return; }
+    try {
+      const UR = window.UpperRoom;
+      let list = [];
+      if (typeof UR.myTodos === 'function') {
+        list = await UR.myTodos();
+      } else if (typeof UR.listTodos === 'function') {
+        list = await UR.listTodos({ limit: 200 });
+      }
+      // Filter out archived; keep done + open so user sees completion state
+      S.todos = (list || []).filter(t => (t.status || '') !== 'Archived');
+      S.todosLoaded = true;
+      _paintTodos(S.todos);
+    } catch (e) {
+      console.warn('[FlockShamar] loadTodos failed', e);
+      _paintTodos([]);
+    } finally {
+      S.todosLoading = false;
+    }
+  }
+
+  function _renderTodosView() {
+    if (!S.todosLoaded && !S.todosLoading) {
+      _loadTodos();
+      _paintTodos([], 'Loading todos…');
+      return;
+    }
+    _paintTodos(S.todos);
+  }
+
+  function _paintTodos(todos, placeholder) {
+    const listEl = document.getElementById('fs-todo-list');
+    if (!listEl) return;
+    const q = (S.searchQuery || '').toLowerCase();
+    const filtered = q
+      ? todos.filter(t => (t.title || '').toLowerCase().includes(q) ||
+                          (t.description || '').toLowerCase().includes(q))
+      : todos;
+    if (!filtered.length) {
+      listEl.innerHTML = `<div class="fs-todo-empty">${_todoEscape(placeholder || 'No todos yet. Tap + Add Todo to create one.')}</div>`;
+      return;
+    }
+    // Sort: open first by dueDate asc, then done
+    filtered.sort((a, b) => {
+      const ad = (a.status === 'Done') ? 1 : 0;
+      const bd = (b.status === 'Done') ? 1 : 0;
+      if (ad !== bd) return ad - bd;
+      const av = a.dueDate ? new Date(a.dueDate.toDate ? a.dueDate.toDate() : a.dueDate).getTime() : Infinity;
+      const bv = b.dueDate ? new Date(b.dueDate.toDate ? b.dueDate.toDate() : b.dueDate).getTime() : Infinity;
+      return av - bv;
+    });
+    listEl.innerHTML = filtered.map(_renderTodoCard).join('');
+    _attachTodoCardListeners();
+  }
+
+  function _renderTodoCard(t) {
+    const isDone = (t.status || '') === 'Done';
+    const pri = (t.priority || 'Medium').toLowerCase();
+    const due = _formatTodoDate(t.dueDate);
+    const cat = t.category || '';
+    const assigned = t.assignedTo || '';
+    return `
+      <div class="fs-todo-card ${isDone ? 'is-done' : ''}" data-todo-id="${_todoEscape(t.id)}">
+        <button class="fs-todo-check" data-todo-complete="${_todoEscape(t.id)}" aria-label="Complete todo" title="Mark complete">${isDone ? '✓' : ''}</button>
+        <div class="fs-todo-main">
+          <div class="fs-todo-row1">
+            <span class="fs-todo-title">${_todoEscape(t.title || '(untitled)')}</span>
+            <span class="fs-todo-chip fs-todo-chip--pri-${pri}">${_todoEscape(t.priority || 'Medium')}</span>
+            <span class="fs-todo-chip fs-todo-chip--status ${isDone ? 'fs-todo-chip--status-done' : ''}">${_todoEscape(t.status || 'Not Started')}</span>
+          </div>
+          ${t.description ? `<div class="fs-todo-desc">${_todoEscape(t.description)}</div>` : ''}
+          <div class="fs-todo-meta">
+            ${due ? `<span>📅 ${_todoEscape(due)}</span>` : ''}
+            ${cat ? `<span>🏷️ ${_todoEscape(cat)}</span>` : ''}
+            ${assigned ? `<span>👤 ${_todoEscape(assigned)}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function _attachTodoCardListeners() {
+    document.querySelectorAll('[data-todo-complete]').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute('data-todo-complete');
+        const UR = window.UpperRoom;
+        if (!UR || !id) return;
+        btn.disabled = true;
+        try {
+          if (typeof UR.completeTodo === 'function') {
+            await UR.completeTodo(id);
+          } else if (typeof UR.updateTodo === 'function') {
+            await UR.updateTodo(id, { status: 'Done' });
+          }
+          S.todosLoaded = false;
+          await _loadTodos();
+        } catch (err) {
+          console.warn('[FlockShamar] completeTodo failed', err);
+          btn.disabled = false;
+        }
+      });
+    });
+  }
+
+  function _wireTodoForm() {
+    const addBtn = document.getElementById('fs-todo-add-btn');
+    const form = document.getElementById('fs-todo-form');
+    const titleEl = document.getElementById('fs-todo-title');
+    const dueEl = document.getElementById('fs-todo-due');
+    const priEl = document.getElementById('fs-todo-priority');
+    const saveBtn = document.getElementById('fs-todo-save-btn');
+    const cancelBtn = document.getElementById('fs-todo-cancel-btn');
+    if (!addBtn || !form || !saveBtn || !cancelBtn) return;
+
+    addBtn.addEventListener('click', () => {
+      form.classList.remove('hidden');
+      titleEl && titleEl.focus();
+    });
+    cancelBtn.addEventListener('click', () => {
+      form.classList.add('hidden');
+      if (titleEl) titleEl.value = '';
+      if (dueEl) dueEl.value = '';
+      if (priEl) priEl.value = 'Medium';
+    });
+    saveBtn.addEventListener('click', async () => {
+      const title = (titleEl?.value || '').trim();
+      if (!title) { titleEl?.focus(); return; }
+      saveBtn.disabled = true;
+      const UR = window.UpperRoom;
+      const ok = await _ensureUpperRoom();
+      if (!ok || !UR || typeof UR.createTodo !== 'function') {
+        alert('Unable to sync with FlockOS. Please try again.');
+        saveBtn.disabled = false;
+        return;
+      }
+      try {
+        const payload = {
+          title,
+          priority: priEl?.value || 'Medium',
+          status: 'Not Started',
+          assignedTo: (S.user && S.user.email) || ''
+        };
+        if (dueEl && dueEl.value) payload.dueDate = new Date(dueEl.value).toISOString();
+        await UR.createTodo(payload);
+        if (titleEl) titleEl.value = '';
+        if (dueEl) dueEl.value = '';
+        if (priEl) priEl.value = 'Medium';
+        form.classList.add('hidden');
+        S.todosLoaded = false;
+        await _loadTodos();
+      } catch (err) {
+        console.warn('[FlockShamar] createTodo failed', err);
+        alert('Failed to create todo: ' + (err?.message || err));
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
+  }
+
   // Global API
   window.FlockShamar = {
     init,
@@ -751,8 +972,9 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
   
   // Auto-initialize when DOM is ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', () => { init(); _wireTodoForm(); });
   } else {
     init();
+    _wireTodoForm();
   }
 })();
