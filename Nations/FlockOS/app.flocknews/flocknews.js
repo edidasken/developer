@@ -69,7 +69,7 @@ const FlockNewsState = {
   dateKey: '' // Format: YYYY-MM-DD
 };
 
-// Wait for Firebase to be ready (no auth required — FlockNews is public)
+// Wait for Firebase + Nehemiah to be ready (no auth required — FlockNews is public)
 function _waitForReady() {
   return new Promise((resolve) => {
     let attempts = 0;
@@ -77,11 +77,11 @@ function _waitForReady() {
 
     const checkReady = () => {
       attempts++;
-      if (typeof firebase !== 'undefined') {
-        resolve();
+      if (typeof firebase !== 'undefined' && typeof Nehemiah !== 'undefined') {
+        resolve(); // Both loaded — check auth state in initFlockNews
       } else if (attempts >= maxAttempts) {
-        console.warn('[FlockNews] Firebase not available — continuing without it.');
-        resolve();
+        console.warn('[FlockNews] Timeout waiting for dependencies — continuing as guest.');
+        resolve(); // Always resolve — never block the app
       } else {
         setTimeout(checkReady, 100);
       }
