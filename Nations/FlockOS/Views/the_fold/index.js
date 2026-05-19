@@ -298,6 +298,14 @@ function _liveCard(p) {
       : bgCheck?.status === 'pending'
         ? `<span class="wall-status-badge wall-status--warn" style="font-size:.66rem;padding:2px 7px">BG PENDING</span>`
         : '';
+  const lsScan   = bgCheck?.liveScan;
+  const lsBadge  = lsScan?.result === 'clear'
+    ? `<span class="wall-status-badge wall-status--ok" style="font-size:.66rem;padding:2px 7px">LS CLEAR</span>`
+    : lsScan?.result === 'pending'
+      ? `<span class="wall-status-badge wall-status--warn" style="font-size:.66rem;padding:2px 7px">LS PENDING</span>`
+      : lsScan?.result === 'failed'
+        ? `<span class="wall-status-badge wall-status--error" style="font-size:.66rem;padding:2px 7px">LS FAILED</span>`
+        : '';
   return `
     <article class="fold-card" role="listitem" tabindex="0"
              data-name="${_e(name.toLowerCase())}" data-role="${_e(role)}" data-id="${_e(uid)}">
@@ -308,6 +316,7 @@ function _liveCard(p) {
           <span class="fold-role-badge fold-role-${_e(role)}">${_e(role)}</span>
           ${yr ? `<span class="fold-joined">Since ${yr}</span>` : ''}
           ${bgBadge}
+          ${lsBadge}
         </div>
       </div>
       ${(phoneTel || email) ? `

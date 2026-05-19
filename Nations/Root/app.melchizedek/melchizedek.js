@@ -11,9 +11,14 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── Constants ──────────────────────────────────────────────────────────── */
-const BG_COLLECTION       = 'backgroundChecks';
+const BG_COLLECTION        = 'backgroundChecks';
 const CANDIDATE_COLLECTION = 'checkrCandidates';
 const DEFAULT_PACKAGE      = 'tasker_standard';
+
+// Live Scan result values (California DOJ fingerprint-based check — AB 506)
+// 'clear' = DOJ returned no disqualifying record
+// 'pending' = submitted, awaiting DOJ response
+// 'failed' = DOJ returned disqualifying record
 
 const ROLE_LEVELS = { readonly: 0, volunteer: 1, care: 2, deacon: 2, leader: 3, treasurer: 3, pastor: 4, admin: 5 };
 
@@ -212,12 +217,18 @@ function _renderView(view) {
 }
 
 function _viewOverview() {
-  const total     = _allMembers.length;
-  const checked   = Object.keys(_checksMap).length;
-  const approved  = Object.values(_checksMap).filter(c => c.status === 'clear').length;
+  const total       = _allMembers.length;
+  const checked     = Object.keys(_checksMap).length;
+  const approved    = Object.values(_checksMap).filter(c => c.status === 'clear').length;
   const notApproved = Object.values(_checksMap).filter(c => c.status === 'consider').length;
-  const pending   = Object.values(_checksMap).filter(c => c.status === 'pending').length;
-  const noCheck   = total - checked;
+  const pending     = Object.values(_checksMap).filter(c => c.status === 'pending').length;
+  const noCheck     = total - checked;
+
+  // Live Scan stats (CA DOJ fingerprint — manual record)
+  const lsCleared  = Object.values(_checksMap).filter(c => c.liveScan?.result === 'clear').length;
+  const lsPending  = Object.values(_checksMap).filter(c => c.liveScan?.result === 'pending').length;
+  const lsFailed   = Object.values(_checksMap).filter(c => c.liveScan?.result === 'failed').length;
+  const lsNone     = total - Object.values(_checksMap).filter(c => c.liveScan?.result).length;
 
   return `
     <div style="margin-bottom:24px">
@@ -225,7 +236,8 @@ function _viewOverview() {
       <div style="font:400 0.88rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">"And Melchizedek king of Salem brought out bread and wine." — Genesis 14:18</div>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:28px">
+    <div style="font:600 0.82rem/1 var(--font-ui,sans-serif);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-muted,#7a7f96);margin-bottom:8px">Checkr</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:24px">
       ${_statCard('Total Members', total, 'var(--accent,#4a7fa5)')}
       ${_statCard('Approved', approved, '#059669')}
       ${_statCard('Not Approved', notApproved, '#dc2626')}
@@ -233,7 +245,17 @@ function _viewOverview() {
       ${_statCard('No Check', noCheck, 'var(--ink-muted,#7a7f96)')}
     </div>
 
-    <div style="font:600 0.82rem/1 var(--font-ui,sans-serif);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-muted,#7a7f96);margin-bottom:12px">Members Without a Check</div>
+    <div style="font:600 0.82rem/1 var(--font-ui,sans-serif);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-muted,#7a7f96);margin-bottom:8px">
+      Live Scan <span style="font-weight:400;font-size:.72rem;text-transform:none;letter-spacing:0">— CA DOJ Fingerprint (manual record)</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:28px">
+      ${_statCard('LS Cleared', lsCleared, '#059669')}
+      ${_statCard('LS Pending', lsPending, '#d97706')}
+      ${_statCard('LS Failed', lsFailed, '#dc2626')}
+      ${_statCard('No Live Scan', lsNone, 'var(--ink-muted,#7a7f96)')}
+    </div>
+
+    <div style="font:600 0.82rem/1 var(--font-ui,sans-serif);text-transform:uppercase;letter-spacing:.07em;color:var(--ink-muted,#7a7f96);margin-bottom:12px">Members Without a Checkr Check</div>
     ${_renderMemberList(_allMembers.filter(m => {
       const uid = m.id || m.memberNumber || m.email || '';
       return !_checksMap[uid];
@@ -309,14 +331,20 @@ function _memberRow(p, opts = {}) {
         <div style="font:400 0.78rem/1.4 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);
           white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${_e(role)}${email ? ' · ' + _e(email) : ''}</div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
         ${badge}
+        ${_liveScanBadge(check?.liveScan)}
         ${opts.showInitiateBtn && email ? `
           <button class="flock-btn flock-btn--sm" data-act="initiate-check"
             data-member-id="${_e(uid)}" data-email="${_e(email)}" data-name="${_e(name)}"
             style="white-space:nowrap">
             ${check ? 'Re-check' : 'Initiate Check'}
           </button>` : ''}
+        <button class="flock-btn flock-btn--sm" data-act="record-livescan"
+          data-member-id="${_e(uid)}" data-name="${_e(name)}"
+          style="white-space:nowrap;background:var(--bg-alt,#f5f6fa);color:var(--ink,#1b264f);border:1px solid var(--line,#e5e7ef)">
+          ${check?.liveScan ? 'Update LS' : '+ Live Scan'}
+        </button>
         ${check?.invitationUrl ? `
           <a href="${_e(check.invitationUrl)}" target="_blank" rel="noopener noreferrer"
             class="flock-btn flock-btn--sm" style="text-decoration:none;white-space:nowrap">
@@ -329,18 +357,46 @@ function _memberRow(p, opts = {}) {
 function _statusBadge(status) {
   switch (status) {
     case 'clear':
-      return '<span class="wall-status-badge wall-status--ok">APPROVED</span>';
+      return '<span class="wall-status-badge wall-status--ok" title="Checkr: Approved">APPROVED</span>';
     case 'consider':
-      return '<span class="wall-status-badge wall-status--error">NOT APPROVED</span>';
+      return '<span class="wall-status-badge wall-status--error" title="Checkr: Not Approved">NOT APPROVED</span>';
     case 'pending':
-      return '<span class="wall-status-badge wall-status--warn">PENDING</span>';
+      return '<span class="wall-status-badge wall-status--warn" title="Checkr: Pending">PENDING</span>';
     default:
-      return '<span class="wall-status-badge wall-status--muted">No Check</span>';
+      return '<span class="wall-status-badge wall-status--muted" title="No Checkr check">No Check</span>';
   }
+}
+
+function _liveScanBadge(ls) {
+  if (!ls?.result) return '<span class="wall-status-badge wall-status--muted" title="No Live Scan on file">No LS</span>';
+  switch (ls.result) {
+    case 'clear':
+      return `<span class="wall-status-badge wall-status--ok" title="Live Scan cleared${ls.clearedAt ? ' · ' + _fmtDate(ls.clearedAt) : ''}">LS CLEAR</span>`;
+    case 'pending':
+      return `<span class="wall-status-badge wall-status--warn" title="Live Scan submitted${ls.submittedAt ? ' · ' + _fmtDate(ls.submittedAt) : ''}">LS PENDING</span>`;
+    case 'failed':
+      return `<span class="wall-status-badge wall-status--error" title="Live Scan failed${ls.clearedAt ? ' · ' + _fmtDate(ls.clearedAt) : ''}">LS FAILED</span>`;
+    default:
+      return '<span class="wall-status-badge wall-status--muted">LS ?</span>';
+  }
+}
+
+function _fmtDate(val) {
+  if (!val) return '';
+  try {
+    const d = val?.toDate ? val.toDate() : new Date(val);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch (_) { return ''; }
 }
 
 /* ── Action wiring ───────────────────────────────────────────────────────── */
 function _wireContentActions(root) {
+  root.querySelectorAll('[data-act="record-livescan"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _showLiveScanModal(btn.dataset.memberId, btn.dataset.name);
+    });
+  });
+
   root.querySelectorAll('[data-act="initiate-check"]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const memberId = btn.dataset.memberId;
@@ -369,6 +425,113 @@ function _wireContentActions(root) {
       }
     });
   });
+}
+
+/* ── Live Scan modal (California DOJ fingerprint — AB 506 — manual entry) ── */
+function _showLiveScanModal(memberId, name) {
+  const existing = _checksMap[memberId]?.liveScan || {};
+
+  // Remove any existing modal
+  document.getElementById('melch-ls-modal')?.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'melch-ls-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);padding:20px';
+  modal.innerHTML = `
+    <div style="background:var(--bg-raised,#fff);border-radius:14px;padding:28px 24px;width:100%;max-width:400px;box-shadow:0 8px 48px rgba(0,0,0,.22)">
+      <div style="font:700 1rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:4px">Live Scan Record</div>
+      <div style="font:400 0.82rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-bottom:20px">
+        ${_e(name)} — California DOJ Fingerprint (AB 506)
+      </div>
+
+      <label style="display:block;margin-bottom:14px">
+        <div style="font:600 0.78rem var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-bottom:4px">Result</div>
+        <select id="ls-result" style="width:100%;padding:8px 10px;border:1px solid var(--line,#e5e7ef);border-radius:7px;font:0.88rem var(--font-ui,sans-serif);background:var(--bg,#fff);color:var(--ink,#1b264f)">
+          <option value="pending" ${existing.result === 'pending' ? 'selected' : ''}>Pending — submitted, awaiting DOJ response</option>
+          <option value="clear"   ${existing.result === 'clear'   ? 'selected' : ''}>Cleared — DOJ returned no disqualifying record</option>
+          <option value="failed"  ${existing.result === 'failed'  ? 'selected' : ''}>Failed — DOJ returned disqualifying record</option>
+        </select>
+      </label>
+
+      <label style="display:block;margin-bottom:14px">
+        <div style="font:600 0.78rem var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-bottom:4px">Date Submitted to Live Scan Station</div>
+        <input type="date" id="ls-submitted" value="${_isoDate(existing.submittedAt)}"
+          style="width:100%;padding:8px 10px;border:1px solid var(--line,#e5e7ef);border-radius:7px;font:0.88rem var(--font-ui,sans-serif);background:var(--bg,#fff);color:var(--ink,#1b264f)">
+      </label>
+
+      <label style="display:block;margin-bottom:20px">
+        <div style="font:600 0.78rem var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-bottom:4px">Date Result Received from DOJ</div>
+        <input type="date" id="ls-received" value="${_isoDate(existing.clearedAt)}"
+          style="width:100%;padding:8px 10px;border:1px solid var(--line,#e5e7ef);border-radius:7px;font:0.88rem var(--font-ui,sans-serif);background:var(--bg,#fff);color:var(--ink,#1b264f)">
+      </label>
+
+      <div style="font:400 0.74rem/1.55 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);padding:10px 12px;background:var(--bg-alt,#f5f6fa);border-radius:7px;margin-bottom:20px">
+        Live Scan is done in person at a CA DOJ-approved fingerprint station. Results go directly from DOJ to your organization — record the result here to keep your roster current.
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button id="ls-cancel" class="flock-btn flock-btn--sm" style="background:var(--bg-alt,#f5f6fa);color:var(--ink,#1b264f);border:1px solid var(--line,#e5e7ef)">Cancel</button>
+        <button id="ls-save"   class="flock-btn flock-btn--primary flock-btn--sm">Save Record</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector('#ls-cancel').addEventListener('click', () => modal.remove());
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+
+  modal.querySelector('#ls-save').addEventListener('click', async () => {
+    const result    = modal.querySelector('#ls-result').value;
+    const submitted = modal.querySelector('#ls-submitted').value;
+    const received  = modal.querySelector('#ls-received').value;
+    const saveBtn   = modal.querySelector('#ls-save');
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving…';
+
+    try {
+      await _saveLiveScan({ memberId, name, result, submitted, received });
+      modal.remove();
+    } catch (err) {
+      console.error('[Melchizedek] saveLiveScan error', err);
+      alert(`Could not save: ${err?.message || String(err)}`);
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Record';
+    }
+  });
+}
+
+async function _saveLiveScan({ memberId, name, result, submitted, received }) {
+  const db = window.firebase?.firestore?.();
+  if (!db) throw new Error('Firestore not available.');
+
+  const lsData = {
+    result,
+    submittedAt: submitted || null,
+    clearedAt:   received  || null,
+    recordedAt:  new Date().toISOString(),
+  };
+
+  await db.collection(BG_COLLECTION).doc(memberId).set({
+    memberId,
+    name,
+    liveScan:  lsData,
+    updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
+
+  // Optimistic local update
+  if (!_checksMap[memberId]) _checksMap[memberId] = { memberId, name };
+  _checksMap[memberId].liveScan  = lsData;
+  _checksMap[memberId].updatedAt = new Date().toISOString();
+  _renderView(_currentView);
+}
+
+function _isoDate(val) {
+  if (!val) return '';
+  try {
+    const d = val?.toDate ? val.toDate() : new Date(val);
+    return d.toISOString().split('T')[0];
+  } catch (_) { return ''; }
 }
 
 /* ── Checkr API proxy (via Cloud Function) ──────────────────────────────── */
