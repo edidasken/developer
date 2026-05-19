@@ -45,28 +45,46 @@ window.FlockDocs = {
   switchView,
 };
 
-// Wait for firm_foundation.js to complete auth
-window.addEventListener('DOMContentLoaded', () => {
-  // firm_foundation.js will call our init after auth completes
-  if (window.firmFoundationReady) {
-    init();
-  } else {
-    window.addEventListener('firm-foundation-ready', init);
-  }
+// Wait for Firebase and Nehemiah to be ready
+function _waitForReady() {
+  return new Promise((resolve) => {
+    const checkReady = () => {
+      if (typeof firebase !== 'undefined' && 
+          typeof Nehemiah !== 'undefined' && 
+          Nehemiah.isAuthenticated()) {
+        resolve();
+      } else {
+        setTimeout(checkReady, 100);
+      }
+    };
+    checkReady();
+  });
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  await _waitForReady();
+  init();
 });
 
 function init() {
   console.log('[FlockDocs] Initializing...');
   
-  // Get authenticated user from firm_foundation
-  if (typeof getCurrentUser === 'function') {
-    S.user = getCurrentUser();
-  }
-  
-  if (!S.user) {
+  // Get authenticated user from Nehemiah
+  const profile = Nehemiah.getProfile();
+  if (!profile) {
     console.error('[FlockDocs] No authenticated user found');
+    window.location.replace('app.flockdocs/index.html');
     return;
   }
+  
+  S.user = {
+    uid: profile.uid,
+    displayName: profile.displayName || profile.email,
+    email: profile.email,
+    role: profile.role || 'member',
+  };
+
+  console.log('[FlockDocs] User:', S.user.displayName);
 
   _loadPrefs();
   _bindEvents();
