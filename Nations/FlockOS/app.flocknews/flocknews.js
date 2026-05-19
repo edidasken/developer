@@ -136,6 +136,7 @@ async function initFlockNews() {
         console.error('[FlockNews] No session after auth guard passed — redirecting.');
         window.location.replace('app.flocknews/index.html');
         return;
+      }
     } else {
       FlockNewsState.currentUser = {
         uid: profile.uid,
