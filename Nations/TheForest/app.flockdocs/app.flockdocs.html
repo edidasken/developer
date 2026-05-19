@@ -62,11 +62,11 @@
       display: grid;
       grid-template-areas: "top top" "side main" "foot foot";
       grid-template-columns: var(--sidebar-w, 256px) 1fr;
-      grid-template-rows: calc(var(--topbar-h, 60px) + var(--safe-top, 0px)) 1fr auto;
+      grid-template-rows: auto 1fr auto;
       height: 100dvh;
       position: relative;
     }
-    #fd-topbar-wrap  { grid-area: top; }
+    #fd-topbar       { grid-area: top; }
     #fd-sidebar-wrap { grid-area: side; overflow-y: auto; overflow-x: hidden; }
     #fd-main         { grid-area: main; overflow-y: auto; overflow-x: hidden; position: relative; }
     #fd-footer       { grid-area: foot; }
@@ -89,56 +89,7 @@
       #fd-sidebar-wrap.is-open { transform: translateX(0); }
     }
 
-    /* ── Topbar ──────────────────────────────────────────────────────────── */
-    #fd-topbar {
-      display: flex; align-items: center; gap: 12px;
-      width: 100%; padding: var(--safe-top, 0px) 20px 0;
-      background: var(--top-bg);
-      border-bottom: 1px solid var(--top-line);
-      color: var(--top-ink);
-      height: calc(var(--topbar-h, 60px) + var(--safe-top, 0px));
-      position: relative; z-index: 400;
-    }
-    #fd-topbar::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-      height: 2.5px; pointer-events: none;
-      background: var(--grad-rainbow);
-      background-size: 200% 100%;
-      animation: fd-rainbow 9s linear infinite;
-      opacity: 0.72;
-    }
-    @keyframes fd-rainbow { from { background-position: 0% 0; } to { background-position: 200% 0; } }
-
-    .fd-logo { display: flex; align-items: center; gap: 8px; font: 700 1.1rem var(--font-ui); }
-    .fd-logo svg { width: 28px; height: 28px; }
-    .fd-spacer { flex: 1; }
-    
-    .fd-btn-icon {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 36px; height: 36px; border-radius: 8px;
-      background: transparent; border: 0; color: var(--top-ink);
-      cursor: pointer; transition: background 150ms;
-    }
-    .fd-btn-icon:hover { background: rgba(255,255,255,0.08); }
-    .fd-btn-icon svg { width: 20px; height: 20px; }
-
-    .fd-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 16px; border-radius: 8px;
-      background: var(--gold); color: #0c1445;
-      font: 600 0.875rem var(--font-ui);
-      border: 0; cursor: pointer;
-      transition: background 150ms, transform 100ms;
-    }
-    .fd-btn:hover { background: #f0b534; transform: translateY(-1px); }
-    .fd-btn:active { transform: scale(0.97); }
-    .fd-btn svg { width: 16px; height: 16px; }
-
-    .fd-btn--ghost {
-      background: transparent; color: var(--top-ink);
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-    .fd-btn--ghost:hover { background: rgba(255,255,255,0.08); }
+    /* ── Topbar (handled by unity-header; no custom styling needed) ──── */
 
     /* ── Sidebar ─────────────────────────────────────────────────────────── */
     #fd-sidebar {
@@ -420,38 +371,8 @@
   <!-- Main app shell -->
   <div class="fd-wrap" id="fd-app">
     
-    <!-- Topbar -->
-    <div id="fd-topbar-wrap">
-      <div id="fd-topbar">
-        <button class="fd-btn-icon" id="fd-menu-btn" aria-label="Menu">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </button>
-        
-        <div class="fd-logo">
-          <svg fill="currentColor" viewBox="0 0 24 24">
-            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-          </svg>
-          <span>FlockDocs</span>
-        </div>
-
-        <div class="fd-spacer"></div>
-
-        <button class="fd-btn" id="fd-new-doc-btn">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-          </svg>
-          New Document
-        </button>
-
-        <button class="fd-btn-icon" id="fd-user-menu-btn" aria-label="Account">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-          </svg>
-        </button>
-      </div>
-    </div>
+    <!-- Topbar (unity header mounted by JS) -->
+    <header class="unity-header" id="fd-topbar" role="banner"></header>
 
     <!-- Sidebar -->
     <div id="fd-sidebar-wrap">

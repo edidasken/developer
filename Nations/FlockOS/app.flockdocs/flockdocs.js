@@ -14,6 +14,8 @@
      • Collaborative editing (future)
    ══════════════════════════════════════════════════════════════════════════════ */
 
+import { mountUnityHeader } from '../Scripts/the_unity_header.js';
+
 /* ── Constants ───────────────────────────────────────────────────────────── */
 const STORE_KEY_PREFS = 'fd_prefs';
 const COLLECTION_DOCS = 'flockDocs';
@@ -87,11 +89,53 @@ function init() {
   console.log('[FlockDocs] User:', S.user.displayName);
 
   _loadPrefs();
+  _mountHeader();
   _bindEvents();
   _loadDocuments();
   _loadFolders();
   
   console.log('[FlockDocs] Ready');
+}
+
+/* ── Unity Header ─────────────────────────────────────────────────────────── */
+function _mountHeader() {
+  const appIconSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>';
+  
+  const newDocHtml = `
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+    </svg>
+    <span>New Document</span>
+  `;
+
+  mountUnityHeader(document.getElementById('fd-topbar'), {
+    appId: 'flockdocs',
+    appName: 'FlockDocs',
+    appIconSvg,
+    appAccent: '#3b82f6',
+    appAccentDk: '#1e3a8a',
+    homeHref: 'app.flockdocs/app.flockdocs.html',
+    user: S.user,
+    onSignOut: async () => {
+      try {
+        await Nehemiah.logout();
+        window.location.replace('app.flockdocs/index.html');
+      } catch (err) {
+        console.error('[FlockDocs] Sign out failed:', err);
+      }
+    },
+    onHamburger: () => {
+      document.getElementById('fd-sidebar-wrap')?.classList.toggle('is-open');
+    },
+    extras: [
+      {
+        html: `<span style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:#e8a838;color:#0c1445;font:600 0.875rem var(--font-ui);cursor:pointer;transition:background .15s">${newDocHtml}</span>`,
+        onClick: createNewDocument,
+        aria: 'New Document',
+        title: 'Create a new document',
+      },
+    ],
+  });
 }
 
 /* ── Preferences ──────────────────────────────────────────────────────────── */
@@ -110,14 +154,6 @@ function _savePrefs() {
 
 /* ── Event Bindings ───────────────────────────────────────────────────────── */
 function _bindEvents() {
-  // Mobile menu toggle
-  document.getElementById('fd-menu-btn')?.addEventListener('click', () => {
-    document.getElementById('fd-sidebar-wrap')?.classList.toggle('is-open');
-  });
-
-  // New document button
-  document.getElementById('fd-new-doc-btn')?.addEventListener('click', createNewDocument);
-
   // Sidebar view buttons
   document.querySelectorAll('[data-view]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -161,10 +197,11 @@ function _bindEvents() {
   // Close mobile sidebar when clicking outside
   document.addEventListener('click', (e) => {
     const sidebar = document.getElementById('fd-sidebar-wrap');
-    const menuBtn = document.getElementById('fd-menu-btn');
+    const hamburger = document.querySelector('.unity-hamburger');
     if (sidebar?.classList.contains('is-open') && 
         !sidebar.contains(e.target) && 
-        !menuBtn.contains(e.target)) {
+        e.target !== hamburger && 
+        !hamburger?.contains(e.target)) {
       sidebar.classList.remove('is-open');
     }
   });
