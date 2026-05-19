@@ -817,7 +817,7 @@
 </head>
 <body>
 
-  <!-- FlockDocs is guest-accessible (read-only for unauthenticated users); no redirect on missing auth -->
+  <!-- Auth gating is handled by flockdocs.js (waits for Firebase Auth state restoration before deciding). -->
 
   <!-- Auth gate placeholder (will be injected by firm_foundation.js) -->
   <div id="auth-gate"></div>

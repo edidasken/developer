@@ -56,28 +56,63 @@ window.FlockDocs = {
   shareDocument,
 };
 
-// Wait for Firebase and Nehemiah to be ready.
-// FlockDocs allows guest (read-only) access — never redirect on missing auth.
+// Wait for Firebase + Nehemiah + restored auth state to be ready.
+// Firebase Auth restores the persisted user asynchronously from IndexedDB, so
+// we MUST wait for onAuthStateChanged to fire once before deciding whether the
+// user is authenticated — otherwise legitimately logged-in users get redirected
+// on a fresh tab where sessionStorage is empty.
 function _waitForReady() {
-  return new Promise((resolve) => {
-    let attempts = 0;
-    const maxAttempts = 50; // 5 seconds max
+  return new Promise((resolve, reject) => {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const TIMEOUT_MS = 8000;
+    const startedAt = Date.now();
 
-    const checkReady = () => {
-      attempts++;
-      if (typeof firebase !== 'undefined' && typeof Nehemiah !== 'undefined') {
-        if (!Nehemiah.isAuthenticated()) {
-          console.warn('[FlockDocs] No authenticated user — continuing as guest (read-only).');
+    function decide() {
+      if (Nehemiah.isAuthenticated()) {
+        resolve();
+        return;
+      }
+      if (isLocalhost) {
+        console.warn('[FlockDocs] User not authenticated (localhost — allowing for development)');
+        resolve();
+        return;
+      }
+      console.warn('[FlockDocs] User not authenticated, redirecting to login');
+      window.location.replace('index.html');
+      reject(new Error('Not authenticated'));
+    }
+
+    function waitForAuthState() {
+      // Firebase + Nehemiah loaded — wait for the first onAuthStateChanged
+      // callback so we know whether a persisted session exists.
+      try {
+        const unsub = firebase.auth().onAuthStateChanged(() => {
+          try { unsub(); } catch (_) {}
+          decide();
+        });
+      } catch (err) {
+        console.error('[FlockDocs] onAuthStateChanged failed:', err);
+        decide();
+      }
+    }
+
+    const tick = () => {
+      if (typeof firebase !== 'undefined' && firebase.auth && typeof Nehemiah !== 'undefined') {
+        waitForAuthState();
+      } else if (Date.now() - startedAt >= TIMEOUT_MS) {
+        if (!isLocalhost) {
+          console.error('[FlockDocs] Timeout waiting for firebase/Nehemiah, redirecting to login');
+          window.location.replace('index.html');
+          reject(new Error('Timeout'));
+        } else {
+          console.warn('[FlockDocs] Timeout waiting for firebase/Nehemiah (localhost — continuing)');
+          resolve();
         }
-        resolve();
-      } else if (attempts >= maxAttempts) {
-        console.warn('[FlockDocs] Timeout waiting for firebase/Nehemiah — continuing as guest.');
-        resolve();
       } else {
-        setTimeout(checkReady, 100);
+        setTimeout(tick, 100);
       }
     };
-    checkReady();
+    tick();
   });
 }
 
@@ -96,8 +131,22 @@ function init() {
 
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-  // Get authenticated user from Nehemiah (may be null — FlockDocs allows guest read-only)
-  const profile = (typeof Nehemiah !== 'undefined' && Nehemiah.getProfile) ? Nehemiah.getProfile() : null;
+  // Get authenticated user from Nehemiah
+  let profile = (typeof Nehemiah !== 'undefined' && Nehemiah.getProfile) ? Nehemiah.getProfile() : null;
+
+  // Fallback: if Nehemiah has no cached profile but Firebase Auth has a user
+  // (e.g. fresh tab with no sessionStorage but persisted Firebase session),
+  // synthesize a minimal profile from the Firebase user so we don't redirect.
+  if (!profile && typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+    const fbUser = firebase.auth().currentUser;
+    profile = {
+      uid: fbUser.uid,
+      email: fbUser.email || '',
+      displayName: fbUser.displayName || fbUser.email || '',
+      role: 'member',
+    };
+  }
+
   if (profile) {
     S.user = {
       uid: profile.uid,
@@ -114,13 +163,9 @@ function init() {
       role: 'admin'
     };
   } else {
-    console.warn('[FlockDocs] No authenticated user — guest mode (read-only)');
-    S.user = {
-      uid: 'guest',
-      displayName: 'Guest',
-      email: '',
-      role: 'guest'
-    };
+    console.error('[FlockDocs] No authenticated user found');
+    window.location.replace('index.html');
+    return;
   }
 
   console.log('[FlockDocs] User:', S.user.displayName);
@@ -1477,9 +1522,7 @@ function _checkFirebase() {
 }
 
 function _isMockUser() {
-  // Treat dev-user (localhost) and guest (unauthenticated live) as mock so
-  // FlockDocs uses localStorage instead of Firestore (which rejects guest writes).
-  return S.user && (S.user.uid === 'dev-user' || S.user.uid === 'guest');
+  return S.user && S.user.uid === 'dev-user';
 }
 
 function _loadFromLocalStorage() {
