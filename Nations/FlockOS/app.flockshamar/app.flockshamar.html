@@ -227,7 +227,7 @@
       background: var(--fs-color-default);
       border: 1px solid var(--fs-gray-mid);
       border-radius: 8px;
-      padding: 16px;
+      padding: 16px 16px 12px;
       cursor: pointer;
       position: relative;
       transition: box-shadow 0.2s;
@@ -236,6 +236,14 @@
       width: 100%;
       margin-bottom: 16px;
       vertical-align: top;
+      color: var(--fs-text-primary);
+      min-height: 60px;
+    }
+    .fs-note-card.is-empty .fs-note-content::after {
+      content: 'Empty note';
+      color: var(--fs-text-secondary);
+      font-style: italic;
+      opacity: 0.6;
     }
     
     .fs-note-card:hover {
@@ -367,6 +375,13 @@
     .fs-note-card.pinned .fs-note-pin {
       opacity: 1;
       color: var(--fs-gold);
+    }
+
+    /* Touch devices: always show actions + pin (no hover available) */
+    @media (hover: none), (max-width: 768px) {
+      .fs-note-actions { opacity: 1; }
+      .fs-note-pin { opacity: 1; }
+      .fs-note-card { padding-right: 44px; }
     }
     
     /* Color Picker Popup */

@@ -477,8 +477,10 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
          </ul>`
       : '';
     
+    const hasChecklist = note.type === 'checklist' && note.checklist && note.checklist.length > 0;
+    const isEmpty = !note.title && !hasChecklist && !(note.content && note.content.trim());
     return `
-      <div class="fs-note-card ${note.pinned ? 'pinned' : ''}" 
+      <div class="fs-note-card ${note.pinned ? 'pinned' : ''} ${isEmpty ? 'is-empty' : ''}" 
            data-note-id="${note.id}" 
            data-color="${note.color || 'default'}">
         <button class="fs-icon-btn fs-note-pin" data-action="pin">
