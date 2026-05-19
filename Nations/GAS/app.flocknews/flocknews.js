@@ -69,25 +69,40 @@ const FlockNewsState = {
   dateKey: '' // Format: YYYY-MM-DD
 };
 
-// Wait for Firebase + Nehemiah to be ready (no auth required — FlockNews is public)
-function _waitForReady() {
-  return new Promise((resolve) => {
-    let attempts = 0;
-    const maxAttempts = 50; // 5 seconds max
+// Silently check pastor+ edit permissions after the page is fully rendered.
+// Polls for Nehemiah to be ready (max 8s) without blocking the initial load.
+function _checkEditPermissions() {
+  let attempts = 0;
+  const maxAttempts = 80; // 8 seconds — plenty of time after render
 
-    const checkReady = () => {
-      attempts++;
-      if (typeof firebase !== 'undefined' && typeof Nehemiah !== 'undefined') {
-        resolve(); // Both loaded — check auth state in initFlockNews
-      } else if (attempts >= maxAttempts) {
-        console.warn('[FlockNews] Timeout waiting for dependencies — continuing as guest.');
-        resolve(); // Always resolve — never block the app
-      } else {
-        setTimeout(checkReady, 100);
+  const poll = () => {
+    attempts++;
+    if (typeof Nehemiah !== 'undefined') {
+      if (Nehemiah.isAuthenticated()) {
+        const profile = Nehemiah.getProfile();
+        if (profile) {
+          FlockNewsState.currentUser = {
+            uid: profile.uid,
+            displayName: profile.displayName || profile.email,
+            email: profile.email,
+            role: profile.role || 'member',
+          };
+          FlockNewsState.isPastorPlus = (profile.role === 'pastor' || profile.role === 'admin');
+          if (FlockNewsState.isPastorPlus) {
+            const editBtn = document.getElementById('fn-edit-toggle');
+            if (editBtn) editBtn.style.display = 'flex';
+            console.log('[FlockNews] Editor permissions granted:', profile.displayName || profile.email);
+          }
+        }
       }
-    };
-    checkReady();
-  });
+      // Nehemiah loaded but not authenticated — stay as guest, nothing to do
+      return;
+    }
+    if (attempts < maxAttempts) setTimeout(poll, 100);
+    // else: timed out — stay as guest silently
+  };
+
+  setTimeout(poll, 100); // Start polling after a tick (non-blocking)
 }
 
 // Initialize FlockNews
@@ -95,45 +110,15 @@ async function initFlockNews() {
   console.log('🚀 FlockNews: Initializing...');
 
   try {
-    // FlockNews is public — no auth required. Optionally pick up signed-in user for edit mode.
-    const profile = (typeof Nehemiah !== 'undefined' && Nehemiah.isAuthenticated()) ? Nehemiah.getProfile() : null;
-    if (profile) {
-      FlockNewsState.currentUser = {
-        uid: profile.uid,
-        displayName: profile.displayName || profile.email,
-        email: profile.email,
-        role: profile.role || 'member',
-      };
-      FlockNewsState.isPastorPlus = (profile.role === 'pastor' || profile.role === 'admin');
-    } else {
-      // Guest / unauthenticated — full read access, no edit mode
-      FlockNewsState.currentUser = null;
-      FlockNewsState.isPastorPlus = false;
-    }
+    // Guest mode by default — edit permissions resolved lazily after render
+    FlockNewsState.currentUser = null;
+    FlockNewsState.isPastorPlus = false;
 
-    console.log('✅ User:', FlockNewsState.currentUser.displayName, '| Pastor+:', FlockNewsState.isPastorPlus);
-
-    // Initialize Firebase Firestore + mint UpperRoom custom token
+    // Initialize Firebase if available
     if (typeof firebase !== 'undefined') {
       FlockNewsState.db = firebase.firestore();
       FlockNewsState.auth = firebase.auth();
       console.log('✅ Firebase initialized');
-      // Mint Firebase custom token via UpperRoom so Firestore reads are authenticated
-      const UR = window.UpperRoom;
-      if (UR && typeof UR.init === 'function') {
-        try {
-          await UR.init(window.FLOCK_FIREBASE_CONFIG || window.FIREBASE_CONFIG || null);
-          await UR.authenticate();
-          console.log('✅ UpperRoom authenticated');
-        } catch (e) {
-          console.warn('[FlockNews] UpperRoom authenticate failed (continuing):', e);
-        }
-      }
-    }
-
-    // Show edit button if pastor+
-    if (FlockNewsState.isPastorPlus) {
-      document.getElementById('fn-edit-toggle').style.display = 'flex';
     }
 
     // Set current date
@@ -1783,9 +1768,12 @@ window.FlockNews = {
 };
 
 // Initialize on DOM ready
-window.addEventListener('DOMContentLoaded', async () => {
-  await _waitForReady();
-  initFlockNews();
+window.addEventListener('DOMContentLoaded', () => {
+  // Start the app immediately — no waiting on auth
+  initFlockNews().then(() => {
+    // After render, silently check for editor permissions in the background
+    _checkEditPermissions();
+  });
 });
 
 export { FlockNewsState, initFlockNews };
