@@ -85,6 +85,14 @@
       gap: 0;                          /* column rules handle visual separation */
       grid-auto-flow: dense;
       border-bottom: 3px double var(--fn-gold);
+
+      /* ◈ Remap all white-based design tokens to dark-on-cream inside the feed.
+         Every descendant using var(--fn-ink) / var(--fn-muted) / var(--fn-border)
+         will now render with dark navy text on the cream newsprint background.
+         The masthead (.fn-header) is outside this element so it is unaffected. */
+      --fn-ink:    #0f1735;
+      --fn-muted:  rgba(15,23,53,0.65);
+      --fn-border: rgba(15,23,53,0.12);
     }
 
     /* Row 1: Full-width lead story */
@@ -1498,6 +1506,38 @@
     .fn-card-reaction-bar  { border-top-color: rgba(15,23,53,0.1) !important; }
     .fn-reaction-bubble    { color: #0f1735 !important; }
     .fn-reaction-bubble.active { color: #c48a20 !important; background: rgba(200,138,32,0.12) !important; }
+
+    /* PILLAR ITEMS (Frontlines Ministry pillars) */
+    .fn-pillar-item  { background: rgba(15,23,53,0.04) !important; border-color: rgba(232,168,56,0.2) !important; }
+    .fn-pillar-name  { color: #0f1735 !important; }
+
+    /* UNREACHED PEOPLE GROUP widget */
+    .fn-unreached-stats {
+      border-top-color:    rgba(15,23,53,0.1) !important;
+      border-bottom-color: rgba(15,23,53,0.1) !important;
+    }
+    .fn-unreached-stats span { color: #1a1a2e !important; }
+    .fn-unreached-summary    { color: rgba(15,23,53,0.70) !important; }
+    .fn-unreached-country    { color: rgba(15,23,53,0.60) !important; }
+    .fn-unreached-label      { color: #c48a20 !important; }
+
+    /* COUNTRY / BIBLE-ACCESS / FRONTLINES sub-widget headers & bodies */
+    .fn-country-header,
+    .fn-frontlines-header,
+    .fn-bible-access-header { border-bottom-color: rgba(15,23,53,0.1) !important; }
+    .fn-country-stat        { background: rgba(15,23,53,0.05) !important; }
+    .fn-stat-value          { color: #c48a20 !important; }
+    .fn-stat-label          { color: rgba(15,23,53,0.55) !important; }
+    .fn-country-details     { background: rgba(15,23,53,0.05) !important; }
+    .fn-country-details p,
+    .fn-country-details strong { color: #1a1a2e !important; }
+    .fn-country-summary     { color: rgba(15,23,53,0.70) !important; }
+    .fn-country-summary p   { color: rgba(15,23,53,0.75) !important; }
+    .fn-country-link        { color: #c48a20 !important; }
+
+    /* Frontlines stat highlight box */
+    .fn-frontlines-stat-highlight { background: rgba(232,168,56,0.1) !important; }
+    .fn-frontlines-stat-highlight > * { color: #0f1735 !important; }
 
     /* ── Masthead responsive ── */
     @media (max-width: 640px) {
