@@ -1286,6 +1286,7 @@ function editSection(sectionId) {
       }
       break;
     }
+  }
 
   contentEl.innerHTML = editorHTML;
   modal.classList.add('fn-modal-open');
