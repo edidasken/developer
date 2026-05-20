@@ -27,6 +27,10 @@ const FlockNewsState = {
   unreachedOfDay: null,
   countryOfDay: null,
   bibleAccessSpotlight: null,
+  churchName: '',
+  newsConfig: {},    // tagline, edition, etc.
+  moduleConfig: null, // null = not yet loaded; use DEFAULT_MODULES as fallback
+  swReg: null,
   newsData: {
     introduction: { title: '', content: '', lastUpdated: null },
     pastorHeart: { title: '', content: '', lastUpdated: null },
@@ -69,6 +73,18 @@ const FlockNewsState = {
   dateKey: '' // Format: YYYY-MM-DD
 };
 
+// Default module configuration (builtin modules in default order)
+const DEFAULT_MODULES = [
+  { id: 'introduction',  type: 'builtin', label: 'Welcome',               icon: '✨', visible: true, order: 0 },
+  { id: 'pastorHeart',   type: 'builtin', label: "Pastor's Heart",        icon: '❤️', visible: true, order: 1 },
+  { id: 'announcements', type: 'builtin', label: 'Announcements',         icon: '📢', visible: true, order: 2 },
+  { id: 'mission',       type: 'builtin', label: 'Mission of the Day',    icon: '🌍', visible: true, order: 3 },
+  { id: 'reading',       type: 'builtin', label: 'Bible Reading',         icon: '📖', visible: true, order: 4 },
+  { id: 'devotional',    type: 'builtin', label: 'Daily Devotional',      icon: '✨', visible: true, order: 5 },
+  { id: 'words',         type: 'builtin', label: 'Word of the Day',       icon: '📚', visible: true, order: 6 },
+  { id: 'book',          type: 'builtin', label: 'Bible Book of the Day', icon: '📕', visible: true, order: 7 },
+];
+
 // Silently check pastor+ edit permissions after the page is fully rendered.
 // Polls for Nehemiah to be ready (max 8s) without blocking the initial load.
 function _checkEditPermissions() {
@@ -101,6 +117,7 @@ function _checkEditPermissions() {
           if (FlockNewsState.isPastorPlus) {
             const editBtn = document.getElementById('fn-edit-toggle');
             if (editBtn) editBtn.style.display = 'flex';
+            // manage-modules FAB stays hidden until edit mode is activated
             console.log('[FlockNews] Editor permissions granted:', profile.displayName || profile.email);
           }
         }
@@ -137,6 +154,9 @@ async function initFlockNews() {
     // Mount Unity Header
     mountHeader();
 
+    // Initialize SW update detection (non-blocking)
+    _initSwUpdateDetection();
+
     // Fetch missions data in parallel (non-blocking)
     const missionsPromise = Promise.all([
       fetchUnreachedOfDay(),
@@ -146,6 +166,9 @@ async function initFlockNews() {
 
     // Load content
     await loadNewsContent();
+
+    // Load church name + FlockNews config (runs after content so applyModuleConfig finds existing module divs)
+    await loadChurchAndConfig();
 
     // Wait for missions data and render
     const [unreached, country, bibleAccess] = await missionsPromise;
@@ -1172,10 +1195,14 @@ function toggleEditMode() {
     appEl.classList.add('fn-editing');
     toggleBtn.classList.add('editing');
     toggleBtn.innerHTML = '✓';
+    const mmBtn = document.getElementById('fn-manage-modules-btn');
+    if (mmBtn) mmBtn.classList.add('visible');
   } else {
     appEl.classList.remove('fn-editing');
     toggleBtn.classList.remove('editing');
     toggleBtn.innerHTML = '✏️';
+    const mmBtn = document.getElementById('fn-manage-modules-btn');
+    if (mmBtn) mmBtn.classList.remove('visible');
   }
 }
 
@@ -1202,7 +1229,7 @@ function editSection(sectionId) {
     words: 'Edit Word of the Day',
     book: 'Edit Bible Book of the Day'
   };
-  titleEl.textContent = titles[sectionId] || 'Edit Section';
+  titleEl.textContent = titles[sectionId] || `Edit ${(FlockNewsState.moduleConfig || DEFAULT_MODULES).find(m => m.id === sectionId)?.label || 'Section'}`;
 
   // Build editor form based on section
   let editorHTML = '';
@@ -1232,7 +1259,30 @@ function editSection(sectionId) {
     case 'book':
       editorHTML = buildBookEditor();
       break;
-  }
+    default: {
+      // Custom module
+      const customMod = (FlockNewsState.moduleConfig || []).find(m => m.id === sectionId && m.type === 'custom');
+      if (customMod) {
+        editorHTML = `
+          <div class="fn-editor-field">
+            <label>Module Label</label>
+            <input type="text" id="edit-custom-label" value="${escapeHTML(customMod.label || '')}" style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;">
+          </div>
+          <div class="fn-editor-field">
+            <label>Icon (emoji)</label>
+            <input type="text" id="edit-custom-icon" value="${escapeHTML(customMod.icon || '📋')}" maxlength="4" style="width:80px;padding:10px;border-radius:6px;border:1px solid #ccc;">
+          </div>
+          <div class="fn-editor-field">
+            <label>Content (HTML supported)</label>
+            <div class="fn-rich-editor">
+              <div class="fd-editor-content" style="min-height:200px;padding:12px;border:1px solid #ccc;border-radius:4px;background:white;color:#000;">
+                ${customMod.content || ''}
+              </div>
+            </div>
+          </div>`;
+      }
+      break;
+    }
 
   contentEl.innerHTML = editorHTML;
   modal.classList.add('fn-modal-open');
@@ -1610,6 +1660,76 @@ async function saveSection() {
         };
         FlockNewsState.newsData.book = updatedData.book;
         break;
+
+      case '__header_tagline__':
+      case '__header_edition__': {
+        const field = sectionId === '__header_tagline__' ? 'tagline' : 'edition';
+        const val = (document.getElementById('edit-header-field')?.value || '').trim();
+        if (field === 'tagline') {
+          const el = document.getElementById('fn-tagline');
+          if (el) el.textContent = val;
+        } else {
+          const el = document.getElementById('fn-masthead-edition');
+          if (el) el.textContent = val;
+        }
+        FlockNewsState.newsConfig[field] = val;
+        try {
+          if (FlockNewsState.db) {
+            await FlockNewsState.db.collection('appConfig').doc('flockNewsConfig').set(
+              { [field]: val, updatedAt: new Date().toISOString() }, { merge: true }
+            );
+          }
+        } catch (e) { console.warn('[FlockNews] Header config save failed:', e.message); }
+        closeEditor();
+        showSuccessMessage('Updated!');
+        return;
+      }
+
+      case '__new_custom__': {
+        const label = (document.getElementById('edit-custom-label')?.value || '').trim() || 'Custom Module';
+        const icon  = (document.getElementById('edit-custom-icon')?.value  || '').trim() || '📋';
+        const content = document.getElementById('edit-custom-content')?.innerHTML || '';
+        const customId = 'custom_' + Date.now();
+        const baseMods = FlockNewsState.moduleConfig ? [...FlockNewsState.moduleConfig] : [...DEFAULT_MODULES];
+        const newMod = { id: customId, type: 'custom', label, icon, visible: true, order: baseMods.length, content, lastUpdated: new Date().toISOString() };
+        baseMods.push(newMod);
+        baseMods.forEach((m, i) => m.order = i);
+        FlockNewsState.moduleConfig = baseMods;
+        try {
+          if (FlockNewsState.db) {
+            await FlockNewsState.db.collection('appConfig').doc('flockNewsConfig').set(
+              { modules: baseMods, updatedAt: new Date().toISOString() }, { merge: true }
+            );
+          }
+        } catch (e) { console.warn('[FlockNews] Custom module save failed:', e.message); }
+        applyModuleConfig(baseMods);
+        closeEditor();
+        showSuccessMessage('Custom module added!');
+        return;
+      }
+
+      default: {
+        // Editing an existing custom module
+        const customMod = (FlockNewsState.moduleConfig || []).find(m => m.id === sectionId && m.type === 'custom');
+        if (customMod) {
+          customMod.label   = (document.getElementById('edit-custom-label')?.value  || '').trim() || customMod.label;
+          customMod.icon    = (document.getElementById('edit-custom-icon')?.value   || '').trim() || customMod.icon;
+          customMod.content = document.getElementById('edit-custom-content')?.innerHTML || customMod.content;
+          customMod.lastUpdated = new Date().toISOString();
+          try {
+            if (FlockNewsState.db) {
+              await FlockNewsState.db.collection('appConfig').doc('flockNewsConfig').set(
+                { modules: FlockNewsState.moduleConfig, updatedAt: new Date().toISOString() }, { merge: true }
+              );
+            }
+          } catch (e) { console.warn('[FlockNews] Custom module update failed:', e.message); }
+          applyModuleConfig(FlockNewsState.moduleConfig);
+          closeEditor();
+          showSuccessMessage('Changes saved!');
+          return;
+        }
+        break;
+      }
     }
 
     // Save to Firestore (try, but don't fail if it doesn't work)
@@ -1669,6 +1789,271 @@ function closeEditor() {
   document.getElementById('fn-editor-modal').classList.remove('fn-modal-open');
   FlockNewsState.currentEditSection = null;
 }
+
+// ── Church Name + FlockNews Config ─────────────────────────────────────
+async function loadChurchAndConfig() {
+  if (!FlockNewsState.db) return;
+  try {
+    const [churchDoc, configDoc] = await Promise.all([
+      FlockNewsState.db.collection('appConfig').doc('church_name').get(),
+      FlockNewsState.db.collection('appConfig').doc('flockNewsConfig').get(),
+    ]);
+
+    if (churchDoc.exists) {
+      const name = (churchDoc.data().value || '').trim();
+      FlockNewsState.churchName = name;
+      const el = document.getElementById('fn-church-name');
+      if (el && name) el.textContent = name;
+    }
+
+    if (configDoc.exists) {
+      const cfg = configDoc.data() || {};
+      FlockNewsState.newsConfig = cfg;
+      if (cfg.tagline) {
+        const el = document.getElementById('fn-tagline');
+        if (el) el.textContent = cfg.tagline;
+      }
+      if (cfg.edition) {
+        const el = document.getElementById('fn-masthead-edition');
+        if (el) el.textContent = cfg.edition;
+      }
+      if (cfg.modules && Array.isArray(cfg.modules)) {
+        FlockNewsState.moduleConfig = cfg.modules;
+      }
+    }
+
+    applyModuleConfig(FlockNewsState.moduleConfig || DEFAULT_MODULES);
+  } catch (e) {
+    console.warn('[FlockNews] loadChurchAndConfig failed:', e.message);
+    applyModuleConfig(DEFAULT_MODULES);
+  }
+}
+
+// Apply module config to the news feed DOM (order + visibility)
+function applyModuleConfig(modules) {
+  if (!modules || !Array.isArray(modules)) return;
+  const feed = document.getElementById('fn-news-feed');
+  if (!feed) return;
+
+  const sorted = [...modules].sort((a, b) => a.order - b.order);
+
+  sorted.forEach(mod => {
+    if (mod.type === 'custom') {
+      let el = document.querySelector(`[data-section="${mod.id}"]`);
+      if (!el) {
+        el = document.createElement('div');
+        el.setAttribute('data-section', mod.id);
+        el.setAttribute('data-custom', 'true');
+        el.className = 'fn-news-card';
+        el.innerHTML = `
+          <div class="fn-card-header">
+            <div class="fn-card-title">
+              <span>${escapeHTML(mod.icon || '📋')}</span>
+              <span>${escapeHTML(mod.label || 'Custom Module')}</span>
+            </div>
+            <button class="fn-card-edit-btn" onclick="FlockNews.editSection('${mod.id}')">Edit</button>
+          </div>
+          <div class="fn-card-content">${mod.content || '<p>Custom content</p>'}</div>`;
+      } else if (el.getAttribute('data-custom') === 'true') {
+        // Update existing custom module content in place
+        const contentEl = el.querySelector('.fn-card-content');
+        if (contentEl && mod.content) contentEl.innerHTML = mod.content;
+        const titleEl = el.querySelector('.fn-card-title span:last-child');
+        if (titleEl) titleEl.textContent = mod.label || 'Custom Module';
+        const iconEl = el.querySelector('.fn-card-title span:first-child');
+        if (iconEl) iconEl.textContent = mod.icon || '📋';
+      }
+      el.style.display = mod.visible ? '' : 'none';
+      feed.appendChild(el);
+    } else {
+      const el = document.querySelector(`[data-section="${mod.id}"]`);
+      if (!el) return;
+      el.style.display = mod.visible ? '' : 'none';
+      feed.appendChild(el); // moves to end, achieving sorted order
+    }
+  });
+}
+
+// ── SW Update Detection ─────────────────────────────────────────────────
+function _initSwUpdateDetection() {
+  if (!('serviceWorker' in navigator)) return;
+
+  navigator.serviceWorker.ready.then(reg => {
+    FlockNewsState.swReg = reg;
+
+    if (reg.waiting && navigator.serviceWorker.controller) {
+      _showSwUpdateBanner();
+    }
+
+    reg.addEventListener('updatefound', () => {
+      const installing = reg.installing;
+      if (!installing) return;
+      installing.addEventListener('statechange', () => {
+        if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+          _showSwUpdateBanner();
+        }
+      });
+    });
+
+    reg.update().catch(() => {});
+  }).catch(() => {});
+
+  let _reloading = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!_reloading) { _reloading = true; location.reload(); }
+  });
+}
+
+function _showSwUpdateBanner() {
+  const banner = document.getElementById('fn-update-banner');
+  if (banner) banner.style.display = 'flex';
+}
+
+async function doUpdate() {
+  const banner = document.getElementById('fn-update-banner');
+  if (banner) banner.style.display = 'none';
+  const reg = FlockNewsState.swReg || (await navigator.serviceWorker.getRegistration().catch(() => null));
+  if (reg && reg.waiting) {
+    reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+  } else {
+    if (reg) await reg.update().catch(() => {});
+    location.reload();
+  }
+}
+
+// ── Module Manager ──────────────────────────────────────────────────────
+function openModuleManager() {
+  if (!FlockNewsState.isPastorPlus) return;
+  const modules = [...(FlockNewsState.moduleConfig || DEFAULT_MODULES)].sort((a, b) => a.order - b.order);
+  const body = document.getElementById('fn-mm-body');
+  if (!body) return;
+
+  body.innerHTML = modules.map((mod, i) => `
+    <div class="fn-mm-module-row" data-mod-id="${escapeHTML(mod.id)}">
+      <span class="fn-mm-module-icon">${mod.icon || '📋'}</span>
+      <span class="fn-mm-module-label">${escapeHTML(mod.label)}</span>
+      <div class="fn-mm-module-controls">
+        <label class="fn-mm-toggle">
+          <input type="checkbox" ${mod.visible ? 'checked' : ''} onchange="FlockNews._mmToggleVisible('${escapeHTML(mod.id)}', this.checked)">
+          <span class="fn-mm-slider"></span>
+        </label>
+        <button class="fn-mm-reorder-btn" onclick="FlockNews._mmMoveUp('${escapeHTML(mod.id)}')" title="Move up" ${i === 0 ? 'disabled' : ''}>↑</button>
+        <button class="fn-mm-reorder-btn" onclick="FlockNews._mmMoveDown('${escapeHTML(mod.id)}')" title="Move down" ${i === modules.length - 1 ? 'disabled' : ''}>↓</button>
+        ${mod.type === 'custom' ? `<button class="fn-mm-delete-btn" onclick="FlockNews._mmDeleteModule('${escapeHTML(mod.id)}')" title="Delete">✕</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('fn-module-manager').style.display = 'flex';
+}
+
+function closeModuleManager() {
+  document.getElementById('fn-module-manager').style.display = 'none';
+}
+
+function _mmGetCurrentModules() {
+  const rows = document.querySelectorAll('.fn-mm-module-row');
+  const base = FlockNewsState.moduleConfig ? [...FlockNewsState.moduleConfig] : [...DEFAULT_MODULES];
+  return Array.from(rows).map((row, i) => {
+    const id = row.getAttribute('data-mod-id');
+    const src = base.find(m => m.id === id) || {};
+    const visible = row.querySelector('input[type="checkbox"]')?.checked ?? true;
+    return { ...src, id, visible, order: i };
+  });
+}
+
+function _mmToggleVisible(id, visible) {
+  const mods = FlockNewsState.moduleConfig ? [...FlockNewsState.moduleConfig] : [...DEFAULT_MODULES];
+  const mod = mods.find(m => m.id === id);
+  if (mod) mod.visible = visible;
+  FlockNewsState.moduleConfig = mods;
+}
+
+function _mmMoveUp(id) {
+  const mods = _mmGetCurrentModules();
+  const i = mods.findIndex(m => m.id === id);
+  if (i <= 0) return;
+  [mods[i - 1], mods[i]] = [mods[i], mods[i - 1]];
+  mods.forEach((m, idx) => m.order = idx);
+  FlockNewsState.moduleConfig = mods;
+  openModuleManager();
+}
+
+function _mmMoveDown(id) {
+  const mods = _mmGetCurrentModules();
+  const i = mods.findIndex(m => m.id === id);
+  if (i >= mods.length - 1) return;
+  [mods[i + 1], mods[i]] = [mods[i], mods[i + 1]];
+  mods.forEach((m, idx) => m.order = idx);
+  FlockNewsState.moduleConfig = mods;
+  openModuleManager();
+}
+
+function _mmDeleteModule(id) {
+  if (!confirm('Delete this custom module? This cannot be undone.')) return;
+  const mods = (FlockNewsState.moduleConfig || [...DEFAULT_MODULES]).filter(m => m.id !== id);
+  mods.forEach((m, i) => m.order = i);
+  FlockNewsState.moduleConfig = mods;
+  openModuleManager();
+}
+
+async function saveModuleConfig() {
+  const mods = _mmGetCurrentModules();
+  FlockNewsState.moduleConfig = mods;
+  try {
+    if (FlockNewsState.db) {
+      await FlockNewsState.db.collection('appConfig').doc('flockNewsConfig').set(
+        { modules: mods, updatedAt: new Date().toISOString() }, { merge: true }
+      );
+    }
+  } catch (e) { console.warn('[FlockNews] saveModuleConfig failed:', e.message); }
+  applyModuleConfig(mods);
+  closeModuleManager();
+  showSuccessMessage('Module layout saved!');
+}
+
+function promptAddCustomModule() {
+  FlockNewsState.currentEditSection = '__new_custom__';
+  closeModuleManager();
+  const modal = document.getElementById('fn-editor-modal');
+  document.getElementById('fn-editor-title').textContent = 'Add Custom Module';
+  document.getElementById('fn-editor-content').innerHTML = `
+    <div class="fn-editor-field">
+      <label>Module Label</label>
+      <input type="text" id="edit-custom-label" placeholder="e.g., Events Calendar" style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;">
+    </div>
+    <div class="fn-editor-field">
+      <label>Icon (emoji)</label>
+      <input type="text" id="edit-custom-icon" placeholder="📅" maxlength="4" value="📋" style="width:80px;padding:10px;border-radius:6px;border:1px solid #ccc;">
+    </div>
+    <div class="fn-editor-field">
+      <label>Content (HTML supported)</label>
+      <div class="fn-rich-editor">
+        <div class="fd-editor-content" id="edit-custom-content" style="min-height:200px;padding:12px;border:1px solid #ccc;border-radius:4px;background:white;color:#000;">
+          <p>Enter your content here...</p>
+        </div>
+      </div>
+    </div>`;
+  modal.classList.add('fn-modal-open');
+}
+
+// Edit header fields (tagline or edition) — pastor+ only
+function editHeaderConfig(field) {
+  if (!FlockNewsState.isPastorPlus) return;
+  const labels = { tagline: 'Page Tagline', edition: 'Edition Text' };
+  const currentVal = field === 'tagline'
+    ? (document.getElementById('fn-tagline')?.textContent || 'Daily Spiritual Nourishment for God\'s Flock')
+    : (document.getElementById('fn-masthead-edition')?.textContent || 'The Church\'s Daily Edition');
+  FlockNewsState.currentEditSection = `__header_${field}__`;
+  document.getElementById('fn-editor-title').textContent = `Edit ${labels[field] || field}`;
+  document.getElementById('fn-editor-content').innerHTML = `
+    <div class="fn-editor-field">
+      <label>${labels[field] || field}</label>
+      <input type="text" id="edit-header-field" value="${escapeHTML(currentVal)}" style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;">
+    </div>`;
+  document.getElementById('fn-editor-modal').classList.add('fn-modal-open');
+}
+
 
 // ──────────────────────────────────────────────────────────────────────
 // REACTIONS SYSTEM
@@ -1839,7 +2224,17 @@ window.FlockNews = {
   closeEditor,
   showReactionPicker,
   addReaction,
-  toggleReaction
+  toggleReaction,
+  doUpdate,
+  editHeaderConfig,
+  openModuleManager,
+  closeModuleManager,
+  saveModuleConfig,
+  promptAddCustomModule,
+  _mmToggleVisible,
+  _mmMoveUp,
+  _mmMoveDown,
+  _mmDeleteModule,
 };
 
 // Initialize on DOM ready

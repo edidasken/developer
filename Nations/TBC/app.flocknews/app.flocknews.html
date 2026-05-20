@@ -202,6 +202,137 @@
       letter-spacing: 0.03em;
     }
 
+    /* ── Church name in masthead ── */
+    .fn-church-name {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: clamp(13px, 2.5vw, 17px);
+      font-weight: 600;
+      color: var(--fn-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 4px 0 0;
+    }
+
+    /* ── SW Update Banner ── */
+    .fn-update-banner {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      background: linear-gradient(90deg, #0f1735 0%, #1b264f 100%);
+      color: #fff; padding: 10px 16px; font-size: 13px; font-weight: 600;
+      border-bottom: 2px solid var(--fn-gold); flex-shrink: 0;
+    }
+    .fn-update-banner-refresh {
+      background: var(--fn-gold); color: #0c0a00; border: none;
+      border-radius: 6px; padding: 5px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .fn-update-banner-dismiss {
+      background: transparent; border: none; color: rgba(255,255,255,0.55);
+      font-size: 18px; cursor: pointer; line-height: 1; padding: 0 4px; margin-left: 4px;
+    }
+
+    /* ── For the Pastor link ── */
+    .fn-pastor-link {
+      text-align: center; padding: 20px 16px 40px;
+      border-top: 1px solid rgba(15,23,53,0.12); margin-top: 8px;
+    }
+    .fn-pastor-link a {
+      font-size: 12px; color: rgba(15,23,53,0.38);
+      text-decoration: none; font-weight: 500; letter-spacing: 0.04em;
+    }
+    .fn-pastor-link a:hover { color: var(--fn-gold-dk); }
+
+    /* ── Header editable fields ── */
+    .fn-tagline-wrap, .fn-edition-wrap {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .fn-header-edit-btn {
+      display: none; background: transparent;
+      border: 1px solid rgba(232,168,56,0.4); border-radius: 5px;
+      color: var(--fn-gold); font-size: 10px; font-weight: 700;
+      padding: 2px 8px; cursor: pointer; letter-spacing: 0.5px;
+    }
+    .fn-editing .fn-header-edit-btn { display: inline-block; }
+
+    /* ── Module Manager ── */
+    .fn-module-manager {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+      z-index: 2000; display: flex; align-items: flex-end; justify-content: center;
+    }
+    .fn-mm-panel {
+      background: #0f1735; width: 100%; max-width: 640px; max-height: 88vh;
+      border-radius: 20px 20px 0 0; display: flex; flex-direction: column;
+      overflow: hidden; box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
+    }
+    .fn-mm-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 24px 16px; border-bottom: 1px solid rgba(232,168,56,0.2); flex-shrink: 0;
+    }
+    .fn-mm-header h2 { font-size: 20px; color: #fff; font-weight: 700; margin: 0; }
+    .fn-mm-close { background: transparent; border: none; color: rgba(255,255,255,0.55); font-size: 22px; cursor: pointer; }
+    .fn-mm-body { flex: 1; overflow-y: auto; padding: 16px; }
+    .fn-mm-module-row {
+      display: flex; align-items: center; gap: 10px; padding: 11px 14px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(232,168,56,0.12);
+      border-radius: 10px; margin-bottom: 8px;
+    }
+    .fn-mm-module-icon { font-size: 18px; min-width: 24px; }
+    .fn-mm-module-label { flex: 1; color: #fff; font-weight: 600; font-size: 14px; }
+    .fn-mm-module-controls { display: flex; gap: 6px; align-items: center; }
+    .fn-mm-toggle { position: relative; width: 42px; height: 22px; cursor: pointer; flex-shrink: 0; }
+    .fn-mm-toggle input { opacity: 0; width: 0; height: 0; }
+    .fn-mm-slider {
+      position: absolute; inset: 0; background: rgba(255,255,255,0.15);
+      border-radius: 11px; transition: background 0.2s;
+    }
+    .fn-mm-slider::before {
+      content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px;
+      background: white; border-radius: 50%; transition: transform 0.2s;
+    }
+    .fn-mm-toggle input:checked + .fn-mm-slider { background: var(--fn-gold); }
+    .fn-mm-toggle input:checked + .fn-mm-slider::before { transform: translateX(20px); }
+    .fn-mm-reorder-btn {
+      background: transparent; border: 1px solid rgba(232,168,56,0.2); border-radius: 5px;
+      color: rgba(255,255,255,0.5); font-size: 14px; width: 26px; height: 26px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .fn-mm-reorder-btn:hover:not(:disabled) { border-color: var(--fn-gold); color: var(--fn-gold); }
+    .fn-mm-reorder-btn:disabled { opacity: 0.25; cursor: default; }
+    .fn-mm-delete-btn {
+      background: transparent; border: 1px solid rgba(239,68,68,0.3); border-radius: 5px;
+      color: rgba(239,68,68,0.6); font-size: 13px; width: 26px; height: 26px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .fn-mm-delete-btn:hover { border-color: #ef4444; color: #ef4444; }
+    .fn-mm-footer {
+      padding: 16px; border-top: 1px solid rgba(232,168,56,0.2);
+      display: flex; gap: 12px; flex-shrink: 0;
+    }
+    .fn-mm-add-btn {
+      flex: 1; padding: 12px; background: rgba(232,168,56,0.08);
+      border: 1px dashed rgba(232,168,56,0.5); border-radius: 10px;
+      color: var(--fn-gold); font-weight: 600; cursor: pointer; font-size: 13px;
+    }
+    .fn-mm-add-btn:hover { background: rgba(232,168,56,0.14); }
+    .fn-mm-save-btn {
+      padding: 12px 24px; background: var(--fn-gold); border: none;
+      border-radius: 10px; color: #0c0a00; font-weight: 700; cursor: pointer; font-size: 14px;
+    }
+    .fn-mm-save-btn:hover { background: var(--fn-gold-dk); }
+
+    /* ── Manage Modules FAB ── */
+    .fn-manage-modules-btn {
+      position: fixed; bottom: 32px; right: 108px;
+      background: #1b264f; color: var(--fn-gold);
+      border: 1px solid rgba(232,168,56,0.35); border-radius: 50%;
+      width: 56px; height: 56px; font-size: 20px; cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 100;
+      display: none; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .fn-manage-modules-btn.visible { display: flex; }
+    .fn-manage-modules-btn:hover { background: #243068; border-color: var(--fn-gold); }
+    @media (max-width: 768px) {
+      .fn-manage-modules-btn { bottom: 20px; right: 84px; width: 48px; height: 48px; font-size: 17px; }
+    }
+
     .fn-edit-toggle {
       position: fixed;
       bottom: 32px;
@@ -1672,6 +1803,14 @@
   <!-- Unity Header (loaded via the_unity_header.js) -->
   <div id="unityHeader"></div>
 
+  <!-- SW Update Banner — shown when a new version is available -->
+  <div id="fn-update-banner" class="fn-update-banner" style="display:none;" role="alert">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+    <span>App update available</span>
+    <button class="fn-update-banner-refresh" onclick="FlockNews.doUpdate()">Update now</button>
+    <button class="fn-update-banner-dismiss" onclick="document.getElementById('fn-update-banner').style.display='none'" aria-label="Dismiss">&#10005;</button>
+  </div>
+
   <!-- Scroll shell: all content below the unity bar scrolls here -->
   <div id="fn-scroll-shell">
   <!-- Main Container -->
@@ -1682,11 +1821,18 @@
       <div class="fn-masthead-rule fn-masthead-rule--top"></div>
       <div class="fn-masthead-meta">
         <span class="fn-date" id="fn-current-date">Loading...</span>
-        <span class="fn-masthead-edition">The Church's Daily Edition</span>
+        <div class="fn-edition-wrap">
+          <span class="fn-masthead-edition" id="fn-masthead-edition">The Church's Daily Edition</span>
+          <button class="fn-header-edit-btn" onclick="FlockNews.editHeaderConfig('edition')">EDIT</button>
+        </div>
       </div>
       <div class="fn-masthead-rule fn-masthead-rule--mid"></div>
-      <h1>FlockNews</h1>
-      <div class="fn-tagline">Daily Spiritual Nourishment for God's Flock</div>
+      <h1>Flock News</h1>
+      <div class="fn-church-name" id="fn-church-name"></div>
+      <div class="fn-tagline-wrap">
+        <div class="fn-tagline" id="fn-tagline">Daily Spiritual Nourishment for God's Flock</div>
+        <button class="fn-header-edit-btn" onclick="FlockNews.editHeaderConfig('tagline')">EDIT</button>
+      </div>
       <div class="fn-masthead-rule fn-masthead-rule--bot"></div>
     </div>
 
@@ -1883,6 +2029,24 @@
     ✏️
   </button>
 
+  <!-- Manage Modules FAB (pastor+ in edit mode only) -->
+  <button class="fn-manage-modules-btn" id="fn-manage-modules-btn" onclick="FlockNews.openModuleManager()" title="Manage Modules">⚙️</button>
+
+  <!-- Module Manager bottom sheet -->
+  <div id="fn-module-manager" class="fn-module-manager" style="display:none;">
+    <div class="fn-mm-panel">
+      <div class="fn-mm-header">
+        <h2>Manage Modules</h2>
+        <button class="fn-mm-close" onclick="FlockNews.closeModuleManager()">✕</button>
+      </div>
+      <div class="fn-mm-body" id="fn-mm-body"></div>
+      <div class="fn-mm-footer">
+        <button class="fn-mm-add-btn" onclick="FlockNews.promptAddCustomModule()">＋ Add Custom Module</button>
+        <button class="fn-mm-save-btn" onclick="FlockNews.saveModuleConfig()">Save Layout</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Editor Modal -->
   <div class="fn-editor-modal" id="fn-editor-modal">
     <div class="fn-editor-container">
@@ -1900,6 +2064,11 @@
   </div>
 
   </div><!-- /#fn-scroll-shell -->
+
+  <!-- For the Pastor — discreet link at page bottom -->
+  <div class="fn-pastor-link">
+    <a href="index.html?launcher=1">For the Pastor &rarr;</a>
+  </div>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" defer></script>

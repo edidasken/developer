@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- Redirect visitors to FlockNews (main landing page). Bypass with ?launcher=1 for pastoral access. -->
+  <script>if (!new URLSearchParams(location.search).has('launcher')) { location.replace('app.flocknews/app.flocknews.html'); }</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <title>The Forest</title>
   <link rel="icon" type="image/png" href="Images/FlockIcon.png">
