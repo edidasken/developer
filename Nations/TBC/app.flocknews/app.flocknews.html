@@ -1796,6 +1796,286 @@
       background: #1b264f !important;
       border-color: #e8a838 !important;
     }
+
+    /* ══════════════════════════════════════════════════════════════════
+       ◈  NEWSPAPER POLISH — Mission of the Day & below
+       Strip modern card chrome from mission sub-cards, reading, devotional,
+       words and book. Replace with flat newsprint columns separated by thin
+       gold rules. Inside-cards behave like newspaper data sidebars.
+       ══════════════════════════════════════════════════════════════════ */
+
+    /* Mission grid: two flush columns separated by a hairline gold rule */
+    [data-section="mission"] .fn-missions-container {
+      gap: 0 !important;
+      column-gap: 40px !important;
+      border-top: 1px solid rgba(15,23,53,0.15) !important;
+      padding-top: 24px !important;
+    }
+    [data-section="mission"] .fn-missions-container > * + * {
+      border-left: 1px solid rgba(15,23,53,0.15) !important;
+      padding-left: 40px !important;
+    }
+    @media (max-width: 768px) {
+      [data-section="mission"] .fn-missions-container > * + * {
+        border-left: none !important;
+        padding-left: 0 !important;
+        border-top: 1px solid rgba(15,23,53,0.15) !important;
+        padding-top: 28px !important;
+        margin-top: 28px !important;
+      }
+    }
+
+    /* Flatten ALL mission sub-cards — no chrome, just newsprint columns */
+    [data-section="mission"] .fn-unreached-card,
+    [data-section="mission"] .fn-country-card,
+    [data-section="mission"] .fn-bible-access-card,
+    [data-section="mission"] .fn-frontlines-card {
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+      padding: 0 0 28px !important;
+      box-shadow: none !important;
+      transform: none !important;
+    }
+    [data-section="mission"] .fn-unreached-card + .fn-country-card,
+    [data-section="mission"] .fn-bible-access-card,
+    [data-section="mission"] .fn-frontlines-card {
+      border-top: 1px solid rgba(15,23,53,0.12) !important;
+      padding-top: 24px !important;
+      margin-top: 4px !important;
+    }
+    [data-section="mission"] .fn-unreached-card:hover {
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Sub-card headers: kicker label + dateline-style country */
+    [data-section="mission"] .fn-unreached-header,
+    [data-section="mission"] .fn-country-header,
+    [data-section="mission"] .fn-bible-access-header,
+    [data-section="mission"] .fn-frontlines-header {
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 2px solid rgba(232,168,56,0.55) !important;
+      padding: 0 0 10px !important;
+      margin-bottom: 18px !important;
+    }
+    [data-section="mission"] .fn-unreached-label,
+    [data-section="mission"] .fn-country-label,
+    [data-section="mission"] .fn-bible-access-header > div:first-child,
+    [data-section="mission"] .fn-frontlines-header > div:first-child {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 3px !important;
+      text-transform: uppercase !important;
+      color: #c48a20 !important;
+    }
+    [data-section="mission"] .fn-unreached-country {
+      font-family: 'Noto Serif', Georgia, serif !important;
+      font-style: italic !important;
+      font-size: 13px !important;
+      color: rgba(15,23,53,0.55) !important;
+      font-weight: 500 !important;
+    }
+
+    /* UPG body: photo as inset cut with italic caption */
+    [data-section="mission"] .fn-unreached-body {
+      padding: 0 !important;
+      text-align: left !important;
+    }
+    [data-section="mission"] .fn-unreached-photo {
+      max-width: 100% !important;
+      width: 100% !important;
+      height: 220px !important;
+      object-fit: cover !important;
+      object-position: center top !important;
+      border: none !important;
+      border-radius: 0 !important;
+      margin: 0 0 6px !important;
+      filter: grayscale(0.15) contrast(1.02);
+    }
+    [data-section="mission"] .fn-unreached-name {
+      font-family: 'Playfair Display', Georgia, serif !important;
+      font-size: 32px !important;
+      font-weight: 800 !important;
+      color: #0f1735 !important;
+      text-align: left !important;
+      letter-spacing: -0.5px !important;
+      line-height: 1.1 !important;
+      margin: 14px 0 8px !important;
+    }
+    [data-section="mission"] .fn-unreached-stats {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 18px !important;
+      padding: 10px 0 !important;
+      border-top: 1px solid rgba(15,23,53,0.12) !important;
+      border-bottom: 1px solid rgba(15,23,53,0.12) !important;
+      margin: 12px 0 16px !important;
+    }
+    [data-section="mission"] .fn-unreached-stats span {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      color: #1a1a2e !important;
+    }
+    [data-section="mission"] .fn-unreached-summary {
+      font-family: 'Noto Serif', Georgia, serif !important;
+      font-size: 14.5px !important;
+      line-height: 1.85 !important;
+      color: rgba(15,23,53,0.78) !important;
+    }
+    [data-section="mission"] .fn-unreached-link,
+    [data-section="mission"] .fn-country-link {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      letter-spacing: 2px !important;
+      text-transform: uppercase !important;
+      color: #c48a20 !important;
+      border-bottom: 1px solid #c48a20 !important;
+      padding-bottom: 2px !important;
+    }
+
+    /* Country: dateline + flat stat slugs */
+    [data-section="mission"] .fn-country-title h3,
+    [data-section="mission"] .fn-bible-access-title h3,
+    [data-section="mission"] .fn-frontlines-title h3 {
+      font-family: 'Playfair Display', Georgia, serif !important;
+      font-size: 26px !important;
+      font-weight: 800 !important;
+      letter-spacing: -0.3px !important;
+      color: #0f1735 !important;
+      margin: 0 !important;
+      line-height: 1.1 !important;
+    }
+    [data-section="mission"] .fn-country-icon { font-size: 22px !important; }
+    [data-section="mission"] .fn-country-stats {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 0 !important;
+      border-top: 1px solid rgba(15,23,53,0.12) !important;
+      border-bottom: 1px solid rgba(15,23,53,0.12) !important;
+      margin: 14px 0 16px !important;
+      padding: 0 !important;
+    }
+    [data-section="mission"] .fn-country-stat {
+      background: transparent !important;
+      border-radius: 0 !important;
+      padding: 14px 16px !important;
+      text-align: left !important;
+      border-right: 1px solid rgba(15,23,53,0.10) !important;
+      border-bottom: 1px solid rgba(15,23,53,0.10) !important;
+    }
+    [data-section="mission"] .fn-country-stat:nth-child(2n) { border-right: none !important; }
+    [data-section="mission"] .fn-country-stat:nth-last-child(-n+2) { border-bottom: none !important; }
+    [data-section="mission"] .fn-stat-value {
+      font-family: 'Playfair Display', Georgia, serif !important;
+      font-size: 24px !important;
+      font-weight: 800 !important;
+      color: #0f1735 !important;
+      margin-bottom: 2px !important;
+    }
+    [data-section="mission"] .fn-stat-label {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 2px !important;
+      text-transform: uppercase !important;
+      color: rgba(15,23,53,0.55) !important;
+    }
+    [data-section="mission"] .fn-country-details,
+    [data-section="mission"] .fn-country-summary {
+      background: transparent !important;
+      border-left: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      margin: 0 0 12px !important;
+    }
+    [data-section="mission"] .fn-country-summary {
+      border-left: 3px solid #e8a838 !important;
+      padding: 4px 0 4px 14px !important;
+      margin: 12px 0 !important;
+    }
+    [data-section="mission"] .fn-country-details p {
+      font-family: 'Noto Serif', Georgia, serif !important;
+      font-size: 14px !important;
+      line-height: 1.7 !important;
+      margin: 4px 0 !important;
+      color: #1a1a2e !important;
+    }
+    [data-section="mission"] .fn-country-badges,
+    [data-section="mission"] .fn-bible-access-badges {
+      margin: 8px 0 14px !important;
+    }
+    [data-section="mission"] .fn-country-badge,
+    [data-section="mission"] .fn-badge-1040,
+    [data-section="mission"] .fn-badge-wwl {
+      background: transparent !important;
+      color: #c48a20 !important;
+      border: 1px solid rgba(196,138,32,0.45) !important;
+      border-radius: 0 !important;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 1.5px !important;
+      text-transform: uppercase !important;
+      padding: 3px 8px !important;
+    }
+
+    /* Frontlines: pillars become inline newspaper slugs */
+    [data-section="mission"] .fn-frontlines-mission {
+      background: transparent !important;
+      border-left: 3px solid #e8a838 !important;
+      border-radius: 0 !important;
+      padding: 4px 0 4px 14px !important;
+      margin: 0 0 18px !important;
+    }
+    [data-section="mission"] .fn-frontlines-mission p {
+      font-family: 'Noto Serif', Georgia, serif !important;
+      font-size: 16px !important;
+      font-style: italic !important;
+      color: #0f1735 !important;
+    }
+    [data-section="mission"] .fn-frontlines-stat-highlight {
+      background: transparent !important;
+      border-top: 1px solid rgba(15,23,53,0.12) !important;
+      border-bottom: 1px solid rgba(15,23,53,0.12) !important;
+      border-radius: 0 !important;
+      padding: 14px 0 !important;
+      margin: 0 0 16px !important;
+      text-align: left !important;
+    }
+    [data-section="mission"] .fn-pillar-item {
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+      padding: 8px 0 !important;
+      border-bottom: 1px solid rgba(15,23,53,0.08) !important;
+    }
+    [data-section="mission"] .fn-pillar-item:hover {
+      background: transparent !important;
+      border-color: rgba(15,23,53,0.08) !important;
+    }
+    [data-section="mission"] .fn-pillar-name {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      color: #1a1a2e !important;
+    }
+    [data-section="mission"] .fn-frontlines-pillars h4,
+    [data-section="mission"] .fn-frontlines-card h4 {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 3px !important;
+      text-transform: uppercase !important;
+      color: #c48a20 !important;
+      margin: 14px 0 8px !important;
+      padding-bottom: 4px !important;
+      border-bottom: 1px solid rgba(232,168,56,0.25) !important;
+    }
   </style>
 </head>
 <body>
