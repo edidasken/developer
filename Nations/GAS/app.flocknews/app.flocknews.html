@@ -18,7 +18,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,800;1,400;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
   <!-- Flash prevention: apply saved FlockOS theme before first paint -->
   <script>
@@ -78,49 +78,38 @@
       padding: 80px 24px 60px;
     }
 
-    /* ── BROADSHEET GRID — real newspaper multi-column layout ── */
+    /* ── Magazine Grid Layout ── */
     #fn-news-feed {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
-      gap: 0;                          /* column rules handle visual separation */
+      gap: 24px;
       grid-auto-flow: dense;
-      border-bottom: 3px double var(--fn-gold);
-
-      /* ◈ Remap all white-based design tokens to dark-on-cream inside the feed.
-         Every descendant using var(--fn-ink) / var(--fn-muted) / var(--fn-border)
-         will now render with dark navy text on the cream newsprint background.
-         The masthead (.fn-header) is outside this element so it is unaffected. */
-      --fn-ink:    #0f1735;
-      --fn-muted:  rgba(15,23,53,0.65);
-      --fn-border: rgba(15,23,53,0.12);
     }
 
-    /* Row 1: Full-width lead story */
-    [data-section="introduction"]  { grid-column: span 12; }
-    /* Row 2: Wide editorial (pastor) + narrow sidebar (announcements) */
-    [data-section="pastorHeart"]   { grid-column: span 8; }
-    [data-section="announcements"] { grid-column: span 4; }
-    /* Row 3: Three equal columns — Mission | Reading | Devotional */
-    [data-section="mission"]       { grid-column: span 4; }
-    [data-section="reading"]       { grid-column: span 4; }
-    [data-section="devotional"]    { grid-column: span 4; }
-    /* Row 4: Book of the Day (wide) + Words (narrow) */
-    [data-section="book"]          { grid-column: span 8; }
-    [data-section="words"]         { grid-column: span 4; }
+    /* Magazine layout sections */
+    [data-section="introduction"] { grid-column: span 12; }
+    [data-section="pastorHeart"] { grid-column: span 12; }
+    [data-section="announcements"] { grid-column: span 12; }
+    [data-section="mission"] { grid-column: span 12; }
+    [data-section="reading"] { grid-column: span 6; }
+    [data-section="devotional"] { grid-column: span 6; }
+    [data-section="words"] { grid-column: span 12; }
+    [data-section="book"] { grid-column: span 12; }
 
-    /* Tablet */
+    /* Tablet: 2-column */
     @media (max-width: 1024px) {
-      [data-section="pastorHeart"]   { grid-column: span 7; }
-      [data-section="announcements"] { grid-column: span 5; }
-      [data-section="mission"]       { grid-column: span 12; }
-      [data-section="reading"]       { grid-column: span 6; }
-      [data-section="devotional"]    { grid-column: span 6; }
-      [data-section="book"]          { grid-column: span 12; }
-      [data-section="words"]         { grid-column: span 12; }
+      [data-section="pastorHeart"] { grid-column: span 12; }
+      [data-section="announcements"] { grid-column: span 12; }
+      [data-section="reading"] { grid-column: span 12; }
+      [data-section="devotional"] { grid-column: span 12; }
     }
-    /* Mobile */
+
+    /* Mobile: stacked */
     @media (max-width: 640px) {
-      #fn-news-feed { grid-template-columns: 1fr; }
+      #fn-news-feed {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
       [data-section] { grid-column: span 1 !important; }
     }
 
@@ -349,19 +338,19 @@
     #fn-news-feed .card {
       background: var(--fn-panel);
       border: 1px solid var(--fn-border);
-      border-radius: 6px;          /* print-like: less rounded */
+      border-radius: 20px;
       padding: 0;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1);
       overflow: hidden;
-      transition: box-shadow 0.2s ease;
+      transition: all 0.3s ease;
       height: 100%;
       display: flex;
       flex-direction: column;
     }
 
     #fn-news-feed .card:hover {
-      transform: none;             /* newspapers don't float */
-      box-shadow: 0 6px 24px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.12);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.15);
     }
 
     /* Featured sections */
@@ -374,39 +363,35 @@
       background: var(--fn-panel-alt);
     }
 
-    /* ── NEWSPAPER COLUMN HEAD ── */
     #fn-news-feed .card-header {
-      padding: 0;
-      border-top: 3px double var(--fn-gold);
-      border-bottom: 2px solid rgba(232,168,56,0.45);
-      background: rgba(255,255,255,0.03);
+      padding: 20px 36px 16px;
+      border-bottom: 1px solid var(--fn-border);
+      background: rgba(255,255,255,0.04);
     }
 
-    /* Remove the old short gold bar — full-width double-rule above handles it */
+    /* Section flag: thin gold bar + small-caps label above title */
     #fn-news-feed .card-header::before {
-      display: none;
+      content: '';
+      display: block;
+      width: 48px;
+      height: 2px;
+      background: var(--fn-gold);
+      margin-bottom: 10px;
+      opacity: 0.8;
     }
 
-    /* Inner flex row for title + edit button */
-    #fn-news-feed .card-header > div:first-child {
-      padding: 12px 32px 10px !important;
-      justify-content: flex-start !important;
-    }
-
-    /* Section name in small-caps newspaper column style */
     #fn-news-feed .card-header div[style*="font-weight: 700"] {
-      font-family: 'Playfair Display', 'Noto Serif', Georgia, serif !important;
+      font-family: 'Noto Serif', Georgia, serif !important;
       color: var(--fn-gold) !important;
-      font-size: 11px !important;
+      font-size: 22px !important;
       font-weight: 700 !important;
-      text-transform: uppercase !important;
-      letter-spacing: 3.5px !important;   /* wide tracking = newspaper section label */
+      letter-spacing: 0.01em !important;
     }
 
-    /* Section emoji icons: smaller ornamental accent */
-    .fn-section-icon {
-      font-size: 14px !important;
-      opacity: 0.7;
+    /* Larger headers for featured sections */
+    [data-section="introduction"] .card-header div[style*="font-weight: 700"],
+    [data-section="mission"] .card-header div[style*="font-weight: 700"] {
+      font-size: 28px !important;
     }
 
     #fn-news-feed .card-body {
@@ -421,31 +406,21 @@
       padding: 48px;
     }
 
-    /* ── NEWSPAPER ARTICLE HEADLINES ── */
     #fn-news-feed .card-body h2 {
-      font-family: 'Playfair Display', 'Noto Serif', Georgia, serif;
       color: var(--fn-ink);
-      margin-bottom: 16px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid rgba(232,168,56,0.25);
-      font-size: 30px;
-      font-weight: 800;
-      letter-spacing: -0.2px;
-      line-height: 1.15;
+      margin-bottom: 20px;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      line-height: 1.3;
     }
 
-    /* Section subheads: newspaper deck style */
     #fn-news-feed .card-body h3 {
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       color: var(--fn-gold);
       margin-top: 28px;
-      margin-bottom: 10px;
-      font-size: 11px;
+      margin-bottom: 16px;
+      font-size: 20px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid rgba(232,168,56,0.18);
     }
 
     #fn-news-feed .card-body p {
@@ -455,59 +430,18 @@
       font-size: 16px;
     }
 
-    /* ── EDITORIAL BODY TEXT: serif for article sections ── */
-    [data-section="pastorHeart"] .card-body p,
-    [data-section="devotional"] .card-body p,
-    [data-section="introduction"] .card-body p {
-      font-family: 'Noto Serif', Georgia, 'Times New Roman', serif;
-      font-size: 16px;
-      line-height: 1.9;
-      color: rgba(255,255,255,0.88);
-    }
-
-    /* Lead / first paragraph: slightly larger, like a newspaper lede */
+    /* Lead paragraph for featured sections */
     [data-section="introduction"] .card-body p:first-of-type,
     [data-section="pastorHeart"] .card-body p:first-of-type {
       font-size: 18px;
-      line-height: 1.85;
-      color: rgba(255,255,255,0.92);
-    }
-
-    /* ── DROP CAPS: first letter of pastor/devotional columns ── */
-    [data-section="pastorHeart"] .card-body p:first-of-type::first-letter,
-    [data-section="devotional"] .card-body p:first-of-type::first-letter {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 72px;
-      font-weight: 800;
-      float: left;
-      line-height: 0.75;
-      margin: 6px 10px 0 0;
-      color: var(--fn-gold);
-    }
-
-    /* ── PULL QUOTE / SCRIPTURE STYLE for em in editorial sections ── */
-    [data-section="devotional"] .card-body em,
-    [data-section="pastorHeart"] .card-body em,
-    [data-section="reading"] .card-body em {
-      display: block;
-      font-family: 'Noto Serif', Georgia, serif;
-      font-size: 17px;
-      font-style: italic;
-      line-height: 1.7;
-      color: var(--fn-gold);
-      padding: 16px 20px;
-      border-left: 3px solid var(--fn-gold);
-      background: rgba(232,168,56,0.07);
-      border-radius: 0 4px 4px 0;
-      margin: 20px 0;
-      clear: both;
+      line-height: 1.9;
+      color: rgba(255,255,255,0.85);
     }
 
     #fn-news-feed .card-body strong {
       color: var(--fn-ink);
     }
 
-    /* em in non-editorial sections stays inline */
     #fn-news-feed .card-body em {
       color: var(--fn-gold);
     }
@@ -517,46 +451,16 @@
       font-weight: 600;
     }
 
-    /* ── EDITORIAL LIST ITEMS ── */
     #fn-news-feed .card-body ul,
     #fn-news-feed .card-body ol {
       color: var(--fn-muted);
-      padding-left: 0;
+      padding-left: 24px;
       margin-bottom: 16px;
-      list-style: none;
     }
 
     #fn-news-feed .card-body li {
-      font-family: 'Noto Serif', Georgia, serif;
-      font-size: 15px;
-      margin-bottom: 0;
-      line-height: 1.75;
-      padding: 9px 0 9px 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      position: relative;
-    }
-
-    #fn-news-feed .card-body li::before {
-      content: '✦';
-      position: absolute;
-      left: 0;
-      top: 10px;
-      color: var(--fn-gold);
-      font-size: 8px;
-    }
-
-    /* ── COLUMN RULE between Reading and Devotional ── */
-    @media (min-width: 641px) {
-      #fn-news-feed {
-        column-gap: 0;
-      }
-      [data-section="reading"] {
-        padding-right: 12px;
-        border-right: 1px solid rgba(232,168,56,0.2);
-      }
-      [data-section="devotional"] {
-        padding-left: 12px;
-      }
+      margin-bottom: 8px;
+      line-height: 1.7;
     }
 
     #fn-news-feed .fn-section-edit-btn {
@@ -1317,227 +1221,53 @@
       .fn-edit-toggle, .fn-section-edit-btn, .fn-card-reaction-bar { display: none !important; }
     }
 
-    /* ════════════════════════════════════════════════════
-       ◈  NEWSPAPER BROADSHEET — COMPLETE BODY OVERRIDE
-       Cards flip to newsprint (cream bg, dark navy ink).
-       Masthead (.fn-header) is left completely untouched.
-       ════════════════════════════════════════════════════ */
-
-    /* NEWSPRINT CARDS: transparent on cream page */
-    #fn-news-feed .card {
-      background: var(--fn-bg) !important;
-      border: none !important;
-      border-top: 3px double var(--fn-gold) !important;
-      border-radius: 0 !important;
-      box-shadow: none !important;
-      overflow: visible !important;
-      margin-bottom: 0 !important;
+    /* ── Newspaper: serif body text for editorial sections ── */
+    [data-section="reading"] .card-body p,
+    [data-section="devotional"] .card-body p,
+    [data-section="introduction"] .card-body p,
+    [data-section="pastorHeart"] .card-body p {
+      font-family: 'Noto Serif', Georgia, serif;
+      line-height: 1.95;
+      font-size: 15px;
     }
-    #fn-news-feed .card:hover {
-      transform: none !important;
-      box-shadow: none !important;
-    }
-    /* Featured top border stays gold but no radius */
-    [data-section="introduction"] .card,
-    [data-section="mission"] .card {
-      border-top: 3px double var(--fn-gold) !important;
+    [data-section="reading"] .card-body h2,
+    [data-section="devotional"] .card-body h2,
+    [data-section="introduction"] .card-body h2,
+    [data-section="pastorHeart"] .card-body h2 {
+      font-family: 'Noto Serif', Georgia, serif;
     }
 
-    /* COLUMN RULES between adjacent articles */
-    [data-section="pastorHeart"]   { border-right: 1px solid rgba(232,168,56,0.3); }
-    [data-section="mission"]       { border-right: 1px solid rgba(232,168,56,0.3); }
-    [data-section="reading"]       { border-right: 1px solid rgba(232,168,56,0.3); }
-    [data-section="book"]          { border-right: 1px solid rgba(232,168,56,0.3); }
-    @media (max-width: 1024px) {
-      [data-section="pastorHeart"],
-      [data-section="mission"],
-      [data-section="reading"],
-      [data-section="book"] { border-right: none; }
-      [data-section="reading"] { border-right: 1px solid rgba(232,168,56,0.3); }
-    }
-    @media (max-width: 640px) {
-      [data-section] { border-right: none !important; }
-    }
-
-    /* SECTION FLAG: narrow navy banner, gold label */
-    #fn-news-feed .card-header {
-      background: #0f1735 !important;
-      border-top: none !important;
-      border-bottom: 2px solid rgba(232,168,56,0.45) !important;
-      padding: 0 !important;
-    }
-    #fn-news-feed .card-header > div:first-child {
-      padding: 8px 24px 7px !important;
-      gap: 8px !important;
-    }
-    #fn-news-feed .card-header div[style*="font-weight: 700"] {
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
-      font-size: 10px !important;
-      font-weight: 700 !important;
-      letter-spacing: 4px !important;
-      text-transform: uppercase !important;
-      color: #e8a838 !important;
-    }
-    .fn-section-icon { font-size: 11px !important; opacity: 0.55 !important; }
-
-    /* CARD BODY: cream paper, dark navy ink */
-    #fn-news-feed .card-body {
-      background: var(--fn-bg) !important;
-      color: #0f1735 !important;
-      padding: 28px 28px 32px !important;
-    }
-    [data-section="introduction"] .card-body,
-    [data-section="pastorHeart"]  .card-body { padding: 32px 36px 40px !important; }
-
-    /* HEADLINES: dramatic Playfair Display, dark navy */
-    #fn-news-feed .card-body h2 {
-      font-family: 'Playfair Display', Georgia, serif !important;
-      color: #0f1735 !important;
-      font-size: 34px !important;
-      font-weight: 800 !important;
-      letter-spacing: -0.5px !important;
-      line-height: 1.1 !important;
-      border-bottom-color: rgba(232,168,56,0.4) !important;
-    }
-    [data-section="introduction"] .card-body h2 {
-      font-size: 48px !important;
-      text-align: center !important;
+    /* ── Drop caps for lead editorial paragraphs ── */
+    [data-section="introduction"] .card-body > p:first-of-type::first-letter,
+    [data-section="pastorHeart"] .card-body > p:first-of-type::first-letter,
+    [data-section="devotional"] .card-body > p:first-of-type::first-letter {
+      float: left;
+      font-family: 'Noto Serif', Georgia, serif;
+      font-size: 4.2em;
+      font-weight: 700;
+      color: var(--fn-gold);
+      line-height: 0.72;
+      margin-right: 6px;
+      margin-top: 6px;
+      padding-right: 2px;
     }
 
-    /* SUBHEADS / DEK */
-    #fn-news-feed .card-body h3 {
-      color: #c48a20 !important;
-      font-size: 10px !important;
-      letter-spacing: 3.5px !important;
+    /* ── Column rule between reading + devotional ── */
+    @media (min-width: 768px) {
+      [data-section="devotional"].card {
+        border-left: 1px solid rgba(232,168,56,0.2) !important;
+        border-radius: 0 20px 20px 0 !important;
+      }
+      [data-section="reading"].card {
+        border-radius: 20px 0 0 20px !important;
+      }
     }
 
-    /* BODY TEXT: Noto Serif, dark ink on cream */
-    #fn-news-feed .card-body p {
-      font-family: 'Noto Serif', Georgia, serif !important;
-      color: #1a1a2e !important;
-      font-size: 15px !important;
-      line-height: 1.9 !important;
+    /* ── Newspaper: section icons stay but reduced ── */
+    #fn-news-feed .fn-section-icon {
+      font-size: 20px;
+      opacity: 0.85;
     }
-    [data-section="introduction"] .card-body p:first-of-type,
-    [data-section="pastorHeart"]  .card-body p:first-of-type {
-      font-size: 18px !important;
-      color: #0f1735 !important;
-    }
-
-    /* DROP CAPS: gold Playfair initial */
-    [data-section="pastorHeart"]  .card-body p:first-of-type::first-letter,
-    [data-section="devotional"]   .card-body p:first-of-type::first-letter,
-    [data-section="introduction"] .card-body p:first-of-type::first-letter {
-      font-family: 'Playfair Display', Georgia, serif !important;
-      font-size: 88px !important;
-      font-weight: 800 !important;
-      float: left !important;
-      line-height: 0.72 !important;
-      margin: 8px 10px 0 0 !important;
-      color: #e8a838 !important;
-    }
-
-    /* PULL QUOTES: em → gold-bordered block quote on cream */
-    [data-section="devotional"]  .card-body em,
-    [data-section="pastorHeart"] .card-body em,
-    [data-section="reading"]     .card-body em {
-      display: block !important;
-      font-family: 'Noto Serif', Georgia, serif !important;
-      font-size: 19px !important;
-      font-style: italic !important;
-      line-height: 1.7 !important;
-      color: #0f1735 !important;
-      padding: 20px 24px !important;
-      border-left: 4px solid #e8a838 !important;
-      background: rgba(232,168,56,0.1) !important;
-      border-radius: 0 4px 4px 0 !important;
-      margin: 24px 0 !important;
-      clear: both !important;
-    }
-    #fn-news-feed .card-body em { color: #c48a20 !important; }
-
-    /* STRONG / SUP */
-    #fn-news-feed .card-body strong { color: #0f1735 !important; }
-    #fn-news-feed .card-body sup    { color: #c48a20 !important; }
-
-    /* LISTS: dark editorial with ✦ gold bullets and faint rule dividers */
-    #fn-news-feed .card-body ul,
-    #fn-news-feed .card-body ol  { color: #1a1a2e !important; }
-    #fn-news-feed .card-body li {
-      font-family: 'Noto Serif', Georgia, serif !important;
-      color: #1a1a2e !important;
-      border-bottom-color: rgba(15,23,53,0.08) !important;
-    }
-    #fn-news-feed .card-body li::before { color: #e8a838 !important; }
-
-    /* NESTED CARDS inside card-body (word grid panels, mission widgets) */
-    #fn-news-feed .card-body .card {
-      background: rgba(15,23,53,0.05) !important;
-      border: 1px solid rgba(15,23,53,0.12) !important;
-      border-top: 1px solid rgba(15,23,53,0.12) !important;
-      border-radius: 4px !important;
-    }
-    .fn-word-term         { color: #0f1735 !important; }
-    .fn-word-language     { color: #c48a20 !important; }
-    .fn-word-transliteration { color: rgba(15,23,53,0.55) !important; }
-    .fn-word-definition   { color: #0f1735 !important; }
-    .fn-word-description,
-    .fn-word-examples,
-    .fn-word-strongs      { color: rgba(15,23,53,0.6) !important; }
-
-    /* MISSION + BOOK stat widgets on cream */
-    .fn-book-stats        { background: rgba(15,23,53,0.06) !important; border-radius: 4px !important; }
-    .fn-book-stat-value   { color: #c48a20 !important; }
-    .fn-book-stat-label   { color: rgba(15,23,53,0.55) !important; }
-    .fn-unreached-card,
-    .fn-country-card,
-    .fn-bible-access-card,
-    .fn-frontlines-card   { background: rgba(15,23,53,0.05) !important; border-color: rgba(15,23,53,0.1) !important; }
-    .fn-unreached-header  { background: rgba(15,23,53,0.08) !important; }
-    .fn-unreached-name,
-    .fn-country-title h3,
-    .fn-frontlines-title h3,
-    .fn-bible-access-title h3 { color: #0f1735 !important; }
-    .fn-unreached-summary,
-    .fn-country-details p,
-    .fn-country-summary p { color: rgba(15,23,53,0.7) !important; }
-
-    /* REACTION BAR on cream */
-    .fn-card-reaction-bar  { border-top-color: rgba(15,23,53,0.1) !important; }
-    .fn-reaction-bubble    { color: #0f1735 !important; }
-    .fn-reaction-bubble.active { color: #c48a20 !important; background: rgba(200,138,32,0.12) !important; }
-
-    /* PILLAR ITEMS (Frontlines Ministry pillars) */
-    .fn-pillar-item  { background: rgba(15,23,53,0.04) !important; border-color: rgba(232,168,56,0.2) !important; }
-    .fn-pillar-name  { color: #0f1735 !important; }
-
-    /* UNREACHED PEOPLE GROUP widget */
-    .fn-unreached-stats {
-      border-top-color:    rgba(15,23,53,0.1) !important;
-      border-bottom-color: rgba(15,23,53,0.1) !important;
-    }
-    .fn-unreached-stats span { color: #1a1a2e !important; }
-    .fn-unreached-summary    { color: rgba(15,23,53,0.70) !important; }
-    .fn-unreached-country    { color: rgba(15,23,53,0.60) !important; }
-    .fn-unreached-label      { color: #c48a20 !important; }
-
-    /* COUNTRY / BIBLE-ACCESS / FRONTLINES sub-widget headers & bodies */
-    .fn-country-header,
-    .fn-frontlines-header,
-    .fn-bible-access-header { border-bottom-color: rgba(15,23,53,0.1) !important; }
-    .fn-country-stat        { background: rgba(15,23,53,0.05) !important; }
-    .fn-stat-value          { color: #c48a20 !important; }
-    .fn-stat-label          { color: rgba(15,23,53,0.55) !important; }
-    .fn-country-details     { background: rgba(15,23,53,0.05) !important; }
-    .fn-country-details p,
-    .fn-country-details strong { color: #1a1a2e !important; }
-    .fn-country-summary     { color: rgba(15,23,53,0.70) !important; }
-    .fn-country-summary p   { color: rgba(15,23,53,0.75) !important; }
-    .fn-country-link        { color: #c48a20 !important; }
-
-    /* Frontlines stat highlight box */
-    .fn-frontlines-stat-highlight { background: rgba(232,168,56,0.1) !important; }
-    .fn-frontlines-stat-highlight > * { color: #0f1735 !important; }
 
     /* ── Masthead responsive ── */
     @media (max-width: 640px) {
@@ -1781,7 +1511,7 @@
   <!-- the_unity_header.js is imported as an ES module inside flocknews.js -->
 
   <!-- FlockNews app logic -->
-  <script src="app.flocknews/flocknews.js?v=20260519" type="module"></script>
+  <script src="app.flocknews/flocknews.js" type="module"></script>
 
 </body>
 </html>
