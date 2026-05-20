@@ -79,7 +79,8 @@ export function mountPrayer(panel, ctx) {
       <iframe
         src="${_chatUrl}"
         title="FlockChat"
-        allow="clipboard-read; clipboard-write; microphone; camera; autoplay; fullscreen"
+        allow="clipboard-read; clipboard-write; microphone; camera; autoplay"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
         referrerpolicy="strict-origin-when-cross-origin"
         loading="eager"
         style="display:block;width:100%;height:520px;border:0;border-radius:14px;margin-top:16px;overflow:hidden;">

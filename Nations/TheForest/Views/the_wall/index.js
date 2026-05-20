@@ -1199,14 +1199,16 @@ const _MISSIONS_SOURCES = [
   { id: 'ms-src-afb', url: 'https://afghanbibles.net' },
 ];
 
-// Poll each missions data source via a no-cors HEAD request.
+// Poll each missions data source via a no-cors GET request.
 // A network-level response (even opaque) means the server is reachable.
-// A network error (DNS failure, timeout) means it's unreachable.
+// Some servers block HEAD requests (returning 405/connection drop), so we use
+// GET + no-cors — the browser receives an opaque response on any HTTP reply,
+// only throwing on true network failures (DNS error, timeout, SSL error).
 async function _pingSource(url) {
   try {
     const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 8000);
-    await fetch(url, { method: 'HEAD', mode: 'no-cors', cache: 'no-store', signal: ctrl.signal });
+    const t = setTimeout(() => ctrl.abort(), 12000);
+    await fetch(url, { method: 'GET', mode: 'no-cors', cache: 'no-store', signal: ctrl.signal });
     clearTimeout(t);
     return true; // opaque response still means server answered
   } catch (_) {

@@ -13222,7 +13222,8 @@ flock-tabs [role="tablist"], .tabs-bar {
 /* ── Prayer tab CTA ───────────────────────────────────────────────────────── */
 .ur-prayer-cta {
   text-align: center;
-  padding: 48px 24px;
+  padding: 32px 28px;
+  margin: 0 4px;
   background: linear-gradient(135deg, #0f1735 0%, #1b264f 100%);
   border: 1px solid rgba(232,168,56,0.25);
   border-radius: 14px;
@@ -13237,6 +13238,7 @@ flock-tabs [role="tablist"], .tabs-bar {
   .ur-input-narrow { flex: 1 1 auto; }
   .ur-devo-card, .ur-read-hero { padding: 18px; }
   .ur-devo-title { font-size: 1.4rem; }
+  .ur-prayer-cta { padding: 24px 16px; margin: 0; border-radius: 10px; }
 }
 
 /* ════════════════════════════════════════════════════════════════════════════
@@ -15519,7 +15521,7 @@ flock-tabs [role="tablist"], .tabs-bar {
   .ms-song-table-wrap { display: none !important; }
   .ms-song-cards      { display: block !important; }
   .ms-modal--fullscreen { padding: env(safe-area-inset-top,10px) 12px env(safe-area-inset-bottom,10px) 12px !important; }
-  .ms-av-toolbar      { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px; border-bottom: 1px solid rgba(0,0,0,0.07); }
+  .ms-av-toolbar      { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-top: 4px; border-top: 1px solid rgba(0,0,0,0.07); border-bottom: none; }
   .ms-av-toolbar::-webkit-scrollbar { display: none; }
   .ms-chord-display   { padding: 12px 14px !important; }
   .ms-cp-song         { font-size: 0.88rem !important; column-count: 1 !important; }

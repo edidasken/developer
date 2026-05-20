@@ -380,7 +380,7 @@ function msEnsureStyles() {
         /* slim badge — used inside the compact toolbar */
         '.ms-stand-badge { display:inline-flex; align-items:center; background:#e2e8f0; color:#0f172a; padding:3px 10px; border-radius:20px; font-size:0.78rem; font-weight:700; border:1px solid #94a3b8; white-space:nowrap; line-height:1.4; }',
         /* toolbar row containing badges + transpose */
-        '.ms-av-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:5px; padding:6px 0 8px 0; border-bottom:1px solid rgba(0,0,0,0.07); margin-bottom:10px; }',
+        '.ms-av-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:5px; padding:8px 0 6px 0; border-top:1px solid rgba(0,0,0,0.07); margin-top:10px; }',
         '.ms-av-divider { width:1px; height:18px; background:rgba(0,0,0,0.15); margin:0 3px; flex-shrink:0; }',
         /* compact transpose pill buttons */
         '.ms-xp-btn { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:6px; border:1px solid rgba(0,0,0,0.15); background:#f3f4f6; color:#374151; font-size:1rem; font-weight:700; cursor:pointer; line-height:1; transition:background 0.12s; flex-shrink:0; padding:0; }',
@@ -473,7 +473,7 @@ function msEnsureStyles() {
         '  .ms-cp-word { font-size:0.88rem; }',
         '  .ms-chord-display { padding:10px 12px; border-radius:8px; }',
         '  .ms-modal--fullscreen { padding:10px 12px 8px 12px !important; }',
-        '  .ms-av-toolbar { gap:4px; padding:4px 0 6px 0; }',
+        '  .ms-av-toolbar { gap:4px; padding:6px 0 4px 0; }',
         '  .ms-modal-title { font-size:0.95rem !important; }',
         '  .ms-xp-btn { width:32px; height:32px; }',
         '  .ms-stand-badge { font-size:0.72rem; padding:2px 7px; }',
@@ -1052,7 +1052,7 @@ function msShowArrangementView(arr) {
     var tempoVal   = tempoMatch ? tempoMatch[1] : (arr.tempo || '');
     var timeVal    = timeMatch  ? timeMatch[1]  : (arr.time  || '');
 
-    // Build modal HTML
+    // Build modal HTML — chord content first so controls sit at the bottom (mobile-reachable)
     modal.innerHTML =
         /* compact header */
         '<div class="ms-modal-header" style="flex-shrink:0;">' +
@@ -1071,6 +1071,10 @@ function msShowArrangementView(arr) {
                 }).join('') +
               '</div>'
             : '') +
+        /* chord / lyric content — flex:1 so it fills the space above the controls */
+        '<div class="ms-chord-display" id="ms-av-chord-content" style="flex:1;">' + buildChordHtml(0) + '</div>' +
+        /* section strip above the toolbar so sections are reachable at the bottom */
+        (_arrSections.length ? msBuildSectionStrip(_arrSections) : '') +
         /* toolbar: key badge + capo picker + sounding key + tempo/time/instrument + transpose */
         '<div class="ms-av-toolbar" style="flex-shrink:0;">' +
             '<span class="ms-stand-badge" id="ms-av-key-badge">&#127929;&nbsp;' + msEscapeHtml(initKey) + '</span>' +
@@ -1082,8 +1086,6 @@ function msShowArrangementView(arr) {
             '<span class="ms-av-divider"></span>' +
             msTransposeControls(originalKey, initKey, capoFret, 'ms-av') +
         '</div>' +
-        (_arrSections.length ? msBuildSectionStrip(_arrSections) : '') +
-        '<div class="ms-chord-display" id="ms-av-chord-content" style="flex:1;">' + buildChordHtml(0) + '</div>' +
         '<div style="text-align:right;margin-top:8px;flex-shrink:0;">' +
             '<button class="ms-btn ms-btn-secondary ms-btn-sm" id="ms-arr-pdf-btn">Export PDF</button>' +
         '</div>';
