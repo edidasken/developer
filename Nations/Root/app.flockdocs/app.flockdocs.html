@@ -814,14 +814,30 @@
       color: var(--ink-muted);
     }
 
-    /* ── Mobile (phones): editor, spreadsheet, toolbar ─────────────────── */
+    /* ── Mobile (phones): library, editor, spreadsheet, toolbar ───────── */
     @media (max-width: 640px) {
-      /* Word-processor editor: shrink "page" padding so content is readable */
-      .fd-editor-container { padding: 12px; }
+      /* Library: tighter padding, stacked header, single-column grid */
+      .fd-library-view { padding: 14px 14px 80px; }
+      .fd-library-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+      }
+      .fd-library-title { font-size: 1.15rem; }
+      .fd-search-box { width: 100%; }
+      .fd-doc-grid { grid-template-columns: 1fr; gap: 10px; }
+      .fd-doc-card { padding: 14px; }
+      .fd-doc-menu-btn { opacity: 1; } /* always show on touch — no hover */
+
+      /* Word-processor editor: shrink "page" padding */
+      .fd-editor-container { padding: 8px; }
       .fd-editor-page {
         max-width: 100%;
         min-height: auto;
-        padding: 24px 18px;
+        padding: 20px 16px;
+        border-radius: 8px;
         box-shadow: 0 1px 4px rgba(0,0,0,0.08);
         font-size: 15px;
       }
@@ -832,11 +848,11 @@
       .fd-editor-content ul,
       .fd-editor-content ol { padding-left: 22px; }
 
-      /* Toolbar: tighter padding + horizontal scroll on overflow */
+      /* Toolbar: horizontally scrollable, no wrap */
       .fd-editor-toolbar,
       .fd-spreadsheet-toolbar {
-        padding: 8px 10px;
-        gap: 3px;
+        padding: 6px 8px;
+        gap: 2px;
         overflow-x: auto;
         flex-wrap: nowrap;
         -webkit-overflow-scrolling: touch;
@@ -846,10 +862,22 @@
       .fd-spreadsheet-toolbar::-webkit-scrollbar { display: none; }
       .fd-editor-toolbar > *,
       .fd-spreadsheet-toolbar > * { flex-shrink: 0; }
-      .fd-toolbar-btn { width: 40px; height: 40px; }
+      .fd-toolbar-btn { width: 42px; height: 42px; }
       .fd-toolbar-btn svg { width: 20px; height: 20px; }
       .fd-toolbar-select { font-size: 0.8rem; padding: 6px 8px; max-width: 110px; }
-      .fd-toolbar-divider { margin: 0 4px; }
+      .fd-toolbar-divider { margin: 0 2px; }
+
+      /* Hide desktop-only toolbar controls — these aren't useful on a phone */
+      .fd-editor-toolbar #fd-font-select,
+      .fd-editor-toolbar #fd-font-size-select,
+      .fd-editor-toolbar .fd-color-picker-wrap,
+      .fd-editor-toolbar [data-format="outdent"],
+      .fd-editor-toolbar [data-format="indent"],
+      .fd-editor-toolbar [data-format="justifyLeft"],
+      .fd-editor-toolbar [data-format="justifyCenter"],
+      .fd-editor-toolbar [data-format="justifyRight"],
+      .fd-editor-toolbar [data-format="justifyFull"],
+      .fd-editor-toolbar #fd-line-spacing-btn { display: none !important; }
 
       /* Spreadsheet: narrower cells, hide formula bar label */
       .fd-cell, .fd-cell-header { min-width: 72px; width: 72px; }
@@ -858,8 +886,9 @@
       .fd-spreadsheet-header { padding: 12px 14px; }
       .fd-spreadsheet-header h2 { font-size: 1.15rem; }
 
-      /* Footer: keep compact */
-      #fd-footer { padding: 10px 14px calc(10px + var(--safe-bottom, 0px)); font-size: 0.75rem; }
+      /* Footer: hide verbose app name, just show save status */
+      #fd-footer > div:first-child { display: none; }
+      #fd-footer { padding: 8px 14px calc(8px + var(--safe-bottom, 0px)); font-size: 0.75rem; justify-content: flex-end; }
     }
   </style>
 </head>

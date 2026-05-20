@@ -117,12 +117,18 @@ function _waitForReady() {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
+  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   try {
     await _waitForReady();
     // Mint Firebase custom token so Firestore reads are authenticated
     if (typeof UpperRoom !== 'undefined') {
       await UpperRoom.init();
-      await UpperRoom.authenticate();
+      try {
+        await UpperRoom.authenticate();
+      } catch (authErr) {
+        if (!isLocalhost) throw authErr;
+        console.warn('[FlockDocs] UpperRoom.authenticate() skipped on localhost:', authErr.message);
+      }
     }
     init();
   } catch (err) {

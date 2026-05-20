@@ -773,6 +773,53 @@ function _getHebrewWordOfDay() {
   };
 }
 
+// Static chapter/verse counts for all 66 canonical books of the Bible
+const BIBLE_BOOK_STATS = {
+  'Genesis': { chapters: 50, verses: 1533 }, 'Exodus': { chapters: 40, verses: 1213 },
+  'Leviticus': { chapters: 27, verses: 859 }, 'Numbers': { chapters: 36, verses: 1288 },
+  'Deuteronomy': { chapters: 34, verses: 959 }, 'Joshua': { chapters: 24, verses: 658 },
+  'Judges': { chapters: 21, verses: 618 }, 'Ruth': { chapters: 4, verses: 85 },
+  '1 Samuel': { chapters: 31, verses: 810 }, '2 Samuel': { chapters: 24, verses: 695 },
+  '1 Kings': { chapters: 22, verses: 816 }, '2 Kings': { chapters: 25, verses: 719 },
+  '1 Chronicles': { chapters: 29, verses: 942 }, '2 Chronicles': { chapters: 36, verses: 822 },
+  'Ezra': { chapters: 10, verses: 280 }, 'Nehemiah': { chapters: 13, verses: 406 },
+  'Esther': { chapters: 10, verses: 167 }, 'Job': { chapters: 42, verses: 1070 },
+  'Psalms': { chapters: 150, verses: 2461 }, 'Proverbs': { chapters: 31, verses: 915 },
+  'Ecclesiastes': { chapters: 12, verses: 222 }, 'Song of Solomon': { chapters: 8, verses: 117 },
+  'Isaiah': { chapters: 66, verses: 1292 }, 'Jeremiah': { chapters: 52, verses: 1364 },
+  'Lamentations': { chapters: 5, verses: 154 }, 'Ezekiel': { chapters: 48, verses: 1273 },
+  'Daniel': { chapters: 12, verses: 357 }, 'Hosea': { chapters: 14, verses: 197 },
+  'Joel': { chapters: 3, verses: 73 }, 'Amos': { chapters: 9, verses: 146 },
+  'Obadiah': { chapters: 1, verses: 21 }, 'Jonah': { chapters: 4, verses: 48 },
+  'Micah': { chapters: 7, verses: 105 }, 'Nahum': { chapters: 3, verses: 47 },
+  'Habakkuk': { chapters: 3, verses: 56 }, 'Zephaniah': { chapters: 3, verses: 53 },
+  'Haggai': { chapters: 2, verses: 38 }, 'Zechariah': { chapters: 14, verses: 211 },
+  'Malachi': { chapters: 4, verses: 55 }, 'Matthew': { chapters: 28, verses: 1071 },
+  'Mark': { chapters: 16, verses: 678 }, 'Luke': { chapters: 24, verses: 1151 },
+  'John': { chapters: 21, verses: 879 }, 'Acts': { chapters: 28, verses: 1007 },
+  'Romans': { chapters: 16, verses: 433 }, '1 Corinthians': { chapters: 16, verses: 437 },
+  '2 Corinthians': { chapters: 13, verses: 257 }, 'Galatians': { chapters: 6, verses: 149 },
+  'Ephesians': { chapters: 6, verses: 155 }, 'Philippians': { chapters: 4, verses: 104 },
+  'Colossians': { chapters: 4, verses: 95 }, '1 Thessalonians': { chapters: 5, verses: 89 },
+  '2 Thessalonians': { chapters: 3, verses: 47 }, '1 Timothy': { chapters: 6, verses: 113 },
+  '2 Timothy': { chapters: 4, verses: 83 }, 'Titus': { chapters: 3, verses: 46 },
+  'Philemon': { chapters: 1, verses: 25 }, 'Hebrews': { chapters: 13, verses: 303 },
+  'James': { chapters: 5, verses: 108 }, '1 Peter': { chapters: 5, verses: 105 },
+  '2 Peter': { chapters: 3, verses: 61 }, '1 John': { chapters: 5, verses: 105 },
+  '2 John': { chapters: 1, verses: 13 }, '3 John': { chapters: 1, verses: 14 },
+  'Jude': { chapters: 1, verses: 25 }, 'Revelation': { chapters: 22, verses: 404 }
+};
+
+// Estimate reading time from chapter count (~4.5 min/chapter at 200 wpm)
+function _estimateReadingTime(chapters) {
+  if (!chapters) return 'N/A';
+  const mins = Math.round(chapters * 4.5);
+  if (mins < 60) return `~${mins} min`;
+  const hrs = Math.floor(mins / 60);
+  const rem = mins % 60;
+  return rem > 0 ? `~${hrs}h ${rem}m` : `~${hrs}h`;
+}
+
 // Get Bible Book of the Day (rotates through all 66 books based on day of year)
 function _getBookOfDay() {
   if (!booksOfBibleData.length) return { name: '', testament: '', author: '', date: '', chapters: 0, verses: 0, readingTime: '', overview: '', themes: [], keyVerses: '', lastUpdated: new Date().toISOString() };
@@ -785,15 +832,17 @@ function _getBookOfDay() {
   // Parse themes from string to array if needed
   const themes = Array.isArray(book.themes) ? book.themes : 
                  (typeof book.themes === 'string' ? book.themes.split(';').map(t => t.trim()) : []);
+
+  const stats = BIBLE_BOOK_STATS[book.bookName] || { chapters: 0, verses: 0 };
   
   return {
     name: book.bookName || '',
     testament: book.testament || '',
     author: book.author || '',
     date: book.timePeriod || '',
-    chapters: 0, // Not in source data
-    verses: 0,   // Not in source data
-    readingTime: '',
+    chapters: stats.chapters,
+    verses: stats.verses,
+    readingTime: _estimateReadingTime(stats.chapters),
     overview: book.summary || '',
     themes: themes,
     keyVerses: book.keyVerse || '',
@@ -1052,6 +1101,13 @@ function renderBook() {
     return;
   }
 
+  // Always use canonical stats (chapters/verses/readingTime) from the static lookup table
+  // so stale Firestore or localStorage values never show 0
+  const canonicalStats = BIBLE_BOOK_STATS[book.name] || { chapters: book.chapters || 0, verses: book.verses || 0 };
+  const chapters = canonicalStats.chapters;
+  const verses = canonicalStats.verses;
+  const readingTime = _estimateReadingTime(chapters);
+
   const themesHTML = book.themes && book.themes.length > 0
     ? `<ul>${book.themes.map(theme => `<li>${theme}</li>`).join('')}</ul>`
     : '<p>No themes listed.</p>';
@@ -1071,15 +1127,15 @@ function renderBook() {
 
     <div class="fn-book-stats">
       <div class="fn-book-stat">
-        <div class="fn-book-stat-value">${book.chapters || 0}</div>
+        <div class="fn-book-stat-value">${chapters}</div>
         <div class="fn-book-stat-label">Chapters</div>
       </div>
       <div class="fn-book-stat">
-        <div class="fn-book-stat-value">${book.verses || 0}</div>
+        <div class="fn-book-stat-value">${verses}</div>
         <div class="fn-book-stat-label">Verses</div>
       </div>
       <div class="fn-book-stat">
-        <div class="fn-book-stat-value">${book.readingTime || 'N/A'}</div>
+        <div class="fn-book-stat-value">${readingTime}</div>
         <div class="fn-book-stat-label">Reading Time</div>
       </div>
     </div>
