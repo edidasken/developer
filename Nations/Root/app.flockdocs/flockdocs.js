@@ -1962,7 +1962,16 @@ function _showContextMenu(event, docId) {
   menu.style.left = x + 'px';
   menu.style.top = y + 'px';
   menu.classList.add('is-open');
-  
+
+  // Clamp to viewport so menu never bleeds off the right or bottom edge
+  const rect = menu.getBoundingClientRect();
+  if (rect.right > window.innerWidth - 8) {
+    menu.style.left = Math.max(8, x - rect.width) + 'px';
+  }
+  if (rect.bottom > window.innerHeight - 8) {
+    menu.style.top = Math.max(8, y - rect.height) + 'px';
+  }
+
   // Close on outside click
   setTimeout(() => {
     document.addEventListener('click', _closeContextMenu);
