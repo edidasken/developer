@@ -1109,18 +1109,18 @@ function _viewCompliance() {
     const hs     = _hoursStatus(check);
     const san    = check.sanEnrolled ? _statusPill('Enrolled', '#059669') : _statusPill('Not Enrolled', '#7a7f96');
     const pn     = check.parentNotif?.sent ? _statusPill('Sent ' + _fmtDate(check.parentNotif.sentDate), '#059669') : '';
-    return `<tr style="border-bottom:1px solid var(--border,#e8eaf6)">
-      <td style="padding:10px 12px;min-width:160px">
+    return `<tr class="mcvt-row" style="border-bottom:1px solid var(--border,#e8eaf6)">
+      <td class="mcvt-cell" data-label="Member" style="padding:10px 12px;min-width:160px">
         <div style="font:600 0.9rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${_e(dname)}</div>
         ${m.role ? `<div style="font:400 0.76rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-top:3px">${_e(m.role)}</div>` : ''}
       </td>
-      <td style="padding:10px 12px">${_statusBadge(check.status)}</td>
-      <td style="padding:10px 12px">${_liveScanBadge(check.liveScan)}</td>
-      <td style="padding:10px 12px">${_statusPill(ws.label, ws.color)}</td>
-      <td style="padding:10px 12px">${_statusPill(os.label, os.color)}</td>
-      <td style="padding:10px 12px">${_statusPill(hs.label, hs.color)}</td>
-      <td style="padding:10px 12px">${san}${pn ? '<br><span style="font:400 0.73rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">Parent notif:</span> ' + pn : ''}</td>
-      <td style="padding:10px 12px;white-space:nowrap">
+      <td class="mcvt-cell" data-label="Checkr" style="padding:10px 12px">${_statusBadge(check.status)}</td>
+      <td class="mcvt-cell" data-label="LiveScan" style="padding:10px 12px">${_liveScanBadge(check.liveScan)}</td>
+      <td class="mcvt-cell" data-label="Annual Waiver" style="padding:10px 12px">${_statusPill(ws.label, ws.color)}</td>
+      <td class="mcvt-cell" data-label="OCAP Cert" style="padding:10px 12px">${_statusPill(os.label, os.color)}</td>
+      <td class="mcvt-cell" data-label="Hours" style="padding:10px 12px">${_statusPill(hs.label, hs.color)}</td>
+      <td class="mcvt-cell" data-label="SAN / Notif" style="padding:10px 12px">${san}${pn ? '<br><span style="font:400 0.73rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">Parent notif:</span> ' + pn : ''}</td>
+      <td class="mcvt-cell" data-label="Actions" style="padding:10px 12px;white-space:nowrap">
         <button class="flock-btn flock-btn--sm flock-btn--ghost" data-act="edit-compliance"
           data-member-id="${_e(uid)}" data-name="${_e(dname)}">Edit</button>
         <button class="flock-btn flock-btn--sm flock-btn--ghost" data-act="generate-waiver"
@@ -1131,7 +1131,29 @@ function _viewCompliance() {
   }).join('');
 
   return `
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+    <div id="melch-cc">
+    <style>
+    #melch-cc .mcv-stats{display:flex;flex-wrap:wrap;gap:12px}
+    @media(max-width:640px){
+      #melch-cc .mcv-hdr{flex-direction:column!important;align-items:flex-start!important}
+      #melch-cc .mcv-stats{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important}
+      #melch-cc .mcvt-wrap{overflow:visible!important;border:none!important;border-radius:0!important}
+      #melch-cc .mcvt-head{display:none!important}
+      #melch-cc .mcvt-row{display:block!important;background:var(--surface,#fff);border:1px solid var(--border,#e8eaf6)!important;border-radius:10px;margin-bottom:10px;overflow:hidden}
+      #melch-cc .mcvt-cell{display:flex!important;align-items:center!important;justify-content:space-between!important;padding:8px 12px!important;border-bottom:1px solid var(--border,#e8eaf6);min-width:0!important;white-space:normal!important;box-sizing:border-box}
+      #melch-cc .mcvt-cell:last-child{border-bottom:none!important}
+      #melch-cc .mcvt-cell::before{content:attr(data-label);font:700 0.72rem/1 var(--font-ui,sans-serif);text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted,#7a7f96);margin-right:10px;flex-shrink:0;min-width:100px}
+      #melch-cc .mcvt-cell[data-label="Member"]{padding:12px!important;display:block!important}
+      #melch-cc .mcvt-cell[data-label="Member"]::before{display:none}
+      #melch-cc .mcvt-cell[data-label="Actions"]{justify-content:flex-end!important;gap:8px;flex-wrap:wrap}
+      #melch-cc .mcvt-cell[data-label="Actions"]::before{display:none}
+    }
+    @media(max-width:380px){
+      #melch-cc .mcv-stats{grid-template-columns:1fr!important}
+      #melch-cc .mcvt-cell::before{min-width:80px}
+    }
+    </style>
+    <div class="mcv-hdr" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
       <div>
         <div style="font:700 1.2rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f);margin-bottom:4px">Compliance Tracker</div>
         <div style="font:400 0.85rem/1.5 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">
@@ -1145,7 +1167,7 @@ function _viewCompliance() {
       </button>
     </div>
 
-    <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px">
+    <div class="mcv-stats" style="margin-bottom:24px">
       ${statCard('Annual Waivers', cntWaiverOk, cntWaiverWarn, '📋')}
       ${statCard('OCAP Certs', cntOcapOk, cntOcapWarn, '📚')}
       <div style="flex:1;min-width:130px;padding:14px 16px;background:var(--surface,#fff);
@@ -1160,9 +1182,9 @@ function _viewCompliance() {
 
     ${_sortBar()}
 
-    <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border,#e8eaf6)">
+    <div class="mcvt-wrap" style="overflow-x:auto;border-radius:10px;border:1px solid var(--border,#e8eaf6)">
       <table style="width:100%;border-collapse:collapse;font:400 0.85rem/1.4 var(--font-ui,sans-serif)">
-        <thead>
+        <thead class="mcvt-head">
           <tr style="background:var(--surface,#f8f9ff)">
             <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
               text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">Member</th>
@@ -1192,6 +1214,7 @@ function _viewCompliance() {
       Hour thresholds: ≥12 hrs/month or ≥26 hrs/year = near threshold (enhanced screening advised);
       >16 hrs/month or >32 hrs/year = over threshold (required).
       Annual waiver expires 1 year from signing (BPC §18975). OCAP cert renewal: 2-year cycle.
+    </div>
     </div>`;
 }
 
