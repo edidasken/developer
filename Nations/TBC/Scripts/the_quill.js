@@ -111,7 +111,7 @@
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.35);
-  z-index: 900;
+  z-index: 3000;
 }
 .quill-panel-backdrop.is-open { display: block; }
 
@@ -125,7 +125,7 @@
   background: var(--fd-panel, #1b264f);
   border-left: 1px solid rgba(255,255,255,0.10);
   box-shadow: -4px 0 24px rgba(0,0,0,0.35);
-  z-index: 901;
+  z-index: 3001;
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
