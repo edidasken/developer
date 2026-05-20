@@ -849,7 +849,8 @@ function _openAdminModal(btn) {
     _showComplianceModal(uid, dname);
   });
   card.querySelector('[data-act="modal-generate-waiver"]')?.addEventListener('click', () => {
-    _generateWaiver(uid, dname);
+    modal.style.display = 'none';
+    window.open(`app.melchizedek/waiver-sign.html?uid=${encodeURIComponent(uid)}`, '_blank');
   });
 
   const initiateBtn = card.querySelector('[data-act="modal-initiate-check"]');
@@ -926,7 +927,8 @@ function _wireContentActions(root) {
   });
 
   root.querySelectorAll('[data-act="generate-waiver"]').forEach(btn => {
-    btn.addEventListener('click', () => _generateWaiver(btn.dataset.memberId, btn.dataset.name));
+    btn.addEventListener('click', () =>
+      window.open(`app.melchizedek/waiver-sign.html?uid=${encodeURIComponent(btn.dataset.memberId)}`, '_blank'));
   });
 
   // In-content navigation links (e.g. compliance alert cards)
@@ -1799,6 +1801,14 @@ function _generateWaiver(memberId, displayName) {
   <!-- SIGNATURE -->
   <div class="section">
     <div class="section-title">6. Signature</div>
+    ${check.waiverSignature ? `
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:14px 16px;margin-top:8px">
+      <div style="font-size:8.5pt;font-weight:bold;text-transform:uppercase;letter-spacing:.06em;color:#059669;margin-bottom:8px">✅ Electronically Signed</div>
+      <img src="${check.waiverSignature}" style="max-height:64px;max-width:280px;display:block;margin:4px 0">
+      <div style="font-size:9.5pt;margin-top:6px"><strong>Printed Name:</strong> ${_e(check.waiverSignedName || displayName)}</div>
+      <div style="font-size:9.5pt"><strong>Date:</strong> ${_e(check.waiverSignedDate ? new Date(check.waiverSignedDate?.toDate?.() || check.waiverSignedDate).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : today)}</div>
+      <div style="font-size:8pt;color:#555;margin-top:6px">This electronic signature was captured via the Melchizedek compliance system and is stored securely in the Organization's database.</div>
+    </div>` : `
     <div class="sign-block">
       <div class="sign-line">
         <span class="sign-label">Volunteer/Staff Signature:</span>
@@ -1824,7 +1834,7 @@ function _generateWaiver(memberId, displayName) {
         <span class="sign-label">Witness Date:</span>
         <span class="sign-rule"></span>
       </div>
-    </div>
+    </div>`}
   </div>
 
   <!-- ADMIN USE ONLY -->

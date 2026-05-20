@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- base: resolves shared assets (CSS, scripts) from New_Covenant/ root -->
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sign Annual Waiver</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: var(--font-ui, 'Plus Jakarta Sans', sans-serif);
+      background: var(--bg, #f4f6fb);
+      color: var(--ink, #1b264f);
+      min-height: 100dvh;
+      margin: 0;
+      padding: 0 0 48px;
+    }
+
+    /* ── Page header ── */
+    .ws-header {
+      background: var(--surface, #fff);
+      border-bottom: 1px solid var(--border, #e8eaf6);
+      padding: 18px 24px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .ws-header-icon {
+      width: 38px; height: 38px;
+      background: #1b264f;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .ws-header h1 {
+      font: 700 1.05rem/1.2 var(--font-ui, sans-serif);
+      color: var(--ink, #1b264f);
+      margin: 0;
+    }
+    .ws-header p {
+      font: 400 0.8rem/1 var(--font-ui, sans-serif);
+      color: var(--ink-muted, #7a7f96);
+      margin: 3px 0 0;
+    }
+
+    /* ── Card ── */
+    .ws-card {
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, #e8eaf6);
+      border-radius: 14px;
+      padding: 24px;
+      max-width: 680px;
+      margin: 24px auto 0;
+      width: calc(100% - 32px);
+    }
+    .ws-card-title {
+      font: 700 0.95rem/1.2 var(--font-ui, sans-serif);
+      color: var(--ink, #1b264f);
+      margin: 0 0 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border, #e8eaf6);
+    }
+
+    /* ── Waiver text ── */
+    .waiver-text {
+      font-family: 'Noto Serif', Georgia, serif;
+      font-size: 0.85rem;
+      line-height: 1.65;
+      color: #333;
+      max-height: 340px;
+      overflow-y: auto;
+      border: 1px solid var(--border, #e8eaf6);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fafbff;
+      margin-bottom: 20px;
+    }
+    .waiver-text h3 {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #1b264f;
+      margin: 16px 0 6px;
+    }
+    .waiver-text h3:first-child { margin-top: 0; }
+    .waiver-text p { margin: 0 0 10px; }
+
+    /* ── Signature canvas ── */
+    .sig-wrap {
+      border: 2px solid var(--border, #e8eaf6);
+      border-radius: 10px;
+      background: #fff;
+      position: relative;
+      margin-bottom: 6px;
+      cursor: crosshair;
+      touch-action: none;
+      overflow: hidden;
+    }
+    .sig-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 160px;
+    }
+    .sig-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: 400 0.82rem/1 var(--font-ui, sans-serif);
+      color: var(--ink-muted, #7a7f96);
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity .15s;
+    }
+    .sig-wrap.has-strokes .sig-placeholder { opacity: 0; }
+
+    .sig-meta {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      font: 400 0.75rem/1 var(--font-ui, sans-serif);
+      color: var(--ink-muted, #7a7f96);
+      margin-bottom: 16px;
+    }
+    .sig-clear {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font: 500 0.75rem/1 var(--font-ui, sans-serif);
+      color: #dc2626;
+      padding: 0;
+    }
+
+    /* ── Form fields ── */
+    .ws-field-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 520px) {
+      .ws-field-group { grid-template-columns: 1fr; }
+    }
+    .ws-field label {
+      display: block;
+      font: 600 0.75rem/1 var(--font-ui, sans-serif);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--ink-muted, #7a7f96);
+      margin-bottom: 6px;
+    }
+    .ws-field input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border, #e8eaf6);
+      border-radius: 8px;
+      font: 500 0.9rem/1 var(--font-ui, sans-serif);
+      color: var(--ink, #1b264f);
+      background: var(--surface, #fff);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .ws-field input:focus { border-color: #1b264f; }
+    .ws-field input[readonly] {
+      background: #f4f6fb;
+      color: var(--ink-muted, #7a7f96);
+    }
+
+    /* ── Agreement checkbox ── */
+    .ws-agree {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: #f4f6fb;
+      border: 1px solid var(--border, #e8eaf6);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    .ws-agree input[type="checkbox"] {
+      width: 18px; height: 18px;
+      margin-top: 1px;
+      accent-color: #1b264f;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .ws-agree span {
+      font: 400 0.82rem/1.5 var(--font-ui, sans-serif);
+      color: var(--ink, #1b264f);
+    }
+
+    /* ── Buttons ── */
+    .ws-submit {
+      width: 100%;
+      padding: 13px;
+      background: #1b264f;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font: 700 0.95rem/1 var(--font-ui, sans-serif);
+      cursor: pointer;
+      transition: background .15s, opacity .15s;
+    }
+    .ws-submit:disabled { opacity: .45; cursor: not-allowed; }
+    .ws-submit:not(:disabled):hover { background: #263870; }
+
+    /* ── Status views ── */
+    .ws-loading, .ws-done, .ws-error, .ws-already {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .ws-icon { font-size: 48px; margin-bottom: 12px; }
+    .ws-done-title {
+      font: 700 1.2rem/1.3 var(--font-ui, sans-serif);
+      color: #059669;
+      margin: 0 0 8px;
+    }
+    .ws-error-title {
+      font: 700 1.1rem/1.3 var(--font-ui, sans-serif);
+      color: #dc2626;
+      margin: 0 0 8px;
+    }
+    .ws-subtitle {
+      font: 400 0.85rem/1.5 var(--font-ui, sans-serif);
+      color: var(--ink-muted, #7a7f96);
+      margin: 0 0 20px;
+    }
+    .ws-meta-row {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin: 16px 0 24px;
+    }
+    .ws-meta-item {
+      text-align: center;
+    }
+    .ws-meta-item .label {
+      font: 600 0.7rem/1 var(--font-ui, sans-serif);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--ink-muted, #7a7f96);
+      margin-bottom: 4px;
+    }
+    .ws-meta-item .value {
+      font: 600 0.9rem/1.2 var(--font-ui, sans-serif);
+      color: var(--ink, #1b264f);
+    }
+    .ws-sig-preview {
+      border: 1px solid var(--border, #e8eaf6);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+    .ws-sig-preview img { max-height: 70px; max-width: 100%; display: block; }
+
+    .ws-btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .ws-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font: 600 0.85rem/1 var(--font-ui, sans-serif);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background .15s;
+    }
+    .ws-btn--primary { background: #1b264f; color: #fff; }
+    .ws-btn--primary:hover { background: #263870; }
+    .ws-btn--ghost { background: transparent; border-color: var(--border, #e8eaf6); color: var(--ink, #1b264f); }
+    .ws-btn--ghost:hover { background: #f4f6fb; }
+
+    .ws-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border, #e8eaf6);
+      border-top-color: #1b264f;
+      border-radius: 50%;
+      animation: ws-spin .7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes ws-spin { to { transform: rotate(360deg); } }
+
+    .ws-notice {
+      font: 400 0.75rem/1.5 var(--font-ui, sans-serif);
+      color: var(--ink-muted, #7a7f96);
+      text-align: center;
+      margin-top: 12px;
+    }
+    .ws-email-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #059669;
+      font: 500 0.8rem/1 var(--font-ui, sans-serif);
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <div class="ws-header">
+    <div class="ws-header-icon">✍️</div>
+    <div>
+      <h1>Annual Authorization</h1>
+      <p>AB-506 Background Check Waiver</p>
+    </div>
+  </div>
+
+  <!-- ── Main card ── -->
+  <div class="ws-card" id="ws-card">
+
+    <!-- Loading -->
+    <div id="view-loading">
+      <div class="ws-loading">
+        <div class="ws-spinner"></div>
+        <p class="ws-subtitle">Loading waiver…</p>
+      </div>
+    </div>
+
+    <!-- Sign pad view -->
+    <div id="view-sign" style="display:none">
+      <div class="ws-card-title" id="sign-title">Sign Annual Waiver</div>
+
+      <!-- Waiver text -->
+      <div class="waiver-text" id="waiver-body">
+        <!-- Populated by JS with member name + org -->
+      </div>
+
+      <!-- Signature pad -->
+      <div style="margin-bottom:4px">
+        <label style="display:block;font:600 0.75rem/1 var(--font-ui,sans-serif);text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted,#7a7f96);margin-bottom:8px">
+          Signature — draw below
+        </label>
+        <div class="sig-wrap" id="sig-wrap">
+          <canvas id="sig-canvas"></canvas>
+          <div class="sig-placeholder">Sign here with finger or mouse</div>
+        </div>
+        <div class="sig-meta">
+          <span>Use your finger or mouse to draw your signature</span>
+          <button class="sig-clear" id="sig-clear" type="button">Clear</button>
+        </div>
+      </div>
+
+      <!-- Print name + date -->
+      <div class="ws-field-group">
+        <div class="ws-field">
+          <label for="print-name">Print Full Name</label>
+          <input type="text" id="print-name" placeholder="Full legal name" autocomplete="off">
+        </div>
+        <div class="ws-field">
+          <label>Date of Signing</label>
+          <input type="text" id="sign-date" readonly>
+        </div>
+      </div>
+
+      <!-- Agreement checkbox -->
+      <label class="ws-agree" for="agree-check">
+        <input type="checkbox" id="agree-check">
+        <span>I have read and understand the above authorization. I voluntarily consent to the background check and annual renewal requirements described herein.</span>
+      </label>
+
+      <!-- Submit -->
+      <button class="ws-submit" id="submit-btn" disabled type="button">Submit Signature</button>
+      <p class="ws-notice">Your signature and the date of signing will be securely stored. A confirmation email will be sent to your email address on file.</p>
+    </div>
+
+    <!-- Already signed view -->
+    <div id="view-already" style="display:none">
+      <div class="ws-already">
+        <div class="ws-icon">✅</div>
+        <div class="ws-done-title">Waiver Already Signed</div>
+        <p class="ws-subtitle">This member has already completed their annual authorization.</p>
+        <div class="ws-meta-row" id="already-meta"></div>
+        <div id="already-sig" class="ws-sig-preview" style="display:none"></div>
+        <div class="ws-btn-row">
+          <button class="ws-btn ws-btn--primary" id="download-pdf-already" type="button">Download PDF</button>
+          <button class="ws-btn ws-btn--ghost" id="re-sign-btn" type="button">Re-Sign (Renewal)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success view -->
+    <div id="view-done" style="display:none">
+      <div class="ws-done">
+        <div class="ws-icon">🎉</div>
+        <div class="ws-done-title">Waiver Signed & Recorded</div>
+        <p class="ws-subtitle">Signature saved. This record is stored securely and may be used to generate the signed waiver document at any time.</p>
+        <div class="ws-meta-row" id="done-meta"></div>
+        <div id="done-sig" class="ws-sig-preview"></div>
+        <div class="ws-btn-row">
+          <button class="ws-btn ws-btn--primary" id="download-pdf-done" type="button">Download Signed PDF</button>
+        </div>
+        <div id="email-status" class="ws-email-note" style="display:none">
+          ✉️ Confirmation email sent
+        </div>
+        <p class="ws-notice" style="margin-top:16px">You may close this tab. The signed record is stored in Melchizedek.</p>
+      </div>
+    </div>
+
+    <!-- Error view -->
+    <div id="view-error" style="display:none">
+      <div class="ws-error">
+        <div class="ws-icon">⚠️</div>
+        <div class="ws-error-title" id="error-title">Something went wrong</div>
+        <p class="ws-subtitle" id="error-msg">Please close this tab and try again from Melchizedek.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Firebase ── -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+  <script>
+  'use strict';
+
+  // ── Config ──────────────────────────────────────────────────────────────
+  // FLOCK_FIREBASE_CONFIG is patched by B-Build; falls back to default project.
+  const FB_CFG = window.FLOCK_FIREBASE_CONFIG || {
+    apiKey:            'AIzaSyBA-fkxjABbwIHn0i6MPiXbGwahfJmuJeo',
+    authDomain:        'flockos-notify.firebaseapp.com',
+    projectId:         'flockos-notify',
+    storageBucket:     'flockos-notify.firebasestorage.app',
+    messagingSenderId: '321766738616',
+    appId:             '1:321766738616:web:d2c1c53ad7493fcde4c24d',
+  };
+
+  // GAS Email API — set this to your deployed GAS Web App URL after deploying
+  // Iris/Bezalel/Scripts/waiver_email_api.gs to Google Apps Script.
+  // Leave blank to skip auto-email (signature is always saved to Firestore).
+  const GAS_EMAIL_URL   = '';   // e.g. 'https://script.google.com/macros/s/AKfy.../exec'
+  const GAS_EMAIL_TOKEN = '';   // Match the WAIVER_API_TOKEN in your GAS Script Properties
+
+  // ── Init ─────────────────────────────────────────────────────────────────
+  if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
+  const db   = firebase.firestore();
+  const auth = firebase.auth();
+
+  // ── State ─────────────────────────────────────────────────────────────────
+  const params  = new URLSearchParams(location.search);
+  const uid     = params.get('uid') || '';
+  let memberDoc = {};
+  let checkDoc  = {};
+  let orgName   = '';
+  let sigDataUrl = '';
+
+  // ── Show/hide views ───────────────────────────────────────────────────────
+  function _show(id) {
+    ['view-loading','view-sign','view-already','view-done','view-error']
+      .forEach(v => document.getElementById(v).style.display = v === id ? '' : 'none');
+  }
+
+  function _err(title, msg) {
+    document.getElementById('error-title').textContent = title;
+    document.getElementById('error-msg').textContent   = msg;
+    _show('view-error');
+  }
+
+  // ── Waiver HTML (scrollable text) ─────────────────────────────────────────
+  function _buildWaiverText(name, org) {
+    const eName = _e(name), eOrg = _e(org);
+    return `
+      <h3>1. Consent &amp; Authorization</h3>
+      <p>I, <strong>${eName}</strong>, hereby voluntarily authorize <strong>${eOrg}</strong>
+      ("the Organization") and its authorized agents to obtain a background investigation report
+      concerning me from consumer reporting agencies, the California Department of Justice (DOJ),
+      and/or other authorized sources.</p>
+      <p>This authorization is required under California AB 506 (Business &amp; Professions Code
+      §18975) for any person with direct contact with minors in a youth-serving organization who
+      is not otherwise required by law to obtain a criminal background check.</p>
+      <p>This authorization is valid for one (1) year from the date signed and must be renewed
+      annually in accordance with the Organization's child safety policy.</p>
+
+      <h3>2. Statutory Disclosure (BPC §18975)</h3>
+      <p>California BPC §18975 requires youth-serving organizations to conduct criminal background
+      checks on employees and volunteers who have direct contact with minors. The required check
+      includes a DOJ records search and, where applicable, an FBI check. A disqualifying offense
+      may result in prohibition from direct contact with minors.</p>
+
+      <h3>3. DOJ Subsequent Arrest Notification (SAN)</h3>
+      <p>The Organization may enroll me in the California DOJ Subsequent Arrest Notification program,
+      which provides ongoing notifications if I am arrested for a qualifying offense after the
+      initial background check. By signing, I consent to such enrollment for the duration of my
+      service with the Organization.</p>
+
+      <h3>4. Child Safety Policy Acknowledgment</h3>
+      <p>I confirm I have received, read, and agree to comply with the Organization's Child Safety
+      Policy. Any violation may result in immediate removal from ministry and, where applicable,
+      reporting to law enforcement.</p>
+
+      <h3>5. Annual Renewal</h3>
+      <p>I understand this authorization expires one (1) year from the date of my signature and
+      that continued service in a role with direct contact with minors requires annual renewal.
+      I agree to re-sign each program year upon request.</p>`;
+  }
+
+  // ── Canvas signature pad ──────────────────────────────────────────────────
+  function _initCanvas() {
+    const wrap   = document.getElementById('sig-wrap');
+    const canvas = document.getElementById('sig-canvas');
+    const ctx    = canvas.getContext('2d');
+    let drawing  = false;
+    let hasStrokes = false;
+
+    function _resize() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = wrap.getBoundingClientRect();
+      canvas.width  = rect.width  * dpr;
+      canvas.height = 160         * dpr;
+      ctx.scale(dpr, dpr);
+      ctx.strokeStyle = '#1b264f';
+      ctx.lineWidth   = 2.2;
+      ctx.lineCap     = 'round';
+      ctx.lineJoin    = 'round';
+    }
+
+    function _pos(e) {
+      const r = canvas.getBoundingClientRect();
+      const src = e.touches ? e.touches[0] : e;
+      return { x: src.clientX - r.left, y: src.clientY - r.top };
+    }
+
+    function _start(e) {
+      e.preventDefault();
+      drawing = true;
+      const p = _pos(e);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+    }
+
+    function _move(e) {
+      if (!drawing) return;
+      e.preventDefault();
+      const p = _pos(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      if (!hasStrokes) {
+        hasStrokes = true;
+        wrap.classList.add('has-strokes');
+        _validate();
+      }
+    }
+
+    function _end() { drawing = false; }
+
+    canvas.addEventListener('mousedown',  _start, { passive: false });
+    canvas.addEventListener('mousemove',  _move,  { passive: false });
+    canvas.addEventListener('mouseup',    _end);
+    canvas.addEventListener('mouseleave', _end);
+    canvas.addEventListener('touchstart', _start, { passive: false });
+    canvas.addEventListener('touchmove',  _move,  { passive: false });
+    canvas.addEventListener('touchend',   _end);
+
+    document.getElementById('sig-clear').addEventListener('click', () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hasStrokes = false;
+      wrap.classList.remove('has-strokes');
+      _validate();
+    });
+
+    // Export canvas to data URL (trim whitespace not needed — keep full canvas)
+    window._getSig = () => hasStrokes ? canvas.toDataURL('image/png') : null;
+    window._hasSig = () => hasStrokes;
+
+    _resize();
+    window.addEventListener('resize', _resize);
+  }
+
+  // ── Validation ────────────────────────────────────────────────────────────
+  function _validate() {
+    const ok = window._hasSig?.()
+      && document.getElementById('print-name').value.trim().length >= 2
+      && document.getElementById('agree-check').checked;
+    document.getElementById('submit-btn').disabled = !ok;
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function _e(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function _fmtDate(val) {
+    if (!val) return '—';
+    const d = val?.toDate ? val.toDate() : new Date(val);
+    if (isNaN(d)) return String(val);
+    return d.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  }
+
+  // ── Build signed PDF ──────────────────────────────────────────────────────
+  function _buildSignedPDF(member, check, org) {
+    const dname     = member.firstName
+      ? `${member.firstName} ${member.lastName || ''}`.trim()
+      : member.displayName || member.name || member.email || 'Member';
+    const today     = _fmtDate(check.waiverSignedDate) || new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    const sigImg    = check.waiverSignature
+      ? `<img src="${check.waiverSignature}" style="max-height:60px;max-width:280px;display:block;margin:4px 0">`
+      : '';
+    const sigName   = check.waiverSignedName || dname;
+    const memberNo  = member.memberNumber || member.id || '';
+    const dob       = check.dateOfBirth || member.dateOfBirth || member.dob || '';
+
+    return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<title>AB-506 Annual Waiver — ${_e(dname)}</title>
+<style>
+  @page { size:letter; margin:.85in 1in; }
+  *{box-sizing:border-box}
+  body{font-family:'Times New Roman',Times,serif;font-size:11pt;line-height:1.55;color:#111;background:#fff;margin:0;padding:24px 32px}
+  .header{text-align:center;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:20px}
+  .org-name{font-size:16pt;font-weight:bold;letter-spacing:.04em;text-transform:uppercase}
+  .doc-title{font-size:13pt;font-weight:bold;margin-top:6px}
+  .doc-sub{font-size:10pt;color:#444;margin-top:2px}
+  .member-box{background:#f8f8f8;border:1px solid #ccc;border-radius:4px;padding:12px 16px;margin-bottom:18px;line-height:1.8}
+  .section{margin-bottom:18px}
+  .sec-title{font-weight:bold;font-size:11pt;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid #aaa;margin-bottom:8px;padding-bottom:3px}
+  .statutory{font-size:9.5pt;color:#333;background:#f4f4f4;border-left:3px solid #aaa;padding:8px 12px;margin:10px 0;line-height:1.6}
+  .sign-line{display:flex;align-items:flex-end;gap:8px;margin-bottom:12px}
+  .sign-label{flex-shrink:0;min-width:160px;font-size:10pt}
+  .sign-rule{flex:1;border-bottom:1px solid #111;margin-bottom:2px}
+  .esig-block{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:12px 16px;margin-top:8px}
+  .esig-label{font-size:8.5pt;color:#059669;font-weight:bold;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+  .admin-box{border:1px solid #aaa;border-radius:4px;padding:12px 16px;background:#fcfcfc}
+  .admin-row{display:flex;gap:24px;margin-bottom:10px}
+  .admin-field{flex:1;border-bottom:1px solid #aaa;min-height:22px}
+  .admin-label{font-size:9pt;color:#555;text-transform:uppercase;letter-spacing:.04em}
+  .footer{margin-top:30px;font-size:8.5pt;color:#666;text-align:center;border-top:1px solid #ccc;padding-top:8px}
+  @media print{.no-print{display:none!important}body{padding:0}}
+</style></head><body>
+<div class="no-print" style="text-align:right;margin-bottom:14px">
+  <button onclick="window.print()" style="padding:8px 20px;font:bold 11pt sans-serif;background:#1b264f;color:#fff;border:none;border-radius:6px;cursor:pointer">Save as PDF / Print</button>
+</div>
+<div class="header">
+  <div class="org-name">${_e(org)}</div>
+  <div class="doc-title">Annual Authorization for Background Check</div>
+  <div class="doc-sub">Pursuant to California Business &amp; Professions Code §18975 (AB 506)</div>
+</div>
+<div class="member-box">
+  <strong>Member Name:</strong> ${_e(dname)}<br>
+  ${dob ? `<strong>Date of Birth:</strong> ${_e(dob)}<br>` : ''}
+  ${memberNo ? `<strong>Member ID:</strong> ${_e(memberNo)}<br>` : ''}
+  <strong>Date of Form:</strong> ${_e(today)}
+</div>
+<div class="section"><div class="sec-title">1. Consent &amp; Authorization</div>
+<p>I, <strong>${_e(dname)}</strong>, hereby voluntarily authorize <strong>${_e(org)}</strong> and its authorized agents to obtain a background investigation report from consumer reporting agencies, the California Department of Justice (DOJ), and/or other authorized sources.</p>
+<p>This authorization is required under California AB 506 (BPC §18975) for any person with direct contact with minors in a youth-serving organization. This authorization is valid for one (1) year and must be renewed annually.</p></div>
+<div class="section"><div class="sec-title">2. Statutory Disclosure (BPC §18975)</div>
+<div class="statutory">California BPC §18975 requires youth-serving organizations to conduct criminal background checks on employees and volunteers who have direct contact with minors. A disqualifying offense may result in prohibition from direct contact with minors.</div>
+<p style="margin-left:20px">I understand and acknowledge the above disclosure and consent to the background check described herein.</p></div>
+<div class="section"><div class="sec-title">3. DOJ Subsequent Arrest Notification (SAN)</div>
+<p>I consent to enrollment in the California DOJ SAN program for the duration of my service, which provides notifications to the Organization if I am arrested for a qualifying offense.</p></div>
+<div class="section"><div class="sec-title">4. Child Safety Policy Acknowledgment</div>
+<p>I confirm I have received, read, and agree to comply with the Organization's Child Safety Policy. Any violation may result in immediate removal and reporting to law enforcement.</p></div>
+<div class="section"><div class="sec-title">5. Annual Renewal</div>
+<p>I understand this authorization expires one (1) year from the date of my signature and agree to re-sign each program year upon request.</p></div>
+<div class="section"><div class="sec-title">6. Signature</div>
+${sigImg ? `
+<div class="esig-block">
+  <div class="esig-label">✅ Electronically Signed</div>
+  ${sigImg}
+  <div style="font-size:9.5pt;margin-top:6px"><strong>Printed Name:</strong> ${_e(sigName)}</div>
+  <div style="font-size:9.5pt"><strong>Date:</strong> ${_e(today)}</div>
+  <div style="font-size:8.5pt;color:#555;margin-top:4px">This electronic signature was captured and recorded via the Melchizedek compliance system. The signature image and timestamp are stored in the Organization's secure database.</div>
+</div>` : `
+<div style="margin-top:8px">
+  <div class="sign-line"><span class="sign-label">Volunteer/Staff Signature:</span><span class="sign-rule"></span></div>
+  <div class="sign-line"><span class="sign-label">Printed Name:</span><span class="sign-rule"></span></div>
+  <div class="sign-line"><span class="sign-label">Date:</span><span class="sign-rule"></span></div>
+  <div class="sign-line"><span class="sign-label">Witness Signature:</span><span class="sign-rule"></span></div>
+  <div class="sign-line"><span class="sign-label">Witness Printed Name:</span><span class="sign-rule"></span></div>
+  <div class="sign-line"><span class="sign-label">Witness Date:</span><span class="sign-rule"></span></div>
+</div>`}
+</div>
+<div class="section"><div class="sec-title">For Office Use Only</div>
+<div class="admin-box">
+  <div class="admin-row">
+    <div><div class="admin-field"></div><div class="admin-label">Background Check Submitted</div></div>
+    <div><div class="admin-field"></div><div class="admin-label">Result Received</div></div>
+    <div><div class="admin-field"></div><div class="admin-label">Result (Clear / Pending / Disqualified)</div></div>
+  </div>
+  <div class="admin-row">
+    <div><div class="admin-field"></div><div class="admin-label">SAN Enrolled (Y/N) &amp; Date</div></div>
+    <div><div class="admin-field"></div><div class="admin-label">Reviewed By</div></div>
+    <div><div class="admin-field"></div><div class="admin-label">Next Renewal Due</div></div>
+  </div>
+</div></div>
+<div class="footer">${_e(org)} | AB-506 Annual Authorization | Generated ${_e(new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}))} | Retain ≥ 7 years</div>
+<script>window.addEventListener('load',()=>setTimeout(()=>window.print(),400));<\/script>
+</body></html>`;
+  }
+
+  function _openPDF(member, check, org) {
+    const html = _buildSignedPDF(member, check, org);
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const win  = window.open(url, '_blank');
+    if (!win) {
+      const a = document.createElement('a');
+      const n = (member.firstName ? `${member.firstName}-${member.lastName || ''}` : 'Waiver').replace(/\s+/g, '-');
+      a.href = url; a.download = `AB506-Waiver-${n}-${new Date().getFullYear()}.html`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  }
+
+  // ── GAS email (fire-and-forget) ───────────────────────────────────────────
+  function _sendEmail(toEmail, name, org, signedDate) {
+    if (!GAS_EMAIL_URL || !toEmail) return;
+    try {
+      const url = new URL(GAS_EMAIL_URL);
+      url.searchParams.set('to',         toEmail);
+      url.searchParams.set('name',       name);
+      url.searchParams.set('org',        org);
+      url.searchParams.set('signedDate', signedDate);
+      url.searchParams.set('token',      GAS_EMAIL_TOKEN);
+      // no-cors: GAS redirects cause CORS errors on response read — fire & forget is fine
+      fetch(url.toString(), { method: 'GET', mode: 'no-cors' })
+        .then(() => {
+          const el = document.getElementById('email-status');
+          if (el) el.style.display = 'inline-flex';
+        })
+        .catch(() => {});
+    } catch (_) {}
+  }
+
+  // ── Load data ─────────────────────────────────────────────────────────────
+  async function _load() {
+    if (!uid) { _err('Missing Member ID', 'No member UID in URL. Open this page from Melchizedek.'); return; }
+
+    try {
+      // Load member
+      const mSnap = await db.collection('members').doc(uid).get();
+      if (mSnap.exists) {
+        memberDoc = { id: mSnap.id, ...mSnap.data() };
+      } else {
+        // fallback: search by memberNumber
+        memberDoc = { id: uid };
+      }
+
+      // Load background check
+      const cSnap = await db.collection('backgroundChecks').doc(uid).get();
+      checkDoc = cSnap.exists ? cSnap.data() : {};
+
+      // Load org name
+      try {
+        const cfgSnap = await db.collection('appConfig').doc('church_name').get();
+        orgName = cfgSnap.exists ? (cfgSnap.data()?.value || '') : '';
+      } catch (_) {}
+
+    } catch (err) {
+      _err('Failed to load data', err.message);
+      return;
+    }
+
+    _render();
+  }
+
+  // ── Render correct view ───────────────────────────────────────────────────
+  function _render() {
+    const dname = memberDoc.firstName
+      ? `${memberDoc.firstName} ${memberDoc.lastName || ''}`.trim()
+      : memberDoc.displayName || memberDoc.name || memberDoc.email || 'Volunteer';
+    const org = orgName || 'Organization';
+
+    if (checkDoc.waiverSignature && !params.get('renew')) {
+      // Already signed — show status view
+      const meta = document.getElementById('already-meta');
+      meta.innerHTML = `
+        <div class="ws-meta-item">
+          <div class="label">Member</div>
+          <div class="value">${_e(dname)}</div>
+        </div>
+        <div class="ws-meta-item">
+          <div class="label">Signed</div>
+          <div class="value">${_fmtDate(checkDoc.waiverSignedDate)}</div>
+        </div>
+        <div class="ws-meta-item">
+          <div class="label">Signed By</div>
+          <div class="value">${_e(checkDoc.waiverSignedName || dname)}</div>
+        </div>`;
+
+      const sigEl = document.getElementById('already-sig');
+      sigEl.innerHTML = `<img src="${checkDoc.waiverSignature}" alt="Signature">`;
+      sigEl.style.display = 'inline-block';
+
+      document.getElementById('download-pdf-already').addEventListener('click', () =>
+        _openPDF(memberDoc, checkDoc, org));
+      document.getElementById('re-sign-btn').addEventListener('click', () => {
+        // Force renewal mode
+        const u = new URL(location.href);
+        u.searchParams.set('renew', '1');
+        location.href = u.toString();
+      });
+
+      _show('view-already');
+    } else {
+      // Show sign pad
+      document.getElementById('sign-title').textContent = `Sign Annual Waiver — ${dname}`;
+      document.getElementById('waiver-body').innerHTML = _buildWaiverText(dname, org);
+      document.getElementById('sign-date').value = new Date().toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      });
+      document.getElementById('print-name').value = dname;
+
+      _initCanvas();
+
+      // Wire validation
+      document.getElementById('print-name').addEventListener('input', _validate);
+      document.getElementById('agree-check').addEventListener('change', _validate);
+      _validate();
+
+      // Wire submit
+      document.getElementById('submit-btn').addEventListener('click', _submit);
+
+      _show('view-sign');
+    }
+  }
+
+  // ── Submit ────────────────────────────────────────────────────────────────
+  async function _submit() {
+    const sig  = window._getSig();
+    const name = document.getElementById('print-name').value.trim();
+    if (!sig)  { alert('Please draw your signature before submitting.'); return; }
+    if (!name) { alert('Please print your full name.'); return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    const org = orgName || 'Organization';
+
+    try {
+      const payload = {
+        waiverSignature:   sig,
+        waiverSignedName:  name,
+        waiverSignedDate:  firebase.firestore.FieldValue.serverTimestamp(),
+        waiverSignedAt:    new Date().toISOString(),
+        waiverDocVersion:  'AB506-2026-v1',
+      };
+      await db.collection('backgroundChecks').doc(uid).set(payload, { merge: true });
+
+      // Refresh checkDoc for PDF generation
+      checkDoc = { ...checkDoc, ...payload, waiverSignedDate: new Date() };
+
+      // Attempt email receipt
+      const memberEmail = memberDoc.email || memberDoc.emailAddress || '';
+      const signedDate  = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+      _sendEmail(memberEmail, name, org, signedDate);
+
+      // Show success
+      const dname = memberDoc.firstName
+        ? `${memberDoc.firstName} ${memberDoc.lastName || ''}`.trim()
+        : memberDoc.displayName || memberDoc.name || memberDoc.email || 'Volunteer';
+
+      const doneMeta = document.getElementById('done-meta');
+      doneMeta.innerHTML = `
+        <div class="ws-meta-item">
+          <div class="label">Signed By</div>
+          <div class="value">${_e(name)}</div>
+        </div>
+        <div class="ws-meta-item">
+          <div class="label">Date</div>
+          <div class="value">${_e(signedDate)}</div>
+        </div>
+        <div class="ws-meta-item">
+          <div class="label">Organization</div>
+          <div class="value">${_e(org)}</div>
+        </div>`;
+
+      document.getElementById('done-sig').innerHTML = `<img src="${sig}" alt="Signature" style="max-height:60px">`;
+
+      document.getElementById('download-pdf-done').addEventListener('click', () =>
+        _openPDF(memberDoc, { ...checkDoc, waiverSignature: sig, waiverSignedName: name }, org));
+
+      _show('view-done');
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Submit Signature';
+      _err('Failed to save', err.message + ' — Please check your connection and try again.');
+    }
+  }
+
+  // ── Boot ──────────────────────────────────────────────────────────────────
+  // Auth state: admin's session persists from Melchizedek (same origin/localStorage).
+  // If somehow unauthenticated, we still attempt the load — Firestore rules will
+  // block the write if no auth, and _err() will surface it clearly.
+  auth.onAuthStateChanged(() => _load());
+
+  </script>
+</body>
+</html>
