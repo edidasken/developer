@@ -3115,8 +3115,8 @@ const TheLife = (() => {
       var reviewsDue = 0;
       var _now = Date.now();
       openCases.forEach(function(c) {
-        var last = c.updatedAt || c.createdAt || '';
-        if (last && Math.floor((_now - new Date(last).getTime()) / 86400000) > 14) overdueCount++;
+        var last = c.lastContactAt || c.updatedAt || c.createdAt || '';
+        if (last && Math.floor((_now - _tsMs(last)) / 86400000) > 14) overdueCount++;
         if (c.nextReviewDate) { var _rd = new Date(c.nextReviewDate); if (!isNaN(_rd) && _rd.getTime() < _now) reviewsDue++; }
       });
       h += '<div class="flock-dashboard-strip">';
@@ -3162,10 +3162,10 @@ const TheLife = (() => {
       h += '<div class="flock-card-grid">';
       openCases.slice(0, 8).forEach(function(c) {
         var ovPills = _statusBadge(c.priority || 'Normal') + _statusBadge(c.status);
-        var _last = c.updatedAt || c.createdAt || '';
-        var _dys = _last ? Math.floor((Date.now() - new Date(_last).getTime()) / 86400000) : 0;
-        if (_dys > 14) ovPills += _statusBadge('Urgent', _dys + 'd ago');
-        else if (_dys > 7) ovPills += _statusBadge('High', _dys + 'd ago');
+        var _lastMs = _tsMs(c.lastContactAt) || _tsMs(c.updatedAt) || _tsMs(c.createdAt);
+        var _dys = _lastMs ? Math.floor((Date.now() - _lastMs) / 86400000) : 0;
+        if (_dys > 14) ovPills += _statusBadge('Urgent', _dys + 'd no contact');
+        else if (_dys > 7) ovPills += _statusBadge('High', _dys + 'd no contact');
         if (c.nextReviewDate) { var _ovRd = new Date(c.nextReviewDate); if (!isNaN(_ovRd) && _ovRd.getTime() < Date.now()) ovPills += _statusBadge('Urgent', '\uD83D\uDD14 Review'); }
         h += _flockCard({
           name: _e(_memberName(c.memberId) || c.memberName || c.party1 || c.memberId || ''),
@@ -3211,10 +3211,11 @@ const TheLife = (() => {
         + '<span style="position:absolute;top:-6px;right:-8px;background:#c94c4c;color:#fff;border-radius:999px;font-size:0.65rem;font-weight:700;padding:1px 5px;line-height:1.4;">' + unassigned + '</span></button>' : '')
       + '</div>';
 
-    // Calculate days since last activity for open cases and sort overdue to top
+    // Calculate days since last CONTACT (not last form-save) for open cases.
+    // Priority: lastContactAt > updatedAt > createdAt
     var now = Date.now();
     rows.forEach(function(c) {
-      var lastMs = _tsMs(c.updatedAt) || _tsMs(c.createdAt);
+      var lastMs = _tsMs(c.lastContactAt) || _tsMs(c.updatedAt) || _tsMs(c.createdAt);
       c._daysSince = lastMs ? Math.floor((now - lastMs) / 86400000) : 999;
     });
     rows.sort(function(a, b) {
@@ -3233,8 +3234,8 @@ const TheLife = (() => {
       else if (c.trend === 'Improving') extraPills += _statusBadge('Low', '\u2197 Improving');
       // Overdue badge for open cases
       var isOpen = (c.status || '').toLowerCase() !== 'resolved' && (c.status || '').toLowerCase() !== 'closed';
-      if (isOpen && c._daysSince > 14) extraPills += _statusBadge('Urgent', c._daysSince + 'd ago');
-      else if (isOpen && c._daysSince > 7) extraPills += _statusBadge('High', c._daysSince + 'd ago');
+      if (isOpen && c._daysSince > 14) extraPills += _statusBadge('Urgent', c._daysSince + 'd no contact');
+      else if (isOpen && c._daysSince > 7) extraPills += _statusBadge('High', c._daysSince + 'd no contact');
       // Review overdue badge
       if (isOpen && c.nextReviewDate) {
         var _rd = new Date(c.nextReviewDate);
