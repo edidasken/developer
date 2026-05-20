@@ -6,6 +6,7 @@
  */
 
 import { mountUnityHeader } from '../Scripts/the_unity_header.js';
+import { mountQuill }       from '../Scripts/the_quill.js';
 
 (function() {
   'use strict';
@@ -239,7 +240,7 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
     document.getElementById('fs-edit-btn-close').addEventListener('click', () => {
       if (S.currentNote) {
         S.currentNote.title = document.getElementById('fs-edit-title').value;
-        S.currentNote.content = document.getElementById('fs-edit-content').value;
+        S.currentNote.content = document.getElementById('fs-edit-content').innerHTML;
         S.currentNote.updatedAt = new Date();
         saveNote(S.currentNote);
         S.currentNote = null;
@@ -295,7 +296,7 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
       if (e.target.id === 'fs-edit-modal') {
         if (S.currentNote) {
           S.currentNote.title = document.getElementById('fs-edit-title').value;
-          S.currentNote.content = document.getElementById('fs-edit-content').value;
+          S.currentNote.content = document.getElementById('fs-edit-content').innerHTML;
           S.currentNote.updatedAt = new Date();
           saveNote(S.currentNote);
           S.currentNote = null;
@@ -637,8 +638,17 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
   function openEditModal(note) {
     S.currentNote = note;
     document.getElementById('fs-edit-title').value = note.title || '';
-    document.getElementById('fs-edit-content').value = note.content || '';
+    const contentEl = document.getElementById('fs-edit-content');
+    contentEl.innerHTML = note.content || '';
     document.getElementById('fs-edit-modal').classList.add('show');
+
+    // Mount Quill on the contenteditable
+    if (S._shamarQuill) S._shamarQuill.destroy();
+    S._shamarQuill = mountQuill(contentEl, {
+      mode:    'note',
+      toolbar: document.getElementById('fs-quill-bar'),
+    });
+    contentEl.focus();
     
     // Update modal background color
     const modalContent = document.querySelector('.fs-modal-content');
@@ -661,6 +671,7 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
   
   // Hide edit modal
   function hideEditModal() {
+    if (S._shamarQuill) { S._shamarQuill.destroy(); S._shamarQuill = null; }
     document.getElementById('fs-edit-modal').classList.remove('show');
     render();
   }

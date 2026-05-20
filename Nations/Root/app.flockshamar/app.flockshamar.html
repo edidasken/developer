@@ -480,9 +480,21 @@
       outline: none;
       font-size: 14px;
       font-family: inherit;
-      resize: none;
       min-height: 150px;
       line-height: 1.5;
+      box-sizing: border-box;
+      padding: 4px 0;
+      color: inherit;
+    }
+    .fs-modal-content-input:empty::before {
+      content: attr(data-placeholder);
+      color: var(--fs-gray-mid, #aaa);
+      pointer-events: none;
+    }
+    .fs-quill-bar-host {
+      margin: 0 -16px;
+      border-radius: 8px 8px 0 0;
+      overflow: hidden;
     }
     
     .fs-modal-toolbar {
@@ -994,7 +1006,9 @@
   <div class="fs-modal" id="fs-edit-modal">
     <div class="fs-modal-content">
       <input type="text" class="fs-modal-title-input" id="fs-edit-title" placeholder="Title">
-      <textarea class="fs-modal-content-input" id="fs-edit-content" placeholder="Take a note..."></textarea>
+      <!-- Quill bar host — filled by the_quill.js -->
+      <div id="fs-quill-bar" class="fs-quill-bar-host"></div>
+      <div class="fs-modal-content-input" contenteditable="true" id="fs-edit-content" data-placeholder="Take a note..."></div>
       
       <div class="fs-modal-toolbar">
         <div class="fs-modal-actions">

@@ -15,6 +15,7 @@
    ══════════════════════════════════════════════════════════════════════════════ */
 
 import { mountUnityHeader } from '../Scripts/the_unity_header.js';
+import { mountQuill }       from '../Scripts/the_quill.js';
 
 /* ── Constants ───────────────────────────────────────────────────────────── */
 const STORE_KEY_PREFS = 'fd_prefs';
@@ -1134,6 +1135,17 @@ function _openEditor() {
         editor.innerHTML = S.currentDoc.content;
         editor.focus();
       }
+      // Mount Quill on the toolbar host
+      if (S._quill) S._quill.destroy();
+      const toolbarHost = document.getElementById('fd-quill-bar');
+      const pageEl      = document.getElementById('fd-editor-page');
+      S._quill = mountQuill(editor, {
+        mode:     'document',
+        toolbar:  toolbarHost,
+        pageEl,
+        onBack:   _closeEditor,
+        statusEl: document.getElementById('fd-save-status'),
+      });
     }
   }
 }
@@ -1143,6 +1155,7 @@ function _closeEditor() {
   const editorView = document.getElementById('fd-editor-view');
   const spreadsheetView = document.getElementById('fd-spreadsheet-view');
 
+  if (S._quill) { S._quill.destroy(); S._quill = null; }
   if (libraryView) libraryView.classList.remove('hidden');
   if (editorView) editorView.classList.add('hidden');
   if (spreadsheetView) spreadsheetView.classList.add('hidden');
