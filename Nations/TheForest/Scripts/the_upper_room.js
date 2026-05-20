@@ -1520,7 +1520,38 @@
       loggedAt:    firebase.firestore.FieldValue.serverTimestamp(),
     };
     return _touchesRef().add(payload).then(function(ref) {
-      payload.id = ref.id; return payload;
+      payload.id = ref.id;
+      // Auto-update any open care cases for this member so that every contact
+      // registers as an update — no manual Save required.
+      _touchOpenCareCases(data.memberId, data.channel || 'unknown');
+      return payload;
+    });
+  }
+
+  // Bump updatedAt + lastContactAt on every open care case for a member
+  // whenever a touch or contact is logged.  Runs fire-and-forget (errors
+  // are logged but never surface to the caller).
+  function _touchOpenCareCases(memberId, channel) {
+    if (!memberId) return;
+    var TERMINAL = { Resolved: true, Closed: true, Deleted: true };
+    _careCasesRef().where('memberId', '==', memberId).get().then(function(snap) {
+      var now = firebase.firestore.FieldValue.serverTimestamp();
+      var batch = firebase.firestore().batch();
+      var count = 0;
+      snap.docs.forEach(function(doc) {
+        var status = doc.data().status;
+        if (TERMINAL[status]) return;
+        batch.update(doc.ref, {
+          updatedAt:          now,
+          lastContactAt:      now,
+          lastContactChannel: channel || 'unknown',
+          updatedBy:          _userEmail || '',
+        });
+        count++;
+      });
+      if (count > 0) return batch.commit();
+    }).catch(function(err) {
+      console.warn('[UpperRoom] _touchOpenCareCases failed:', err);
     });
   }
 
@@ -4537,7 +4568,12 @@
   }
   function createContact(data) {
     data.createdAt = _ts(); data.createdBy = _userEmail;
-    return _contactsRef().add(data).then(function(ref) { data.id = ref.id; return data; });
+    return _contactsRef().add(data).then(function(ref) {
+      data.id = ref.id;
+      // Auto-touch any open care cases for this member.
+      _touchOpenCareCases(data.memberId, data.contactType || data.channel || 'unknown');
+      return data;
+    });
   }
 
   function listPastoralNotes(opts) {
