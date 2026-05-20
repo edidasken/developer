@@ -171,6 +171,25 @@ const TheLife = (() => {
   var _PANEL_PAGE_SIZE = 25;
   var _prayerPage = 0;
 
+  // ── Timestamp-safe ms converter ─────────────────────────────────────────
+  // Handles: Firestore Timestamp objects (.toMillis), plain JS Dates, ISO strings
+  function _tsMs(ts) {
+    if (!ts) return 0;
+    if (typeof ts.toMillis === 'function') return ts.toMillis();  // Firestore Timestamp
+    if (ts.seconds)  return ts.seconds * 1000;                     // raw {seconds, nanoseconds}
+    var n = new Date(ts).getTime();
+    return isNaN(n) ? 0 : n;
+  }
+
+  // Stamp today's ISO string onto a cached care case so _daysSince recalculates
+  // immediately, without waiting for the next full hub re-fetch.
+  function _bustCareCache(caseId) {
+    var now = new Date().toISOString();
+    (_cache.care || []).forEach(function(c) {
+      if (c.id === caseId) c.updatedAt = now;
+    });
+  }
+
   // ── TTL-aware fetch: serves warm data via TheVine.nurture() ─────────────
   var _TTL_CARE = 60000;   // Pastoral data: 60 sec fresh window
   function _fetch(key, fetcher, ttl) {
@@ -1424,6 +1443,7 @@ const TheLife = (() => {
               : TheVine.flock.care.update({ id: id, notes: _val });
             savePromise.then(function() {
               _stat('Notes saved ✓');
+              _bustCareCache(id);
               // Keep "saved" visible briefly then clear
               setTimeout(function() { _stat(''); }, 2500);
             }).catch(function(e) {
@@ -1464,6 +1484,8 @@ const TheLife = (() => {
         _stat('Updating case\u2026');
         await (_isFB() ? UpperRoom.updateCareCase(data) : TheVine.flock.care.update(data));
         _audit('care.update', 'SpiritualCareCases', _fpCareId, data.status || '');
+        // Refresh the cache entry so the hub shows today's timestamp immediately
+        _bustCareCache(_fpCareId);
       } else {
         _stat('Creating case\u2026');
         var res = await (_isFB() ? UpperRoom.createCareCase(data) : TheVine.flock.care.create(data));
@@ -3192,8 +3214,8 @@ const TheLife = (() => {
     // Calculate days since last activity for open cases and sort overdue to top
     var now = Date.now();
     rows.forEach(function(c) {
-      var last = c.updatedAt || c.createdAt || '';
-      c._daysSince = last ? Math.floor((now - new Date(last).getTime()) / 86400000) : 999;
+      var lastMs = _tsMs(c.updatedAt) || _tsMs(c.createdAt);
+      c._daysSince = lastMs ? Math.floor((now - lastMs) / 86400000) : 999;
     });
     rows.sort(function(a, b) {
       // Open/active first, then by overdue days descending
