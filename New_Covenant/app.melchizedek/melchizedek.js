@@ -60,8 +60,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const N  = window.Nehemiah;
 
     // Auth guard — redirect to sign-in if no active session
+    // Note: <base href="../"> in the HTML means 'app.melchizedek/index.html'
+    // resolves correctly to /app.melchizedek/index.html
     if (!N.isAuthenticated()) {
-      window.location.replace('index.html');
+      window.location.replace('app.melchizedek/index.html');
       return;
     }
 
@@ -69,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const profile  = N.getProfile ? N.getProfile() : null;
     const role     = (profile?.role || '').toLowerCase();
     if (_roleLevel(role) < 4) {
-      window.location.replace('index.html');
+      window.location.replace('app.melchizedek/index.html');
       return;
     }
 
@@ -127,11 +129,11 @@ function _wireHeader(profile) {
       appAccent:   '#e8a838',
       appAccentDk: '#92400e',
       homeHref:    'app.melchizedek/',
-      signInHref:  'index.html',
+      signInHref:  'app.melchizedek/index.html',
       user:        profile || null,
       onSignOut:   async () => {
         try { await window.Nehemiah?.signOut?.(); } catch (_) {}
-        window.location.replace('index.html');
+        window.location.replace('app.melchizedek/index.html');
       },
       onHamburger: () => {
         document.body.classList.toggle('veil-side-open');
