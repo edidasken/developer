@@ -544,7 +544,7 @@ import { mountQuill }       from '../Scripts/the_quill.js';
         </button>
         
         ${note.title ? `<div class="fs-note-title">${escapeHtml(note.title)}</div>` : ''}
-        ${checklist || `<div class="fs-note-content">${escapeHtml(note.content || '')}</div>`}
+        ${checklist || `<div class="fs-note-content">${escapeHtml(stripHtml(note.content || ''))}</div>`}
         ${labels}
         
         <div class="fs-note-actions">
@@ -797,7 +797,13 @@ import { mountQuill }       from '../Scripts/the_quill.js';
     div.textContent = text;
     return div.innerHTML;
   }
-  
+
+  function stripHtml(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+  }
+
   function autoResizeTextarea(e) {
     e.target.style.height = 'auto';
     e.target.style.height = e.target.scrollHeight + 'px';
