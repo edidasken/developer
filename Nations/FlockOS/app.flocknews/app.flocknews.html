@@ -1885,16 +1885,28 @@
       text-align: left !important;
     }
     [data-section="mission"] .fn-unreached-photo {
-      max-width: 100% !important;
-      width: 100% !important;
-      height: 220px !important;
+      max-width: 180px !important;
+      width: 180px !important;
+      height: 140px !important;
       object-fit: cover !important;
-      object-position: center top !important;
-      border: none !important;
+      object-position: center !important;
+      border: 1px solid rgba(15,23,53,0.18) !important;
       border-radius: 0 !important;
-      margin: 0 0 6px !important;
-      filter: grayscale(0.15) contrast(1.02);
+      float: left !important;
+      margin: 4px 18px 8px 0 !important;
+      display: block !important;
+      filter: grayscale(0.85) contrast(1.05);
     }
+    @media (max-width: 540px) {
+      [data-section="mission"] .fn-unreached-photo {
+        max-width: 140px !important;
+        width: 140px !important;
+        height: 110px !important;
+        margin: 4px 14px 6px 0 !important;
+      }
+    }
+    [data-section="mission"] .fn-unreached-info { clear: none !important; }
+    [data-section="mission"] .fn-unreached-summary { clear: both !important; }
     [data-section="mission"] .fn-unreached-name {
       font-family: 'Playfair Display', Georgia, serif !important;
       font-size: 32px !important;
