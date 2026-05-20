@@ -308,7 +308,10 @@ async function loadNewsContent() {
       try {
         // Fetch other sections from 'flockNews' collection
         const newsRef = FlockNewsState.db.collection('flockNews').doc(FlockNewsState.dateKey);
-        const newsDoc = await newsRef.get();
+        const newsDoc = await Promise.race([
+          newsRef.get(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout')), 5000))
+        ]);
         
         if (newsDoc.exists) {
           const newsData = newsDoc.data();
@@ -1794,9 +1797,10 @@ function closeEditor() {
 async function loadChurchAndConfig() {
   if (!FlockNewsState.db) return;
   try {
+    const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout')), ms));
     const [churchDoc, configDoc] = await Promise.all([
-      FlockNewsState.db.collection('appConfig').doc('church_name').get(),
-      FlockNewsState.db.collection('appConfig').doc('flockNewsConfig').get(),
+      Promise.race([FlockNewsState.db.collection('appConfig').doc('church_name').get(), timeout(5000)]),
+      Promise.race([FlockNewsState.db.collection('appConfig').doc('flockNewsConfig').get(), timeout(5000)]),
     ]);
 
     if (churchDoc.exists) {
@@ -2237,13 +2241,11 @@ window.FlockNews = {
   _mmDeleteModule,
 };
 
-// Initialize on DOM ready
-window.addEventListener('DOMContentLoaded', () => {
-  // Start the app immediately — no waiting on auth
-  initFlockNews().then(() => {
-    // After render, silently check for editor permissions in the background
-    _checkEditPermissions();
-  });
+// Module scripts are deferred by default — DOMContentLoaded has already fired
+// by the time this module executes, so call initFlockNews directly.
+initFlockNews().then(() => {
+  // After render, silently check for editor permissions in the background
+  _checkEditPermissions();
 });
 
 export { FlockNewsState, initFlockNews };
