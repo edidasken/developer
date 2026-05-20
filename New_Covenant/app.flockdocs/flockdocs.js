@@ -47,6 +47,7 @@ window.FlockDocs = {
   openDocument,
   saveDocument,
   deleteDocument,
+  emptyTrash,
   switchView,
   importFromExcel,
   exportToExcel,
@@ -725,6 +726,52 @@ async function deleteDocument(docId) {
   }
 }
 
+async function emptyTrash() {
+  const count = S.documents.length;
+  if (count === 0) {
+    _toast('Trash is already empty', 'info');
+    return;
+  }
+
+  const confirmed = await _showConfirmDialog(
+    'Empty Trash',
+    `Permanently delete ${count} document${count !== 1 ? 's' : ''}? This cannot be undone.`,
+    'Empty Trash',
+    'Cancel'
+  );
+  if (!confirmed) return;
+
+  if (!_checkFirebase()) return;
+
+  if (_isMockUser()) {
+    try {
+      let allDocs = _loadFromLocalStorage();
+      allDocs = allDocs.filter(d => !d.deleted);
+      _saveToLocalStorage(allDocs);
+      _toast('Trash emptied', 'success');
+      _loadDocuments();
+    } catch (err) {
+      console.error('[FlockDocs] Error emptying trash:', err);
+      _toast('Failed to empty trash', 'error');
+    }
+    return;
+  }
+
+  try {
+    const db = firebase.firestore();
+    const batch = db.batch();
+    S.documents.forEach(doc => {
+      batch.delete(db.collection(COLLECTION_DOCS).doc(doc.id));
+    });
+    await batch.commit();
+    _toast('Trash emptied', 'success');
+    _loadDocuments();
+  } catch (err) {
+    console.error('[FlockDocs] Error emptying trash:', err);
+    _toast('Failed to empty trash', 'error');
+  }
+}
+
 /* ── File Management (Folders, Move, Share, Rename) ───────────────────────── */
 async function createFolder() {
   const folderName = await _showInputDialog(
@@ -940,6 +987,10 @@ function switchView(viewName) {
     'trash': 'Trash',
   };
   document.getElementById('fd-library-title').textContent = titles[viewName] || 'Documents';
+
+  // Show Empty Trash button only when in trash view
+  const emptyTrashBtn = document.getElementById('fd-empty-trash-btn');
+  if (emptyTrashBtn) emptyTrashBtn.style.display = viewName === 'trash' ? '' : 'none';
 
   _loadDocuments();
 }

@@ -993,6 +993,12 @@
       <div class="fd-library-view" id="fd-library-view">
         <div class="fd-library-header">
           <h1 class="fd-library-title" id="fd-library-title">All Documents</h1>
+          <button id="fd-empty-trash-btn" class="fd-btn fd-btn--danger" style="display:none" onclick="FlockDocs.emptyTrash()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            Empty Trash
+          </button>
           <div class="fd-search-box">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -1409,7 +1415,7 @@
   <script defer src="Scripts/the_true_vine.js"></script>
 
   <!-- FlockDocs app logic -->
-  <script src="app.flockdocs/flockdocs.js?v=2" type="module"></script>
+  <script src="app.flockdocs/flockdocs.js?v=3" type="module"></script>
   <!-- Google Docs features -->
   <script defer src="app.flockdocs/flockdocs-gdocs-features.js"></script>
   <!-- Google Sheets features -->
