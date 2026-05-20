@@ -15489,7 +15489,7 @@ flock-tabs [role="tablist"], .tabs-bar {
   .ms-main        { background: var(--ms-bg); }
   .ms-menu-toggle { display: flex; }
   .ms-view        {
-    padding: 16px 16px calc(var(--ms-bnav-h) + 12px);
+    padding: 16px 16px calc(var(--ms-bnav-h) + 72px);
     max-width: none;
   }
   .ms-editor-layout { grid-template-columns: 1fr; }
@@ -15512,7 +15512,7 @@ flock-tabs [role="tablist"], .tabs-bar {
   .ms-btn--account      { padding-left: 10px; padding-right: 10px; }
 }
 @media (max-width: 430px) {
-  .ms-view    { padding: 16px; }
+  .ms-view    { padding: 16px 16px calc(var(--ms-bnav-h) + 72px); }
   .ms-header  { padding-left: 14px; padding-right: 14px; }
   #ms-account-name    { display: none; }
   .ms-song-controls   { flex-wrap: wrap; }

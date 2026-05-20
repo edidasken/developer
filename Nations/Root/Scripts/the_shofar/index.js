@@ -378,20 +378,21 @@ function msEnsureStyles() {
         '.ms-stand-song-title { font-family:Merriweather,serif; font-size:1.8rem; color:#fff; margin:0; }',
         '.ms-stand-meta { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px; }',
         /* slim badge — used inside the compact toolbar */
-        '.ms-stand-badge { display:inline-flex; align-items:center; background:#e2e8f0; color:#0f172a; padding:3px 10px; border-radius:20px; font-size:0.78rem; font-weight:700; border:1px solid #94a3b8; white-space:nowrap; line-height:1.4; }',
+        '.ms-stand-badge { display:inline-flex; align-items:center; background:rgba(232,168,56,0.12); color:#e8a838; padding:2px 8px; border-radius:12px; font-size:0.68rem; font-weight:700; border:1px solid rgba(232,168,56,0.4); white-space:nowrap; line-height:1; height:24px; box-sizing:border-box; }',
         /* toolbar row containing badges + transpose */
-        '.ms-av-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:5px; padding:8px 0 6px 0; border-top:1px solid rgba(0,0,0,0.07); margin-top:10px; }',
-        '.ms-av-divider { width:1px; height:18px; background:rgba(0,0,0,0.15); margin:0 3px; flex-shrink:0; }',
+        '.ms-av-toolbar { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:5px; padding:8px 0 6px 0; border-top:1px solid rgba(232,168,56,0.3); margin-top:8px; }',
+        '.ms-av-toolbar-row { display:flex; align-items:center; gap:5px; width:100%; }',
+        '.ms-av-divider { width:1px; height:16px; background:rgba(255,255,255,0.18); margin:0 3px; flex-shrink:0; }',
         /* compact transpose pill buttons */
-        '.ms-xp-btn { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:6px; border:1px solid rgba(0,0,0,0.15); background:#f3f4f6; color:#374151; font-size:1rem; font-weight:700; cursor:pointer; line-height:1; transition:background 0.12s; flex-shrink:0; padding:0; }',
-        '.ms-xp-btn:hover { background:#e5e7eb; }',
+        '.ms-xp-btn { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:8px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.9); font-size:0.88rem; font-weight:700; cursor:pointer; line-height:1; transition:background 0.15s; flex-shrink:0; padding:0; }',
+        '.ms-xp-btn:hover { background:rgba(255,255,255,0.16); }',
         '.ms-xp-reset { font-size:0.9rem; }',
         /* key select inside toolbar — override ms-input sizing */
-        '#ms-av-key,#ms-sv-key { height:28px !important; min-width:0 !important; width:auto !important; padding:0 6px !important; border-radius:6px !important; border:1px solid rgba(0,0,0,0.15) !important; background:#f3f4f6 !important; color:#374151 !important; font-size:0.85rem !important; font-weight:700 !important; cursor:pointer !important; }',
+        '#ms-av-key,#ms-sv-key { height:26px !important; min-width:0 !important; width:auto !important; padding:0 6px !important; border-radius:8px !important; border:1px solid rgba(255,255,255,0.18) !important; background:rgba(255,255,255,0.08) !important; color:rgba(255,255,255,0.9) !important; font-size:0.72rem !important; font-weight:700 !important; cursor:pointer !important; }',
         /* capo picker inline in toolbar */
-        '.ms-capo-select { height:28px !important; padding:0 4px !important; border-radius:6px !important; border:1px solid rgba(0,0,0,0.15) !important; background:#f3f4f6 !important; color:#374151 !important; font-size:0.78rem !important; font-weight:700 !important; cursor:pointer !important; }',
-        /* sounding key badge — green accent */
-        '.ms-sounding-badge { display:inline-flex; align-items:center; background:#dcfce7; color:#166534; padding:3px 10px; border-radius:20px; font-size:0.78rem; font-weight:700; border:1px solid #86efac; white-space:nowrap; line-height:1.4; }',
+        '.ms-capo-select { height:26px !important; padding:0 6px !important; border-radius:8px !important; border:1px solid rgba(255,255,255,0.18) !important; background:rgba(255,255,255,0.08) !important; color:rgba(255,255,255,0.9) !important; font-size:0.68rem !important; font-weight:700 !important; cursor:pointer !important; }',
+        /* sounding key badge — subtle green on dark */
+        '.ms-sounding-badge { display:inline-flex; align-items:center; background:rgba(74,222,128,0.12); color:#4ade80; padding:2px 8px; border-radius:12px; font-size:0.68rem; font-weight:700; border:1px solid rgba(74,222,128,0.35); white-space:nowrap; line-height:1; height:24px; box-sizing:border-box; }',
         /* arrangement selector strip */
         '.ms-arr-selector { display:flex; gap:5px; flex-wrap:wrap; padding:4px 0 6px; flex-shrink:0; border-bottom:1px solid rgba(0,0,0,0.07); margin-bottom:6px; }',
         '.ms-arr-chip { display:inline-flex; align-items:center; height:24px; padding:0 10px; border-radius:12px; border:1px solid rgba(0,0,0,0.18); background:#f3f4f6; color:#374151; font-size:0.7rem; font-weight:700; cursor:pointer; white-space:nowrap; transition:background 0.12s; }',
@@ -1076,18 +1077,23 @@ function msShowArrangementView(arr) {
         /* section strip above the toolbar so sections are reachable at the bottom */
         (_arrSections.length ? msBuildSectionStrip(_arrSections) : '') +
         /* toolbar: key badge + capo picker + sounding key + tempo/time/instrument + transpose */
-        '<div class="ms-av-toolbar" style="flex-shrink:0;">' +
-            '<span class="ms-stand-badge" id="ms-av-key-badge">&#127929;&nbsp;' + msEscapeHtml(initKey) + '</span>' +
-            capoSelectHtml(capoFret) +
-            '<span id="ms-av-sounding-wrap">' + soundingBadgeHtml(initKey, capoFret) + '</span>' +
-            (tempoVal  ? '<span class="ms-stand-badge">' + msEscapeHtml(tempoVal) + '&thinsp;BPM</span>' : '') +
-            (timeVal   ? '<span class="ms-stand-badge">' + msEscapeHtml(timeVal) + '</span>' : '') +
-            '<span class="ms-stand-badge">' + msEscapeHtml(arr.instrument || 'Guitar') + '</span>' +
-            '<span class="ms-av-divider"></span>' +
-            msTransposeControls(originalKey, initKey, capoFret, 'ms-av') +
-        '</div>' +
-        '<div style="text-align:right;margin-top:8px;flex-shrink:0;">' +
-            '<button class="ms-btn ms-btn-secondary ms-btn-sm" id="ms-arr-pdf-btn">Export PDF</button>' +
+        '<div class="ms-av-toolbar" style="flex-shrink:0;flex-direction:column;align-items:stretch;gap:0;">' +
+            /* Row 1: Key · Guitar · PDF */
+            '<div class="ms-av-toolbar-row">' +
+                '<span class="ms-stand-badge" id="ms-av-key-badge">&#127929;&nbsp;' + msEscapeHtml(initKey) + '</span>' +
+                '<span class="ms-stand-badge">' + msEscapeHtml(arr.instrument || 'Guitar') + '</span>' +
+                '<span style="flex:1;"></span>' +
+                '<button class="ms-xp-btn" id="ms-arr-pdf-btn" title="Export PDF" style="width:auto;padding:0 10px;font-size:0.65rem;font-weight:800;letter-spacing:.06em;border-color:rgba(232,168,56,0.4);color:#e8a838;height:24px;">PDF</button>' +
+            '</div>' +
+            /* Row 2: Capo · Sounding key · BPM/Time · Transpose · Reset */
+            '<div class="ms-av-toolbar-row" style="margin-top:6px;">' +
+                capoSelectHtml(capoFret) +
+                '<span id="ms-av-sounding-wrap">' + soundingBadgeHtml(initKey, capoFret) + '</span>' +
+                (tempoVal ? '<span class="ms-stand-badge">' + msEscapeHtml(tempoVal) + '&thinsp;BPM</span>' : '') +
+                (timeVal  ? '<span class="ms-stand-badge">' + msEscapeHtml(timeVal) + '</span>' : '') +
+                '<span style="flex:1;"></span>' +
+                msTransposeControls(originalKey, initKey, capoFret, 'ms-av') +
+            '</div>' +
         '</div>';
 
     // Bind section strip (must be after modal.innerHTML is set)
