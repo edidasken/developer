@@ -69,7 +69,10 @@
     body {
       font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, var(--fs-navy-dark) 0%, var(--fs-navy-mid) 100%);
-      min-height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
       color: var(--fs-text-primary);
     }
     
@@ -77,7 +80,14 @@
     .fs-container {
       max-width: 1600px;
       margin: 0 auto;
-      padding: 80px 20px 40px;
+      padding: 24px 20px 40px;
+    }
+
+    /* Scrollable shell wrapping all content below the unity bar */
+    #fs-scroll-shell {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     
     /* Quick Add Note */
@@ -851,7 +861,7 @@
     @media (min-width: 769px) {
       .fs-container {
         margin-left: 280px;
-        padding-top: 60px;
+        padding-top: 24px;
       }
       
       .fs-notes-grid {
@@ -863,7 +873,9 @@
 <body>
   <!-- Unity Header -->
   <header class="unity-header" id="fs-topbar" role="banner"></header>
-  
+
+  <!-- Scroll shell: sidebar + main content scroll together below the fixed unity bar -->
+  <div id="fs-scroll-shell">
   <!-- Sidebar -->
   <aside class="fs-sidebar" id="fs-sidebar">
     <div class="fs-sidebar-item active" data-view="notes">
@@ -1020,8 +1032,10 @@
         <button class="fs-btn-primary" id="fs-edit-btn-close">Close</button>
       </div>
     </div>
-  </div>
-  
+  </div><!-- /#fs-edit-modal -->
+
+  </div><!-- /#fs-scroll-shell -->
+
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" defer></script>

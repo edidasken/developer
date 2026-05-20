@@ -41,7 +41,7 @@
     
     html, body {
       height: 100dvh; margin: 0; padding: 0;
-      overflow-x: hidden;
+      overflow: hidden;
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     }
 
@@ -70,12 +70,19 @@
       --fn-book:         #f0b845;
     }
 
-    body { background: var(--fn-bg); }
+    body { background: var(--fn-bg); display: flex; flex-direction: column; }
+
+    /* Scrollable shell — everything below the unity bar scrolls here */
+    #fn-scroll-shell {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
     .fn-container {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 80px 24px 60px;
+      padding: 24px 24px 60px;
     }
 
     /* ── Magazine Grid Layout ── */
@@ -1114,7 +1121,7 @@
     }
 
     @media (max-width: 768px) {
-      .fn-container { padding-top: 60px; }
+      .fn-container { padding-top: 16px; }
       .fn-word-grid { grid-template-columns: 1fr; }
       .fn-edit-toggle { width: 56px; height: 56px; bottom: 20px; right: 20px; }
       .fn-unreached-body {
@@ -1665,6 +1672,8 @@
   <!-- Unity Header (loaded via the_unity_header.js) -->
   <div id="unityHeader"></div>
 
+  <!-- Scroll shell: all content below the unity bar scrolls here -->
+  <div id="fn-scroll-shell">
   <!-- Main Container -->
   <div class="fn-container" id="fn-app">
     
@@ -1889,6 +1898,8 @@
       </div>
     </div>
   </div>
+
+  </div><!-- /#fn-scroll-shell -->
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" defer></script>
