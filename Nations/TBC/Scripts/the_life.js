@@ -1628,6 +1628,17 @@ const TheLife = (() => {
 
     _audit('care.reach', 'SpiritualCareCases', _fpCareId, method + ' to ' + mName);
 
+    // Always bump open care cases for this member — fire-and-forget.
+    // Every outreach from the app counts as care given, keeping "last updated" current.
+    if (memberId && _isFB() && typeof UpperRoom !== 'undefined' && UpperRoom.createTouch) {
+      UpperRoom.createTouch({
+        memberId:   memberId,
+        memberName: mName,
+        channel:    method === 'email' ? 'email' : 'text',
+        note:       msg.substring(0, 200),
+      }).catch(function(e) { console.warn('[TheLife] care touch failed:', e); });
+    }
+
     // Optionally log as care interaction
     if (mode === 'log' && _fpCareId) {
       try {

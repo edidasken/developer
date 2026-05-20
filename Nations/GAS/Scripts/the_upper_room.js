@@ -453,6 +453,22 @@
       lastSenderName: _userName
     }, { merge: true });
     return batch.commit().then(function() {
+      // If this is a DM, bump open care cases for the other participant — fire-and-forget.
+      // Keeps "last updated" current whenever the pastor messages a member via FlockChat.
+      if (String(convoId).indexOf('dm_') === 0) {
+        _convosRef().doc(convoId).get().then(function(doc) {
+          if (!doc.exists) return;
+          var parts = doc.data().participants || [];
+          var otherEmail = '';
+          for (var pi = 0; pi < parts.length; pi++) {
+            if (parts[pi] !== _userEmail) { otherEmail = parts[pi]; break; }
+          }
+          if (!otherEmail) return;
+          return getMember(otherEmail).then(function(m) {
+            if (m && m.id) _touchOpenCareCases(m.id, 'flockchat');
+          });
+        }).catch(function(e) { console.warn('[UpperRoom] DM care touch failed:', e); });
+      }
       return msgId;
     });
   }
