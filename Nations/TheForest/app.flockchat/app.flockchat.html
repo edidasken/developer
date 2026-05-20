@@ -1877,7 +1877,12 @@
         appAccent: '#06b6d4',
         appAccentDk: '#0c4a6e',
         homeHref: 'app.flockchat/',
-        hideHamburger: true  // FlockChat doesn't use sidebar
+        hideHamburger: true,  // FlockChat doesn't use sidebar
+        features: [
+          { id: 'fc-conversations', label: 'All Conversations', hint: 'Browse all channels', run: () => document.getElementById('fc-back-btn')?.click() },
+          { id: 'fc-announcements', label: 'Announcements',     hint: 'Church announcements', run: () => window._openConversation?.('announcements') },
+          { id: 'fc-prayer',        label: 'Prayer Chain',      hint: 'Church prayer requests', run: () => window._openConversation?.('prayer') },
+        ],
       });
     });
   </script>

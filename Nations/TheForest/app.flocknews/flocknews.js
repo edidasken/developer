@@ -195,6 +195,10 @@ function mountHeader() {
     onHamburger: () => {
       // Future: toggle sidebar
     },
+    features: [
+      { id: 'fn-top',    label: "Today's Content",  hint: 'Scroll to top of feed',     run: () => document.getElementById('fn-news-feed')?.scrollTo({ top: 0, behavior: 'smooth' }) },
+      { id: 'fn-edit',   label: 'Edit Content',     hint: 'Pastor mode — edit today\'s content', run: () => document.getElementById('fn-edit-toggle')?.click() },
+    ],
   });
 }
 

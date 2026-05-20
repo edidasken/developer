@@ -292,6 +292,10 @@
         homeHref:    'app.invite/',
         user:        null,
         signInHref:  './',
+        features: [
+          { id: 'inv-share',    label: 'Share This Page', hint: 'Send this invitation to someone', run: () => document.getElementById('inv-topbar-share')?.click() },
+          { id: 'inv-launcher', label: 'Back to Launcher', hint: 'All FlockOS apps',               run: () => { location.href = '../'; } },
+        ],
       });
     }
 

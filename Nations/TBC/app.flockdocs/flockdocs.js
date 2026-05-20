@@ -214,6 +214,13 @@ function _mountHeader() {
     onHamburger: () => {
       document.getElementById('fd-sidebar-wrap')?.classList.toggle('is-open');
     },
+    features: [
+      { id: 'fd-all-docs',  label: 'All Documents',  hint: 'Browse all docs',        run: () => document.querySelector('[data-view="all-docs"]')?.click() },
+      { id: 'fd-my-docs',   label: 'My Documents',   hint: 'Docs you created',       run: () => document.querySelector('[data-view="my-docs"]')?.click() },
+      { id: 'fd-shared',    label: 'Shared with Me', hint: 'Docs shared with you',   run: () => document.querySelector('[data-view="shared-docs"]')?.click() },
+      { id: 'fd-recent',    label: 'Recent',         hint: 'Recently viewed docs',   run: () => document.querySelector('[data-view="recent"]')?.click() },
+      { id: 'fd-trash',     label: 'Trash',          hint: 'Deleted documents',      run: () => document.querySelector('[data-view="trash"]')?.click() },
+    ],
     extras: [
       {
         html: `<div id="fd-new-btn-wrap" style="position:relative;margin-left:48px"></div>`,

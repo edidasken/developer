@@ -2731,6 +2731,11 @@
         const sb = document.getElementById('bm-sidebar');
         if (sb) sb.classList.toggle('is-open');
       },
+      features: [
+        { id: 'bm-sermons',    label: 'Sermons',      hint: 'Browse all sermons',  run: () => { const sb = document.getElementById('bm-sidebar'); if (sb) sb.classList.add('is-open'); } },
+        { id: 'bm-new-sermon', label: 'New Sermon',   hint: 'Start a new sermon',  run: () => document.getElementById('bm-new-btn')?.click() },
+        { id: 'bm-overview',   label: 'Overview',     hint: 'Close current sermon and return to FEED', run: () => document.getElementById('bm-close-sermon-btn')?.click() },
+      ],
     });
 
     // When a sermon is active, intercept the brand click to close the sermon

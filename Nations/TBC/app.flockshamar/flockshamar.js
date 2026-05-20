@@ -109,7 +109,13 @@ import { mountUnityHeader } from '../Scripts/the_unity_header.js';
           if (sidebar) {
             sidebar.classList.toggle('show');
           }
-        }
+        },
+        features: [
+          { id: 'fs-notes',   label: 'Notes',   hint: 'All your notes',   run: () => document.querySelector('[data-view="notes"]')?.click() },
+          { id: 'fs-todos',   label: 'To-dos',  hint: 'Checklist notes',  run: () => document.querySelector('[data-view="todos"]')?.click() },
+          { id: 'fs-archive', label: 'Archive', hint: 'Archived notes',   run: () => document.querySelector('[data-view="archive"]')?.click() },
+          { id: 'fs-trash',   label: 'Trash',   hint: 'Deleted notes',    run: () => document.querySelector('[data-view="trash"]')?.click() },
+        ],
       });
     }
     

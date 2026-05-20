@@ -842,7 +842,7 @@
       mountUnityHeader(document.getElementById('ws-header'), {
         appId: 'wellspring',
         appName: 'The Wellspring',
-        appIconSvg: '💧',
+        appIconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/><line x1="12" y1="14" x2="12" y2="18" stroke-opacity="0.5"/></svg>',
         appAccent: '#22c55e',
         appAccentDk: '#16a34a',
         homeHref: 'app.wellspring/app.wellspring.html',
@@ -852,6 +852,11 @@
           try { sessionStorage.clear(); } catch (_) {}
           location.reload();
         },
+        features: [
+          { id: 'ws-status',  label: 'Sync Status',   hint: 'View current sync status',    run: () => document.getElementById('ws-status-section')?.scrollIntoView({ behavior: 'smooth' }) },
+          { id: 'ws-vault',   label: 'Vault Status',  hint: 'View local vault status',     run: () => document.getElementById('ws-vault-section')?.scrollIntoView({ behavior: 'smooth' }) },
+          { id: 'ws-refresh', label: 'Refresh Status', hint: 'Re-check sync and vault',    run: () => document.getElementById('ws-refresh-btn')?.click() },
+        ],
       });
       // Wait for TheWellspring to be available
       const ws = await waitForWellspring();
