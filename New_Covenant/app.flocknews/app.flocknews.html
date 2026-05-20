@@ -1485,6 +1485,42 @@
     .fn-word-examples,
     .fn-word-strongs       { color: rgba(15,23,53,0.6) !important; }
 
+    /* 13a ── BIBLE BOOK OF THE DAY — header layout + title size */
+    .fn-book-header {
+      display: flex !important;
+      align-items: center !important;
+      gap: 20px !important;
+      padding: 0 0 20px !important;
+      border-bottom: 1px solid rgba(232,168,56,0.35) !important;
+      margin-bottom: 28px !important;
+    }
+    .fn-book-icon {
+      font-size: 52px !important;
+      line-height: 1 !important;
+      flex-shrink: 0 !important;
+    }
+    /* Book TITLE is an h3 inside .fn-book-info — needs ID in selector to beat #fn-news-feed .card-body h3 */
+    #fn-news-feed .fn-book-info h3 {
+      font-family: 'Playfair Display', Georgia, serif !important;
+      font-size: 42px !important;
+      font-weight: 800 !important;
+      letter-spacing: -0.5px !important;
+      text-transform: none !important;
+      color: #0f1735 !important;
+      border-bottom: none !important;
+      padding-bottom: 4px !important;
+      margin: 0 0 6px !important;
+      line-height: 1.05 !important;
+    }
+    #fn-news-feed .fn-book-meta {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 2px !important;
+      color: #c48a20 !important;
+    }
+
     /* 13 ── STAT/MISSION WIDGETS */
     .fn-book-stats         { background: rgba(15,23,53,0.06) !important; border-radius: 4px !important; }
     .fn-book-stat-value    { color: #c48a20 !important; }
