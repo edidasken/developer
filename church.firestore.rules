@@ -3,12 +3,30 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     // ═══════════════════════════════════════════════════════════
-    // DEMO MODE - ALL PERMISSIONS OPEN FOR SIGNED-IN USERS
+    // AUTH REQUIRED - All collections require Firebase Auth sign-in.
+    // Sensitive collections (backgroundChecks, checkrCandidates) are
+    // explicitly listed here. Role enforcement at the DB level requires
+    // Firebase custom claims (set via Admin SDK at login time).
+    // TODO: Add isPastorOrAdmin() helper once custom claims are issued:
+    //   function isPastorOrAdmin() {
+    //     return request.auth.token.role == 'admin'
+    //         || request.auth.token.role == 'pastor';
+    //   }
     // ═══════════════════════════════════════════════════════════
-    
+
     // Helper function: Check if user is signed in
     function isSignedIn() {
       return request.auth != null;
+    }
+
+    // ── Background Checks (CA DOJ / AB-506 — highly sensitive) ───
+    match /backgroundChecks/{docId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+
+    // ── Checkr Candidates (PII — sensitive) ──────────────────────
+    match /checkrCandidates/{docId} {
+      allow read, create, update, delete: if isSignedIn();
     }
     
     // ── Church Settings ────────────────────────────────────────
