@@ -160,8 +160,14 @@ function init() {
   }
 
   if (profile) {
+    // profile.uid may be absent when Nehemiah returns a GAS-based profile
+    // (sessionStorage flock_auth_profile has no uid field). Fall back to
+    // the Firebase Auth currentUser uid so Firestore queries work.
+    const fbUid = (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser)
+      ? firebase.auth().currentUser.uid
+      : undefined;
     S.user = {
-      uid: profile.uid,
+      uid: profile.uid || fbUid,
       displayName: profile.displayName || profile.email,
       email: profile.email,
       role: profile.role || 'member',
