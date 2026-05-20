@@ -38,6 +38,7 @@ export const NC_APP_ICONS = {
   feed:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
   wellspring: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/><line x1="12" y1="14" x2="12" y2="18" stroke-opacity="0.5"/></svg>',
   melchizedek: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/><polyline points="9,12 11,14 15,10"/></svg>',
+  pastor:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 22V9"/><path d="M10 9a5 5 0 0 1 10 0 5 5 0 0 1-5 5"/></svg>',
 };
 
 /* Canonical app catalog. Order = launcher order (Public first, then Secure). */
@@ -54,6 +55,7 @@ export const NC_APPS = [
   { id: 'feed',      name: 'FEED',           sub: 'Sermon prep & study tools',      href: 'app.feed/',                      tone: 'gold'   },
   { id: 'wellspring', name: 'The Wellspring', sub: 'Offline data & local database',  href: 'app.wellspring/app.wellspring.html', tone: 'green' },
   { id: 'melchizedek', name: 'Melchizedek',   sub: 'Background checks — powered by Checkr', href: 'app.melchizedek/app.melchizedek.html', tone: 'gold' },
+  { id: 'pastor',      name: 'For the Pastor', sub: 'Home & app launcher',                    href: 'index.html',                           tone: 'gold' },
 ];
 
 /* ─── Styles (injected once) ────────────────────────────────────────────── */
