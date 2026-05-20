@@ -2096,11 +2096,11 @@
        date line at the right edge. Cream background — looks like the
        front page of a print broadsheet.
        ══════════════════════════════════════════════════════════════════ */
-    [data-section="mission"]    .card-header,
-    [data-section="reading"]    .card-header,
-    [data-section="devotional"] .card-header,
-    [data-section="words"]      .card-header,
-    [data-section="book"]       .card-header {
+    #fn-news-feed [data-section="mission"]    .card-header,
+    #fn-news-feed [data-section="reading"]    .card-header,
+    #fn-news-feed [data-section="devotional"] .card-header,
+    #fn-news-feed [data-section="words"]      .card-header,
+    #fn-news-feed [data-section="book"]       .card-header {
       background: var(--fn-bg) !important;
       border: none !important;
       border-top: 4px double #0f1735 !important;
@@ -2112,20 +2112,20 @@
         0 6px 0 #0f1735 !important;
       margin-bottom: 14px !important;
     }
-    [data-section="mission"]    .card-header > div:first-child,
-    [data-section="reading"]    .card-header > div:first-child,
-    [data-section="devotional"] .card-header > div:first-child,
-    [data-section="words"]      .card-header > div:first-child,
-    [data-section="book"]       .card-header > div:first-child {
+    #fn-news-feed [data-section="mission"]    .card-header > div:first-child,
+    #fn-news-feed [data-section="reading"]    .card-header > div:first-child,
+    #fn-news-feed [data-section="devotional"] .card-header > div:first-child,
+    #fn-news-feed [data-section="words"]      .card-header > div:first-child,
+    #fn-news-feed [data-section="book"]       .card-header > div:first-child {
       padding: 0 28px 12px !important;
       gap: 14px !important;
       align-items: baseline !important;
     }
-    [data-section="mission"]    .card-header div[style*="font-weight: 700"],
-    [data-section="reading"]    .card-header div[style*="font-weight: 700"],
-    [data-section="devotional"] .card-header div[style*="font-weight: 700"],
-    [data-section="words"]      .card-header div[style*="font-weight: 700"],
-    [data-section="book"]       .card-header div[style*="font-weight: 700"] {
+    #fn-news-feed [data-section="mission"]    .card-header div[style*="font-weight: 700"],
+    #fn-news-feed [data-section="reading"]    .card-header div[style*="font-weight: 700"],
+    #fn-news-feed [data-section="devotional"] .card-header div[style*="font-weight: 700"],
+    #fn-news-feed [data-section="words"]      .card-header div[style*="font-weight: 700"],
+    #fn-news-feed [data-section="book"]       .card-header div[style*="font-weight: 700"] {
       font-family: 'Playfair Display', Georgia, serif !important;
       font-size: clamp(28px, 3.6vw, 40px) !important;
       font-weight: 900 !important;
@@ -2134,16 +2134,167 @@
       color: #0f1735 !important;
       line-height: 1 !important;
     }
-    [data-section="mission"]    .card-header .fn-section-icon,
-    [data-section="reading"]    .card-header .fn-section-icon,
-    [data-section="devotional"] .card-header .fn-section-icon,
-    [data-section="words"]      .card-header .fn-section-icon,
-    [data-section="book"]       .card-header .fn-section-icon {
+    #fn-news-feed [data-section="mission"]    .card-header .fn-section-icon,
+    #fn-news-feed [data-section="reading"]    .card-header .fn-section-icon,
+    #fn-news-feed [data-section="devotional"] .card-header .fn-section-icon,
+    #fn-news-feed [data-section="words"]      .card-header .fn-section-icon,
+    #fn-news-feed [data-section="book"]       .card-header .fn-section-icon {
       font-size: 24px !important;
       opacity: 0.5 !important;
     }
     /* Body padding under the section flag */
-    [data-section="mission"] .card-body { padding-top: 18px !important; }
+    #fn-news-feed [data-section="mission"] .card-body { padding-top: 18px !important; }
+
+    /* ══════════════════════════════════════════════════════════════════
+       ◈  PER-SECTION PAPER TINTS & ACCENT COLORS
+       Each editorial section gets a subtle paper-stock tint plus a
+       colored top-rule on the section flag. Tints are MUCH lighter than
+       the surrounding cream — never dark — so the page still reads as a
+       single broadsheet, but each article block is visually distinct.
+       ══════════════════════════════════════════════════════════════════ */
+    #fn-news-feed [data-section="introduction"]  { background: #faf3e3 !important; }
+    #fn-news-feed [data-section="pastorHeart"]   { background: #faece4 !important; } /* warm cream */
+    #fn-news-feed [data-section="announcements"] { background: #f1ecdf !important; } /* dun */
+    #fn-news-feed [data-section="mission"]       { background: #f7f1e2 !important; } /* parchment */
+    #fn-news-feed [data-section="reading"]       { background: #eef0e8 !important; } /* sage cream */
+    #fn-news-feed [data-section="devotional"]    { background: #f9ece9 !important; } /* rose cream */
+    #fn-news-feed [data-section="words"]         { background: #ecf1f0 !important; } /* mint cream */
+    #fn-news-feed [data-section="book"]          { background: #f5ecdb !important; } /* old-book tan */
+
+    /* Section flag inherits the article tint so the flag merges with body */
+    #fn-news-feed [data-section="mission"]    .card,
+    #fn-news-feed [data-section="reading"]    .card,
+    #fn-news-feed [data-section="devotional"] .card,
+    #fn-news-feed [data-section="words"]      .card,
+    #fn-news-feed [data-section="book"]       .card {
+      background: transparent !important;
+    }
+    #fn-news-feed [data-section="mission"]    .card-header,
+    #fn-news-feed [data-section="reading"]    .card-header,
+    #fn-news-feed [data-section="devotional"] .card-header,
+    #fn-news-feed [data-section="words"]      .card-header,
+    #fn-news-feed [data-section="book"]       .card-header,
+    #fn-news-feed [data-section="mission"]    .card-body,
+    #fn-news-feed [data-section="reading"]    .card-body,
+    #fn-news-feed [data-section="devotional"] .card-body,
+    #fn-news-feed [data-section="words"]      .card-body,
+    #fn-news-feed [data-section="book"]       .card-body {
+      background: transparent !important;
+    }
+
+    /* Match the double-rule "box-shadow trick" backstop to the tint */
+    #fn-news-feed [data-section="mission"]    .card-header { box-shadow: 0 1px 0 #0f1735, 0 5px 0 #f7f1e2, 0 6px 0 #0f1735 !important; }
+    #fn-news-feed [data-section="reading"]    .card-header { box-shadow: 0 1px 0 #0f1735, 0 5px 0 #eef0e8, 0 6px 0 #0f1735 !important; }
+    #fn-news-feed [data-section="devotional"] .card-header { box-shadow: 0 1px 0 #0f1735, 0 5px 0 #f9ece9, 0 6px 0 #0f1735 !important; }
+    #fn-news-feed [data-section="words"]      .card-header { box-shadow: 0 1px 0 #0f1735, 0 5px 0 #ecf1f0, 0 6px 0 #0f1735 !important; }
+    #fn-news-feed [data-section="book"]       .card-header { box-shadow: 0 1px 0 #0f1735, 0 5px 0 #f5ecdb, 0 6px 0 #0f1735 !important; }
+
+    /* Per-section accent: small colored bar above the section flag */
+    #fn-news-feed [data-section="introduction"]  .card-header::before,
+    #fn-news-feed [data-section="pastorHeart"]   .card-header::before,
+    #fn-news-feed [data-section="announcements"] .card-header::before,
+    #fn-news-feed [data-section="mission"]       .card-header::before,
+    #fn-news-feed [data-section="reading"]       .card-header::before,
+    #fn-news-feed [data-section="devotional"]    .card-header::before,
+    #fn-news-feed [data-section="words"]         .card-header::before,
+    #fn-news-feed [data-section="book"]          .card-header::before {
+      content: '' !important;
+      position: absolute !important;
+      top: -4px; left: 0; right: 0;
+      height: 4px !important;
+      display: block !important;
+    }
+    #fn-news-feed [data-section="mission"]    .card-header::before { background: #c48a20 !important; } /* gold  */
+    #fn-news-feed [data-section="reading"]    .card-header::before { background: #2f6b4f !important; } /* sage  */
+    #fn-news-feed [data-section="devotional"] .card-header::before { background: #a8362f !important; } /* red   */
+    #fn-news-feed [data-section="words"]      .card-header::before { background: #1d6470 !important; } /* teal  */
+    #fn-news-feed [data-section="book"]       .card-header::before { background: #7a4a1f !important; } /* sepia */
+
+    /* Section flag title color picks up the accent */
+    #fn-news-feed [data-section="reading"]    .card-header div[style*="font-weight: 700"] { color: #1f4a36 !important; }
+    #fn-news-feed [data-section="devotional"] .card-header div[style*="font-weight: 700"] { color: #762824 !important; }
+    #fn-news-feed [data-section="words"]      .card-header div[style*="font-weight: 700"] { color: #134850 !important; }
+    #fn-news-feed [data-section="book"]       .card-header div[style*="font-weight: 700"] { color: #5d381a !important; }
+
+    /* ── Sub-article tints inside Mission — alternate so each is distinct ── */
+    #fn-news-feed [data-section="mission"] .fn-unreached-card,
+    #fn-news-feed [data-section="mission"] .fn-bible-access-card {
+      background: rgba(255,255,255,0.55) !important;
+      padding: 16px 18px 22px !important;
+      border-radius: 2px !important;
+    }
+    #fn-news-feed [data-section="mission"] .fn-country-card,
+    #fn-news-feed [data-section="mission"] .fn-frontlines-card {
+      background: rgba(15,23,53,0.04) !important;
+      padding: 16px 18px 22px !important;
+      border-radius: 2px !important;
+    }
+
+    /* ══════════════════════════════════════════════════════════════════
+       ◈  RESPONSIVE BREAKPOINT TUNING
+       ══════════════════════════════════════════════════════════════════ */
+    @media (max-width: 1180px) {
+      #fn-news-feed [data-section="mission"] .fn-unreached-summary {
+        column-count: 1 !important;
+      }
+    }
+    @media (max-width: 900px) {
+      #fn-news-feed [data-section="mission"]    .card-header div[style*="font-weight: 700"],
+      #fn-news-feed [data-section="reading"]    .card-header div[style*="font-weight: 700"],
+      #fn-news-feed [data-section="devotional"] .card-header div[style*="font-weight: 700"],
+      #fn-news-feed [data-section="words"]      .card-header div[style*="font-weight: 700"],
+      #fn-news-feed [data-section="book"]       .card-header div[style*="font-weight: 700"] {
+        font-size: 26px !important;
+      }
+      #fn-news-feed [data-section="mission"] .fn-unreached-name,
+      #fn-news-feed [data-section="mission"] .fn-country-title h3,
+      #fn-news-feed [data-section="mission"] .fn-bible-access-title h3,
+      #fn-news-feed [data-section="mission"] .fn-frontlines-title h3 {
+        font-size: 30px !important;
+      }
+    }
+    @media (max-width: 640px) {
+      #fn-news-feed [data-section="mission"]    .card-header > div:first-child,
+      #fn-news-feed [data-section="reading"]    .card-header > div:first-child,
+      #fn-news-feed [data-section="devotional"] .card-header > div:first-child,
+      #fn-news-feed [data-section="words"]      .card-header > div:first-child,
+      #fn-news-feed [data-section="book"]       .card-header > div:first-child {
+        padding: 0 16px 10px !important;
+      }
+      #fn-news-feed [data-section="mission"]    .card-header div[style*="font-weight: 700"],
+      #fn-news-feed [data-section="reading"]    .card-header div[style*="font-weight: 700"],
+      #fn-news-feed [data-section="devotional"] .card-header div[style*="font-weight: 700"],
+      #fn-news-feed [data-section="words"]      .card-header div[style*="font-weight: 700"],
+      #fn-news-feed [data-section="book"]       .card-header div[style*="font-weight: 700"] {
+        font-size: 22px !important;
+        letter-spacing: 0 !important;
+      }
+      #fn-news-feed [data-section="mission"] .fn-unreached-name,
+      #fn-news-feed [data-section="mission"] .fn-country-title h3,
+      #fn-news-feed [data-section="mission"] .fn-bible-access-title h3,
+      #fn-news-feed [data-section="mission"] .fn-frontlines-title h3 {
+        font-size: 26px !important;
+        letter-spacing: -0.5px !important;
+      }
+      #fn-news-feed [data-section="mission"] .fn-unreached-photo {
+        float: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 200px !important;
+        margin: 0 0 14px !important;
+      }
+      #fn-news-feed [data-section="mission"] .fn-country-stats {
+        grid-template-columns: 1fr !important;
+      }
+      #fn-news-feed [data-section="mission"] .fn-country-stat {
+        border-right: none !important;
+        border-bottom: 1px solid rgba(15,23,53,0.10) !important;
+      }
+      #fn-news-feed [data-section="mission"] .fn-country-stat:last-child {
+        border-bottom: none !important;
+      }
+    }
+  </style>
 
     /* ── Sub-article hierarchy inside Mission ──
        Demote the gold kicker, promote the article headline so the
