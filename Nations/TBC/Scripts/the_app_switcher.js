@@ -42,7 +42,7 @@ export const NC_APP_ICONS = {
 
 /* Canonical app catalog. Order = launcher order (Public first, then Secure). */
 export const NC_APPS = [
-  { id: 'launcher',  name: 'Launcher',       sub: 'All apps',                       href: './',                             tone: 'gold'   },
+  { id: 'flocknews', name: 'FlockNews',      sub: 'Daily spiritual content',        href: 'app.flocknews/app.flocknews.html', tone: 'gold' },
   { id: 'grow',      name: 'GROW',           sub: 'Discipleship & Bible study',     href: 'app.grow/app.grow.html',         tone: 'gold'   },
   { id: 'invite',    name: 'The Invitation', sub: 'Share the hope of Jesus Christ', href: 'app.invite/app.invite.html',     tone: 'green'  },
   { id: 'flockos',   name: 'FlockOS',        sub: 'Church management',              href: 'app.flockos/app.flockos.html',   tone: 'blue'   },
@@ -51,7 +51,6 @@ export const NC_APPS = [
   { id: 'flockchat', name: 'FlockChat',      sub: 'Messaging & prayer chain',       href: 'app.flockchat/app.flockchat.html', tone: 'cyan' },
   { id: 'flockdocs', name: 'FlockDocs',      sub: 'Documents & productivity',       href: 'app.flockdocs/app.flockdocs.html', tone: 'blue' },
   { id: 'flockshamar', name: 'FlockShamar',  sub: 'Keep & guard your notes',        href: 'app.flockshamar/app.flockshamar.html', tone: 'gold' },
-  { id: 'flocknews', name: 'FlockNews',      sub: 'Daily spiritual content',        href: 'app.flocknews/app.flocknews.html', tone: 'gold' },
   { id: 'feed',      name: 'FEED',           sub: 'Sermon prep & study tools',      href: 'app.feed/',                      tone: 'gold'   },
   { id: 'wellspring', name: 'The Wellspring', sub: 'Offline data & local database',  href: 'app.wellspring/app.wellspring.html', tone: 'green' },
   { id: 'melchizedek', name: 'Melchizedek',   sub: 'Background checks — powered by Checkr', href: 'app.melchizedek/app.melchizedek.html', tone: 'gold' },
