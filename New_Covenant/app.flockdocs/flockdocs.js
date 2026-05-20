@@ -1115,20 +1115,21 @@ function _renderSpreadsheet() {
 
   let html = '<table class="fd-spreadsheet-table"><thead><tr><th class="fd-cell-header"></th>';
   
-  // Column headers
+  // Column headers with resize handles
   for (let c = 0; c < cols; c++) {
     const col = String.fromCharCode(65 + c); // A, B, C, ...
-    html += `<th class="fd-cell-header">${col}</th>`;
+    const width = S.currentDoc.columnWidths?.[col] || 100;
+    html += `<th class="fd-cell-header" data-col="${col}" style="width:${width}px;min-width:${width}px">${col}<div class="fd-col-resize-handle" data-col="${col}"></div></th>`;
   }
   html += '</tr></thead><tbody>';
 
-  // Rows
+  // Rows with height and row-resize handles
   for (let r = 1; r <= rows; r++) {
-    html += `<tr><th class="fd-cell-header">${r}</th>`;
+    const rowH = S.currentDoc.rowHeights?.[r] || 28;
+    html += `<tr style="height:${rowH}px"><th class="fd-cell-header" data-row="${r}">${r}<div class="fd-row-resize-handle" data-row="${r}"></div></th>`;
     for (let c = 0; c < cols; c++) {
       const col = String.fromCharCode(65 + c);
       const cellId = `${col}${r}`;
-      const cellData = S.currentDoc.cells?.[cellId];
       const value = _getCellDisplayValue(cellId);
       
       html += `<td class="fd-cell" data-cell="${cellId}" data-row="${r}" data-col="${col}">`;
@@ -1147,9 +1148,113 @@ function _renderSpreadsheet() {
     cell.addEventListener('dblclick', (e) => _onCellDoubleClick(e.currentTarget));
   });
 
+  // Bind resize handles
+  _initResizeHandles(container);
+
   // Update name in title
   const titleEl = document.getElementById('fd-spreadsheet-title');
   if (titleEl) titleEl.textContent = S.currentDoc.name || 'Untitled Spreadsheet';
+}
+
+function _initResizeHandles(container) {
+  container.querySelectorAll('.fd-col-resize-handle').forEach(handle => {
+    handle.addEventListener('mousedown', _onColResizeStart);
+    handle.addEventListener('touchstart', _onColResizeTouchStart, { passive: false });
+  });
+  container.querySelectorAll('.fd-row-resize-handle').forEach(handle => {
+    handle.addEventListener('mousedown', _onRowResizeStart);
+    handle.addEventListener('touchstart', _onRowResizeTouchStart, { passive: false });
+  });
+}
+
+function _onColResizeStart(e) {
+  e.preventDefault(); e.stopPropagation();
+  const col = e.currentTarget.dataset.col;
+  const th = e.currentTarget.closest('th');
+  const container = document.getElementById('fd-spreadsheet-container');
+  const startX = e.clientX;
+  const startWidth = th.offsetWidth;
+  const onMove = (ev) => {
+    const w = Math.max(40, startWidth + (ev.clientX - startX));
+    th.style.width = w + 'px'; th.style.minWidth = w + 'px';
+    container.querySelectorAll(`td[data-col="${col}"]`).forEach(td => { td.style.width = w + 'px'; td.style.minWidth = w + 'px'; });
+  };
+  const onUp = (ev) => {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    S.currentDoc.columnWidths = S.currentDoc.columnWidths || {};
+    S.currentDoc.columnWidths[col] = Math.max(40, startWidth + (ev.clientX - startX));
+    _autoSave();
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function _onColResizeTouchStart(e) {
+  e.preventDefault(); e.stopPropagation();
+  const touch = e.touches[0];
+  const col = e.currentTarget.dataset.col;
+  const th = e.currentTarget.closest('th');
+  const container = document.getElementById('fd-spreadsheet-container');
+  const startX = touch.clientX;
+  const startWidth = th.offsetWidth;
+  const onMove = (ev) => {
+    const t = ev.touches[0];
+    const w = Math.max(40, startWidth + (t.clientX - startX));
+    th.style.width = w + 'px'; th.style.minWidth = w + 'px';
+    container.querySelectorAll(`td[data-col="${col}"]`).forEach(td => { td.style.width = w + 'px'; td.style.minWidth = w + 'px'; });
+  };
+  const onEnd = () => {
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+    S.currentDoc.columnWidths = S.currentDoc.columnWidths || {};
+    S.currentDoc.columnWidths[col] = th.offsetWidth;
+    _autoSave();
+  };
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onEnd);
+}
+
+function _onRowResizeStart(e) {
+  e.preventDefault(); e.stopPropagation();
+  const row = e.currentTarget.dataset.row;
+  const tr = e.currentTarget.closest('tr');
+  const startY = e.clientY;
+  const startHeight = tr.offsetHeight;
+  const onMove = (ev) => {
+    tr.style.height = Math.max(20, startHeight + (ev.clientY - startY)) + 'px';
+  };
+  const onUp = (ev) => {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    S.currentDoc.rowHeights = S.currentDoc.rowHeights || {};
+    S.currentDoc.rowHeights[row] = Math.max(20, startHeight + (ev.clientY - startY));
+    _autoSave();
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function _onRowResizeTouchStart(e) {
+  e.preventDefault(); e.stopPropagation();
+  const touch = e.touches[0];
+  const row = e.currentTarget.dataset.row;
+  const tr = e.currentTarget.closest('tr');
+  const startY = touch.clientY;
+  const startHeight = tr.offsetHeight;
+  const onMove = (ev) => {
+    const t = ev.touches[0];
+    tr.style.height = Math.max(20, startHeight + (t.clientY - startY)) + 'px';
+  };
+  const onEnd = () => {
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+    S.currentDoc.rowHeights = S.currentDoc.rowHeights || {};
+    S.currentDoc.rowHeights[row] = tr.offsetHeight;
+    _autoSave();
+  };
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onEnd);
 }
 
 function _onCellClick(cellEl) {
