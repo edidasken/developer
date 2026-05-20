@@ -1579,7 +1579,7 @@ function _generateWaiver(memberId, displayName) {
   <meta charset="UTF-8">
   <title>AB-506 Annual Waiver — ${_e(displayName)}</title>
   <style>
-    @page { margin: 0.85in 1in; }
+    @page { size: letter; margin: 0.85in 1in; }
     * { box-sizing: border-box; }
     body {
       font-family: 'Times New Roman', Times, serif;
@@ -1588,9 +1588,8 @@ function _generateWaiver(memberId, displayName) {
       color: #111;
       background: #fff;
       margin: 0;
-      padding: 0;
+      padding: 24px 32px;
     }
-    .page { max-width: 7.5in; margin: 0 auto; }
     .header {
       text-align: center;
       border-bottom: 2px solid #111;
@@ -1697,18 +1696,19 @@ function _generateWaiver(memberId, displayName) {
       padding-top: 8px;
     }
     @media print {
-      body { font-size: 10.5pt; }
+      body { font-size: 10.5pt; padding: 0; }
       .no-print { display: none !important; }
     }
   </style>
 </head>
 <body>
-<div class="page">
 
   <!-- PRINT BUTTON (hidden when printing) -->
   <div class="no-print" style="text-align:right;margin-bottom:14px">
-    <button onclick="window.print()" style="padding:8px 20px;font:bold 11pt sans-serif;background:#1b264f;color:#fff;border:none;border-radius:6px;cursor:pointer">Print / Save PDF</button>
+    <button onclick="window.print()" style="padding:8px 20px;font:bold 11pt sans-serif;background:#1b264f;color:#fff;border:none;border-radius:6px;cursor:pointer">Save as PDF / Print</button>
   </div>
+
+<div class="page">
 
   <div class="header">
     <div class="org-name">${_e(org)}</div>
@@ -1874,20 +1874,27 @@ function _generateWaiver(memberId, displayName) {
   </div>
 
 </div>
+
+<script>
+  // Auto-open Save as PDF dialog after page renders
+  window.addEventListener('load', () => {
+    setTimeout(() => window.print(), 400);
+  });
+</script>
 </body>
 </html>`;
 
-  const blob    = new Blob([html], { type: 'text/html;charset=utf-8' });
-  const url     = URL.createObjectURL(blob);
-  const a       = document.createElement('a');
-  const safeName = (displayName || 'Member').replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-');
-  const year    = new Date().getFullYear();
-  a.href        = url;
-  a.download    = `AB506-Waiver-${safeName}-${year}.html`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if (!win) {
+    // Fallback: download the HTML file if popup truly blocked
+    const a = document.createElement('a');
+    const safeName = (displayName || 'Member').replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-');
+    a.href = url; a.download = `AB506-Waiver-${safeName}-${new Date().getFullYear()}.html`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 
 async function _saveParentNotif({ memberId, sent, sentDate, method, confirmedDate }) {
