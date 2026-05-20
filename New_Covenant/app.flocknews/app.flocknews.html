@@ -1477,13 +1477,75 @@
       border-top: 1px solid rgba(15,23,53,0.12) !important;
       border-radius: 4px !important;
     }
-    .fn-word-term          { color: #0f1735 !important; }
-    .fn-word-language      { color: #c48a20 !important; }
-    .fn-word-transliteration { color: rgba(15,23,53,0.55) !important; }
-    .fn-word-definition    { color: #0f1735 !important; }
+    /* ── WORD OF THE DAY — complete newspaper card treatment ── */
+    #fn-news-feed #fn-greek-word,
+    #fn-news-feed #fn-hebrew-word {
+      padding: 28px 32px 24px !important;
+    }
+    /* Language label: gold uppercase with bottom rule */
+    #fn-news-feed #fn-greek-word .fn-word-language,
+    #fn-news-feed #fn-hebrew-word .fn-word-language {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      letter-spacing: 3px !important;
+      color: #c48a20 !important;
+      text-transform: uppercase !important;
+      padding-bottom: 12px !important;
+      margin-bottom: 16px !important;
+      border-bottom: 1px solid rgba(15,23,53,0.15) !important;
+      display: block !important;
+    }
+    /* Large word: dark navy Playfair italic */
+    #fn-news-feed #fn-greek-word .fn-word-term,
+    #fn-news-feed #fn-hebrew-word .fn-word-term {
+      font-family: 'Playfair Display', Georgia, serif !important;
+      font-size: 44px !important;
+      font-style: italic !important;
+      font-weight: 700 !important;
+      color: #0f1735 !important;
+      line-height: 1.15 !important;
+      margin-bottom: 8px !important;
+    }
+    /* Transliteration: grey italic Noto Serif */
+    #fn-news-feed #fn-greek-word .fn-word-transliteration,
+    #fn-news-feed #fn-hebrew-word .fn-word-transliteration {
+      font-family: 'Noto Serif', Georgia, serif !important;
+      font-style: italic !important;
+      font-size: 18px !important;
+      color: rgba(15,23,53,0.40) !important;
+      margin-bottom: 20px !important;
+    }
+    /* Definition: bold dark navy */
+    .fn-word-definition    {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 16px !important;
+      font-weight: 700 !important;
+      color: #0f1735 !important;
+      margin-bottom: 14px !important;
+    }
+    /* Description/examples: Noto Serif readable */
     .fn-word-description,
-    .fn-word-examples,
-    .fn-word-strongs       { color: rgba(15,23,53,0.6) !important; }
+    .fn-word-examples {
+      font-family: 'Noto Serif', Georgia, serif !important;
+      font-size: 14px !important;
+      color: rgba(15,23,53,0.70) !important;
+      line-height: 1.75 !important;
+      margin-bottom: 10px !important;
+    }
+    /* Strong's: muted, separated with top rule */
+    .fn-word-strongs {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      letter-spacing: 1px !important;
+      text-transform: uppercase !important;
+      color: rgba(15,23,53,0.35) !important;
+      display: block !important;
+      margin-top: 16px !important;
+      padding-top: 10px !important;
+      border-top: 1px solid rgba(15,23,53,0.10) !important;
+    }
 
     /* 13a ── BIBLE BOOK OF THE DAY — header layout + title size */
     .fn-book-header {
@@ -1552,10 +1614,49 @@
     .fn-unreached-stats span { color: #1a1a2e !important; }
     .fn-frontlines-stat-highlight { background: rgba(232,168,56,0.1) !important; }
 
-    /* 14 ── REACTION BAR on cream */
+    /* 14 ── REACTION BAR on cream (general) */
     .fn-card-reaction-bar  { border-top-color: rgba(15,23,53,0.1) !important; }
     .fn-reaction-bubble    { color: #0f1735 !important; }
     .fn-reaction-bubble.active { color: #c48a20 !important; background: rgba(200,138,32,0.12) !important; }
+
+    /* 15 ── WORD CARD REACTIONS — navy background, gold text */
+    #fn-greek-word .fn-card-reaction-bar,
+    #fn-hebrew-word .fn-card-reaction-bar {
+      border-top-color: rgba(15,23,53,0.18) !important;
+      margin-top: 20px;
+    }
+    #fn-greek-word .fn-reaction-bubble,
+    #fn-hebrew-word .fn-reaction-bubble {
+      background: #0f1735 !important;
+      border-color: #0f1735 !important;
+      color: #e8a838 !important;
+      font-weight: 600 !important;
+    }
+    #fn-greek-word .fn-reaction-bubble:hover,
+    #fn-hebrew-word .fn-reaction-bubble:hover {
+      background: #1b264f !important;
+      border-color: #e8a838 !important;
+      color: #e8a838 !important;
+    }
+    #fn-greek-word .fn-reaction-bubble.active,
+    #fn-hebrew-word .fn-reaction-bubble.active {
+      background: #e8a838 !important;
+      border-color: #c48a20 !important;
+      color: #0f1735 !important;
+    }
+    #fn-greek-word .fn-reaction-add-btn,
+    #fn-hebrew-word .fn-reaction-add-btn {
+      background: #0f1735 !important;
+      border: 1px solid #0f1735 !important;
+      color: #e8a838 !important;
+      font-weight: 600 !important;
+      opacity: 1 !important;
+    }
+    #fn-greek-word .fn-reaction-add-btn:hover,
+    #fn-hebrew-word .fn-reaction-add-btn:hover {
+      background: #1b264f !important;
+      border-color: #e8a838 !important;
+    }
   </style>
 </head>
 <body>
@@ -1688,9 +1789,13 @@
               <div class="fn-word-language">Greek</div>
               <div class="fn-word-term">ἀγάπη</div>
               <div class="fn-word-transliteration">agapē</div>
-              <div style="font-weight: 600; margin-bottom: 12px;">Love; divine, unconditional love</div>
-              <p style="color: var(--ink-muted); line-height: 1.6; margin-bottom: 12px;">This is the highest form of love in Greek, referring to the selfless, sacrificial, unconditional love that God has for humanity and that Christians are called to have for one another. Unlike romantic or familial love, agapē is a choice and an action, not merely a feeling.</p>
-              <div style="font-size: 12px; color: var(--ink-muted); font-family: 'Courier New', monospace;">Strong's G26</div>
+              <div class="fn-word-definition">Love; divine, unconditional love</div>
+              <div class="fn-word-description">This is the highest form of love in Greek, referring to the selfless, sacrificial, unconditional love that God has for humanity and that Christians are called to have for one another. Unlike romantic or familial love, agapē is a choice and an action, not merely a feeling.</div>
+              <div class="fn-word-strongs">Strong's G26</div>
+              <div class="fn-card-reaction-bar">
+                <div class="fn-card-reactions"></div>
+                <div class="fn-reaction-add"><button class="fn-reaction-add-btn" onclick="FlockNews.showReactionPicker('greekWord')" title="Add reaction">➕ React</button></div>
+              </div>
             </div>
 
             <!-- Hebrew Word -->
@@ -1698,9 +1803,13 @@
               <div class="fn-word-language">Hebrew</div>
               <div class="fn-word-term">שָׁלוֹם</div>
               <div class="fn-word-transliteration">shalom</div>
-              <div style="font-weight: 600; margin-bottom: 12px;">Peace; wholeness, completeness, welfare</div>
-              <p style="color: var(--ink-muted); line-height: 1.6; margin-bottom: 12px;">More than just the absence of conflict, shalom represents complete well-being, harmony, and prosperity. It encompasses physical health, emotional wellness, right relationships with God and others, and spiritual wholeness. It's both a greeting and a blessing in Hebrew culture.</p>
-              <div style="font-size: 12px; color: var(--ink-muted); font-family: 'Courier New', monospace;">Strong's H7965</div>
+              <div class="fn-word-definition">Peace; wholeness, completeness, welfare</div>
+              <div class="fn-word-description">More than just the absence of conflict, shalom represents complete well-being, harmony, and prosperity. It encompasses physical health, emotional wellness, right relationships with God and others, and spiritual wholeness. It's both a greeting and a blessing in Hebrew culture.</div>
+              <div class="fn-word-strongs">Strong's H7965</div>
+              <div class="fn-card-reaction-bar">
+                <div class="fn-card-reactions"></div>
+                <div class="fn-reaction-add"><button class="fn-reaction-add-btn" onclick="FlockNews.showReactionPicker('hebrewWord')" title="Add reaction">➕ React</button></div>
+              </div>
             </div>
           </div>
         </div>

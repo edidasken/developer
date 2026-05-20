@@ -1075,6 +1075,7 @@ function renderWords() {
       <div class="fn-word-nuance">${greek.nuance || ''}</div>
       ${greek.examples ? `<div class="fn-word-nuance"><strong>Examples:</strong> ${greek.examples}</div>` : ''}
       <div class="fn-word-strongs">${greek.strongs || ''}</div>
+      ${renderCardReactions('greekWord')}
     `;
   }
 
@@ -1088,6 +1089,7 @@ function renderWords() {
       <div class="fn-word-nuance">${hebrew.nuance || ''}</div>
       ${hebrew.examples ? `<div class="fn-word-nuance"><strong>Examples:</strong> ${hebrew.examples}</div>` : ''}
       <div class="fn-word-strongs">${hebrew.strongs || ''}</div>
+      ${renderCardReactions('hebrewWord')}
     `;
   }
 }
@@ -1727,6 +1729,8 @@ async function addReaction(sectionId, emoji) {
     // Re-render section to show updated reactions
     switch (sectionId) {
       case 'pastorHeart': renderPastorHeart(); break;
+      case 'greekWord':
+      case 'hebrewWord': renderWords(); break;
       // Add other sections as needed
     }
   } catch (err) {
@@ -1776,7 +1780,8 @@ async function toggleReaction(sectionId, emoji) {
     // Re-render section to show updated reactions
     switch (sectionId) {
       case 'pastorHeart': renderPastorHeart(); break;
-      // Add other sections as needed
+      case 'greekWord':
+      case 'hebrewWord': renderWords(); break;
     }
   } catch (err) {
     console.error('Failed to toggle reaction:', err);
