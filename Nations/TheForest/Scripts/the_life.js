@@ -1404,6 +1404,35 @@ const TheLife = (() => {
       }
       // Set initial next review date for new cases
       if (_isNew && priSel) _setNextReview(priSel.value);
+
+      // ── Notes auto-save ──────────────────────────────────────────────────
+      // For existing cases: debounce 1.5 s after last keystroke, then write
+      // only the notes field.  No Save button required.
+      if (notesTa && id && _canViewNotes()) {
+        var _noteTimer = null;
+        notesTa.addEventListener('input', function() {
+          var st1 = document.getElementById('fp-save-status');
+          var st2 = document.getElementById('fp-save-status2');
+          function _stat(msg) { if (st1) st1.textContent = msg; if (st2) st2.textContent = msg; }
+          _stat('Unsaved…');
+          clearTimeout(_noteTimer);
+          var _val = notesTa.value;
+          _noteTimer = setTimeout(function() {
+            _stat('Saving…');
+            var savePromise = _isFB()
+              ? UpperRoom.updateCareCase({ id: id, notes: _val })
+              : TheVine.flock.care.update({ id: id, notes: _val });
+            savePromise.then(function() {
+              _stat('Notes saved ✓');
+              // Keep "saved" visible briefly then clear
+              setTimeout(function() { _stat(''); }, 2500);
+            }).catch(function(e) {
+              console.warn('[TheLife] notes auto-save failed:', e);
+              _stat('Save failed');
+            });
+          }, 1500);
+        });
+      }
     })();
   }
 
