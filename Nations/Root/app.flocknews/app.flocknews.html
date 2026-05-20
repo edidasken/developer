@@ -18,7 +18,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,700;0,800;1,400;1,700&display=swap" rel="stylesheet">
 
   <!-- Flash prevention: apply saved FlockOS theme before first paint -->
   <script>
@@ -1275,6 +1275,388 @@
       .fn-masthead-meta { justify-content: center; }
       .fn-header { padding: 28px 24px 24px; }
     }
+
+    /* ══════════════════════════════════════════════════════════════════
+       ◈  NEWSPAPER BROADSHEET — full body override
+       Cards flip to newsprint (cream bg, dark navy ink).
+       .fn-header masthead is NOT touched — it stays navy exactly as-is.
+       ══════════════════════════════════════════════════════════════════ */
+
+    /* 1 ── RE-SCOPE CSS VARIABLES for dark-on-cream inside the feed
+            Every var(--fn-ink), var(--fn-muted), var(--fn-border)
+            descendant now gets dark navy values automatically.
+            The masthead sits OUTSIDE #fn-news-feed so it is unaffected. */
+    #fn-news-feed {
+      --fn-ink:    #0f1735;
+      --fn-muted:  rgba(15,23,53,0.65);
+      --fn-border: rgba(15,23,53,0.12);
+
+      /* 2 ── BROADSHEET GRID */
+      display: grid !important;
+      grid-template-columns: repeat(12, 1fr) !important;
+      gap: 0 !important;
+      grid-auto-flow: dense;
+      border-top:    3px double var(--fn-gold);
+      border-bottom: 3px double var(--fn-gold);
+    }
+
+    /* Column spans — broadsheet layout */
+    [data-section="introduction"]  { grid-column: span 12; }
+    [data-section="pastorHeart"]   { grid-column: span 8; border-right: 1px solid rgba(232,168,56,0.3); }
+    [data-section="announcements"] { grid-column: span 4; }
+    [data-section="mission"]       { grid-column: span 4; border-right: 1px solid rgba(232,168,56,0.3); }
+    [data-section="reading"]       { grid-column: span 4; border-right: 1px solid rgba(232,168,56,0.3); }
+    [data-section="devotional"]    { grid-column: span 4; }
+    [data-section="book"]          { grid-column: span 8; border-right: 1px solid rgba(232,168,56,0.3); }
+    [data-section="words"]         { grid-column: span 4; }
+
+    @media (max-width: 1024px) {
+      [data-section="pastorHeart"]   { grid-column: span 7; }
+      [data-section="announcements"] { grid-column: span 5; border-right: none; }
+      [data-section="mission"]       { grid-column: span 12; border-right: none; }
+      [data-section="reading"]       { grid-column: span 6; }
+      [data-section="devotional"]    { grid-column: span 6; border-right: none; }
+      [data-section="book"]          { grid-column: span 12; border-right: none; }
+      [data-section="words"]         { grid-column: span 12; }
+    }
+    @media (max-width: 640px) {
+      #fn-news-feed { grid-template-columns: 1fr !important; }
+      [data-section] { grid-column: span 1 !important; border-right: none !important; }
+    }
+
+    /* 3 ── NEWSPRINT CARDS: transparent on cream page */
+    #fn-news-feed .card {
+      background: var(--fn-bg) !important;
+      border: none !important;
+      border-top: 3px double var(--fn-gold) !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      overflow: visible !important;
+      margin-bottom: 0 !important;
+      transform: none !important;
+    }
+    #fn-news-feed .card:hover {
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* 4 ── SECTION FLAG: narrow navy banner + gold section label */
+    #fn-news-feed .card-header {
+      background: #0f1735 !important;
+      border-top: none !important;
+      border-bottom: 2px solid rgba(232,168,56,0.45) !important;
+      padding: 0 !important;
+    }
+    #fn-news-feed .card-header::before { display: none !important; }
+    #fn-news-feed .card-header > div:first-child {
+      padding: 8px 24px 7px !important;
+      gap: 8px !important;
+    }
+    #fn-news-feed .card-header div[style*="font-weight: 700"] {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 4px !important;
+      text-transform: uppercase !important;
+      color: #e8a838 !important;
+    }
+    .fn-section-icon { font-size: 11px !important; opacity: 0.55 !important; }
+
+    /* 5 ── CARD BODY: cream paper, dark ink */
+    #fn-news-feed .card-body {
+      background: var(--fn-bg) !important;
+      color: #0f1735 !important;
+      padding: 28px 28px 32px !important;
+    }
+    [data-section="introduction"] .card-body,
+    [data-section="pastorHeart"]  .card-body { padding: 32px 36px 40px !important; }
+
+    /* 6 ── HEADLINES: Playfair Display, dark navy */
+    #fn-news-feed .card-body h2 {
+      font-family: 'Playfair Display', Georgia, serif !important;
+      color: #0f1735 !important;
+      font-size: 34px !important;
+      font-weight: 800 !important;
+      letter-spacing: -0.5px !important;
+      line-height: 1.1 !important;
+      border-bottom: 1px solid rgba(232,168,56,0.4) !important;
+      padding-bottom: 12px !important;
+      margin-bottom: 16px !important;
+    }
+    [data-section="introduction"] .card-body h2 {
+      font-size: 48px !important;
+      text-align: center !important;
+    }
+
+    /* 7 ── SUBHEADS: narrow newspaper dek */
+    #fn-news-feed .card-body h3 {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      color: #c48a20 !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 3.5px !important;
+      padding-bottom: 6px !important;
+      border-bottom: 1px solid rgba(232,168,56,0.25) !important;
+      margin: 24px 0 8px !important;
+    }
+
+    /* 8 ── BODY TEXT: Noto Serif, dark on cream */
+    #fn-news-feed .card-body p {
+      font-family: 'Noto Serif', Georgia, serif !important;
+      color: #1a1a2e !important;
+      font-size: 15px !important;
+      line-height: 1.9 !important;
+      margin-bottom: 16px !important;
+    }
+    [data-section="introduction"] .card-body p:first-of-type,
+    [data-section="pastorHeart"]  .card-body p:first-of-type {
+      font-size: 18px !important;
+      color: #0f1735 !important;
+    }
+
+    /* 9 ── DROP CAPS: 88px gold Playfair initial */
+    [data-section="pastorHeart"]  .card-body p:first-of-type::first-letter,
+    [data-section="devotional"]   .card-body p:first-of-type::first-letter,
+    [data-section="introduction"] .card-body p:first-of-type::first-letter {
+      font-family: 'Playfair Display', Georgia, serif !important;
+      font-size: 88px !important;
+      font-weight: 800 !important;
+      float: left !important;
+      line-height: 0.72 !important;
+      margin: 8px 10px 0 0 !important;
+      color: #e8a838 !important;
+    }
+
+    /* 10 ── PULL QUOTES: em in editorial sections → gold-bordered block */
+    [data-section="devotional"]  .card-body em,
+    [data-section="pastorHeart"] .card-body em,
+    [data-section="reading"]     .card-body em {
+      display: block !important;
+      font-family: 'Noto Serif', Georgia, serif !important;
+      font-size: 19px !important;
+      font-style: italic !important;
+      line-height: 1.7 !important;
+      color: #0f1735 !important;
+      padding: 20px 24px !important;
+      border-left: 4px solid #e8a838 !important;
+      background: rgba(232,168,56,0.1) !important;
+      border-radius: 0 4px 4px 0 !important;
+      margin: 24px 0 !important;
+      clear: both !important;
+    }
+    #fn-news-feed .card-body em  { color: #c48a20 !important; }
+    #fn-news-feed .card-body strong { color: #0f1735 !important; }
+    #fn-news-feed .card-body sup    { color: #c48a20 !important; }
+
+    /* 11 ── LISTS: ✦ gold bullets + faint rule dividers */
+    #fn-news-feed .card-body ul,
+    #fn-news-feed .card-body ol  { color: #1a1a2e !important; padding-left: 0 !important; list-style: none !important; }
+    #fn-news-feed .card-body li {
+      font-family: 'Noto Serif', Georgia, serif !important;
+      color: #1a1a2e !important;
+      font-size: 15px !important;
+      line-height: 1.75 !important;
+      padding: 9px 0 9px 22px !important;
+      border-bottom: 1px solid rgba(15,23,53,0.08) !important;
+      position: relative;
+      margin-bottom: 0 !important;
+    }
+    #fn-news-feed .card-body li::before {
+      content: '✦';
+      position: absolute;
+      left: 0; top: 11px;
+      color: #e8a838 !important;
+      font-size: 8px;
+    }
+
+    /* 12 ── NESTED CARDS (word grid, mission widgets) */
+    #fn-news-feed .card-body .card {
+      background: rgba(15,23,53,0.05) !important;
+      border: 1px solid rgba(15,23,53,0.12) !important;
+      border-top: 1px solid rgba(15,23,53,0.12) !important;
+      border-radius: 4px !important;
+    }
+    /* ── WORD OF THE DAY — complete newspaper card treatment ── */
+    #fn-news-feed #fn-greek-word,
+    #fn-news-feed #fn-hebrew-word {
+      padding: 28px 32px 24px !important;
+    }
+    /* Language label: gold uppercase with bottom rule */
+    #fn-news-feed #fn-greek-word .fn-word-language,
+    #fn-news-feed #fn-hebrew-word .fn-word-language {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      letter-spacing: 3px !important;
+      color: #c48a20 !important;
+      text-transform: uppercase !important;
+      padding-bottom: 12px !important;
+      margin-bottom: 16px !important;
+      border-bottom: 1px solid rgba(15,23,53,0.15) !important;
+      display: block !important;
+    }
+    /* Large word: dark navy Playfair italic */
+    #fn-news-feed #fn-greek-word .fn-word-term,
+    #fn-news-feed #fn-hebrew-word .fn-word-term {
+      font-family: 'Playfair Display', Georgia, serif !important;
+      font-size: 44px !important;
+      font-style: italic !important;
+      font-weight: 700 !important;
+      color: #0f1735 !important;
+      line-height: 1.15 !important;
+      margin-bottom: 8px !important;
+    }
+    /* Transliteration: grey italic Noto Serif */
+    #fn-news-feed #fn-greek-word .fn-word-transliteration,
+    #fn-news-feed #fn-hebrew-word .fn-word-transliteration {
+      font-family: 'Noto Serif', Georgia, serif !important;
+      font-style: italic !important;
+      font-size: 18px !important;
+      color: rgba(15,23,53,0.40) !important;
+      margin-bottom: 20px !important;
+    }
+    /* Definition: bold dark navy */
+    .fn-word-definition    {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 16px !important;
+      font-weight: 700 !important;
+      color: #0f1735 !important;
+      margin-bottom: 14px !important;
+    }
+    /* Description/examples: Noto Serif readable */
+    .fn-word-description,
+    .fn-word-examples {
+      font-family: 'Noto Serif', Georgia, serif !important;
+      font-size: 14px !important;
+      color: rgba(15,23,53,0.70) !important;
+      line-height: 1.75 !important;
+      margin-bottom: 10px !important;
+    }
+    /* Strong's: muted, separated with top rule */
+    .fn-word-strongs {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      letter-spacing: 1px !important;
+      text-transform: uppercase !important;
+      color: rgba(15,23,53,0.35) !important;
+      display: block !important;
+      margin-top: 16px !important;
+      padding-top: 10px !important;
+      border-top: 1px solid rgba(15,23,53,0.10) !important;
+    }
+
+    /* 13a ── BIBLE BOOK OF THE DAY — header layout + title size */
+    .fn-book-header {
+      display: flex !important;
+      align-items: center !important;
+      gap: 20px !important;
+      padding: 0 0 20px !important;
+      border-bottom: 1px solid rgba(232,168,56,0.35) !important;
+      margin-bottom: 28px !important;
+    }
+    .fn-book-icon {
+      font-size: 52px !important;
+      line-height: 1 !important;
+      flex-shrink: 0 !important;
+    }
+    /* Book TITLE is an h3 inside .fn-book-info — needs ID in selector to beat #fn-news-feed .card-body h3 */
+    #fn-news-feed .fn-book-info h3 {
+      font-family: 'Playfair Display', Georgia, serif !important;
+      font-size: 42px !important;
+      font-weight: 800 !important;
+      letter-spacing: -0.5px !important;
+      text-transform: none !important;
+      color: #0f1735 !important;
+      border-bottom: none !important;
+      padding-bottom: 4px !important;
+      margin: 0 0 6px !important;
+      line-height: 1.05 !important;
+    }
+    #fn-news-feed .fn-book-meta {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 2px !important;
+      color: #c48a20 !important;
+    }
+
+    /* 13 ── STAT/MISSION WIDGETS */
+    .fn-book-stats         { background: rgba(15,23,53,0.06) !important; border-radius: 4px !important; }
+    .fn-book-stat-value    { color: #c48a20 !important; }
+    .fn-book-stat-label    { color: rgba(15,23,53,0.55) !important; }
+    .fn-unreached-card,
+    .fn-country-card,
+    .fn-bible-access-card,
+    .fn-frontlines-card    { background: rgba(15,23,53,0.05) !important; border-color: rgba(15,23,53,0.1) !important; }
+    .fn-unreached-header   { background: rgba(15,23,53,0.08) !important; }
+    .fn-unreached-name,
+    .fn-country-title h3,
+    .fn-frontlines-title h3,
+    .fn-bible-access-title h3 { color: #0f1735 !important; }
+    .fn-unreached-summary,
+    .fn-country-summary    { color: rgba(15,23,53,0.70) !important; }
+    .fn-country-details    { background: rgba(15,23,53,0.05) !important; }
+    .fn-country-details p,
+    .fn-country-details strong { color: #1a1a2e !important; }
+    .fn-country-stat       { background: rgba(15,23,53,0.05) !important; }
+    .fn-stat-value         { color: #c48a20 !important; }
+    .fn-stat-label         { color: rgba(15,23,53,0.55) !important; }
+    .fn-pillar-item        { background: rgba(15,23,53,0.04) !important; border-color: rgba(232,168,56,0.2) !important; }
+    .fn-pillar-name        { color: #0f1735 !important; }
+    .fn-country-header,
+    .fn-frontlines-header,
+    .fn-bible-access-header { border-bottom-color: rgba(15,23,53,0.1) !important; }
+    .fn-country-link       { color: #c48a20 !important; }
+    .fn-unreached-stats    { border-top-color: rgba(15,23,53,0.1) !important; border-bottom-color: rgba(15,23,53,0.1) !important; }
+    .fn-unreached-stats span { color: #1a1a2e !important; }
+    .fn-frontlines-stat-highlight { background: rgba(232,168,56,0.1) !important; }
+
+    /* 14 ── REACTION BAR on cream (general) */
+    .fn-card-reaction-bar  { border-top-color: rgba(15,23,53,0.1) !important; }
+    .fn-reaction-bubble    { color: #0f1735 !important; }
+    .fn-reaction-bubble.active { color: #c48a20 !important; background: rgba(200,138,32,0.12) !important; }
+
+    /* 15 ── WORD CARD REACTIONS — navy background, gold text */
+    #fn-greek-word .fn-card-reaction-bar,
+    #fn-hebrew-word .fn-card-reaction-bar {
+      border-top-color: rgba(15,23,53,0.18) !important;
+      margin-top: 20px;
+    }
+    #fn-greek-word .fn-reaction-bubble,
+    #fn-hebrew-word .fn-reaction-bubble {
+      background: #0f1735 !important;
+      border-color: #0f1735 !important;
+      color: #e8a838 !important;
+      font-weight: 600 !important;
+    }
+    #fn-greek-word .fn-reaction-bubble:hover,
+    #fn-hebrew-word .fn-reaction-bubble:hover {
+      background: #1b264f !important;
+      border-color: #e8a838 !important;
+      color: #e8a838 !important;
+    }
+    #fn-greek-word .fn-reaction-bubble.active,
+    #fn-hebrew-word .fn-reaction-bubble.active {
+      background: #e8a838 !important;
+      border-color: #c48a20 !important;
+      color: #0f1735 !important;
+    }
+    #fn-greek-word .fn-reaction-add-btn,
+    #fn-hebrew-word .fn-reaction-add-btn {
+      background: #0f1735 !important;
+      border: 1px solid #0f1735 !important;
+      color: #e8a838 !important;
+      font-weight: 600 !important;
+      opacity: 1 !important;
+    }
+    #fn-greek-word .fn-reaction-add-btn:hover,
+    #fn-hebrew-word .fn-reaction-add-btn:hover {
+      background: #1b264f !important;
+      border-color: #e8a838 !important;
+    }
   </style>
 </head>
 <body>
@@ -1407,9 +1789,13 @@
               <div class="fn-word-language">Greek</div>
               <div class="fn-word-term">ἀγάπη</div>
               <div class="fn-word-transliteration">agapē</div>
-              <div style="font-weight: 600; margin-bottom: 12px;">Love; divine, unconditional love</div>
-              <p style="color: var(--ink-muted); line-height: 1.6; margin-bottom: 12px;">This is the highest form of love in Greek, referring to the selfless, sacrificial, unconditional love that God has for humanity and that Christians are called to have for one another. Unlike romantic or familial love, agapē is a choice and an action, not merely a feeling.</p>
-              <div style="font-size: 12px; color: var(--ink-muted); font-family: 'Courier New', monospace;">Strong's G26</div>
+              <div class="fn-word-definition">Love; divine, unconditional love</div>
+              <div class="fn-word-description">This is the highest form of love in Greek, referring to the selfless, sacrificial, unconditional love that God has for humanity and that Christians are called to have for one another. Unlike romantic or familial love, agapē is a choice and an action, not merely a feeling.</div>
+              <div class="fn-word-strongs">Strong's G26</div>
+              <div class="fn-card-reaction-bar">
+                <div class="fn-card-reactions"></div>
+                <div class="fn-reaction-add"><button class="fn-reaction-add-btn" onclick="FlockNews.showReactionPicker('greekWord')" title="Add reaction">➕ React</button></div>
+              </div>
             </div>
 
             <!-- Hebrew Word -->
@@ -1417,9 +1803,13 @@
               <div class="fn-word-language">Hebrew</div>
               <div class="fn-word-term">שָׁלוֹם</div>
               <div class="fn-word-transliteration">shalom</div>
-              <div style="font-weight: 600; margin-bottom: 12px;">Peace; wholeness, completeness, welfare</div>
-              <p style="color: var(--ink-muted); line-height: 1.6; margin-bottom: 12px;">More than just the absence of conflict, shalom represents complete well-being, harmony, and prosperity. It encompasses physical health, emotional wellness, right relationships with God and others, and spiritual wholeness. It's both a greeting and a blessing in Hebrew culture.</p>
-              <div style="font-size: 12px; color: var(--ink-muted); font-family: 'Courier New', monospace;">Strong's H7965</div>
+              <div class="fn-word-definition">Peace; wholeness, completeness, welfare</div>
+              <div class="fn-word-description">More than just the absence of conflict, shalom represents complete well-being, harmony, and prosperity. It encompasses physical health, emotional wellness, right relationships with God and others, and spiritual wholeness. It's both a greeting and a blessing in Hebrew culture.</div>
+              <div class="fn-word-strongs">Strong's H7965</div>
+              <div class="fn-card-reaction-bar">
+                <div class="fn-card-reactions"></div>
+                <div class="fn-reaction-add"><button class="fn-reaction-add-btn" onclick="FlockNews.showReactionPicker('hebrewWord')" title="Add reaction">➕ React</button></div>
+              </div>
             </div>
           </div>
         </div>
