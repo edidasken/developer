@@ -704,29 +704,15 @@ function _memberRow(p, opts = {}) {
         <div style="font:400 0.78rem/1.4 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);
           white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${_e(role)}${email ? ' · ' + _e(email) : ''}</div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
         ${badge}
         ${_liveScanBadge(check?.liveScan)}
-        ${opts.showInitiateBtn && email ? `
-          <button class="flock-btn flock-btn--primary flock-btn--sm" data-act="initiate-check"
-            data-member-id="${_e(uid)}" data-email="${_e(email)}" data-name="${_e(name)}">
-            ${check ? 'Re-check' : 'Initiate Check'}
-          </button>` : ''}
-        <button class="flock-btn flock-btn--ghost flock-btn--sm" data-act="record-livescan"
-          data-member-id="${_e(uid)}" data-name="${_e(name)}">
-          ${check?.liveScan ? 'Update LS' : '+ Live Scan'}
-        </button>
-        ${opts.showParentNotif ? `
-          <button class="flock-btn flock-btn--sm" data-act="document-parent-notif"
-            data-member-id="${_e(uid)}" data-name="${_e(name)}"
-            style="background:${check?.parentNotif?.sent ? '#dcfce7' : '#fff7ed'};color:${check?.parentNotif?.sent ? '#059669' : '#92400e'};border:1px solid ${check?.parentNotif?.sent ? '#bbf7d0' : '#fde68a'}">
-            ${check?.parentNotif?.sent ? '✓ Notified ' + _fmtDate(check.parentNotif.sentDate) : '§ Document Notification'}
-          </button>` : ''}
-        ${check?.invitationUrl ? `
-          <a href="${_e(check.invitationUrl)}" target="_blank" rel="noopener noreferrer"
-            class="flock-btn flock-btn--sm" style="text-decoration:none">
-            View Report ↗
-          </a>` : ''}
+        <button class="flock-btn flock-btn--ghost flock-btn--sm" data-act="open-admin-modal"
+          data-member-id="${_e(uid)}" data-name="${_e(name)}" data-email="${_e(email)}"
+          ${opts.showInitiateBtn ? 'data-show-initiate="1"' : ''}
+          ${opts.showParentNotif ? 'data-show-parent-notif="1"' : ''}
+          ${check?.invitationUrl ? `data-invitation-url="${_e(check.invitationUrl)}"` : ''}
+          style="font-weight:600">Admin</button>
       </div>
     </div>`;
 }
@@ -766,8 +752,130 @@ function _fmtDate(val) {
   } catch (_) { return ''; }
 }
 
+/* ── Admin modal (overview + member list rows) ───────────────────────────── */
+function _ensureAdminModal() {
+  let modal = document.getElementById('melch-adm-modal');
+  if (modal) return modal;
+  modal = document.createElement('div');
+  modal.id = 'melch-adm-modal';
+  modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:16px';
+  modal.innerHTML = '<div class="melch-adm-card" style="background:var(--surface,#fff);border-radius:16px;width:100%;max-width:400px;max-height:88vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.22)"></div>';
+  modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function _openAdminModal(btn) {
+  const uid          = btn.dataset.memberId || '';
+  const dname        = btn.dataset.name || '';
+  const email        = btn.dataset.email || '';
+  const showInitiate = btn.hasAttribute('data-show-initiate');
+  const showPNtf     = btn.hasAttribute('data-show-parent-notif');
+  const invUrl       = btn.dataset.invitationUrl || '';
+
+  const m     = _allMembers.find(x => (x.id || x.memberNumber || x.email || '') === uid) || {};
+  const check = _checksMap[uid] || {};
+  const ws    = _waiverStatus(check);
+  const os    = _ocapStatus(check);
+  const hs    = _hoursStatus(check);
+
+  const initials = ((m.firstName?.[0] || dname[0] || '') + (m.lastName?.[0] || dname[1] || '')).toUpperCase().slice(0, 2);
+  const color    = _AVATAR_COLORS[(dname.charCodeAt(0) + (dname.charCodeAt(1) || 0)) % _AVATAR_COLORS.length];
+  const san      = check.sanEnrolled ? _statusPill('SAN Enrolled', '#059669') : _statusPill('SAN Not Enrolled', '#7a7f96');
+  const pn       = check.parentNotif?.sent
+    ? _statusPill('Notif Sent ' + _fmtDate(check.parentNotif.sentDate), '#059669')
+    : _statusPill('No Parent Notif', '#7a7f96');
+
+  const modal = _ensureAdminModal();
+  const card  = modal.querySelector('.melch-adm-card');
+
+  card.innerHTML = `
+    <div style="padding:16px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border,#e8eaf6)">
+      <div style="width:40px;height:40px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;flex-shrink:0;font:700 0.82rem var(--font-ui,sans-serif);color:#fff">${_e(initials)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font:700 1rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${_e(dname)}</div>
+        <div style="font:400 0.78rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.role ? _e(m.role) : ''}${email ? (m.role ? ' · ' : '') + _e(email) : ''}</div>
+      </div>
+      <button data-act="close-adm-modal" style="background:none;border:none;cursor:pointer;font-size:1.2rem;line-height:1;color:var(--ink-muted,#7a7f96);padding:4px 6px;border-radius:6px;flex-shrink:0" aria-label="Close">✕</button>
+    </div>
+    <div style="padding:14px 18px;display:flex;flex-direction:column;gap:0;border-bottom:1px solid var(--border,#e8eaf6)">
+      ${_amRow('Checkr',        _statusBadge(check.status))}
+      ${_amRow('Live Scan',     _liveScanBadge(check.liveScan))}
+      ${_amRow('Annual Waiver', _statusPill(ws.label, ws.color))}
+      ${_amRow('OCAP Cert',     _statusPill(os.label, os.color))}
+      ${_amRow('Hours',         _statusPill(hs.label, hs.color))}
+      ${_amRow('SAN',           san)}
+      ${_amRow('Parent Notif',  pn)}
+    </div>
+    <div style="padding:14px 18px;display:flex;flex-wrap:wrap;gap:8px">
+      ${showInitiate && email ? `
+        <button class="flock-btn flock-btn--primary flock-btn--sm" data-act="modal-initiate-check"
+          data-member-id="${_e(uid)}" data-email="${_e(email)}" data-name="${_e(dname)}">
+          ${check.status ? 'Re-check' : 'Initiate Check'}
+        </button>` : ''}
+      <button class="flock-btn flock-btn--ghost flock-btn--sm" data-act="modal-record-livescan">
+        ${check.liveScan ? 'Update LS' : '+ Live Scan'}
+      </button>
+      ${(showPNtf || check.status === 'consider') ? `
+        <button class="flock-btn flock-btn--sm" data-act="modal-parent-notif"
+          style="background:${check.parentNotif?.sent ? '#dcfce7' : '#fff7ed'};color:${check.parentNotif?.sent ? '#059669' : '#92400e'};border:1px solid ${check.parentNotif?.sent ? '#bbf7d0' : '#fde68a'}">
+          ${check.parentNotif?.sent ? '✓ Notified ' + _fmtDate(check.parentNotif.sentDate) : '§ Document Notification'}
+        </button>` : ''}
+      ${invUrl ? `
+        <a href="${_e(invUrl)}" target="_blank" rel="noopener noreferrer"
+          class="flock-btn flock-btn--sm" style="text-decoration:none">View Report ↗</a>` : ''}
+    </div>`;
+
+  card.querySelector('[data-act="close-adm-modal"]').addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+  card.querySelector('[data-act="modal-record-livescan"]')?.addEventListener('click', () => {
+    modal.style.display = 'none';
+    _showLiveScanModal(uid, dname);
+  });
+  card.querySelector('[data-act="modal-parent-notif"]')?.addEventListener('click', () => {
+    modal.style.display = 'none';
+    _showParentNotifModal(uid, dname);
+  });
+
+  const initiateBtn = card.querySelector('[data-act="modal-initiate-check"]');
+  if (initiateBtn) {
+    initiateBtn.addEventListener('click', async () => {
+      const ok = confirm(`Initiate a background check for ${dname}?\n\nCheckr will send an email to ${email} with a secure link to submit their information.`);
+      if (!ok) return;
+      initiateBtn.disabled = true;
+      const orig = initiateBtn.textContent;
+      initiateBtn.textContent = 'Sending…';
+      try {
+        await _initiateCheck({ memberId: uid, email, name: dname });
+        initiateBtn.textContent = 'Sent ✓';
+        setTimeout(() => { initiateBtn.disabled = false; initiateBtn.textContent = 'Re-check'; }, 3000);
+      } catch (err) {
+        console.error('[Melchizedek] initiateCheck error', err);
+        alert(`Could not initiate check: ${err?.message || String(err)}`);
+        initiateBtn.disabled = false;
+        initiateBtn.textContent = orig;
+      }
+    });
+  }
+
+  modal.style.display = 'flex';
+}
+
+function _amRow(label, value) {
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--border,#e8eaf6)">
+      <span style="font:500 0.8rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);flex-shrink:0">${label}</span>
+      <span style="flex-shrink:0">${value}</span>
+    </div>`;
+}
+
 /* ── Action wiring ───────────────────────────────────────────────────────── */
 function _wireContentActions(root) {
+  root.querySelectorAll('[data-act="open-admin-modal"]').forEach(btn => {
+    btn.addEventListener('click', () => _openAdminModal(btn));
+  });
+
   root.querySelectorAll('[data-act="sort"]').forEach(btn => {
     btn.addEventListener('click', () => {
       const field = btn.dataset.sortField;
