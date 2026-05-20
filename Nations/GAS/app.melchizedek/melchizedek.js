@@ -773,6 +773,7 @@ function _openAdminModal(btn) {
   const email        = btn.dataset.email || '';
   const showInitiate = btn.hasAttribute('data-show-initiate');
   const showPNtf     = btn.hasAttribute('data-show-parent-notif');
+  const showComp     = btn.hasAttribute('data-show-compliance');
   const invUrl       = btn.dataset.invitationUrl || '';
 
   const m     = _allMembers.find(x => (x.id || x.memberNumber || x.email || '') === uid) || {};
@@ -826,6 +827,10 @@ function _openAdminModal(btn) {
       ${invUrl ? `
         <a href="${_e(invUrl)}" target="_blank" rel="noopener noreferrer"
           class="flock-btn flock-btn--sm" style="text-decoration:none">View Report ↗</a>` : ''}
+      ${showComp ? `
+        <button class="flock-btn flock-btn--ghost flock-btn--sm" data-act="modal-edit-compliance">Edit Compliance</button>
+        <button class="flock-btn flock-btn--ghost flock-btn--sm" data-act="modal-generate-waiver"
+          style="color:#059669;border-color:#bbf7d0">Waiver ↓</button>` : ''}
     </div>`;
 
   card.querySelector('[data-act="close-adm-modal"]').addEventListener('click', () => {
@@ -838,6 +843,13 @@ function _openAdminModal(btn) {
   card.querySelector('[data-act="modal-parent-notif"]')?.addEventListener('click', () => {
     modal.style.display = 'none';
     _showParentNotifModal(uid, dname);
+  });
+  card.querySelector('[data-act="modal-edit-compliance"]')?.addEventListener('click', () => {
+    modal.style.display = 'none';
+    _showComplianceModal(uid, dname);
+  });
+  card.querySelector('[data-act="modal-generate-waiver"]')?.addEventListener('click', () => {
+    _generateWaiver(uid, dname);
   });
 
   const initiateBtn = card.querySelector('[data-act="modal-initiate-check"]');
@@ -1212,31 +1224,31 @@ function _viewCompliance() {
     </div>`;
 
   const rows = sorted.map(m => {
-    const uid    = m.id || m.memberNumber || m.email || '';
-    const dname  = _memberDisplayName(m);
-    const check  = _checksMap[uid] || {};
-    const ws     = _waiverStatus(check);
-    const os     = _ocapStatus(check);
-    const hs     = _hoursStatus(check);
-    const san    = check.sanEnrolled ? _statusPill('Enrolled', '#059669') : _statusPill('Not Enrolled', '#7a7f96');
-    const pn     = check.parentNotif?.sent ? _statusPill('Sent ' + _fmtDate(check.parentNotif.sentDate), '#059669') : '';
+    const uid   = m.id || m.memberNumber || m.email || '';
+    const dname = _memberDisplayName(m);
+    const check = _checksMap[uid] || {};
+    // Quick status dot: red if any critical issue, amber if any warning, green if all clear
+    const ws = _waiverStatus(check);
+    const os = _ocapStatus(check);
+    const hs = _hoursStatus(check);
+    const hasCritical = [ws, os].some(s => s.status === 'expired' || s.status === 'missing') ||
+                        hs.status === 'over' || check.status === 'consider';
+    const hasWarn     = [ws, os].some(s => s.status === 'expiring') || hs.status === 'near';
+    const dotColor    = hasCritical ? '#dc2626' : hasWarn ? '#d97706' : '#059669';
     return `<tr class="mcvt-row" style="border-bottom:1px solid var(--border,#e8eaf6)">
-      <td class="mcvt-cell" data-label="Member" style="padding:10px 12px;min-width:160px">
-        <div style="font:600 0.9rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${_e(dname)}</div>
-        ${m.role ? `<div style="font:400 0.76rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-top:3px">${_e(m.role)}</div>` : ''}
+      <td class="mcvt-cell" data-label="Member" style="padding:10px 14px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="width:8px;height:8px;border-radius:50%;background:${dotColor};flex-shrink:0" title="${hasCritical ? 'Needs attention' : hasWarn ? 'Expiring soon' : 'All clear'}"></span>
+          <div>
+            <div style="font:600 0.9rem/1.2 var(--font-ui,sans-serif);color:var(--ink,#1b264f)">${_e(dname)}</div>
+            ${m.role ? `<div style="font:400 0.76rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96);margin-top:2px">${_e(m.role)}</div>` : ''}
+          </div>
+        </div>
       </td>
-      <td class="mcvt-cell" data-label="Checkr" style="padding:10px 12px">${_statusBadge(check.status)}</td>
-      <td class="mcvt-cell" data-label="LiveScan" style="padding:10px 12px">${_liveScanBadge(check.liveScan)}</td>
-      <td class="mcvt-cell" data-label="Annual Waiver" style="padding:10px 12px">${_statusPill(ws.label, ws.color)}</td>
-      <td class="mcvt-cell" data-label="OCAP Cert" style="padding:10px 12px">${_statusPill(os.label, os.color)}</td>
-      <td class="mcvt-cell" data-label="Hours" style="padding:10px 12px">${_statusPill(hs.label, hs.color)}</td>
-      <td class="mcvt-cell" data-label="SAN / Notif" style="padding:10px 12px">${san}${pn ? '<br><span style="font:400 0.73rem/1 var(--font-ui,sans-serif);color:var(--ink-muted,#7a7f96)">Parent notif:</span> ' + pn : ''}</td>
-      <td class="mcvt-cell" data-label="Actions" style="padding:10px 12px;white-space:nowrap">
-        <button class="flock-btn flock-btn--sm flock-btn--ghost" data-act="edit-compliance"
-          data-member-id="${_e(uid)}" data-name="${_e(dname)}">Edit</button>
-        <button class="flock-btn flock-btn--sm flock-btn--ghost" data-act="generate-waiver"
+      <td class="mcvt-cell" data-label="Admin" style="padding:8px 14px;text-align:right;width:1%">
+        <button class="flock-btn flock-btn--ghost flock-btn--sm" data-act="open-admin-modal"
           data-member-id="${_e(uid)}" data-name="${_e(dname)}"
-          style="margin-left:6px;color:#059669;border-color:#bbf7d0">Waiver ↓</button>
+          data-show-compliance="1" style="font-weight:600;white-space:nowrap">Admin</button>
       </td>
     </tr>`;
   }).join('');
@@ -1245,23 +1257,18 @@ function _viewCompliance() {
     <div id="melch-cc">
     <style>
     #melch-cc .mcv-stats{display:flex;flex-wrap:wrap;gap:12px}
+    #melch-cc .mcvt-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border,#e8eaf6)}
     @media(max-width:640px){
       #melch-cc .mcv-hdr{flex-direction:column!important;align-items:flex-start!important}
       #melch-cc .mcv-stats{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important}
-      #melch-cc .mcvt-wrap{overflow:visible!important;border:none!important;border-radius:0!important}
+      #melch-cc .mcvt-wrap{border:none!important;border-radius:0!important}
       #melch-cc .mcvt-head{display:none!important}
-      #melch-cc .mcvt-row{display:block!important;background:var(--surface,#fff);border:1px solid var(--border,#e8eaf6)!important;border-radius:10px;margin-bottom:10px;overflow:hidden}
-      #melch-cc .mcvt-cell{display:flex!important;align-items:center!important;justify-content:space-between!important;padding:8px 12px!important;border-bottom:1px solid var(--border,#e8eaf6);min-width:0!important;white-space:normal!important;box-sizing:border-box}
-      #melch-cc .mcvt-cell:last-child{border-bottom:none!important}
-      #melch-cc .mcvt-cell::before{content:attr(data-label);font:700 0.72rem/1 var(--font-ui,sans-serif);text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted,#7a7f96);margin-right:10px;flex-shrink:0;min-width:100px}
-      #melch-cc .mcvt-cell[data-label="Member"]{padding:12px!important;display:block!important}
-      #melch-cc .mcvt-cell[data-label="Member"]::before{display:none}
-      #melch-cc .mcvt-cell[data-label="Actions"]{justify-content:flex-end!important;gap:8px;flex-wrap:wrap}
-      #melch-cc .mcvt-cell[data-label="Actions"]::before{display:none}
+      #melch-cc .mcvt-row{display:flex!important;align-items:center!important;justify-content:space-between!important;background:var(--surface,#fff);border:1px solid var(--border,#e8eaf6)!important;border-radius:10px;margin-bottom:8px;padding:2px 0;gap:8px}
+      #melch-cc .mcvt-cell[data-label="Member"]{flex:1;min-width:0;padding:10px 12px!important}
+      #melch-cc .mcvt-cell[data-label="Admin"]{padding:8px 12px!important;flex-shrink:0}
     }
     @media(max-width:380px){
       #melch-cc .mcv-stats{grid-template-columns:1fr!important}
-      #melch-cc .mcvt-cell::before{min-width:80px}
     }
     </style>
     <div class="mcv-hdr" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
@@ -1297,26 +1304,14 @@ function _viewCompliance() {
       <table style="width:100%;border-collapse:collapse;font:400 0.85rem/1.4 var(--font-ui,sans-serif)">
         <thead class="mcvt-head">
           <tr style="background:var(--surface,#f8f9ff)">
-            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
+            <th style="padding:10px 14px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
               text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">Member</th>
-            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
-              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">Checkr</th>
-            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
-              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">LiveScan</th>
-            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
-              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">Annual Waiver</th>
-            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
-              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">OCAP Cert</th>
-            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
-              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">Volunteer Hours</th>
-            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
-              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">SAN / Parent Notif</th>
-            <th style="padding:10px 12px;text-align:left;font:600 0.78rem/1 var(--font-ui,sans-serif);
-              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96)">Actions</th>
+            <th style="padding:10px 14px;text-align:right;font:600 0.78rem/1 var(--font-ui,sans-serif);
+              text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted,#7a7f96);width:1%"></th>
           </tr>
         </thead>
         <tbody>
-          ${rows || '<tr><td colspan="8" style="padding:20px;text-align:center;color:var(--ink-muted,#7a7f96)">No members loaded.</td></tr>'}
+          ${rows || '<tr><td colspan="2" style="padding:20px;text-align:center;color:var(--ink-muted,#7a7f96)">No members loaded.</td></tr>'}
         </tbody>
       </table>
     </div>
@@ -1882,12 +1877,17 @@ function _generateWaiver(memberId, displayName) {
 </body>
 </html>`;
 
-  const win = window.open('', '_blank', 'width=850,height=1100,scrollbars=yes,resizable=yes');
-  if (!win) { alert('Pop-up blocked — please allow pop-ups for this site and try again.'); return; }
-  win.document.open();
-  win.document.write(html);
-  win.document.close();
-  win.focus();
+  const blob    = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url     = URL.createObjectURL(blob);
+  const a       = document.createElement('a');
+  const safeName = (displayName || 'Member').replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-');
+  const year    = new Date().getFullYear();
+  a.href        = url;
+  a.download    = `AB506-Waiver-${safeName}-${year}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
 async function _saveParentNotif({ memberId, sent, sentDate, method, confirmedDate }) {
