@@ -2,28 +2,44 @@
   "name": "FlockDocs — Productivity Suite",
   "short_name": "FlockDocs",
   "description": "Document editor, spreadsheets, and productivity tools for your church",
-  "start_url": "../app.flockdocs/index.html",
-  "scope": "../",
+  "start_url": "./app.flockdocs.html",
+  "id": "./app.flockdocs.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#0e1320",
   "theme_color": "#3b82f6",
-  "orientation": "any",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["productivity", "business", "utilities"],
   "icons": [
+    {
+      "src": "../Images/icon-flockdocs.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "../Images/icon-flockdocs.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
     {
       "src": "../Images/FlockIcon-512.webp",
       "sizes": "512x512",
       "type": "image/webp",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ],
-  "categories": ["productivity", "business", "utilities"],
   "shortcuts": [
     {
       "name": "New Document",
       "short_name": "New Doc",
       "description": "Create a new document",
-      "url": "../app.flockdocs/app.flockdocs.html?action=new",
-      "icons": [{ "src": "../Images/FlockIcon-512.webp", "sizes": "512x512" }]
+      "url": "./app.flockdocs.html?action=new",
+      "icons": [{ "src": "../Images/icon-flockdocs.svg", "sizes": "any" }]
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }

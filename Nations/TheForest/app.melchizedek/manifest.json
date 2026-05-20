@@ -2,16 +2,41 @@
   "name": "Melchizedek — Background Checks",
   "short_name": "Melchizedek",
   "description": "Church background check management via Checkr",
-  "start_url": "./index.html",
+  "start_url": "./app.melchizedek.html",
+  "id": "./app.melchizedek.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "theme_color": "#1b264f",
   "background_color": "#1b264f",
+  "theme_color": "#1b264f",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["productivity", "utilities"],
   "icons": [
-    { "src": "../Images/FlockIcon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "../Images/FlockIcon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "../Images/FlockIcon-192.webp", "sizes": "192x192", "type": "image/webp" },
-    { "src": "../Images/FlockIcon-512.webp", "sizes": "512x512", "type": "image/webp" }
-  ]
+    {
+      "src": "../Images/icon-melchizedek.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "../Images/icon-melchizedek.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "../Images/FlockIcon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "../Images/FlockIcon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "prefer_related_applications": false
 }

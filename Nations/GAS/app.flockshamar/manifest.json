@@ -1,16 +1,36 @@
 {
   "name": "FlockShamar",
   "short_name": "Shamar",
-  "description": "Keep and guard your notes - The Lord bless you and keep you",
+  "description": "Keep and guard your notes — The Lord bless you and keep you",
   "start_url": "./app.flockshamar.html",
+  "id": "./app.flockshamar.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#0f1735",
   "theme_color": "#e8a838",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["productivity", "utilities"],
   "icons": [
+    {
+      "src": "../Images/icon-flockshamar.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "../Images/icon-flockshamar.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
     {
       "src": "../Images/FlockIcon-512.webp",
       "sizes": "512x512",
-      "type": "image/webp"
+      "type": "image/webp",
+      "purpose": "any"
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }

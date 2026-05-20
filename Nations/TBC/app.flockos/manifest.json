@@ -3,6 +3,7 @@
   "short_name": "TBC",
   "description": "Complete church management and pastoral care platform. Google Sheets, Firebase, or fully offline via The Wellspring. 30+ modules. 210 countries. 256-bit encrypted. Free forever.",
   "start_url": "./app.flockos.html",
+  "id": "./app.flockos.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

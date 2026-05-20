@@ -3,6 +3,7 @@
   "short_name": "Wellspring",
   "description": "Manage offline data for FlockOS. Import local Excel databases and run entirely without an internet connection.",
   "start_url": "./app.wellspring.html",
+  "id": "./app.wellspring.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
@@ -22,10 +23,17 @@
       "purpose": "any"
     },
     {
+      "src": "../Images/icon-wellspring.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
       "src": "../Images/FlockIcon-512.webp",
       "sizes": "512x512",
       "type": "image/webp",
       "purpose": "any"
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }
