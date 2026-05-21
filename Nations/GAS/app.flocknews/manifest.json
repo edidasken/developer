@@ -1,43 +1,16 @@
 {
-  "name": "FlockNews",
+  "name": "The Flock Herald",
   "short_name": "FlockNews",
-  "description": "Daily spiritual content, word studies, and missions updates for your church",
-  "start_url": "./app.flocknews.html",
-  "id": "./app.flocknews.html",
-  "scope": "./",
+  "description": "Daily ministry news, devotionals, and missions — free to the Body of Christ.",
+  "start_url": "app.flocknews/flocknews.html",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#0f172a",
-  "theme_color": "#3b82f6",
-  "lang": "en",
-  "dir": "ltr",
-  "categories": ["productivity", "news", "education"],
+  "background_color": "#f7f2e7",
+  "theme_color": "#1a1a1a",
   "icons": [
     {
       "src": "../Images/icon-flocknews.svg",
       "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "../Images/icon-flocknews.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
-    },
-    {
-      "src": "../Images/FlockIcon-192.webp",
-      "sizes": "192x192",
-      "type": "image/webp",
-      "purpose": "any"
-    },
-    {
-      "src": "../Images/FlockIcon-512.webp",
-      "sizes": "512x512",
-      "type": "image/webp",
-      "purpose": "any"
+      "type": "image/svg+xml"
     }
-  ],
-  "screenshots": [],
-  "prefer_related_applications": false
+  ]
 }

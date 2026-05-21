@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="The Flock Herald — Daily ministry news, devotionals, missions, and the FlockOS suite. Free to the Body of Christ.">
+  <title>The Flock Herald — FlockOS Daily</title>
+
+  <!-- Newspaper fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IM+Fell+English:ital@0;1&display=swap">
+
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try { var t = localStorage.getItem('flock_theme') || 'america'; document.documentElement.setAttribute('data-theme', t); }
+      catch (_) { document.documentElement.setAttribute('data-theme', 'america'); }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="flocknews.css">
+</head>
+<body>
+
+<div class="fn-page">
+
+  <!-- ══ BACK / SHARE BAR ════════════════════════════════════════════════ -->
+  <div class="fn-back-bar">
+    <button class="fn-back-btn" onclick="goBack()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to FlockOS
+    </button>
+    <button class="fn-share-btn" id="fn-share-btn" onclick="shareHerald()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Share This Edition
+    </button>
+  </div>
+
+  <!-- ══ MASTHEAD ════════════════════════════════════════════════════════ -->
+  <header class="fn-masthead">
+    <hr class="fn-masthead-rule-top">
+    <div class="fn-masthead-inner">
+      <div class="fn-flag">The Flock Herald</div>
+      <div class="fn-motto">Ministry News for the Body of Christ &nbsp;·&nbsp; Free to the Church</div>
+      <div class="fn-dateline">
+        <span>Vol. I &nbsp;·&nbsp; No. <span id="fn-issue">1</span></span>
+        <span id="fn-date">May 21, 2026</span>
+        <span>flock-os.github.io</span>
+      </div>
+    </div>
+    <hr class="fn-masthead-rule-bot">
+  </header>
+
+  <!-- ══ FRONT PAGE GRID ════════════════════════════════════════════════ -->
+  <div class="fn-front-grid">
+
+    <!-- ── Left sidebar: Devotional of the Day ─────────────────────── -->
+    <aside class="fn-front-sidebar">
+      <div class="fn-devo-label">Devotional of the Day</div>
+      <div id="fn-devo-content" class="fn-loading">Loading today's devotional…</div>
+
+      <!-- Also Inside index -->
+      <div class="fn-index-box">
+        <div class="fn-index-box-label">Also in This Edition</div>
+        <ul class="fn-index-list">
+          <li>
+            <span>Missions Spotlight</span>
+            <span class="fn-index-dots"></span>
+            <span class="fn-index-pg">§ 2</span>
+          </li>
+          <li>
+            <span>Global Statistics</span>
+            <span class="fn-index-dots"></span>
+            <span class="fn-index-pg">§ 2</span>
+          </li>
+          <li>
+            <span>World Watch</span>
+            <span class="fn-index-dots"></span>
+            <span class="fn-index-pg">§ 2</span>
+          </li>
+          <li>
+            <span>The FlockOS Suite</span>
+            <span class="fn-index-dots"></span>
+            <span class="fn-index-pg">§ 3</span>
+          </li>
+          <li>
+            <span>Try FlockOS Free</span>
+            <span class="fn-index-dots"></span>
+            <span class="fn-index-pg">§ 3</span>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- ── Main column: Lead story ──────────────────────────────────── -->
+    <main class="fn-front-main">
+      <div class="fn-lead-kicker">Special Report &nbsp;·&nbsp; Ministry Edition</div>
+      <h1 class="fn-lead-headline">A Complete Suite of Ministry Tools, Built for the Work of the Church</h1>
+      <p class="fn-lead-deck">Everything a pastor touches in the course of his week — in one integrated system, on any device, completely free.</p>
+      <p class="fn-lead-byline">By the FlockOS Team &nbsp;·&nbsp; flock-os.github.io</p>
+
+      <div class="fn-lead-body">
+        <p>FlockOS is not a product. It is a calling made software. Built for the local church pastor — not for a denomination, not for a megachurch with an IT department, but for the man in the room with the people, carrying the weight of their names, their struggles, their prayers, and their growth in grace.</p>
+
+        <p>It brings together everything a pastor touches in the course of his week — member directory, pastoral notes, prayer requests, small group rosters, worship planning, outreach tools, discipleship resources, and church communication — into one integrated system that runs on any device, in any browser, from anywhere in the world.</p>
+
+        <div class="fn-pull">"FlockOS carries the weight of the administration so the pastor can carry the weight of the people — and it is completely free, because the Gospel is."</div>
+
+        <h3>A Foundation Built on Grace, Not Commerce</h3>
+
+        <p>Church management software has historically been priced as if the church is a business and the pastor is a product manager. FlockOS was built on a different conviction. There is no subscription fee. No per-seat pricing. No features locked behind an upgrade wall. Every module. Every update. Every capability — free. The resources of a large church deserve to be in the hands of the smallest congregation.</p>
+
+        <p>The pastor of twelve should have the same tools as the pastor of twelve hundred. <em>"Freely you have received; freely give."</em> — Matthew 10:8</p>
+
+        <h3>No Server. No IT. No Barriers.</h3>
+
+        <p>FlockOS is a web application that runs in any modern browser on any device. There is nothing to install, no server to maintain, no IT team required. It is hosted for free on GitHub Pages — an infrastructure maintained by Microsoft — serving churches 24 hours a day with no monthly fees and no expiration date.</p>
+
+        <p>For pastors without reliable internet access, The Wellspring mode allows the complete church database to run offline on a single encrypted file — no connectivity required. FlockOS was designed to go wherever the Great Commission sends you.</p>
+
+        <h3>Your Data. Your Accounts. Your Church.</h3>
+
+        <p>The design keeps your church's data in your own Google or Firebase accounts — not in a central FlockOS-owned database. You own it. You control it. If you stop using FlockOS tomorrow, your data is still yours. There is no exit fee. No hostage situation.</p>
+
+        <p>Sensitive pastoral records — counseling notes, care cases, prayer journals — are protected by role-based access control. Six permission levels, from Guest to Admin, ensure that your private conversations with a struggling family never appear on the welcome desk screen.</p>
+      </div>
+    </main>
+
+  </div><!-- /.fn-front-grid -->
+
+
+  <!-- ══ MISSIONS REPORT ════════════════════════════════════════════════ -->
+  <hr class="rule-double" style="margin-top: 28px;">
+  <p class="fn-section-label">Missions Report &nbsp;·&nbsp; Joshua Project &amp; Operation World</p>
+
+  <div class="fn-missions-grid">
+
+    <!-- Spotlight -->
+    <div class="fn-missions-spotlight">
+      <div class="fn-col-label">Today's Spotlight</div>
+      <div id="fn-spot-content" class="fn-loading">Loading missions data…</div>
+    </div>
+
+    <!-- Global stats -->
+    <div class="fn-missions-stats">
+      <div class="fn-col-label">Global Numbers</div>
+      <div id="fn-stats-content" class="fn-loading">…</div>
+    </div>
+
+    <!-- World Watch -->
+    <div class="fn-missions-watch">
+      <div class="fn-col-label">World Watch</div>
+      <div id="fn-watch-content" class="fn-loading">…</div>
+    </div>
+
+  </div><!-- /.fn-missions-grid -->
+
+
+  <!-- ══ THE FLOCKOS SUITE ═══════════════════════════════════════════════ -->
+  <hr class="rule-double" style="margin-top: 28px;">
+  <p class="fn-section-label">The FlockOS Suite &nbsp;·&nbsp; Eight Apps, One Mission</p>
+
+  <div class="fn-suite-grid">
+    <div class="fn-suite-card">
+      <div class="fn-suite-name">FlockOS — The Shepherd's Dashboard</div>
+      <div class="fn-suite-desc">Member directory, pastoral care notes, prayer tracking, small groups, events, attendance, spiritual milestones, and service planning — all in one place.</div>
+    </div>
+    <div class="fn-suite-card">
+      <div class="fn-suite-name">GROW — Discipleship Hub</div>
+      <div class="fn-suite-desc">Gospel presentation, one-year Bible plan, devotionals, Strong's lexicon, theology, apologetics, and missions data for 238 nations. Public. No account required.</div>
+    </div>
+    <div class="fn-suite-card">
+      <div class="fn-suite-name">The Invitation — Gospel Page</div>
+      <div class="fn-suite-desc">One page. One message. A clear presentation of Jesus — who He is, what He did, how to respond. Share it with a seeker in a text or a counseling conversation.</div>
+    </div>
+    <div class="fn-suite-card">
+      <div class="fn-suite-name">Flock Stand — The Music Stand</div>
+      <div class="fn-suite-desc">Song library, setlist builder, chord transposer, and live lyrics display. The entire worship team, on the same page, in any key, with or without internet.</div>
+    </div>
+    <div class="fn-suite-card">
+      <div class="fn-suite-name">FlockChat — Church Messaging</div>
+      <div class="fn-suite-desc">Secure real-time messaging — team channels, small group rooms, direct messages, and prayer chains. Your congregation's conversations stay in your church's accounts.</div>
+    </div>
+    <div class="fn-suite-card">
+      <div class="fn-suite-name">FlockShow — Worship Display</div>
+      <div class="fn-suite-desc">Slides for your service — lyrics, Scripture, announcements — pulling directly from your setlists and service plans. No manual recreation every week.</div>
+    </div>
+    <div class="fn-suite-card">
+      <div class="fn-suite-name">FEED — Sermon Workspace</div>
+      <div class="fn-suite-desc">Outline your message, track your series, and build a searchable archive of every sermon ever preached — connected directly to your service plans.</div>
+    </div>
+    <div class="fn-suite-card">
+      <div class="fn-suite-name">The Wellspring — Offline Mode</div>
+      <div class="fn-suite-desc">The full suite, running from a single encrypted file with zero internet required. Built for the missionary, the church planter, and the pastor at the edge of the world.</div>
+    </div>
+  </div><!-- /.fn-suite-grid -->
+
+
+  <!-- ══ FOOTER ══════════════════════════════════════════════════════════ -->
+  <footer class="fn-footer">
+    <em>"And he gave the apostles, the prophets, the evangelists, the shepherds and teachers,<br>
+    to equip the saints for the work of ministry, for building up the body of Christ."<br>
+    — Ephesians 4:11–12</em>
+    The Flock Herald &nbsp;·&nbsp; FlockOS &nbsp;·&nbsp; flock-os.github.io &nbsp;·&nbsp; Free to the Church &nbsp;·&nbsp; All Rights Reserved
+  </footer>
+
+</div><!-- /.fn-page -->
+
+<div id="fn-status" role="alert" aria-live="polite"></div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SCRIPTS
+     ═══════════════════════════════════════════════════════════════════════ -->
+<script>
+  'use strict';
+
+  // ── Masthead: live date + issue number (day of year) ─────────────────
+  (function () {
+    var now      = new Date();
+    var start    = new Date(now.getFullYear(), 0, 0);
+    var dayOfYear = Math.floor((now - start) / 86400000);
+
+    var dateEl = document.getElementById('fn-date');
+    if (dateEl) {
+      dateEl.textContent = now.toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+
+    var issueEl = document.getElementById('fn-issue');
+    if (issueEl) issueEl.textContent = dayOfYear;
+
+    window._FN_DAY_OF_YEAR = dayOfYear;
+    window._FN_TODAY_STR   = now.toISOString().slice(0, 10); // "YYYY-MM-DD"
+  })();
+
+  // ── Back navigation ──────────────────────────────────────────────────
+  function goBack() {
+    if (window.opener && !window.opener.closed) {
+      window.close();
+    } else if (history.length > 1) {
+      history.back();
+    } else {
+      window.location.href = '../index.html';
+    }
+  }
+
+  // ── Share ─────────────────────────────────────────────────────────────
+  function shareHerald() {
+    var shareData = {
+      title: 'The Flock Herald — FlockOS Daily',
+      text: 'Ministry news, devotionals & missions — free to the Body of Christ.',
+      url: 'https://flock-os.github.io/FlockOS/Nations/Root/app.flocknews/flocknews.html'
+    };
+    if (navigator.share) {
+      navigator.share(shareData).catch(function () {});
+    } else {
+      navigator.clipboard.writeText(shareData.url).then(function () {
+        var btn = document.getElementById('fn-share-btn');
+        var orig = btn.innerHTML;
+        btn.textContent = 'Link Copied!';
+        setTimeout(function () { btn.innerHTML = orig; }, 2200);
+      }).catch(function () {
+        prompt('Copy this link to share:', shareData.url);
+      });
+    }
+  }
+
+  // ── Truncate text to N words ──────────────────────────────────────────
+  function truncateWords(text, n) {
+    if (!text) return '';
+    var words = text.trim().split(/\s+/);
+    if (words.length <= n) return text;
+    return words.slice(0, n).join(' ') + '…';
+  }
+
+  // ── Escape HTML ───────────────────────────────────────────────────────
+  function esc(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ── Format large numbers ──────────────────────────────────────────────
+  function fmtNum(n) {
+    if (!n || isNaN(n)) return '—';
+    if (n >= 1000000000) return (n / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+    if (n >= 1000000)    return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (n >= 1000)       return (n / 1000).toFixed(0) + 'K';
+    return n.toLocaleString();
+  }
+</script>
+
+<!-- Data loader — ES module so we can import devotionals.js & missions.js -->
+<script type="module">
+  import devosRaw   from '../Data/devotionals.js';
+  import missionsRaw from '../Data/missions.js';
+
+  const today    = window._FN_TODAY_STR;
+  const dayOfYear = window._FN_DAY_OF_YEAR;
+
+  // ══════════════════════════════════════════════════════════════════════
+  // DEVOTIONAL OF THE DAY
+  // ══════════════════════════════════════════════════════════════════════
+  (function renderDevo() {
+    const devo = devosRaw.find(d => d.date === today)
+              || devosRaw[dayOfYear % devosRaw.length]
+              || devosRaw[0];
+
+    if (!devo) {
+      document.getElementById('fn-devo-content').innerHTML =
+        '<p class="fn-devo-reflection">No devotional found for today.</p>';
+      return;
+    }
+
+    document.getElementById('fn-devo-content').innerHTML = `
+      <div class="fn-devo-theme">${esc(devo.theme || '')}</div>
+      <h2 class="fn-devo-title">${esc(devo.title || 'Today\'s Devotional')}</h2>
+      <div class="fn-devo-scripture">${esc(devo.scripture || '')}</div>
+      <p class="fn-devo-reflection">${esc(truncateWords(devo.reflection, 70))}</p>
+      <hr class="fn-devo-divider">
+      <div class="fn-devo-question-label">Reflection Question</div>
+      <div class="fn-devo-question">${esc(devo.question || '')}</div>
+      <hr class="fn-devo-divider">
+      <div class="fn-devo-prayer-label">Today's Prayer</div>
+      <div class="fn-devo-prayer">${esc(devo.prayer || '')}</div>
+    `;
+  })();
+
+
+  // ══════════════════════════════════════════════════════════════════════
+  // MISSIONS SPOTLIGHT — rotates daily through all countries
+  // ══════════════════════════════════════════════════════════════════════
+  (function renderSpotlight() {
+    if (!missionsRaw || !missionsRaw.length) {
+      document.getElementById('fn-spot-content').textContent = 'Missions data unavailable.';
+      return;
+    }
+
+    const country = missionsRaw[dayOfYear % missionsRaw.length];
+
+    const pctChristian = country.percentChristian
+      ? (country.percentChristian).toFixed(1) + '%'
+      : (country.christianPercent ? country.christianPercent.toFixed(2) + '%' : '—');
+
+    const pctEvangelical = country.percentEvangelical
+      ? (country.percentEvangelical).toFixed(1) + '%'
+      : (country.evangelicalPercent ? country.evangelicalPercent.toFixed(2) + '%' : '—');
+
+    const unreached     = country.unreachedGroups || country.totalPeopleGroups || '—';
+    const pop           = fmtNum(country.population || country.jpPopulation);
+    const tier          = country.persecutionTier || country.persecutionLevel || '—';
+    const region        = country.region || '—';
+    const summary       = country.owSummary || '';
+    const challenges    = country.owPrayerChallenges || [];
+    const challenge     = challenges.length > 0 ? challenges[0] : null;
+    const jpUrl         = country.jpProfileUrl || country.profileUrl || null;
+    const window10_40   = country.tenFortyWindow ? 'Yes' : 'No';
+
+    document.getElementById('fn-spot-content').innerHTML = `
+      <div class="fn-spot-country">${esc(country.icon || '')} ${esc(country.countryName || '')}</div>
+      <div class="fn-spot-meta">
+        <span>${esc(region)}</span>
+        <span>Pop. ${esc(pop)}</span>
+        <span>Christian ${esc(pctChristian)}</span>
+        <span>Evangelical ${esc(pctEvangelical)}</span>
+        <span>Unreached groups: ${esc(String(unreached))}</span>
+        <span>10/40 Window: ${esc(window10_40)}</span>
+        <span>Persecution: ${esc(tier)}</span>
+      </div>
+      ${summary ? `<p class="fn-spot-summary">${esc(truncateWords(summary, 90))}</p>` : ''}
+      ${challenge ? `
+        <div class="fn-spot-challenge-label">Prayer Challenge</div>
+        <div class="fn-spot-challenge">${esc(truncateWords(challenge, 50))}</div>
+      ` : ''}
+      ${jpUrl ? `<a class="fn-spot-link" href="${esc(jpUrl)}" target="_blank" rel="noopener">Joshua Project Profile →</a>` : ''}
+    `;
+  })();
+
+
+  // ══════════════════════════════════════════════════════════════════════
+  // GLOBAL STATS — computed from full missions dataset
+  // ══════════════════════════════════════════════════════════════════════
+  (function renderStats() {
+    if (!missionsRaw || !missionsRaw.length) {
+      document.getElementById('fn-stats-content').textContent = '—';
+      return;
+    }
+
+    let totalCountries   = missionsRaw.length;
+    let totalUnreached   = 0;
+    let totalPop         = 0;
+    let totalPopUnreached = 0;
+    let extremeCount     = 0;
+    let tenFortyCount    = 0;
+
+    missionsRaw.forEach(c => {
+      totalUnreached   += (c.unreachedGroups || c.totalPeopleGroups || 0);
+      totalPop         += (c.population || c.jpPopulation || 0);
+      totalPopUnreached += (c.populationUnreached || 0);
+      if ((c.persecutionTier || c.persecutionLevel || '').toLowerCase().includes('extreme')) extremeCount++;
+      if (c.tenFortyWindow) tenFortyCount++;
+    });
+
+    document.getElementById('fn-stats-content').innerHTML = `
+      <div class="fn-stat-row">
+        <div class="fn-stat-number">${totalCountries}</div>
+        <div class="fn-stat-label">Nations in the<br>missions registry</div>
+      </div>
+      <div class="fn-stat-row">
+        <div class="fn-stat-number">${fmtNum(totalUnreached)}</div>
+        <div class="fn-stat-label">Unreached people<br>groups tracked</div>
+      </div>
+      <div class="fn-stat-row">
+        <div class="fn-stat-number">${fmtNum(totalPopUnreached)}</div>
+        <div class="fn-stat-label">People living in<br>unreached groups</div>
+      </div>
+      <div class="fn-stat-row">
+        <div class="fn-stat-number">${extremeCount}</div>
+        <div class="fn-stat-label">Nations with<br>extreme persecution</div>
+      </div>
+      <div class="fn-stat-row">
+        <div class="fn-stat-number">${tenFortyCount}</div>
+        <div class="fn-stat-label">Nations in the<br>10/40 Window</div>
+      </div>
+    `;
+  })();
+
+
+  // ══════════════════════════════════════════════════════════════════════
+  // WORLD WATCH — top 10 most persecuted nations
+  // ══════════════════════════════════════════════════════════════════════
+  (function renderWatch() {
+    if (!missionsRaw || !missionsRaw.length) {
+      document.getElementById('fn-watch-content').textContent = '—';
+      return;
+    }
+
+    // Sort by persecutionRank (lower = worse) and pick top 10
+    const ranked = missionsRaw
+      .filter(c => typeof c.persecutionRank === 'number' && c.persecutionRank > 0)
+      .sort((a, b) => a.persecutionRank - b.persecutionRank)
+      .slice(0, 10);
+
+    if (!ranked.length) {
+      document.getElementById('fn-watch-content').textContent = 'No data.';
+      return;
+    }
+
+    const items = ranked.map(c => `
+      <li>
+        <span class="fn-watch-rank">${c.persecutionRank}.</span>
+        <div>
+          <div class="fn-watch-name">${esc(c.icon || '')} ${esc(c.countryName || '')}</div>
+          <div class="fn-watch-desc">${esc(c.persecutionTier || c.persecutionLevel || '')}${c.capital ? ' · ' + esc(c.capital) : ''}</div>
+        </div>
+      </li>
+    `).join('');
+
+    document.getElementById('fn-watch-content').innerHTML =
+      `<ul class="fn-watch-list">${items}</ul>`;
+  })();
+
+</script>
+
+</body>
+</html>
