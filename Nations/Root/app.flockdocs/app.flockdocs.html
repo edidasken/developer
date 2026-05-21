@@ -62,6 +62,9 @@
     }
     body { background: var(--fd-bg, #f5f0e4); }
 
+    /* Auth gate: hide app shell until auth resolves to prevent guest access */
+    #fd-app { display: none; }
+
     /* ── Shell grid ──────────────────────────────────────────────────────── */
     .fd-wrap {
       display: grid;
