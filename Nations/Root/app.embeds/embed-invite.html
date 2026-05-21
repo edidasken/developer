@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Absolute base so all relative URLs resolve to GitHub Pages regardless of embed host -->
+  <base href="https://flock-os.github.io/FlockOS/New_Covenant/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <meta name="theme-color" content="#22c55e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="A hope-filled look at Jesus Christ — His invitations, His identity, and His finished work.">
+  <title>The Invitation — FlockOS</title>
+
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="Images/icon-invite.svg">
+  <link rel="apple-touch-icon" href="Images/icon-invite.svg">
+  <link rel="manifest" href="app.invite/manifest.json">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Firebase preconnect -->
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+  <link rel="preconnect" href="https://securetoken.googleapis.com">
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com">
+
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+
+  <!-- App CSS — new_covenant.css contains all shared styles -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading state -->
+  <div id="inv-loading" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);z-index:9999;">
+    <div style="font-size:3rem;margin-bottom:16px;">✝️</div>
+    <div style="font:700 1.4rem var(--font-ui,sans-serif);color:var(--ink);text-transform:uppercase;letter-spacing:.1em;">The Invitation</div>
+  </div>
+
+  <!-- App root -->
+  <div id="inv-topbar"></div>
+  <div id="inv-root"></div>
+
+  <!-- Firebase config — patched per-church by B-Build -->
+  <script>
+    window.FLOCK_FIREBASE_CONFIG = {
+      apiKey:            'AIzaSyBA-fkxjABbwIHn0i6MPiXbGwahfJmuJeo',
+      authDomain:        'flockos-notify.firebaseapp.com',
+      projectId:         'flockos-notify',
+      storageBucket:     'flockos-notify.firebasestorage.app',
+      messagingSenderId: '321766738616',
+      appId:             '1:321766738616:web:d2c1c53ad7493fcde4c24d',
+    };
+  </script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+  <!-- Standalone invite boot -->
+  <script>
+    window._INVITE_SHARE_URL = location.href.split('?')[0].split('#')[0];
+  </script>
+
+  <script defer src="Scripts/the_upper_room.js"></script>
+
+  <script type="module">
+    import { mountUnityHeader } from 'Scripts/the_unity_header.js';
+    import { render, mount }    from 'Scripts/the_gospel/the_gospel_invitation.js';
+
+    const INV_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="4.5" y1="8.5" x2="19.5" y2="8.5"/></svg>';
+    const topbar = document.getElementById('inv-topbar');
+    if (topbar) {
+      mountUnityHeader(topbar, {
+        appId:       'invite',
+        appName:     'The Invitation',
+        appIconSvg:  INV_ICON,
+        appAccent:   '#22c55e',
+        appAccentDk: '#14532d',
+        homeHref:    'app.invite/',
+        user:        null,
+        signInHref:  './',
+        features: [
+          { id: 'inv-share',    label: 'Share This Page', hint: 'Send this invitation to someone', run: () => document.getElementById('inv-topbar-share')?.click() },
+          { id: 'inv-launcher', label: 'Back to Launcher', hint: 'All FlockOS apps', run: () => { location.href = './'; } },
+        ],
+      });
+    }
+
+    const root    = document.getElementById('inv-root');
+    const loading = document.getElementById('inv-loading');
+
+    root.innerHTML = render();
+    loading.remove();
+    mount(root);
+
+    /* Church name in topbar */
+    (async () => {
+      try {
+        const cfg = window.FLOCK_FIREBASE_CONFIG;
+        const fb  = window.firebase;
+        if (!fb || !cfg) return;
+        const appName = 'invite-embed-church-info';
+        const app = fb.apps.find(a => a.name === appName) || fb.initializeApp(cfg, appName);
+        const db  = app.firestore();
+        const doc = await db.collection('appConfig').doc('church_name').get();
+        const name = doc.exists ? (doc.data().value || '').trim() : '';
+        const el = document.getElementById('inv-church-name');
+        if (name && el) el.textContent = name;
+      } catch (_) {}
+    })();
+  </script>
+
+</body>
+</html>

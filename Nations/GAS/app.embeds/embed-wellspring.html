@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Absolute base so all relative URLs resolve to GitHub Pages regardless of embed host -->
+  <base href="https://flock-os.github.io/FlockOS/New_Covenant/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, date=no, email=no, address=no">
+  <title>The Wellspring — FlockOS</title>
+
+  <!-- Icons -->
+  <link rel="icon" type="image/svg+xml" href="Images/icon-wellspring.svg">
+  <link rel="apple-touch-icon" href="Images/icon-wellspring.svg">
+  <link rel="manifest" href="app.wellspring/manifest.json">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Firebase preconnect -->
+  <link rel="preconnect" href="https://firestore.googleapis.com">
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com">
+  <link rel="preconnect" href="https://securetoken.googleapis.com">
+  <link rel="dns-prefetch" href="https://firestore.googleapis.com">
+
+  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('flock_theme') || 'america';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'america');
+      }
+    })();
+  </script>
+
+  <!-- App CSS — new_covenant.css contains all shared styles -->
+  <link rel="stylesheet" href="Styles/new_covenant.css">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      background: var(--bg);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Boot splash -->
+  <div id="ws-boot" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);z-index:9999;transition:opacity 400ms,visibility 400ms;">
+    <div style="font-size:3rem;margin-bottom:16px;">💧</div>
+    <div style="font:700 1.4rem var(--font-ui,sans-serif);color:var(--ink);text-transform:uppercase;letter-spacing:.1em;">The Wellspring</div>
+  </div>
+
+  <!-- Firebase config — patched per-church by B-Build -->
+  <script>
+    window.FLOCK_FIREBASE_CONFIG = {
+      apiKey:            'AIzaSyBA-fkxjABbwIHn0i6MPiXbGwahfJmuJeo',
+      authDomain:        'flockos-notify.firebaseapp.com',
+      projectId:         'flockos-notify',
+      storageBucket:     'flockos-notify.firebasestorage.app',
+      messagingSenderId: '321766738616',
+      appId:             '1:321766738616:web:d2c1c53ad7493fcde4c24d',
+    };
+  </script>
+
+  <!-- Firebase SDK -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+  <!-- Wellspring app logic -->
+  <script defer src="Scripts/the_wellspring.js"></script>
+  <script defer src="Scripts/the_upper_room.js"></script>
+
+  <!-- Hide boot splash after app loads -->
+  <script>
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var boot = document.getElementById('ws-boot');
+        if (boot) { boot.style.opacity = '0'; boot.style.visibility = 'hidden'; }
+      }, 800);
+    });
+  </script>
+
+</body>
+</html>

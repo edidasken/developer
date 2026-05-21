@@ -7969,8 +7969,7 @@ body.embedded #btn-manage-users { display: none !important; }
 ===============================================================================
 */
 
-/* === America Theme Variables (imported or defined here) === */
-@import url('./the_garment.css');
+/* === America Theme Variables === */
 
 /* === Utility Classes (shared across all deployments) === */
 .flex { display: flex; }
