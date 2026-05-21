@@ -43,7 +43,7 @@ export const NC_APP_ICONS = {
 
 /* Canonical app catalog. Order = launcher order (Public first, then Secure). */
 export const NC_APPS = [
-  { id: 'flocknews', name: 'FlockNews',      sub: 'Daily spiritual content',        href: 'app.flocknews/app.flocknews.html', tone: 'gold' },
+  { id: 'flocknews', name: 'FlockNews',      sub: 'Daily spiritual content',        href: 'app.flocknews/flocknews.html',   tone: 'gold' },
   { id: 'grow',      name: 'GROW',           sub: 'Discipleship & Bible study',     href: 'app.grow/app.grow.html',         tone: 'gold'   },
   { id: 'invite',    name: 'The Invitation', sub: 'Share the hope of Jesus Christ', href: 'app.invite/app.invite.html',     tone: 'green'  },
   { id: 'flockos',   name: 'FlockOS',        sub: 'Church management',              href: 'app.flockos/app.flockos.html',   tone: 'blue'   },
