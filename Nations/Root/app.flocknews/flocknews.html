@@ -23,7 +23,7 @@
   <div class="fn-back-bar" style="position:relative">
     <button class="fn-back-btn" id="fn-app-switcher-btn" aria-haspopup="true" aria-expanded="false" aria-controls="fn-app-switcher">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Select an App
+      <span class="fn-btn-label">Select an App</span>
       <svg class="fn-switcher-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
     <!-- App switcher dropdown -->
@@ -65,15 +65,19 @@
         <span class="fn-sw-icon" style="color:#22c55e"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6 9 4 13 4 16a8 8 0 0 0 16 0c0-3-2-7-8-14z"/></svg></span>
         <span class="fn-sw-text"><span class="fn-sw-name">The Wellspring</span><span class="fn-sw-hint">Offline Mode</span></span>
       </a>
+      <a class="fn-sw-item" href="../app.multiply/multiply.html" role="menuitem">
+        <span class="fn-sw-icon" style="color:#22c55e"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="5" y1="5" x2="7.5" y2="7.5"/><line x1="16.5" y1="16.5" x2="19" y2="19"/><line x1="19" y1="5" x2="16.5" y2="7.5"/><line x1="7.5" y1="16.5" x2="5" y2="19"/></svg></span>
+        <span class="fn-sw-text"><span class="fn-sw-name">Multiply</span><span class="fn-sw-hint">Church planting &amp; multiplication</span></span>
+      </a>
     </nav>
     <div style="display:flex;gap:10px;align-items:center">
-      <a class="fn-edit-btn" href="news_editor.html">
+      <a class="fn-edit-btn" id="fn-editor-link" href="news_editor.html">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         Editor
       </a>
       <button class="fn-share-btn" id="fn-share-btn" onclick="shareHerald()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-        Share This Edition
+        <span class="fn-btn-label">Share This Edition</span>
       </button>
     </div>
   </div>
@@ -1319,6 +1323,34 @@ function closeSuitePanel() {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeSuitePanel();
 });
+</script>
+
+<!-- ── Firebase config — B-Build patches this per deployment ───────── -->
+<script>
+  window.FLOCK_FIREBASE_CONFIG = {
+    apiKey:            'AIzaSyBA-fkxjABbwIHn0i6MPiXbGwahfJmuJeo',
+    authDomain:        'flockos-notify.firebaseapp.com',
+    projectId:         'flockos-notify',
+    storageBucket:     'flockos-notify.firebasestorage.app',
+    messagingSenderId: '321766738616',
+    appId:             '1:321766738616:web:d2c1c53ad7493fcde4c24d'
+  };
+</script>
+<script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script>
+  // Show editor link only when user is authenticated
+  window.addEventListener('load', function() {
+    var cfg = window.FLOCK_FIREBASE_CONFIG;
+    if (!cfg || !cfg.apiKey) return;
+    try {
+      var app = firebase.apps.length ? firebase.apps[0] : firebase.initializeApp(cfg);
+      firebase.auth(app).onAuthStateChanged(function(user) {
+        var btn = document.getElementById('fn-editor-link');
+        if (btn) btn.style.display = user ? 'inline-flex' : 'none';
+      });
+    } catch(_) {}
+  });
 </script>
 
 </body>

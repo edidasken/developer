@@ -139,6 +139,12 @@ html, body {
     font-size: 12px;
     padding: 8px 18px 8px 14px;
   }
+  /* Icon-only on mobile — hide text labels */
+  .fn-btn-label { display: none; }
+  .fn-back-btn  { padding: 8px 10px; }
+  .fn-share-btn { padding: 5px 10px; }
+  /* Section labels (e.g. "Today's Scripture Readings") center on mobile */
+  .fn-col-label { display: block; text-align: center; }
 }
 
 
@@ -152,7 +158,8 @@ html, body {
 .fn-share-btn:hover { opacity: .82; }
 
 .fn-edit-btn {
-  display: inline-flex; align-items: center; gap: 5px;
+  display: none; /* shown by JS only when user is authenticated */
+  align-items: center; gap: 5px;
   font-family: var(--serif); font-size: 10px; font-weight: 700;
   letter-spacing: .15em; text-transform: uppercase;
   color: var(--ink-label); background: none;

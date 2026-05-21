@@ -17,11 +17,13 @@
       height: 100dvh;
     }
 
-    /* ── Deployment selector pill ─────────────────────────────────────── */
+    /* ── Deployment selector pill — bottom-right fixed ───────────────── */
     #deploy-pill {
       position: fixed;
+      bottom: max(16px, env(safe-area-inset-bottom, 16px));
+      right:  max(16px, env(safe-area-inset-right,  16px));
       z-index: 9999;
-      display: none; /* shown by JS after iframe loads + position is known */
+      display: none; /* shown after init */
     }
 
     /* Matches fn-back-btn style exactly, with gold border to distinguish */
@@ -49,32 +51,28 @@
     #deploy-chevron { transition: transform .18s ease; }
     #deploy-btn[aria-expanded="true"] #deploy-chevron { transform: rotate(180deg); }
 
-    /* Dropdown — mirrors fn-app-switcher style */
+    /* Dropdown — always opens upward from bottom-right pill */
     #deploy-menu {
       position: absolute;
-      top: calc(100% + 6px);
-      left: 0;
+      bottom: calc(100% + 8px); /* opens upward */
+      top: auto;
+      right: 0;                 /* right-aligned */
+      left: auto;
       z-index: 9998;
       min-width: 220px;
-      max-width: calc(100vw - 16px);
+      max-width: calc(100vw - 24px);
       background: #0c1445;
       border-radius: 12px;
-      box-shadow: 0 8px 40px rgba(12,20,69,.55), 0 2px 8px rgba(0,0,0,.35);
+      box-shadow: 0 -4px 24px rgba(12,20,69,.45), 0 8px 40px rgba(12,20,69,.55);
       padding: 6px;
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
     #deploy-menu[hidden] { display: none !important; }
-    /* Flip upward when pill is near screen bottom */
-    #deploy-pill.open-up #deploy-menu {
-      top: auto;
-      bottom: calc(100% + 6px);
-    }
-    /* On mobile: align dropdown from right edge, not left */
+    /* Mobile: bigger tap targets */
     @media (max-width: 639px) {
-      #deploy-menu { left: auto; right: 0; }
-      .deploy-item { padding: 11px 14px; } /* bigger tap targets */
+      .deploy-item { padding: 11px 14px; }
     }
 
     .deploy-item {
@@ -196,41 +194,9 @@
       : 'Nations/' + folder + '/app.flocknews/flocknews.html';
   }
 
-  // ── Pin pill next to SELECT AN APP button (same-origin iframe DOM) ────
+  // ── Show pill — position is pure CSS (bottom-right fixed) ───────────
   function positionPill() {
-    var frame = document.getElementById('herald-frame');
-    var appBtn;
-    try { appBtn = frame.contentDocument && frame.contentDocument.getElementById('fn-app-switcher-btn'); }
-    catch (_) {}
-    var pill  = document.getElementById('deploy-pill');
-    var vw    = window.innerWidth;
-    var vh    = window.innerHeight;
-
-    if (vw < 640) {
-      // ── Mobile: fixed top-right within safe area; don't touch iframe DOM ──
-      pill.style.top   = 'max(8px, env(safe-area-inset-top, 8px))';
-      pill.style.right = 'max(8px, env(safe-area-inset-right, 8px))';
-      pill.style.left  = 'auto';
-      pill.classList.remove('open-up');
-    } else if (appBtn) {
-      // ── Desktop: anchor right of SELECT AN APP, clamped to viewport ──────
-      var r         = appBtn.getBoundingClientRect();
-      var pillW     = pill.offsetWidth || 150;
-      var clampedL  = Math.min(r.right + 8, vw - pillW - 8);
-      pill.style.top   = r.top + 'px';
-      pill.style.left  = Math.max(8, clampedL) + 'px';
-      pill.style.right = 'auto';
-      // Flip dropdown upward if pill is in the lower half of screen
-      if (r.top > vh / 2) { pill.classList.add('open-up'); }
-      else                { pill.classList.remove('open-up'); }
-    } else {
-      // ── Fallback: top-left corner ─────────────────────────────────────────
-      pill.style.top   = '8px';
-      pill.style.left  = '8px';
-      pill.style.right = 'auto';
-      pill.classList.remove('open-up');
-    }
-    pill.style.display = 'block';
+    document.getElementById('deploy-pill').style.display = 'block';
   }
 
   // ── Menu open/close ───────────────────────────────────────────────────
@@ -280,15 +246,10 @@
 
     // Load the Herald for the active deployment
     var frame = document.getElementById('herald-frame');
-    frame.addEventListener('load', function() {
-      positionPill();
-      try { frame.contentWindow.addEventListener('resize', positionPill); } catch(_) {}
-    });
+    frame.addEventListener('load', function() { positionPill(); });
     frame.src = _active === 'New_Covenant'
       ? 'New_Covenant/app.flocknews/flocknews.html'
       : 'Nations/' + _active + '/app.flocknews/flocknews.html';
-
-    window.addEventListener('resize', positionPill);
   })();
   </script>
 
