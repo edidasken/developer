@@ -70,7 +70,7 @@
       --fn-book:         #f0b845;
     }
 
-    body { background: var(--fn-bg); display: flex; flex-direction: column; }
+    body { background: var(--fn-bg); display: flex; flex-direction: column; overflow-x: hidden; }
 
     /* Scrollable shell — everything below the unity bar scrolls here */
     #fn-scroll-shell {
@@ -228,17 +228,6 @@
       background: transparent; border: none; color: rgba(255,255,255,0.55);
       font-size: 18px; cursor: pointer; line-height: 1; padding: 0 4px; margin-left: 4px;
     }
-
-    /* ── For the Pastor link ── */
-    .fn-pastor-link {
-      text-align: center; padding: 20px 16px 40px;
-      border-top: 1px solid rgba(15,23,53,0.12); margin-top: 8px;
-    }
-    .fn-pastor-link a {
-      font-size: 12px; color: rgba(15,23,53,0.38);
-      text-decoration: none; font-weight: 500; letter-spacing: 0.04em;
-    }
-    .fn-pastor-link a:hover { color: var(--fn-gold-dk); }
 
     /* ── Header editable fields ── */
     .fn-tagline-wrap, .fn-edition-wrap {
@@ -1458,9 +1447,33 @@
       [data-section="book"]          { grid-column: span 12; border-right: none; }
       [data-section="words"]         { grid-column: span 12; }
     }
+    /* Stack reading + devotional before they get too narrow */
+    @media (max-width: 860px) {
+      [data-section="reading"]    { grid-column: span 12; border-right: none; }
+      [data-section="devotional"] { grid-column: span 12; }
+    }
+    /* Stack pastorHeart + announcements at tablet portrait */
+    @media (max-width: 768px) {
+      [data-section="pastorHeart"]   { grid-column: span 12; border-right: none; }
+      [data-section="announcements"] { grid-column: span 12; }
+      /* Shrink drop cap so it doesn't dominate narrow columns */
+      [data-section="pastorHeart"]  .card-body p:first-of-type::first-letter,
+      [data-section="devotional"]   .card-body p:first-of-type::first-letter,
+      [data-section="introduction"] .card-body p:first-of-type::first-letter {
+        font-size: 60px !important;
+        margin: 4px 8px 0 0 !important;
+      }
+    }
     @media (max-width: 640px) {
       #fn-news-feed { grid-template-columns: 1fr !important; }
       [data-section] { grid-column: span 1 !important; border-right: none !important; }
+      /* Drop cap even smaller on phone */
+      [data-section="pastorHeart"]  .card-body p:first-of-type::first-letter,
+      [data-section="devotional"]   .card-body p:first-of-type::first-letter,
+      [data-section="introduction"] .card-body p:first-of-type::first-letter {
+        font-size: 44px !important;
+        margin: 2px 6px 0 0 !important;
+      }
     }
 
     /* 3 ── NEWSPRINT CARDS: transparent on cream page */
@@ -2562,11 +2575,6 @@
   </div>
 
   </div><!-- /#fn-scroll-shell -->
-
-  <!-- For the Pastor — discreet link at page bottom -->
-  <div class="fn-pastor-link">
-    <a href="index.html">For the Pastor &rarr;</a>
-  </div>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" defer></script>
