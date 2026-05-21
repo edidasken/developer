@@ -219,8 +219,9 @@ function mountHeader() {
       // Future: toggle sidebar
     },
     features: [
-      { id: 'fn-top',    label: "Today's Content",  hint: 'Scroll to top of feed',     run: () => document.getElementById('fn-news-feed')?.scrollTo({ top: 0, behavior: 'smooth' }) },
-      { id: 'fn-edit',   label: 'Edit Content',     hint: 'Pastor mode — edit today\'s content', run: () => document.getElementById('fn-edit-toggle')?.click() },
+      { id: 'fn-top',      label: "Today's Content",  hint: 'Scroll to top of feed',          run: () => document.getElementById('fn-news-feed')?.scrollTo({ top: 0, behavior: 'smooth' }) },
+      { id: 'fn-edit',     label: 'Edit Content',      hint: 'Pastor mode — edit today\'s content', run: () => window.open('flocknews-editor.html', '_blank') },
+      { id: 'fn-multiply', label: 'Multiply',          hint: 'Church multiplication dashboard', run: () => window.open('multiply.html', '_blank') },
     ],
   });
 }
@@ -257,18 +258,34 @@ async function loadNewsContent() {
         reference: `OT: ${readingEntry.ot}, NT: ${readingEntry.nt}, Psalm ${readingEntry.ps}, Proverbs ${readingEntry.pr}`,
         content: `
           <h2>${readingEntry.date} — One Year Bible</h2>
-          <div style="display: grid; gap: 16px; margin-top: 16px;">
-            <div style="padding: 12px; background: rgba(251,146,60,0.15); border-left: 4px solid #fb923c; border-radius: 6px;">
-              <strong style="color: #fb923c;">📜 Old Testament:</strong> ${readingEntry.ot}
+          <div style="display: grid; gap: 14px; margin-top: 16px;">
+            <div class="fn-reading-pill">
+              <span class="fn-reading-pill-label">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                Old Testament
+              </span>
+              <span class="fn-reading-pill-text">${readingEntry.ot}</span>
             </div>
-            <div style="padding: 12px; background: rgba(96,165,250,0.15); border-left: 4px solid #60a5fa; border-radius: 6px;">
-              <strong style="color: #60a5fa;">✝️ New Testament:</strong> ${readingEntry.nt}
+            <div class="fn-reading-pill">
+              <span class="fn-reading-pill-label">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                New Testament
+              </span>
+              <span class="fn-reading-pill-text">${readingEntry.nt}</span>
             </div>
-            <div style="padding: 12px; background: rgba(34,197,94,0.15); border-left: 4px solid #22c55e; border-radius: 6px;">
-              <strong style="color: #22c55e;">🎶 Psalms:</strong> ${readingEntry.ps}
+            <div class="fn-reading-pill">
+              <span class="fn-reading-pill-label">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                Psalms
+              </span>
+              <span class="fn-reading-pill-text">${readingEntry.ps}</span>
             </div>
-            <div style="padding: 12px; background: rgba(250,204,21,0.15); border-left: 4px solid #facc15; border-radius: 6px;">
-              <strong style="color: #facc15;">💡 Proverbs:</strong> ${readingEntry.pr}
+            <div class="fn-reading-pill">
+              <span class="fn-reading-pill-label">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/><path d="M18 2l4 4-4 4"/><path d="M22 2l-4 4"/></svg>
+                Proverbs
+              </span>
+              <span class="fn-reading-pill-text">${readingEntry.pr}</span>
             </div>
           </div>
         `,
@@ -840,10 +857,10 @@ const BIBLE_BOOK_STATS = {
   'Jude': { chapters: 1, verses: 25 }, 'Revelation': { chapters: 22, verses: 404 }
 };
 
-// Estimate reading time from chapter count (~4.5 min/chapter at 200 wpm)
+// Estimate reading time from chapter count (~7 min/chapter for prayerful study pace)
 function _estimateReadingTime(chapters) {
   if (!chapters) return 'N/A';
-  const mins = Math.round(chapters * 4.5);
+  const mins = Math.round(chapters * 7);
   if (mins < 60) return `~${mins} min`;
   const hrs = Math.floor(mins / 60);
   const rem = mins % 60;

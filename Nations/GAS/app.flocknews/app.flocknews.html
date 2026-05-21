@@ -451,8 +451,8 @@
     .fn-unreached-header,
     .fn-bible-access-header,
     .fn-frontlines-header {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       align-items: flex-start;
       margin-bottom: 8px;
       gap: 8px;
@@ -469,6 +469,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      min-width: 0;
     }
 
     .fn-country-label,
@@ -480,7 +481,6 @@
       text-transform: uppercase;
       color: var(--fn-ink-muted);
       text-align: right;
-      flex-shrink: 0;
     }
 
     .fn-country-icon { font-size: 20px; }
@@ -772,6 +772,42 @@
 
     /* ── BIBLE READING ───────────────────────────────── */
     /* Scripture text is larger than body for readability */
+    /* ── READING PILLS ───────────────────────────────── */
+    .fn-reading-pill {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      font-family: var(--body);
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--fn-ink);
+      flex-wrap: wrap;
+    }
+    .fn-reading-pill-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--navy-mid);
+      color: var(--gold);
+      font-family: var(--serif);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      padding: 4px 13px 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .fn-reading-pill-label svg {
+      flex-shrink: 0;
+      stroke: var(--gold);
+    }
+    .fn-reading-pill-text {
+      color: var(--fn-ink);
+      font-family: var(--body);
+      font-size: 16px;
+    }
+
     #fn-reading-content p,
     #fn-reading-content div p {
       font-size: 19px !important;
