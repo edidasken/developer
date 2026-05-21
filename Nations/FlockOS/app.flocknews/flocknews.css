@@ -111,7 +111,7 @@ html, body {
   border: none; border-top: 1px solid rgba(255,255,255,.15); margin: 4px 0;
 }
 
-/* ── Mobile ───────────────────────────────────────────────────────────── */
+/* ── Mobile layout ────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
   /* Darken muted label color on mobile for readability */
   :root { --ink-label: #2e2820; }
@@ -136,9 +136,6 @@ html, body {
   }
   .fn-sw-item { padding: 13px 18px; min-height: 56px; gap: 14px; }
   .fn-sw-icon svg { width: 20px; height: 20px; }
-  .fn-sw-name { font-size: 14px; }
-  .fn-sw-hint { font-size: 12px; }
-  .fn-back-btn { font-size: 12px; padding: 8px 18px 8px 14px; }
 
   /* Icon-only on mobile — hide text labels */
   .fn-btn-label { display: none; }
@@ -147,19 +144,6 @@ html, body {
 
   /* Section labels center on mobile */
   .fn-col-label { display: block; text-align: center; }
-
-  /* ── Bump tiny font sizes to readable minimums ─────────────────────── */
-  .fn-ph-type-badge, .fn-spot-jp-label, .fn-sp-label { font-size: 11px; }
-  .fn-reading-tag, .fn-ph-label, .fn-spot-section-label,
-  .fn-spot-challenge-label, .fn-hc-category, .fn-mirror-label,
-  .fn-apol-category, .fn-iam-need, .fn-quiz-diff,
-  .fn-col-label, .fn-lead-kicker, .fn-lead-byline,
-  .fn-devo-sub-label, .fn-quiz-cat, .fn-counsel-steps-label,
-  .fn-spot-link, .fn-index-box-label { font-size: 12px; }
-  .fn-lead-theme, .fn-theo-category, .fn-stat-label,
-  .fn-dateline, .fn-section-label, .fn-watch-rank,
-  .fn-spot-meta, .fn-footer, .fn-motto { font-size: 14px; }
-  .fn-watch-desc { font-size: 14px; }
 }
 
 
@@ -1140,4 +1124,73 @@ html, body {
 .fn-loading {
   font-family: var(--body-serif);
   font-size: 16px; color: var(--ink-label); padding: 14px 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MOBILE TYPOGRAPHY — at end of file so it wins over all base font sizes
+   ════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+
+  /* ── Close buttons: proper tap targets ─────────────────────────────── */
+  .fn-dossier-close {
+    font-size: 32px;
+    min-width: 52px; min-height: 52px;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 6px; margin: -12px -8px 16px 0;
+    border-radius: 50%;
+  }
+  .fn-suite-panel-close {
+    width: 52px; height: 52px; font-size: 28px;
+    margin: 12px 12px 0 0;
+  }
+
+  /* ── All body / prose text → 20px ──────────────────────────────────── */
+  .fn-page p, .fn-page li,
+  .fn-lead-body p,
+  .fn-devo-question, .fn-devo-prayer,
+  .fn-hc-question, .fn-hc-prescription,
+  .fn-mirror-q, .fn-mirror-scripture,
+  .fn-spot-summary,
+  .fn-spot-challenge,
+  .fn-spot-challenges-list .fn-spot-challenge,
+  .fn-ph-body, .fn-ph-detail,
+  .fn-sp-text, .fn-sp-list, .fn-sp-list li,
+  .fn-figure-body, .fn-figure-bio,
+  .fn-iam-verse, .fn-iam-desc,
+  .fn-work-summary, .fn-work-hope,
+  .fn-inv-insight, .fn-inv-quote,
+  .fn-quiz-q, .fn-quiz-btn,
+  .fn-counsel-step-list li,
+  .fn-watch-desc,
+  .fn-loading { font-size: 20px; line-height: 1.8; }
+
+  /* ── Metadata / secondary text → 16px ──────────────────────────────── */
+  .fn-spot-meta, .fn-spot-meta span,
+  .fn-spot-rel-row, .fn-spot-rel-name, .fn-spot-rel-pct,
+  .fn-watch-name, .fn-reading-ref,
+  .fn-sw-name, .fn-sw-hint,
+  .fn-sp-sub, .fn-suite-tile-name,
+  .fn-col-label, .fn-section-label, .fn-dateline, .fn-lead-theme,
+  .fn-stat-label, .fn-quiz-ref,
+  .fn-figure-name-big, .fn-figure-title,
+  .fn-inv-title, .fn-work-title,
+  .fn-index-list li { font-size: 16px; }
+
+  /* ── All tiny labels → 14px minimum ────────────────────────────────── */
+  .fn-ph-type-badge, .fn-ph-label,
+  .fn-spot-section-label, .fn-spot-challenge-label,
+  .fn-spot-jp-label, .fn-spot-link,
+  .fn-sp-label, .fn-sp-open,
+  .fn-lead-kicker, .fn-lead-byline, .fn-devo-sub-label,
+  .fn-hc-category, .fn-mirror-label,
+  .fn-theo-category, .fn-apol-category,
+  .fn-quiz-diff, .fn-quiz-cat,
+  .fn-iam-need, .fn-iam-label,
+  .fn-readings-day, .fn-reading-tag,
+  .fn-watch-rank, .fn-figure-lifespan, .fn-figure-ref, .fn-figure-meaning,
+  .fn-index-box-label, .fn-inv-ref, .fn-inv-share-btn,
+  .fn-work-hope-label, .fn-work-sub,
+  .fn-suite-tile-sub,
+  .fn-back-btn, .fn-share-btn,
+  .fn-motto, .fn-footer { font-size: 14px; }
 }

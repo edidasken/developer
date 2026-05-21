@@ -439,3 +439,35 @@
     }
     #mly-status.visible       { display: block; }
     #mly-status.error         { border-color: var(--red); color: var(--red); }
+
+    /* ════════════════════════════════════════════════════════════════════
+       MOBILE TYPOGRAPHY — at end to override base font sizes
+       ════════════════════════════════════════════════════════════════════ */
+    @media (max-width: 640px) {
+      html, body { font-size: 20px; }
+
+      .herald-body p, .herald-body li { font-size: 20px; line-height: 1.78; }
+      .herald-body h3 { font-size: 16px; }
+      .herald-deck { font-size: clamp(18px, 4.5vw, 22px); }
+      .herald-pull { font-size: 21px; }
+      .herald-form-sub { font-size: 18px; }
+      .herald-app-card-desc { font-size: 16px; }
+      .herald-trust-a { font-size: 17px; }
+      .herald-form input, .herald-form textarea { font-size: 18px; }
+      .herald-submit { font-size: 17px; padding: 16px 20px; }
+      .herald-success h3 { font-size: 24px; }
+      .herald-success p { font-size: 19px; }
+      .herald-footer em { font-size: 17px; }
+
+      .herald-section-label { font-size: 15px; }
+      .herald-byline { font-size: 14px; }
+      .herald-app-card-name { font-size: 16px; }
+      .herald-trust-q { font-size: 15px; }
+      .herald-back-btn { font-size: 14px; padding: 7px 16px 7px 12px; }
+      .herald-share-btn { font-size: 14px; }
+      .herald-form label { font-size: 14px; }
+
+      .herald-tagline { font-size: 13px; }
+      .herald-dateline { font-size: 13px; }
+      .herald-footer { font-size: 13px; }
+    }
