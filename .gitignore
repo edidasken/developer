@@ -103,3 +103,6 @@ Architechtural Docs/
 # Local-only symlink to gitignored Architechtural Docs (was breaking GitHub Pages tar --dereference)
 Covenant/Scrolls/ChurchRegistry
 Architechtural Docs/New Covenant/Automation/AI_Doc_Runner/dumps/
+
+# B-Build rsync output — jsconfig.json copied from New_Covenant source
+Nations/*/jsconfig.json
