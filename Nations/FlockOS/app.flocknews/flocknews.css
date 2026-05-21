@@ -49,7 +49,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 0 10px;
+  padding: max(8px, env(safe-area-inset-top, 8px)) 0 10px;
   border-bottom: 1px solid var(--rule);
   margin-bottom: 4px;
 }
