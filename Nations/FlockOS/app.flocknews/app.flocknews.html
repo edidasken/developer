@@ -229,137 +229,12 @@
       font-size: 18px; cursor: pointer; line-height: 1; padding: 0 4px; margin-left: 4px;
     }
 
-    /* ── Header editable fields ── */
-    .fn-tagline-wrap, .fn-edition-wrap {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .fn-header-edit-btn {
-      display: none; background: transparent;
-      border: 1px solid rgba(232,168,56,0.4); border-radius: 5px;
-      color: var(--fn-gold); font-size: 10px; font-weight: 700;
-      padding: 2px 8px; cursor: pointer; letter-spacing: 0.5px;
-    }
-    .fn-editing .fn-header-edit-btn { display: inline-block; }
 
-    /* ── Module Manager ── */
-    .fn-module-manager {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.65);
-      z-index: 2000; display: flex; align-items: flex-end; justify-content: center;
-    }
-    .fn-mm-panel {
-      background: #0f1735; width: 100%; max-width: 640px; max-height: 88vh;
-      border-radius: 20px 20px 0 0; display: flex; flex-direction: column;
-      overflow: hidden; box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
-    }
-    .fn-mm-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 20px 24px 16px; border-bottom: 1px solid rgba(232,168,56,0.2); flex-shrink: 0;
-    }
-    .fn-mm-header h2 { font-size: 20px; color: #fff; font-weight: 700; margin: 0; }
-    .fn-mm-close { background: transparent; border: none; color: rgba(255,255,255,0.55); font-size: 22px; cursor: pointer; }
-    .fn-mm-body { flex: 1; overflow-y: auto; padding: 16px; }
-    .fn-mm-module-row {
-      display: flex; align-items: center; gap: 10px; padding: 11px 14px;
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(232,168,56,0.12);
-      border-radius: 10px; margin-bottom: 8px;
-    }
-    .fn-mm-module-icon { font-size: 18px; min-width: 24px; }
-    .fn-mm-module-label { flex: 1; color: #fff; font-weight: 600; font-size: 14px; }
-    .fn-mm-module-controls { display: flex; gap: 6px; align-items: center; }
-    .fn-mm-toggle { position: relative; width: 42px; height: 22px; cursor: pointer; flex-shrink: 0; }
-    .fn-mm-toggle input { opacity: 0; width: 0; height: 0; }
-    .fn-mm-slider {
-      position: absolute; inset: 0; background: rgba(255,255,255,0.15);
-      border-radius: 11px; transition: background 0.2s;
-    }
-    .fn-mm-slider::before {
-      content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px;
-      background: white; border-radius: 50%; transition: transform 0.2s;
-    }
-    .fn-mm-toggle input:checked + .fn-mm-slider { background: var(--fn-gold); }
-    .fn-mm-toggle input:checked + .fn-mm-slider::before { transform: translateX(20px); }
-    .fn-mm-reorder-btn {
-      background: transparent; border: 1px solid rgba(232,168,56,0.2); border-radius: 5px;
-      color: rgba(255,255,255,0.5); font-size: 14px; width: 26px; height: 26px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-    }
-    .fn-mm-reorder-btn:hover:not(:disabled) { border-color: var(--fn-gold); color: var(--fn-gold); }
-    .fn-mm-reorder-btn:disabled { opacity: 0.25; cursor: default; }
-    .fn-mm-delete-btn {
-      background: transparent; border: 1px solid rgba(239,68,68,0.3); border-radius: 5px;
-      color: rgba(239,68,68,0.6); font-size: 13px; width: 26px; height: 26px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-    }
-    .fn-mm-delete-btn:hover { border-color: #ef4444; color: #ef4444; }
-    .fn-mm-footer {
-      padding: 16px; border-top: 1px solid rgba(232,168,56,0.2);
-      display: flex; gap: 12px; flex-shrink: 0;
-    }
-    .fn-mm-add-btn {
-      flex: 1; padding: 12px; background: rgba(232,168,56,0.08);
-      border: 1px dashed rgba(232,168,56,0.5); border-radius: 10px;
-      color: var(--fn-gold); font-weight: 600; cursor: pointer; font-size: 13px;
-    }
-    .fn-mm-add-btn:hover { background: rgba(232,168,56,0.14); }
-    .fn-mm-save-btn {
-      padding: 12px 24px; background: var(--fn-gold); border: none;
-      border-radius: 10px; color: #0c0a00; font-weight: 700; cursor: pointer; font-size: 14px;
-    }
-    .fn-mm-save-btn:hover { background: var(--fn-gold-dk); }
 
-    /* ── Manage Modules FAB ── */
-    .fn-manage-modules-btn {
-      position: fixed; bottom: 32px; right: 108px;
-      background: #1b264f; color: var(--fn-gold);
-      border: 1px solid rgba(232,168,56,0.35); border-radius: 50%;
-      width: 56px; height: 56px; font-size: 20px; cursor: pointer;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 100;
-      display: none; align-items: center; justify-content: center; transition: all 0.2s;
-    }
-    .fn-manage-modules-btn.visible { display: flex; }
-    .fn-manage-modules-btn:hover { background: #243068; border-color: var(--fn-gold); }
-    @media (max-width: 768px) {
-      .fn-manage-modules-btn { bottom: 20px; right: 84px; width: 48px; height: 48px; font-size: 17px; }
-    }
-
-    .fn-edit-toggle {
-      position: fixed;
-      bottom: 32px;
-      right: 32px;
-      background: var(--fn-gold);
-      color: #0c0a00;
-      border: none;
-      border-radius: 50%;
-      width: 64px;
-      height: 64px;
-      font-size: 24px;
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(232,168,56,0.3);
-      transition: all 0.3s ease;
-      z-index: 100;
-    }
-
-    .fn-edit-toggle:hover {
-      transform: scale(1.1);
-      background: var(--fn-gold-dk);
-    }
-
-    .fn-edit-toggle.editing {
-      background: var(--fn-gold-dk);
-    }
 
     .fn-section-icon {
       font-size: 32px;
     }
-
-    .fn-section-edit-btn {
-      display: none;
-    }
-
-    .fn-editing .fn-section-edit-btn {
-      display: inline-block;
-    }
-
     .fn-word-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -590,22 +465,6 @@
       line-height: 1.7;
     }
 
-    #fn-news-feed .fn-section-edit-btn {
-      background: rgba(232,168,56,0.15);
-      color: var(--fn-gold);
-      border: 1px solid var(--fn-gold-dim);
-      padding: 6px 16px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    #fn-news-feed .fn-section-edit-btn:hover {
-      background: var(--fn-gold-dim);
-      border-color: var(--fn-gold);
-    }
 
     /* Word of the Day - special styling for Greek/Hebrew panels */
     .fn-word-grid {
@@ -1088,175 +947,6 @@
       color: var(--fn-ink);
     }
 
-    /* ── Editor Modal (Navy Theme) ── */
-    .fn-editor-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.75);
-      z-index: 2000;
-      padding: 20px;
-      overflow-y: auto;
-    }
-
-    .fn-editor-modal.fn-modal-open {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 60px;
-    }
-
-    .fn-editor-container {
-      background: var(--fn-panel);
-      border: 1px solid var(--fn-border);
-      border-radius: 16px;
-      max-width: 900px;
-      width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-      max-height: calc(100vh - 100px);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .fn-editor-header {
-      padding: 24px 32px;
-      border-bottom: 1px solid var(--fn-border);
-      background: rgba(255,255,255,0.03);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .fn-editor-header h2 {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--fn-gold);
-      margin: 0;
-    }
-
-    .fn-editor-actions {
-      display: flex;
-      gap: 12px;
-    }
-
-    .fn-btn-save,
-    .fn-btn-cancel {
-      padding: 8px 20px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
-    }
-
-    .fn-btn-save {
-      background: var(--fn-gold);
-      color: #0c0a00;
-    }
-
-    .fn-btn-save:hover {
-      background: var(--fn-gold-dk);
-    }
-
-    .fn-btn-cancel {
-      background: rgba(255,255,255,0.1);
-      color: var(--fn-ink);
-      border: 1px solid var(--fn-border);
-    }
-
-    .fn-btn-cancel:hover {
-      background: rgba(255,255,255,0.15);
-    }
-
-    .fn-editor-content {
-      padding: 32px;
-      overflow-y: auto;
-      color: var(--fn-ink);
-    }
-
-    .fn-editor-field {
-      margin-bottom: 24px;
-    }
-
-    .fn-editor-field label {
-      display: block;
-      font-weight: 600;
-      color: var(--fn-gold);
-      margin-bottom: 8px;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .fn-editor-field input[type="text"],
-    .fn-editor-field input[type="url"],
-    .fn-editor-field textarea {
-      width: 100%;
-      padding: 12px 16px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--fn-border);
-      border-radius: 8px;
-      color: var(--fn-ink);
-      font-size: 15px;
-      font-family: inherit;
-      transition: all 0.2s;
-    }
-
-    .fn-editor-field input:focus,
-    .fn-editor-field textarea:focus {
-      outline: none;
-      border-color: var(--fn-gold);
-      background: rgba(255,255,255,0.08);
-    }
-
-    .fn-editor-field textarea {
-      min-height: 150px;
-      resize: vertical;
-      font-family: inherit;
-      line-height: 1.6;
-    }
-
-    .fn-editor-field input::placeholder,
-    .fn-editor-field textarea::placeholder {
-      color: var(--fn-muted);
-    }
-
-    .fn-rich-editor {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--fn-border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .fn-rich-editor [contenteditable] {
-      padding: 16px;
-      min-height: 200px;
-      color: var(--fn-ink);
-      outline: none;
-    }
-
-    .fn-rich-editor [contenteditable]:focus {
-      background: rgba(255,255,255,0.08);
-    }
-
-    @media (max-width: 768px) {
-      .fn-container { padding: 12px 8px 60px; }
-      .fn-word-grid { grid-template-columns: 1fr; }
-      .fn-edit-toggle { width: 56px; height: 56px; bottom: 20px; right: 20px; }
-      .fn-unreached-body {
-        grid-template-columns: 1fr;
-      }
-      .fn-unreached-photo {
-        width: 100%;
-        height: auto;
-        max-height: 300px;
-      }
-      .fn-country-stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
     /* ── Card Reactions ── */
     .fn-card-reaction-bar {
       margin-top: 20px;
@@ -1345,7 +1035,6 @@
     }
 
     @media print {
-      .fn-edit-toggle, .fn-section-edit-btn, .fn-card-reaction-bar { display: none !important; }
     }
 
     /* ── Newspaper: serif body text for editorial sections ── */
@@ -2332,19 +2021,18 @@
       <div class="fn-masthead-rule fn-masthead-rule--top"></div>
       <div class="fn-masthead-meta">
         <span class="fn-date" id="fn-current-date">Loading...</span>
-        <div class="fn-edition-wrap">
-          <span class="fn-masthead-edition" id="fn-masthead-edition">The Church's Daily Edition</span>
-          <button class="fn-header-edit-btn" onclick="FlockNews.editHeaderConfig('edition')">EDIT</button>
-        </div>
+        <span class="fn-masthead-edition" id="fn-masthead-edition">The Church's Daily Edition</span>
       </div>
       <div class="fn-masthead-rule fn-masthead-rule--mid"></div>
       <h1>Flock News</h1>
       <div class="fn-church-name" id="fn-church-name"></div>
       <div class="fn-tagline-wrap">
         <div class="fn-tagline" id="fn-tagline">Daily Spiritual Nourishment for God's Flock</div>
-        <button class="fn-header-edit-btn" onclick="FlockNews.editHeaderConfig('tagline')">EDIT</button>
       </div>
       <div class="fn-masthead-rule fn-masthead-rule--bot"></div>
+      <div id="fn-editor-link-wrap" style="display:none;margin-top:10px;">
+        <a href="flocknews-editor.html" style="font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#c48a20;text-decoration:none;border-bottom:1px solid rgba(196,138,32,0.4);padding-bottom:2px;">✏ Edit Today's Edition</a>
+      </div>
     </div>
 
     <!-- Loading State -->
@@ -2363,7 +2051,6 @@
             <span class="fn-section-icon">✨</span>
             Welcome
           </div>
-          <button class="btn btn-sm fn-section-edit-btn" onclick="FlockNews.editSection('introduction')">Edit</button>
         </div>
         <div class="card-body" id="fn-introduction-content">
           <p>Loading welcome message...</p>
@@ -2377,7 +2064,6 @@
             <span class="fn-section-icon">❤️</span>
             Pastor's Heart
           </div>
-          <button class="btn btn-sm fn-section-edit-btn" onclick="FlockNews.editSection('pastorHeart')">Edit</button>
         </div>
         <div class="card-body" id="fn-pastorHeart-content">
           <p>Loading pastor's message...</p>
@@ -2391,7 +2077,6 @@
             <span class="fn-section-icon">📢</span>
             Announcements
           </div>
-          <button class="btn btn-sm fn-section-edit-btn" onclick="FlockNews.editSection('announcements')">Edit</button>
         </div>
         <div class="card-body" id="fn-announcements-content">
           <p>Loading announcements...</p>
@@ -2405,7 +2090,6 @@
             <span class="fn-section-icon">🌍</span>
             Mission of the Day
           </div>
-          <button class="btn btn-sm fn-section-edit-btn" onclick="FlockNews.editSection('mission')">Edit</button>
         </div>
         <div class="card-body" id="fn-mission-content">
           <p>Loading mission content from Joshua Project...</p>
@@ -2419,7 +2103,6 @@
             <span class="fn-section-icon">📖</span>
             Bible Reading
           </div>
-          <button class="btn btn-sm fn-section-edit-btn" onclick="FlockNews.editSection('reading')">Edit</button>
         </div>
         <div class="card-body" id="fn-reading-content">
           <p>Loading today's Bible reading...</p>
@@ -2433,7 +2116,6 @@
             <span class="fn-section-icon">✨</span>
             Daily Devotional
           </div>
-          <button class="btn btn-sm fn-section-edit-btn" onclick="FlockNews.editSection('devotional')">Edit</button>
         </div>
         <div class="card-body" id="fn-devotional-content">
           <p>Loading devotional...</p>
@@ -2447,7 +2129,6 @@
             <span class="fn-section-icon">📚</span>
             Word of the Day
           </div>
-          <button class="btn btn-sm fn-section-edit-btn" onclick="FlockNews.editSection('words')">Edit</button>
         </div>
         <div class="card-body">
           <div class="fn-word-grid">
@@ -2489,7 +2170,6 @@
             <span class="fn-section-icon">📕</span>
             Bible Book of the Day
           </div>
-          <button class="btn btn-sm fn-section-edit-btn" onclick="FlockNews.editSection('book')">Edit</button>
         </div>
         <div class="card-body" id="fn-book-content">
           <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 24px; padding: 20px; background: var(--surface-raised); border-radius: 12px;">
@@ -2535,44 +2215,6 @@
 
   </div>
 
-  <!-- Edit Toggle Button (only visible to pastor+) -->
-  <button class="fn-edit-toggle" id="fn-edit-toggle" style="display: none;" onclick="FlockNews.toggleEditMode()">
-    ✏️
-  </button>
-
-  <!-- Manage Modules FAB (pastor+ in edit mode only) -->
-  <button class="fn-manage-modules-btn" id="fn-manage-modules-btn" onclick="FlockNews.openModuleManager()" title="Manage Modules">⚙️</button>
-
-  <!-- Module Manager bottom sheet -->
-  <div id="fn-module-manager" class="fn-module-manager" style="display:none;">
-    <div class="fn-mm-panel">
-      <div class="fn-mm-header">
-        <h2>Manage Modules</h2>
-        <button class="fn-mm-close" onclick="FlockNews.closeModuleManager()">✕</button>
-      </div>
-      <div class="fn-mm-body" id="fn-mm-body"></div>
-      <div class="fn-mm-footer">
-        <button class="fn-mm-add-btn" onclick="FlockNews.promptAddCustomModule()">＋ Add Custom Module</button>
-        <button class="fn-mm-save-btn" onclick="FlockNews.saveModuleConfig()">Save Layout</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Editor Modal -->
-  <div class="fn-editor-modal" id="fn-editor-modal">
-    <div class="fn-editor-container">
-      <div class="fn-editor-header">
-        <h2 id="fn-editor-title">Edit Section</h2>
-        <div class="fn-editor-actions">
-          <button class="fn-btn-save" onclick="FlockNews.saveSection()">Save</button>
-          <button class="fn-btn-cancel" onclick="FlockNews.closeEditor()">Cancel</button>
-        </div>
-      </div>
-      <div class="fn-editor-content" id="fn-editor-content">
-        <!-- Editor fields will be dynamically inserted here -->
-      </div>
-    </div>
-  </div>
 
   </div><!-- /#fn-scroll-shell -->
 
