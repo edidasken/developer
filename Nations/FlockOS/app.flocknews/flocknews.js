@@ -1363,6 +1363,53 @@ function showSuccessMessage(message) {
   }, 3000);
 }
 
+// ── SW Update Detection ──────────────────────────────────────────────────────
+function _initSwUpdateDetection() {
+  if (!('serviceWorker' in navigator)) return;
+
+  navigator.serviceWorker.ready.then(reg => {
+    FlockNewsState.swReg = reg;
+
+    if (reg.waiting && navigator.serviceWorker.controller) {
+      _showSwUpdateBanner();
+    }
+
+    reg.addEventListener('updatefound', () => {
+      const installing = reg.installing;
+      if (!installing) return;
+      installing.addEventListener('statechange', () => {
+        if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+          _showSwUpdateBanner();
+        }
+      });
+    });
+
+    reg.update().catch(() => {});
+  }).catch(() => {});
+
+  let _reloading = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!_reloading) { _reloading = true; location.reload(); }
+  });
+}
+
+function _showSwUpdateBanner() {
+  const banner = document.getElementById('fn-update-banner');
+  if (banner) banner.style.display = 'flex';
+}
+
+async function doUpdate() {
+  const banner = document.getElementById('fn-update-banner');
+  if (banner) banner.style.display = 'none';
+  const reg = FlockNewsState.swReg || (await navigator.serviceWorker.getRegistration().catch(() => null));
+  if (reg && reg.waiting) {
+    reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+  } else {
+    if (reg) await reg.update().catch(() => {});
+    location.reload();
+  }
+}
+
 // Export FlockNews API
 window.FlockNews = {
   showReactionPicker,
