@@ -221,7 +221,7 @@ function mountHeader() {
     features: [
       { id: 'fn-top',      label: "Today's Content",  hint: 'Scroll to top of feed',          run: () => document.getElementById('fn-news-feed')?.scrollTo({ top: 0, behavior: 'smooth' }) },
       { id: 'fn-edit',     label: 'Edit Content',      hint: 'Pastor mode — edit today\'s content', run: () => window.open('flocknews-editor.html', '_blank') },
-      { id: 'fn-multiply', label: 'Multiply',          hint: 'Church multiplication dashboard', run: () => window.open('multiply.html', '_blank') },
+      { id: 'fn-multiply', label: 'Multiply',          hint: 'Church multiplication dashboard', run: () => window.open('app.multiply/multiply.html', '_blank') },
     ],
   });
 }

@@ -1,0 +1,1069 @@
+    /* ═══════════════════════════════════════════════════
+       FLOCK NEWS — Newspaper stylesheet
+       All layout, typography and chrome lives here.
+       new_covenant.css provides the shell reset only.
+    ═══════════════════════════════════════════════════ */
+
+    /* ── Tokens ─────────────────────────────────────── */
+    :root {
+      --paper:       #f5f0e8;
+      --fn-ink:         #1a1a1a;
+      --fn-ink-muted:   #5a534e;
+      --rule:        #1a1a1a;
+      --rule-soft:   #c5bfb0;
+      --navy:        #0f1735;
+      --navy-mid:    #1b264f;
+      --gold:        #e8a838;
+      --gold-dk:     #c48a20;
+      --serif:       'Playfair Display', Georgia, 'Times New Roman', serif;
+      --body:        'IM Fell English', Georgia, 'Times New Roman', serif;
+      --ui:          'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    /* ── Reset ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100dvh;
+      overflow: hidden;
+      background: var(--navy);
+      color: var(--fn-ink);
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* ── Page scaffold ──────────────────────────────── */
+    /* Unity header sits at top (fixed height via new_covenant.css).
+       fn-page fills the rest and scrolls. */
+    #fn-page {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    #fn-scroll-shell {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: var(--paper);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .fn-inner {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 0 0 100px;
+    }
+
+    /* ── MASTHEAD ────────────────────────────────────── */
+    .fn-masthead {
+      background: linear-gradient(160deg, var(--navy) 0%, var(--navy-mid) 100%);
+      padding: 20px 24px 16px;
+      text-align: center;
+    }
+
+    .fn-masthead-flag {
+      font-family: var(--serif);
+      font-size: clamp(32px, 5.5vw, 58px);
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      line-height: 1.05;
+    }
+
+    .fn-masthead-rule {
+      border: none;
+      border-top: 1px solid rgba(232, 168, 56, 0.45);
+      margin: 10px auto 8px;
+      width: 100%;
+    }
+
+    .fn-masthead-tagline {
+      font-family: var(--serif);
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #ffffff;
+      margin: 6px 0 10px;
+    }
+
+    .fn-masthead-dateline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--serif);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #ffffff;
+      border-top: 1px solid rgba(232, 168, 56, 0.3);
+      padding-top: 8px;
+      margin-top: 4px;
+    }
+
+    /* ── BROADSHEET GRID ─────────────────────────────── */
+    /* Desktop: 3-column broadsheet.
+       Mobile: single column stack.  */
+    #fn-news-feed {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Row containers for side-by-side sections */
+    .fn-row {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .fn-row > .fn-section {
+      border-bottom: none; /* row provides the bottom rule */
+    }
+
+    /* Full-width section */
+    .fn-section {
+      border-bottom: 1px solid var(--rule-soft);
+    }
+
+    /* Wide column (2/3) */
+    .fn-col-wide {
+      flex: 2;
+      border-right: 1px solid var(--rule-soft);
+    }
+
+    /* Narrow column (1/3) */
+    .fn-col-narrow {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Equal half columns */
+    .fn-col-half {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .fn-col-half + .fn-col-half,
+    .fn-col-wide + .fn-col-narrow {
+      border-left: 1px solid var(--rule-soft);
+    }
+
+    /* ── SECTION ANATOMY ─────────────────────────────── */
+    .fn-section-inner {
+      padding: 18px 22px 20px;
+    }
+
+    /* Section label (small caps running head) */
+    .fn-section-label {
+      font-family: var(--serif);
+      font-size: 11.5px;
+      font-variant: small-caps;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: var(--navy-mid);
+      display: inline-block;
+      padding: 4px 14px 3px;
+      border-radius: 999px;
+      text-align: right;
+      float: right;
+      margin-bottom: 12px;
+    }
+
+    .fn-section-label + * { clear: both; }
+
+    /* Section headline */
+    .fn-section-head {
+      font-family: var(--serif);
+      font-size: clamp(20px, 3.2vw, 32px);
+      font-weight: 700;
+      line-height: 1.1;
+      text-align: center;
+      color: var(--fn-ink);
+      margin-bottom: 6px;
+    }
+
+    /* Section deck / subhead */
+    .fn-section-deck {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 18px;
+      color: var(--fn-ink-muted);
+      text-align: center;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    /* Byline */
+    .fn-byline {
+      font-family: var(--serif);
+      font-size: 12.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--fn-ink-muted);
+      text-align: center;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+
+    /* ── BODY TEXT — 2-column newspaper flow ─────────── */
+    .fn-body {
+      column-count: 2;
+      column-gap: 28px;
+      column-rule: 1px solid var(--rule-soft);
+      text-align: justify;
+      hyphens: auto;
+      orphans: 3;
+      widows: 3;
+    }
+
+    /* Narrow columns: keep single */
+    .fn-col-narrow .fn-body {
+      column-count: 1;
+      text-align: left;
+    }
+
+    .fn-body p,
+    .fn-body li {
+      font-family: var(--body);
+      font-size: 19px;
+      line-height: 1.78;
+      color: var(--fn-ink);
+      margin-bottom: 0.8em;
+    }
+
+    /* Drop cap on first paragraph */
+    .fn-body > p:first-child::first-letter,
+    .fn-body p:first-of-type::first-letter {
+      font-family: var(--serif);
+      font-size: 4.4em;
+      font-weight: 700;
+      line-height: 0.76;
+      float: left;
+      margin: 5px 7px 0 0;
+      color: var(--fn-ink);
+    }
+
+    /* h2 inside body content spans both columns */
+    .fn-body h2 {
+      column-span: all;
+      font-family: var(--serif);
+      font-size: clamp(22px, 3.5vw, 34px);
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.1;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--rule-soft);
+      color: var(--fn-ink);
+    }
+
+    /* h3 subhead — mid-article section break */
+    .fn-body h3 {
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-top: 2px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 4px 0;
+      margin: 18px 0 10px;
+      break-inside: avoid;
+      break-after: avoid;
+      column-span: all;
+      color: var(--fn-ink);
+    }
+
+    /* Pull quote spans both columns */
+    .fn-pull {
+      column-span: all;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 20px;
+      line-height: 1.5;
+      border-top: 2px solid var(--rule);
+      border-bottom: 2px solid var(--rule);
+      padding: 10px 8px;
+      margin: 18px 0;
+      text-align: center;
+      break-inside: avoid;
+      color: var(--fn-ink);
+    }
+
+    /* Reaction bar spans columns */
+    .fn-card-reaction-bar {
+      column-span: all;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding-top: 12px;
+      border-top: 1px solid var(--rule-soft);
+      margin-top: 14px;
+    }
+
+    .fn-card-reactions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .fn-reaction-bubble {
+      background: transparent;
+      border: 1px solid var(--rule-soft);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: var(--ui);
+      color: var(--fn-ink-muted);
+      transition: border-color .15s;
+    }
+    .fn-reaction-bubble:hover,
+    .fn-reaction-bubble.active { border-color: var(--fn-ink); color: var(--fn-ink); }
+
+    .fn-reaction-add-btn {
+      background: transparent;
+      border: 1px dashed var(--rule-soft);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: var(--ui);
+      color: var(--fn-ink-muted);
+    }
+
+    .fn-reaction-picker {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      display: flex;
+      gap: 4px;
+      background: var(--paper);
+      border: 1px solid var(--rule-soft);
+      padding: 6px;
+      z-index: 200;
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+    }
+
+    .fn-reaction-picker-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: background .12s;
+    }
+    .fn-reaction-picker-btn:hover { background: rgba(0,0,0,.06); }
+
+    /* ── ANNOUNCEMENT LIST ───────────────────────────── */
+    .fn-body ul.fn-announce-list {
+      list-style: none;
+      padding: 0;
+    }
+    .fn-body ul.fn-announce-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--rule-soft);
+      line-height: 1.55;
+    }
+    .fn-body ul.fn-announce-list li:last-child { border-bottom: none; }
+
+    /* Strip inline background/border styles injected by JS default content */
+    .fn-body ul li[style] {
+      background: none !important;
+      border-left: none !important;
+      border-radius: 0 !important;
+    }
+
+    /* ── MISSION SECTION ─────────────────────────────── */
+    .fn-missions-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+      column-span: all;
+    }
+
+    .fn-country-card,
+    .fn-unreached-card,
+    .fn-bible-access-card,
+    .fn-frontlines-card {
+      padding: 16px;
+      border: 1px solid var(--rule-soft);
+      margin: -1px -1px 0 0;
+      background: var(--paper);
+      font-family: var(--body);
+      font-size: 17px;
+      line-height: 1.55;
+      color: var(--fn-ink);
+    }
+
+    .fn-country-header,
+    .fn-unreached-header,
+    .fn-bible-access-header,
+    .fn-frontlines-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .fn-country-title,
+    .fn-unreached-name,
+    .fn-bible-access-title,
+    .fn-frontlines-title {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--fn-ink);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .fn-country-label,
+    .fn-unreached-label,
+    .fn-frontlines-mission {
+      font-family: var(--serif);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--fn-ink-muted);
+      text-align: right;
+    }
+
+    .fn-country-icon { font-size: 20px; }
+
+    .fn-country-badges,
+    .fn-unreached-stats,
+    .fn-bible-access-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+
+    .fn-country-badge {
+      font-family: var(--ui);
+      font-size: 11px;
+      padding: 2px 8px;
+      border: 1px solid var(--rule-soft);
+      color: var(--fn-ink-muted);
+    }
+
+    .fn-country-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin: 10px 0;
+      border-top: 1px solid var(--rule-soft);
+      border-bottom: 1px solid var(--rule-soft);
+      padding: 8px 0;
+    }
+
+    .fn-country-stat {
+      text-align: center;
+    }
+
+    .fn-stat-value {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--fn-ink);
+    }
+
+    .fn-stat-label {
+      font-family: var(--ui);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--fn-ink-muted);
+    }
+
+    .fn-country-details p {
+      font-family: var(--body);
+      font-size: 17px;
+      color: var(--fn-ink-muted);
+      margin-bottom: 4px;
+    }
+
+    .fn-country-link,
+    .fn-unreached-link {
+      display: inline-block;
+      margin-top: 10px;
+      font-family: var(--serif);
+      font-size: 14px;
+      color: var(--fn-ink);
+      text-decoration: underline;
+      text-decoration-color: var(--rule-soft);
+    }
+
+    .fn-unreached-body {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .fn-unreached-photo {
+      width: 72px;
+      height: 72px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid var(--rule-soft);
+    }
+
+    .fn-unreached-info { flex: 1; min-width: 0; }
+
+    .fn-unreached-summary {
+      font-family: var(--body);
+      font-size: 19px;
+      color: var(--fn-ink-muted);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .fn-frontlines-stat-highlight {
+      text-align: center;
+      padding: 12px 0;
+      border-top: 1px solid var(--rule-soft);
+      border-bottom: 1px solid var(--rule-soft);
+      margin: 12px 0;
+    }
+
+    .fn-frontlines-pillars h4 {
+      font-family: var(--serif);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--fn-ink-muted);
+      margin-bottom: 8px;
+    }
+
+    .fn-pillar-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--rule-soft);
+      font-family: var(--body);
+      font-size: 18px;
+      color: var(--fn-ink);
+    }
+
+    .fn-pillar-icon { font-size: 16px; }
+
+    .fn-missions-empty {
+      padding: 24px;
+      text-align: center;
+      font-family: var(--body);
+      font-style: italic;
+      color: var(--fn-ink-muted);
+    }
+
+    /* ── WORD OF THE DAY ─────────────────────────────── */
+    .fn-words-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-top: 1px solid var(--rule-soft);
+      margin-top: 14px;
+    }
+
+    .fn-word-panel {
+      padding: 14px 16px;
+      border-right: 1px solid var(--rule-soft);
+    }
+    .fn-word-panel:last-child { border-right: none; }
+
+    .fn-word-language {
+      font-family: var(--serif);
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--fn-ink-muted);
+      margin-bottom: 6px;
+    }
+
+    .fn-word-term {
+      font-family: var(--serif);
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 700;
+      color: var(--fn-ink);
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .fn-word-transliteration {
+      font-family: var(--body);
+      font-style: italic;
+      font-size: 19px;
+      color: var(--fn-ink-muted);
+      margin-bottom: 8px;
+    }
+
+    .fn-word-definition {
+      font-family: var(--body);
+      font-size: 19px;
+      line-height: 1.6;
+      color: var(--fn-ink);
+      margin-bottom: 6px;
+    }
+
+    .fn-word-nuance {
+      font-family: var(--body);
+      font-size: 19px;
+      color: var(--fn-ink-muted);
+      line-height: 1.55;
+      margin-bottom: 6px;
+    }
+
+    .fn-word-strongs {
+      font-family: var(--ui);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fn-ink-muted);
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px solid var(--rule-soft);
+    }
+
+    /* ── BOOK OF THE DAY ─────────────────────────────── */
+    .fn-book-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .fn-book-icon {
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+
+    .fn-book-info h3 {
+      font-family: var(--serif);
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      color: var(--fn-ink);
+      margin-bottom: 4px;
+    }
+
+    .fn-book-meta {
+      font-family: var(--body);
+      font-style: italic;
+      font-size: 18px;
+      color: var(--fn-ink-muted);
+    }
+
+    .fn-book-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 1px solid var(--rule-soft);
+      margin-bottom: 14px;
+    }
+
+    .fn-book-stat {
+      text-align: center;
+      padding: 10px 8px;
+      border-right: 1px solid var(--rule-soft);
+    }
+    .fn-book-stat:last-child { border-right: none; }
+
+    .fn-book-stat-value {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--fn-ink);
+    }
+
+    .fn-book-stat-label {
+      font-family: var(--ui);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fn-ink-muted);
+    }
+
+    .fn-book-content-body h3 {
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-top: 1px solid var(--rule-soft);
+      padding-top: 10px;
+      margin: 14px 0 6px;
+      color: var(--fn-ink-muted);
+    }
+
+    .fn-book-content-body p,
+    .fn-book-content-body li {
+      font-family: var(--body);
+      font-size: 19px;
+      line-height: 1.65;
+      color: var(--fn-ink);
+      margin-bottom: 6px;
+    }
+
+    .fn-book-content-body ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .fn-book-content-body ul li::before {
+      content: '— ';
+      color: var(--fn-ink-muted);
+    }
+
+    /* ── BIBLE READING ───────────────────────────────── */
+    /* Scripture text is larger than body for readability */
+    /* ── READING PILLS ───────────────────────────────── */
+    .fn-reading-pill {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      font-family: var(--body);
+      font-size: 18px;
+      line-height: 1.5;
+      color: var(--fn-ink);
+      flex-wrap: wrap;
+    }
+    .fn-reading-pill-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--navy-mid);
+      color: var(--gold);
+      font-family: var(--serif);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      padding: 4px 13px 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .fn-reading-pill-label svg {
+      flex-shrink: 0;
+      stroke: var(--gold);
+    }
+    .fn-reading-pill-text {
+      color: var(--fn-ink);
+      font-family: var(--body);
+      font-size: 18px;
+    }
+
+    #fn-reading-content p,
+    #fn-reading-content div p {
+      font-size: 19px !important;
+      line-height: 1.78;
+    }
+
+    /* Devotional scripture quotes (italic paragraphs at top) */
+    #fn-devotional-content p em,
+    #fn-devotional-content p:first-of-type {
+      font-size: 19px;
+      line-height: 1.78;
+    }
+
+    /* Strip the colorful inline boxes the JS injects */
+    #fn-reading-content div[style*="background"],
+    #fn-reading-content div[style*="border-left"] {
+      background: none !important;
+      border-left: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+    }
+
+    #fn-reading-content strong[style*="color"],
+    #fn-reading-content p strong[style] {
+      color: var(--fn-ink) !important;
+    }
+
+    #fn-reading-content div[style] {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    #fn-reading-content h2 {
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--rule-soft);
+      color: var(--fn-ink);
+    }
+
+    /* ── DEVOTIONAL ──────────────────────────────────── */
+    #fn-devotional-content h2 {
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--rule-soft);
+      color: var(--fn-ink);
+    }
+
+    #fn-devotional-content p[style*="color"],
+    #fn-devotional-content p[style*="font-weight"] {
+      color: var(--fn-ink-muted) !important;
+      font-style: italic;
+    }
+
+    /* ── LOADING SPINNER ─────────────────────────────── */
+    #fn-loading {
+      display: none;
+      text-align: center;
+      padding: 60px 24px;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 15px;
+      color: var(--fn-ink-muted);
+    }
+
+    #fn-loading::after {
+      content: '';
+      display: block;
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--rule-soft);
+      border-top-color: var(--fn-ink);
+      border-radius: 50%;
+      margin: 16px auto 0;
+      animation: fn-spin 0.8s linear infinite;
+    }
+
+    @keyframes fn-spin { to { transform: rotate(360deg); } }
+
+    /* ── EDIT TOGGLE ─────────────────────────────────── */
+    #fn-edit-toggle {
+      display: none;
+      position: fixed;
+      bottom: 88px;
+      right: 20px;
+      background: var(--navy);
+      color: var(--gold);
+      border: 1px solid var(--gold-dk);
+      padding: 10px 16px;
+      font-family: var(--ui);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      z-index: 500;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.35);
+    }
+    #fn-edit-toggle:hover { background: var(--navy-mid); }
+
+    /* ── SW UPDATE BANNER ────────────────────────────── */
+    #fn-update-banner {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: var(--navy);
+      color: var(--gold);
+      padding: 10px 20px;
+      font-family: var(--ui);
+      font-size: 13px;
+      font-weight: 600;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      z-index: 9999;
+      border-bottom: 1px solid var(--gold-dk);
+    }
+
+    #fn-update-banner button {
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      padding: 6px 14px;
+      font-family: var(--ui);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── EDITOR LINK ─────────────────────────────────── */
+    #fn-editor-link-wrap {
+      display: none;
+      text-align: center;
+      padding: 8px 0 0;
+    }
+
+    /* ── DOUBLE RULES ────────────────────────────────── */
+    .fn-double-rule {
+      border: none;
+      border-top: 3px double var(--rule);
+      margin: 0;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────────── */
+
+    /* Hard stop on horizontal overflow — body/page containers only */
+    html, body, #fn-page, .fn-inner {
+      max-width: 100%;
+    }
+
+    /* Prevent long words/URLs from blowing out layout */
+    .fn-body, .fn-book-content-body, .fn-section-inner {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    img, video, iframe, table {
+      max-width: 100%;
+      height: auto;
+    }
+
+    @media (max-width: 680px) {
+      /* Stack all rows on mobile */
+      .fn-row {
+        flex-direction: column;
+      }
+
+      .fn-col-wide,
+      .fn-col-narrow,
+      .fn-col-half {
+        border-right: none !important;
+        border-left: none !important;
+        flex: none;
+        width: 100%;
+      }
+
+      .fn-col-half + .fn-col-half,
+      .fn-col-wide + .fn-col-narrow {
+        border-left: none;
+        border-top: 1px solid var(--rule-soft);
+      }
+
+      /* Single column text on mobile */
+      .fn-body {
+        column-count: 1;
+        text-align: left;
+        hyphens: none;
+      }
+
+      /* Reduce drop cap on mobile so it doesn't dominate narrow column */
+      .fn-body > p:first-child::first-letter,
+      .fn-body p:first-of-type::first-letter {
+        font-size: 3em;
+      }
+
+      /* Mission cards stack on mobile */
+      .fn-missions-container {
+        grid-template-columns: 1fr;
+      }
+
+      /* Country stats: 2 columns instead of 4 on mobile */
+      .fn-country-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      /* Book stats: 2 columns instead of 3 on small screens */
+      .fn-book-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      /* Words grid stacks */
+      .fn-words-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .fn-word-panel { border-right: none; border-bottom: 1px solid var(--rule-soft); }
+      .fn-word-panel:last-child { border-bottom: none; }
+
+      /* Masthead tightening for mobile */
+      .fn-masthead {
+        padding: 16px 16px 12px;
+      }
+
+      .fn-masthead-flag {
+        letter-spacing: 0.1em;
+      }
+
+      .fn-masthead-tagline {
+        letter-spacing: 0.14em;
+        font-size: 11px;
+      }
+
+      .fn-masthead-dateline {
+        flex-direction: column;
+        gap: 4px;
+        text-align: center;
+      }
+
+      /* Section inner padding tighter on mobile */
+      .fn-section-inner {
+        padding: 14px 14px 16px;
+      }
+
+      /* Book section: smaller title on small phones */
+      .fn-book-info h3 {
+        font-size: clamp(26px, 7vw, 40px);
+      }
+
+      /* Unreached photo slightly smaller on very narrow screens */
+      .fn-unreached-photo {
+        width: 60px;
+        height: 60px;
+      }
+
+      /* Prevent pill labels from overflowing on tiny screens */
+      .fn-section-label {
+        max-width: 90%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    /* Tiny phones (SE, Galaxy A series ≤375px) */
+    @media (max-width: 375px) {
+      .fn-masthead-flag {
+        letter-spacing: 0.06em;
+        font-size: 28px;
+      }
+
+      .fn-section-inner {
+        padding: 12px 12px 14px;
+      }
+
+      .fn-body p, .fn-body li {
+        font-size: 16px;
+      }
+
+      .fn-book-stats {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (min-width: 681px) and (max-width: 900px) {
+      /* Tablet: keep rows but reduce body column count on narrow sections */
+      .fn-col-narrow .fn-body {
+        column-count: 1;
+      }
+
+      /* Tablet: country stats 2 columns */
+      .fn-country-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }

@@ -1,0 +1,441 @@
+    /* ── Reset & base ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper:        #f5f0e8;
+      --ink:          #1a1a1a;
+      --ink-muted:    #5a534e;
+      --rule:         #1a1a1a;
+      --rule-soft:    #c5bfb0;
+      --red:          #8b1a1a;
+      --serif:        'Playfair Display', Georgia, 'Times New Roman', serif;
+      --body-serif:   'IM Fell English', Georgia, serif;
+      --sans:         system-ui, -apple-system, sans-serif;
+      --masthead-font:'Pirata One', 'Times New Roman', serif;
+    }
+
+    html, body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--body-serif);
+      font-size: 18px;
+      line-height: 1.65;
+      -webkit-text-size-adjust: 100%;
+      min-height: 100%;
+    }
+
+    /* ── Page wrapper ─────────────────────────────────────────────────── */
+    .herald-page {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 28px 18px 100px;
+    }
+    @media (min-width: 640px) {
+      .herald-page { padding: 40px 40px 120px; }
+    }
+
+    /* ── Back-to-suite bar ───────────────────────────────────────────── */
+    .herald-back-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0 10px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 4px;
+    }
+    .herald-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--serif);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      background: none;
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      padding: 4px 14px 4px 10px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .herald-back-btn:hover { color: var(--ink); border-color: var(--ink); }
+    .herald-share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--serif);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--paper);
+      background: var(--ink);
+      border: none;
+      border-radius: 999px;
+      padding: 4px 14px;
+      cursor: pointer;
+    }
+    .herald-share-btn:hover { opacity: .85; }
+
+    /* ── Masthead ─────────────────────────────────────────────────────── */
+    .herald-masthead {
+      text-align: center;
+      border-top: 4px double var(--rule);
+      border-bottom: 4px double var(--rule);
+      padding: 16px 0 14px;
+    }
+    .herald-flag {
+      font-family: var(--masthead-font);
+      font-size: clamp(38px, 9vw, 76px);
+      line-height: 1.08;
+      color: var(--ink);
+      letter-spacing: .01em;
+    }
+    .herald-tagline {
+      font-family: var(--serif);
+      font-size: 11px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-top: 6px;
+    }
+    .herald-dateline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--serif);
+      font-size: 11px;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 5px 0;
+      margin-top: 8px;
+    }
+
+    /* ── Rules ────────────────────────────────────────────────────────── */
+    .rule-thick  { border: none; border-top: 3px solid var(--rule); margin: 14px 0 0; }
+    .rule-thin   { border: none; border-top: 1px solid var(--rule); margin: 10px 0; }
+    .rule-double { border: none; border-top: 4px double var(--rule); margin: 22px 0; }
+
+    /* ── Headline & deck ──────────────────────────────────────────────── */
+    .herald-headline {
+      font-family: var(--serif);
+      font-size: clamp(24px, 4.5vw, 44px);
+      font-weight: 700;
+      line-height: 1.1;
+      text-align: center;
+      padding: 20px 0 10px;
+      letter-spacing: -.01em;
+    }
+    .herald-deck {
+      text-align: center;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(17px, 3vw, 22px);
+      color: var(--ink-muted);
+      padding-bottom: 12px;
+      max-width: 70ch;
+      margin: 0 auto;
+      line-height: 1.45;
+    }
+    .herald-byline {
+      text-align: center;
+      font-family: var(--serif);
+      font-size: 11.5px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      padding: 6px 0 16px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    /* ── Body columns ─────────────────────────────────────────────────── */
+    .herald-body {
+      column-count: 2;
+      column-gap: 32px;
+      column-rule: 1px solid var(--rule-soft);
+      padding-top: 18px;
+      text-align: justify;
+      hyphens: auto;
+      orphans: 3;
+      widows: 3;
+    }
+    @media (max-width: 580px) {
+      .herald-body { column-count: 1; text-align: left; }
+    }
+    .herald-body p {
+      margin-bottom: .9em;
+      font-size: 18px;
+      line-height: 1.75;
+    }
+    /* Drop cap */
+    .herald-body > p:first-child::first-letter {
+      font-family: var(--serif);
+      font-size: 4.6em;
+      font-weight: 700;
+      line-height: .76;
+      float: left;
+      margin: 4px 7px 0 0;
+      color: var(--ink);
+    }
+    .herald-body h3 {
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      border-top: 2px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 4px 0;
+      margin: 20px 0 10px;
+      break-inside: avoid;
+      break-after: avoid;
+    }
+
+    /* ── Pull quote ───────────────────────────────────────────────────── */
+    .herald-pull {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 20px;
+      line-height: 1.55;
+      border-top: 2px solid var(--rule);
+      border-bottom: 2px solid var(--rule);
+      padding: 12px 8px;
+      margin: 20px 0;
+      text-align: center;
+      break-inside: avoid;
+    }
+
+    /* ── Section label ────────────────────────────────────────────────── */
+    .herald-section-label {
+      font-family: var(--serif);
+      font-size: 12px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 6px 0 14px;
+      color: var(--ink-muted);
+    }
+
+    /* ── App cards grid ───────────────────────────────────────────────── */
+    .herald-apps {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0;
+      border: 1px solid var(--rule-soft);
+      margin: 0 0 4px;
+    }
+    .herald-app-card {
+      padding: 14px 16px 16px;
+      border-right: 1px solid var(--rule-soft);
+      border-bottom: 1px solid var(--rule-soft);
+      background: #fff;
+    }
+    .herald-app-card:nth-child(2n) { border-right: none; }
+    @media (min-width: 740px) {
+      .herald-apps { grid-template-columns: repeat(4, 1fr); }
+      .herald-app-card:nth-child(2n) { border-right: 1px solid var(--rule-soft); }
+      .herald-app-card:nth-child(4n) { border-right: none; }
+    }
+    .herald-app-card-name {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 6px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--rule-soft);
+      line-height: 1.3;
+    }
+    .herald-app-card-desc {
+      font-family: var(--sans);
+      font-size: 14.5px;
+      line-height: 1.55;
+      color: var(--ink-muted);
+    }
+
+    /* ── Trust grid ───────────────────────────────────────────────────── */
+    .herald-trust-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      border: 1px solid var(--rule-soft);
+      margin-top: 14px;
+    }
+    @media (max-width: 480px) {
+      .herald-trust-grid { grid-template-columns: 1fr; }
+    }
+    .herald-trust-item {
+      padding: 16px 18px;
+      border-right: 1px solid var(--rule-soft);
+      border-bottom: 1px solid var(--rule-soft);
+    }
+    .herald-trust-item:nth-child(2n) { border-right: none; }
+    .herald-trust-item:nth-last-child(-n+2) { border-bottom: none; }
+    @media (max-width: 480px) {
+      .herald-trust-item { border-right: none; }
+      .herald-trust-item:last-child { border-bottom: none; }
+      .herald-trust-item:nth-last-child(-n+2) { border-bottom: 1px solid var(--rule-soft); }
+      .herald-trust-item:last-child { border-bottom: none; }
+    }
+    .herald-trust-q {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: var(--red);
+    }
+    .herald-trust-a {
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.58;
+      color: var(--ink-muted);
+    }
+
+    /* ── Outreach form ────────────────────────────────────────────────── */
+    .herald-form-section {
+      margin-top: 40px;
+      border: 3px double var(--rule);
+      padding: 30px 30px 36px;
+      background: #fff;
+    }
+    @media (max-width: 520px) {
+      .herald-form-section { padding: 22px 18px 28px; }
+    }
+    .herald-form-head {
+      text-align: center;
+      font-family: var(--serif);
+      font-size: clamp(20px, 4vw, 30px);
+      font-weight: 700;
+      margin-bottom: 5px;
+      line-height: 1.15;
+    }
+    .herald-form-sub {
+      text-align: center;
+      font-family: var(--body-serif);
+      font-style: italic;
+      font-size: 17px;
+      color: var(--ink-muted);
+      margin-bottom: 26px;
+    }
+    .herald-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 520px) {
+      .herald-form { grid-template-columns: 1fr; }
+    }
+    .herald-form-field       { display: flex; flex-direction: column; gap: 5px; }
+    .herald-form-field.full  { grid-column: 1 / -1; }
+    .herald-form label {
+      font-family: var(--serif);
+      font-size: 13px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      font-weight: 700;
+    }
+    .herald-form input,
+    .herald-form textarea {
+      border: 1px solid var(--rule-soft);
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--body-serif);
+      font-size: 17px;
+      padding: 10px 12px;
+      border-radius: 0;
+      outline: none;
+      width: 100%;
+      transition: border-color .15s;
+    }
+    .herald-form input:focus,
+    .herald-form textarea:focus { border-color: var(--ink); }
+    .herald-form textarea { resize: vertical; min-height: 96px; }
+    .herald-submit {
+      display: block;
+      width: 100%;
+      grid-column: 1 / -1;
+      margin-top: 4px;
+      padding: 14px 20px;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .herald-submit:hover    { background: #333; }
+    .herald-submit:disabled { opacity: .5; cursor: default; }
+
+    /* ── Success state ────────────────────────────────────────────────── */
+    .herald-success         { display: none; text-align: center; padding: 32px 16px; }
+    .herald-success.visible { display: block; }
+    .herald-success-icon    { font-size: 44px; margin-bottom: 14px; }
+    .herald-success h3 {
+      font-family: var(--serif);
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .herald-success p {
+      font-family: var(--body-serif);
+      font-style: italic;
+      color: var(--ink-muted);
+      font-size: 17px;
+      max-width: 50ch;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    /* ── Footer ───────────────────────────────────────────────────────── */
+    .herald-footer {
+      text-align: center;
+      font-family: var(--serif);
+      font-size: 11px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-top: 44px;
+      padding-top: 14px;
+      border-top: 1px solid var(--rule);
+      line-height: 2;
+    }
+    .herald-footer em {
+      display: block;
+      font-style: italic;
+      font-size: 15px;
+      letter-spacing: .02em;
+      text-transform: none;
+      margin-bottom: 8px;
+      color: var(--ink-muted);
+    }
+
+    /* ── Status toast ─────────────────────────────────────────────────── */
+    #mly-status {
+      display: none;
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      border: 1.5px solid var(--rule-soft);
+      padding: 11px 22px;
+      font-family: var(--serif);
+      font-size: 14px;
+      z-index: 9999;
+      box-shadow: 0 4px 20px rgba(0,0,0,.13);
+      white-space: nowrap;
+      max-width: calc(100vw - 40px);
+      white-space: normal;
+      text-align: center;
+    }
+    #mly-status.visible       { display: block; }
+    #mly-status.error         { border-color: var(--red); color: var(--red); }

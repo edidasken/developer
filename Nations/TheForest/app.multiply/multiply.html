@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="FlockOS — A complete suite of ministry tools for the local church pastor. Free to the Body of Christ.">
+  <title>FlockOS — A Ministry Suite for the Local Church</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap">
+
+  <!-- Firebase config — patched per-church by B-Build -->
+  <script>
+        window.FLOCK_FIREBASE_CONFIG = {
+      apiKey:  'AIzaSyCnIbShg2ra1t4EiP3CffsivwvIK-bNu8M',
+      authDomain:  'flockos-theforest.firebaseapp.com',
+      projectId:  'flockos-theforest',
+      storageBucket:  'flockos-theforest.firebasestorage.app',
+      messagingSenderId:  '476522944133',
+      appId:  '1:476522944133:web:29ad5d19cf5a84c11b7bec',
+      measurementId:  'G-WMGPRHXP0Q',
+    };
+    window.FLOCK_CHURCH_ID = 'theforest';
+  </script>
+
+  <!-- Flash prevention -->
+  <script>
+    (function () {
+      try { var t = localStorage.getItem('flock_theme') || 'america'; document.documentElement.setAttribute('data-theme', t); }
+      catch (_) { document.documentElement.setAttribute('data-theme', 'america'); }
+    })();
+  </script>
+
+  <!-- Multiply-specific styles — edit app.multiply/multiply.css -->
+  <link rel="stylesheet" href="multiply.css">
+</head>
+<body>
+
+<div class="herald-page">
+
+  <!-- ══ BACK TO SUITE + SHARE ═══════════════════════════════════════ -->
+  <div class="herald-back-bar">
+    <button class="herald-back-btn" onclick="goBack()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to FlockOS
+    </button>
+    <button class="herald-share-btn" id="mly-share-btn" onclick="shareFlockOS()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Share with a Friend
+    </button>
+  </div>
+
+  <!-- ══ MASTHEAD ════════════════════════════════════════════════════ -->
+  <header class="herald-masthead">
+    <div class="herald-flag">The Flock Herald</div>
+    <div class="herald-tagline">Ministry Tools for the Local Church &nbsp;·&nbsp; Free to the Body of Christ</div>
+    <div class="herald-dateline">
+      <span>Vol. I &nbsp;·&nbsp; No. 1</span>
+      <span id="mly-date">2026</span>
+      <span>flock-os.github.io</span>
+    </div>
+  </header>
+
+  <hr class="rule-thick">
+
+  <!-- ══ HEADLINE ═════════════════════════════════════════════════════ -->
+  <h1 class="herald-headline">FlockOS — A Complete Suite of Ministry Tools, Built for the Work of the Church</h1>
+  <p class="herald-deck">Everything a pastor touches in the course of his week — in one integrated system, on any device, completely free.</p>
+  <p class="herald-byline">By the FlockOS Team &nbsp;·&nbsp; Special Report &nbsp;·&nbsp; Ministry Edition</p>
+
+  <hr class="rule-thin">
+
+  <!-- ══ BODY COLUMNS ══════════════════════════════════════════════════ -->
+  <div class="herald-body">
+
+    <p>FlockOS is not a product. It is a calling made software. Built specifically for the local church pastor — not for a denomination, not for a megachurch with an IT department, but for the man in the room with the people, carrying the weight of their names, their struggles, their prayers, and their growth.</p>
+
+    <p>It brings together everything a pastor touches in the course of his week — member directory, pastoral notes, prayer requests, small group rosters, worship planning, outreach tools, discipleship resources, and church communication — into one integrated system that runs on any device, in any browser, from anywhere in the world.</p>
+
+    <div class="herald-pull">"FlockOS carries the weight of the administration so the pastor can carry the weight of the people — and it is completely free, because the Gospel is."</div>
+
+    <h3>A Foundation Built on Grace, Not Commerce</h3>
+
+    <p>Church management software has historically been priced as if the church is a business and the pastor is a product manager. FlockOS was built on a different conviction. There is no subscription fee. No per-seat pricing. No features locked behind an upgrade wall. Every module. Every update. Every capability — free. The resources of a large church deserve to be in the hands of the smallest congregation.</p>
+
+    <p>The pastor of twelve should have the same tools as the pastor of twelve hundred. <em>"Freely you have received; freely give."</em> — Matthew 10:8</p>
+
+    <h3>No Server. No IT. No Barriers.</h3>
+
+    <p>FlockOS is a web application that runs in any modern browser on any device. There is nothing to install, no server to maintain, no IT team required. It is hosted for free on GitHub Pages — an infrastructure maintained by Microsoft — serving churches 24 hours a day with no monthly fees and no expiration date.</p>
+
+    <p>For pastors without reliable internet access, The Wellspring mode allows the complete church database to run offline on a single encrypted file — no connectivity required. FlockOS was designed to go wherever the Great Commission sends you.</p>
+
+    <h3>Your Data. Your Accounts. Your Church.</h3>
+
+    <p>The design keeps your church's data in your own Google or Firebase accounts — not in a central FlockOS-owned database. You own it. You control it. If you stop using FlockOS tomorrow, your data is still yours. There is no hostage situation. There is no exit fee.</p>
+
+    <p>Sensitive pastoral records — counseling notes, care cases, prayer journals — are protected by role-based access control. Six permission levels, from Guest to Admin, ensure that your private conversations with a struggling family never appear on the welcome desk screen.</p>
+
+  </div>
+
+  <!-- ══ APP SUITE ═════════════════════════════════════════════════════ -->
+  <hr class="rule-double">
+  <p class="herald-section-label">The FlockOS Suite — Eight Apps, One Mission</p>
+
+  <div class="herald-apps">
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">FlockOS — The Shepherd's Dashboard</div>
+      <div class="herald-app-card-desc">Member directory, pastoral care notes, prayer tracking, small groups, events, attendance, spiritual milestones, service planning, and analytics — all in one place.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">GROW — Discipleship Hub</div>
+      <div class="herald-app-card-desc">A public-facing resource for seekers and new believers. Gospel presentation, one-year Bible plan, devotionals, Strong's lexicon, theology, apologetics, and missions data for 210+ nations.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">The Invitation — Gospel Page</div>
+      <div class="herald-app-card-desc">One page. One message. A clear presentation of Jesus — who He is, what He did, how to respond. Share it with a seeker in a text, a counseling session, or a follow-up conversation.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">Flock Stand — The Music Stand</div>
+      <div class="herald-app-card-desc">Song library, setlist builder, chord transposer, and live lyrics display. The entire worship team, on the same page, in any key, with or without internet.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">FlockChat — Church Messaging</div>
+      <div class="herald-app-card-desc">Secure real-time messaging — team channels, small group rooms, direct messages, and prayer chains. Your congregation's conversations stay in your church's accounts.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">FlockShow — Worship Display</div>
+      <div class="herald-app-card-desc">Slides for your service — lyrics, Scripture, announcements — pulling directly from your setlists and service plans. No manual recreation every week.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">FEED — Sermon Workspace</div>
+      <div class="herald-app-card-desc">Outline your message, track your series, and build a searchable archive of every sermon you have ever preached — connected to your service plans.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">The Wellspring — Offline Mode</div>
+      <div class="herald-app-card-desc">The full suite, running from a single encrypted file with zero internet required. Built for the missionary, the church planter, and the pastor in places the internet has not yet reached.</div>
+    </div>
+  </div>
+
+  <!-- ══ TRUST ══════════════════════════════════════════════════════════ -->
+  <hr class="rule-double">
+  <p class="herald-section-label">Why Pastors Trust FlockOS</p>
+
+  <div class="herald-trust-grid">
+    <div class="herald-trust-item">
+      <div class="herald-trust-q">Your Data. Your Accounts.</div>
+      <div class="herald-trust-a">Your church's data lives in your own Google or Firebase accounts — not in a central FlockOS-owned database. You own it. You control it. Always.</div>
+    </div>
+    <div class="herald-trust-item">
+      <div class="herald-trust-q">Pastoral Privacy Protected</div>
+      <div class="herald-trust-a">Role-based access control with six permission levels means your private counseling notes and care records are visible only to the people you authorize.</div>
+    </div>
+    <div class="herald-trust-item">
+      <div class="herald-trust-q">AES-GCM 256-Bit Encryption</div>
+      <div class="herald-trust-a">Offline vaults use PIN-protected encryption. The key is never stored — only the right PIN unlocks your data. Your congregation's records are safe even if a device is lost.</div>
+    </div>
+    <div class="herald-trust-item">
+      <div class="herald-trust-q">Built to Last</div>
+      <div class="herald-trust-a">Hosted on Microsoft's GitHub Pages infrastructure. No startup server. No monthly bill that can lapse. The goal is not dependency on us — the goal is durability for the church.</div>
+    </div>
+  </div>
+
+  <!-- ══ OUTREACH CARD ══════════════════════════════════════════════════ -->
+  <div class="herald-form-section" id="mly-form-wrap">
+    <hr class="rule-thin" style="margin-bottom: 24px;">
+    <h2 class="herald-form-head">Ready to Try FlockOS for Your Church?</h2>
+    <p class="herald-form-sub">Fill out the card below. Your pastor will follow up personally.</p>
+
+    <div id="mly-success" class="herald-success">
+      <div class="herald-success-icon">✉</div>
+      <h3>Your Card Has Been Received</h3>
+      <p>Thank you. Your pastor has been notified and will reach out soon.<br><em>"The Lord bless you and keep you."</em> — Numbers 6:24</p>
+    </div>
+
+    <form class="herald-form" id="mly-form" novalidate>
+      <div class="herald-form-field">
+        <label for="mly-name">Your Name <span style="color:var(--red)">*</span></label>
+        <input type="text" id="mly-name" name="name" placeholder="Full name" required autocomplete="name">
+      </div>
+      <div class="herald-form-field">
+        <label for="mly-church">Church or Ministry Name</label>
+        <input type="text" id="mly-church" name="churchName" placeholder="If applicable" autocomplete="organization">
+      </div>
+      <div class="herald-form-field">
+        <label for="mly-phone">Phone Number</label>
+        <input type="tel" id="mly-phone" name="phone" placeholder="(555) 000-0000" autocomplete="tel">
+      </div>
+      <div class="herald-form-field">
+        <label for="mly-email">Email Address</label>
+        <input type="email" id="mly-email" name="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="herald-form-field full">
+        <label for="mly-message">How Can We Help You? <span style="color:var(--red)">*</span></label>
+        <textarea id="mly-message" name="message" placeholder="Tell us about your church and what you're looking for…" required></textarea>
+      </div>
+      <button type="submit" class="herald-submit" id="mly-submit">Send My Card — I Want to Learn More</button>
+    </form>
+  </div>
+
+  <!-- ══ FOOTER ══════════════════════════════════════════════════════════ -->
+  <footer class="herald-footer">
+    <em>"And he gave the apostles, the prophets, the evangelists, the shepherds and teachers,<br>to equip the saints for the work of ministry, for building up the body of Christ."<br>— Ephesians 4:11–12</em>
+    FlockOS &nbsp;·&nbsp; flock-os.github.io &nbsp;·&nbsp; Free to the Church &nbsp;·&nbsp; All Rights Reserved
+  </footer>
+
+</div><!-- /.herald-page -->
+
+<!-- ── Status toast ──────────────────────────────────────────────────── -->
+<div id="mly-status" role="alert" aria-live="polite"></div>
+
+<!-- ── Firebase ──────────────────────────────────────────────────────── -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+  'use strict';
+
+  // ── Back to suite ────────────────────────────────────────────────────
+  function goBack() {
+    if (window.opener && !window.opener.closed) {
+      window.close();
+    } else if (history.length > 1) {
+      history.back();
+    } else {
+      window.location.href = 'index.html';
+    }
+  }
+
+  // ── Share ─────────────────────────────────────────────────────────────
+  function shareFlockOS() {
+    var shareData = {
+      title: 'FlockOS — Ministry Tools for the Church',
+      text: 'How can FlockOS help your ministry?',
+      url: 'https://flock-os.github.io/FlockOS/Nations/Root/multiply.html'
+    };
+    if (navigator.share) {
+      navigator.share(shareData).catch(function() {});
+    } else {
+      var text = shareData.text + '\n' + shareData.url;
+      navigator.clipboard.writeText(text).then(function() {
+        var btn = document.getElementById('mly-share-btn');
+        var orig = btn.innerHTML;
+        btn.textContent = 'Link Copied!';
+        setTimeout(function() { btn.innerHTML = orig; }, 2200);
+      }).catch(function() {
+        prompt('Copy this link to share:', shareData.url);
+      });
+    }
+  }
+
+  // ── Live date in masthead ─────────────────────────────────────────────
+  (function() {
+    var el = document.getElementById('mly-date');
+    if (el) {
+      el.textContent = new Date().toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+  })();
+
+  // ── Firebase init ─────────────────────────────────────────────────────
+  var _db = null;
+  (function() {
+    var cfg = window.FLOCK_FIREBASE_CONFIG;
+    if (!cfg || !cfg.projectId || window.FLOCK_NO_FIREBASE) return;
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(cfg);
+      _db = firebase.firestore();
+    } catch (e) {
+      console.warn('multiply.html: Firebase init failed', e);
+    }
+  })();
+
+  // ── Helpers ───────────────────────────────────────────────────────────
+  function showStatus(msg, isError) {
+    var el = document.getElementById('mly-status');
+    el.textContent = msg;
+    el.className = 'visible' + (isError ? ' error' : '');
+    setTimeout(function() { el.className = ''; }, 4500);
+  }
+
+  function showSuccess() {
+    document.getElementById('mly-form').style.display = 'none';
+    document.getElementById('mly-success').classList.add('visible');
+    document.getElementById('mly-success').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ── Form submission ───────────────────────────────────────────────────
+  document.getElementById('mly-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var name    = document.getElementById('mly-name').value.trim();
+    var church  = document.getElementById('mly-church').value.trim();
+    var phone   = document.getElementById('mly-phone').value.trim();
+    var email   = document.getElementById('mly-email').value.trim();
+    var message = document.getElementById('mly-message').value.trim();
+
+    // Validation
+    if (!name)    { showStatus('Please enter your name.', true); return; }
+    if (!message) { showStatus('Please tell us how we can help.', true); return; }
+    if (!phone && !email) {
+      showStatus('Please enter a phone number or email so we can reach you.', true);
+      return;
+    }
+
+    var btn = document.getElementById('mly-submit');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    var payload = {
+      name:         name,
+      churchName:   church || '',
+      phone:        phone  || '',
+      email:        email  || '',
+      message:      message,
+      type:         'FlockOS Interest',
+      status:       'Open',
+      assignedRole: 'Lead Pastor',
+      source:       'multiply',
+      churchId:     window.FLOCK_CHURCH_ID || 'root'
+    };
+
+    if (_db) {
+      payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      _db.collection('outreachLeads').add(payload)
+        .then(function() { showSuccess(); })
+        .catch(function(err) {
+          console.error('multiply.html: Firestore write failed', err);
+          btn.disabled = false;
+          btn.textContent = 'Send My Card — I Want to Learn More';
+          showStatus('Something went wrong. Please try again.', true);
+        });
+    } else {
+      // Firebase unavailable — degrade gracefully
+      payload.createdAt = new Date().toISOString();
+      console.log('multiply.html: lead (no Firebase):', payload);
+      showSuccess();
+    }
+  });
+</script>
+
+</body>
+</html>

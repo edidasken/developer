@@ -131,10 +131,6 @@ input, select, textarea { font-size: max(1rem, 16px); }
   --radius-lg:     20px;
   --radius-pill:   9999px;
 
-  --paper:         #fffef8;
-  --paper-line:    #d4c5a9;
-  --paper-margin:  #e8a0a0;
-
   /* ── Content-surface helpers — use these instead of hardcoded rgba() overlays */
   --bg-input:      var(--bg-sunken);   /* input / textarea field background      */
   --bg-overlay:    var(--bg-raised);   /* sub-header / panel tint over --bg      */
