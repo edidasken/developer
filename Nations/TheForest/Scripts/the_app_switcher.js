@@ -249,7 +249,12 @@ function openSwitcher(btn, currentId) {
 
   const backdrop = document.createElement('div');
   backdrop.className = 'nc-switcher-backdrop';
-  backdrop.addEventListener('click', closeSwitcher);
+  // Guard against iOS ghost-click: the backdrop renders under the tap point,
+  // so iOS fires a synthetic click on it ~300ms after opening. Ignore any
+  // backdrop click that arrives within 350ms of the switcher opening.
+  let _justOpened = true;
+  setTimeout(() => { _justOpened = false; }, 350);
+  backdrop.addEventListener('click', () => { if (!_justOpened) closeSwitcher(); });
 
   const pop = document.createElement('div');
   pop.className = 'nc-switcher-pop';
