@@ -60,6 +60,51 @@
       .herald-page { padding: 40px 40px 120px; }
     }
 
+    /* ── Back-to-suite bar ───────────────────────────────────────────── */
+    .herald-back-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0 10px;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 4px;
+    }
+    .herald-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--serif);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      background: none;
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      padding: 4px 14px 4px 10px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .herald-back-btn:hover { color: var(--ink); border-color: var(--ink); }
+    .herald-share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--serif);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--paper);
+      background: var(--ink);
+      border: none;
+      border-radius: 999px;
+      padding: 4px 14px;
+      cursor: pointer;
+    }
+    .herald-share-btn:hover { opacity: .85; }
+
     /* ── Masthead ─────────────────────────────────────────────────────── */
     .herald-masthead {
       text-align: center;
@@ -426,6 +471,18 @@
 
 <div class="herald-page">
 
+  <!-- ══ BACK TO SUITE + SHARE ═══════════════════════════════════════ -->
+  <div class="herald-back-bar">
+    <button class="herald-back-btn" onclick="goBack()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to FlockOS
+    </button>
+    <button class="herald-share-btn" id="mly-share-btn" onclick="shareFlockOS()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Share with a Friend
+    </button>
+  </div>
+
   <!-- ══ MASTHEAD ════════════════════════════════════════════════════ -->
   <header class="herald-masthead">
     <div class="herald-flag">The Flock Herald</div>
@@ -590,6 +647,39 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
   'use strict';
+
+  // ── Back to suite ────────────────────────────────────────────────────
+  function goBack() {
+    if (window.opener && !window.opener.closed) {
+      window.close();
+    } else if (history.length > 1) {
+      history.back();
+    } else {
+      window.location.href = 'index.html';
+    }
+  }
+
+  // ── Share ─────────────────────────────────────────────────────────────
+  function shareFlockOS() {
+    var shareData = {
+      title: 'FlockOS — Ministry Tools for the Church',
+      text: 'How can FlockOS help your ministry?',
+      url: 'https://flock-os.github.io/FlockOS/Nations/Root/multiply.html'
+    };
+    if (navigator.share) {
+      navigator.share(shareData).catch(function() {});
+    } else {
+      var text = shareData.text + '\n' + shareData.url;
+      navigator.clipboard.writeText(text).then(function() {
+        var btn = document.getElementById('mly-share-btn');
+        var orig = btn.innerHTML;
+        btn.textContent = 'Link Copied!';
+        setTimeout(function() { btn.innerHTML = orig; }, 2200);
+      }).catch(function() {
+        prompt('Copy this link to share:', shareData.url);
+      });
+    }
+  }
 
   // ── Live date in masthead ─────────────────────────────────────────────
   (function() {
