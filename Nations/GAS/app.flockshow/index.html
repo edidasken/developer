@@ -189,6 +189,12 @@
       font-size: .73rem;
       margin-top: 24px;
     }
+    .return-home-link {
+      display: block; text-align: center; margin-top: 14px;
+      font-size: .73rem; color: var(--muted);
+      text-decoration: none; transition: opacity .15s;
+    }
+    .return-home-link:hover { opacity: .75; }
   </style>
 </head>
 <body>
@@ -228,6 +234,7 @@
     <div class="error-msg" id="fs-error"></div>
 
     <p class="foot-note">"Praise Him with strings and pipe." — Psalm 150:4</p>
+    <a href="../app.flocknews/flocknews.html" class="return-home-link">← Return to Home</a>
   </div>
 
   <!-- Firebase & auth dependencies (same order as app.flockshow.html) -->

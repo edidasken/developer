@@ -183,6 +183,12 @@
       font-size: .73rem;
       margin-top: 24px;
     }
+    .return-home-link {
+      display: block; text-align: center; margin-top: 14px;
+      font-size: .73rem; color: var(--muted);
+      text-decoration: none; transition: opacity .15s;
+    }
+    .return-home-link:hover { opacity: .75; }
   </style>
 </head>
 <body>
@@ -221,6 +227,7 @@
     <div class="error-msg" id="fc-error"></div>
 
     <p class="foot-note">"How good and pleasant it is when God's people live together in unity!" — Psalm 133:1</p>
+    <a href="../app.flocknews/flocknews.html" class="return-home-link">← Return to Home</a>
   </div>
 
   <!-- Firebase & auth dependencies (same order as app.flockchat.html) -->

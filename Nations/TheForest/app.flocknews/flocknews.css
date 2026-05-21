@@ -111,40 +111,55 @@ html, body {
   border: none; border-top: 1px solid rgba(255,255,255,.15); margin: 4px 0;
 }
 
-/* ── Mobile: full-width dropdown, fixed position ───────────────────────── */
+/* ── Mobile ───────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
+  /* Darken muted label color on mobile for readability */
+  :root { --ink-label: #2e2820; }
+
   .fn-back-bar { position: static !important; }
+
+  /* Compact centered popover — NOT full-page takeover */
   .fn-app-switcher {
     position: fixed;
-    top: 0; left: 0; right: 0;
-    min-width: unset; width: 100%;
-    max-height: 85dvh;
-    border-radius: 0 0 18px 18px;
-    box-shadow: 0 12px 48px rgba(12,20,69,.65);
-    padding-top: 12px;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    top: 62px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(360px, calc(100vw - 24px));
+    right: auto; min-width: unset;
+    max-height: min(75dvh, 520px);
+    border-radius: 14px;
+    box-shadow: 0 12px 48px rgba(12,20,69,.65), 0 4px 16px rgba(0,0,0,.3);
+    padding: 8px 0;
     z-index: 9999;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
-  .fn-sw-item {
-    padding: 15px 22px;
-    min-height: 62px;
-    gap: 16px;
-  }
-  .fn-sw-icon svg { width: 22px; height: 22px; }
-  .fn-sw-name { font-size: 15px; }
-  .fn-sw-hint { font-size: 13px; }
-  .fn-back-btn {
-    font-size: 12px;
-    padding: 8px 18px 8px 14px;
-  }
+  .fn-sw-item { padding: 13px 18px; min-height: 56px; gap: 14px; }
+  .fn-sw-icon svg { width: 20px; height: 20px; }
+  .fn-sw-name { font-size: 14px; }
+  .fn-sw-hint { font-size: 12px; }
+  .fn-back-btn { font-size: 12px; padding: 8px 18px 8px 14px; }
+
   /* Icon-only on mobile — hide text labels */
   .fn-btn-label { display: none; }
   .fn-back-btn  { padding: 8px 10px; }
   .fn-share-btn { padding: 5px 10px; }
-  /* Section labels (e.g. "Today's Scripture Readings") center on mobile */
+
+  /* Section labels center on mobile */
   .fn-col-label { display: block; text-align: center; }
+
+  /* ── Bump tiny font sizes to readable minimums ─────────────────────── */
+  .fn-ph-type-badge, .fn-spot-jp-label, .fn-sp-label { font-size: 11px; }
+  .fn-reading-tag, .fn-ph-label, .fn-spot-section-label,
+  .fn-spot-challenge-label, .fn-hc-category, .fn-mirror-label,
+  .fn-apol-category, .fn-iam-need, .fn-quiz-diff,
+  .fn-col-label, .fn-lead-kicker, .fn-lead-byline,
+  .fn-devo-sub-label, .fn-quiz-cat, .fn-counsel-steps-label,
+  .fn-spot-link, .fn-index-box-label { font-size: 12px; }
+  .fn-lead-theme, .fn-theo-category, .fn-stat-label,
+  .fn-dateline, .fn-section-label, .fn-watch-rank,
+  .fn-spot-meta, .fn-footer, .fn-motto { font-size: 14px; }
+  .fn-watch-desc { font-size: 14px; }
 }
 
 
