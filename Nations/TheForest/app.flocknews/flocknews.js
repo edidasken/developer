@@ -1184,6 +1184,88 @@ function renderBook() {
 }
 
 // Reveal the editor link in the masthead for pastor+ users
+async function loadChurchAndConfig() {
+  if (!FlockNewsState.db) return;
+  try {
+    const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout')), ms));
+    const [churchDoc, configDoc] = await Promise.all([
+      Promise.race([FlockNewsState.db.collection('appConfig').doc('church_name').get(), timeout(5000)]),
+      Promise.race([FlockNewsState.db.collection('appConfig').doc('flockNewsConfig').get(), timeout(5000)]),
+    ]);
+
+    if (churchDoc.exists) {
+      const name = (churchDoc.data().value || '').trim();
+      FlockNewsState.churchName = name;
+      const el = document.getElementById('fn-church-name');
+      if (el && name) el.textContent = name;
+    }
+
+    if (configDoc.exists) {
+      const cfg = configDoc.data() || {};
+      FlockNewsState.newsConfig = cfg;
+      if (cfg.tagline) {
+        const el = document.getElementById('fn-tagline');
+        if (el) el.textContent = cfg.tagline;
+      }
+      if (cfg.edition) {
+        const el = document.getElementById('fn-masthead-edition');
+        if (el) el.textContent = cfg.edition;
+      }
+      if (cfg.modules && Array.isArray(cfg.modules)) {
+        FlockNewsState.moduleConfig = cfg.modules;
+      }
+    }
+
+    applyModuleConfig(FlockNewsState.moduleConfig || DEFAULT_MODULES);
+  } catch (e) {
+    console.warn('[FlockNews] loadChurchAndConfig failed:', e.message);
+    applyModuleConfig(DEFAULT_MODULES);
+  }
+}
+
+// Apply module config to the news feed DOM (order + visibility)
+function applyModuleConfig(modules) {
+  if (!modules || !Array.isArray(modules)) return;
+  const feed = document.getElementById('fn-news-feed');
+  if (!feed) return;
+
+  const sorted = [...modules].sort((a, b) => a.order - b.order);
+
+  sorted.forEach(mod => {
+    if (mod.type === 'custom') {
+      let el = document.querySelector(`[data-section="${mod.id}"]`);
+      if (!el) {
+        el = document.createElement('div');
+        el.setAttribute('data-section', mod.id);
+        el.setAttribute('data-custom', 'true');
+        el.className = 'fn-news-card';
+        el.innerHTML = `
+          <div class="fn-card-header">
+            <div class="fn-card-title">
+              <span>${escapeHTML(mod.icon || '📋')}</span>
+              <span>${escapeHTML(mod.label || 'Custom Module')}</span>
+            </div>
+          </div>
+          <div class="fn-card-content">${mod.content || '<p>Custom content</p>'}</div>`;
+      } else if (el.getAttribute('data-custom') === 'true') {
+        const contentEl = el.querySelector('.fn-card-content');
+        if (contentEl && mod.content) contentEl.innerHTML = mod.content;
+        const titleEl = el.querySelector('.fn-card-title span:last-child');
+        if (titleEl) titleEl.textContent = mod.label || 'Custom Module';
+        const iconEl = el.querySelector('.fn-card-title span:first-child');
+        if (iconEl) iconEl.textContent = mod.icon || '📋';
+      }
+      el.style.display = mod.visible ? '' : 'none';
+      feed.appendChild(el);
+    } else {
+      const el = document.querySelector(`[data-section="${mod.id}"]`);
+      if (!el) return;
+      el.style.display = mod.visible ? '' : 'none';
+      feed.appendChild(el);
+    }
+  });
+}
+
 function _revealEditorLink() {
   let attempts = 0;
   const poll = () => {
