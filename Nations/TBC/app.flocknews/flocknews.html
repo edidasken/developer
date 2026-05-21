@@ -3,38 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="The Flock Herald — Daily ministry news, devotionals, missions, and the FlockOS suite. Free to the Body of Christ.">
+  <meta name="description" content="The Flock Herald — Daily devotionals, missions, theology, apologetics, discipleship, and Scripture for the Body of Christ.">
   <title>The Flock Herald — FlockOS Daily</title>
-
-  <!-- Newspaper fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IM+Fell+English:ital@0;1&display=swap">
-
-  <!-- Flash prevention: apply saved FlockOS theme before first paint -->
   <script>
     (function () {
       try { var t = localStorage.getItem('flock_theme') || 'america'; document.documentElement.setAttribute('data-theme', t); }
       catch (_) { document.documentElement.setAttribute('data-theme', 'america'); }
     })();
   </script>
-
   <link rel="stylesheet" href="flocknews.css">
 </head>
 <body>
-
 <div class="fn-page">
 
-  <!-- ══ BACK / SHARE BAR ════════════════════════════════════════════════ -->
-  <div class="fn-back-bar">
-    <button class="fn-back-btn" onclick="goBack()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      Back to FlockOS
+  <!-- ══ BACK / SHARE BAR ═══════════════════════════════════════════════ -->
+  <div class="fn-back-bar" style="position:relative">
+    <button class="fn-back-btn" id="fn-app-switcher-btn" aria-haspopup="true" aria-expanded="false" aria-controls="fn-app-switcher">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Select an App
+      <svg class="fn-switcher-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
-    <button class="fn-share-btn" id="fn-share-btn" onclick="shareHerald()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-      Share This Edition
-    </button>
+    <!-- App switcher dropdown -->
+    <nav id="fn-app-switcher" class="fn-app-switcher" role="menu" aria-hidden="true" hidden>
+      <a class="fn-sw-item" href="../index.html" role="menuitem">
+        <span class="fn-sw-icon" style="color:#e8a838"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2h16a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg></span>
+        <span class="fn-sw-text"><span class="fn-sw-name">The Flock Herald</span><span class="fn-sw-hint">Daily paper — you are here</span></span>
+      </a>
+      <hr class="fn-sw-divider">
+      <a class="fn-sw-item" href="../app.flockos/app.flockos.html" role="menuitem">
+        <span class="fn-sw-icon" style="color:#3b82f6"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+        <span class="fn-sw-text"><span class="fn-sw-name">FlockOS</span><span class="fn-sw-hint">Shepherd's Dashboard</span></span>
+      </a>
+      <a class="fn-sw-item" href="../app.grow/app.grow.html" role="menuitem">
+        <span class="fn-sw-icon" style="color:#d97706"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 12C5 7 8 4 12 2c4 2 7 5 7 10"/><path d="M5 12c0 3 3 6 7 8 4-2 7-5 7-8"/></svg></span>
+        <span class="fn-sw-text"><span class="fn-sw-name">GROW</span><span class="fn-sw-hint">Discipleship Hub</span></span>
+      </a>
+      <a class="fn-sw-item" href="../app.invite/app.invite.html" role="menuitem">
+        <span class="fn-sw-icon" style="color:#22c55e"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><line x1="5" y1="9" x2="19" y2="9"/></svg></span>
+        <span class="fn-sw-text"><span class="fn-sw-name">The Invitation</span><span class="fn-sw-hint">Gospel Page</span></span>
+      </a>
+      <a class="fn-sw-item" href="../app.stand/music_stand.html" role="menuitem">
+        <span class="fn-sw-icon" style="color:#a855f7"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+        <span class="fn-sw-text"><span class="fn-sw-name">Flock Stand</span><span class="fn-sw-hint">Music Stand</span></span>
+      </a>
+      <a class="fn-sw-item" href="../app.flockshow/app.flockshow.html" role="menuitem">
+        <span class="fn-sw-icon" style="color:#ef4444"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+        <span class="fn-sw-text"><span class="fn-sw-name">FlockShow</span><span class="fn-sw-hint">Worship Display</span></span>
+      </a>
+      <a class="fn-sw-item" href="../app.feed/feed.html" role="menuitem">
+        <span class="fn-sw-icon" style="color:#e8a838"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+        <span class="fn-sw-text"><span class="fn-sw-name">FEED</span><span class="fn-sw-hint">Sermon Workspace</span></span>
+      </a>
+      <a class="fn-sw-item" href="../../flockchat-public/FlockChat.html" role="menuitem">
+        <span class="fn-sw-icon" style="color:#06b6d4"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        <span class="fn-sw-text"><span class="fn-sw-name">FlockChat</span><span class="fn-sw-hint">Church Messaging</span></span>
+      </a>
+      <a class="fn-sw-item" href="../app.wellspring/app.wellspring.html" role="menuitem">
+        <span class="fn-sw-icon" style="color:#22c55e"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6 9 4 13 4 16a8 8 0 0 0 16 0c0-3-2-7-8-14z"/></svg></span>
+        <span class="fn-sw-text"><span class="fn-sw-name">The Wellspring</span><span class="fn-sw-hint">Offline Mode</span></span>
+      </a>
+    </nav>
+    <div style="display:flex;gap:10px;align-items:center">
+      <a class="fn-edit-btn" href="news_editor.html">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Editor
+      </a>
+      <button class="fn-share-btn" id="fn-share-btn" onclick="shareHerald()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share This Edition
+      </button>
+    </div>
   </div>
 
   <!-- ══ MASTHEAD ════════════════════════════════════════════════════════ -->
@@ -42,429 +83,1242 @@
     <hr class="fn-masthead-rule-top">
     <div class="fn-masthead-inner">
       <div class="fn-flag">The Flock Herald</div>
-      <div class="fn-motto">Ministry News for the Body of Christ &nbsp;·&nbsp; Free to the Church</div>
+      <div class="fn-church-name">Trinity Baptist Church</div>
+      <div class="fn-motto">
+        <a class="fn-motto-link" href="../app.grow/app.grow.html#the_gospel_courses">Discipleship</a>
+        &nbsp;·&nbsp;
+        <a class="fn-motto-link" href="../app.grow/app.grow.html#the_gospel_devotionals">Devotions</a>
+        &nbsp;·&nbsp;
+        <a class="fn-motto-link" href="../app.grow/app.grow.html#the_gospel_missions">Missions</a>
+        &nbsp;·&nbsp;
+        <a class="fn-motto-link" href="../app.grow/app.grow.html#the_gospel_theology">Theology</a>
+      </div>
       <div class="fn-dateline">
-        <span>Vol. I &nbsp;·&nbsp; No. <span id="fn-issue">1</span></span>
-        <span id="fn-date">May 21, 2026</span>
-        <span>flock-os.github.io</span>
+        <span>Vol. <span id="fn-vol">2026</span> &nbsp;·&nbsp; No. <span id="fn-issue">1</span></span>
+        <span class="fn-date-nav">
+          <button class="fn-date-arrow" id="fn-prev-day" title="Previous edition" aria-label="Previous edition">‹</button>
+          <span id="fn-date" title="Click to select edition date" style="cursor:pointer">May 21, 2026</span>
+          <input type="date" id="fn-date-picker" class="fn-date-picker" aria-label="Select edition date">
+          <button class="fn-date-arrow" id="fn-next-day" title="Next edition" aria-label="Next edition">›</button>
+        </span>
+        <span>tbc.yhwh.one</span>
       </div>
     </div>
     <hr class="fn-masthead-rule-bot">
   </header>
 
-  <!-- ══ FRONT PAGE GRID ════════════════════════════════════════════════ -->
-  <div class="fn-front-grid">
+  <!-- ══ SECTION 1 — FRONT PAGE GRID ═══════════════════════════════════ -->
+  <section data-fn-section="front" id="fn-section-front">
+    <div class="fn-front-grid">
 
-    <!-- ── Left sidebar: Devotional of the Day ─────────────────────── -->
-    <aside class="fn-front-sidebar">
-      <div class="fn-devo-label">Devotional of the Day</div>
-      <div id="fn-devo-content" class="fn-loading">Loading today's devotional…</div>
+      <!-- ── Left: Today's Readings ──────────────────────────────────── -->
+      <aside class="fn-front-left">
+        <div class="fn-col-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_reading">Today's Scripture Readings</a></div>
+        <div id="fn-readings-content" class="fn-loading">Loading…</div>
+        <div id="fn-psalm-highlight"></div>
+        <div class="fn-index-box">
+          <div class="fn-index-box-label">In This Edition</div>
+          <ul class="fn-index-list">
+            <li><span>Devotional</span><span class="fn-index-dots"></span><span class="fn-index-pg">§ 1</span></li>
+            <li><span>Missions</span><span class="fn-index-dots"></span><span class="fn-index-pg">§ 2</span></li>
+            <li><span>Theology</span><span class="fn-index-dots"></span><span class="fn-index-pg">§ 3</span></li>
+            <li><span>Apologetics</span><span class="fn-index-dots"></span><span class="fn-index-pg">§ 4</span></li>
+            <li><span>Discipleship</span><span class="fn-index-dots"></span><span class="fn-index-pg">§ 5</span></li>
+            <li><span>Daily Quiz</span><span class="fn-index-dots"></span><span class="fn-index-pg">§ 6</span></li>
+            <li><span>Person of Scripture</span><span class="fn-index-dots"></span><span class="fn-index-pg">§ 7</span></li>
+            <li><span>The Invitation</span><span class="fn-index-dots"></span><span class="fn-index-pg">§ 8</span></li>
+            <li><span>The FlockOS Suite</span><span class="fn-index-dots"></span><span class="fn-index-pg">§ 9</span></li>
+          </ul>
+        </div>
+      </aside>
 
-      <!-- Also Inside index -->
-      <div class="fn-index-box">
-        <div class="fn-index-box-label">Also in This Edition</div>
-        <ul class="fn-index-list">
-          <li>
-            <span>Missions Spotlight</span>
-            <span class="fn-index-dots"></span>
-            <span class="fn-index-pg">§ 2</span>
-          </li>
-          <li>
-            <span>Global Statistics</span>
-            <span class="fn-index-dots"></span>
-            <span class="fn-index-pg">§ 2</span>
-          </li>
-          <li>
-            <span>World Watch</span>
-            <span class="fn-index-dots"></span>
-            <span class="fn-index-pg">§ 2</span>
-          </li>
-          <li>
-            <span>The FlockOS Suite</span>
-            <span class="fn-index-dots"></span>
-            <span class="fn-index-pg">§ 3</span>
-          </li>
-          <li>
-            <span>Try FlockOS Free</span>
-            <span class="fn-index-dots"></span>
-            <span class="fn-index-pg">§ 3</span>
-          </li>
-        </ul>
+      <!-- ── Main: Devotional of the Day ─────────────────────────────── -->
+      <main class="fn-front-main" id="fn-section-devo">
+        <div class="fn-col-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_devotionals">Devotional of the Day</a></div>
+        <div id="fn-devo-content" class="fn-loading">Loading today's devotional…</div>
+        <!-- ── Heart Check (flows directly below prayer) ────────────── -->
+        <div id="fn-section-heartcheck" class="fn-heartcheck-inline">
+          <hr style="border:none;border-top:2px solid var(--rule);margin:24px 0 18px">
+          <div class="fn-col-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_heart">Heart Check</a></div>
+          <div id="fn-heart-content" class="fn-loading">Loading…</div>
+        </div>
+      </main>
+
+    </div>
+  </section>
+
+  <!-- ══ SECTION 2 — MISSIONS REPORT ════════════════════════════════════ -->
+  <section data-fn-section="missions" id="fn-section-missions">
+    <hr class="rule-double" style="margin-top:30px">
+    <p class="fn-section-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_missions">§ 2 &nbsp;·&nbsp; Missions Report &nbsp;·&nbsp; Joshua Project &amp; Operation World &nbsp;·&nbsp; <span id="fn-spot-country-name">—</span></a></p>
+    <div class="fn-missions-grid">
+      <div class="fn-missions-spotlight">
+        <div class="fn-col-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_missions">Today's Spotlight</a></div>
+        <div id="fn-spot-content" class="fn-loading">Loading…</div>
       </div>
-    </aside>
-
-    <!-- ── Main column: Lead story ──────────────────────────────────── -->
-    <main class="fn-front-main">
-      <div class="fn-lead-kicker">Special Report &nbsp;·&nbsp; Ministry Edition</div>
-      <h1 class="fn-lead-headline">A Complete Suite of Ministry Tools, Built for the Work of the Church</h1>
-      <p class="fn-lead-deck">Everything a pastor touches in the course of his week — in one integrated system, on any device, completely free.</p>
-      <p class="fn-lead-byline">By the FlockOS Team &nbsp;·&nbsp; flock-os.github.io</p>
-
-      <div class="fn-lead-body">
-        <p>FlockOS is not a product. It is a calling made software. Built for the local church pastor — not for a denomination, not for a megachurch with an IT department, but for the man in the room with the people, carrying the weight of their names, their struggles, their prayers, and their growth in grace.</p>
-
-        <p>It brings together everything a pastor touches in the course of his week — member directory, pastoral notes, prayer requests, small group rosters, worship planning, outreach tools, discipleship resources, and church communication — into one integrated system that runs on any device, in any browser, from anywhere in the world.</p>
-
-        <div class="fn-pull">"FlockOS carries the weight of the administration so the pastor can carry the weight of the people — and it is completely free, because the Gospel is."</div>
-
-        <h3>A Foundation Built on Grace, Not Commerce</h3>
-
-        <p>Church management software has historically been priced as if the church is a business and the pastor is a product manager. FlockOS was built on a different conviction. There is no subscription fee. No per-seat pricing. No features locked behind an upgrade wall. Every module. Every update. Every capability — free. The resources of a large church deserve to be in the hands of the smallest congregation.</p>
-
-        <p>The pastor of twelve should have the same tools as the pastor of twelve hundred. <em>"Freely you have received; freely give."</em> — Matthew 10:8</p>
-
-        <h3>No Server. No IT. No Barriers.</h3>
-
-        <p>FlockOS is a web application that runs in any modern browser on any device. There is nothing to install, no server to maintain, no IT team required. It is hosted for free on GitHub Pages — an infrastructure maintained by Microsoft — serving churches 24 hours a day with no monthly fees and no expiration date.</p>
-
-        <p>For pastors without reliable internet access, The Wellspring mode allows the complete church database to run offline on a single encrypted file — no connectivity required. FlockOS was designed to go wherever the Great Commission sends you.</p>
-
-        <h3>Your Data. Your Accounts. Your Church.</h3>
-
-        <p>The design keeps your church's data in your own Google or Firebase accounts — not in a central FlockOS-owned database. You own it. You control it. If you stop using FlockOS tomorrow, your data is still yours. There is no exit fee. No hostage situation.</p>
-
-        <p>Sensitive pastoral records — counseling notes, care cases, prayer journals — are protected by role-based access control. Six permission levels, from Guest to Admin, ensure that your private conversations with a struggling family never appear on the welcome desk screen.</p>
+      <div class="fn-missions-stats">
+        <div class="fn-col-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_missions">Global Numbers</a></div>
+        <div id="fn-stats-content" class="fn-loading">…</div>
       </div>
-    </main>
-
-  </div><!-- /.fn-front-grid -->
-
-
-  <!-- ══ MISSIONS REPORT ════════════════════════════════════════════════ -->
-  <hr class="rule-double" style="margin-top: 28px;">
-  <p class="fn-section-label">Missions Report &nbsp;·&nbsp; Joshua Project &amp; Operation World</p>
-
-  <div class="fn-missions-grid">
-
-    <!-- Spotlight -->
-    <div class="fn-missions-spotlight">
-      <div class="fn-col-label">Today's Spotlight</div>
-      <div id="fn-spot-content" class="fn-loading">Loading missions data…</div>
+      <div class="fn-missions-watch">
+        <div class="fn-col-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_missions">World Watch</a></div>
+        <div id="fn-watch-content" class="fn-loading">…</div>
+      </div>
     </div>
+  </section>
 
-    <!-- Global stats -->
-    <div class="fn-missions-stats">
-      <div class="fn-col-label">Global Numbers</div>
-      <div id="fn-stats-content" class="fn-loading">…</div>
-    </div>
+  <!-- ══ SECTION 3 — THEOLOGY CORNER ════════════════════════════════════ -->
+  <section data-fn-section="theology" id="fn-section-theology">
+    <hr class="rule-double" style="margin-top:30px">
+    <p class="fn-section-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_theology">§ 3 &nbsp;·&nbsp; Theology Corner &nbsp;·&nbsp; <span id="fn-theo-head">—</span></a></p>
+    <div id="fn-theo-content" class="fn-loading">Loading…</div>
+  </section>
 
-    <!-- World Watch -->
-    <div class="fn-missions-watch">
-      <div class="fn-col-label">World Watch</div>
-      <div id="fn-watch-content" class="fn-loading">…</div>
-    </div>
+  <!-- ══ SECTION 4 — APOLOGETICS ═════════════════════════════════════════ -->
+  <section data-fn-section="apologetics" id="fn-section-apologetics">
+    <hr class="rule-double" style="margin-top:30px">
+    <p class="fn-section-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_apologetics">§ 4 &nbsp;·&nbsp; Apologetics &nbsp;·&nbsp; Answers to Hard Questions</a></p>
+    <div id="fn-apol-content" class="fn-loading">Loading…</div>
+  </section>
 
-  </div><!-- /.fn-missions-grid -->
+  <!-- ══ SECTION 5 — DISCIPLESHIP & CARE ═════════════════════════════════ -->
+  <section data-fn-section="discipleship" id="fn-section-discipleship">
+    <hr class="rule-double" style="margin-top:30px">
+    <p class="fn-section-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_counseling">§ 5 &nbsp;·&nbsp; Discipleship &amp; Biblical Care &nbsp;·&nbsp; <span id="fn-counsel-head">—</span></a></p>
+    <div id="fn-counsel-content" class="fn-loading">Loading…</div>
+  </section>
 
+  <!-- ══ SECTION 6 — DAILY QUIZ ═══════════════════════════════════════════ -->
+  <section data-fn-section="quiz" id="fn-section-quiz">
+    <hr class="rule-double" style="margin-top:30px">
+    <p class="fn-section-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_quizzes">§ 6 &nbsp;·&nbsp; The Daily Quiz &nbsp;·&nbsp; Test Your Knowledge</a></p>
+    <div id="fn-quiz-content" class="fn-loading">Loading…</div>
+  </section>
 
-  <!-- ══ THE FLOCKOS SUITE ═══════════════════════════════════════════════ -->
-  <hr class="rule-double" style="margin-top: 28px;">
-  <p class="fn-section-label">The FlockOS Suite &nbsp;·&nbsp; Eight Apps, One Mission</p>
+  <!-- ══ SECTION 7 — PERSON OF SCRIPTURE ══════════════════════════════════ -->
+  <section data-fn-section="figure" id="fn-section-figure">
+    <hr class="rule-double" style="margin-top:30px">
+    <p class="fn-section-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_genealogy">§ 7 &nbsp;·&nbsp; Person of Scripture &nbsp;·&nbsp; <span id="fn-figure-head">—</span></a></p>
+    <div id="fn-figure-content" class="fn-loading">Loading…</div>
+  </section>
 
-  <div class="fn-suite-grid">
-    <div class="fn-suite-card">
-      <div class="fn-suite-name">FlockOS — The Shepherd's Dashboard</div>
-      <div class="fn-suite-desc">Member directory, pastoral care notes, prayer tracking, small groups, events, attendance, spiritual milestones, and service planning — all in one place.</div>
+  <!-- ══ SECTION 8 — THE INVITATION ═════════════════════════════════════ -->
+  <section data-fn-section="invitation" id="fn-section-invitation">
+    <hr class="rule-double" style="margin-top:30px">
+    <p class="fn-section-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_invitation">§ 9 &nbsp;·&nbsp; The Invitation &nbsp;·&nbsp; Come to Christ</a></p>
+    <div class="fn-inv-grid">
+      <div class="fn-inv-col" id="fn-inv-invitation">
+        <div class="fn-col-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_invitation">Today’s Invitation</a></div>
+        <div class="fn-loading">Loading…</div>
+      </div>
+      <div class="fn-inv-col" id="fn-inv-iam">
+        <div class="fn-col-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_invitation">I Am</a></div>
+        <div class="fn-loading">Loading…</div>
+      </div>
+      <div class="fn-inv-col" id="fn-inv-work">
+        <div class="fn-col-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_invitation">The Finished Work</a></div>
+        <div class="fn-loading">Loading…</div>
+      </div>
     </div>
-    <div class="fn-suite-card">
-      <div class="fn-suite-name">GROW — Discipleship Hub</div>
-      <div class="fn-suite-desc">Gospel presentation, one-year Bible plan, devotionals, Strong's lexicon, theology, apologetics, and missions data for 238 nations. Public. No account required.</div>
+    <div class="fn-inv-share-bar">
+      <button class="fn-inv-share-btn" id="fn-inv-share-btn">Share the Invitation with a Friend &rarr;</button>
     </div>
-    <div class="fn-suite-card">
-      <div class="fn-suite-name">The Invitation — Gospel Page</div>
-      <div class="fn-suite-desc">One page. One message. A clear presentation of Jesus — who He is, what He did, how to respond. Share it with a seeker in a text or a counseling conversation.</div>
-    </div>
-    <div class="fn-suite-card">
-      <div class="fn-suite-name">Flock Stand — The Music Stand</div>
-      <div class="fn-suite-desc">Song library, setlist builder, chord transposer, and live lyrics display. The entire worship team, on the same page, in any key, with or without internet.</div>
-    </div>
-    <div class="fn-suite-card">
-      <div class="fn-suite-name">FlockChat — Church Messaging</div>
-      <div class="fn-suite-desc">Secure real-time messaging — team channels, small group rooms, direct messages, and prayer chains. Your congregation's conversations stay in your church's accounts.</div>
-    </div>
-    <div class="fn-suite-card">
-      <div class="fn-suite-name">FlockShow — Worship Display</div>
-      <div class="fn-suite-desc">Slides for your service — lyrics, Scripture, announcements — pulling directly from your setlists and service plans. No manual recreation every week.</div>
-    </div>
-    <div class="fn-suite-card">
-      <div class="fn-suite-name">FEED — Sermon Workspace</div>
-      <div class="fn-suite-desc">Outline your message, track your series, and build a searchable archive of every sermon ever preached — connected directly to your service plans.</div>
-    </div>
-    <div class="fn-suite-card">
-      <div class="fn-suite-name">The Wellspring — Offline Mode</div>
-      <div class="fn-suite-desc">The full suite, running from a single encrypted file with zero internet required. Built for the missionary, the church planter, and the pastor at the edge of the world.</div>
-    </div>
-  </div><!-- /.fn-suite-grid -->
+  </section>
 
+  <!-- ══ SECTION 9 — THE FLOCKOS SUITE ════════════════════════════════════ -->
+  <section data-fn-section="suite" id="fn-section-suite">
+    <hr class="rule-double" style="margin-top:30px">
+    <p class="fn-section-label">§ 9 &nbsp;·&nbsp; The FlockOS Suite &nbsp;·&nbsp; Eight Apps, One Mission</p>
+    <div class="fn-suite-icons">
 
-  <!-- ══ FOOTER ══════════════════════════════════════════════════════════ -->
+      <button class="fn-suite-tile" onclick="openSuitePanel('flockos')" aria-label="FlockOS details">
+        <span class="fn-suite-tile-icon" style="color:#3b82f6"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+        <span class="fn-suite-tile-name">FlockOS</span>
+        <span class="fn-suite-tile-sub">Shepherd's Dashboard</span>
+      </button>
+
+      <button class="fn-suite-tile" onclick="openSuitePanel('grow')" aria-label="GROW details">
+        <span class="fn-suite-tile-icon" style="color:#d97706"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 12C5 7 8 4 12 2c4 2 7 5 7 10"/><path d="M5 12c0 3 3 6 7 8 4-2 7-5 7-8"/></svg></span>
+        <span class="fn-suite-tile-name">GROW</span>
+        <span class="fn-suite-tile-sub">Discipleship Hub</span>
+      </button>
+
+      <button class="fn-suite-tile" onclick="openSuitePanel('invite')" aria-label="The Invitation details">
+        <span class="fn-suite-tile-icon" style="color:#22c55e"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><line x1="5" y1="9" x2="19" y2="9"/></svg></span>
+        <span class="fn-suite-tile-name">The Invitation</span>
+        <span class="fn-suite-tile-sub">Gospel Page</span>
+      </button>
+
+      <button class="fn-suite-tile" onclick="openSuitePanel('stand')" aria-label="Flock Stand details">
+        <span class="fn-suite-tile-icon" style="color:#a855f7"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+        <span class="fn-suite-tile-name">Flock Stand</span>
+        <span class="fn-suite-tile-sub">Music Stand</span>
+      </button>
+
+      <button class="fn-suite-tile" onclick="openSuitePanel('flockchat')" aria-label="FlockChat details">
+        <span class="fn-suite-tile-icon" style="color:#06b6d4"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        <span class="fn-suite-tile-name">FlockChat</span>
+        <span class="fn-suite-tile-sub">Church Messaging</span>
+      </button>
+
+      <button class="fn-suite-tile" onclick="openSuitePanel('flockshow')" aria-label="FlockShow details">
+        <span class="fn-suite-tile-icon" style="color:#ef4444"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+        <span class="fn-suite-tile-name">FlockShow</span>
+        <span class="fn-suite-tile-sub">Worship Display</span>
+      </button>
+
+      <button class="fn-suite-tile" onclick="openSuitePanel('feed')" aria-label="FEED details">
+        <span class="fn-suite-tile-icon" style="color:#e8a838"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+        <span class="fn-suite-tile-name">FEED</span>
+        <span class="fn-suite-tile-sub">Sermon Workspace</span>
+      </button>
+
+      <button class="fn-suite-tile" onclick="openSuitePanel('wellspring')" aria-label="The Wellspring details">
+        <span class="fn-suite-tile-icon" style="color:#22c55e"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6 9 4 13 4 16a8 8 0 0 0 16 0c0-3-2-7-8-14z"/></svg></span>
+        <span class="fn-suite-tile-name">The Wellspring</span>
+        <span class="fn-suite-tile-sub">Offline Mode</span>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- ══ APP SUITE DETAIL PANEL ════════════════════════════════════════ -->
+  <div id="fn-suite-overlay" class="fn-suite-overlay" onclick="closeSuitePanel()"></div>
+  <aside id="fn-suite-panel" class="fn-suite-panel" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="fn-sp-name">
+    <button class="fn-suite-panel-close" onclick="closeSuitePanel()" aria-label="Close">&#215;</button>
+    <div id="fn-suite-panel-body" class="fn-suite-panel-body"></div>
+  </aside>
+
+  <!-- ══ FOOTER ════════════════════════════════════════════════════════ -->
   <footer class="fn-footer">
     <em>"And he gave the apostles, the prophets, the evangelists, the shepherds and teachers,<br>
     to equip the saints for the work of ministry, for building up the body of Christ."<br>
     — Ephesians 4:11–12</em>
-    The Flock Herald &nbsp;·&nbsp; FlockOS &nbsp;·&nbsp; flock-os.github.io &nbsp;·&nbsp; Free to the Church &nbsp;·&nbsp; All Rights Reserved
+    The Flock Herald &nbsp;·&nbsp; A FlockOS Publication &nbsp;·&nbsp; All Rights Reserved
   </footer>
 
 </div><!-- /.fn-page -->
 
-<div id="fn-status" role="alert" aria-live="polite"></div>
+<!-- ══ COUNTRY DOSSIER DRAWER ════════════════════════════════════════════ -->
+<div id="fn-dossier-backdrop" class="fn-dossier-backdrop" aria-hidden="true"></div>
+<aside id="fn-dossier-drawer" class="fn-dossier-drawer" role="dialog" aria-modal="true" aria-label="Country Dossier" aria-hidden="true">
+  <button id="fn-dossier-close" class="fn-dossier-close" aria-label="Close">&#x2715;</button>
+  <div id="fn-dossier-body" class="fn-dossier-body"></div>
+</aside>
 
+<div id="fn-status" role="alert" aria-live="polite"></div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════
      SCRIPTS
      ═══════════════════════════════════════════════════════════════════════ -->
 <script>
-  'use strict';
+'use strict';
 
-  // ── Masthead: live date + issue number (day of year) ─────────────────
-  (function () {
-    var now      = new Date();
-    var start    = new Date(now.getFullYear(), 0, 0);
-    var dayOfYear = Math.floor((now - start) / 86400000);
+// ── Date + issue (supports edition override via sessionStorage) ────────────
+(function () {
+  var today    = new Date();
+  var todayStr = today.toISOString().slice(0, 10);
 
-    var dateEl = document.getElementById('fn-date');
-    if (dateEl) {
-      dateEl.textContent = now.toLocaleDateString('en-US', {
-        year: 'numeric', month: 'long', day: 'numeric'
-      });
+  // Read any stored edition override — URL param takes priority over sessionStorage
+  var override = null;
+  try {
+    var urlParam = new URLSearchParams(location.search).get('date');
+    if (urlParam && urlParam <= todayStr) { override = urlParam; sessionStorage.setItem('fn_edition_date', urlParam); }
+    else override = sessionStorage.getItem('fn_edition_date');
+  } catch(_) {}
+  // Cap future dates at today
+  if (override && override > todayStr) override = null;
+
+  var _date  = override ? new Date(override + 'T12:00:00') : today;
+  var _start = new Date(_date.getFullYear(), 0, 0);
+
+  window._FN_NOW   = _date;
+  window._FN_DAY   = Math.floor((_date - _start) / 86400000);
+  window._FN_TODAY = override || todayStr;
+
+  // Render date label
+  document.getElementById('fn-date').textContent = _date.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  document.getElementById('fn-issue').textContent = window._FN_DAY;
+  document.getElementById('fn-vol').textContent = _date.getFullYear();
+
+  // Seed the date picker
+  var picker = document.getElementById('fn-date-picker');
+  picker.value = window._FN_TODAY;
+  picker.max   = todayStr;
+
+  // ── Arrow navigation ──────────────────────────────────────────
+  function goToDate(d) {
+    var s = d.toISOString().slice(0, 10);
+    if (s > todayStr) return;                // never go future
+    try { sessionStorage.setItem('fn_edition_date', s); } catch(_) {}
+    window.location.reload();
+  }
+
+  document.getElementById('fn-prev-day').addEventListener('click', function() {
+    var d = new Date(window._FN_TODAY + 'T12:00:00');
+    d.setDate(d.getDate() - 1);
+    goToDate(d);
+  });
+
+  document.getElementById('fn-next-day').addEventListener('click', function() {
+    var d = new Date(window._FN_TODAY + 'T12:00:00');
+    d.setDate(d.getDate() + 1);
+    goToDate(d);
+  });
+
+  // ── Secret date click → show picker ────────────────────────────────
+  document.getElementById('fn-date').addEventListener('click', function() {
+    picker.classList.toggle('fn-date-picker-open');
+    if (picker.classList.contains('fn-date-picker-open')) picker.showPicker ? picker.showPicker() : picker.focus();
+  });
+
+  picker.addEventListener('change', function() {
+    if (!picker.value) return;
+    try { sessionStorage.setItem('fn_edition_date', picker.value); } catch(_) {}
+    window.location.reload();
+  });
+})();
+
+var _FN_NOW   = window._FN_NOW;
+var _FN_DAY   = window._FN_DAY;
+var _FN_TODAY = window._FN_TODAY;
+
+// ── Load editor config ────────────────────────────────────────────────────
+var _CFG = (function () {
+  try { return JSON.parse(localStorage.getItem('fn_config') || 'null') || {}; }
+  catch (_) { return {}; }
+})();
+var _SEC  = _CFG.sections  || {};
+var _PICK = _CFG.picks     || {};
+
+// ── Apply section toggles ─────────────────────────────────────────────────
+['devo','heartcheck','missions','theology','apologetics','discipleship','quiz','figure','suite'].forEach(function(k) {
+  if (_SEC[k] === false) {
+    var el = document.getElementById('fn-section-' + k);
+    if (el) el.classList.add('fn-hidden');
+  }
+});
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function truncW(t, n) {
+  if (!t) return '';
+  var w = t.trim().split(/\s+/);
+  return w.length <= n ? t : w.slice(0,n).join(' ') + '…';
+}
+function fmtNum(n) {
+  if (!n || isNaN(n)) return '—';
+  if (n >= 1e9) return (n/1e9).toFixed(1).replace(/\.0$/,'') + 'B';
+  if (n >= 1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'') + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
+  return String(n);
+}
+function pick(arr, base) {
+  if (!arr || !arr.length) return null;
+  return arr[(base || _FN_DAY) % arr.length];
+}
+
+// If rendered inside an iframe (e.g. index.html Herald shell), intercept internal
+// navigation so links drive the top-level window instead of the iframe.
+if (window !== window.top) {
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest('a[href]');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    // Skip anchors, javascript: URIs, and absolute http(s) links (those have their own target)
+    if (!href || href.startsWith('#') || href.startsWith('javascript') ||
+        href.startsWith('http://') || href.startsWith('https://') ||
+        href.startsWith('sms:') || href.startsWith('tel:') || href.startsWith('mailto:')) return;
+    // Let links that already have an explicit target through unchanged
+    if (link.getAttribute('target')) return;
+    e.preventDefault();
+    window.top.location.href = new URL(href, location.href).href;
+  }, false);
+}
+
+function goBack() {
+  if (window !== window.top) { window.top.location.href = '../index.html'; return; }
+  if (window.opener && !window.opener.closed) window.close();
+  else if (history.length > 1) history.back();
+  else window.location.href = '../index.html';
+}
+
+// ── App Switcher ───────────────────────────────────────────────────
+(function () {
+  var btn     = document.getElementById('fn-app-switcher-btn');
+  var panel   = document.getElementById('fn-app-switcher');
+  var chevron = btn.querySelector('.fn-switcher-chevron');
+
+  // Backdrop overlay for mobile
+  var backdrop = document.createElement('div');
+  backdrop.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9998;-webkit-tap-highlight-color:transparent;';
+  document.body.appendChild(backdrop);
+
+  function openSwitcher() {
+    panel.hidden = false;
+    panel.setAttribute('aria-hidden', 'false');
+    btn.setAttribute('aria-expanded', 'true');
+    chevron.style.transform = 'rotate(180deg)';
+    if (window.innerWidth <= 640) {
+      backdrop.style.display = 'block';
+      document.body.style.overflow = 'hidden';
     }
-
-    var issueEl = document.getElementById('fn-issue');
-    if (issueEl) issueEl.textContent = dayOfYear;
-
-    window._FN_DAY_OF_YEAR = dayOfYear;
-    window._FN_TODAY_STR   = now.toISOString().slice(0, 10); // "YYYY-MM-DD"
-  })();
-
-  // ── Back navigation ──────────────────────────────────────────────────
-  function goBack() {
-    if (window.opener && !window.opener.closed) {
-      window.close();
-    } else if (history.length > 1) {
-      history.back();
-    } else {
-      window.location.href = '../index.html';
-    }
+  }
+  function closeSwitcher() {
+    panel.hidden = true;
+    panel.setAttribute('aria-hidden', 'true');
+    btn.setAttribute('aria-expanded', 'false');
+    chevron.style.transform = '';
+    backdrop.style.display = 'none';
+    document.body.style.overflow = '';
   }
 
-  // ── Share ─────────────────────────────────────────────────────────────
-  function shareHerald() {
-    var shareData = {
-      title: 'The Flock Herald — FlockOS Daily',
-      text: 'Ministry news, devotionals & missions — free to the Body of Christ.',
-      url: 'https://flock-os.github.io/FlockOS/Nations/Root/app.flocknews/flocknews.html'
-    };
-    if (navigator.share) {
-      navigator.share(shareData).catch(function () {});
-    } else {
-      navigator.clipboard.writeText(shareData.url).then(function () {
-        var btn = document.getElementById('fn-share-btn');
-        var orig = btn.innerHTML;
-        btn.textContent = 'Link Copied!';
-        setTimeout(function () { btn.innerHTML = orig; }, 2200);
-      }).catch(function () {
-        prompt('Copy this link to share:', shareData.url);
-      });
-    }
-  }
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    panel.hidden ? openSwitcher() : closeSwitcher();
+  });
+  backdrop.addEventListener('click', closeSwitcher);
+  document.addEventListener('click', function (e) {
+    if (!panel.hidden && !panel.contains(e.target) && e.target !== btn) closeSwitcher();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !panel.hidden) closeSwitcher();
+  });
+  // Close if user scrolls the page on desktop
+  window.addEventListener('scroll', function () {
+    if (!panel.hidden && window.innerWidth > 640) closeSwitcher();
+  }, { passive: true });
+})();
+function shareHerald() {
+  var date = (window._FN_TODAY || new Date().toISOString().slice(0,10));
+  var url = 'https://flock-os.github.io/FlockOS/Nations/Root/app.flocknews/flocknews.html?date=' + date;
+  if (navigator.share) navigator.share({ title:'The Flock Herald — ' + date, text:'Daily discipleship, devotions & missions.', url: url }).catch(function(){});
+  else navigator.clipboard.writeText(url).then(function(){
+    var b = document.getElementById('fn-share-btn');
+    var o = b.innerHTML; b.textContent = 'Link Copied!';
+    setTimeout(function(){ b.innerHTML = o; }, 2200);
+  }).catch(function(){ prompt('Copy to share:', url); });
+}
 
-  // ── Truncate text to N words ──────────────────────────────────────────
-  function truncateWords(text, n) {
-    if (!text) return '';
-    var words = text.trim().split(/\s+/);
-    if (words.length <= n) return text;
-    return words.slice(0, n).join(' ') + '…';
+// ── Listen for editor postMessage updates ─────────────────────────────────
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'fn_config_update') {
+    try { localStorage.setItem('fn_config', JSON.stringify(e.data.config)); }
+    catch(_){}
+    window.location.reload();
   }
-
-  // ── Escape HTML ───────────────────────────────────────────────────────
-  function esc(s) {
-    return String(s || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  // ── Format large numbers ──────────────────────────────────────────────
-  function fmtNum(n) {
-    if (!n || isNaN(n)) return '—';
-    if (n >= 1000000000) return (n / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
-    if (n >= 1000000)    return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-    if (n >= 1000)       return (n / 1000).toFixed(0) + 'K';
-    return n.toLocaleString();
-  }
+});
 </script>
 
-<!-- Data loader — ES module so we can import devotionals.js & missions.js -->
 <script type="module">
-  import devosRaw   from '../Data/devotionals.js';
-  import missionsRaw from '../Data/missions.js';
+import devosRaw     from '../Data/devotionals.js';
+import missionsRaw  from '../Data/missions.js';
+import theologyRaw  from '../Data/theology.js';
+import apologeticsRaw from '../Data/apologetics.js';
+import counselingRaw  from '../Data/counseling.js';
+import quizRaw        from '../Data/quiz.js';
+import genealogyRaw   from '../Data/genealogy.js';
+import heartRaw       from '../Data/heart.js';
+import bibleRaw       from '../Data/one_year_bible.js';
+import psalmsRaw      from '../Data/psalms.js';
 
-  const today    = window._FN_TODAY_STR;
-  const dayOfYear = window._FN_DAY_OF_YEAR;
+const DAY   = window._FN_DAY;
+const TODAY = window._FN_TODAY;
+const PICK  = window._PICK || {};
 
-  // ══════════════════════════════════════════════════════════════════════
-  // DEVOTIONAL OF THE DAY
-  // ══════════════════════════════════════════════════════════════════════
-  (function renderDevo() {
-    const devo = devosRaw.find(d => d.date === today)
-              || devosRaw[dayOfYear % devosRaw.length]
-              || devosRaw[0];
+// ════════════════════════════════════════════════════════════════════════════
+// § 1A — TODAY'S READINGS (left sidebar)
+// ════════════════════════════════════════════════════════════════════════════
+(function () {
+  // one_year_bible — find today by day-of-year (1-indexed)
+  const entry = bibleRaw.find(e => e.day === DAY) || bibleRaw[(DAY - 1) % 365];
+  if (!entry) { document.getElementById('fn-readings-content').textContent = 'Not available.'; return; }
 
-    if (!devo) {
-      document.getElementById('fn-devo-content').innerHTML =
-        '<p class="fn-devo-reflection">No devotional found for today.</p>';
-      return;
-    }
+  // Psalm title
+  const psNum   = entry.ps ? parseInt(entry.ps.replace('Psalm ',''), 10) : null;
+  const psEntry = psNum ? (psalmsRaw.byNumber || []).find(p => p.number === psNum) : null;
 
-    document.getElementById('fn-devo-content').innerHTML = `
-      <div class="fn-devo-theme">${esc(devo.theme || '')}</div>
-      <h2 class="fn-devo-title">${esc(devo.title || 'Today\'s Devotional')}</h2>
-      <div class="fn-devo-scripture">${esc(devo.scripture || '')}</div>
-      <p class="fn-devo-reflection">${esc(truncateWords(devo.reflection, 70))}</p>
-      <hr class="fn-devo-divider">
-      <div class="fn-devo-question-label">Reflection Question</div>
-      <div class="fn-devo-question">${esc(devo.question || '')}</div>
-      <hr class="fn-devo-divider">
-      <div class="fn-devo-prayer-label">Today's Prayer</div>
-      <div class="fn-devo-prayer">${esc(devo.prayer || '')}</div>
-    `;
-  })();
+  // Split multi-passage readings (separated by "; ") onto individual lines
+  function fmtReading(ref) {
+    if (!ref) return '';
+    return ref.split(/;\s*/).map(p => `<span class="fn-reading-passage">${esc(p.trim())}</span>`).join('');
+  }
 
+  document.getElementById('fn-readings-content').innerHTML = `
+    <div class="fn-readings-day">${esc(entry.date)}</div>
+    <div class="fn-reading-row">
+      <div class="fn-reading-tag">Old Testament</div>
+      <div class="fn-reading-ref">${fmtReading(entry.ot)}</div>
+    </div>
+    <div class="fn-reading-row">
+      <div class="fn-reading-tag">New Testament</div>
+      <div class="fn-reading-ref">${fmtReading(entry.nt)}</div>
+    </div>
+    <div class="fn-reading-row">
+      <div class="fn-reading-tag">Psalm</div>
+      <div class="fn-reading-ref">${fmtReading(entry.ps)}</div>
+    </div>
+    <div class="fn-reading-row">
+      <div class="fn-reading-tag">Proverbs</div>
+      <div class="fn-reading-ref">${fmtReading(entry.pr)}</div>
+    </div>
+  `;
 
-  // ══════════════════════════════════════════════════════════════════════
-  // MISSIONS SPOTLIGHT — rotates daily through all countries
-  // ══════════════════════════════════════════════════════════════════════
-  (function renderSpotlight() {
-    if (!missionsRaw || !missionsRaw.length) {
-      document.getElementById('fn-spot-content').textContent = 'Missions data unavailable.';
-      return;
-    }
-
-    const country = missionsRaw[dayOfYear % missionsRaw.length];
-
-    const pctChristian = country.percentChristian
-      ? (country.percentChristian).toFixed(1) + '%'
-      : (country.christianPercent ? country.christianPercent.toFixed(2) + '%' : '—');
-
-    const pctEvangelical = country.percentEvangelical
-      ? (country.percentEvangelical).toFixed(1) + '%'
-      : (country.evangelicalPercent ? country.evangelicalPercent.toFixed(2) + '%' : '—');
-
-    const unreached     = country.unreachedGroups || country.totalPeopleGroups || '—';
-    const pop           = fmtNum(country.population || country.jpPopulation);
-    const tier          = country.persecutionTier || country.persecutionLevel || '—';
-    const region        = country.region || '—';
-    const summary       = country.owSummary || '';
-    const challenges    = country.owPrayerChallenges || [];
-    const challenge     = challenges.length > 0 ? challenges[0] : null;
-    const jpUrl         = country.jpProfileUrl || country.profileUrl || null;
-    const window10_40   = country.tenFortyWindow ? 'Yes' : 'No';
-
-    document.getElementById('fn-spot-content').innerHTML = `
-      <div class="fn-spot-country">${esc(country.icon || '')} ${esc(country.countryName || '')}</div>
-      <div class="fn-spot-meta">
-        <span>${esc(region)}</span>
-        <span>Pop. ${esc(pop)}</span>
-        <span>Christian ${esc(pctChristian)}</span>
-        <span>Evangelical ${esc(pctEvangelical)}</span>
-        <span>Unreached groups: ${esc(String(unreached))}</span>
-        <span>10/40 Window: ${esc(window10_40)}</span>
-        <span>Persecution: ${esc(tier)}</span>
-      </div>
-      ${summary ? `<p class="fn-spot-summary">${esc(truncateWords(summary, 90))}</p>` : ''}
-      ${challenge ? `
-        <div class="fn-spot-challenge-label">Prayer Challenge</div>
-        <div class="fn-spot-challenge">${esc(truncateWords(challenge, 50))}</div>
-      ` : ''}
-      ${jpUrl ? `<a class="fn-spot-link" href="${esc(jpUrl)}" target="_blank" rel="noopener">Joshua Project Profile →</a>` : ''}
-    `;
-  })();
-
-
-  // ══════════════════════════════════════════════════════════════════════
-  // GLOBAL STATS — computed from full missions dataset
-  // ══════════════════════════════════════════════════════════════════════
-  (function renderStats() {
-    if (!missionsRaw || !missionsRaw.length) {
-      document.getElementById('fn-stats-content').textContent = '—';
-      return;
-    }
-
-    let totalCountries   = missionsRaw.length;
-    let totalUnreached   = 0;
-    let totalPop         = 0;
-    let totalPopUnreached = 0;
-    let extremeCount     = 0;
-    let tenFortyCount    = 0;
-
-    missionsRaw.forEach(c => {
-      totalUnreached   += (c.unreachedGroups || c.totalPeopleGroups || 0);
-      totalPop         += (c.population || c.jpPopulation || 0);
-      totalPopUnreached += (c.populationUnreached || 0);
-      if ((c.persecutionTier || c.persecutionLevel || '').toLowerCase().includes('extreme')) extremeCount++;
-      if (c.tenFortyWindow) tenFortyCount++;
-    });
-
-    document.getElementById('fn-stats-content').innerHTML = `
-      <div class="fn-stat-row">
-        <div class="fn-stat-number">${totalCountries}</div>
-        <div class="fn-stat-label">Nations in the<br>missions registry</div>
-      </div>
-      <div class="fn-stat-row">
-        <div class="fn-stat-number">${fmtNum(totalUnreached)}</div>
-        <div class="fn-stat-label">Unreached people<br>groups tracked</div>
-      </div>
-      <div class="fn-stat-row">
-        <div class="fn-stat-number">${fmtNum(totalPopUnreached)}</div>
-        <div class="fn-stat-label">People living in<br>unreached groups</div>
-      </div>
-      <div class="fn-stat-row">
-        <div class="fn-stat-number">${extremeCount}</div>
-        <div class="fn-stat-label">Nations with<br>extreme persecution</div>
-      </div>
-      <div class="fn-stat-row">
-        <div class="fn-stat-number">${tenFortyCount}</div>
-        <div class="fn-stat-label">Nations in the<br>10/40 Window</div>
-      </div>
-    `;
-  })();
-
-
-  // ══════════════════════════════════════════════════════════════════════
-  // WORLD WATCH — top 10 most persecuted nations
-  // ══════════════════════════════════════════════════════════════════════
-  (function renderWatch() {
-    if (!missionsRaw || !missionsRaw.length) {
-      document.getElementById('fn-watch-content').textContent = '—';
-      return;
-    }
-
-    // Sort by persecutionRank (lower = worse) and pick top 10
-    const ranked = missionsRaw
-      .filter(c => typeof c.persecutionRank === 'number' && c.persecutionRank > 0)
-      .sort((a, b) => a.persecutionRank - b.persecutionRank)
-      .slice(0, 10);
-
-    if (!ranked.length) {
-      document.getElementById('fn-watch-content').textContent = 'No data.';
-      return;
-    }
-
-    const items = ranked.map(c => `
-      <li>
-        <span class="fn-watch-rank">${c.persecutionRank}.</span>
-        <div>
-          <div class="fn-watch-name">${esc(c.icon || '')} ${esc(c.countryName || '')}</div>
-          <div class="fn-watch-desc">${esc(c.persecutionTier || c.persecutionLevel || '')}${c.capital ? ' · ' + esc(c.capital) : ''}</div>
+  // Psalm highlight card (separate element below readings)
+  const hlEl = document.getElementById('fn-psalm-highlight');
+  if (hlEl && psEntry) {
+    const typeBadges = (psEntry.types || [psEntry.type]).map(t =>
+      `<span class="fn-ph-type-badge">${esc(t)}</span>`).join('');
+    hlEl.innerHTML = `
+      <div class="fn-ph-wrap">
+        <div class="fn-ph-label">Psalm of the Day</div>
+        <div class="fn-ph-body">
+          <div class="fn-ph-num">${esc(String(psEntry.number))}</div>
+          <div class="fn-ph-detail">
+            <div class="fn-ph-types">${typeBadges}</div>
+            <div class="fn-ph-title">${esc(psEntry.title)}</div>
+          </div>
         </div>
-      </li>
-    `).join('');
+      </div>`;
+  }
+})();
 
-    document.getElementById('fn-watch-content').innerHTML =
-      `<ul class="fn-watch-list">${items}</ul>`;
-  })();
 
+// ════════════════════════════════════════════════════════════════════════════
+// § 1B — DEVOTIONAL OF THE DAY (main column)
+// ════════════════════════════════════════════════════════════════════════════
+(function () {
+  const devo = (PICK.devoDate
+    ? devosRaw.find(d => d.date === PICK.devoDate)
+    : devosRaw.find(d => d.date === TODAY))
+    || devosRaw[DAY % devosRaw.length];
+
+  if (!devo) { document.getElementById('fn-devo-content').innerHTML = '<p>No devotional found.</p>'; return; }
+
+  document.getElementById('fn-devo-content').innerHTML = `
+    <div class="fn-lead-theme">${esc(devo.theme||'')}</div>
+    <h1 class="fn-lead-headline">${esc(devo.title||'Devotional')}</h1>
+    <div class="fn-lead-scripture">${esc(devo.scripture||'')}</div>
+    <p class="fn-lead-byline">Devotional &nbsp;·&nbsp; ${esc(devo.date||TODAY)} &nbsp;·&nbsp; Theme: ${esc(devo.theme||'—')}</p>
+    <div class="fn-lead-body">
+      <p>${esc(devo.reflection||'')}</p>
+      <hr style="border:none;border-top:1px solid var(--rule-soft);margin:12px 0;">
+      <div class="fn-devo-sub-label">Reflection</div>
+      <div class="fn-devo-question">${esc(devo.question||'')}</div>
+      <hr style="border:none;border-top:1px solid var(--rule-soft);margin:12px 0;">
+      <div class="fn-devo-sub-label">Today's Prayer</div>
+      <div class="fn-devo-prayer">${esc(devo.prayer||'')}</div>
+    </div>
+  `;
+})();
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// § 1C — HEART CHECK (right sidebar)
+// ════════════════════════════════════════════════════════════════════════════
+(function () {
+  const hcArray = Array.isArray(heartRaw) ? heartRaw : Object.values(heartRaw||{});
+  const idx = PICK.heartIdx != null ? PICK.heartIdx : DAY % hcArray.length;
+  const hc  = hcArray[idx];
+  if (!hc) { document.getElementById('fn-heart-content').textContent = '—'; return; }
+
+  const cat  = hc['Category']        || hc.category        || '';
+  const q    = hc['Question']        || hc.question        || '';
+  const rx   = hc['Prescription']    || hc.prescription    || '';
+  const vref = hc['Verse Reference'] || hc.verseReference  || '';
+
+  // Mirror question (different offset)
+  let mirrorHTML = '';
+  try {
+    const mirrorArr = Array.isArray(window._mirrorArr) ? window._mirrorArr : [];
+    if (mirrorArr.length) {
+      const m = mirrorArr[(DAY + 7) % mirrorArr.length];
+      if (m) mirrorHTML = `
+        <div class="fn-mirror-box">
+          <div class="fn-mirror-label">Shepherd's Mirror</div>
+          <div class="fn-mirror-q">${esc(m['Question']||m.question||'')}</div>
+          <div class="fn-mirror-scripture">${esc(m['Scripture']||m.scripture||'')}</div>
+        </div>`;
+    }
+  } catch(e){}
+
+  document.getElementById('fn-heart-content').innerHTML = `
+    <div class="fn-hc-category">${esc(cat)}</div>
+    <div class="fn-hc-question">${esc(q)}</div>
+    ${vref ? `<div class="fn-hc-verse">${esc(vref)}</div>` : ''}
+    <div class="fn-hc-prescription">${esc(rx)}</div>
+    ${mirrorHTML}
+  `;
+})();
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// § 2 — MISSIONS SPOTLIGHT  (JP daily unreached → full missions.js dossier)
+// ════════════════════════════════════════════════════════════════════════════
+(async function () {
+  const JP_API  = 'https://api.joshuaproject.net/v1/people_groups/daily_unreached.json?api_key=75c0d936a53c';
+  const HIDE    = () => { document.getElementById('fn-spot-content').innerHTML = ''; };
+
+  // 1. Fetch JP People Group of the Day
+  let jpGroup = null;
+  try {
+    console.log('[FlockNews Spotlight] Fetching JP daily unreached…', JP_API);
+    const res = await fetch(JP_API);
+    if (!res.ok) {
+      console.error('[FlockNews Spotlight] JP API HTTP error:', res.status, res.statusText);
+      HIDE(); return;
+    }
+    const data = await res.json();
+    console.log('[FlockNews Spotlight] JP raw response:', JSON.stringify(data).slice(0, 500));
+    jpGroup = Array.isArray(data) && data.length ? data[0] : null;
+    if (!jpGroup) {
+      console.warn('[FlockNews Spotlight] JP response was empty or malformed — no people group returned.');
+      HIDE(); return;
+    }
+    console.log('[FlockNews Spotlight] JP people group of the day:', jpGroup.PeopNameInCountry || jpGroup.PeopNameAcrossCountries,
+      '| Ctry:', jpGroup.Ctry, '| ROG3:', jpGroup.ROG3);
+  } catch (err) {
+    console.error('[FlockNews Spotlight] JP fetch threw:', err);
+    HIDE(); return;
+  }
+
+  // 2. Match JP country to missions.js dossier
+  const ctryName = (jpGroup.Ctry  || '').toLowerCase().trim();
+  const isoCode  = (jpGroup.ROG3  || '').toUpperCase();
+  console.log('[FlockNews Spotlight] Matching against missions.js — ctryName:', ctryName, '| isoCode:', isoCode);
+
+  const country = missionsRaw.find(c =>
+    (c.countryName || '').toLowerCase() === ctryName ||
+    (c.isoCode     || '').toUpperCase() === isoCode
+  );
+
+  if (!country) {
+    console.warn('[FlockNews Spotlight] No match found in missions.js for Ctry="' + jpGroup.Ctry + '" / ROG3="' + jpGroup.ROG3 + '".',
+      'Available isoCode sample:', missionsRaw.slice(0, 5).map(c => c.isoCode).join(', '));
+    HIDE(); return;
+  }
+  console.log('[FlockNews Spotlight] Matched to missions.js record:', country.countryName, '| isoCode:', country.isoCode);
+
+  document.getElementById('fn-spot-country-name').textContent = (country.icon||'') + ' ' + (country.countryName||'');
+
+  // 4. Build full dossier
+  const pctC  = country.percentChristian   != null ? (+country.percentChristian).toFixed(2)+'%'
+              : country.christianPercent    != null ? (+country.christianPercent).toFixed(2)+'%' : '—';
+  const pctE  = country.percentEvangelical != null ? (+country.percentEvangelical).toFixed(2)+'%'
+              : country.evangelicalPercent  != null ? (+country.evangelicalPercent).toFixed(2)+'%' : '—';
+  const unr   = country.unreachedGroups    || country.totalPeopleGroups || '—';
+  const pop   = fmtNum(country.population  || country.jpPopulation);
+  const tier  = country.persecutionTier    || country.persecutionLevel || null;
+  const jpUrl = country.jpProfileUrl       || country.profileUrl || null;
+  const challenges = country.owPrayerChallenges || [];
+
+  // JP people group callout
+  let jpGroupHTML = '';
+  if (jpGroup) {
+    const pgName  = esc(jpGroup.PeopNameInCountry || jpGroup.PeopNameAcrossCountries || '');
+    const pgLang  = esc(jpGroup.PrimaryLanguageName || '—');
+    const pgRel   = esc(jpGroup.PrimaryReligion || '—');
+    const pgPop   = jpGroup.Population ? fmtNum(+jpGroup.Population) : '—';
+    const pgPctE  = jpGroup.PercentEvangelical != null ? (+jpGroup.PercentEvangelical).toFixed(2)+'%' : '—';
+    const pgUrl   = esc(jpGroup.PeopleGroupURL || 'https://joshuaproject.net');
+    jpGroupHTML = `
+      <div class="fn-spot-jp-group">
+        <div class="fn-spot-jp-label">Unreached People Group of the Day</div>
+        <div class="fn-spot-jp-name">${pgName}</div>
+        <div class="fn-spot-jp-meta">
+          <span>Language: ${pgLang}</span><span>Religion: ${pgRel}</span>
+          <span>Population: ${pgPop}</span><span>Evangelical: ${pgPctE}</span>
+        </div>
+        <a class="fn-spot-link" href="${pgUrl}" target="_blank" rel="noopener">View People Group Profile →</a>
+      </div>`;
+  }
+
+  // Religion breakdown
+  let religionHTML = '';
+  const rb = country.religionBreakdown;
+  if (rb && typeof rb === 'object') {
+    const entries = Object.entries(rb)
+      .filter(([, v]) => v > 0.05)
+      .sort(([,a],[,b]) => b - a);
+    if (entries.length) {
+      religionHTML = `
+        <div class="fn-spot-section-label">Religion Breakdown</div>
+        <div class="fn-spot-religion-grid">
+          ${entries.map(([k, v]) => `<div class="fn-spot-rel-row"><span class="fn-spot-rel-name">${esc(k)}</span><span class="fn-spot-rel-pct">${(+v).toFixed(1)}%</span></div>`).join('')}
+        </div>`;
+    }
+  }
+
+  // Bible access block
+  let bibleHTML = '';
+  if (country.restrictionsRank || country.bibleShortageRank) {
+    bibleHTML = `<div class="fn-spot-section-label">Bible Access</div><div class="fn-spot-meta" style="margin-top:0">`;
+    if (country.restrictionsRank) bibleHTML += `<span>Access Restrictions Rank: #${country.restrictionsRank}</span>`;
+    if (country.bibleShortageRank) bibleHTML += `<span>Bible Shortage Rank: #${country.bibleShortageRank}</span>`;
+    if (country.bibleShortageTier) bibleHTML += `<span>Shortage Tier: ${esc(country.bibleShortageTier)}</span>`;
+    if (country.bibleShortageRange) bibleHTML += `<span>Need Est.: ${esc(country.bibleShortageRange)}</span>`;
+    bibleHTML += `</div>`;
+  }
+
+  document.getElementById('fn-spot-content').innerHTML = `
+    <div class="fn-spot-country">${esc(country.icon||'')} ${esc(country.countryName||'')}</div>
+    <div class="fn-spot-meta">
+      <span>${esc(country.region||'—')}</span>
+      <span>Pop. ${esc(pop)}</span>
+      <span>Capital: ${esc(country.capital||'—')}</span>
+      <span>Christian: ${esc(pctC)}</span>
+      <span>Evangelical: ${esc(pctE)}</span>
+      <span>Unreached groups: ${esc(String(unr))}</span>
+      <span>10/40 Window: ${country.tenFortyWindow ? 'Yes' : 'No'}</span>
+      ${tier ? `<span>Persecution: ${esc(tier)}</span>` : ''}
+      ${country.gospelAccess ? `<span>Gospel Access: ${esc(country.gospelAccess)}</span>` : ''}
+      ${country.worldWatchListRank ? `<span>World Watch Rank: #${country.worldWatchListRank}</span>` : ''}
+    </div>
+    ${bibleHTML}
+    ${religionHTML}
+    ${country.owSummary ? `
+      <div class="fn-spot-section-label">Operation World — Country Overview</div>
+      <p class="fn-spot-summary">${esc(country.owSummary)}</p>` : ''}
+    ${challenges.length ? `
+      <div class="fn-spot-section-label">Prayer Challenges</div>
+      <ol class="fn-spot-challenges-list">
+        ${challenges.map(c => `<li class="fn-spot-challenge">${esc(c)}</li>`).join('')}
+      </ol>` : ''}
+    ${jpGroupHTML}
+    ${jpUrl ? `<a class="fn-spot-link" href="${esc(jpUrl)}" target="_blank" rel="noopener">Joshua Project Country Profile →</a>` : ''}
+  `;
+
+  // Global stats
+  let totUnreached=0, totPopUnr=0, extreme=0, tenForty=0;
+  missionsRaw.forEach(c => {
+    totUnreached += c.unreachedGroups || c.totalPeopleGroups || 0;
+    totPopUnr    += c.populationUnreached || 0;
+    if ((c.persecutionTier||c.persecutionLevel||'').toLowerCase().includes('extreme')) extreme++;
+    if (c.tenFortyWindow) tenForty++;
+  });
+  document.getElementById('fn-stats-content').innerHTML = `
+    <div class="fn-stat-row"><div class="fn-stat-number">${missionsRaw.length}</div><div class="fn-stat-label">Nations tracked</div></div>
+    <div class="fn-stat-row"><div class="fn-stat-number">${fmtNum(totUnreached)}</div><div class="fn-stat-label">Unreached people groups</div></div>
+    <div class="fn-stat-row"><div class="fn-stat-number">${fmtNum(totPopUnr)}</div><div class="fn-stat-label">People in unreached groups</div></div>
+    <div class="fn-stat-row"><div class="fn-stat-number">${extreme}</div><div class="fn-stat-label">Nations with extreme persecution</div></div>
+    <div class="fn-stat-row"><div class="fn-stat-number">${tenForty}</div><div class="fn-stat-label">Nations in the 10/40 Window</div></div>
+  `;
+
+  // World Watch — clickable rows open dossier drawer
+  const ranked = missionsRaw.filter(c=>typeof c.persecutionRank==='number'&&c.persecutionRank>0)
+    .sort((a,b)=>a.persecutionRank-b.persecutionRank).slice(0,10);
+  document.getElementById('fn-watch-content').innerHTML =
+    '<ul class="fn-watch-list">' +
+    ranked.map(c=>`<li class="fn-watch-item" data-iso="${esc(c.isoCode||'')}" tabindex="0" role="button" aria-label="View dossier for ${esc(c.countryName||'')}">
+      <span class="fn-watch-rank">${c.persecutionRank}.</span>
+      <div>
+        <div class="fn-watch-name">${esc(c.icon||'')} ${esc(c.countryName||'')}</div>
+        <div class="fn-watch-desc">${esc(c.persecutionTier||c.persecutionLevel||'')}${c.capital?' · '+esc(c.capital):''}</div>
+      </div>
+      <span class="fn-watch-arrow">›</span>
+    </li>`).join('')
+    + '</ul>';
+
+  // Wire up click handlers
+  document.getElementById('fn-watch-content').addEventListener('click', function(e) {
+    const li = e.target.closest('.fn-watch-item');
+    if (!li) return;
+    const iso = li.dataset.iso;
+    const country = missionsRaw.find(c => (c.isoCode||'').toUpperCase() === iso.toUpperCase());
+    if (country) openDossierDrawer(country);
+  });
+  document.getElementById('fn-watch-content').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      const li = e.target.closest('.fn-watch-item');
+      if (!li) return;
+      e.preventDefault();
+      const iso = li.dataset.iso;
+      const country = missionsRaw.find(c => (c.isoCode||'').toUpperCase() === iso.toUpperCase());
+      if (country) openDossierDrawer(country);
+    }
+  });
+})();
+
+// ── Dossier Drawer ────────────────────────────────────────────────────────
+function buildDossierHTML(country) {
+  const pctC = country.percentChristian  != null ? (+country.percentChristian).toFixed(2)+'%'
+             : country.christianPercent   != null ? (+country.christianPercent).toFixed(2)+'%' : '—';
+  const pctE = country.percentEvangelical != null ? (+country.percentEvangelical).toFixed(2)+'%'
+             : country.evangelicalPercent  != null ? (+country.evangelicalPercent).toFixed(2)+'%' : '—';
+  const unr  = country.unreachedGroups || country.totalPeopleGroups || '—';
+  const pop  = fmtNum(country.population || country.jpPopulation);
+  const tier = country.persecutionTier || country.persecutionLevel || null;
+  const jpUrl = country.jpProfileUrl || country.profileUrl || null;
+  const challenges = country.owPrayerChallenges || [];
+
+  // Religion breakdown
+  let religionHTML = '';
+  const rb = country.religionBreakdown;
+  if (rb && typeof rb === 'object') {
+    const entries = Object.entries(rb).filter(([,v])=>v>0.05).sort(([,a],[,b])=>b-a);
+    if (entries.length) {
+      religionHTML = `<div class="fn-spot-section-label">Religion Breakdown</div>
+        <div class="fn-spot-religion-grid">${entries.map(([k,v])=>`<div class="fn-spot-rel-row"><span class="fn-spot-rel-name">${esc(k)}</span><span class="fn-spot-rel-pct">${(+v).toFixed(1)}%</span></div>`).join('')}</div>`;
+    }
+  }
+
+  // Bible access
+  let bibleHTML = '';
+  if (country.restrictionsRank || country.bibleShortageRank) {
+    bibleHTML = `<div class="fn-spot-section-label">Bible Access</div><div class="fn-spot-meta" style="margin-top:0">`;
+    if (country.restrictionsRank)  bibleHTML += `<span>Access Restrictions Rank: #${country.restrictionsRank}</span>`;
+    if (country.bibleShortageRank) bibleHTML += `<span>Bible Shortage Rank: #${country.bibleShortageRank}</span>`;
+    if (country.bibleShortageTier) bibleHTML += `<span>Shortage Tier: ${esc(country.bibleShortageTier)}</span>`;
+    if (country.bibleShortageRange) bibleHTML += `<span>Need Est.: ${esc(country.bibleShortageRange)}</span>`;
+    bibleHTML += `</div>`;
+  }
+
+  return `
+    <div class="fn-spot-country" style="margin-bottom:10px">${esc(country.icon||'')} ${esc(country.countryName||'')}</div>
+    <div class="fn-spot-meta">
+      <span>${esc(country.region||'—')}</span>
+      <span>Pop. ${esc(pop)}</span>
+      <span>Capital: ${esc(country.capital||'—')}</span>
+      <span>Christian: ${esc(pctC)}</span>
+      <span>Evangelical: ${esc(pctE)}</span>
+      <span>Unreached groups: ${esc(String(unr))}</span>
+      <span>10/40 Window: ${country.tenFortyWindow ? 'Yes' : 'No'}</span>
+      ${tier ? `<span>Persecution: ${esc(tier)}</span>` : ''}
+      ${country.gospelAccess ? `<span>Gospel Access: ${esc(country.gospelAccess)}</span>` : ''}
+      ${country.worldWatchListRank ? `<span>World Watch Rank: #${country.worldWatchListRank}</span>` : ''}
+    </div>
+    ${bibleHTML}
+    ${religionHTML}
+    ${country.owSummary ? `<div class="fn-spot-section-label">Operation World — Country Overview</div><p class="fn-spot-summary">${esc(country.owSummary)}</p>` : ''}
+    ${challenges.length ? `<div class="fn-spot-section-label">Prayer Challenges</div><ol class="fn-spot-challenges-list">${challenges.map(c=>`<li class="fn-spot-challenge">${esc(c)}</li>`).join('')}</ol>` : ''}
+    ${jpUrl ? `<a class="fn-spot-link" href="${esc(jpUrl)}" target="_blank" rel="noopener">Joshua Project Country Profile →</a>` : ''}
+  `;
+}
+
+function openDossierDrawer(country) {
+  document.getElementById('fn-dossier-body').innerHTML = buildDossierHTML(country);
+  const drawer   = document.getElementById('fn-dossier-drawer');
+  const backdrop = document.getElementById('fn-dossier-backdrop');
+  drawer.setAttribute('aria-hidden', 'false');
+  drawer.classList.add('fn-dossier-open');
+  backdrop.classList.add('fn-dossier-backdrop-visible');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('fn-dossier-close').focus();
+}
+
+function closeDossierDrawer() {
+  const drawer   = document.getElementById('fn-dossier-drawer');
+  const backdrop = document.getElementById('fn-dossier-backdrop');
+  drawer.setAttribute('aria-hidden', 'true');
+  drawer.classList.remove('fn-dossier-open');
+  backdrop.classList.remove('fn-dossier-backdrop-visible');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('fn-dossier-close').addEventListener('click', closeDossierDrawer);
+document.getElementById('fn-dossier-backdrop').addEventListener('click', closeDossierDrawer);
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDossierDrawer(); });
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// § 3 — THEOLOGY CORNER
+// ════════════════════════════════════════════════════════════════════════════
+(function () {
+  const idx  = PICK.theologyIdx != null ? PICK.theologyIdx : DAY % theologyRaw.length;
+  const theo = theologyRaw[idx];
+  if (!theo) { document.getElementById('fn-theo-content').textContent = '—'; return; }
+
+  document.getElementById('fn-theo-head').textContent = theo.categoryTitle + ' — ' + (theo.sectionTitle||'').replace(/^[^\s]+ /,'');
+
+  document.getElementById('fn-theo-content').innerHTML = `
+    <div class="fn-theology-grid">
+      <div class="fn-theology-left">
+        <div class="fn-theo-category">${esc(theo.categoryTitle||'')}${theo.categoryIcon ? ' '+esc(theo.categoryIcon) : ''}</div>
+        <h2 class="fn-theo-title">${esc((theo.sectionTitle||'').replace(/^[^\s]+ /,''))}</h2>
+        ${theo.categoryIntro ? `<div class="fn-theo-intro">${esc(theo.categoryIntro)}</div>` : ''}
+        ${theo.categorySubtitle ? `<p style="font-family:var(--body-serif);font-style:italic;font-size:16px;color:var(--ink-mid);line-height:1.6;">${esc(theo.categorySubtitle)}</p>` : ''}
+        ${theo.scriptureRefs ? `<div class="fn-theo-refs">References: ${esc(theo.scriptureRefs)}</div>` : ''}
+      </div>
+      <div class="fn-theology-right">
+        <div class="fn-theo-content">${esc(theo.content||'—')}</div>
+      </div>
+    </div>
+  `;
+})();
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// § 4 — APOLOGETICS
+// ════════════════════════════════════════════════════════════════════════════
+(function () {
+  const i1 = PICK.apol1Idx != null ? PICK.apol1Idx : DAY % apologeticsRaw.length;
+  const i2 = PICK.apol2Idx != null ? PICK.apol2Idx : (DAY + 1) % apologeticsRaw.length;
+  const a1 = apologeticsRaw[i1];
+  const a2 = apologeticsRaw[i2];
+
+  function renderApol(a) {
+    if (!a) return '';
+    return `
+      <div class="fn-apol-item">
+        <div class="fn-apol-category">${esc(a.categoryTitle||'')}</div>
+        <h3 class="fn-apol-question">${esc(a.questionTitle||'')}</h3>
+        <p class="fn-apol-answer">${esc(a.answerContent||'')}</p>
+        ${a.quoteText ? `<div class="fn-apol-quote">${esc(a.quoteText)}</div>` : ''}
+        ${a.referenceText ? `<div class="fn-apol-ref">${esc(a.referenceText)}</div>` : ''}
+      </div>`;
+  }
+
+  document.getElementById('fn-apol-content').innerHTML =
+    `<div class="fn-apol-grid">${renderApol(a1)}${renderApol(a2)}</div>`;
+})();
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// § 5 — DISCIPLESHIP & BIBLICAL CARE
+// ════════════════════════════════════════════════════════════════════════════
+(function () {
+  const idx = PICK.counselingIdx != null ? PICK.counselingIdx : DAY % counselingRaw.length;
+  const c   = counselingRaw[idx];
+  if (!c) { document.getElementById('fn-counsel-content').textContent = '—'; return; }
+
+  document.getElementById('fn-counsel-head').textContent = c.title||'—';
+
+  // Steps: split by period-space or newline
+  const steps = (c.steps||'').split(/(?<=[.!?])\s+(?=[A-Z])/).filter(Boolean);
+
+  document.getElementById('fn-counsel-content').innerHTML = `
+    <div class="fn-counsel-grid">
+      <div class="fn-counsel-topic">
+        <h2 class="fn-counsel-title">${esc(c.icon||'')} ${esc(c.title||'')}</h2>
+        <p class="fn-counsel-def">${esc(c.definition||'')}</p>
+        ${c.scriptures ? `<div class="fn-counsel-scriptures">${esc(c.scriptures)}</div>` : ''}
+      </div>
+      <div class="fn-counsel-steps">
+        <div class="fn-counsel-steps-label">Biblical Steps Forward</div>
+        <ol class="fn-counsel-step-list">
+          ${steps.map(s=>`<li>${esc(s.trim())}</li>`).join('')}
+        </ol>
+      </div>
+    </div>
+  `;
+})();
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// § 6 — DAILY QUIZ
+// ════════════════════════════════════════════════════════════════════════════
+(function () {
+  const idx = PICK.quizIdx != null ? PICK.quizIdx : DAY % quizRaw.length;
+  const q   = quizRaw[idx];
+  if (!q) { document.getElementById('fn-quiz-content').textContent = '—'; return; }
+
+  const opts = [
+    { letter:'A', text: q.optionA, key:'a' },
+    { letter:'B', text: q.optionB, key:'b' },
+    { letter:'C', text: q.optionC, key:'c' },
+    { letter:'D', text: q.optionD, key:'d' },
+  ].filter(o => o.text);
+
+  const correct = (q.correctAnswer||'').toLowerCase();
+
+  document.getElementById('fn-quiz-content').innerHTML = `
+    <div class="fn-quiz-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="fn-quiz-cat">${esc(q.category||'Bible')}</div>
+        <div class="fn-quiz-diff">${esc(q.difficulty||'')}</div>
+      </div>
+      <div class="fn-quiz-q">${esc(q.question||'')}</div>
+      <div class="fn-quiz-options" id="fn-quiz-opts">
+        ${opts.map(o=>`<button class="fn-quiz-btn" data-key="${esc(o.key)}" onclick="quizAnswer(this,'${esc(correct)}')"><span class="fn-quiz-letter">${esc(o.letter)}.</span> ${esc(o.text)}</button>`).join('')}
+      </div>
+      <div class="fn-quiz-result" id="fn-quiz-result"></div>
+      <div class="fn-quiz-ref">${esc(q.reference||'')}</div>
+    </div>
+  `;
+})();
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// § 7 — PERSON OF SCRIPTURE
+// ════════════════════════════════════════════════════════════════════════════
+(function () {
+  // filter to entries with meaningful bios
+  const filtered = genealogyRaw.filter(p => p.bio && p.bio.length > 30 && p.name);
+  const idx  = PICK.figureIdx != null ? PICK.figureIdx : DAY % filtered.length;
+  const fig  = filtered[idx];
+  if (!fig) { document.getElementById('fn-figure-content').textContent = '—'; return; }
+
+  document.getElementById('fn-figure-head').textContent = fig.name + (fig.title ? ' — ' + fig.title : '');
+
+  document.getElementById('fn-figure-content').innerHTML = `
+    <div class="fn-figure-grid">
+      <div class="fn-figure-card">
+        <div class="fn-figure-name-big">${esc(fig.name.charAt(0))}</div>
+        <div class="fn-figure-title">${esc(fig.title||'')}</div>
+        ${fig.meaning ? `<div class="fn-figure-meaning">"${esc(fig.meaning)}"</div>` : ''}
+        ${fig.lifespan ? `<div class="fn-figure-lifespan">Lived: ${esc(fig.lifespan)} years</div>` : ''}
+        ${fig.reference ? `<div class="fn-figure-ref">${esc(fig.reference)}</div>` : ''}
+      </div>
+      <div class="fn-figure-body">
+        <p class="fn-figure-bio">${esc(fig.bio)}</p>
+      </div>
+    </div>
+  `;
+})();
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// § 9 — THE INVITATION
+// ════════════════════════════════════════════════════════════════════════════
+(function () {
+  const INVITATIONS = [
+    { title: 'The Call to the Exhausted', quote: 'Come to me, all who labor and are heavy laden, and I will give you rest.', ref: 'Matthew 11:28', insight: 'Jesus does not demand more religious striving. He identifies the exhaustion of trying to earn worth and offers Himself as the antidote.' },
+    { title: 'The Call to the Thirsty',   quote: 'If anyone thirsts, let him come to me and drink.',                          ref: 'John 7:37–38',  insight: 'Addressed to human dissatisfaction. Jesus promises a qualitative kind of life that provides an internal, eternal satisfaction.' },
+    { title: 'The Call to Intimacy',      quote: 'Behold, I stand at the door and knock.',                                    ref: 'Revelation 3:20', insight: 'A picture of divine pursuit. God does not force His way in; He knocks and offers friendship and reconciliation.' },
+  ];
+
+  const IAM = [
+    { label: 'Bread of Life',       need: 'Spiritual Hunger',       verse: 'John 6:35',   description: 'Just as physical bread sustains the body, Jesus is the essential nutrient for the soul. Without Him, the spirit starves; with Him, there is enduring life.' },
+    { label: 'Light of the World',  need: 'Guidance in Darkness',   verse: 'John 8:12',   description: 'In a world of confusion, Jesus provides absolute clarity. Following Him guarantees you will walk in the light of life.' },
+    { label: 'Door of the Sheep',   need: 'Security & Access',      verse: 'John 10:9',   description: 'Jesus is the singular entry point to safety. Through Him, one finds protection from spiritual predators and the freedom of abundant life.' },
+    { label: 'Good Shepherd',       need: 'Care & Protection',      verse: 'John 10:11',  description: 'Unlike a hired hand, the Good Shepherd loves so profoundly that He willingly lays down His life for the vulnerable.' },
+    { label: 'Resurrection & Life', need: 'Victory over Death',     verse: 'John 11:25',  description: 'Faced with the terror of death, Jesus claims total authority. He is the resurrection; in Him, death is merely a doorway.' },
+    { label: 'Way, Truth & Life',   need: 'Direction & Reality',    verse: 'John 14:6',   description: 'The embodiment of ultimate reality and the source of all existence. All human searching ends in Him.' },
+    { label: 'True Vine',           need: 'Purpose & Fruitfulness', verse: 'John 15:1',   description: 'By abiding in Jesus, believers draw on His endless grace and strength to produce enduring fruit that lasts.' },
+  ];
+
+  const WORK = [
+    { title: 'The Incarnation',  sub: 'God With Us',          summary: 'The Creator took on human flesh, experiencing our pains and limitations without sin.',                    hope: 'God knows exactly what it feels like to be human. You are deeply understood.' },
+    { title: 'The Crucifixion',  sub: 'The Atonement',        summary: 'On the cross, Jesus absorbed the debt of sin and guilt, declaring "It is finished."',                   hope: 'Your failures are paid for. There is no condemnation left for those who trust Him.' },
+    { title: 'The Resurrection', sub: 'Victory Over Death',   summary: 'Three days later, Jesus rose, defeating the finality of death and inaugurating a new creation.',        hope: 'Death is not the end. The worst things are never the last things.' },
+    { title: 'The Ascension',    sub: 'The Eternal Advocate', summary: 'Jesus ascended to the Father, where He currently reigns and intercedes for His people.',                 hope: 'You have a perfect representative in the highest court of reality.' },
+  ];
+
+  const inv  = INVITATIONS[DAY % INVITATIONS.length];
+  const iam  = IAM[DAY % IAM.length];
+  const work = WORK[DAY % WORK.length];
+
+  document.getElementById('fn-inv-invitation').innerHTML = `
+    <div class="fn-col-label"><a class="fn-section-link" href="../app.grow/app.grow.html#the_gospel_invitation">Today's Invitation</a></div>
+    <div class="fn-inv-title">${esc(inv.title)}</div>
+    <blockquote class="fn-inv-quote">"${esc(inv.quote)}"</blockquote>
+    <div class="fn-inv-ref">${esc(inv.ref)}</div>
+    <p class="fn-inv-insight">${esc(inv.insight)}</p>
+  `;
+
+  document.getElementById('fn-inv-iam').innerHTML = `
+    <div class="fn-col-label">I Am</div>
+    <div class="fn-iam-label">${esc(iam.label)}</div>
+    <div class="fn-iam-need">${esc(iam.need)}</div>
+    <div class="fn-iam-verse">${esc(iam.verse)}</div>
+    <p class="fn-iam-desc">${esc(iam.description)}</p>
+  `;
+
+  document.getElementById('fn-inv-work').innerHTML = `
+    <div class="fn-col-label">The Finished Work</div>
+    <div class="fn-work-title">${esc(work.title)}</div>
+    <div class="fn-work-sub">${esc(work.sub)}</div>
+    <p class="fn-work-summary">${esc(work.summary)}</p>
+    <div class="fn-work-hope"><span class="fn-work-hope-label">Hope:</span> ${esc(work.hope)}</div>
+  `;
+
+  // Share button
+  const SHARE_URL  = 'https://flock-os.github.io/FlockOS/New_Covenant/app.invite/app.invite.html';
+  const SHARE_TEXT = 'Hey! I thought you might like to know who Jesus is, and what He has done for you!\n' + SHARE_URL;
+
+  document.getElementById('fn-inv-share-btn').addEventListener('click', function () {
+    if (navigator.share) {
+      navigator.share({ title: 'The Invitation', text: 'Hey! I thought you might like to know who Jesus is, and what He has done for you!', url: SHARE_URL }).catch(function(){});
+    } else {
+      window.open('sms:?body=' + encodeURIComponent(SHARE_TEXT), '_self');
+    }
+  });
+})();
+
+</script>
+
+<script>
+// ── Quiz answer handler (non-module, needs global scope) ──────────────────
+function quizAnswer(btn, correct) {
+  var opts = document.querySelectorAll('.fn-quiz-btn');
+  opts.forEach(function(b) { b.disabled = true; });
+  var isCorrect = btn.dataset.key === correct;
+  opts.forEach(function(b) {
+    if (b.dataset.key === correct) b.classList.add('correct');
+    else if (b === btn) b.classList.add('incorrect');
+  });
+  var result = document.getElementById('fn-quiz-result');
+  if (result) {
+    if (isCorrect) {
+      result.textContent = 'Yes, VERY GOOD!';
+      result.className = 'fn-quiz-result fn-quiz-result--correct';
+    } else {
+      var refEl = document.querySelector('.fn-quiz-ref');
+      var refText = refEl ? refEl.textContent.trim() : '';
+      result.textContent = refText
+        ? 'We encourage you to study: ' + refText
+        : 'We encourage you to study this topic further.';
+      result.className = 'fn-quiz-result fn-quiz-result--study';
+    }
+  }
+}
+
+// ── Suite Panel ───────────────────────────────────────────────────────────
+var SUITE_APPS = {
+  flockos: {
+    name: 'FlockOS',
+    full: 'FlockOS — The Shepherd\'s Dashboard',
+    sub: 'Shepherd\'s Dashboard',
+    color: '#3b82f6',
+    href: '../app.flockos/app.flockos.html',
+    svg: '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    what: 'FlockOS is a complete pastoral management platform — built to help shepherds know their flock by name. From first-time visitor to seasoned deacon, every member\'s spiritual journey is tracked, prayed over, and cared for in one place.',
+    keyFeatures: ['Member directory with care notes', 'Prayer wall and tracking', 'Service planning and attendance', 'Small groups and events'],
+    allFeatures: ['Full member directory', 'Pastoral care notes per member', 'Prayer request wall and follow-up tracking', 'Small group management', 'Event creation and attendance records', 'Spiritual milestones (salvation, baptism, membership)', 'Service planning connected to FEED and Flock Stand', 'Giving records and stewardship notes', 'Visitor follow-up workflows', 'Leadership team role assignments'],
+    body: 'No sheep falls through the cracks. FlockOS ensures every member of the congregation is known, prayed for, and actively cared for — not as a number in a spreadsheet, but as a person with a name, a story, and a spiritual need.',
+    pastor: 'One dashboard for every pastoral responsibility. Whether you\'re tracking a hospital visit, planning Sunday\'s service, or following up with a new family — FlockOS keeps it all in front of you so nothing is forgotten and no one is overlooked.',
+    kingdom: 'A well-shepherded church produces mature disciples who make disciples. FlockOS enables the depth of personal care that transforms church attendance into genuine discipleship — and genuine disciples are the engine of the Kingdom.'
+  },
+  grow: {
+    name: 'GROW',
+    full: 'GROW — Discipleship Hub',
+    sub: 'Discipleship Hub',
+    color: '#d97706',
+    href: '../app.grow/app.grow.html',
+    svg: '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 12C5 7 8 4 12 2c4 2 7 5 7 10"/><path d="M5 12c0 3 3 6 7 8 4-2 7-5 7-8"/></svg>',
+    what: 'GROW is a public-access discipleship library covering daily devotionals, Bible reading plans, theology, apologetics, and global missions data for 238 nations. No account required — built for the believer and the curious seeker alike.',
+    keyFeatures: ['Daily devotionals with reflection and prayer', 'Theology corner and apologetics Q&A', 'Strong\'s Greek and Hebrew lexicon', 'Missions data for 238 nations'],
+    allFeatures: ['Daily devotional with theme, scripture, reflection, and prayer', 'Theology corner — doctrinal questions and answers', 'Apologetics module — answers to hard questions about faith', 'Structured Bible reading plans', 'Strong\'s Greek and Hebrew lexicon integration', 'Missions data and statistics for 238 nations', 'Daily quiz to test biblical knowledge', 'Person of Scripture — biographical studies', 'Zero login barrier — fully public access'],
+    body: 'GROW equips every believer with the Word, answers to their hardest questions, and a burden for the nations — all without creating an account. It meets people where they are and walks them deeper into Scripture at their own pace.',
+    pastor: 'A free resource you can put in every member\'s pocket. Send the GROW link to your congregation for daily spiritual formation between Sundays — devotionals, lexicon tools, and theology ready the moment they open their phone.',
+    kingdom: 'With zero login friction and missions data for 238 nations, GROW gives the Gospel a global reach. Truth goes to anyone, anywhere — the believer in a small town and the seeker on the other side of the world.'
+  },
+  invite: {
+    name: 'The Invitation',
+    full: 'The Invitation — Gospel Page',
+    sub: 'Gospel Page',
+    color: '#22c55e',
+    href: '../app.invite/app.invite.html',
+    svg: '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><line x1="5" y1="9" x2="19" y2="9"/></svg>',
+    what: 'The Invitation is a single, clean page presenting the Gospel of Jesus Christ — who He is, what He did, and how to respond. It is designed to be shared directly with a seeker, removing all barriers between a person and the message of salvation.',
+    keyFeatures: ['Clear Gospel presentation anchored in Scripture', 'Who Jesus is — identity and nature', 'The cross, resurrection, and the call to respond', 'Shareable link — one tap from any conversation'],
+    allFeatures: ['The identity and nature of Jesus Christ', 'The problem of human sin and its consequence', 'The crucifixion and resurrection — the finished work', 'The call to repentance and faith', 'A simple, scriptural prayer of response', 'Follow-up contact option for the local church', 'No ads, no navigation, no distractions — the message only', 'Optimized for sharing via text, social, and QR code'],
+    body: 'The Invitation arms every believer to be an evangelist. No training required, no fear of saying the wrong thing — just share the link. Every member of your congregation becomes a potential instrument of the Holy Spirit\'s work in someone\'s life.',
+    pastor: 'A pastor-approved Gospel presentation in every member\'s pocket. You set the theological foundation; your people share it. The Invitation ensures the Gospel your church proclaims from the pulpit is the same Gospel going out through every relationship.',
+    kingdom: 'Every disciple becomes a potential evangelist. When the barrier to sharing the Gospel is as low as a single link, the message spreads through the most powerful network ever built — personal relationships. The Kingdom grows one conversation at a time.'
+  },
+  stand: {
+    name: 'Flock Stand',
+    full: 'Flock Stand — The Music Stand',
+    sub: 'Music Stand',
+    color: '#a855f7',
+    href: '../app.stand/music_stand.html',
+    svg: '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    what: 'Flock Stand is a digital music stand for worship teams — a unified platform for song library management, setlist building, real-time chord transposition, and live lyrics display. The entire worship team, on the same page, every service.',
+    keyFeatures: ['Full song library with chords and lyrics', 'Setlist builder tied to service plans', 'Real-time chord transposition by key', 'Live lyrics display mode for worship team'],
+    allFeatures: ['Searchable song library with full chord charts and lyrics', 'Setlist builder connected to FlockOS service plans', 'One-tap chord transposition to any key', 'Worship team sync — everyone sees the same setlist live', 'SongSelect integration for licensed song imports', 'Lyrics display mode — clean, full-screen for performers', 'Capo and alternate tuning support', 'Song history and usage tracking', 'Offline access to saved songs and setlists'],
+    body: 'Flock Stand unifies the worship team — every musician and vocalist reading from the same source, in the same key, at the same moment. No more mismatched chord sheets, no more transposing by hand. The team enters prepared and worships with confidence.',
+    pastor: 'Your worship and your service planning are finally connected. Setlists built in Flock Stand flow directly into the service plan in FlockOS — one entry, no duplication, and full visibility into what Sunday looks like before Sunday arrives.',
+    kingdom: 'Excellence in worship is an act of honor before a holy God. A worship team that is prepared, unified, and technically equipped creates the space for the Spirit to move — and a congregation that encounters God in worship is a congregation ready to be sent.'
+  },
+  flockchat: {
+    name: 'FlockChat',
+    full: 'FlockChat — Church Messaging',
+    sub: 'Church Messaging',
+    color: '#06b6d4',
+    href: '../../flockchat-public/FlockChat.html',
+    svg: '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    what: 'FlockChat is a secure, real-time church messaging platform — channels for ministry teams, rooms for small groups, direct messages for pastoral care, and prayer chains for the whole body. Every conversation stays within the church\'s own account.',
+    keyFeatures: ['Ministry team channels', 'Small group rooms', 'Direct messages and prayer chains', 'Church-scoped accounts — no public exposure'],
+    allFeatures: ['Ministry and leadership team channels', 'Small group and community rooms', 'Direct messaging between members', 'Prayer request threads with follow-up tracking', 'Announcement boards for the full congregation', 'End-to-end encrypted messages', 'Church-scoped accounts — members are never on a public platform', 'File and media sharing within conversations', 'Notification controls for healthy boundaries', 'Admin moderation and member management'],
+    body: 'FlockChat keeps the community connected between Sundays. Prayer needs are shared and responded to in real time. Encouragement flows through channels. No one is isolated between services — the church is always one message away from its people.',
+    pastor: 'A private, church-owned communication layer for every level of ministry. Leadership discussions happen in secure channels. Pastoral care conversations stay off public platforms. Announcements reach everyone. And prayer chains actually function as chains.',
+    kingdom: 'The early church devoted themselves to fellowship — and fellowship requires communication. FlockChat makes the daily connection Scripture describes possible in the modern world, keeping the body knit together in love between every gathering.'
+  },
+  flockshow: {
+    name: 'FlockShow',
+    full: 'FlockShow — Worship Display',
+    sub: 'Worship Display',
+    color: '#ef4444',
+    href: '../app.flockshow/app.flockshow.html',
+    svg: '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+    what: 'FlockShow is worship presentation software — lyrics, Scripture slides, and announcements displayed on screen and pulled directly from the setlists built in Flock Stand. No manual re-entry, no Sunday-morning scramble. What is planned is what displays.',
+    keyFeatures: ['Live lyrics from setlists — no re-entry', 'Scripture passage slides', 'Announcement builder', 'Multi-screen support'],
+    allFeatures: ['Lyrics sourced directly from Flock Stand setlists', 'Scripture reference slides with formatted passage text', 'Announcement and bulletin slide builder', 'Custom background themes and branding', 'Multi-screen and secondary display support', 'Countdown and service flow timers', 'Slide transition controls', 'Confidence monitor for the presenter', 'Emergency blank and blackout controls', 'Service flow display — what\'s coming next'],
+    body: 'FlockShow creates a unified, distraction-free worship environment where every person in the room can engage fully. When lyrics are visible, voices join. When Scripture is on screen, the Word lands in eyes and hearts simultaneously.',
+    pastor: 'Zero duplicate work. Whatever is in your service plan and setlist shows on screen — no exporting, no copy-pasting, no additional Sunday preparation. The worship experience you planned is the worship experience the congregation receives.',
+    kingdom: 'Friction in corporate worship is a distraction from the King. When the presentation works, people look up. When people look up, they encounter Jesus. FlockShow removes every technical barrier between a prepared service and a Spirit-led moment.'
+  },
+  feed: {
+    name: 'FEED',
+    full: 'FEED — Sermon Workspace',
+    sub: 'Sermon Workspace',
+    color: '#e8a838',
+    href: '../app.feed/feed.html',
+    svg: '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
+    what: 'FEED is a full sermon preparation and archive workspace — outline your message, track your series, tag your Scripture references, and build a searchable library of every word you\'ve preached. Connected to your FlockOS service plans so nothing stands alone.',
+    keyFeatures: ['Sermon outliner with structured sections', 'Series and sequence tracking', 'Full-text searchable sermon archive', 'Linked to FlockOS service plans'],
+    allFeatures: ['Sermon outliner with introduction, points, application, and close', 'Series management with sermon sequence tracking', 'Scripture reference tagging per sermon', 'Full-text search across the complete sermon archive', 'Connection to FlockOS service plans', 'Preaching notes and delivery annotations', 'Export to notes format for use in the pulpit', 'Illustration and quote library', 'Message calendar and planning view', 'Historical preaching analytics — topics, books, frequency'],
+    body: 'FEED feeds the flock with prepared, Scripture-anchored messages. And a searchable archive means no truth is ever buried — every sermon, every series, every insight you\'ve ever preached is retrievable, searchable, and available to inform the next message.',
+    pastor: 'Your complete preaching library in one place. Research, draft, deliver, and archive — all connected. When you want to revisit a passage, trace a theme across years of ministry, or plan the next series, FEED is the institutional memory of your pulpit.',
+    kingdom: 'A preacher who prepares deeply preaches powerfully. Powerful preaching transforms lives. Transformed lives transform families, communities, and nations. FEED is the engine room of the Kingdom\'s most ancient and most effective tool: the proclaimed Word of God.'
+  },
+  wellspring: {
+    name: 'The Wellspring',
+    full: 'The Wellspring — Offline Mode',
+    sub: 'Offline Mode',
+    color: '#22c55e',
+    href: '../app.wellspring/app.wellspring.html',
+    svg: '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6 9 4 13 4 16a8 8 0 0 0 16 0c0-3-2-7-8-14z"/></svg>',
+    what: 'The Wellspring is the complete FlockOS suite packaged into a single encrypted local file — zero internet required. Built for the missionary, the church planter, and the pastor operating in restricted or remote regions where connectivity cannot be assumed.',
+    keyFeatures: ['Full FlockOS suite — offline', 'AES-encrypted local database', 'Zero server dependency', 'Single-file deployment — works from USB or local storage'],
+    allFeatures: ['Complete access to all FlockOS modules without internet', 'AES-encrypted local database for data security', 'Operates in government-restricted or internet-hostile regions', 'No cloud dependency — all data stays on-device', 'Single-file deployment — distribute via USB, SD card, or local transfer', 'Printable data and record export', 'Periodic sync to cloud when connectivity is available', 'Full member, prayer, and service data offline', 'Multilingual support for cross-cultural deployment'],
+    body: 'The Wellspring ensures the church has access to its tools, its data, and its discipleship resources even in the most remote or restricted environments. No congregation should lose its shepherd\'s dashboard because the cell tower is unreliable.',
+    pastor: 'For the church planter in the jungle and the missionary in the closed country — all of FlockOS in your bag. No Wi-Fi. No cloud account. No compromise. Your flock is cared for whether you have a signal or not.',
+    kingdom: 'The Gospel cannot be blocked by a poor signal, a hostile government, or a failed data connection. The Wellspring takes the full power of FlockOS to the most unreached places on earth — because the places that are hardest to reach are often the places that need the church most.'
+  }
+};
+
+function openSuitePanel(key) {
+  var app = SUITE_APPS[key];
+  if (!app) return;
+  var li = function(arr) { return arr.map(function(f){ return '<li>' + f + '</li>'; }).join(''); };
+  document.getElementById('fn-suite-panel-body').innerHTML =
+    '<div class="fn-sp-header">' +
+      '<span class="fn-sp-icon" style="color:' + app.color + '">' + app.svg + '</span>' +
+      '<div><div class="fn-sp-name" id="fn-sp-name">' + app.full + '</div>' +
+      '<div class="fn-sp-sub">' + app.sub + '</div></div>' +
+    '</div>' +
+    '<a class="fn-sp-open" href="' + app.href + '" target="_top">Open ' + app.name + ' \u2192</a>' +
+    '<hr class="fn-sp-rule">' +
+    '<div class="fn-sp-section"><div class="fn-sp-label">What It Does</div><p class="fn-sp-text">' + app.what + '</p></div>' +
+    '<hr class="fn-sp-divider">' +
+    '<div class="fn-sp-section"><div class="fn-sp-label">Key Features</div><ul class="fn-sp-list">' + li(app.keyFeatures) + '</ul></div>' +
+    '<div class="fn-sp-section"><div class="fn-sp-label">All Features</div><ul class="fn-sp-list">' + li(app.allFeatures) + '</ul></div>' +
+    '<hr class="fn-sp-divider">' +
+    '<div class="fn-sp-section"><div class="fn-sp-label">Supporting the Body of Christ</div><p class="fn-sp-text">' + app.body + '</p></div>' +
+    '<div class="fn-sp-section"><div class="fn-sp-label">Supporting the Pastor</div><p class="fn-sp-text">' + app.pastor + '</p></div>' +
+    '<div class="fn-sp-section"><div class="fn-sp-label">Furthering the Kingdom of God</div><p class="fn-sp-text">' + app.kingdom + '</p></div>';
+
+  document.getElementById('fn-suite-overlay').classList.add('fn-open');
+  document.getElementById('fn-suite-panel').classList.add('fn-open');
+  document.getElementById('fn-suite-panel').setAttribute('aria-hidden', 'false');
+  document.getElementById('fn-suite-panel').scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSuitePanel() {
+  document.getElementById('fn-suite-overlay').classList.remove('fn-open');
+  document.getElementById('fn-suite-panel').classList.remove('fn-open');
+  document.getElementById('fn-suite-panel').setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSuitePanel();
+});
 </script>
 
 </body>

@@ -1281,6 +1281,29 @@ else:
         f.write(content)
 PYEOF
 
+  # ── 11m. Patch app.flocknews/flocknews.html — replace {{CHURCH_NAME}} + {{CHURCH_WEBSITE}} ──
+  CHURCH_WEBSITE=$(jq -r '.website // "flock-os.github.io"' "$CFG")
+  export _NC_CHURCH_WEBSITE="$CHURCH_WEBSITE"
+  python3 << 'PYEOF'
+import os
+
+t       = os.environ['_NC_TARGET']
+name    = os.environ['_NC_CHURCH_NAME']
+website = os.environ['_NC_CHURCH_WEBSITE']
+path    = t + '/app.flocknews/flocknews.html'
+
+if not os.path.exists(path):
+    print('  ✓ flocknews.html not present — skip church name patch')
+else:
+    with open(path, 'r') as f:
+        content = f.read()
+    content = content.replace('{{CHURCH_NAME}}', name)
+    content = content.replace('{{CHURCH_WEBSITE}}', website)
+    with open(path, 'w') as f:
+        f.write(content)
+    print(f'  ✓ flocknews.html church name → {name} · website → {website}')
+PYEOF
+
   # ── 12. Patch index.html selector — replace {{CHURCH_NAME}} ────────
   python3 << 'PYEOF'
 import os

@@ -29,6 +29,10 @@ const PRECACHE_URLS = [
   'index.html',
   'manifest.json',
 
+  /* ── The Flock Herald (primary app) ──────────────────────────────────── */
+  'app.flocknews/flocknews.html',
+  'app.flocknews/flocknews.css',
+
   /* ── GROW public PWA ─────────────────────────────────────────────────── */
   'app.grow/app.grow.html',
   'Scripts/grow_public.js',

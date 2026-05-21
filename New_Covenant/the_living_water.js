@@ -10,7 +10,7 @@
    • PUSH        → Show notification; click → focus or open app
    ══════════════════════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'flockos-new-covenant-v1.21';
+const CACHE_NAME = 'flockos-new-covenant-v1.22';
 
 /* Derive base path from SW location (works at root or any subpath) */
 const SW_BASE = self.location.pathname.replace(/\/[^\/]+$/, '/');
@@ -28,6 +28,10 @@ const PRECACHE_URLS = [
   '',
   'index.html',
   'manifest.json',
+
+  /* ── The Flock Herald (primary app) ──────────────────────────────────── */
+  'app.flocknews/flocknews.html',
+  'app.flocknews/flocknews.css',
 
   /* ── GROW public PWA ─────────────────────────────────────────────────── */
   'app.grow/app.grow.html',

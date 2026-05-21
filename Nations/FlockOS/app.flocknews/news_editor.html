@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Flock Herald — Editor's Desk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700&display=swap">
+  <script>
+    (function () {
+      try { var t = localStorage.getItem('flock_theme') || 'america'; document.documentElement.setAttribute('data-theme', t); }
+      catch (_) { document.documentElement.setAttribute('data-theme', 'america'); }
+    })();
+  </script>
+  <link rel="stylesheet" href="news_editor.css">
+</head>
+<body>
+
+<div class="ed-layout">
+
+  <!-- ══ SIDEBAR ════════════════════════════════════════════════════════════ -->
+  <div class="ed-sidebar">
+
+    <div class="ed-header">
+      <div class="ed-header-title">The Flock Herald — Editor's Desk</div>
+      <div class="ed-header-sub">Toggle sections on/off · Pick content by index · Ctrl+S to apply</div>
+    </div>
+
+    <div class="ed-controls" id="ed-controls">
+
+      <!-- §1 Devotional -->
+      <div class="ed-accordion-item" data-section="devo">
+        <button class="ed-accordion-btn" onclick="toggleAccordion(this)">
+          <div class="ed-accordion-btn-inner">
+            <span class="ed-acc-num">§1</span>
+            <span class="ed-acc-label">Devotional</span>
+          </div>
+          <div class="ed-acc-toggle">
+            <div class="ed-vis-icon visible" title="Toggle visibility" onclick="toggleSection(event,'devo',this)"></div>
+            <span class="ed-acc-arrow">▼</span>
+          </div>
+        </button>
+        <div class="ed-accordion-body">
+          <div class="ed-row">
+            <label>Date Override (YYYY-MM-DD) <span class="ed-auto-badge active">AUTO</span></label>
+            <input type="text" id="pick-devoDate" placeholder="e.g. 2026-05-21" oninput="updateBadge(this,'pick-devoDate')">
+          </div>
+        </div>
+      </div>
+
+      <!-- §1c Heart Check -->
+      <div class="ed-accordion-item" data-section="heartcheck">
+        <button class="ed-accordion-btn" onclick="toggleAccordion(this)">
+          <div class="ed-accordion-btn-inner">
+            <span class="ed-acc-num">§1c</span>
+            <span class="ed-acc-label">Heart Check</span>
+          </div>
+          <div class="ed-acc-toggle">
+            <div class="ed-vis-icon visible" title="Toggle visibility" onclick="toggleSection(event,'heartcheck',this)"></div>
+            <span class="ed-acc-arrow">▼</span>
+          </div>
+        </button>
+        <div class="ed-accordion-body">
+          <div class="ed-row">
+            <label>Question Index (0–n) <span class="ed-auto-badge active">AUTO</span></label>
+            <input type="text" id="pick-heartIdx" placeholder="Leave blank for auto" oninput="updateBadge(this,'pick-heartIdx')">
+          </div>
+        </div>
+      </div>
+
+      <!-- §2 Missions -->
+      <div class="ed-accordion-item" data-section="missions">
+        <button class="ed-accordion-btn" onclick="toggleAccordion(this)">
+          <div class="ed-accordion-btn-inner">
+            <span class="ed-acc-num">§2</span>
+            <span class="ed-acc-label">Missions Report</span>
+          </div>
+          <div class="ed-acc-toggle">
+            <div class="ed-vis-icon visible" title="Toggle visibility" onclick="toggleSection(event,'missions',this)"></div>
+            <span class="ed-acc-arrow">▼</span>
+          </div>
+        </button>
+        <div class="ed-accordion-body">
+          <div class="ed-row">
+            <label>Country Index (0–237) <span class="ed-auto-badge active">AUTO</span></label>
+            <input type="text" id="pick-missionsIdx" placeholder="Leave blank for auto" oninput="updateBadge(this,'pick-missionsIdx')">
+          </div>
+        </div>
+      </div>
+
+      <!-- §3 Theology -->
+      <div class="ed-accordion-item" data-section="theology">
+        <button class="ed-accordion-btn" onclick="toggleAccordion(this)">
+          <div class="ed-accordion-btn-inner">
+            <span class="ed-acc-num">§3</span>
+            <span class="ed-acc-label">Theology Corner</span>
+          </div>
+          <div class="ed-acc-toggle">
+            <div class="ed-vis-icon visible" title="Toggle visibility" onclick="toggleSection(event,'theology',this)"></div>
+            <span class="ed-acc-arrow">▼</span>
+          </div>
+        </button>
+        <div class="ed-accordion-body">
+          <div class="ed-row">
+            <label>Topic Index (0–26) <span class="ed-auto-badge active">AUTO</span></label>
+            <input type="text" id="pick-theologyIdx" placeholder="Leave blank for auto" oninput="updateBadge(this,'pick-theologyIdx')">
+          </div>
+        </div>
+      </div>
+
+      <!-- §4 Apologetics -->
+      <div class="ed-accordion-item" data-section="apologetics">
+        <button class="ed-accordion-btn" onclick="toggleAccordion(this)">
+          <div class="ed-accordion-btn-inner">
+            <span class="ed-acc-num">§4</span>
+            <span class="ed-acc-label">Apologetics</span>
+          </div>
+          <div class="ed-acc-toggle">
+            <div class="ed-vis-icon visible" title="Toggle visibility" onclick="toggleSection(event,'apologetics',this)"></div>
+            <span class="ed-acc-arrow">▼</span>
+          </div>
+        </button>
+        <div class="ed-accordion-body">
+          <div class="ed-row">
+            <label>Q&amp;A 1 — Index (0–114) <span class="ed-auto-badge active">AUTO</span></label>
+            <input type="text" id="pick-apol1Idx" placeholder="Leave blank for auto" oninput="updateBadge(this,'pick-apol1Idx')">
+          </div>
+          <div class="ed-row">
+            <label>Q&amp;A 2 — Index (0–114) <span class="ed-auto-badge active">AUTO</span></label>
+            <input type="text" id="pick-apol2Idx" placeholder="Leave blank for auto" oninput="updateBadge(this,'pick-apol2Idx')">
+          </div>
+        </div>
+      </div>
+
+      <!-- §5 Discipleship -->
+      <div class="ed-accordion-item" data-section="discipleship">
+        <button class="ed-accordion-btn" onclick="toggleAccordion(this)">
+          <div class="ed-accordion-btn-inner">
+            <span class="ed-acc-num">§5</span>
+            <span class="ed-acc-label">Discipleship &amp; Care</span>
+          </div>
+          <div class="ed-acc-toggle">
+            <div class="ed-vis-icon visible" title="Toggle visibility" onclick="toggleSection(event,'discipleship',this)"></div>
+            <span class="ed-acc-arrow">▼</span>
+          </div>
+        </button>
+        <div class="ed-accordion-body">
+          <div class="ed-row">
+            <label>Topic Index (0–49) <span class="ed-auto-badge active">AUTO</span></label>
+            <input type="text" id="pick-counselingIdx" placeholder="Leave blank for auto" oninput="updateBadge(this,'pick-counselingIdx')">
+          </div>
+        </div>
+      </div>
+
+      <!-- §6 Quiz -->
+      <div class="ed-accordion-item" data-section="quiz">
+        <button class="ed-accordion-btn" onclick="toggleAccordion(this)">
+          <div class="ed-accordion-btn-inner">
+            <span class="ed-acc-num">§6</span>
+            <span class="ed-acc-label">Daily Quiz</span>
+          </div>
+          <div class="ed-acc-toggle">
+            <div class="ed-vis-icon visible" title="Toggle visibility" onclick="toggleSection(event,'quiz',this)"></div>
+            <span class="ed-acc-arrow">▼</span>
+          </div>
+        </button>
+        <div class="ed-accordion-body">
+          <div class="ed-row">
+            <label>Question Index (0–49) <span class="ed-auto-badge active">AUTO</span></label>
+            <input type="text" id="pick-quizIdx" placeholder="Leave blank for auto" oninput="updateBadge(this,'pick-quizIdx')">
+          </div>
+        </div>
+      </div>
+
+      <!-- §7 Person of Scripture -->
+      <div class="ed-accordion-item" data-section="figure">
+        <button class="ed-accordion-btn" onclick="toggleAccordion(this)">
+          <div class="ed-accordion-btn-inner">
+            <span class="ed-acc-num">§7</span>
+            <span class="ed-acc-label">Person of Scripture</span>
+          </div>
+          <div class="ed-acc-toggle">
+            <div class="ed-vis-icon visible" title="Toggle visibility" onclick="toggleSection(event,'figure',this)"></div>
+            <span class="ed-acc-arrow">▼</span>
+          </div>
+        </button>
+        <div class="ed-accordion-body">
+          <div class="ed-row">
+            <label>Person Index (0–n) <span class="ed-auto-badge active">AUTO</span></label>
+            <input type="text" id="pick-figureIdx" placeholder="Leave blank for auto" oninput="updateBadge(this,'pick-figureIdx')">
+          </div>
+        </div>
+      </div>
+
+      <!-- §8 Suite -->
+      <div class="ed-accordion-item" data-section="suite">
+        <button class="ed-accordion-btn" onclick="toggleAccordion(this)">
+          <div class="ed-accordion-btn-inner">
+            <span class="ed-acc-num">§8</span>
+            <span class="ed-acc-label">The Suite</span>
+          </div>
+          <div class="ed-acc-toggle">
+            <div class="ed-vis-icon visible" title="Toggle visibility" onclick="toggleSection(event,'suite',this)"></div>
+            <span class="ed-acc-arrow">▼</span>
+          </div>
+        </button>
+        <div class="ed-accordion-body">
+          <p style="font-size:12px;color:var(--ed-text-dim);line-height:1.6;padding-top:4px;">The Suite cards are fixed and always link to the live apps. Toggle off above to hide from readers.</p>
+        </div>
+      </div>
+
+    </div><!-- /.ed-controls -->
+
+    <div class="ed-footer">
+      <button class="ed-btn-primary" onclick="applyConfig()">Apply Changes</button>
+      <button class="ed-btn-secondary" onclick="resetConfig()">Reset to Auto — Clear All Overrides</button>
+      <div class="ed-hint">Ctrl+S / ⌘+S to apply &nbsp;·&nbsp; Changes update the preview instantly</div>
+    </div>
+
+  </div><!-- /.ed-sidebar -->
+
+  <!-- ══ PREVIEW PANE ════════════════════════════════════════════════════════ -->
+  <div class="ed-preview">
+    <div class="ed-preview-bar">
+      <span>The Flock Herald</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-family:var(--sans);font-weight:400;color:var(--ed-text-dim)">Live Preview</span>
+        <button class="ed-reload-btn" onclick="reloadPreview()">Reload</button>
+        <a class="ed-reload-btn" href="flocknews.html" target="_blank" style="text-decoration:none">Open in Tab ↗</a>
+      </div>
+    </div>
+    <iframe id="ed-frame" src="flocknews.html" title="The Flock Herald Preview" sandbox="allow-scripts allow-same-origin allow-forms allow-modals"></iframe>
+  </div>
+
+</div><!-- /.ed-layout -->
+
+<div id="ed-status" role="alert" aria-live="polite"></div>
+
+<script>
+'use strict';
+
+// ── Accordion ─────────────────────────────────────────────────────────────
+function toggleAccordion(btn) {
+  var body = btn.nextElementSibling;
+  var isOpen = btn.classList.contains('open');
+  btn.classList.toggle('open', !isOpen);
+  body.classList.toggle('open', !isOpen);
+}
+
+// ── Visibility toggle ──────────────────────────────────────────────────────
+var _sectionState = {
+  devo:true, heartcheck:true, missions:true, theology:true,
+  apologetics:true, discipleship:true, quiz:true, figure:true, suite:true
+};
+
+function toggleSection(e, key, icon) {
+  e.stopPropagation();
+  _sectionState[key] = !_sectionState[key];
+  icon.classList.toggle('visible', _sectionState[key]);
+  var frame = document.getElementById('ed-frame');
+  try {
+    var doc = frame.contentDocument || frame.contentWindow.document;
+    var sec = doc.getElementById('fn-section-' + key);
+    if (sec) sec.classList.toggle('fn-hidden', !_sectionState[key]);
+  } catch(err) {}
+}
+
+// ── Badge auto/manual ──────────────────────────────────────────────────────
+function updateBadge(input, pickId) {
+  var label = input.previousElementSibling;
+  if (!label) return;
+  var badge = label.querySelector('.ed-auto-badge');
+  if (!badge) return;
+  var hasVal = input.value.trim() !== '';
+  badge.textContent = hasVal ? 'MANUAL' : 'AUTO';
+  badge.classList.toggle('active', !hasVal);
+}
+
+// ── Load existing config into form ─────────────────────────────────────────
+(function loadConfig() {
+  var cfg;
+  try { cfg = JSON.parse(localStorage.getItem('fn_config') || 'null') || {}; }
+  catch(_){ cfg = {}; }
+  var p = cfg.picks || {};
+  var s = cfg.sections || {};
+
+  // picks
+  ['devoDate','heartIdx','missionsIdx','theologyIdx','apol1Idx','apol2Idx','counselingIdx','quizIdx','figureIdx'].forEach(function(k) {
+    var el = document.getElementById('pick-'+k);
+    if (el && p[k] != null) { el.value = p[k]; updateBadge(el, 'pick-'+k); }
+  });
+  // sections
+  Object.keys(s).forEach(function(k) {
+    if (s[k] === false) {
+      _sectionState[k] = false;
+      var icon = document.querySelector('[data-section="'+k+'"] .ed-vis-icon');
+      if (icon) icon.classList.remove('visible');
+    }
+  });
+})();
+
+// ── Build + apply config ───────────────────────────────────────────────────
+function buildConfig() {
+  var picks = {};
+  var pickFields = {
+    devoDate:     'pick-devoDate',
+    heartIdx:     'pick-heartIdx',
+    missionsIdx:  'pick-missionsIdx',
+    theologyIdx:  'pick-theologyIdx',
+    apol1Idx:     'pick-apol1Idx',
+    apol2Idx:     'pick-apol2Idx',
+    counselingIdx:'pick-counselingIdx',
+    quizIdx:      'pick-quizIdx',
+    figureIdx:    'pick-figureIdx',
+  };
+  Object.keys(pickFields).forEach(function(k) {
+    var el = document.getElementById(pickFields[k]);
+    if (!el) return;
+    var v = el.value.trim();
+    if (v === '') return;
+    // numeric keys
+    if (k !== 'devoDate') {
+      var n = parseInt(v, 10);
+      if (!isNaN(n)) picks[k] = n;
+    } else {
+      picks[k] = v;
+    }
+  });
+  return { sections: Object.assign({}, _sectionState), picks: picks };
+}
+
+function applyConfig() {
+  var cfg = buildConfig();
+  try { localStorage.setItem('fn_config', JSON.stringify(cfg)); }
+  catch(e) { toast('Storage error: '+e.message); return; }
+  var frame = document.getElementById('ed-frame');
+  frame.contentWindow.postMessage({ type: 'fn_config_update', config: cfg }, '*');
+  reloadPreview();
+  toast('Applied — Preview refreshing…');
+}
+
+function reloadPreview() {
+  var frame = document.getElementById('ed-frame');
+  frame.src = frame.src.split('?')[0] + '?t=' + Date.now();
+}
+
+function resetConfig() {
+  if (!confirm('Reset all overrides and use today\'s auto-rotation?')) return;
+  try { localStorage.removeItem('fn_config'); } catch(e){}
+  // clear inputs
+  document.querySelectorAll('.ed-controls input, .ed-controls textarea').forEach(function(el){ el.value=''; });
+  document.querySelectorAll('.ed-auto-badge').forEach(function(b){ b.textContent='AUTO'; b.classList.add('active'); });
+  // reset section states
+  Object.keys(_sectionState).forEach(function(k){ _sectionState[k]=true; });
+  document.querySelectorAll('.ed-vis-icon').forEach(function(i){ i.classList.add('visible'); });
+  reloadPreview();
+  toast('Reset to auto-rotation');
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────
+var _toastTimer;
+function toast(msg) {
+  var el = document.getElementById('ed-status');
+  el.textContent = msg;
+  el.classList.add('visible');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){ el.classList.remove('visible'); }, 2800);
+}
+
+// ── Keyboard shortcut ─────────────────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    applyConfig();
+  }
+});
+</script>
+
+</body>
+</html>
