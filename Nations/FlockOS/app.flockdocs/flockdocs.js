@@ -80,7 +80,7 @@ function _waitForReady() {
         return;
       }
       console.warn('[FlockDocs] User not authenticated, redirecting to login');
-      window.location.replace('index.html');
+      window.location.replace('app.flockdocs/index.html');
       reject(new Error('Not authenticated'));
     }
 
@@ -104,7 +104,7 @@ function _waitForReady() {
       } else if (Date.now() - startedAt >= TIMEOUT_MS) {
         if (!isLocalhost) {
           console.error('[FlockDocs] Timeout waiting for firebase/Nehemiah, redirecting to login');
-          window.location.replace('index.html');
+          window.location.replace('app.flockdocs/index.html');
           reject(new Error('Timeout'));
         } else {
           console.warn('[FlockDocs] Timeout waiting for firebase/Nehemiah (localhost — continuing)');
@@ -186,7 +186,7 @@ function init() {
     };
   } else {
     console.error('[FlockDocs] No authenticated user found');
-    window.location.replace('index.html');
+    window.location.replace('app.flockdocs/index.html');
     return;
   }
 
