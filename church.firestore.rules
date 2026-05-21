@@ -241,6 +241,14 @@ service cloud.firestore {
       allow read, create, update, delete: if isSignedIn();
     }
     
+    // ── Outreach Leads (public form — multiply.html) ───────────
+    // Public visitors may submit an outreach card without signing in.
+    // Only signed-in staff may read, update, or delete records.
+    match /outreachLeads/{leadId} {
+      allow create: if true;
+      allow read, update, delete: if isSignedIn();
+    }
+
     // ── Catch-all for any other collections ────────────────────
     match /{document=**} {
       allow read, create, update, delete: if isSignedIn();

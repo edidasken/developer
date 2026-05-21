@@ -1140,6 +1140,54 @@ else:
     print(f'  ✓ app.stand/manifest.json name → {name} · Flock Stand')
 PYEOF
 
+  # ── 11k. Patch multiply.html — Firebase config + FLOCK_CHURCH_ID ────
+  python3 << 'PYEOF'
+import os, json, re
+
+t          = os.environ['_NC_TARGET']
+fb_raw     = os.environ['_NC_FB_CONFIG']
+church_id  = os.environ.get('_NC_CHURCH_ID', '')
+gas_only   = os.environ.get('_NC_GAS_ONLY', 'false').strip().lower() == 'true'
+path       = t + '/multiply.html'
+
+if not os.path.exists(path):
+    print('  ✓ multiply.html not present — skip Firebase patch')
+else:
+    with open(path, 'r') as f:
+        content = f.read()
+
+    if gas_only:
+        content = re.sub(
+            r'[ \t]*<script>\s*window\.FLOCK_FIREBASE_CONFIG\s*=\s*\{[^}]+\};\s*window\.FLOCK_CHURCH_ID[^<]*</script>\n?',
+            '', content, flags=re.DOTALL)
+        content = re.sub(r'[ \t]*<script[^>]+gstatic\.com/firebasejs[^>]*></script>\n?', '', content)
+        if '<head>' in content:
+            content = content.replace('<head>', '<head>\n  <script>window.FLOCK_NO_FIREBASE = true;</script>', 1)
+        print('  ✓ multiply.html Firebase stripped (GAS-only build)')
+    else:
+        try:
+            fb_obj = json.loads(fb_raw)
+        except Exception:
+            fb_obj = None
+
+        if isinstance(fb_obj, dict) and 'projectId' in fb_obj:
+            cfg_lines = ['    window.FLOCK_FIREBASE_CONFIG = {']
+            for k, v in fb_obj.items():
+                cfg_lines.append(f"      {k}:  '{v}',")
+            cfg_lines.append('    };')
+            cfg_lines.append(f"    window.FLOCK_CHURCH_ID = '{church_id or 'root'}';")
+            new_block = '\n'.join(cfg_lines)
+            content = re.sub(
+                r'window\.FLOCK_FIREBASE_CONFIG\s*=\s*\{[^}]+\};\s*\n\s*window\.FLOCK_CHURCH_ID\s*=[^;]+;',
+                new_block, content, flags=re.DOTALL)
+            print(f'  ✓ multiply.html Firebase config → {fb_obj["projectId"]} / church {church_id or "root"}')
+        else:
+            print('  ✓ multiply.html Firebase config kept as default (flockos-notify)')
+
+    with open(path, 'w') as f:
+        f.write(content)
+PYEOF
+
   # ── 12. Patch index.html selector — replace {{CHURCH_NAME}} ────────
   python3 << 'PYEOF'
 import os

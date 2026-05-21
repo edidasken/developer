@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="FlockOS — A complete suite of ministry tools for the local church pastor. Free to the Body of Christ.">
+  <title>FlockOS — A Ministry Suite for the Local Church</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap">
+
+  <!-- Firebase config — patched per-church by B-Build -->
+  <script>
+        window.FLOCK_FIREBASE_CONFIG = {
+      apiKey:  'AIzaSyCnIbShg2ra1t4EiP3CffsivwvIK-bNu8M',
+      authDomain:  'flockos-theforest.firebaseapp.com',
+      projectId:  'flockos-theforest',
+      storageBucket:  'flockos-theforest.firebasestorage.app',
+      messagingSenderId:  '476522944133',
+      appId:  '1:476522944133:web:29ad5d19cf5a84c11b7bec',
+      measurementId:  'G-WMGPRHXP0Q',
+    };
+    window.FLOCK_CHURCH_ID = 'theforest';
+  </script>
+
+  <style>
+    /* ── Reset & base ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper:        #f5f0e8;
+      --ink:          #1a1a1a;
+      --ink-muted:    #5a534e;
+      --rule:         #1a1a1a;
+      --rule-soft:    #c5bfb0;
+      --red:          #8b1a1a;
+      --serif:        'Playfair Display', Georgia, 'Times New Roman', serif;
+      --body-serif:   'IM Fell English', Georgia, serif;
+      --sans:         system-ui, -apple-system, sans-serif;
+      --masthead-font:'UnifrakturMaguntia', 'Times New Roman', serif;
+    }
+
+    html, body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--body-serif);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-text-size-adjust: 100%;
+      min-height: 100%;
+    }
+
+    /* ── Page wrapper ─────────────────────────────────────────────────── */
+    .herald-page {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 28px 18px 100px;
+    }
+    @media (min-width: 640px) {
+      .herald-page { padding: 40px 40px 120px; }
+    }
+
+    /* ── Masthead ─────────────────────────────────────────────────────── */
+    .herald-masthead {
+      text-align: center;
+      border-top: 4px double var(--rule);
+      border-bottom: 4px double var(--rule);
+      padding: 16px 0 14px;
+    }
+    .herald-flag {
+      font-family: var(--masthead-font);
+      font-size: clamp(38px, 9vw, 76px);
+      line-height: 1.08;
+      color: var(--ink);
+      letter-spacing: .01em;
+    }
+    .herald-tagline {
+      font-family: var(--serif);
+      font-size: 11px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-top: 6px;
+    }
+    .herald-dateline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--serif);
+      font-size: 11px;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 5px 0;
+      margin-top: 8px;
+    }
+
+    /* ── Rules ────────────────────────────────────────────────────────── */
+    .rule-thick  { border: none; border-top: 3px solid var(--rule); margin: 14px 0 0; }
+    .rule-thin   { border: none; border-top: 1px solid var(--rule); margin: 10px 0; }
+    .rule-double { border: none; border-top: 4px double var(--rule); margin: 22px 0; }
+
+    /* ── Headline & deck ──────────────────────────────────────────────── */
+    .herald-headline {
+      font-family: var(--serif);
+      font-size: clamp(24px, 4.5vw, 44px);
+      font-weight: 700;
+      line-height: 1.1;
+      text-align: center;
+      padding: 20px 0 10px;
+      letter-spacing: -.01em;
+    }
+    .herald-deck {
+      text-align: center;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(14px, 2.2vw, 18px);
+      color: var(--ink-muted);
+      padding-bottom: 12px;
+      max-width: 70ch;
+      margin: 0 auto;
+      line-height: 1.45;
+    }
+    .herald-byline {
+      text-align: center;
+      font-family: var(--serif);
+      font-size: 11.5px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      padding: 6px 0 16px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    /* ── Body columns ─────────────────────────────────────────────────── */
+    .herald-body {
+      column-count: 2;
+      column-gap: 32px;
+      column-rule: 1px solid var(--rule-soft);
+      padding-top: 18px;
+      text-align: justify;
+      hyphens: auto;
+      orphans: 3;
+      widows: 3;
+    }
+    @media (max-width: 580px) {
+      .herald-body { column-count: 1; text-align: left; }
+    }
+    .herald-body p {
+      margin-bottom: .9em;
+      font-size: 15.5px;
+      line-height: 1.7;
+    }
+    /* Drop cap */
+    .herald-body > p:first-child::first-letter {
+      font-family: var(--serif);
+      font-size: 4.6em;
+      font-weight: 700;
+      line-height: .76;
+      float: left;
+      margin: 4px 7px 0 0;
+      color: var(--ink);
+    }
+    .herald-body h3 {
+      font-family: var(--serif);
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      border-top: 2px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 4px 0;
+      margin: 20px 0 10px;
+      break-inside: avoid;
+      break-after: avoid;
+    }
+
+    /* ── Pull quote ───────────────────────────────────────────────────── */
+    .herald-pull {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 17px;
+      line-height: 1.55;
+      border-top: 2px solid var(--rule);
+      border-bottom: 2px solid var(--rule);
+      padding: 12px 8px;
+      margin: 20px 0;
+      text-align: center;
+      break-inside: avoid;
+    }
+
+    /* ── Section label ────────────────────────────────────────────────── */
+    .herald-section-label {
+      font-family: var(--serif);
+      font-size: 12px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 6px 0 14px;
+      color: var(--ink-muted);
+    }
+
+    /* ── App cards grid ───────────────────────────────────────────────── */
+    .herald-apps {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0;
+      border: 1px solid var(--rule-soft);
+      margin: 0 0 4px;
+    }
+    .herald-app-card {
+      padding: 14px 16px 16px;
+      border-right: 1px solid var(--rule-soft);
+      border-bottom: 1px solid var(--rule-soft);
+      background: #fff;
+    }
+    .herald-app-card:nth-child(2n) { border-right: none; }
+    @media (min-width: 740px) {
+      .herald-apps { grid-template-columns: repeat(4, 1fr); }
+      .herald-app-card:nth-child(2n) { border-right: 1px solid var(--rule-soft); }
+      .herald-app-card:nth-child(4n) { border-right: none; }
+    }
+    .herald-app-card-name {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 13.5px;
+      margin-bottom: 6px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--rule-soft);
+      line-height: 1.3;
+    }
+    .herald-app-card-desc {
+      font-family: var(--sans);
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--ink-muted);
+    }
+
+    /* ── Trust grid ───────────────────────────────────────────────────── */
+    .herald-trust-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      border: 1px solid var(--rule-soft);
+      margin-top: 14px;
+    }
+    @media (max-width: 480px) {
+      .herald-trust-grid { grid-template-columns: 1fr; }
+    }
+    .herald-trust-item {
+      padding: 16px 18px;
+      border-right: 1px solid var(--rule-soft);
+      border-bottom: 1px solid var(--rule-soft);
+    }
+    .herald-trust-item:nth-child(2n) { border-right: none; }
+    .herald-trust-item:nth-last-child(-n+2) { border-bottom: none; }
+    @media (max-width: 480px) {
+      .herald-trust-item { border-right: none; }
+      .herald-trust-item:last-child { border-bottom: none; }
+      .herald-trust-item:nth-last-child(-n+2) { border-bottom: 1px solid var(--rule-soft); }
+      .herald-trust-item:last-child { border-bottom: none; }
+    }
+    .herald-trust-q {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 12.5px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: var(--red);
+    }
+    .herald-trust-a {
+      font-family: var(--sans);
+      font-size: 13px;
+      line-height: 1.58;
+      color: var(--ink-muted);
+    }
+
+    /* ── Outreach form ────────────────────────────────────────────────── */
+    .herald-form-section {
+      margin-top: 40px;
+      border: 3px double var(--rule);
+      padding: 30px 30px 36px;
+      background: #fff;
+    }
+    @media (max-width: 520px) {
+      .herald-form-section { padding: 22px 18px 28px; }
+    }
+    .herald-form-head {
+      text-align: center;
+      font-family: var(--serif);
+      font-size: clamp(20px, 4vw, 30px);
+      font-weight: 700;
+      margin-bottom: 5px;
+      line-height: 1.15;
+    }
+    .herald-form-sub {
+      text-align: center;
+      font-family: var(--body-serif);
+      font-style: italic;
+      font-size: 15px;
+      color: var(--ink-muted);
+      margin-bottom: 26px;
+    }
+    .herald-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 520px) {
+      .herald-form { grid-template-columns: 1fr; }
+    }
+    .herald-form-field       { display: flex; flex-direction: column; gap: 5px; }
+    .herald-form-field.full  { grid-column: 1 / -1; }
+    .herald-form label {
+      font-family: var(--serif);
+      font-size: 11px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      font-weight: 700;
+    }
+    .herald-form input,
+    .herald-form textarea {
+      border: 1px solid var(--rule-soft);
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--body-serif);
+      font-size: 15px;
+      padding: 10px 12px;
+      border-radius: 0;
+      outline: none;
+      width: 100%;
+      transition: border-color .15s;
+    }
+    .herald-form input:focus,
+    .herald-form textarea:focus { border-color: var(--ink); }
+    .herald-form textarea { resize: vertical; min-height: 96px; }
+    .herald-submit {
+      display: block;
+      width: 100%;
+      grid-column: 1 / -1;
+      margin-top: 4px;
+      padding: 14px 20px;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .herald-submit:hover    { background: #333; }
+    .herald-submit:disabled { opacity: .5; cursor: default; }
+
+    /* ── Success state ────────────────────────────────────────────────── */
+    .herald-success         { display: none; text-align: center; padding: 32px 16px; }
+    .herald-success.visible { display: block; }
+    .herald-success-icon    { font-size: 44px; margin-bottom: 14px; }
+    .herald-success h3 {
+      font-family: var(--serif);
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .herald-success p {
+      font-family: var(--body-serif);
+      font-style: italic;
+      color: var(--ink-muted);
+      font-size: 15px;
+      max-width: 50ch;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    /* ── Footer ───────────────────────────────────────────────────────── */
+    .herald-footer {
+      text-align: center;
+      font-family: var(--serif);
+      font-size: 11px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-top: 44px;
+      padding-top: 14px;
+      border-top: 1px solid var(--rule);
+      line-height: 2;
+    }
+    .herald-footer em {
+      display: block;
+      font-style: italic;
+      font-size: 13px;
+      letter-spacing: .02em;
+      text-transform: none;
+      margin-bottom: 8px;
+      color: var(--ink-muted);
+    }
+
+    /* ── Status toast ─────────────────────────────────────────────────── */
+    #mly-status {
+      display: none;
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      border: 1.5px solid var(--rule-soft);
+      padding: 11px 22px;
+      font-family: var(--serif);
+      font-size: 14px;
+      z-index: 9999;
+      box-shadow: 0 4px 20px rgba(0,0,0,.13);
+      white-space: nowrap;
+      max-width: calc(100vw - 40px);
+      white-space: normal;
+      text-align: center;
+    }
+    #mly-status.visible       { display: block; }
+    #mly-status.error         { border-color: var(--red); color: var(--red); }
+  </style>
+</head>
+<body>
+
+<div class="herald-page">
+
+  <!-- ══ MASTHEAD ════════════════════════════════════════════════════ -->
+  <header class="herald-masthead">
+    <div class="herald-flag">The Flock Herald</div>
+    <div class="herald-tagline">Ministry Tools for the Local Church &nbsp;·&nbsp; Free to the Body of Christ</div>
+    <div class="herald-dateline">
+      <span>Vol. I &nbsp;·&nbsp; No. 1</span>
+      <span id="mly-date">2026</span>
+      <span>flock-os.github.io</span>
+    </div>
+  </header>
+
+  <hr class="rule-thick">
+
+  <!-- ══ HEADLINE ═════════════════════════════════════════════════════ -->
+  <h1 class="herald-headline">FlockOS — A Complete Suite of Ministry Tools, Built for the Work of the Church</h1>
+  <p class="herald-deck">Everything a pastor touches in the course of his week — in one integrated system, on any device, completely free.</p>
+  <p class="herald-byline">By the FlockOS Team &nbsp;·&nbsp; Special Report &nbsp;·&nbsp; Ministry Edition</p>
+
+  <hr class="rule-thin">
+
+  <!-- ══ BODY COLUMNS ══════════════════════════════════════════════════ -->
+  <div class="herald-body">
+
+    <p>FlockOS is not a product. It is a calling made software. Built specifically for the local church pastor — not for a denomination, not for a megachurch with an IT department, but for the man in the room with the people, carrying the weight of their names, their struggles, their prayers, and their growth.</p>
+
+    <p>It brings together everything a pastor touches in the course of his week — member directory, pastoral notes, prayer requests, small group rosters, worship planning, outreach tools, discipleship resources, and church communication — into one integrated system that runs on any device, in any browser, from anywhere in the world.</p>
+
+    <div class="herald-pull">"FlockOS carries the weight of the administration so the pastor can carry the weight of the people — and it is completely free, because the Gospel is."</div>
+
+    <h3>A Foundation Built on Grace, Not Commerce</h3>
+
+    <p>Church management software has historically been priced as if the church is a business and the pastor is a product manager. FlockOS was built on a different conviction. There is no subscription fee. No per-seat pricing. No features locked behind an upgrade wall. Every module. Every update. Every capability — free. The resources of a large church deserve to be in the hands of the smallest congregation.</p>
+
+    <p>The pastor of twelve should have the same tools as the pastor of twelve hundred. <em>"Freely you have received; freely give."</em> — Matthew 10:8</p>
+
+    <h3>No Server. No IT. No Barriers.</h3>
+
+    <p>FlockOS is a web application that runs in any modern browser on any device. There is nothing to install, no server to maintain, no IT team required. It is hosted for free on GitHub Pages — an infrastructure maintained by Microsoft — serving churches 24 hours a day with no monthly fees and no expiration date.</p>
+
+    <p>For pastors without reliable internet access, The Wellspring mode allows the complete church database to run offline on a single encrypted file — no connectivity required. FlockOS was designed to go wherever the Great Commission sends you.</p>
+
+    <h3>Your Data. Your Accounts. Your Church.</h3>
+
+    <p>The design keeps your church's data in your own Google or Firebase accounts — not in a central FlockOS-owned database. You own it. You control it. If you stop using FlockOS tomorrow, your data is still yours. There is no hostage situation. There is no exit fee.</p>
+
+    <p>Sensitive pastoral records — counseling notes, care cases, prayer journals — are protected by role-based access control. Six permission levels, from Guest to Admin, ensure that your private conversations with a struggling family never appear on the welcome desk screen.</p>
+
+  </div>
+
+  <!-- ══ APP SUITE ═════════════════════════════════════════════════════ -->
+  <hr class="rule-double">
+  <p class="herald-section-label">The FlockOS Suite — Eight Apps, One Mission</p>
+
+  <div class="herald-apps">
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">FlockOS — The Shepherd's Dashboard</div>
+      <div class="herald-app-card-desc">Member directory, pastoral care notes, prayer tracking, small groups, events, attendance, spiritual milestones, service planning, and analytics — all in one place.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">GROW — Discipleship Hub</div>
+      <div class="herald-app-card-desc">A public-facing resource for seekers and new believers. Gospel presentation, one-year Bible plan, devotionals, Strong's lexicon, theology, apologetics, and missions data for 210+ nations.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">The Invitation — Gospel Page</div>
+      <div class="herald-app-card-desc">One page. One message. A clear presentation of Jesus — who He is, what He did, how to respond. Share it with a seeker in a text, a counseling session, or a follow-up conversation.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">Flock Stand — The Music Stand</div>
+      <div class="herald-app-card-desc">Song library, setlist builder, chord transposer, and live lyrics display. The entire worship team, on the same page, in any key, with or without internet.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">FlockChat — Church Messaging</div>
+      <div class="herald-app-card-desc">Secure real-time messaging — team channels, small group rooms, direct messages, and prayer chains. Your congregation's conversations stay in your church's accounts.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">FlockShow — Worship Display</div>
+      <div class="herald-app-card-desc">Slides for your service — lyrics, Scripture, announcements — pulling directly from your setlists and service plans. No manual recreation every week.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">FEED — Sermon Workspace</div>
+      <div class="herald-app-card-desc">Outline your message, track your series, and build a searchable archive of every sermon you have ever preached — connected to your service plans.</div>
+    </div>
+    <div class="herald-app-card">
+      <div class="herald-app-card-name">The Wellspring — Offline Mode</div>
+      <div class="herald-app-card-desc">The full suite, running from a single encrypted file with zero internet required. Built for the missionary, the church planter, and the pastor in places the internet has not yet reached.</div>
+    </div>
+  </div>
+
+  <!-- ══ TRUST ══════════════════════════════════════════════════════════ -->
+  <hr class="rule-double">
+  <p class="herald-section-label">Why Pastors Trust FlockOS</p>
+
+  <div class="herald-trust-grid">
+    <div class="herald-trust-item">
+      <div class="herald-trust-q">Your Data. Your Accounts.</div>
+      <div class="herald-trust-a">Your church's data lives in your own Google or Firebase accounts — not in a central FlockOS-owned database. You own it. You control it. Always.</div>
+    </div>
+    <div class="herald-trust-item">
+      <div class="herald-trust-q">Pastoral Privacy Protected</div>
+      <div class="herald-trust-a">Role-based access control with six permission levels means your private counseling notes and care records are visible only to the people you authorize.</div>
+    </div>
+    <div class="herald-trust-item">
+      <div class="herald-trust-q">AES-GCM 256-Bit Encryption</div>
+      <div class="herald-trust-a">Offline vaults use PIN-protected encryption. The key is never stored — only the right PIN unlocks your data. Your congregation's records are safe even if a device is lost.</div>
+    </div>
+    <div class="herald-trust-item">
+      <div class="herald-trust-q">Built to Last</div>
+      <div class="herald-trust-a">Hosted on Microsoft's GitHub Pages infrastructure. No startup server. No monthly bill that can lapse. The goal is not dependency on us — the goal is durability for the church.</div>
+    </div>
+  </div>
+
+  <!-- ══ OUTREACH CARD ══════════════════════════════════════════════════ -->
+  <div class="herald-form-section" id="mly-form-wrap">
+    <hr class="rule-thin" style="margin-bottom: 24px;">
+    <h2 class="herald-form-head">Ready to Try FlockOS for Your Church?</h2>
+    <p class="herald-form-sub">Fill out the card below. Your pastor will follow up personally.</p>
+
+    <div id="mly-success" class="herald-success">
+      <div class="herald-success-icon">✉</div>
+      <h3>Your Card Has Been Received</h3>
+      <p>Thank you. Your pastor has been notified and will reach out soon.<br><em>"The Lord bless you and keep you."</em> — Numbers 6:24</p>
+    </div>
+
+    <form class="herald-form" id="mly-form" novalidate>
+      <div class="herald-form-field">
+        <label for="mly-name">Your Name <span style="color:var(--red)">*</span></label>
+        <input type="text" id="mly-name" name="name" placeholder="Full name" required autocomplete="name">
+      </div>
+      <div class="herald-form-field">
+        <label for="mly-church">Church or Ministry Name</label>
+        <input type="text" id="mly-church" name="churchName" placeholder="If applicable" autocomplete="organization">
+      </div>
+      <div class="herald-form-field">
+        <label for="mly-phone">Phone Number</label>
+        <input type="tel" id="mly-phone" name="phone" placeholder="(555) 000-0000" autocomplete="tel">
+      </div>
+      <div class="herald-form-field">
+        <label for="mly-email">Email Address</label>
+        <input type="email" id="mly-email" name="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="herald-form-field full">
+        <label for="mly-message">How Can We Help You? <span style="color:var(--red)">*</span></label>
+        <textarea id="mly-message" name="message" placeholder="Tell us about your church and what you're looking for…" required></textarea>
+      </div>
+      <button type="submit" class="herald-submit" id="mly-submit">Send My Card — I Want to Learn More</button>
+    </form>
+  </div>
+
+  <!-- ══ FOOTER ══════════════════════════════════════════════════════════ -->
+  <footer class="herald-footer">
+    <em>"And he gave the apostles, the prophets, the evangelists, the shepherds and teachers,<br>to equip the saints for the work of ministry, for building up the body of Christ."<br>— Ephesians 4:11–12</em>
+    FlockOS &nbsp;·&nbsp; flock-os.github.io &nbsp;·&nbsp; Free to the Church &nbsp;·&nbsp; All Rights Reserved
+  </footer>
+
+</div><!-- /.herald-page -->
+
+<!-- ── Status toast ──────────────────────────────────────────────────── -->
+<div id="mly-status" role="alert" aria-live="polite"></div>
+
+<!-- ── Firebase ──────────────────────────────────────────────────────── -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+  'use strict';
+
+  // ── Live date in masthead ─────────────────────────────────────────────
+  (function() {
+    var el = document.getElementById('mly-date');
+    if (el) {
+      el.textContent = new Date().toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+  })();
+
+  // ── Firebase init ─────────────────────────────────────────────────────
+  var _db = null;
+  (function() {
+    var cfg = window.FLOCK_FIREBASE_CONFIG;
+    if (!cfg || !cfg.projectId || window.FLOCK_NO_FIREBASE) return;
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(cfg);
+      _db = firebase.firestore();
+    } catch (e) {
+      console.warn('multiply.html: Firebase init failed', e);
+    }
+  })();
+
+  // ── Helpers ───────────────────────────────────────────────────────────
+  function showStatus(msg, isError) {
+    var el = document.getElementById('mly-status');
+    el.textContent = msg;
+    el.className = 'visible' + (isError ? ' error' : '');
+    setTimeout(function() { el.className = ''; }, 4500);
+  }
+
+  function showSuccess() {
+    document.getElementById('mly-form').style.display = 'none';
+    document.getElementById('mly-success').classList.add('visible');
+    document.getElementById('mly-success').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ── Form submission ───────────────────────────────────────────────────
+  document.getElementById('mly-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var name    = document.getElementById('mly-name').value.trim();
+    var church  = document.getElementById('mly-church').value.trim();
+    var phone   = document.getElementById('mly-phone').value.trim();
+    var email   = document.getElementById('mly-email').value.trim();
+    var message = document.getElementById('mly-message').value.trim();
+
+    // Validation
+    if (!name)    { showStatus('Please enter your name.', true); return; }
+    if (!message) { showStatus('Please tell us how we can help.', true); return; }
+    if (!phone && !email) {
+      showStatus('Please enter a phone number or email so we can reach you.', true);
+      return;
+    }
+
+    var btn = document.getElementById('mly-submit');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    var payload = {
+      name:         name,
+      churchName:   church || '',
+      phone:        phone  || '',
+      email:        email  || '',
+      message:      message,
+      type:         'FlockOS Interest',
+      status:       'Open',
+      assignedRole: 'Lead Pastor',
+      source:       'multiply',
+      churchId:     window.FLOCK_CHURCH_ID || 'root'
+    };
+
+    if (_db) {
+      payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      _db.collection('outreachLeads').add(payload)
+        .then(function() { showSuccess(); })
+        .catch(function(err) {
+          console.error('multiply.html: Firestore write failed', err);
+          btn.disabled = false;
+          btn.textContent = 'Send My Card — I Want to Learn More';
+          showStatus('Something went wrong. Please try again.', true);
+        });
+    } else {
+      // Firebase unavailable — degrade gracefully
+      payload.createdAt = new Date().toISOString();
+      console.log('multiply.html: lead (no Firebase):', payload);
+      showSuccess();
+    }
+  });
+</script>
+
+</body>
+</html>
