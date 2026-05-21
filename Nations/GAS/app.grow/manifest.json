@@ -3,6 +3,7 @@
   "short_name": "GROW",
   "description": "Free discipleship tools in 210 countries \u2014 Bible reading plans, devotionals, Strongs lexicons, apologetics, theology, missions, and more. No account required. Offline-capable.",
   "start_url": "./app.grow.html",
+  "id": "./app.grow.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
@@ -78,6 +79,5 @@
       ]
     }
   ],
-  "prefer_related_applications": false,
-  "id": "./app.grow.html"
+  "prefer_related_applications": false
 }

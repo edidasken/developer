@@ -1,5 +1,5 @@
 {
-  "name": "{{CHURCH_NAME}} \u00b7 FlockChat",
+  "name": "The Forest \u00b7 FlockChat",
   "short_name": "FlockChat",
   "description": "Church team messaging, prayer chain, and announcements.",
   "start_url": "./app.flockchat.html",

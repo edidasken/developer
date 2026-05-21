@@ -1083,6 +1083,63 @@ else:
     print(f'  ✓ app.flockshow/manifest.json name → {name} · FlockShow')
 PYEOF
 
+  # ── 11c. Patch app.feed/manifest.json — church name ──────────────────
+  python3 << 'PYEOF'
+import os
+
+t    = os.environ['_NC_TARGET']
+name = os.environ['_NC_CHURCH_NAME']
+path = t + '/app.feed/manifest.json'
+
+if not os.path.exists(path):
+    print('  ✓ app.feed/manifest.json not present — skip name patch')
+else:
+    with open(path, 'r') as f:
+        content = f.read()
+    content = content.replace('{{CHURCH_NAME}}', name)
+    with open(path, 'w') as f:
+        f.write(content)
+    print(f'  ✓ app.feed/manifest.json name → {name} · Bread Maker')
+PYEOF
+
+  # ── 11d. Patch app.flockchat/manifest.json — church name ─────────────
+  python3 << 'PYEOF'
+import os
+
+t    = os.environ['_NC_TARGET']
+name = os.environ['_NC_CHURCH_NAME']
+path = t + '/app.flockchat/manifest.json'
+
+if not os.path.exists(path):
+    print('  ✓ app.flockchat/manifest.json not present — skip name patch')
+else:
+    with open(path, 'r') as f:
+        content = f.read()
+    content = content.replace('{{CHURCH_NAME}}', name)
+    with open(path, 'w') as f:
+        f.write(content)
+    print(f'  ✓ app.flockchat/manifest.json name → {name} · FlockChat')
+PYEOF
+
+  # ── 11e. Patch app.stand/manifest.json — church name ─────────────────
+  python3 << 'PYEOF'
+import os
+
+t    = os.environ['_NC_TARGET']
+name = os.environ['_NC_CHURCH_NAME']
+path = t + '/app.stand/manifest.json'
+
+if not os.path.exists(path):
+    print('  ✓ app.stand/manifest.json not present — skip name patch')
+else:
+    with open(path, 'r') as f:
+        content = f.read()
+    content = content.replace('{{CHURCH_NAME}}', name)
+    with open(path, 'w') as f:
+        f.write(content)
+    print(f'  ✓ app.stand/manifest.json name → {name} · Flock Stand')
+PYEOF
+
   # ── 12. Patch index.html selector — replace {{CHURCH_NAME}} ────────
   python3 << 'PYEOF'
 import os

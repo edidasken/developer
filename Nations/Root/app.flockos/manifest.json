@@ -33,6 +33,12 @@
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any"
+    },
+    {
+      "src": "../Images/FlockIcon-512.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any"
     }
   ],
   "shortcuts": [
