@@ -2,869 +2,295 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <title>FlockOS — Built to Be Shared</title>
-  <link rel="icon" type="image/png" sizes="192x192" href="New_Covenant/Images/FlockIcon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="New_Covenant/Images/FlockIcon-512.png">
-  <link rel="apple-touch-icon" href="New_Covenant/Images/FlockIcon-512.png">
-  <link rel="manifest" href="manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="FlockOS">
-  <meta name="theme-color" content="#0c1445">
-  <meta name="description" content="FlockOS — complete church management and GROW discipleship tools. Free forever. 210 countries. Built to be shared.">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="FlockOS — Built to Be Shared">
-  <meta property="og:description" content="Complete pastoral care, member management, discipleship, and outreach. Free forever. 210 countries. 256-bit encrypted.">
-  <meta property="og:image" content="New_Covenant/Images/FlockIcon-512.png">
-  <meta property="og:type" content="website">
-
-  <!-- Preload critical images so the launcher paints instantly -->
-  <link rel="preload" as="image" href="New_Covenant/Images/FlockIcon-192.png">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Merriweather:ital@1&display=swap" rel="stylesheet">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlockOS Dev — Deployment Viewer</title>
+  <link rel="icon" type="image/png" href="New_Covenant/Images/FlockIcon.png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; height: 100dvh; overflow: hidden; background: #f5f0e8; }
 
-    :root {
-      --bg:       #09102e;
-      --card:     #111b44;
-      --ink:      #eef1fb;
-      --muted:    #9ba8d0;
-      --faint:    #3d4f7c;
-      --gold:     #e8a838;
-      --blue:     #5b8dee;
-      --line:     rgba(255,255,255,0.09);
-      --font:     'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      --serif:    'Merriweather', Georgia, serif;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bot: env(safe-area-inset-bottom, 0px);
-    }
-
-    html, body {
-      height: 100%;
-      font-family: var(--font);
-      -webkit-font-smoothing: antialiased;
-      background: var(--bg);
-      color: var(--ink);
-      overflow: hidden;
-      overscroll-behavior: none;
-    }
-
-    body { background-image: radial-gradient(ellipse 80% 45% at 50% -5%, rgba(91,141,238,0.14) 0%, transparent 60%); }
-
-    /* ── Launcher shell ────────────────────────────────────────────── */
-    .launcher {
-      height: 100%;
-      overflow-y: auto;
-      overflow-x: hidden;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
-      display: flex;
-      flex-direction: column;
-      padding: calc(var(--safe-top) + 2rem) 1.25rem calc(var(--safe-bot) + 2rem);
-      gap: 2rem;
-    }
-
-    /* ── Identity ──────────────────────────────────────────────────── */
-    .church-id {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 1rem;
-      text-align: left;
+    #herald-frame {
+      display: block;
+      border: none;
       width: 100%;
-      max-width: 420px;
-      margin: 0 auto;
-    }
-    .church-id img {
-      width: 70px; height: 70px;
-      border-radius: 18px;
-      box-shadow: 0 6px 22px rgba(0,0,0,0.40);
-    }
-    .church-id-text {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-    .church-id h1 {
-      font-size: clamp(1.2rem, 5vw, 1.7rem);
-      font-weight: 800;
-      letter-spacing: -0.025em;
-      color: var(--gold);
-      line-height: 1.2;
-    }
-    .church-id .tagline {
-      display: inline-block;
-      font-size: clamp(0.85rem, 3vw, 1.05rem);
-      font-weight: 800;
-      color: var(--gold);
-      letter-spacing: 0.02em;
-      background: #0f1735;
-      border: 1.5px solid rgba(232,168,56,0.35);
-      border-radius: 999px;
-      padding: 5px 18px 6px;
-      margin-top: 6px;
-      line-height: 1.3;
+      height: 100%;
+      height: 100dvh;
     }
 
-    /* ── App sections ──────────────────────────────────────────────── */
-    .app-sections {
-      width: 100%;
-      max-width: 420px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1.4rem;
+    /* ── Deployment selector pill ─────────────────────────────────────── */
+    #deploy-pill {
+      position: fixed;
+      z-index: 9999;
+      display: none; /* shown by JS after iframe loads + position is known */
     }
 
-    .section-label {
-      display: flex;
+    /* Matches fn-back-btn style exactly, with gold border to distinguish */
+    #deploy-btn {
+      display: inline-flex;
       align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 0.55rem;
-    }
-    .section-label span {
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
+      gap: 7px;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 11.5px;
+      font-weight: 900;
+      letter-spacing: .18em;
       text-transform: uppercase;
-      color: var(--muted);
+      color: #e8a838;
+      background: #162858;
+      border: 1.5px solid #e8a838;
+      border-radius: 999px;
+      padding: 7px 14px 7px 11px;
+      cursor: pointer;
+      white-space: nowrap;
+      line-height: 1;
+      min-height: 36px; /* adequate tap target */
+      -webkit-tap-highlight-color: transparent;
     }
-    .section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--line);
-    }
-    .section-label .section-icon { font-size: 0.78rem; opacity: 0.6; }
+    #deploy-btn:hover { background: #1e3472; }
+    #deploy-chevron { transition: transform .18s ease; }
+    #deploy-btn[aria-expanded="true"] #deploy-chevron { transform: rotate(180deg); }
 
-    .apps {
+    /* Dropdown — mirrors fn-app-switcher style */
+    #deploy-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      z-index: 9998;
+      min-width: 220px;
+      max-width: calc(100vw - 16px);
+      background: #0c1445;
+      border-radius: 12px;
+      box-shadow: 0 8px 40px rgba(12,20,69,.55), 0 2px 8px rgba(0,0,0,.35);
+      padding: 6px;
       display: flex;
       flex-direction: column;
-      gap: 0.65rem;
+      gap: 2px;
+    }
+    #deploy-menu[hidden] { display: none !important; }
+    /* Flip upward when pill is near screen bottom */
+    #deploy-pill.open-up #deploy-menu {
+      top: auto;
+      bottom: calc(100% + 6px);
+    }
+    /* On mobile: align dropdown from right edge, not left */
+    @media (max-width: 639px) {
+      #deploy-menu { left: auto; right: 0; }
+      .deploy-item { padding: 11px 14px; } /* bigger tap targets */
     }
 
-    /* ── App button ────────────────────────────────────────────────── */
-    .app-btn {
+    .deploy-item {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
-      padding: 0.9rem 1.1rem;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 14px;
+      gap: 10px;
+      padding: 9px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: rgba(255,255,255,0.75);
+      font-family: system-ui, -apple-system, sans-serif;
       text-decoration: none;
-      color: var(--ink);
-      box-shadow: 0 2px 12px rgba(0,0,0,0.22);
-      transition: transform 0.13s ease, box-shadow 0.13s ease, border-color 0.13s ease;
-      will-change: transform;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      transition: background .12s;
     }
-    .app-btn:hover  { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.36); }
-    .app-btn:active { transform: scale(0.985); box-shadow: none; }
-
-    .app-btn--grow   { border-color: rgba(232,168,56,0.20); }
-    .app-btn--invite { border-color: rgba(61,179,79,0.20);  }
-    .app-btn--flock  { border-color: rgba(91,141,238,0.20); }
-    .app-btn--stand  { border-color: rgba(168,85,247,0.20); }
-    .app-btn--show   { border-color: rgba(239,68,68,0.20);  }
-    .app-btn--chat   { border-color: rgba(34,211,238,0.20); }
-    .app-btn--feed   { border-color: rgba(232,168,56,0.20); }
-    .app-btn:hover.app-btn--grow   { border-color: rgba(232,168,56,0.50); }
-    .app-btn:hover.app-btn--invite { border-color: rgba(61,179,79,0.50);  }
-    .app-btn:hover.app-btn--flock  { border-color: rgba(91,141,238,0.50); }
-    .app-btn:hover.app-btn--stand  { border-color: rgba(168,85,247,0.50); }
-    .app-btn:hover.app-btn--show   { border-color: rgba(239,68,68,0.50);  }
-    .app-btn:hover.app-btn--chat   { border-color: rgba(34,211,238,0.50); }
-    .app-btn:hover.app-btn--feed   { border-color: rgba(232,168,56,0.50); }
-
-    .app-icon {
-      width: 42px; height: 42px;
-      border-radius: 10px;
-      flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.28);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .app-icon--grow   { background: linear-gradient(135deg,#78350f,#d97706); }
-    .app-icon--invite { background: linear-gradient(135deg,#14532d,#22c55e); }
-    .app-icon--flock  { background: linear-gradient(135deg,#1e3a8a,#3b82f6); }
-    .app-icon--stand  { background: linear-gradient(135deg,#4c1d95,#a855f7); }
-    .app-icon--chat   { background: linear-gradient(135deg,#0c4a6e,#06b6d4); }
-    .app-icon--show   { background: linear-gradient(135deg,#7f1d1d,#ef4444); }
-    .app-icon--feed   { background: linear-gradient(135deg,#c48a20,#e8a838); }
-    .app-label { flex: 1; }
-    .app-label strong {
-      display: block;
-      font-size: 0.97rem;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-    }
-    .app-btn--grow   .app-label strong { color: var(--gold); }
-    .app-btn--invite .app-label strong { color: #6ee7b7; }
-    .app-btn--flock  .app-label strong { color: #a0beff; }
-    .app-btn--stand  .app-label strong { color: #d8b4fe; }
-    .app-btn--show   .app-label strong { color: #fca5a5; }
-    .app-btn--chat   .app-label strong { color: #67e8f9; }
-    .app-btn--feed   .app-label strong { color: var(--gold); }
-    .app-label span {
-      display: block;
-      font-size: 0.77rem;
-      color: var(--muted);
-      margin-top: 0.1rem;
-    }
-    .app-arrow {
-      font-size: 1rem;
-      color: var(--faint);
-      transition: color 0.13s, transform 0.13s;
-      flex-shrink: 0;
-    }
-    .app-btn:hover .app-arrow { color: var(--ink); transform: translateX(3px); }
-
-    /* ── Update banner ─────────────────────────────────────────────── */
-    .update-banner {
-      position: fixed; top: calc(var(--safe-top) + 0px); left: 0; right: 0;
-      z-index: 9990; background: #1e2d6e; border-bottom: 1px solid rgba(91,141,238,0.35);
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 16px; font-size: 0.82rem; color: #d0d9f8;
-    }
-    .update-banner[hidden] { display: none !important; }
-    .update-banner svg { flex-shrink: 0; opacity: 0.75; }
-    .update-banner-text { flex: 1; font-weight: 500; }
-    .update-banner-refresh {
-      padding: 5px 13px; border-radius: 8px;
-      background: var(--blue); color: #fff; border: none;
-      font: 600 0.8rem var(--font); cursor: pointer; flex-shrink: 0;
-    }
-    .update-banner-refresh:disabled { opacity: 0.55; cursor: not-allowed; }
-    .update-banner-dismiss {
-      padding: 4px 6px; border: none; background: none;
-      color: var(--muted); cursor: pointer; font-size: 1.1rem; flex-shrink: 0;
-      line-height: 1;
-    }
-
-    /* ── Install button ────────────────────────────────────────────── */
-    .install-btn-wrap {
-      width: 100%; max-width: 420px;
-      display: flex; flex-direction: column; gap: 8px;
-    }
-    .install-btn {
-      display: flex; align-items: center; justify-content: center; gap: 9px;
-      padding: 13px 20px; border-radius: 14px; cursor: pointer;
-      border: 1px dashed rgba(232,168,56,0.45);
-      background: rgba(232,168,56,0.07); color: var(--gold);
-      font: 700 0.9rem var(--font); text-decoration: none;
-      transition: background 0.15s, border-color 0.15s;
-    }
-    .install-btn:hover { background: rgba(232,168,56,0.14); border-color: rgba(232,168,56,0.65); }
-    .install-hint {
-      text-align: center; font-size: 0.73rem; color: var(--faint);
-      line-height: 1.4; padding: 0 8px;
-    }
-
-    /* ── PTR ───────────────────────────────────────────────────────── */
-    @media (max-width: 860px) {
-      .ptr-indicator {
-        display: none; position: fixed; top: calc(var(--safe-top) + 8px);
-        left: 50%; transform: translateX(-50%);
-        z-index: 9998; background: var(--card); border: 1px solid var(--line);
-        border-radius: 20px; padding: 5px 13px; font-size: 0.72rem; color: var(--muted);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.28); white-space: nowrap;
-      }
-      .ptr-indicator.visible { display: block; }
-    }
-
-    /* ── For the Pastor button ─────────────────────────────────────── */
-    .pastor-btn-wrap {
-      width: 100%; max-width: 420px;
-      display: flex; flex-direction: column; gap: 8px;
-      margin-top: 1rem;
-    }
-    .pastor-btn {
-      display: flex; align-items: center; justify-content: center; gap: 9px;
-      padding: 13px 20px; border-radius: 14px; cursor: pointer;
-      border: 1px solid rgba(91,141,238,0.35);
-      background: rgba(91,141,238,0.12); color: #a0beff;
-      font: 700 0.9rem var(--font); text-decoration: none;
-      transition: background 0.15s, border-color 0.15s, transform 0.13s;
-    }
-    .pastor-btn:hover {
-      background: rgba(91,141,238,0.22);
-      border-color: rgba(91,141,238,0.55);
-      transform: translateY(-2px);
-    }
-    .pastor-btn:active { transform: scale(0.985); }
-
-    /* ── Pastor Modal ──────────────────────────────────────────────── */
-    .pastor-modal-backdrop {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      z-index: 9999; background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      display: flex; align-items: center; justify-content: center;
-      padding: 1rem; opacity: 0; pointer-events: none;
-      transition: opacity 0.25s ease;
-    }
-    .pastor-modal-backdrop.visible {
-      opacity: 1; pointer-events: auto;
-    }
-    .pastor-modal {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      width: 100%; max-width: 720px;
-      max-height: 88vh;
-      display: flex; flex-direction: column;
-      transform: scale(0.94); opacity: 0;
-      transition: transform 0.25s ease, opacity 0.25s ease;
-    }
-    .pastor-modal-backdrop.visible .pastor-modal {
-      transform: scale(1); opacity: 1;
-    }
-    .pastor-modal-header {
-      padding: 1.4rem 1.6rem;
-      border-bottom: 1px solid var(--line);
-      display: flex; align-items: center; justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .pastor-modal-title {
-      font-size: 1.3rem; font-weight: 800;
-      letter-spacing: -0.02em; color: var(--gold);
-      display: flex; align-items: center; gap: 0.6rem;
-    }
-    .pastor-modal-close {
-      width: 32px; height: 32px; border-radius: 8px;
-      border: 1px solid var(--line); background: transparent;
-      color: var(--muted); font-size: 1.2rem;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
-      flex-shrink: 0; line-height: 1;
-    }
-    .pastor-modal-close:hover {
-      background: rgba(255,255,255,0.06);
-      color: var(--ink); border-color: var(--muted);
-    }
-    .pastor-modal-body {
-      padding: 1.6rem;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      flex: 1;
-    }
-    .pastor-content { color: var(--ink); line-height: 1.7; }
-    .pastor-content h2 {
-      font-size: 1.5rem; font-weight: 800;
-      color: var(--gold); margin-top: 2rem; margin-bottom: 0.8rem;
-      letter-spacing: -0.02em; display: flex; align-items: center; gap: 0.6rem;
-    }
-    .pastor-content h2:first-child { margin-top: 0; }
-    .pastor-content h3 {
-      font-size: 1.2rem; font-weight: 700;
-      color: var(--blue); margin-top: 1.8rem; margin-bottom: 0.6rem;
-      letter-spacing: -0.01em;
-    }
-    .pastor-content h4 {
-      font-size: 1rem; font-weight: 700;
-      color: var(--ink); margin-top: 1.2rem; margin-bottom: 0.5rem;
-    }
-    .pastor-content p {
-      margin-bottom: 1rem; color: var(--muted);
-    }
-    .pastor-content strong { color: var(--ink); font-weight: 700; }
-    .pastor-content em { font-family: var(--serif); color: #a0beff; font-style: italic; }
-    .pastor-content ul, .pastor-content ol {
-      margin-bottom: 1rem; padding-left: 1.5rem;
-    }
-    .pastor-content li {
-      margin-bottom: 0.5rem; color: var(--muted);
-    }
-    .pastor-content blockquote {
-      border-left: 3px solid var(--gold);
-      padding: 0.8rem 1.2rem;
-      margin: 1.2rem 0;
-      background: rgba(232,168,56,0.06);
-      border-radius: 0 10px 10px 0;
-      font-family: var(--serif);
-      font-style: italic;
-      color: #d0d9f8;
-    }
-    .pastor-content blockquote p { margin-bottom: 0.4rem; }
-    .pastor-content blockquote cite {
-      display: block; font-size: 0.85rem;
-      color: var(--gold); margin-top: 0.5rem;
-      font-style: normal; font-weight: 600;
-    }
-    .pastor-content hr {
-      border: none; height: 1px;
-      background: var(--line);
-      margin: 2rem 0;
-    }
-    .pastor-app-section {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 1.2rem;
-      margin: 1.5rem 0;
-      background: rgba(255,255,255,0.02);
-    }
-    .pastor-app-section h3 { margin-top: 0; }
-    .pastor-charge {
-      background: rgba(91,141,238,0.08);
-      border: 1px solid rgba(91,141,238,0.25);
-      border-radius: 10px;
-      padding: 1rem 1.2rem;
-      margin-top: 1rem;
-    }
-    .pastor-charge blockquote {
-      margin: 0;
-      border-left-color: var(--blue);
-      background: transparent;
-    }
-    @media (max-width: 640px) {
-      .pastor-modal { max-height: 92vh; border-radius: 16px; }
-      .pastor-modal-header { padding: 1.1rem 1.2rem; }
-      .pastor-modal-title { font-size: 1.15rem; }
-      .pastor-modal-body { padding: 1.2rem; }
-      .pastor-content h2 { font-size: 1.3rem; }
-      .pastor-content h3 { font-size: 1.1rem; }
-    }
+    .deploy-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .deploy-item.active { background: rgba(232,168,56,.14); color: #e8a838; }
+    .deploy-item-name { font-size: 13px; font-weight: 700; display: block; }
+    .deploy-item-folder { font-size: 10.5px; opacity: 0.5; display: block; margin-top: 1px; }
   </style>
 </head>
 <body>
 
-  <!-- App Update Available banner — hidden until SW detects a new version -->
-  <div class="update-banner" id="updateBanner" hidden>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
-    <span class="update-banner-text">Launcher update available</span>
-    <button class="update-banner-refresh" id="updateRefreshBtn" onclick="_doUpdate()">Update now</button>
-    <button class="update-banner-dismiss" id="updateDismissBtn" aria-label="Dismiss" onclick="document.getElementById('updateBanner').hidden=true">&#10005;</button>
+  <!-- Deployment selector — positioned by JS next to Herald's SELECT AN APP button -->
+  <div id="deploy-pill">
+    <button id="deploy-btn" aria-haspopup="true" aria-expanded="false" onclick="toggleDeployMenu(event)">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span id="deploy-label">Loading…</span>
+      <svg id="deploy-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div id="deploy-menu" hidden></div>
   </div>
 
-  <div class="launcher">
-
-    <div class="church-id">
-      <img src="New_Covenant/Images/FlockIcon-192.png" alt="FlockOS" width="70" height="70" fetchpriority="high">
-      <div class="church-id-text">
-        <h1>FlockOS</h1>
-        <p class="tagline">Built to be Shared.</p>
-      </div>
-    </div>
-
-    <div class="app-sections">
-
-      <!-- ── Public ─────────────────────────────────────────────── -->
-      <div>
-        <div class="section-label">
-          <span class="section-icon">🌐</span>
-          <span>Public</span>
-        </div>
-        <nav class="apps" aria-label="Public apps">
-
-          <a class="app-btn app-btn--grow" href="Nations/Root/app.grow/app.grow.html">
-            <div class="app-icon app-icon--grow" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            </div>
-            <div class="app-label">
-              <strong>GROW</strong>
-              <span>Discipleship &amp; Bible study</span>
-            </div>
-            <span class="app-arrow" aria-hidden="true">&#8594;</span>
-          </a>
-
-          <a class="app-btn app-btn--invite" href="Nations/Root/app.invite/app.invite.html">
-            <div class="app-icon app-icon--invite" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="4.5" y1="8.5" x2="19.5" y2="8.5"/></svg>
-            </div>
-            <div class="app-label">
-              <strong>The Invitation</strong>
-              <span>Share the hope of Jesus Christ</span>
-            </div>
-            <span class="app-arrow" aria-hidden="true">&#8594;</span>
-          </a>
-
-        </nav>
-      </div>
-
-      <!-- ── Secure ──────────────────────────────────────────────── -->
-      <div>
-        <div class="section-label">
-          <span class="section-icon">🔒</span>
-          <span>Secure</span>
-        </div>
-        <nav class="apps" aria-label="Secure apps">
-
-          <a class="app-btn app-btn--flock" href="Nations/Root/app.flockos/app.flockos.html">
-            <div class="app-icon app-icon--flock" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-            </div>
-            <div class="app-label">
-              <strong>FlockOS</strong>
-              <span>Church management &amp; pastoral care</span>
-            </div>
-            <span class="app-arrow" aria-hidden="true">&#8594;</span>
-          </a>
-
-          <a class="app-btn app-btn--stand" href="Nations/Root/app.stand/">
-            <div class="app-icon app-icon--stand" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-            </div>
-            <div class="app-label">
-              <strong>FlockStand</strong>
-              <span>Songs, setlists &amp; live presenter</span>
-            </div>
-            <span class="app-arrow" aria-hidden="true">&#8594;</span>
-          </a>
-
-          <a class="app-btn app-btn--show" href="Nations/Root/app.flockshow/app.flockshow.html">
-            <div class="app-icon app-icon--show" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16 10,8" fill="white" stroke="none"/></svg>
-            </div>
-            <div class="app-label">
-              <strong>FlockShow</strong>
-              <span>Worship slides &amp; service presentation</span>
-            </div>
-            <span class="app-arrow" aria-hidden="true">&#8594;</span>
-          </a>
-
-          <a class="app-btn app-btn--chat" href="Nations/Root/app.flockchat/app.flockchat.html">
-            <div class="app-icon app-icon--chat" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            </div>
-            <div class="app-label">
-              <strong>FlockChat</strong>
-              <span>Messaging, prayer chain &amp; announcements</span>
-            </div>
-            <span class="app-arrow" aria-hidden="true">&#8594;</span>
-          </a>
-
-          <a class="app-btn app-btn--feed" href="Nations/Root/app.feed/">
-            <div class="app-icon app-icon--feed" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            </div>
-            <div class="app-label">
-              <strong>FEED</strong>
-              <span>Sermon preparation &amp; manuscript builder</span>
-            </div>
-            <span class="app-arrow" aria-hidden="true">&#8594;</span>
-          </a>
-
-        </nav>
-      </div>
-
-    </div>
-
-    <!-- For the Pastor button -->
-    <div class="pastor-btn-wrap">
-      <button class="pastor-btn" id="pastorBtn" onclick="_openPastorModal()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        For the Pastor
-      </button>
-    </div>
-
-    <!-- Install button — shown only when PWA install is available -->
-    <div class="install-btn-wrap" id="installBtnWrap" hidden>
-      <button class="install-btn" id="installBtn" onclick="_doInstall()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Install FlockOS
-      </button>
-      <p class="install-hint">Add the launcher to your home screen — works on phones, tablets &amp; desktop.</p>
-    </div>
-
-  </div>
-
-  <!-- Pull-to-Refresh indicator -->
-  <div class="ptr-indicator" id="ptrIndicator">&#8635; Release to refresh</div>
-
-  <!-- Pastor Modal -->
-  <div class="pastor-modal-backdrop" id="pastorModalBackdrop" onclick="if(event.target===this) _closePastorModal()">
-    <div class="pastor-modal">
-      <div class="pastor-modal-header">
-        <div class="pastor-modal-title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          FlockOS — A Pastor's Guide
-        </div>
-        <button class="pastor-modal-close" onclick="_closePastorModal()" aria-label="Close">✕</button>
-      </div>
-      <div class="pastor-modal-body">
-        <div class="pastor-content">
-          <p><em>"I am the vine; you are the branches."</em> — John 15:5</p>
-          <hr>
-
-          <h2>What FlockOS Is</h2>
-          <p>FlockOS is a complete church management and ministry platform — built specifically for pastors who understand that ministry is not a workflow problem, but a calling. It brings together every dimension of church life into one integrated system: member care, pastoral notes, prayer requests, small groups, events, attendance, giving, discipleship resources, missions data, worship planning, and real-time communication.</p>
-          <p>Think of it as the operating system for your church — not just software that manages a contact list, but a full infrastructure that grows with you from your first twenty members to your five hundredth, carrying the story of every soul God brings through your doors.</p>
-
-          <h3>Why It Was Built</h3>
-          <p>Church management software has always been priced as if the church is a business and the pastor is a product manager. FlockOS was built by someone who understands that pastoral ministry is different. The goal wasn't to automate the pastor out of the picture — it was to hand him back hours, so that when he sits with the grieving widow on a Wednesday afternoon, he isn't mentally carrying the weight of fifty things he hasn't tracked yet.</p>
-          <p><strong>FlockOS carries the weight so the pastor can carry the people.</strong></p>
-
-          <h3>The Foundation: Free, Because the Gospel Is Free</h3>
-          <p><strong>No subscription fees. No per-seat pricing. No "upgrade to unlock pastoral care." Every feature. Every module. Every update. Free.</strong></p>
-          <p>The resources of a large church deserve to be in the hands of the smallest congregation. The pastor of twelve should have the same tools as the pastor of twelve hundred. <em>"Freely you have received; freely give."</em> (Matthew 10:8)</p>
-
-          <hr>
-
-          <h2>How FlockOS Works — No IT Required</h2>
-          <p>FlockOS is a <strong>web-based progressive web app</strong> that runs in any modern browser on any device — desktop, tablet, or phone. There's no software to install, no server to maintain, and no IT team required.</p>
-
-          <h3>Three Backend Options (Choose What Fits Your Church)</h3>
-          <p>FlockOS meets churches where they are — technically and geographically. You choose the backend that fits your situation:</p>
-
-          <h4>1. Google Sheets + Apps Script (The Original Engine)</h4>
-          <p>Your church data lives in a Google Spreadsheet that you own and control. Google Apps Script serves it as a free API. No servers. No hosting fees. Just a spreadsheet. This works anywhere smartphones can reach Google Drive.</p>
-
-          <h4>2. Firebase Firestore (Real-Time Cloud)</h4>
-          <p>Real-time, cloud-native. Member data, messaging, prayer chains, and pastoral care all sync live across devices. Scales from a church of 12 to a network of 12,000. Most churches stay within Firebase's free tier and pay $0.</p>
-
-          <h4>3. The Wellspring (Fully Offline)</h4>
-          <p>No internet. No cloud. Your entire church in one encrypted file, loaded directly into the browser. For the pastor the internet hasn't reached yet. Export your database once, load it into FlockOS, and the full app runs entirely offline with zero connectivity required.</p>
-
-          <h3>Free Hosting via GitHub Pages</h3>
-          <p>FlockOS is hosted for free on <strong>GitHub Pages</strong> — a service provided by GitHub at no cost. Your church gets a permanent web address that serves your FlockOS deployment 24/7, with no monthly fees, no bandwidth charges, and no expiration.</p>
-
-          <h3>Security You Can Trust</h3>
-          <ul>
-            <li><strong>256-bit AES-GCM encryption</strong> with PBKDF2 key derivation for offline data vaults</li>
-            <li><strong>Role-based access control</strong> with 6 permission levels (Guest, Member, Leader, Deacon, Pastor, Admin)</li>
-            <li><strong>PIN-protected offline vaults</strong> — the encryption key is never stored; only the right PIN unlocks member data</li>
-            <li><strong>Firebase Security Rules</strong> enforce strict data access — members can only see what their role permits</li>
-            <li><strong>No third-party tracking</strong> — your church data stays with you, not with advertisers</li>
-          </ul>
-
-          <hr>
-
-          <h2>The FlockOS App Family</h2>
-          <p>FlockOS is not one app — it's a complete suite of ministry tools, each designed to serve a specific calling in the life of the church. Every app can be installed as a standalone progressive web app on any device.</p>
-
-          <div class="pastor-app-section">
-            <h3>1. FlockOS — The Shepherd's Dashboard</h3>
-            <p><strong>What It Does:</strong> FlockOS is the heart of the system — your complete church management platform. Member directory with photos and family connections, pastoral care notes, prayer request tracking, small groups, events, attendance, giving records, spiritual milestones (salvations, baptisms, dedications), service planning, announcements, analytics, and more.</p>
-            <div class="pastor-charge">
-              <blockquote>
-                <p><em>"Shepherd the flock of God that is among you, exercising oversight, not under compulsion, but willingly, as God would have you; not for shameful gain, but eagerly; not domineering over those in your charge, but being examples to the flock."</em></p>
-                <cite>— 1 Peter 5:2-3 (ESV)</cite>
-              </blockquote>
-            </div>
-            <p>FlockOS exists to help you shepherd well — to remember the names, the stories, the prayers, and the moments that make up the life of your flock.</p>
-          </div>
-
-          <div class="pastor-app-section">
-            <h3>2. GROW — Public Discipleship & Outreach</h3>
-            <p><strong>What It Does:</strong> GROW is your church's public-facing ministry page — a beautiful, Gospel-centered resource hub you can share with anyone. Daily devotionals, one-year Bible plans, Strong's Lexicon, apologetics, systematic theology, world missions data, Bible quizzes, pastoral counseling resources, and teaching plans. No account required.</p>
-            <div class="pastor-charge">
-              <blockquote>
-                <p><em>"Go therefore and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit, teaching them to observe all that I have commanded you."</em></p>
-                <cite>— Matthew 28:19-20 (ESV)</cite>
-              </blockquote>
-            </div>
-            <p>GROW exists to make disciples — not just to inform, but to transform.</p>
-          </div>
-
-          <div class="pastor-app-section">
-            <h3>3. Flock Stand — The Worship Team's Music Stand</h3>
-            <p><strong>What It Does:</strong> Complete digital music stand for your worship team. Song library, setlist builder, transposition, Nashville Number System, live presenter mode. Everything your worship leader needs in one app.</p>
-            <div class="pastor-charge">
-              <blockquote>
-                <p><em>"Speaking to one another with psalms, hymns, and songs from the Spirit. Sing and make music from your heart to the Lord, always giving thanks to God the Father for everything, in the name of our Lord Jesus Christ."</em></p>
-                <cite>— Ephesians 5:19-20 (NIV)</cite>
-              </blockquote>
-            </div>
-            <p>Flock Stand exists to help your worship team lead well — to prepare with excellence and create space for the Spirit to move.</p>
-          </div>
-
-          <div class="pastor-app-section">
-            <h3>4. The Invitation — A Gospel Presentation</h3>
-            <p><strong>What It Does:</strong> A standalone Gospel presentation page — a clear, compelling walk through who Jesus is, what He offers, and how to respond. Designed to be shared with seekers, new believers, or anyone who needs to hear the good news.</p>
-            <div class="pastor-charge">
-              <blockquote>
-                <p><em>"For I am not ashamed of the gospel, because it is the power of God that brings salvation to everyone who believes: first to the Jew, then to the Gentile."</em></p>
-                <cite>— Romans 1:16 (NIV)</cite>
-              </blockquote>
-            </div>
-            <p>The Invitation exists to proclaim Christ — clearly, boldly, without apology.</p>
-          </div>
-
-          <div class="pastor-app-section">
-            <h3>5. FlockChat — Real-Time Church Messaging</h3>
-            <p><strong>What It Does:</strong> Your church's private messaging platform — secure, real-time communication for your team, small groups, and ministry leaders. Public channels, private rooms, direct messages, prayer chains with status tracking, role-based access, and push notifications.</p>
-            <div class="pastor-charge">
-              <blockquote>
-                <p><em>"And let us consider how we may spur one another on toward love and good deeds, not giving up meeting together, as some are in the habit of doing, but encouraging one another—and all the more as you see the Day approaching."</em></p>
-                <cite>— Hebrews 10:24-25 (NIV)</cite>
-              </blockquote>
-            </div>
-            <p>FlockChat exists to build fellowship — to connect the scattered, to encourage the weary, and to keep the body moving together.</p>
-          </div>
-
-          <div class="pastor-app-section">
-            <h3>6. FlockShow — Church Presentation & Worship Display</h3>
-            <p><strong>What It Does:</strong> Your church's presentation tool — build and display slides for worship lyrics, sermon points, announcements, and Scripture. Designed specifically for church services with clean layouts and distraction-free display.</p>
-            <div class="pastor-charge">
-              <blockquote>
-                <p><em>"Until I come, devote yourself to the public reading of Scripture, to preaching and to teaching."</em></p>
-                <cite>— 1 Timothy 4:13 (NIV)</cite>
-              </blockquote>
-            </div>
-            <p>FlockShow exists to help you proclaim the Word — to display it clearly and keep the focus where it belongs.</p>
-          </div>
-
-          <div class="pastor-app-section">
-            <h3>7. Bread Maker (FEED) — Sermon Preparation</h3>
-            <p><strong>What It Does:</strong> Your sermon preparation workspace — a place to craft the Word with clarity and depth. Outline your message, store notes, track sermon series, and prepare to feed your flock well.</p>
-            <div class="pastor-charge">
-              <blockquote>
-                <p><em>"Preach the word; be prepared in season and out of season; correct, rebuke and encourage—with great patience and careful instruction."</em></p>
-                <cite>— 2 Timothy 4:2 (NIV)</cite>
-              </blockquote>
-            </div>
-            <p>Bread Maker exists to help you prepare well — to dig deep, to think clearly, and to deliver the Word with faithfulness.</p>
-          </div>
-
-          <div class="pastor-app-section">
-            <h3>8. The Wellspring — Offline Data Management</h3>
-            <p><strong>What It Does:</strong> FlockOS's local-first data engine — the tool that makes full offline ministry possible. Export your entire church database into one encrypted file, load it into FlockOS, and the full app runs entirely offline. No internet required.</p>
-            <div class="pastor-charge">
-              <blockquote>
-                <p><em>"Whoever drinks the water I give them will never thirst. Indeed, the water I give them will become in them a spring of water welling up to eternal life."</em></p>
-                <cite>— John 4:14 (NIV)</cite>
-              </blockquote>
-            </div>
-            <p>The Wellspring exists to ensure that no pastor is left without tools — no matter where he is, no matter how remote, no matter how disconnected.</p>
-          </div>
-
-          <hr>
-
-          <h2>The Bottom Line for Pastors</h2>
-          <p>FlockOS is not a product. It's a calling made software. It was built to serve you — to give you back time, to help you remember the people God has entrusted to you, and to support the ministry He's placed on your shoulders.</p>
-          <p>It's free because the Gospel is free. It's offline-capable because the Great Commission doesn't stop at the edge of the internet. It's integrated because the body of Christ doesn't work in silos.</p>
-          <p><strong>Use it well. Shepherd your flock. Make disciples. Proclaim Christ.</strong></p>
-
-          <blockquote>
-            <p><em>"And he gave the apostles, the prophets, the evangelists, the shepherds and teachers, to equip the saints for the work of ministry, for building up the body of Christ."</em></p>
-            <cite>— Ephesians 4:11-12 (ESV)</cite>
-          </blockquote>
-        </div>
-      </div>
-    </div>
-  </div>
+  <iframe id="herald-frame" src="" title="The Flock Herald — Dev Viewer"></iframe>
 
   <script>
-  (function () {
-    if (window.innerWidth > 860) return;
-    var ptr = document.getElementById('ptrIndicator');
-    if (!ptr) return;
-    var startY = 0, pulling = false, triggered = false;
+  var _deployments = [];
+  var _active = localStorage.getItem('devDeployment') || 'Root';
 
-    document.addEventListener('touchstart', function (e) {
-      if ((window.scrollY || document.documentElement.scrollTop) > 5) return;
-      startY = e.touches[0].clientY; pulling = true; triggered = false;
-    }, { passive: true });
+  // ── Short labels shown in the pill button (compact for the header) ────
+  var LABEL_SHORT = {
+    'New_Covenant': 'New Covenant',
+    'Root':         'FlockOS',
+    'FlockOS':      'FlockOS',
+    'TBC':          'Trinity',
+    'TheForest':    'The Forest',
+    'GAS':          'Dev'
+  };
 
-    document.addEventListener('touchmove', function (e) {
-      if (!pulling) return;
-      if (e.touches[0].clientY - startY > 60) { triggered = true; ptr.classList.add('visible'); }
-      else if (!triggered) { ptr.classList.remove('visible'); }
-    }, { passive: true });
+  // ── Preferred sort order (unknown folders appended after) ─────────────
+  var FOLDER_ORDER = ['New_Covenant', 'Root', 'FlockOS', 'TBC', 'TheForest', 'GAS'];
 
-    document.addEventListener('touchend', function () {
-      if (triggered) { ptr.textContent = 'Refreshing\u2026'; setTimeout(function () { location.reload(); }, 300); }
-      else { ptr.classList.remove('visible'); }
-      pulling = triggered = false;
-    }, { passive: true });
-  })();
-
-  // ── PWA: install prompt capture ────────────────────────────────────
-  var _installPrompt = null;
-  window.addEventListener('beforeinstallprompt', function (e) {
-    e.preventDefault();
-    _installPrompt = e;
-    document.getElementById('installBtnWrap').hidden = false;
-  });
-  window.addEventListener('appinstalled', function () {
-    document.getElementById('installBtnWrap').hidden = true;
-    _installPrompt = null;
-  });
-  async function _doInstall() {
-    if (!_installPrompt) return;
-    _installPrompt.prompt();
-    var outcome = await _installPrompt.userChoice;
-    if (outcome.outcome === 'accepted') {
-      document.getElementById('installBtnWrap').hidden = true;
-      _installPrompt = null;
-    }
+  function sortOrder(folder) {
+    var i = FOLDER_ORDER.indexOf(folder);
+    return i === -1 ? 999 : i;
   }
 
-  // ── PWA: SW registration + update detection ────────────────────────
-  var _swReg = null;
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js', { scope: './', updateViaCache: 'none' }).then(function (reg) {
-      _swReg = reg;
-      if (reg.waiting && navigator.serviceWorker.controller) { _showUpdateBanner(); }
-      reg.addEventListener('updatefound', function () {
-        var installing = reg.installing;
-        if (!installing) return;
-        installing.addEventListener('statechange', function () {
-          if (installing.state === 'installed' && navigator.serviceWorker.controller) {
-            _showUpdateBanner();
-          }
-        });
-      });
-      reg.update().catch(function () {});
-    }).catch(function (err) { console.warn('[SW] registration failed', err); });
+  // ── Discover Nations/* subfolders via directory listing ───────────────
+  async function discoverDeployments() {
+    try {
+      var res = await fetch('Nations/');
+      if (!res.ok) return [];
+      var html = await res.text();
+      var folders = [];
+      var re = /href="([A-Za-z][^"\/]*)\/"/g;
+      var m;
+      while ((m = re.exec(html)) !== null) {
+        folders.push(m[1]);
+      }
+      return folders;
+    } catch (_) { return []; }
+  }
 
-    var _reloading = false;
-    navigator.serviceWorker.addEventListener('controllerchange', function () {
-      if (!_reloading) { _reloading = true; location.reload(); }
+  // ── Get full church name from manifest (used in dropdown only) ────────
+  async function getName(folder) {
+    try {
+      var res = await fetch('Nations/' + folder + '/manifest.json');
+      if (!res.ok) return folder;
+      var d = await res.json();
+      return d.name || folder;
+    } catch (_) { return folder; }
+  }
+
+  // ── Build dropdown menu ───────────────────────────────────────────────
+  function buildMenu() {
+    var menu = document.getElementById('deploy-menu');
+    menu.innerHTML = '';
+    _deployments.forEach(function(d) {
+      var btn = document.createElement('button');
+      btn.className = 'deploy-item' + (d.folder === _active ? ' active' : '');
+      var pathLabel = d.folder === 'New_Covenant' ? 'New_Covenant/' : 'Nations/' + d.folder;
+      btn.innerHTML =
+        '<div>' +
+          '<span class="deploy-item-name">' + _esc(d.name) + '</span>' +
+          '<span class="deploy-item-folder">' + _esc(pathLabel) + '</span>' +
+        '</div>';
+      btn.addEventListener('click', function() { switchDeployment(d.folder); });
+      menu.appendChild(btn);
     });
   }
 
-  function _showUpdateBanner() {
-    document.getElementById('updateBanner').hidden = false;
+  function _esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  async function _doUpdate() {
-    var btn = document.getElementById('updateRefreshBtn');
-    if (!navigator.onLine) {
-      var orig = btn ? btn.textContent : '';
-      if (btn) { btn.textContent = 'No internet \u2014 connect first'; btn.disabled = true; }
-      setTimeout(function () {
-        if (btn) { btn.textContent = orig || 'Update now'; btn.disabled = false; }
-      }, 3000);
-      return;
-    }
-    document.getElementById('updateBanner').hidden = true;
-    var reg = _swReg || (await navigator.serviceWorker.getRegistration('./'));
-    if (reg && reg.waiting) {
-      reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+  // ── Switch deployment ─────────────────────────────────────────────────
+  function switchDeployment(folder) {
+    _active = folder;
+    localStorage.setItem('devDeployment', folder);
+    document.getElementById('deploy-label').textContent = LABEL_SHORT[folder] || folder;
+    buildMenu();
+    closeDeployMenu();
+    var frame = document.getElementById('herald-frame');
+    frame.src = folder === 'New_Covenant'
+      ? 'New_Covenant/app.flocknews/flocknews.html'
+      : 'Nations/' + folder + '/app.flocknews/flocknews.html';
+  }
+
+  // ── Pin pill next to SELECT AN APP button (same-origin iframe DOM) ────
+  function positionPill() {
+    var frame = document.getElementById('herald-frame');
+    var appBtn;
+    try { appBtn = frame.contentDocument && frame.contentDocument.getElementById('fn-app-switcher-btn'); }
+    catch (_) {}
+    var pill  = document.getElementById('deploy-pill');
+    var vw    = window.innerWidth;
+    var vh    = window.innerHeight;
+
+    if (vw < 640) {
+      // ── Mobile: fixed top-right within safe area; don't touch iframe DOM ──
+      pill.style.top   = 'max(8px, env(safe-area-inset-top, 8px))';
+      pill.style.right = 'max(8px, env(safe-area-inset-right, 8px))';
+      pill.style.left  = 'auto';
+      pill.classList.remove('open-up');
+    } else if (appBtn) {
+      // ── Desktop: anchor right of SELECT AN APP, clamped to viewport ──────
+      var r         = appBtn.getBoundingClientRect();
+      var pillW     = pill.offsetWidth || 150;
+      var clampedL  = Math.min(r.right + 8, vw - pillW - 8);
+      pill.style.top   = r.top + 'px';
+      pill.style.left  = Math.max(8, clampedL) + 'px';
+      pill.style.right = 'auto';
+      // Flip dropdown upward if pill is in the lower half of screen
+      if (r.top > vh / 2) { pill.classList.add('open-up'); }
+      else                { pill.classList.remove('open-up'); }
     } else {
-      if (reg) { await reg.update().catch(function () {}); }
-      location.reload();
+      // ── Fallback: top-left corner ─────────────────────────────────────────
+      pill.style.top   = '8px';
+      pill.style.left  = '8px';
+      pill.style.right = 'auto';
+      pill.classList.remove('open-up');
     }
+    pill.style.display = 'block';
   }
 
-  // ── Pastor Modal ───────────────────────────────────────────────────
-  function _openPastorModal() {
-    var backdrop = document.getElementById('pastorModalBackdrop');
-    if (backdrop) {
-      backdrop.classList.add('visible');
-      document.body.style.overflow = 'hidden';
-    }
+  // ── Menu open/close ───────────────────────────────────────────────────
+  function toggleDeployMenu(e) {
+    e.stopPropagation();
+    var menu = document.getElementById('deploy-menu');
+    var btn  = document.getElementById('deploy-btn');
+    var open = !menu.hidden;
+    menu.hidden = open;
+    btn.setAttribute('aria-expanded', String(!open));
   }
 
-  function _closePastorModal() {
-    var backdrop = document.getElementById('pastorModalBackdrop');
-    if (backdrop) {
-      backdrop.classList.remove('visible');
-      document.body.style.overflow = '';
-    }
+  function closeDeployMenu() {
+    document.getElementById('deploy-menu').hidden = true;
+    document.getElementById('deploy-btn').setAttribute('aria-expanded', 'false');
   }
 
-  // Close modal on ESC key
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') _closePastorModal();
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('deploy-pill').contains(e.target)) {
+      closeDeployMenu();
+    }
   });
+
+  // ── Init ──────────────────────────────────────────────────────────────
+  (async function init() {
+    var folders = await discoverDeployments();
+    if (!folders.length) folders = ['Root', 'FlockOS', 'TBC', 'TheForest', 'GAS'];
+
+    var names = await Promise.all(folders.map(getName));
+    var discovered = folders.map(function(f, i) { return { folder: f, name: names[i] }; });
+
+    // Prepend New_Covenant as the pinned first entry
+    var ncEntry = { folder: 'New_Covenant', name: 'New Covenant (source)' };
+    var all = [ncEntry].concat(discovered);
+
+    // Apply preferred sort order (New_Covenant stays first via index 0 in FOLDER_ORDER)
+    all.sort(function(a, b) { return sortOrder(a.folder) - sortOrder(b.folder); });
+    _deployments = all;
+
+    // Validate saved selection
+    if (!_deployments.find(function(d) { return d.folder === _active; })) {
+      _active = 'Root';
+    }
+
+    document.getElementById('deploy-label').textContent = LABEL_SHORT[_active] || _active;
+    buildMenu();
+
+    // Load the Herald for the active deployment
+    var frame = document.getElementById('herald-frame');
+    frame.addEventListener('load', function() {
+      positionPill();
+      try { frame.contentWindow.addEventListener('resize', positionPill); } catch(_) {}
+    });
+    frame.src = _active === 'New_Covenant'
+      ? 'New_Covenant/app.flocknews/flocknews.html'
+      : 'Nations/' + _active + '/app.flocknews/flocknews.html';
+
+    window.addEventListener('resize', positionPill);
+  })();
   </script>
+
 </body>
 </html>
