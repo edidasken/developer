@@ -138,7 +138,7 @@
   }
 
   function render() {
-    var main = document.getElementById('section-main');
+    var main = document.getElementById('panel-prayer') || document.getElementById('section-main');
     if (!main) return;
     injectStyles();
     loadAnnouncements(); loadPrayers();
@@ -222,7 +222,7 @@
   }
 
   function attachEvents() {
-    var main = document.getElementById('section-main');
+    var main = document.getElementById('panel-prayer') || document.getElementById('section-main');
     if (!main) return;
 
     main.addEventListener('click', function(e) {

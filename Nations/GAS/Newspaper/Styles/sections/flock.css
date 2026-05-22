@@ -1,0 +1,5 @@
+/* flock.css — section-specific accents for The Flock */
+
+.np-panel[open] summary.np-panel__hdr {
+  border-left: 3px solid var(--sec-flock, #3d1818);
+}

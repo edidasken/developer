@@ -1629,3 +1629,224 @@ This is exactly what it says: **lipstick and font work** on a system whose bones
 ---
 
 *Plan authored: May 2026. Revised: accuracy pass — 47 registered views confirmed against `the_ark.js`, 16 Tier 1 sections, The Codex added, palette finalized. Start with Phase 0.*
+
+---
+
+## VERSION 5 — Consolidation, Gap Analysis & Phase 2–3 Build Plan (2026-05-21)
+
+### As-Built Reality (Herald standalone, all 16 sections deployed)
+
+The Herald is a fully standalone newspaper PWA with its own design system (`the_broadsheet.css`),
+auth stack (`the_true_vine.js` + `firm_foundation.js` / Nehemiah), and section scripts.
+The original two-tier architecture (Herald wrapping FlockOS apps) has been superseded —
+the Herald IS the application. Every section is its own HTML page. IIFEs only, no ES modules.
+
+**Auth stack:** `the_true_vine.js` + `firm_foundation.js` (Nehemiah). Local dev bypass:
+call `Nehemiah.enableLocalBypass()` in browser console, then reload.
+
+**Build:** `bash "Iris/Bezalel/Scripts/C-Build_Newspaper.sh"` → 5 Nations.
+
+**Script load order (all pages):**
+`the_true_vine.js` → `firm_foundation.js` → inline auth guard → `the_adornment.js` → `the_gates.js?v=2` → section script
+
+---
+
+### Firestore Verification — flockos-notify (2026-05-21)
+
+Live collections confirmed by `admin.firestore().listCollections()` against `flockos-notify`.
+
+#### ✅ Herald-relevant collections that ARE live
+
+| Collection | Herald Section |
+|---|---|
+| `careCases` | The Flock — Care |
+| `careInteractions` | The Flock — Care interactions |
+| `careAssignments` | The Flock — Care assignments |
+| `prayers` | The Flock — Prayer requests |
+| `members` | The Family |
+| `outreachCampaigns` | The Mission |
+| `events` + `calendarEvents` | The Calendar |
+| `sermons` + `servicePlans` + `songs` | The Sanctuary |
+| `volunteers` | The Weavers |
+| `groups` | The Weavers |
+| `discipleshipPaths` | The Way |
+| `strategicGoals/Initiatives/KeyDates` | The Shepherd |
+| `psalms` + `psalmThemes` | The Tabernacle — devotional content |
+| `readingPlans` + `readingPlanDays` + `oneYearBible` | The Way — reading plans |
+| `teachingPlans` + `quarterlyPlans` | The Sanctuary — sermon series planning |
+| `flockDocs` + `library` | The Archive / The Shepherd |
+| `flockNews` | The Herald front page |
+| `lexiconGreek` + `lexiconHebrew` | The Way — scripture depth |
+| `shepherdsMirror` | The Shepherd — pastoral reflection |
+| `heartCheck` + `touches` | The Flock — pastoral contact tracking |
+
+#### ❌ Schema-defined but NOT yet in live Firestore (GAS fallback required)
+
+| Collection | Herald Section | Fallback |
+|---|---|---|
+| `compassionRequests` + `compassionLogs` + `compassionResources` | The Flock — Compassion | defer until seeded |
+| `outreachContacts` + `outreachFollowUps` | The Mission list | GAS `outreach.contacts.*` |
+| `giving` + `pledges` | The Shepherd — giving KPIs | GAS `giving.*` |
+| `attendance` | The Shepherd — attendance | GAS `attendance.*` |
+| `households` | The Family | GAS `members.*` |
+| `ministries` | The Weavers teams | GAS `volunteers.*` |
+| `pastoralNotes` | The Flock — confidential notes | GAS `care.notes` perm |
+
+---
+
+### Section Consolidation — 16 Thin Stubs → 9 Rich Sections
+
+The original 16 sections are replaced with 9 consolidated sections.
+Each section is a longer, multi-panel page instead of a thin stub.
+
+| New Section | Absorbs (old keys) | minRole | Data |
+|---|---|---|---|
+| **The Herald** | `herald` | -1 (public) | Front page — `flockNews`, announcements |
+| **The Sanctuary** | `pulpit` + `levites` + `stage` | 3 (leader) | Sermon builder + song planner + service order |
+| **The Flock** | `gatehouse` + `epistles` | 2 (care/deacon) | Care cases + prayer requests + compassion |
+| **The Mission** | `great_commission` + `harvest` | 4 (pastor) | Outreach contacts + decisions + missions registry |
+| **The Family** | `genealogies` | 0 (member) | Member directory + households + milestones |
+| **The Way** | `straight_path` + `living_water` | -1 (public) | Discipleship + reading plans + scripture |
+| **The Shepherd** | `cornerstone` + `editors_desk` + `council` + `scroll_room` | 4 (pastor) | Giving + attendance + pastoral tools + codex |
+| **The Calendar** | *(new)* | 0 (member) | Events, services, birthdays — `events` + `calendarEvents` |
+| **The Weavers** | *(new)* | 3 (leader) | Volunteer teams + ministries + small groups |
+
+**Retired section folders** (7 sections absorbed — keep HTML as redirect to new parent):
+`pulpit/`, `levites/`, `stage/`, `epistles/`, `great_commission/`, `scroll_room/`,
+`cornerstone/`, `editors_desk/`, `council/`
+
+---
+
+### Full GAS API Surface — Per Section
+
+#### The Flock (care + prayer + compassion)
+
+**Care — 3 Firestore collections (`careCases`, `careInteractions`, `careAssignments`)**
+GAS routes: `care.list`, `care.get`, `care.create`, `care.update`, `care.resolve`,
+`care.interactions.list`, `care.interactions.create`, `care.interactions.followUpDone`,
+`care.followUps.due`, `care.assignments.list`, `care.assignments.myFlock`,
+`care.assignments.create`, `care.assignments.end`, `care.assignments.reassign`,
+`care.caregivers.list`, `care.dashboard`
+
+Permission levels: `care`=2, `care.view-all`=3, `care.edit-all`=4, `care.notes`=4 (confidential)
+
+**Care case schema (25 care types):**
+Shepherding, Elder Care, Crisis, Abuse / Domestic Violence, Immigration / Deportation,
+Incarceration & Re-Entry, Grief, Pregnancy & Infant Loss, Marriage, Pre-Marriage,
+Addiction, Pornography / Sexual Addiction, Hospital Visit, Medical,
+Terminal Illness / End of Life, New Believer, New Member Integration, Restoration,
+Counseling, Mental Health, Gender Identity / Sexuality, Discipleship, Family, Financial, Other
+
+**Prayer — `prayers` collection**
+GAS routes: `prayer.list`, `prayer.create`, `prayer.update`, `prayer.answer`, `prayer.archive`
+
+**Compassion — defer (collections not yet seeded in Firestore)**
+GAS routes when ready: `compassion.requests.*` (13 routes), `compassion.resources.*`, `compassion.log.*`
+
+#### The Sanctuary (worship + service prep)
+
+Three collapsible panels on one page:
+1. **Sermon Builder** (`sermons` collection) — GAS `sermons.list/get/create/update`
+2. **Song Planner** (`songs` collection) — GAS `songs.list/search/add` + `servicePlans.*`
+3. **Service Order** (`servicePlans` collection) — GAS `serviceOrders.get/save`
+
+Also available: `teachingPlans`, `quarterlyPlans` for series planning context
+
+#### The Mission (outreach + missions)
+
+Two panels:
+1. **Harvest Tracker** — `outreachCampaigns` (live) + `outreachContacts` (GAS fallback)
+   GAS `outreach.contacts.*`, `outreach.campaigns.*`, `outreach.followUps.*`, `outreach.dashboard`
+2. **Missions Registry** — `missionsRegistry`, `missionsPrayerFocus`, `missionsUpdates`, `missionsPartners`
+
+#### The Family (members)
+
+`members` collection — full 47-field schema:
+name, dob, email, phone, address, membershipStatus, memberSince, baptismDate,
+salvationDate, householdId, familyRole, ministryTeams, volunteerRoles, spiritualGifts,
+smallGroup, pastoralNotes, lastContactDate, nextFollowUp, followUpPriority, assignedTo, tags
+
+GAS `members.list/get/create/update/archive` + `milestones.*` + `contactLog.*`
+
+#### The Shepherd (pastor dashboard)
+
+Four panels:
+1. **Giving KPIs** — `giving` (GAS fallback: `giving.summary`, `giving.list`)
+2. **Attendance** — `attendance` (GAS fallback: `attendance.summary`, `attendance.list`)
+3. **Strategic** — `strategicGoals`, `strategicInitiatives`, `strategicKeyDates`
+4. **Pastoral tools** — `shepherdsMirror`, `heartCheck`, `touches`, `flockDocs`, `library`
+
+#### The Calendar (events)
+
+`events` + `calendarEvents` collections
+GAS `events.list/get/create/update/cancel/rsvp` + `events.public` (no auth — public events)
+
+#### The Weavers (teams + volunteers)
+
+`volunteers` + `groups` collections
+GAS `volunteers.list/schedule/create/update/swap` + `groups.list/get/addMember/removeMember`
+
+#### The Way (discipleship + scripture)
+
+`discipleshipPaths` + `readingPlans` + `readingPlanDays` + `oneYearBible`
+`lexiconGreek` + `lexiconHebrew` + `psalms` + `psalmThemes`
+
+#### The Tabernacle (worship + devotional)
+
+`devotionals` + `psalms` + `psalmThemes` + `theology` + `theologyCategories`
+
+---
+
+### The Flock — Care Board minRole Decision
+
+**OPEN:** `gatehouse` (The Bulletin / care cases) is currently `minRole: 0`.
+Care cases include: Medical, Crisis, Addiction, Grief, Abuse — sensitive pastoral data.
+**Recommendation:** bump to `minRole: 2` (care/deacon) in `the_gates.js` SECTIONS registry.
+**Requires explicit user confirmation before changing.**
+
+---
+
+### Phase 2 — Connect Existing Sections to Live Firestore
+
+1. **The Flock** — wire `careCases/careInteractions/careAssignments` + `prayers`;
+   full case detail sheet, interaction log, follow-up queue, caregiver assignment panel;
+   GAS fallback for `compassionRequests` (defer until collections seeded)
+2. **The Sanctuary** — wire `sermons`, `songs`, `servicePlans`; replace localStorage sermon builder
+3. **The Mission** — wire `outreachCampaigns` + `missionsRegistry` + `missionsPrayerFocus`;
+   GAS fallback for `outreachContacts`
+4. **The Family** — wire `members` collection, add search/filter, milestones panel
+
+### Phase 3 — Build New Sections
+
+5. **The Calendar** (`the_calendar/`) — `events` + `calendarEvents`; upcoming events,
+   services, birthdays this week; RSVP support; minRole: 0
+6. **The Weavers** (`the_weavers/`) — `volunteers` + `groups`; teams roster, open positions,
+   small group list; minRole: 3
+7. **The Shepherd upgrade** — connect `giving`/`attendance` (GAS fallback); add
+   `shepherdsMirror`, `heartCheck`, `touches`; strategic goals display
+
+### Phase 4 — Content Depth
+
+8. **The Way** — wire `readingPlans`, `lexiconGreek/Hebrew`, `psalmThemes`
+9. **The Tabernacle** — wire `devotionals`, `psalms`, liturgical calendar
+10. **Compassion panel** — build once `compassionRequests` collections are seeded
+
+---
+
+### Connectivity Model (applies to all sections)
+
+```
+1. Check window.UpperRoom.isReady() — Firestore initialized?
+   YES → read from live collection (same paths as FlockOS)
+   NO  → fall back to GAS endpoint via the_living_water_adapter
+2. localStorage as tertiary fallback (offline / no GAS URL configured)
+3. Never block render — show placeholder/skeleton, swap in live data async
+4. Firestore paths are TOP-LEVEL collections (not nested under /churches/{id}/)
+   confirmed against flockos-notify: careCases, prayers, members, etc.
+```
+
+---
+
+*Version 5 authored: 2026-05-21. Based on live Firestore verification of flockos-notify,
+full GAS API audit (06 — GAS Backend Master Code.md), and schema cross-check
+(19 — Firestore Data Schema.sql). 93 collections in schema; 71 confirmed live.*

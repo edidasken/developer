@@ -201,7 +201,7 @@
   }
 
   function render() {
-    var main = document.getElementById('section-main');
+    var main = document.getElementById('panel-songs') || document.getElementById('section-main');
     if (!main) return;
     injectStyles();
     buildSongList();
@@ -297,7 +297,7 @@
     if (searchEl) {
       searchEl.addEventListener('input', function() { state.filter = this.value; render(); });
     }
-    var main = document.getElementById('section-main');
+    var main = document.getElementById('panel-songs') || document.getElementById('section-main');
     if (main) {
       main.addEventListener('click', function(e) {
         var btn = e.target.closest('[data-action]');

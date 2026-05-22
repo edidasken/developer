@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="broadsheet">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="theme-color" content="#faf6ed">
+  <title>The Sanctuary — The Flock Herald</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="../../Styles/the_broadsheet.css">
+  <link rel="stylesheet" href="../../Styles/sections/sanctuary.css">
+  <script>
+    (function () {
+      try {
+        var s = parseFloat(localStorage.getItem('flock_font_scale') || '1');
+        if (s >= 0.85 && s <= 1.25) document.documentElement.style.setProperty('--fn-scale', s);
+        var t = localStorage.getItem('flock_theme') || 'broadsheet';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {}
+    })();
+  </script>
+</head>
+<body>
+  <nav class="sec-nav-bar" id="sec-nav" aria-label="Paper sections"></nav>
+
+  <main class="np-page" id="section-main">
+
+    <div class="np-section-banner">
+      <p class="np-section-banner__flag">The Flock Herald &mdash; Worship &amp; Service Prep</p>
+      <h1 class="np-section-banner__title">The Sanctuary</h1>
+      <p class="np-section-banner__deck">Sermon preparation &middot; Song planning &middot; Service order</p>
+      <span class="np-section-banner__accent" style="background:var(--sec-sanctuary,#2e1a4a)"></span>
+    </div>
+
+    <div class="np-panels">
+
+      <details class="np-panel" id="accordion-sermons" open>
+        <summary class="np-panel__hdr">
+          <span class="np-panel__icon">&#127908;</span>
+          <span class="np-panel__title">Sermon Builder</span>
+          <span class="np-panel__meta">Prepare &amp; outline the Word</span>
+          <span class="np-panel__caret">&#9656;</span>
+        </summary>
+        <div class="np-panel__body" id="panel-sermons"></div>
+      </details>
+
+      <details class="np-panel" id="accordion-songs">
+        <summary class="np-panel__hdr">
+          <span class="np-panel__icon">&#127925;</span>
+          <span class="np-panel__title">Song Planner</span>
+          <span class="np-panel__meta">Build this Sunday&rsquo;s set</span>
+          <span class="np-panel__caret">&#9656;</span>
+        </summary>
+        <div class="np-panel__body" id="panel-songs"></div>
+      </details>
+
+      <details class="np-panel" id="accordion-service">
+        <summary class="np-panel__hdr">
+          <span class="np-panel__icon">&#128203;</span>
+          <span class="np-panel__title">Service Order</span>
+          <span class="np-panel__meta">Runsheet &amp; stage notes</span>
+          <span class="np-panel__caret">&#9656;</span>
+        </summary>
+        <div class="np-panel__body" id="panel-service"></div>
+      </details>
+
+    </div><!-- .np-panels -->
+  </main>
+
+  <script src="../../Scripts/the_true_vine.js"></script>
+  <script src="../../Scripts/firm_foundation.js"></script>
+  <script>
+    (function () {
+      if (typeof Nehemiah !== 'undefined') {
+        var sess = Nehemiah.guard();
+        if (sess && !Nehemiah.hasRole('leader')) { window.location.replace('../../index.html'); }
+      }
+    })();
+  </script>
+  <script src="../../Scripts/the_adornment.js"></script>
+  <script src="../../Scripts/the_gates.js?v=2"></script>
+  <!-- Three panels — each script targets its own panel div -->
+  <script src="../../Scripts/the_pulpit.js?v=2"></script>
+  <script src="../../Scripts/the_cantors.js?v=2"></script>
+  <script src="../../Scripts/the_stage.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+/* the_way.css */
+.np-panel[open] summary.np-panel__hdr {
+  border-left: 3px solid var(--sec-the-way, #4a2808);
+}

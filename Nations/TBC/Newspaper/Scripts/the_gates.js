@@ -31,22 +31,16 @@
 
   // ── Section Registry ──────────────────────────────────────────────────────
   var SECTIONS = [
-    { slug: 'herald',           label: 'The Herald',            tagline: 'All the news of the congregation, set in type each morning.',          path: 'index.html',                        minRole: -1 },
-    { slug: 'tabernacle',       label: 'The Tabernacle',        tagline: 'Worship, devotional, and the life of prayer.',                         path: 'Sections/tabernacle/index.html',    minRole:  0 },
-    { slug: 'pulpit',           label: 'The Pulpit',            tagline: 'Sermons, teachings, and the preached Word.',                           path: 'Sections/pulpit/index.html',        minRole:  3 },
-    { slug: 'levites',          label: 'The Cantors',           tagline: 'Music, worship planning, and the ministry of song.',                   path: 'Sections/levites/index.html',       minRole:  3 },
-    { slug: 'stage',            label: 'The Stage',             tagline: 'Media, presentations, and visual ministry.',                           path: 'Sections/stage/index.html',         minRole:  3 },
-    { slug: 'epistles',         label: 'The Letters',           tagline: 'Church communications, announcements, and correspondence.',            path: 'Sections/epistles/index.html',      minRole:  0 },
-    { slug: 'straight_path',    label: 'The Path',              tagline: 'Discipleship, growth, and the journey of faith.',                      path: 'Sections/straight_path/index.html', minRole: -1 },
-    { slug: 'great_commission', label: 'The Mission',           tagline: 'Outreach, evangelism, and the harvest field.',                         path: 'Sections/great_commission/index.html', minRole: 4 },
-    { slug: 'living_water',     label: 'The Wellspring',        tagline: 'Scripture, reflection, and living water for the soul.',                path: 'Sections/living_water/index.html',  minRole: -1 },
-    { slug: 'scroll_room',      label: 'The Archive',           tagline: 'Documents, records, and the written history of the church.',           path: 'Sections/scroll_room/index.html',   minRole:  4 },
-    { slug: 'gatehouse',        label: 'The Bulletin',          tagline: 'Announcements, events, and the weekly bulletin board.',                path: 'Sections/gatehouse/index.html',     minRole:  0 },
-    { slug: 'genealogies',      label: 'The Family Tree',       tagline: 'Congregation records, families, and the generations.',                 path: 'Sections/genealogies/index.html',   minRole:  0 },
-    { slug: 'harvest',          label: 'The Harvest',           tagline: 'Giving, stewardship, and the fruit of generosity.',                    path: 'Sections/harvest/index.html',       minRole:  4 },
-    { slug: 'cornerstone',      label: "The Shepherd's Desk",   tagline: "The pastor's operational dashboard — care, mission, and the flock.",   path: 'Sections/cornerstone/index.html',   minRole:  4 },
-    { slug: 'editors_desk',     label: "Editor's Desk",         tagline: 'Control the Herald — publish, schedule, and manage the paper.',        path: 'Sections/editors_desk/index.html',  minRole:  4 },
-    { slug: 'council',          label: 'The Council',           tagline: 'The Codex — as-built documentation and the architecture of the flock.', path: 'Sections/council/index.html',      minRole:  4 },
+    { slug: 'herald',     label: 'The Herald',      tagline: 'All the news of the congregation, set in type each morning.',                               path: 'index.html',                   minRole: -1 },
+    { slug: 'tabernacle', label: 'The Tabernacle',   tagline: 'Worship, devotional, and the life of prayer.',                                              path: 'Sections/tabernacle/index.html', minRole:  0 },
+    { slug: 'sanctuary',  label: 'The Sanctuary',    tagline: 'Sermon prep, song planning, and service order — all in one place.',                         path: 'Sections/sanctuary/index.html',  minRole:  3 },
+    { slug: 'flock',      label: 'The Flock',        tagline: 'Pastoral care, prayer requests, and the shepherding of the congregation.',                   path: 'Sections/flock/index.html',      minRole:  2 },
+    { slug: 'family',     label: 'The Family',       tagline: 'Congregation records, households, and the generations of the church.',                       path: 'Sections/family/index.html',     minRole:  0 },
+    { slug: 'the_way',    label: 'The Way',           tagline: 'Discipleship paths, reading plans, scripture, and the journey of faith.',                   path: 'Sections/the_way/index.html',    minRole: -1 },
+    { slug: 'mission',    label: 'The Mission',      tagline: 'Outreach contacts, campaigns, and the global missions registry.',                            path: 'Sections/mission/index.html',    minRole:  4 },
+    { slug: 'shepherd',   label: 'The Shepherd',     tagline: "The pastor's dashboard — giving, attendance, strategic goals, and pastoral tools.",          path: 'Sections/shepherd/index.html',   minRole:  4 },
+    { slug: 'calendar',   label: 'The Calendar',     tagline: 'Upcoming services, events, and the rhythms of the church year.',                             path: 'Sections/calendar/index.html',   minRole:  0 },
+    { slug: 'weavers',    label: 'The Weavers',      tagline: 'Volunteer teams, ministry assignments, and small group coordination.',                       path: 'Sections/weavers/index.html',    minRole:  3 },
   ];
 
   // Expose for use by the_proclamation.js (loads after this script)

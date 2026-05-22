@@ -120,7 +120,7 @@
   }
 
   function render() {
-    var main = document.getElementById('section-main');
+    var main = document.getElementById('panel-sermons') || document.getElementById('section-main');
     if (!main) return;
     injectStyles();
     loadSermons();
@@ -238,7 +238,7 @@
   }
 
   function attachEvents() {
-    var main = document.getElementById('section-main');
+    var main = document.getElementById('panel-sermons') || document.getElementById('section-main');
     if (!main) return;
 
     // Auto-save title/ref/series on input

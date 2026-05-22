@@ -151,7 +151,7 @@
 
   // ── Render ────────────────────────────────────────────────────────────────
   function render(data) {
-    var main = document.getElementById('section-main');
+    var main = document.getElementById('panel-wellspring') || document.getElementById('section-main');
     if (!main) return;
     var churchName = (window.HERALD_CHURCH_NAME && window.HERALD_CHURCH_NAME !== 'The Flock Herald')
       ? window.HERALD_CHURCH_NAME : 'The Wellspring';

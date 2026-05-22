@@ -62,6 +62,16 @@
   --sec-harvest:        #0e2818;   /* Field Dispatch */
   --sec-cornerstone:    #1a2a3a;   /* Blueprint Slate */
 
+  /* ── Consolidated section accents (v5, 2026-05-21) ─────────── */
+  --sec-sanctuary:      #2e1a4a;   /* Bishop's Purple (worship + preaching) */
+  --sec-flock:          #3d1818;   /* Crimson Notice  (care + prayer) */
+  --sec-mission:        #0e2818;   /* Field Dispatch  (outreach + missions) */
+  --sec-family:         #1a3030;   /* Cedar & Stone   (members + households) */
+  --sec-the-way:        #4a2808;   /* Pilgrim Brown   (discipleship + scripture) */
+  --sec-shepherd:       #1a2a3a;   /* Blueprint Slate (pastor dashboard) */
+  --sec-calendar:       #204060;   /* Schedule Blue   (events + seasons) */
+  --sec-weavers:        #1a3d28;   /* Cedar Green     (teams + volunteers) */
+
   /* ── Newsroom palette (Editor's Desk + Editorial Board) ─────── */
   --ed-bg:          #120f08;
   --ed-panel:       #1c1710;
@@ -239,6 +249,15 @@ button {
 .sec-nav-tab.is-active[data-section="genealogies"]    { background: var(--sec-genealogies);   border-color: var(--sec-genealogies); }
 .sec-nav-tab.is-active[data-section="harvest"]        { background: var(--sec-harvest);       border-color: var(--sec-harvest); }
 .sec-nav-tab.is-active[data-section="cornerstone"]    { background: var(--sec-cornerstone);   border-color: var(--sec-cornerstone); }
+/* Consolidated sections (v5) */
+.sec-nav-tab.is-active[data-section="sanctuary"]      { background: var(--sec-sanctuary);     border-color: var(--sec-sanctuary); }
+.sec-nav-tab.is-active[data-section="flock"]          { background: var(--sec-flock);         border-color: var(--sec-flock); }
+.sec-nav-tab.is-active[data-section="mission"]        { background: var(--sec-mission);       border-color: var(--sec-mission); }
+.sec-nav-tab.is-active[data-section="family"]         { background: var(--sec-family);        border-color: var(--sec-family); }
+.sec-nav-tab.is-active[data-section="the_way"]        { background: var(--sec-the-way);       border-color: var(--sec-the-way); }
+.sec-nav-tab.is-active[data-section="shepherd"]       { background: var(--sec-shepherd);      border-color: var(--sec-shepherd); }
+.sec-nav-tab.is-active[data-section="calendar"]       { background: var(--sec-calendar);      border-color: var(--sec-calendar); }
+.sec-nav-tab.is-active[data-section="weavers"]        { background: var(--sec-weavers);       border-color: var(--sec-weavers); }
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -682,6 +701,98 @@ button {
   letter-spacing: 0.08em;
   color: var(--ink-dim);
   margin-top: 24px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   §14b — ACCORDION PANELS  (.np-panel) — consolidated sections
+   ═══════════════════════════════════════════════════════════════ */
+.np-panel {
+  border: 1px solid var(--rule-soft);
+  border-radius: 4px;
+  margin: 0 0 10px 0;
+  overflow: hidden;
+}
+.np-panel[open] { border-color: var(--rule); }
+
+.np-panel summary.np-panel__hdr {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  list-style: none;
+  background: var(--paper-tint);
+  border-bottom: 1px solid transparent;
+  font-family: var(--font-label);
+  font-size: 0.82rem;
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  user-select: none;
+  transition: background 0.15s;
+}
+.np-panel[open] summary.np-panel__hdr {
+  border-bottom-color: var(--rule-soft);
+  background: var(--paper-white);
+}
+.np-panel summary.np-panel__hdr::-webkit-details-marker { display: none; }
+.np-panel summary.np-panel__hdr::marker { display: none; }
+
+.np-panel__icon   { font-size: 1rem; flex-shrink: 0; }
+.np-panel__title  { flex: 1; font-weight: 700; }
+.np-panel__meta   { font-size: 0.72rem; color: var(--ink-muted); font-variant: normal; letter-spacing: 0; }
+.np-panel__caret  { font-size: 0.65rem; color: var(--ink-dim); transition: transform 0.2s; }
+.np-panel[open] .np-panel__caret { transform: rotate(90deg); }
+
+.np-panel__body   { padding: 14px 16px; }
+.np-panel__body:empty::after {
+  content: 'Loading\2026';
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ink-dim);
+  font-style: italic;
+  padding: 20px 0;
+}
+
+/* Section banner for consolidated pages */
+.np-section-banner {
+  padding: 16px var(--gutter, 16px) 12px;
+  border-bottom: 2px solid var(--rule);
+  margin-bottom: 12px;
+}
+.np-section-banner__flag {
+  font-family: var(--font-label);
+  font-size: 0.68rem;
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+  color: var(--ink-muted);
+  margin: 0 0 4px;
+}
+.np-section-banner__title {
+  font-family: var(--font-headline);
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 4px;
+  line-height: 1.15;
+}
+.np-section-banner__deck {
+  font-family: var(--font-body);
+  font-size: 0.84rem;
+  color: var(--ink-muted);
+  margin: 0;
+  font-style: italic;
+}
+.np-section-banner__accent {
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  margin-top: 10px;
+}
+
+/* Panel container */
+.np-panels {
+  padding: 12px var(--gutter, 16px);
 }
 
 

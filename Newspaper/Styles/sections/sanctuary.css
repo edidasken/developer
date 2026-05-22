@@ -1,0 +1,8 @@
+/* sanctuary.css — section-specific accents for The Sanctuary */
+
+/* Accent colour: Bishop's Purple */
+.np-section-banner__accent { background: var(--sec-sanctuary, #2e1a4a); }
+
+.np-panel[open] summary.np-panel__hdr {
+  border-left: 3px solid var(--sec-sanctuary, #2e1a4a);
+}

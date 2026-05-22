@@ -145,7 +145,7 @@
   }
 
   function render() {
-    var main = document.getElementById('section-main');
+    var main = document.getElementById('panel-service') || document.getElementById('section-main');
     if (!main) return;
     injectStyles();
     loadOrder(); loadNotes();
@@ -209,7 +209,7 @@
   }
 
   function attachEvents() {
-    var main = document.getElementById('section-main');
+    var main = document.getElementById('panel-service') || document.getElementById('section-main');
     if (!main) return;
 
     main.addEventListener('click', function(e) {

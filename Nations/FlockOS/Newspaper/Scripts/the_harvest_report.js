@@ -153,7 +153,7 @@
   }
 
   function render() {
-    var main = document.getElementById('section-main');
+    var main = document.getElementById('panel-harvest') || document.getElementById('section-main');
     if (!main) return;
     injectStyles();
     loadConvos(); loadTargets();
@@ -227,7 +227,7 @@
   }
 
   function attachEvents() {
-    var main = document.getElementById('section-main');
+    var main = document.getElementById('panel-harvest') || document.getElementById('section-main');
     if (!main) return;
 
     main.addEventListener('click', function(e) {

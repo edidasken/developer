@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="broadsheet">
+<head>
+  <script>
+    window.FLOCK_FIREBASE_CONFIG = null;
+    window.HERALD_CHURCH_NAME = "FlockOS";
+    window.HERALD_CHURCH_ID   = "flockos";
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="theme-color" content="#faf6ed">
+  <title>The Flock — The Flock Herald</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="../../Styles/the_broadsheet.css">
+  <link rel="stylesheet" href="../../Styles/sections/flock.css">
+  <script>
+    (function () {
+      try {
+        var s = parseFloat(localStorage.getItem('flock_font_scale') || '1');
+        if (s >= 0.85 && s <= 1.25) document.documentElement.style.setProperty('--fn-scale', s);
+        var t = localStorage.getItem('flock_theme') || 'broadsheet';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {}
+    })();
+  </script>
+</head>
+<body>
+  <nav class="sec-nav-bar" id="sec-nav" aria-label="Paper sections"></nav>
+
+  <main class="np-page" id="section-main">
+
+    <div class="np-section-banner">
+      <p class="np-section-banner__flag">The Flock Herald &mdash; Pastoral Care</p>
+      <h1 class="np-section-banner__title">The Flock</h1>
+      <p class="np-section-banner__deck">Care board &middot; Prayer requests &middot; Announcements</p>
+      <span class="np-section-banner__accent" style="background:var(--sec-flock,#3d1818)"></span>
+    </div>
+
+    <div class="np-panels">
+
+      <details class="np-panel" id="accordion-care" open>
+        <summary class="np-panel__hdr">
+          <span class="np-panel__icon">&#10084;&#65039;</span>
+          <span class="np-panel__title">Care Board</span>
+          <span class="np-panel__meta">Pastoral care &amp; shepherd visits</span>
+          <span class="np-panel__caret">&#9656;</span>
+        </summary>
+        <div class="np-panel__body" id="panel-care"></div>
+      </details>
+
+      <details class="np-panel" id="accordion-prayer">
+        <summary class="np-panel__hdr">
+          <span class="np-panel__icon">&#128591;</span>
+          <span class="np-panel__title">Prayer &amp; Announcements</span>
+          <span class="np-panel__meta">Requests &amp; church notices</span>
+          <span class="np-panel__caret">&#9656;</span>
+        </summary>
+        <div class="np-panel__body" id="panel-prayer"></div>
+      </details>
+
+    </div><!-- .np-panels -->
+  </main>
+
+  <script src="../../Scripts/the_true_vine.js"></script>
+  <script src="../../Scripts/firm_foundation.js"></script>
+  <script>
+    (function () {
+      if (typeof Nehemiah !== 'undefined') {
+        var sess = Nehemiah.guard();
+        if (sess && !Nehemiah.hasRole('care')) { window.location.replace('../../index.html'); }
+      }
+    })();
+  </script>
+  <script src="../../Scripts/the_adornment.js"></script>
+  <script src="../../Scripts/the_gates.js?v=2"></script>
+  <script src="../../Scripts/the_bulletin.js?v=2"></script>
+  <script src="../../Scripts/the_letters.js?v=2"></script>
+</body>
+</html>
