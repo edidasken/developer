@@ -288,4 +288,36 @@ function stripExport(src) {
   console.log('✓ quiz.js — ' + arr.length + ' questions');
 })();
 
+// ── 17. strongs-greek — export default object → keyed by Strong's number ─
+(function () {
+  const raw = stripExport('strongs-greek.js');
+  const obj = eval('(' + raw.replace(/;$/, '') + ')');
+  const count = Object.keys(obj).length;
+  const out = [
+    '// Herald Data: Strong\'s Greek Concordance',
+    '// Source: New_Covenant/Data/strongs-greek.js — ' + count + ' entries',
+    '// DO NOT EDIT — regenerate with: node Newspaper/convert_herald_data.js',
+    'window.HERALD_DATA = window.HERALD_DATA || {};',
+    'window.HERALD_DATA.strongsGreek = ' + JSON.stringify(obj) + ';',
+  ].join('\n');
+  fs.writeFileSync(path.join(DST, 'strongs_greek.js'), out);
+  console.log('✓ strongs_greek.js — ' + count + ' Greek entries');
+})();
+
+// ── 18. strongs-hebrew — export default object → keyed by Strong's number ─
+(function () {
+  const raw = stripExport('strongs-hebrew.js');
+  const obj = eval('(' + raw.replace(/;$/, '') + ')');
+  const count = Object.keys(obj).length;
+  const out = [
+    '// Herald Data: Strong\'s Hebrew Concordance',
+    '// Source: New_Covenant/Data/strongs-hebrew.js — ' + count + ' entries',
+    '// DO NOT EDIT — regenerate with: node Newspaper/convert_herald_data.js',
+    'window.HERALD_DATA = window.HERALD_DATA || {};',
+    'window.HERALD_DATA.strongsHebrew = ' + JSON.stringify(obj) + ';',
+  ].join('\n');
+  fs.writeFileSync(path.join(DST, 'strongs_hebrew.js'), out);
+  console.log('✓ strongs_hebrew.js — ' + count + ' Hebrew entries');
+})();
+
 console.log('\n✅ Herald data bundle complete → Newspaper/Data/');

@@ -166,6 +166,28 @@
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
+  // ── Word Study Widget ─────────────────────────────────────────────────────
+  function buildWordStudy() {
+    return [
+      '<div class="np-word-study" style="margin-top:2rem;padding-top:1.25rem;border-top:2px solid var(--sec-scroll-room)">',
+      '  <p class="np-col__flag" style="color:var(--sec-scroll-room);margin-bottom:0.5rem">Word Study &mdash; Strong\'s Concordance</p>',
+      '  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem">',
+      '    <input id="ws-input" type="text" placeholder="G3056 &middot; logos &middot; or Hebrew H7225&hellip;" ',
+      '      style="font-family:var(--font-body);font-size:0.9rem;border:1px solid var(--rule);',
+      '             background:var(--paper);color:var(--ink);padding:0.45rem 0.75rem;border-radius:3px;',
+      '             flex:1 1 220px;min-width:180px;" />',
+      '    <button onclick="wsSearch()" ',
+      '      style="font-family:var(--font-headline);font-size:0.82rem;letter-spacing:.06em;',
+      '             background:var(--sec-scroll-room);color:var(--paper);border:none;',
+      '             padding:0.45rem 1rem;border-radius:3px;cursor:pointer;white-space:nowrap">',
+      '      Look Up',
+      '    </button>',
+      '  </div>',
+      '  <div id="ws-result" style="font-family:var(--font-body);font-size:0.88rem;min-height:1.5rem"></div>',
+      '</div>',
+    ].join('\n');
+  }
+
   function render() {
     var main = document.getElementById('section-main');
     if (!main) return;
@@ -180,8 +202,91 @@
       buildChristCol(book),
       buildShelfCol(book),
       '</div>',
+      buildWordStudy(),
       '</div>',
     ].join('\n');
+
+    // Attach word study search after DOM injection
+    window.wsSearch = function () {
+      var raw    = (document.getElementById('ws-input').value || '').trim();
+      var result = document.getElementById('ws-result');
+      if (!raw) { result.innerHTML = ''; return; }
+
+      var upper = raw.toUpperCase();
+      var entry, lang;
+
+      // Try exact Strong's number first (G… or H…)
+      if (/^G\d+$/i.test(raw) && window.HERALD_DATA && window.HERALD_DATA.strongsGreek) {
+        entry = window.HERALD_DATA.strongsGreek[upper];
+        lang  = 'Greek';
+      } else if (/^H\d+$/i.test(raw) && window.HERALD_DATA && window.HERALD_DATA.strongsHebrew) {
+        entry = window.HERALD_DATA.strongsHebrew[upper];
+        lang  = 'Hebrew';
+      } else {
+        // Transliteration search — scan both lexicons
+        var q = raw.toLowerCase();
+        var gk = window.HERALD_DATA && window.HERALD_DATA.strongsGreek;
+        var hb = window.HERALD_DATA && window.HERALD_DATA.strongsHebrew;
+        if (gk) {
+          var gkeys = Object.keys(gk);
+          for (var i = 0; i < gkeys.length; i++) {
+            if ((gk[gkeys[i]].translit || '').toLowerCase().indexOf(q) === 0) {
+              entry = gk[gkeys[i]];
+              entry._num = gkeys[i];
+              lang = 'Greek';
+              break;
+            }
+          }
+        }
+        if (!entry && hb) {
+          var hkeys = Object.keys(hb);
+          for (var j = 0; j < hkeys.length; j++) {
+            if ((hb[hkeys[j]].translit || '').toLowerCase().indexOf(q) === 0) {
+              entry = hb[hkeys[j]];
+              entry._num = hkeys[j];
+              lang = 'Hebrew';
+              break;
+            }
+          }
+        }
+      }
+
+      if (!entry) {
+        result.innerHTML = '<em style="color:var(--ink-dim)">No entry found for \u201c' + esc(raw) + '\u201d &mdash; try a Strong\'s number (G3056) or transliteration.</em>';
+        return;
+      }
+
+      var num = entry._num || upper;
+      result.innerHTML = [
+        '<div style="display:grid;grid-template-columns:auto 1fr;gap:0.3rem 1rem;align-items:baseline">',
+        '  <span style="font-variant:small-caps;font-size:0.78rem;color:var(--ink-dim)">Number</span>',
+        '  <strong style="font-family:var(--font-headline)">' + esc(num) + ' &mdash; ' + lang + '</strong>',
+        entry.lemma ?
+          '  <span style="font-variant:small-caps;font-size:0.78rem;color:var(--ink-dim)">Word</span>' +
+          '  <span style="font-size:1.05rem">' + esc(entry.lemma) + '</span>' : '',
+        entry.translit ?
+          '  <span style="font-variant:small-caps;font-size:0.78rem;color:var(--ink-dim)">Translit.</span>' +
+          '  <span style="font-style:italic">' + esc(entry.translit) + '</span>' : '',
+        entry.kjv_def ?
+          '  <span style="font-variant:small-caps;font-size:0.78rem;color:var(--ink-dim)">KJV</span>' +
+          '  <span>' + esc(entry.kjv_def) + '</span>' : '',
+        entry.strongs_def ?
+          '  <span style="font-variant:small-caps;font-size:0.78rem;color:var(--ink-dim)">Definition</span>' +
+          '  <span>' + esc(entry.strongs_def) + '</span>' : '',
+        entry.derivation ?
+          '  <span style="font-variant:small-caps;font-size:0.78rem;color:var(--ink-dim)">Derivation</span>' +
+          '  <span style="font-size:0.83rem;color:var(--ink-dim)">' + esc(entry.derivation) + '</span>' : '',
+        '</div>',
+      ].filter(Boolean).join('\n');
+    };
+
+    // Allow Enter key in search box
+    var inp = document.getElementById('ws-input');
+    if (inp) {
+      inp.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') window.wsSearch();
+      });
+    }
   }
 
   function boot() {
