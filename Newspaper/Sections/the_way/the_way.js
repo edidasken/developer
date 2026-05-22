@@ -75,7 +75,7 @@
 
   /* ── Aside strip modules (col 3) ─────────────────────────────────────────── */
   var ASIDE_MODULES = [
-    { mod: 'the_gospel_psalms',        label: 'Psalm of the Day',     accent: '#8B7028',
+    { mod: 'the_gospel_psalms',        label: 'Psalms by Theme',      accent: '#8B7028',
       svg: '<svg ' + _S + '><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>' },
     { mod: 'the_gospel_reading',       label: "Today's Reading",      accent: '#059669',
       svg: '<svg ' + _S + '><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>' },
@@ -449,39 +449,66 @@
     $hd.innerHTML = '<span class="section-label">TODAY</span>';
     $aside.appendChild($hd);
 
-    /* Psalm of the day from psalms module */
-    _importMod('the_gospel_psalms')
-      .then(function (mod) {
-        var p = typeof mod.getPsalmOfDay === 'function'
-          ? mod.getPsalmOfDay(getDayOfYear())
-          : null;
-        if (p) {
-          _appendAsideCard($aside, 'Psalm of the Day',
-            p.title || ('Psalm ' + (p.num || '')),
-            p.summary || p.intro || '',
-            p.verse || '',
-            '#8B7028',
-            'the_gospel_psalms'
-          );
-        }
-      })
-      .catch(function () {});
+    /* ── TODAY — 5 items, each picked by day-of-year rotation ─────────────── */
+    var _day = getDayOfYear();
 
-    /* OYB today from reading module */
-    _importMod('the_gospel_reading')
-      .then(function (mod) {
-        var r = typeof mod.getOYBToday === 'function' ? mod.getOYBToday() : null;
-        if (r) {
-          _appendAsideCard($aside, "Today's Reading",
-            r.label || r.passage || 'Bible in a Year',
-            r.streams ? r.streams.join(' \u00b7 ') : '',
-            '',
-            '#059669',
-            'the_gospel_reading'
-          );
-        }
-      })
-      .catch(function () {});
+    /* 1 · Daily Apologetic */
+    var $ph1 = document.createElement('div'); $aside.appendChild($ph1);
+    import('../../Data/apologetics.js').then(function (m) {
+      var rows = m.default || []; if (!rows.length) return;
+      var q = rows[_day % rows.length];
+      var $el = _buildTodayItem('Apologetic', q.shortTitle || q.questionTitle,
+        q.categoryTitle || '', '#6b5b9a',
+        function () { window.FlockGates.openDrawer('Apologetic', _apoDrawerHtml(q)); });
+      $ph1.parentNode && $ph1.parentNode.replaceChild($el, $ph1);
+    }).catch(function () {});
+
+    /* 2 · Counseling Topic */
+    var $ph2 = document.createElement('div'); $aside.appendChild($ph2);
+    import('../../Data/counseling.js').then(function (m) {
+      var rows = m.default || []; if (!rows.length) return;
+      var t = rows[_day % rows.length];
+      var $el = _buildTodayItem('Counseling', (t.icon ? t.icon + '\u00a0' : '') + (t.title || ''),
+        t.definition ? t.definition.substring(0, 72) + '\u2026' : '', '#16a34a',
+        function () { window.FlockGates.openDrawer('Counseling \u00b7 ' + (t.title || ''), _couDrawerHtml(t)); });
+      $ph2.parentNode && $ph2.parentNode.replaceChild($el, $ph2);
+    }).catch(function () {});
+
+    /* 3 · Lexicon Word (Greek even days / Hebrew odd days) */
+    var $ph3 = document.createElement('div'); $aside.appendChild($ph3);
+    var _lexGreek = (_day % 2 === 0);
+    import(_lexGreek ? '../../Data/strongs-greek.js' : '../../Data/strongs-hebrew.js').then(function (m) {
+      var arr = Object.values(m.default || {}); if (!arr.length) return;
+      var w = arr[_day % arr.length];
+      var _la = _lexGreek ? 'Greek' : 'Hebrew';
+      var _ac = _lexGreek ? '#0891b2' : '#b45309';
+      var $el = _buildTodayItem('Lexicon \u00b7 ' + _la, w.lemma || '',
+        (w.translit || w.xlit || '') + (w.kjv_def ? ' \u2014 ' + w.kjv_def.substring(0, 40) : ''), _ac,
+        function () { window.FlockGates.openDrawer('Lexicon \u00b7 ' + _la, _lexDrawerHtml(w, _la, _ac)); });
+      $ph3.parentNode && $ph3.parentNode.replaceChild($el, $ph3);
+    }).catch(function () {});
+
+    /* 4 · Bible Book Summary */
+    var $ph4 = document.createElement('div'); $aside.appendChild($ph4);
+    import('../../Data/books-of-the-bible.js').then(function (m) {
+      var rows = m.default || []; if (!rows.length) return;
+      var b = rows[_day % rows.length];
+      var $el = _buildTodayItem('Bible Book', b.bookName || '',
+        b.genre || '', '#b45309',
+        function () { window.FlockGates.openDrawer(b.bookName || 'Bible Book', _bibDrawerHtml(b)); });
+      $ph4.parentNode && $ph4.parentNode.replaceChild($el, $ph4);
+    }).catch(function () {});
+
+    /* 5 · Heart-Check Question */
+    var $ph5 = document.createElement('div'); $aside.appendChild($ph5);
+    import('../../Data/heart.js').then(function (m) {
+      var rows = m.default || []; if (!rows.length) return;
+      var q = rows[_day % rows.length];
+      var $el = _buildTodayItem('Heart Check', q['Question'] || '',
+        q['Category'] || '', '#dc2626',
+        function () { window.FlockGates.openDrawer('Heart Check', _hrtDrawerHtml(q)); });
+      $ph5.parentNode && $ph5.parentNode.replaceChild($el, $ph5);
+    }).catch(function () {});
 
     /* All Modules quick links */
     var $rule2 = document.createElement('div');
@@ -564,6 +591,110 @@
       });
     }
     $parent.appendChild($card);
+  }
+
+  /* ── TODAY item builder ─────────────────────────────────────────────────────── */
+  function _buildTodayItem(label, title, sub, color, onOpen) {
+    var $card = document.createElement('div');
+    $card.className = 'way-today-card';
+    $card.style.cssText = 'border-left-color:' + color + ';cursor:pointer;';
+    $card.setAttribute('role', 'button');
+    $card.setAttribute('tabindex', '0');
+    $card.innerHTML = '<span class="way-today-card__label" style="color:' + esc(color) + '">' + esc(label) + '</span>'
+      + '<div class="way-today-card__title">' + esc(title) + '</div>'
+      + (sub ? '<div class="way-today-card__body">' + esc(sub) + '</div>' : '')
+      + '<div class="way-today-card__open" aria-hidden="true">Open \u2192</div>';
+    $card.addEventListener('click', onOpen);
+    $card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); }
+    });
+    return $card;
+  }
+
+  /* ── TODAY drawer HTML builders ─────────────────────────────────────────── */
+  function _dStyle(vars) {
+    return 'padding:1rem 1.25rem 1.5rem;font-family:\'Plus Jakarta Sans\',system-ui,sans-serif;' + (vars || '');
+  }
+  function _dLabel(text, color) {
+    return '<div style="font-size:0.5625rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:' + color + ';margin-bottom:0.375rem">' + esc(text) + '</div>';
+  }
+  function _dH2(text) {
+    return '<h2 style="font-size:1.0625rem;font-weight:700;line-height:1.3;font-family:\'Lora\',Georgia,serif;color:var(--ink);margin-bottom:0.625rem">' + esc(text) + '</h2>';
+  }
+  function _dP(text) {
+    return text ? '<p style="font-size:0.875rem;line-height:1.65;color:var(--ink);margin-bottom:0.75rem">' + esc(text) + '</p>' : '';
+  }
+  function _dSmall(text) {
+    return text ? '<p style="font-size:0.75rem;line-height:1.5;color:var(--ink-muted);margin-bottom:0.5rem">' + esc(text) + '</p>' : '';
+  }
+  function _dBQ(quote, ref, color) {
+    return quote
+      ? '<blockquote style="border-left:3px solid ' + color + ';padding:0.5rem 0.75rem;margin:0.75rem 0;background:var(--paper-card);border-radius:0 6px 6px 0">'
+        + '<p style="font-size:0.875rem;font-style:italic;font-family:\'Lora\',Georgia,serif;color:var(--ink);margin-bottom:0.25rem">' + esc(quote) + '</p>'
+        + (ref ? '<cite style="font-size:0.75rem;color:' + color + ';font-style:normal;font-weight:600">' + esc(ref) + '</cite>' : '')
+        + '</blockquote>'
+      : '';
+  }
+  function _dSect(title) {
+    return '<div style="font-size:0.625rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-muted);border-bottom:1px solid var(--rule);padding-bottom:0.25rem;margin:1rem 0 0.5rem">' + esc(title) + '</div>';
+  }
+
+  function _apoDrawerHtml(q) {
+    return '<div style="' + _dStyle() + '">'
+      + _dLabel(q.categoryTitle || 'Apologetics', '#6b5b9a')
+      + _dH2(q.questionTitle || '')
+      + _dP(q.answerContent || '')
+      + _dBQ(q.quoteText || '', q.referenceText || '', '#6b5b9a')
+      + (q.referenceUrl ? '<a href="' + esc(q.referenceUrl) + '" target="_blank" rel="noopener" style="font-size:0.75rem;color:#6b5b9a;font-weight:600">View Reference \u2192</a>' : '')
+      + '</div>';
+  }
+
+  function _couDrawerHtml(t) {
+    return '<div style="' + _dStyle() + '">'
+      + _dLabel('Counseling', '#16a34a')
+      + _dH2((t.icon ? t.icon + '\u00a0' : '') + (t.title || ''))
+      + _dP(t.definition || '')
+      + (t.steps ? _dSect('Steps') + _dP(t.steps) : '')
+      + (t.scriptures ? _dSect('Scripture') + _dSmall(t.scriptures) : '')
+      + '</div>';
+  }
+
+  function _lexDrawerHtml(w, lang, color) {
+    var def = w.strongs_def || '';
+    var deriv = w.derivation || '';
+    var kjv = w.kjv_def || '';
+    var tr = w.translit || w.xlit || '';
+    var pron = w.pron || '';
+    return '<div style="' + _dStyle() + '">'
+      + _dLabel('Lexicon \u00b7 ' + lang, color)
+      + '<h2 style="font-size:1.5rem;font-weight:700;font-family:\'Lora\',Georgia,serif;color:var(--ink);margin-bottom:0.25rem">' + esc(w.lemma || '') + '</h2>'
+      + (tr ? '<div style="font-size:0.875rem;color:' + color + ';font-weight:600;margin-bottom:0.625rem">' + esc(tr) + (pron ? ' (' + esc(pron) + ')' : '') + '</div>' : '')
+      + (def ? _dSect('Definition') + _dP(def) : '')
+      + (kjv ? _dSect('KJV Usage') + _dSmall(kjv) : '')
+      + (deriv ? _dSect('Derivation') + _dSmall(deriv) : '')
+      + '</div>';
+  }
+
+  function _bibDrawerHtml(b) {
+    return '<div style="' + _dStyle() + '">'
+      + _dLabel((b.genre || '') + (b.testament ? ' \u00b7 ' + b.testament + ' Testament' : ''), '#b45309')
+      + _dH2(b.bookName || '')
+      + (b.author ? '<div style="font-size:0.8125rem;color:var(--ink-muted);margin-bottom:0.625rem">' + esc(b.author) + (b.timePeriod ? ' \u00b7 ' + esc(b.timePeriod) : '') + '</div>' : '')
+      + _dP(b.summary || '')
+      + _dBQ(b.keyVerse || '', '', '#b45309')
+      + (b.themes ? _dSect('Themes') + _dSmall(b.themes) : '')
+      + (b.christInBook ? _dSect('Christ in This Book') + _dP(b.christInBook) : '')
+      + (b.application ? _dSect('Application') + _dP(b.application) : '')
+      + '</div>';
+  }
+
+  function _hrtDrawerHtml(q) {
+    return '<div style="' + _dStyle() + '">'
+      + _dLabel((q['Category'] || '') + ' \u00b7 Heart Check', '#dc2626')
+      + _dH2(q['Question'] || '')
+      + (q['Prescription'] ? _dSect('Prescription') + _dP(q['Prescription']) : '')
+      + (q['Verse Reference'] ? _dBQ('', q['Verse Reference'], '#dc2626') : '')
+      + '</div>';
   }
 
   /* ── Daily teaser lookup (THE_WAY_DAILY seed + localStorage overrides) ───── */
