@@ -1197,12 +1197,12 @@ Every section page must pass all of these before any feature work begins:
 - [ ] BCP
 
 ### Phase 4 — The Sanctuary
-- [ ] Sermon builder wired to `sermons` Firestore collection
-- [ ] Song planner wired to `songs` + `servicePlans`
-- [ ] Service order wired to `servicePlans`
-- [ ] All three panels collapsible on one page
-- [ ] `the_sanctuary.css` — `--sec-color: var(--lilac)`
-- [ ] BCP
+- [x] Sermon builder wired to `sermons` Firestore collection
+- [x] Song planner wired to `songs` + `servicePlans`
+- [x] Service order wired to `servicePlans`
+- [x] All three panels collapsible on one page
+- [x] `the_sanctuary.css` — `--sec-color: var(--lilac)`
+- [x] BCP
 
 ### Phase 5 — The Flock
 - [ ] Care board wired to `careCases` + `careInteractions` + `careAssignments`
@@ -1439,6 +1439,27 @@ All 7 Herald panels are live. `buildFrontPage` shows church name + date + rotati
 **Notes / deviations from plan:**
 - `flockNews` has no UpperRoom or TheVine adapter domain; the Herald tries `UpperRoom.listFlockNews` at runtime (may or may not exist on a given deployment) and falls to localStorage cache → empty state. This is correct per the connectivity model.
 - Panels 4–7 (Prayer Spotlight, Nation, Heart Check, Quiz) are dynamically appended to the grid rather than being in the initial HTML — this keeps the HTML skeleton clean and prevents FOUC on the pre-loaded skeleton cards.
+
+---
+
+### [Phase 4 — The Sanctuary: Sermon Builder, Song Planner, Service Order]
+**Date:** 2026-05-22
+**Commit:** `698d06137dc388084308a1448d4767fb000310c4` — "Phase 4 — The Sanctuary: sermon builder, song planner, service order — three-column broadsheet layout"
+**Files created/modified:**
+- `Newspaper/Styles/sections/the_sanctuary.css` — FULL BUILD: section identity (`--sec-color: var(--lilac)`), `.sanctuary-columns` three-column grid (→ 2-col @900px → 1-col @600px) with `.sanctuary-col` border-right column rules, `.sanc-panel-header` collapsible headers, `.sanc-story` newspaper story cards with kicker/hed/deck/meta, `.sanc-song-row` + `.sanc-key-chip` song library rows, `.sanc-run-item` service order rows, `.sanc-transpose` semitone widget, `.sanc-badge` status badges (draft/ready/preached), `.sanc-tabs`, `.sanc-section-row` sermon outline sections, `@media print` (hides cols 1 & 2, shows order only) (~400 lines)
+- `Newspaper/Sections/the_sanctuary/the_sanctuary.js` — FULL BUILD: ~650-line IIFE; Panel A (Sermon Builder) — create/edit/delete sermons, debounced autosave, XSS-safe rendering, Firestore→GAS→localStorage cascade; Panel B (Song Planner) — song library (20 starter hymns fallback), set list builder, semitone transpose widget, Library/Sunday's Set tabs; Panel C (Service Order) — service run sheet (8 item types, duration tracking, total time, print support), service date, debounced plan save; all three panels collapsible; global event delegation; `Promise.allSettled` concurrent data load; `_e()` XSS escape throughout
+- `Newspaper/Sections/the_sanctuary/index.html` — REWRITTEN: replaced Phase 0 empty stub with `.sanctuary-columns` three-column broadsheet grid; Col 1 — Sermon Builder (search, filter, new-sermon toolbar + `sanc-sermon-list-inner` render target); Col 2 — Song Planner (Library/Set tabs + search toolbar + `sanc-song-list-inner` render target); Col 3 — Service Order (`sanc-order-body` render target); correct auth guard (`_HERALD_AUTH_LEVEL = 3`), drawer + toast layer, full script load order
+**What was built:**
+Phase 4 delivers The Sanctuary as a true three-column broadsheet management tool for church leaders. Column 1 is a full sermon builder — create, outline (9 section types), research notes, altar call, status lifecycle (draft→ready→preached), active sermon pin, and debounced Firestore autosave. Column 2 is a song planner with a library tab (searchable, with 20 starter hymns for empty databases) and Sunday's Set tab (ordered setlist with per-song semitone transpose widget). Column 3 is a service order run sheet with 8 item types (worship, prayer, sermon, offering, communion, welcome, announcements, other), duration tracking, total service time, print support, and service date. All three columns collapse independently. Data flows Firestore → GAS → localStorage → static fallback throughout.
+**Verified:**
+- [x] get_errors: zero errors on the_sanctuary.css, the_sanctuary/index.html, the_sanctuary.js
+- [x] C-Build: clean pass — all 5 nations built
+- [x] git ls-files "Architechtural Docs/": returned empty
+- [ ] macOS duplicate scan: pending
+- [ ] Playwright: pending
+**Notes / deviations from plan:**
+- Toolbar and tabs are rendered in static HTML outside the collapsible `sanc-*-body` divs; JS renders list content only into `sanc-sermon-list-inner` and `sanc-song-list-inner` sub-containers to prevent toolbar/tab overwrite on re-render.
+- Service order `renderOrderPanel()` owns its entire `sanc-order-body` including the add-item form and date input (no pre-rendered markup needed).
 
 ---
 
