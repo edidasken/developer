@@ -659,6 +659,7 @@ hr, .broadsheet-rule {
   color: var(--story-accent, var(--accent));
   margin: 0 0 0.3125rem;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  text-align: center;
 }
 
 /* ── Story headline ───────────────────────────────────────────────────────── */
