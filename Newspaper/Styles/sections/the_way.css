@@ -1227,3 +1227,153 @@
 .way-decision-btn:hover { background: var(--accent-soft, #f0f5fa); }
 .way-submit-btn:disabled,
 .way-decision-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Psalm Module — By Number list ─────────────────────────────────────────── */
+.grow-psalm-number-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.grow-psalm-row--num {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 1.25rem;
+  padding: 0.8125rem 1.25rem 0.8125rem 1.75rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-card);
+  transition: background 0.12s;
+  border-left: 3px solid var(--psalm-color, var(--rule-strong));
+}
+.grow-psalm-row--num:last-child { border-bottom: none; }
+.grow-psalm-row--num:hover { background: var(--paper-sunken); }
+.grow-psalm-num--link {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--psalm-color, var(--gold));
+  text-decoration: none;
+  white-space: nowrap;
+  grid-row: 1;
+  grid-column: 1;
+  padding-left: 1rem;
+}
+.grow-psalm-num--link:hover { text-decoration: underline; }
+.grow-psalm-title--num {
+  font-family: var(--font-headline);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.35;
+  grid-row: 1;
+  grid-column: 2;
+  padding-right: 1rem;
+}
+.grow-psalm-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  grid-row: 2;
+  grid-column: 2;
+  margin-top: 0.3125rem;
+  padding-right: 1rem;
+}
+.grow-psalm-type {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--type-color, #6366f1) 12%, transparent);
+  color: var(--type-color, #6366f1);
+}
+
+/* ── Psalm Module — By Theme accordion ─────────────────────────────────────── */
+.grow-psalm-section {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid var(--psalm-color, var(--rule-strong));
+}
+.grow-psalm-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--paper-card);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  gap: 0.5rem;
+  transition: background 0.12s;
+}
+.grow-psalm-head:hover { background: var(--paper-sunken); }
+.grow-psalm-label { display: flex; align-items: center; gap: 0.625rem; flex: 1; min-width: 0; }
+.grow-psalm-theme {
+  font-family: var(--font-headline);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.grow-psalm-count {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--psalm-color, var(--gold)) 14%, transparent);
+  color: var(--psalm-color, var(--gold));
+  white-space: nowrap;
+}
+.grow-psalm-chevron {
+  color: var(--ink-faint);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.grow-psalm-section.is-open .grow-psalm-chevron { transform: rotate(180deg); }
+.grow-psalm-body {
+  border-top: 1px solid var(--rule);
+  background: var(--paper-sunken);
+  padding: 0.75rem 1rem;
+}
+.grow-psalm-body[hidden] { display: none; }
+.grow-psalm-intro {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  font-style: italic;
+  margin-bottom: 0.75rem;
+  line-height: 1.55;
+}
+/* Chips view (hidden on narrow drawers, show in expanded) */
+.grow-psalm-chips { display: none; }
+.grow-psalm-rows { display: flex; flex-direction: column; gap: 0; }
+.grow-psalm-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.3125rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.grow-psalm-row:last-child { border-bottom: none; }
+.grow-psalm-num {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--psalm-color, var(--gold));
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 4.5rem;
+}
+.grow-psalm-title {
+  font-size: 0.875rem;
+  color: var(--ink);
+  line-height: 1.4;
+}

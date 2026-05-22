@@ -108,15 +108,15 @@
           devScripture  = entry.scripture || '';
           devQuestion   = entry.question || '';
           devPrayer     = entry.prayer || '';
-          _drawers['front-page'] = `
-            <p class="story-kicker">DAILY DEVOTIONAL \u00b7 ${esc(shortDate)}</p>
-            ${devTheme ? `<p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.6875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--story-accent);margin:0.5rem 0 0.25rem">${esc(devTheme)}</p>` : ''}
-            <h2 style="font-family:'Lora',Georgia,serif;font-size:1.375rem;line-height:1.25;margin:0 0 0.75rem">${esc(devTitle)}</h2>
-            ${devScripture ? `<blockquote style="border-left:3px solid var(--story-accent);padding:0.5rem 0 0.5rem 1rem;margin:0 0 1rem;font-style:italic;color:var(--ink-muted);font-family:'Lora',Georgia,serif">${esc(devScripture)}</blockquote>` : ''}
-            ${devReflection ? `<p style="line-height:1.75;color:var(--ink);margin:0 0 1rem">${esc(devReflection)}</p>` : ''}
-            ${devQuestion ? `<p style="font-style:italic;color:var(--ink-muted);border-top:1px solid var(--rule);padding-top:0.75rem;margin:0 0 1rem">${esc(devQuestion)}</p>` : ''}
-            ${devPrayer ? `<p style="font-size:0.875rem;color:var(--ink-muted);font-style:italic"><strong style="font-style:normal;color:var(--story-accent)">Prayer:</strong> ${esc(devPrayer)}</p>` : ''}`;
-        }
+          _drawers['front-page'] = `<div class="drawer-article">
+            <p class="drawer-article__kicker">DAILY DEVOTIONAL \u00b7 ${esc(shortDate)}</p>
+            ${devTheme ? `<p class="drawer-article__theme">${esc(devTheme)}</p>` : ''}
+            <h2 class="drawer-article__hed">${esc(devTitle)}</h2>
+            ${devScripture ? `<blockquote class="drawer-article__scripture">${esc(devScripture)}</blockquote>` : ''}
+            ${devReflection ? `<p class="drawer-article__body">${esc(devReflection)}</p>` : ''}
+            ${devQuestion ? `<p class="drawer-article__question">${esc(devQuestion)}</p>` : ''}
+            ${devPrayer ? `<div class="drawer-article__prayer"><span class="drawer-article__prayer-label">Prayer</span>${esc(devPrayer)}</div>` : ''}
+          </div>`;        }
       }
     } catch (_) {}
 
@@ -149,6 +149,43 @@
 
   /** § 1 — Today's Readings (One Year Bible) */
   async function buildOYBStory(cfg) {
+    // Bible.com ESV (version 59) URL for a chapter reference.
+    // Handles ranges like "2 Chronicles 3–4" → links to 2CH.3.1.ESV
+    const _BC = {
+      'genesis':'GEN','exodus':'EXO','leviticus':'LEV','numbers':'NUM','deuteronomy':'DEU',
+      'joshua':'JOS','judges':'JDG','ruth':'RUT',
+      '1 samuel':'1SA','2 samuel':'2SA','1 kings':'1KI','2 kings':'2KI',
+      '1 chronicles':'1CH','2 chronicles':'2CH','ezra':'EZR','nehemiah':'NEH','esther':'EST',
+      'job':'JOB','psalm':'PSA','psalms':'PSA','proverbs':'PRO','ecclesiastes':'ECC',
+      'song of solomon':'SNG','song of songs':'SNG','isaiah':'ISA','jeremiah':'JER',
+      'lamentations':'LAM','ezekiel':'EZK','daniel':'DAN','hosea':'HOS','joel':'JOL',
+      'amos':'AMO','obadiah':'OBA','jonah':'JON','micah':'MIC','nahum':'NAM',
+      'habakkuk':'HAB','zephaniah':'ZEP','haggai':'HAG','zechariah':'ZEC','malachi':'MAL',
+      'matthew':'MAT','mark':'MRK','luke':'LUK','john':'JHN','acts':'ACT','romans':'ROM',
+      '1 corinthians':'1CO','2 corinthians':'2CO','galatians':'GAL','ephesians':'EPH',
+      'philippians':'PHP','colossians':'COL','1 thessalonians':'1TH','2 thessalonians':'2TH',
+      '1 timothy':'1TI','2 timothy':'2TI','titus':'TIT','philemon':'PHM','hebrews':'HEB',
+      'james':'JAS','1 peter':'1PE','2 peter':'2PE','1 john':'1JN','2 john':'2JN',
+      '3 john':'3JN','jude':'JUD','revelation':'REV',
+    };
+    function _oybUrl(ref) {
+      // Normalize dashes and lowercase
+      const s = ref.toLowerCase().replace(/[\u2013\u2014\-]/g, '-').trim();
+      // Match: optional number prefix + book words + chapter (take first chapter of range)
+      const m = s.match(/^((?:[1-3]\s+)?)([a-z]+(?:\s+[a-z]+)*)\s+(\d+)/);
+      if (!m) return null;
+      const bookKey = ((m[1] || '').trim() + ' ' + m[2].trim()).replace(/^\s/, '').trim();
+      const chapter = m[3];
+      const code = _BC[bookKey] || _BC[m[2].trim()];
+      if (!code) return null;
+      return `https://www.bible.com/bible/59/${code}.${chapter}.1.ESV`;
+    }
+    const _ICONS = {
+      ot: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+      nt: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="9" x2="19" y2="9"/></svg>`,
+      ps: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+      pr: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.6-1.4 4.8-3.5 6.1L15 17H9l-.5-1.9C6.4 13.8 5 11.6 5 9a7 7 0 0 1 7-7z"/></svg>`,
+    };
     let entry = null;
     try {
       const { default: oyb } = await import('../../Data/one_year_bible.js');
@@ -162,11 +199,23 @@
       return _story({ num: 1, category: 'DAILY READINGS', section: 'ONE YEAR BIBLE', hed: "Today's Readings", deck: 'Reading plan unavailable — check back shortly.', byline: 'ONE YEAR BIBLE PLAN' });
     }
 
+    function _oybRow(label, ref, iconKey) {
+      const url = _oybUrl(ref);
+      const tag = url ? 'a' : 'div';
+      const attrs = url ? ` href="${url}" target="_blank" rel="noopener noreferrer"` : '';
+      return `<${tag} class="oyb-row"${attrs}>
+        <span class="oyb-icon">${_ICONS[iconKey]}</span>
+        <dt class="oyb-label">${label}</dt>
+        <dd class="oyb-passage">${esc(ref)}</dd>
+        ${url ? '<span class="oyb-arrow">↗</span>' : ''}
+      </${tag}>`;
+    }
+
     const rows = [
-      entry.ot ? `<div class="oyb-row"><dt class="oyb-label">Old Testament</dt><dd class="oyb-passage">${esc(entry.ot)}</dd></div>` : '',
-      entry.nt ? `<div class="oyb-row"><dt class="oyb-label">New Testament</dt><dd class="oyb-passage">${esc(entry.nt)}</dd></div>` : '',
-      entry.ps ? `<div class="oyb-row"><dt class="oyb-label">Psalm</dt><dd class="oyb-passage">${esc(entry.ps)}</dd></div>` : '',
-      entry.pr ? `<div class="oyb-row"><dt class="oyb-label">Proverbs</dt><dd class="oyb-passage">${esc(entry.pr)}</dd></div>` : '',
+      entry.ot ? _oybRow('Old Testament', entry.ot, 'ot') : '',
+      entry.nt ? _oybRow('New Testament', entry.nt, 'nt') : '',
+      entry.ps ? _oybRow('Psalm',         entry.ps, 'ps') : '',
+      entry.pr ? _oybRow('Proverbs',      entry.pr, 'pr') : '',
     ].filter(Boolean).join('');
 
     _drawers['oyb'] = `
@@ -174,13 +223,24 @@
       <h2 style="font-family:'Lora',Georgia,serif;font-size:1.25rem;margin:0.5rem 0 1rem">Today's Readings</h2>
       <dl class="oyb-list">${rows}</dl>`;
 
+    const SPURGEON_QUOTES = [
+      '\u201cA Bible that\u2019s falling apart usually belongs to someone who isn\u2019t.\u201d',
+      '\u201cVisit many good books, but live in the Bible.\u201d',
+      '\u201cNo man can do me a truer kindness in this world than to pray for me.\u201d',
+      '\u201cThe Word of God is like a lion. You don\u2019t have to defend a lion. All you have to do is let the lion loose.\u201d',
+      '\u201cIt is not how much we have, but how much we enjoy, that makes happiness.\u201d',
+      '\u201cRead the Bible to be wise, believe it to be safe, practice it to be holy.\u201d',
+      '\u201cThe more you read the Bible, and the more you meditate on it, the more you will be astonished with it.\u201d',
+    ];
+    const spurgeon = SPURGEON_QUOTES[dayIndex() % SPURGEON_QUOTES.length];
+
     return _story({
       num:      1,
       category: 'DAILY READINGS',
       section:  'ONE YEAR BIBLE',
-      hed:      "Today's Readings",
-      deck:     entry.ot || entry.nt || 'Scripture readings for today',
-      byline:   'ONE YEAR BIBLE PLAN',
+      hed:      "Today\u2019s Readings",
+      deck:     spurgeon,
+      byline:   '\u2014 Charles Spurgeon',
       bodyHtml: `<dl class="oyb-list">${rows}</dl>`,
       drawer:   'oyb',
     });
