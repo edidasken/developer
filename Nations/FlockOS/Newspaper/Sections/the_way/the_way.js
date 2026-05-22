@@ -199,23 +199,31 @@
 
   /* Build the prayer hours card HTML for the aside */
   function _buildPrayerHoursCard() {
+    var _ico = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+    var _icons = {
+      dawn:    '<svg ' + _ico + '><line x1="2" y1="17" x2="22" y2="17"/><path d="M8 17a4 4 0 0 1 8 0"/><line x1="12" y1="5" x2="12" y2="7"/><line x1="5.22" y1="8.22" x2="6.64" y2="9.64"/><line x1="18.78" y1="8.22" x2="17.36" y2="9.64"/><line x1="2" y1="13" x2="4" y2="13"/><line x1="20" y1="13" x2="22" y2="13"/></svg>',
+      midday:  '<svg ' + _ico + '><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+      three:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="6" y1="9" x2="18" y2="9"/></svg>',
+      vespers: '<svg ' + _ico + '><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+    };
     var now  = _currentPrayerHour();
     var rows = '';
     WAY_PRAYER_HOURS.forEach(function (l) {
       var isNow = (l.id === now.id);
       rows += '<div class="way-ph-row' + (isNow ? ' is-now' : '') + '" data-hour="' + esc(l.id) + '" tabindex="0" role="button" aria-label="Begin ' + esc(l.label) + '">'
-           + '<div class="way-ph-icon">' + l.icon + '</div>'
+           + '<div class="way-ph-icon">' + (_icons[l.id] || '') + '</div>'
            + '<div class="way-ph-body">'
-           +   '<div class="way-ph-time">' + esc(l.time) + ' \u2014 ' + esc(l.label)
+           +   '<div class="way-ph-time">' + esc(l.time)
            +     (isNow ? ' <span class="way-ph-now-pill">Now</span>' : '')
            +   '</div>'
+           +   '<div class="way-ph-sublabel">' + esc(l.label) + '</div>'
            +   '<div class="way-ph-text">' + esc(l.text) + '</div>'
            + '</div>'
            + '</div>';
     });
     return '<div class="way-ph-card">'
-      + '<div class="way-ph-title">Daily Prayer Hours</div>'
-      + '<div class="way-ph-verse">\u201cEvening, morning and noon I cry out in distress, and he hears my voice.\u201d \u2014 Psalm 55:17</div>'
+      + '<div class="way-ph-title">Prayer Hours</div>'
+      + '<div class="way-ph-verse">\u201cEvening, morning and noon I cry out.\u201d \u2014 Ps.\u00a055:17</div>'
       + '<div class="way-ph-list">' + rows + '</div>'
       + '<button class="way-ph-begin-btn" type="button">Begin ' + esc(now.label) + '</button>'
       + '</div>';
@@ -229,6 +237,12 @@
     }
     if (!hour) return;
 
+    var _sico  = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+    var _bell  = '<svg ' + _sico + '><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+    var _book  = '<svg ' + _sico + '><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
+    var _heart = '<svg ' + _sico + '><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+    var _cross = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="6" y1="9" x2="18" y2="9"/></svg>';
+
     var items = hour.intercession.map(function (line, idx) {
       return '<label class="pray-lit-prompt">'
         + '<input type="checkbox" data-prompt="' + idx + '">'
@@ -238,26 +252,25 @@
 
     var html = '<div class="pray-lit-session">'
       + '<div class="pray-lit-step">'
-      +   '<div class="pray-lit-step-label">Step 1 \u2014 Call to Prayer</div>'
+      +   '<div class="pray-lit-step-label">' + _bell + 'Call to Prayer</div>'
       +   '<div class="pray-lit-call">' + esc(hour.callToPrayer) + '</div>'
       + '</div>'
       + '<div class="pray-lit-step">'
-      +   '<div class="pray-lit-step-label">Step 2 \u2014 Scripture Reading</div>'
-      +   '<div class="pray-lit-scripture-ref">' + esc(hour.scripture.ref) + '</div>'
+      +   '<div class="pray-lit-step-label">' + _book + 'Scripture \u2014 ' + esc(hour.scripture.ref) + '</div>'
       +   '<div class="pray-lit-scripture-text">' + esc(hour.scripture.text) + '</div>'
       + '</div>'
       + '<div class="pray-lit-step">'
-      +   '<div class="pray-lit-step-label">Step 3 \u2014 Intercession</div>'
+      +   '<div class="pray-lit-step-label">' + _heart + 'Intercession</div>'
       +   '<div class="pray-lit-intercession">' + items + '</div>'
       + '</div>'
       + '<div class="pray-lit-step">'
-      +   '<div class="pray-lit-step-label">Step 4 \u2014 Closing Prayer</div>'
+      +   '<div class="pray-lit-step-label">' + _cross + 'Closing Prayer</div>'
       +   '<div class="pray-lit-closing">' + esc(hour.closing) + '</div>'
       + '</div>'
       + '<button class="way-amen-btn" type="button" id="way-amen-btn">\u271D Mark Complete \u2014 Amen</button>'
       + '</div>';
 
-    window.FlockGates.openDrawer(hour.icon + ' ' + hour.label, html);
+    window.FlockGates.openDrawer(hour.label, html);
 
     setTimeout(function () {
       var $btn = document.getElementById('way-amen-btn');

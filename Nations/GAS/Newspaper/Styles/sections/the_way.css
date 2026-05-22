@@ -1227,149 +1227,166 @@ a.oyb-stream-card:hover .oyb-stream-arrow { color: var(--sc, var(--accent)); }
 
 /* ═══ DAILY PRAYER HOURS — aside card ══════════════════════════════════════════════════════════════════ */
 .way-ph-card {
-  background: linear-gradient(135deg, #0f1735 0%, #1b264f 100%);
-  border-radius: 12px;
-  padding: 16px;
-  color: #fff;
+  background: var(--paper-card, #faf9f7);
+  border: 1px solid var(--rule, #e5e7ef);
+  border-top: 3px solid var(--gold, #8B7028);
+  border-radius: 3px;
+  padding: 12px 14px 14px;
   margin-bottom: 1rem;
 }
 .way-ph-title {
-  font: 700 1.05rem/1.2 var(--font-serif, Georgia, serif);
-  color: #fff;
-  margin-bottom: 6px;
+  font: 700 0.75rem/1.2 var(--font-ui, sans-serif);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--gold, #8B7028);
+  margin-bottom: 7px;
 }
 .way-ph-verse {
-  font: italic 600 0.78rem/1.5 var(--font-serif, Georgia, serif);
-  color: rgba(255,255,255,.82);
-  margin-bottom: 14px;
+  font: italic 0.9rem/1.55 var(--font-serif, Georgia, serif);
+  color: var(--ink-muted, #6b6b6b);
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule, #e5e7ef);
 }
-.way-ph-list { display: flex; flex-direction: column; gap: 8px; }
+.way-ph-list { display: flex; flex-direction: column; }
 .way-ph-row {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: flex-start;
-  padding: 7px 8px;
-  margin: -7px -8px;
-  border-radius: 8px;
+  padding: 10px 4px;
   cursor: pointer;
+  border-bottom: 1px solid var(--rule, #e5e7ef);
   transition: background 120ms;
 }
-.way-ph-row:hover { background: rgba(255,255,255,.07); }
-.way-ph-row:focus-visible { outline: 2px solid var(--gold,#8B7028); outline-offset: 2px; }
+.way-ph-row:last-child { border-bottom: 0; }
+.way-ph-row:hover { background: var(--paper-sunken, #f4f5f9); }
+.way-ph-row:focus-visible { outline: 2px solid var(--gold, #8B7028); outline-offset: 2px; }
 .way-ph-row.is-now {
-  background: rgba(139,112,40,.22);
-  border-left: 3px solid var(--gold,#8B7028);
-  padding-left: 5px;
+  background: rgba(139,112,40,.06);
+  border-left: 3px solid var(--gold, #8B7028);
+  padding-left: 1px;
 }
-.way-ph-row.is-now .way-ph-time { color: #fff; }
-.way-ph-icon { font-size: 1.1rem; flex: none; line-height: 1.4; }
+.way-ph-icon {
+  width: 30px;
+  min-width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold, #8B7028);
+  padding-top: 2px;
+}
+.way-ph-icon svg { display: block; width: 20px; height: 20px; }
 .way-ph-body { flex: 1; min-width: 0; }
-.way-ph-time { font: 700 0.82rem/1.2 var(--font-ui, sans-serif); color: rgba(255,255,255,.9); }
+.way-ph-time { font: 700 0.95rem/1.2 var(--font-ui, sans-serif); color: var(--ink, #2c2c2c); }
+.way-ph-row.is-now .way-ph-time { color: var(--gold, #8B7028); }
 .way-ph-now-pill {
   display: inline-block;
   margin-left: 5px;
-  padding: 1px 6px;
+  padding: 1px 7px;
   border-radius: 999px;
-  background: var(--gold,#8B7028);
-  color: #1b264f;
-  font: 700 0.62rem var(--font-ui, sans-serif);
+  background: var(--gold, #8B7028);
+  color: #fff;
+  font: 700 0.65rem var(--font-ui, sans-serif);
   text-transform: uppercase;
-  letter-spacing: .05em;
+  letter-spacing: .04em;
   vertical-align: middle;
 }
+.way-ph-sublabel {
+  font: italic 0.95rem/1.2 var(--font-ui, sans-serif);
+  color: var(--ink, #2c2c2c);
+  margin-top: 1px;
+}
+.way-ph-row.is-now .way-ph-sublabel { color: var(--gold, #8B7028); }
 .way-ph-text {
-  font: 0.74rem/1.5 var(--font-ui, sans-serif);
-  color: rgba(255,255,255,.75);
-  margin-top: 2px;
+  font: italic 0.85rem/1.45 var(--font-serif, Georgia, serif);
+  color: var(--ink-muted, #6b6b6b);
+  margin-top: 3px;
 }
 .way-ph-begin-btn {
   display: block;
   width: 100%;
-  margin-top: 14px;
-  padding: 8px 0;
+  margin-top: 12px;
+  padding: 9px 0;
   background: transparent;
-  border: 1.5px solid rgba(255,255,255,.3);
-  border-radius: 8px;
-  color: #fff;
-  font: 700 0.76rem var(--font-ui, sans-serif);
-  letter-spacing: .04em;
+  border: 1.5px solid var(--gold, #8B7028);
+  border-radius: 3px;
+  color: var(--gold, #8B7028);
+  font: 700 0.8rem var(--font-ui, sans-serif);
+  letter-spacing: .07em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background 140ms, border-color 140ms;
+  transition: background 140ms, color 140ms;
 }
-.way-ph-begin-btn:hover {
-  background: rgba(255,255,255,.1);
-  border-color: rgba(255,255,255,.55);
-}
+.way-ph-begin-btn:hover { background: var(--gold, #8B7028); color: #fff; }
 
 /* ═══ GUIDED PRAYER SESSION — drawer content ════════════════════════════════════════════════════════ */
 .pray-lit-session { display: flex; flex-direction: column; }
 .pray-lit-step {
-  padding: 16px 0;
+  padding: 11px 0;
   border-bottom: 1px solid var(--rule, #e5e7ef);
 }
 .pray-lit-step:last-of-type { border-bottom: 0; }
 .pray-lit-step-label {
-  font: 700 0.72rem var(--font-ui, sans-serif);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 700 0.75rem var(--font-ui, sans-serif);
   text-transform: uppercase;
-  letter-spacing: .08em;
+  letter-spacing: .09em;
   color: var(--gold, #8B7028);
-  margin-bottom: 10px;
-}
-.pray-lit-call {
-  font: italic 1.0rem/1.6 var(--font-serif, Georgia, serif);
-  color: var(--ink, #2c2c2c);
-}
-.pray-lit-scripture-ref {
-  font: 700 0.9rem var(--font-ui, sans-serif);
-  color: var(--ink, #2c2c2c);
   margin-bottom: 8px;
 }
+.pray-lit-step-label svg { display: block; width: 15px; height: 15px; flex: none; }
+.pray-lit-call {
+  font: italic 1.0rem/1.65 var(--font-serif, Georgia, serif);
+  color: var(--ink, #2c2c2c);
+}
 .pray-lit-scripture-text {
-  font: italic 600 0.92rem/1.55 var(--font-serif, Georgia, serif);
-  color: #7c3aed;
-  padding: 12px 16px;
-  background: rgba(167,139,250,.10);
-  border-left: 4px solid #7c3aed;
-  border-radius: 0 8px 8px 0;
+  font: italic 0.95rem/1.6 var(--font-serif, Georgia, serif);
+  color: #5b21b6;
+  padding: 10px 14px;
+  background: rgba(139,92,246,.07);
+  border-left: 3px solid #7c3aed;
+  border-radius: 0 6px 6px 0;
   margin: 0;
 }
-.pray-lit-intercession { display: flex; flex-direction: column; gap: 8px; }
+.pray-lit-intercession { display: flex; flex-direction: column; gap: 1px; }
 .pray-lit-prompt {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: flex-start;
   cursor: pointer;
-  padding: 7px 8px;
-  border-radius: 8px;
+  padding: 5px 6px;
+  border-radius: 5px;
   transition: background 120ms;
 }
 .pray-lit-prompt:hover { background: var(--paper-sunken, #f4f5f9); }
 .pray-lit-prompt input { margin-top: 4px; flex: none; cursor: pointer; }
 .pray-lit-prompt input:checked + span { color: var(--ink-muted, #6b6b6b); text-decoration: line-through; }
-.pray-lit-prompt span { font: 0.88rem/1.55 var(--font-ui, sans-serif); color: var(--ink, #2c2c2c); }
+.pray-lit-prompt span { font: 0.95rem/1.55 var(--font-ui, sans-serif); color: var(--ink, #2c2c2c); }
 .pray-lit-closing {
-  font: italic 0.92rem/1.6 var(--font-serif, Georgia, serif);
+  font: italic 0.95rem/1.65 var(--font-serif, Georgia, serif);
   color: var(--ink, #2c2c2c);
   padding: 10px 14px;
   border-left: 3px solid var(--gold, #8B7028);
-  background: rgba(139,112,40,.06);
-  border-radius: 0 6px 6px 0;
+  background: rgba(139,112,40,.05);
+  border-radius: 0 5px 5px 0;
 }
 .way-amen-btn {
   display: block;
   width: 100%;
-  margin-top: 20px;
-  padding: 11px 0;
+  margin-top: 16px;
+  padding: 10px 0;
   background: var(--gold, #8B7028);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  font: 700 0.84rem var(--font-ui, sans-serif);
-  letter-spacing: .04em;
+  border-radius: 3px;
+  font: 700 0.8rem var(--font-ui, sans-serif);
+  letter-spacing: .05em;
   cursor: pointer;
   transition: opacity .15s;
 }
-.way-amen-btn:hover { opacity: .88; }
+.way-amen-btn:hover { opacity: .85; }
 
 /* Edit Daily Messages aside button */
 .way-edit-daily-btn {
