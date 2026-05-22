@@ -55,9 +55,37 @@
       .replace(/"/g, '&quot;');
   }
 
+  // ── Herald date (secret date picker) ─────────────────────────────────────
+  var HERALD_DATE_KEY = 'np_herald_date';
+
+  function todayMidnight() {
+    var d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  function getHeraldDate() {
+    try {
+      var saved = localStorage.getItem(HERALD_DATE_KEY);
+      if (saved) {
+        var d = new Date(saved);
+        if (!isNaN(d.getTime())) { d.setHours(0, 0, 0, 0); return d; }
+      }
+    } catch (_) {}
+    return todayMidnight();
+  }
+
+  function setHeraldDate(d) {
+    try { localStorage.setItem(HERALD_DATE_KEY, d.toISOString()); } catch (_) {}
+  }
+
+  function formatHeraldDate(d) {
+    return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
   // ── Column 1: Lead Article ────────────────────────────────────────────────
   function buildLeadCol(churchName, cfg) {
-    var headline = (cfg && cfg.leadHeadline) || ('Welcome to ' + churchName);
+    var headline = (cfg && cfg.leadHeadline) || ('Welcome to ' + churchName.replace(/^The\s+/i, ''));
     var subhead  = (cfg && cfg.leadSubhead)  || 'Your church, every day.';
     var body1    = (cfg && cfg.leadBody1)    ||
       'The Flock Herald is the daily newspaper of the congregation \u2014 every section ' +
@@ -186,7 +214,7 @@
         '  <hr class="np-column-rule" style="margin-top:14px">',
         '  <p class="np-col__flag">Question of the Day</p>',
         '  <p style="font-family:var(--font-headline);font-size:1rem;line-height:1.5;margin:6px 0 10px;">' + esc(q.question) + '</p>',
-        '  <p style="font-size:0.9rem;color:var(--ink-dim);font-style:italic;">',
+        '  <p style="font-size:1.05rem;color:var(--ink-dim);font-style:italic;">',
         '    Answer: ' + corr + '. ' + esc(optMap[corr] || '') +
         (q.reference ? ' &mdash; ' + esc(q.reference) : '') +
         ' &mdash; <a href="Sections/pulpit/index.html" style="color:var(--gold)">See The Pulpit \u2192</a>',
@@ -202,18 +230,53 @@
     var deck = (cfg && cfg.bannerDeck) ||
       'All the news of the congregation, set in type each morning.';
 
+    var heraldDate = getHeraldDate();
+    var isToday = heraldDate.toDateString() === todayMidnight().toDateString();
+
     return [
       '<div class="np-banner">',
-      '  <p class="np-banner__flag">The Flock Herald &nbsp;&nbsp; ' + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</p>',
+      '  <p class="np-banner__flag">',
+      '    <button class="np-date-btn np-date-btn--prev" aria-label="Previous day" title="Previous day">&#8249;</button>',
+      '    <span id="np-banner-date">' + formatHeraldDate(heraldDate) + '</span>',
+      '    <button class="np-date-btn np-date-btn--next' + (isToday ? ' np-date-btn--disabled' : '') + '" aria-label="Next day" title="Next day"' + (isToday ? ' disabled' : '') + '>&#8250;</button>',
+      '  </p>',
       '  <h2 class="np-banner__headline">' + esc(headline) + '</h2>',
       '  <p class="np-banner__deck">' + esc(deck) + '</p>',
       '</div>',
     ].join('\n');
   }
 
+  // ── Wire date picker buttons ──────────────────────────────────────────────
+  function wireDateButtons() {
+    var prev = document.querySelector('.np-date-btn--prev');
+    var next = document.querySelector('.np-date-btn--next');
+    var dateSpan = document.getElementById('np-banner-date');
+    if (!prev || !next || !dateSpan) return;
+
+    prev.addEventListener('click', function () {
+      var d = getHeraldDate();
+      d.setDate(d.getDate() - 1);
+      setHeraldDate(d);
+      dateSpan.textContent = formatHeraldDate(d);
+      next.disabled = false;
+      next.classList.remove('np-date-btn--disabled');
+    });
+
+    next.addEventListener('click', function () {
+      if (next.disabled) return;
+      var d = getHeraldDate();
+      d.setDate(d.getDate() + 1);
+      setHeraldDate(d);
+      dateSpan.textContent = formatHeraldDate(d);
+      if (d.toDateString() === todayMidnight().toDateString()) {
+        next.disabled = true;
+        next.classList.add('np-date-btn--disabled');
+      }
+    });
+  }
+
   // ── Wire section brief clicks through flipTo ──────────────────────────────
-  function wireBriefClicks() {
-    var briefs = document.querySelectorAll('.np-briefs__link[data-section]');
+  function wireBriefClicks() {    var briefs = document.querySelectorAll('.np-briefs__link[data-section]');
     briefs.forEach(function (a) {
       a.addEventListener('click', function (e) {
         e.preventDefault();
@@ -249,9 +312,8 @@
     ].join('\n');
 
     wireBriefClicks();
+    wireDateButtons();
   }
-
-  // ── Boot ──────────────────────────────────────────────────────────────────
   function boot() {
     var initialLevel = getUserRoleLevel();
     renderHerald(initialLevel);
@@ -262,6 +324,7 @@
           ? ROLE_MAP[sess.role] : 0;
         renderHerald(level);
         wireBriefClicks();
+        wireDateButtons();
       });
     }
   }

@@ -110,7 +110,7 @@
    §3 — FONT SCALE
    ═══════════════════════════════════════════════════════════════ */
 html {
-  font-size: calc(var(--fn-scale) * 100%);
+  font-size: calc(var(--fn-scale) * 115%);
 }
 
 
@@ -209,8 +209,9 @@ button {
   background: transparent;
   color: var(--ink-dim);
   font-family: var(--font-label);
-  font-size: 0.75rem;
+  font-size: 1rem;
   font-variant: small-caps;
+  font-weight: 700;
   letter-spacing: 0.03em;
   white-space: nowrap;
   cursor: pointer;
@@ -288,10 +289,11 @@ button {
 
 .np-masthead__meta {
   font-family: var(--font-label);
-  font-size: 0.7rem;
+  font-size: 1rem;
   font-variant: small-caps;
+  font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--ink-dim);
+  color: var(--ink);
   display: flex;
   justify-content: center;
   gap: 16px;
@@ -333,7 +335,8 @@ button {
   font-family: var(--font-label);
   font-size: 1.05rem;
   font-variant: small-caps;
-  color: var(--ink-dim);
+  font-weight: 700;
+  color: var(--ink);
   letter-spacing: 0.05em;
   margin-bottom: 12px;
 }
@@ -551,8 +554,9 @@ button {
   font-family: var(--font-label);
   font-size: 0.9rem;
   font-variant: small-caps;
+  font-weight: 700;
   letter-spacing: 0.14em;
-  color: var(--ink-dim);
+  color: var(--ink);
   text-transform: uppercase;
   margin-bottom: 6px;
 }
@@ -570,6 +574,40 @@ button {
   font-style: italic;
   font-size: 1.4rem;
   color: var(--ink-mid);
+}
+
+/* Secret date picker */
+.np-banner__flag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+}
+
+.np-date-btn {
+  background: none;
+  border: none;
+  padding: 2px 6px;
+  font-family: var(--font-label);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+  opacity: 0.18;
+  cursor: pointer;
+  line-height: 1;
+  transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.np-date-btn:hover {
+  opacity: 0.7;
+}
+
+.np-date-btn--disabled {
+  opacity: 0.06;
+  cursor: default;
+  pointer-events: none;
 }
 
 /* Column grid */
@@ -605,10 +643,11 @@ button {
 /* Column section flag */
 .np-col__flag {
   font-family: var(--font-label);
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-variant: small-caps;
+  font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--ink-dim);
+  color: var(--ink);
   text-transform: uppercase;
   border-bottom: 1px solid var(--rule-soft);
   padding-bottom: 4px;
@@ -826,10 +865,11 @@ button {
   gap: 7px;
   padding: 6px 14px;
   font-family: var(--font-label);
-  font-size: 0.72rem;
+  font-size: 1rem;
   font-variant: small-caps;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  color: var(--ink-dim);
+  color: var(--ink);
   background: transparent;
   border: 1px solid transparent;
   border-radius: 3px;
@@ -876,10 +916,11 @@ button {
 
 .np-flip-counter {
   font-family: var(--font-label);
-  font-size: 0.62rem;
+  font-size: 0.95rem;
   font-variant: small-caps;
+  font-weight: 700;
   letter-spacing: 0.06em;
-  color: var(--ink-dim);
+  color: var(--ink);
   text-align: center;
   flex: 1;
   user-select: none;
