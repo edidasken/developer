@@ -108,29 +108,38 @@
           devScripture  = entry.scripture || '';
           devQuestion   = entry.question || '';
           devPrayer     = entry.prayer || '';
+
+          const _svgBook   = `<svg class="herald-devo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
+          const _svgReflect= `<svg class="herald-devo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.6-1.4 4.8-3.5 6.1L15 17H9l-.5-1.9C6.4 13.8 5 11.6 5 9a7 7 0 0 1 7-7z"/></svg>`;
+          const _svgPrayer = `<svg class="herald-devo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 3a3 3 0 0 0-3 3l-4 9-4-9a3 3 0 1 0-2.7 4.3L9 20h6l4.7-9.7A3 3 0 0 0 18 3z"/></svg>`;
+
           _drawers['front-page'] = `<div class="drawer-article">
             <p class="drawer-article__kicker">DAILY DEVOTIONAL \u00b7 ${esc(shortDate)}</p>
             ${devTheme ? `<p class="drawer-article__theme">${esc(devTheme)}</p>` : ''}
             <h2 class="drawer-article__hed">${esc(devTitle)}</h2>
-            ${devScripture ? `<blockquote class="drawer-article__scripture">${esc(devScripture)}</blockquote>` : ''}
-            ${devReflection ? `<p class="drawer-article__body">${esc(devReflection)}</p>` : ''}
-            ${devQuestion ? `<p class="drawer-article__question">${esc(devQuestion)}</p>` : ''}
-            ${devPrayer ? `<div class="drawer-article__prayer"><span class="drawer-article__prayer-label">Prayer</span>${esc(devPrayer)}</div>` : ''}
-          </div>`;        }
+            ${devScripture ? `<blockquote class="drawer-article__scripture">
+              <span class="drawer-article__scripture-icon">${_svgBook}</span>
+              <span>${esc(devScripture)}</span>
+            </blockquote>` : ''}
+            ${devReflection ? `<p class="drawer-article__body drawer-article__dropcap">${esc(devReflection)}</p>` : ''}
+            ${devQuestion ? `<div class="drawer-article__question">
+              ${_svgReflect}
+              <em>${esc(devQuestion)}</em>
+            </div>` : ''}
+            ${devPrayer ? `<div class="drawer-article__prayer">
+              <span class="drawer-article__prayer-label">${_svgPrayer} Prayer</span>
+              <p>${esc(devPrayer)}</p>
+            </div>` : ''}
+          </div>`;
+        }
       }
     } catch (_) {}
 
     const hed  = devTitle || `The Flock Herald \u2014 ${shortDate}`;
-    const deck = devTheme && devScripture
-      ? `${devTheme} \u2014 ${devScripture.split('\u2014').pop().trim() || devScripture}`
-      : devTheme || 'Shepherding the flock by the power of the Word.';
 
-    // Scripture pull-quote block
-    const scriptureBlock = devScripture
-      ? `<div class="herald-scripture">
-          <p class="herald-scripture__ref">${esc(devScripture)}</p>
-         </div>`
-      : '';
+    const _svgBook   = `<svg class="herald-devo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
+    const _svgReflect= `<svg class="herald-devo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.6-1.4 4.8-3.5 6.1L15 17H9l-.5-1.9C6.4 13.8 5 11.6 5 9a7 7 0 0 1 7-7z"/></svg>`;
+    const _svgPrayer = `<svg class="herald-devo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 3a3 3 0 0 0-3 3l-4 9-4-9a3 3 0 1 0-2.7 4.3L9 20h6l4.7-9.7A3 3 0 0 0 18 3z"/></svg>`;
 
     const hedInner = _drawers['front-page']
       ? `<button class="story-hed-btn" type="button" data-open-drawer="front-page">${esc(hed)}</button>`
@@ -139,10 +148,23 @@
     return `<article class="story story--lead">
       <p class="story-kicker">DAILY DEVOTIONAL \u00b7\u00a0${esc(dateStr.toUpperCase())}</p>
       <h2 class="story-hed">${hedInner}</h2>
-      <p class="story-deck">${esc(deck)}</p>
+      ${devTheme ? `<p class="story-deck">${esc(devTheme)}</p>` : ''}
       <p class="story-byline">${esc(churchName)} \u00b7 ${esc(shortDate)}</p>
-      ${devReflection ? `<p class="story-body story-body--lead story-dropcap">${esc(devReflection)}</p>` : '<p class="story-body story-body--lead">Today the flock gathers around the living Word. May God\'s truth shepherd your steps, strengthen your hands, and fill your heart with his peace as you read this edition.</p>'}
-      ${scriptureBlock}
+      <div class="story-body story-body--lead">
+        ${devScripture ? `<blockquote class="herald-devo-scripture">
+          <span class="herald-devo-scripture__icon">${_svgBook}</span>
+          <span>${esc(devScripture)}</span>
+        </blockquote>` : ''}
+        ${devReflection ? `<p class="herald-devo-reflection story-dropcap">${esc(devReflection)}</p>` : '<p>Today the flock gathers around the living Word.</p>'}
+        ${devQuestion ? `<div class="herald-devo-question">
+          ${_svgReflect}
+          <em>${esc(devQuestion)}</em>
+        </div>` : ''}
+        ${devPrayer ? `<div class="herald-devo-prayer">
+          <span class="herald-devo-prayer__label">${_svgPrayer} Prayer</span>
+          <p>${esc(devPrayer)}</p>
+        </div>` : ''}
+      </div>
       <hr class="story-rule">
     </article>`;
   }

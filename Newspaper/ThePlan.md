@@ -159,7 +159,7 @@ serving, and seeking God. Every pixel must reflect that weight.
   "Open Service", "Send Invitation" — never just "Submit" or "OK".
 
 ### Visual consistency checklist (enforce per section)
-- [ ] Section masthead has the correct `--sec-color` 3px top stripe
+- [ ] Section masthead matches the AS-BUILT standard (see "The Masthead" section): fixed, brand top-left, Aa top-right, Great Vibes title + bold tagline + bold date centered, SVG ornament, paddingTop set via JS
 - [ ] All card headers use `'Lora'` at the correct weight
 - [ ] All body text and labels use `'Plus Jakarta Sans'`
 - [ ] No raw hex values in section CSS — only `var(--token)` references
@@ -206,9 +206,8 @@ All colors come directly from `new_covenant.css`. No new values invented.
 | The Calendar | Success Green | `--success` | `#3d8b4f` |
 | The Weavers | Rose | `--rose` | `#e69aba` |
 
-Signature color appears in exactly two places per section:
+Signature color appears in exactly one place per section:
 1. The active chip in the section nav bar (background)
-2. A 3px top accent stripe on the section masthead
 
 Everywhere else: shared paper/ink palette below.
 
@@ -601,25 +600,35 @@ sections. Stories span variable column widths. The front page commands the eye
 like a broadsheet, not an app dashboard.
 
 ### The Masthead (top of every section page)
+
+> **⚠️ AS-BUILT STANDARD — May 22, 2026**
+> The masthead below is the confirmed, shipped design for every section tab.
+> Do not deviate from this unless the user explicitly instructs otherwise.
+> Herald and The Way are the reference implementations.
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ ══════════════════════════════════════════════════════════════ │  ← 3px rule
+│ Powered by FlockOS          [section title]              [Aa]   │  ← absolute top-left brand / top-right Aa btn
 │                                                                 │
-│               The Flock Herald                                  │  ← nameplate
+│                    The Flock Herald                             │  ← Great Vibes, 1.75rem, centered
+│          SHEPHERDING THE FLOCK BY THE POWER OF THE WORD        │  ← bold uppercase tagline, centered
+│                    FRIDAY, MAY 22, 2026                         │  ← bold uppercase date, centered
 │                                                                 │
-│                    FLOCKOS                                      │  ← subhead, tracked caps
-│   DISCIPLESHIP  ·  DEVOTIONS  ·  MISSIONS  ·  THEOLOGY         │  ← tagline
-│                                                                 │
-│ ══════════════════════════════════════════════════════════════ │  ← 1px + 3px double rule
-│ VOL. 2026 · NO. 141    ‹ MAY 22, 2026 ›    ROOT.YHWH.ONE      │  ← edition bar
-│ ══════════════════════════════════════════════════════════════ │  ← 1px rule
+│  ─────────────────── ◆  ✛  ◆ ───────────────────────────────  │  ← gold SVG ornament (lines + diamonds)
 └─────────────────────────────────────────────────────────────────┘
 ```
-- Nameplate: existing live typeface (do not change — already established on live site)
-- Background: `--paper` (cream `#f5f0e8`), not white
-- All rule lines: `--rule` token (`#2c2c2c`), hairline (`1px`) or bold (`3px`)
-- Edition bar: Vol, issue number auto-calculated from year + day-of-year. Date
-  navigation arrows (‹ ›) let user page through past editions. URL right-aligned.
+
+**Standard rules (enforce on every section):**
+- `position: fixed; top: 0; left: 0; right: 0; width: 100%` — always pinned
+- `background: var(--paper-card)` — no tinted backgrounds, no top accent stripe
+- "Powered by FlockOS" — `position: absolute`, top-left, vertically centered with Aa button, mixed case, no uppercase transform
+- `Aa` button — `position: absolute`, top-right, iOS safe-area aware (`env(safe-area-inset-*)`)
+- Great Vibes title at `1.75rem` — centered
+- Tagline + date — bold (`font-weight: 700`), uppercase, `var(--ink-muted)` — centered
+- SVG ornament (`viewBox="0 0 400 16"`, `width: min(500px, 92%)`) — centered, always visible
+- `document.body.style.paddingTop = masthead.offsetHeight + 'px'` — set via JS on load + resize + `document.fonts.ready`
+- **Herald only:** collapses to compact on scroll (`scrollY > 100`), expands at `scrollY < 50` (hysteresis). Large nameplate (`clamp(2.5rem, 8vw, 4.5rem)`) visible only in landing state.
+- **All other sections:** always show compact form only — no landing/expand state.
 
 ### The Column Grid — Newspaper Layout
 

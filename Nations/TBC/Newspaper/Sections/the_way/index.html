@@ -35,14 +35,28 @@
     <!-- Aa button: absolute top-right, safe area aware -->
     <button class="sec-masthead__font-btn way-aa-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
 
-    <div class="way-masthead__folio">
-      <div class="way-masthead__center">
-        <h1 class="way-masthead__title">The Flock Herald</h1>
-        <p class="way-masthead__tagline">Shepherding the Flock by the Power of the Word</p>
-        <p class="way-masthead__date" id="way-header-date"></p>
+    <!-- Brand: absolute top-left -->
+    <span class="way-brand">Powered by FlockOS</span>
+
+    <!-- Compact folio: always visible -->
+    <div class="way-compact-folio">
+      <div class="way-compact__center">
+        <h1 class="way-compact__title">The Flock Herald</h1>
+        <p class="way-compact__tagline">Shepherding the Flock by the Power of the Word</p>
+        <p class="way-compact__date" id="way-header-date"></p>
       </div>
     </div>
-    <div class="way-masthead__rule" aria-hidden="true"></div>
+
+    <!-- Decorative ornament -->
+    <svg class="way-ornament" viewBox="0 0 400 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line x1="0" y1="8" x2="168" y2="8" stroke="var(--gold)" stroke-width="0.75"/>
+      <path d="M171 5 L175 8 L171 11 L167 8 Z" fill="var(--gold)"/>
+      <path d="M200 2 L208 8 L200 14 L192 8 Z" fill="var(--gold)"/>
+      <rect x="198.5" y="2" width="3" height="12" fill="var(--paper-card)"/>
+      <rect x="192" y="6.5" width="16" height="3" fill="var(--paper-card)"/>
+      <path d="M229 5 L233 8 L229 11 L225 8 Z" fill="var(--gold)"/>
+      <line x1="232" y1="8" x2="400" y2="8" stroke="var(--gold)" stroke-width="0.75"/>
+    </svg>
   </header>
 
   <!-- Section Nav Bar — scrolls with page content -->

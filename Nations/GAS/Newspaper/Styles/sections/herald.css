@@ -29,6 +29,10 @@
   right: 0;
   width: 100%;
   z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   transition: padding 0.18s ease;
 }
 
@@ -46,34 +50,46 @@
   min-width: 52px !important;
 }
 
-/* Folio row: church/edition label */
+/* Folio row: absolute top-left, mirrors Aa button top-right */
 .herald-folio {
-  display: block;
-  text-align: left;
-  gap: 0.5rem;
+  position: absolute;
+  top: calc(max(0.6rem, env(safe-area-inset-top)) + 0.675rem);
+  left: max(0.75rem, env(safe-area-inset-left));
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-size: 0.625rem;
-  text-transform: uppercase;
+  font-size: 0.5625rem;
+  font-weight: 700;
   letter-spacing: 0.09em;
   color: var(--ink-muted);
-  padding-bottom: 0.5rem;
 }
-.herald-folio__label { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: none; font-weight: 700; }
+.herald-folio__label { white-space: nowrap; }
 
-/* Double rule: gold accent line above nameplate */
-.herald-nameplate-rule {
-  border: none;
-  border-top: 5px double var(--gold);
-  margin: 0;
+/* Decorative ornament — permanent, never collapses */
+.herald-ornament {
+  width: min(500px, 92%);
+  height: 16px;
+  margin: 0.375rem 0 0.375rem;
+  flex-shrink: 0;
+}
+/* Tighten gap above ornament when compact */
+.sec-herald .sec-masthead.is-compact .herald-ornament {
+  margin-top: 0;
+}
+/* Collapse compact-folio bottom padding in compact to pull ornament flush */
+.sec-herald .sec-masthead.is-compact .herald-compact-folio {
+  padding-bottom: 0.125rem;
 }
 
 /* Nameplate: large italic Lora title */
 .herald-nameplate {
   padding: 1.25rem 0 0.375rem;
+  overflow: visible;
+  max-height: 200px;
+  opacity: 1;
+  transition: max-height 0.35s ease, opacity 0.28s ease, padding 0.35s ease, margin 0.35s ease;
 }
 .herald-nameplate__title {
   font-family: 'Great Vibes', cursive;
-  font-size: clamp(3rem, 10vw, 5.5rem);
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
   font-weight: 400;
   font-style: normal;
   color: var(--ink);
@@ -109,13 +125,17 @@
 
 /* ── Compact mini-nameplate (sticky collapse on scroll) ─────────────────── */
 /* Large nameplate pieces — collapse smoothly when compact */
-.herald-folio,
+.herald-folio {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.28s ease;
+}
 .herald-nameplate {
-  overflow: hidden;
+  overflow: visible;
+  max-height: 200px;
+  opacity: 1;
   transition: max-height 0.35s ease, opacity 0.28s ease, padding 0.35s ease, margin 0.35s ease;
 }
-.herald-folio     { max-height: 60px;  opacity: 1; }
-.herald-nameplate { max-height: 200px; opacity: 1; }
 
 /* Compact folio — slides in from under the double gold rule */
 .herald-compact-folio {
@@ -129,7 +149,22 @@
   transform: translateY(-6px);
   transition: max-height 0.35s ease, opacity 0.3s ease, transform 0.3s ease;
 }
-.herald-compact__brand { display: none; }
+.herald-compact__brand {
+  position: absolute;
+  top: calc(max(0.6rem, env(safe-area-inset-top)) + 0.675rem);
+  left: max(0.75rem, env(safe-area-inset-left));
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  color: var(--ink-muted);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+.sec-herald .sec-masthead.is-compact .herald-compact__brand {
+  opacity: 1;
+  pointer-events: auto;
+}
 .herald-compact__center { text-align: center; }
 .herald-compact__title {
   font-family: 'Great Vibes', cursive;
@@ -143,6 +178,7 @@
   font-size: 0.4375rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
+  font-weight: 700;
   color: var(--ink-muted);
   margin-top: 0.125rem;
 }
@@ -150,22 +186,14 @@
   font-size: 0.5rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  font-weight: 700;
   color: var(--ink-muted);
   margin-top: 0.0625rem;
 }
 .herald-compact__btn { display: flex; justify-content: flex-end; }
 
-/* Separator rule — slides in with compact folio */
-.herald-compact-rule {
-  display: block;
-  border: none;
-  border-top: 1px solid var(--rule);
-  margin: 0.375rem 0 0;
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.28s ease;
-}
+/* Separator rule — hidden; ornament replaces it */
+.herald-compact-rule { display: none; }
 
 /* is-compact: double gold rule stays; folio+nameplate collapse; compact slides in */
 .sec-herald .sec-masthead.is-compact {
@@ -182,9 +210,13 @@
   max-height: 2px;
   opacity: 1;
 }
-/* Collapse large nameplate — gold bars stay visible always */
-.sec-herald .sec-masthead.is-compact .herald-folio,
+/* Collapse large nameplate */
+.sec-herald .sec-masthead.is-compact .herald-folio {
+  opacity: 0;
+  pointer-events: none;
+}
 .sec-herald .sec-masthead.is-compact .herald-nameplate {
+  overflow: hidden;
   max-height: 0;
   opacity: 0;
   padding: 0;
@@ -621,7 +653,31 @@ details.heart-rx[open] .heart-rx__toggle::before { content: '▾ '; }
   margin: 0 0 1.25rem;
 }
 
+.drawer-article__dropcap::first-letter {
+  font-family: 'Great Vibes', cursive;
+  font-size: 3.5em;
+  float: left;
+  line-height: 0.75;
+  margin: 0.1em 0.1em 0 0;
+  color: var(--gold);
+}
+
+.drawer-article__scripture {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.drawer-article__scripture-icon {
+  flex-shrink: 0;
+  margin-top: 0.1em;
+  color: var(--gold);
+}
+
 .drawer-article__question {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
   border-top: 1px solid var(--rule);
   padding-top: 1rem;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -632,8 +688,10 @@ details.heart-rx[open] .heart-rx__toggle::before { content: '▾ '; }
   margin: 0 0 1.25rem;
 }
 
-.drawer-article__question::before {
-  content: '🙏 ';
+.drawer-article__question .herald-devo-icon {
+  flex-shrink: 0;
+  margin-top: 0.1em;
+  color: var(--gold);
 }
 
 .drawer-article__prayer {
@@ -648,13 +706,119 @@ details.heart-rx[open] .heart-rx__toggle::before { content: '▾ '; }
   margin: 0;
 }
 
+.drawer-article__prayer p { margin: 0; }
+
 .drawer-article__prayer-label {
   font-style: normal;
   font-weight: 700;
   color: var(--gold);
-  display: block;
-  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.4rem;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.drawer-article__prayer-label .herald-devo-icon {
+  color: var(--gold);
+}
+
+/* ── Herald Devo Icons (shared SVG sizing) ─────────────────────────────── */
+.herald-devo-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* ── Herald Devotional Card Blocks (lead story card) ───────────────────── */
+.herald-devo-scripture {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  border-left: 3px solid var(--gold);
+  background: var(--paper-sunken);
+  padding: 0.75rem 0.875rem;
+  border-radius: 0 4px 4px 0;
+  font-family: 'Lora', Georgia, serif;
+  font-style: italic;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink);
+  margin: 0 0 1rem;
+}
+
+.herald-devo-scripture__icon {
+  flex-shrink: 0;
+  margin-top: 0.1em;
+  color: var(--gold);
+}
+
+.herald-devo-reflection {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: var(--ink);
+  margin: 0 0 1rem;
+}
+
+.herald-devo-reflection.story-dropcap::first-letter {
+  font-family: 'Great Vibes', cursive;
+  font-size: 3.5em;
+  float: left;
+  line-height: 0.75;
+  margin: 0.1em 0.1em 0 0;
+  color: var(--gold);
+}
+
+.herald-devo-question {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  border-top: 1px solid var(--rule);
+  padding-top: 0.875rem;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-style: italic;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+  margin: 0 0 0.875rem;
+}
+
+.herald-devo-question .herald-devo-icon {
+  flex-shrink: 0;
+  margin-top: 0.05em;
+  color: var(--gold);
+}
+
+.herald-devo-prayer {
+  background: var(--paper-sunken);
+  border-radius: 6px;
+  padding: 0.75rem 0.875rem;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-style: italic;
+  line-height: 1.65;
+  color: var(--ink-muted);
+  margin: 0 0 0.5rem;
+}
+
+.herald-devo-prayer p { margin: 0; }
+
+.herald-devo-prayer__label {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.herald-devo-prayer__label .herald-devo-icon {
+  color: var(--gold);
 }

@@ -40,12 +40,14 @@
 
     <!-- Folio row: church label only -->
     <div class="herald-folio">
-      <span class="herald-folio__label">Powered By FlockOS</span>
+      <span class="herald-folio__label">Powered by FlockOS</span>
     </div>
+
+    <!-- Brand label: absolute top-left, visible only in compact state -->
+    <span class="herald-compact__brand">Powered by FlockOS</span>
 
     <!-- Compact mini-nameplate — revealed when scrolled -->
     <div class="herald-compact-folio">
-      <span class="herald-compact__brand">Powered By FlockOS</span>
       <div class="herald-compact__center">
         <h2 class="herald-compact__title">The Flock Herald</h2>
         <p class="herald-compact__tagline">Shepherding the Flock by the Power of the Word</p>
@@ -61,8 +63,16 @@
       <p class="herald-nameplate__date" id="herald-date">Loading…</p>
     </div>
 
-    <!-- Double gold rule — permanent bottom of fixed header -->
-    <div class="herald-nameplate-rule" aria-hidden="true"></div>
+    <!-- Decorative ornament — permanent, shows in both landing and compact -->
+    <svg class="herald-ornament" viewBox="0 0 400 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line x1="0" y1="8" x2="168" y2="8" stroke="var(--gold)" stroke-width="0.75"/>
+      <path d="M171 5 L175 8 L171 11 L167 8 Z" fill="var(--gold)"/>
+      <path d="M200 2 L208 8 L200 14 L192 8 Z" fill="var(--gold)"/>
+      <rect x="198.5" y="2" width="3" height="12" fill="var(--paper-card)"/>
+      <rect x="192" y="6.5" width="16" height="3" fill="var(--paper-card)"/>
+      <path d="M229 5 L233 8 L229 11 L225 8 Z" fill="var(--gold)"/>
+      <line x1="232" y1="8" x2="400" y2="8" stroke="var(--gold)" stroke-width="0.75"/>
+    </svg>
 
   </header>
 
@@ -106,8 +116,15 @@
       }
 
       function onScroll() {
-        masthead.classList.toggle('is-compact', window.scrollY > 80);
-        setTimeout(updatePadding, 360);
+        var y = window.scrollY;
+        var compact = masthead.classList.contains('is-compact');
+        if (!compact && y > 100) {
+          masthead.classList.add('is-compact');
+          setTimeout(updatePadding, 360);
+        } else if (compact && y < 50) {
+          masthead.classList.remove('is-compact');
+          setTimeout(updatePadding, 360);
+        }
       }
 
       window.addEventListener('scroll', onScroll, { passive: true });
