@@ -156,7 +156,7 @@
   padding-bottom: 0.625rem;
   max-height: 0;
   opacity: 0;
-  overflow: hidden;
+  overflow: visible;
   pointer-events: none;
   transform: translateY(-6px);
   transition: max-height 0.3s ease-in-out, opacity 0.24s ease-in-out, transform 0.24s ease-in-out;
@@ -185,6 +185,7 @@
   color: var(--ink);
   line-height: 1.1;
   margin: 0;
+  white-space: nowrap;
 }
 .herald-compact__tagline {
   font-size: 0.4375rem;
