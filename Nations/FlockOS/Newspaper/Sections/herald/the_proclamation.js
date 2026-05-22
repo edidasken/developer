@@ -107,7 +107,7 @@
           psalmTitle  = entry.title || '';
           psalmSummary = entry.summary || '';
           _drawers['front-page'] = `
-            <p class="story-kicker">DAILY SCRIPTURE · ${esc(shortDate)}</p>
+            <p class="story-kicker">DAILY DEVOTIONAL · ${esc(shortDate)}</p>
             <h2 style="font-family:'Lora',Georgia,serif;font-size:1.375rem;line-height:1.25;margin:0.5rem 0 0.25rem">${esc(psalmRef)}</h2>
             ${psalmTitle ? `<p style="font-family:'Lora',Georgia,serif;font-style:italic;color:var(--ink-muted);font-size:1rem;margin:0 0 1rem">${esc(psalmTitle)}</p>` : ''}
             ${psalmSummary ? `<p style="line-height:1.75;color:var(--ink)">${esc(psalmSummary)}</p>` : ''}`;
