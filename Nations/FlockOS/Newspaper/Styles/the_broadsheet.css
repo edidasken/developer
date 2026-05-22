@@ -773,7 +773,9 @@ hr, .broadsheet-rule {
   text-transform: uppercase;
   color: var(--gold);
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  cursor: pointer;
 }
+.story-readmore-strip:hover { opacity: 0.75; }
 .story-readmore-strip__rule {
   flex: 1;
   height: 1px;

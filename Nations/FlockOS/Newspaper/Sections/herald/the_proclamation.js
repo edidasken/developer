@@ -74,7 +74,7 @@
       ${opts.deck   ? `<p class="story-deck">${esc(opts.deck)}</p>` : ''}
       ${opts.byline ? `<p class="story-byline">${esc(opts.byline)}</p>` : ''}
       ${opts.bodyHtml ? `<div class="story-body${bodyCls}">${opts.bodyHtml}</div>` : ''}
-      ${opts.drawer ? `<p class="story-readmore-strip"><span>Read more</span><span class="story-readmore-strip__rule"></span><span>&#8594;</span></p>` : ''}
+      ${opts.drawer ? `<p class="story-readmore-strip" data-open-drawer="${esc(opts.drawer)}"><span>Read more</span><span class="story-readmore-strip__rule"></span><span>&#8594;</span></p>` : ''}
       <hr class="story-rule">
     </article>`;
   }
@@ -656,7 +656,7 @@
         ${unreachedLine}
         ${summaryCard ? `<p class="story-body">${esc(summaryCard)}</p>` : ''}
         ${perLabel ? `<p class="nation-persecution">⚠ ${esc(perLabel)}</p>` : ''}
-        <p class="story-readmore-strip"><span>Read more</span><span class="story-readmore-strip__rule"></span><span>&#8594;</span></p>
+        <p class="story-readmore-strip" data-open-drawer="nation"><span>Read more</span><span class="story-readmore-strip__rule"></span><span>&#8594;</span></p>
         <hr class="story-rule">
       </article>`;
   }
@@ -694,7 +694,7 @@
         <p class="story-kicker">${esc(category || 'DAILY SELF-INVENTORY')}</p>
         <h2 class="story-hed"><button class="story-hed-btn" type="button" data-open-drawer="heart" style="font-size:1rem">${esc(qText)}</button></h2>
         ${verse ? `<p class="story-byline">${esc(verse)}</p>` : ''}
-        <p class="story-readmore-strip"><span>Read more</span><span class="story-readmore-strip__rule"></span><span>&#8594;</span></p>
+        <p class="story-readmore-strip" data-open-drawer="heart"><span>Read more</span><span class="story-readmore-strip__rule"></span><span>&#8594;</span></p>
         <hr class="story-rule">
       </article>`;
   }
