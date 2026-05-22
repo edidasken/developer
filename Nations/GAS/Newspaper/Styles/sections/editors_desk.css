@@ -1,19 +1,189 @@
 /*
  * Styles/sections/editors_desk.css
- * Section: The Editor's Desk — Newsroom dark
- *
- * ADDITIVE ONLY. Rules here:
- *   1. Only define --sec-* prefixed custom properties
- *   2. Never redefine tokens from the_broadsheet.css
- *   3. Max 80 lines for cosmetic sections; larger only for unique layouts
- *   4. Accent color: var(--ed-bg)
+ * Section: The Editor's Desk
+ * Accent: var(--ed-bg) = #120f08  (deep newsroom ink)
  */
 
-/* Section accent (used by section-specific headers, active chips, etc.) */
-.sec-editors_desk--accent {
-  color: var(--ed-bg);
+/* ── Editorial form layout ───────────────────────────────────────────────── */
+
+/* Two-col grid: left (2fr) for banner+lead, right (1fr) for scripture+actions */
+.ed-cols {
+  grid-template-columns: 2fr 1fr;
+  align-items: start;
 }
 
-.sec-editors_desk--border {
+@media (max-width: 700px) {
+  .ed-cols { grid-template-columns: 1fr; }
+  .ed-cols .np-col[style*="span 2"] { grid-column: span 1 !important; }
+}
+
+/* Section group within a col */
+.ed-section {
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.ed-section:last-child { border-bottom: none; margin-bottom: 0; }
+
+.ed-section__title {
+  font-family: var(--font-label);
+  font-size: 0.62rem;
+  font-variant: small-caps;
+  letter-spacing: 0.14em;
+  color: var(--ed-bg);
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--ed-bg);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.ed-section__desc {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--ink-dim);
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
+/* Individual field */
+.ed-field {
+  margin-bottom: 14px;
+}
+
+.ed-label {
+  display: block;
+  font-family: var(--font-label);
+  font-size: 0.6rem;
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+  color: var(--ink-dim);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.ed-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--ink);
+  background: var(--paper-dark, #f2ede1);
+  border: 1px solid var(--rule-soft);
+  border-radius: 2px;
+  outline: none;
+  resize: vertical;
+  line-height: 1.5;
+  transition: border-color 0.15s, background 0.15s;
+  -webkit-appearance: none;
+}
+
+.ed-input:focus {
+  border-color: var(--ed-bg);
+  background: var(--paper);
+}
+
+.ed-input::placeholder {
+  color: var(--ink-faint, #bfb8a8);
+  font-style: italic;
+}
+
+textarea.ed-input {
+  min-height: 80px;
+}
+
+/* Action buttons */
+.ed-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.ed-btn {
+  display: block;
+  width: 100%;
+  padding: 11px 16px;
+  font-family: var(--font-label);
+  font-size: 0.72rem;
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--rule-soft);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  line-height: 1;
+}
+
+.ed-btn--save {
+  background: var(--ed-bg);
+  color: var(--paper);
   border-color: var(--ed-bg);
 }
+
+.ed-btn--save:hover { opacity: 0.85; }
+
+.ed-btn--preview {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--rule-soft);
+}
+
+.ed-btn--preview:hover {
+  background: var(--paper-dark, #f2ede1);
+  border-color: var(--ink-dim);
+}
+
+.ed-btn--reset {
+  background: transparent;
+  color: var(--ink-dim);
+  border-color: var(--rule-faint, #e0d9cc);
+  font-style: italic;
+}
+
+.ed-btn--reset:hover {
+  border-color: var(--rule-soft);
+  color: var(--ink);
+}
+
+/* Status message */
+.ed-status {
+  font-family: var(--font-label);
+  font-size: 0.68rem;
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  text-align: center;
+  min-height: 20px;
+  margin-top: 12px;
+  transition: opacity 0.3s;
+}
+
+.ed-status--ok    { color: #3a6e3a; }
+.ed-status--error { color: #8b2020; }
+
+/* Override badge */
+.ed-badge {
+  display: inline-block;
+  font-family: var(--font-label);
+  font-size: 0.58rem;
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  border-radius: 2px;
+  background: var(--rule-faint, #e0d9cc);
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.ed-badge--active {
+  background: var(--ed-bg);
+  color: var(--paper);
+}
+
