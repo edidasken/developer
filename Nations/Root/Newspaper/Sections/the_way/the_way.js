@@ -449,25 +449,6 @@
     $hd.innerHTML = '<span class="section-label">TODAY</span>';
     $aside.appendChild($hd);
 
-    /* Daily Prayer Hours card */
-    var $phWrap = document.createElement('div');
-    $phWrap.innerHTML = _buildPrayerHoursCard();
-    $aside.appendChild($phWrap.firstElementChild);
-    var $phCard = $aside.querySelector('.way-ph-card');
-    if ($phCard) {
-      $phCard.querySelector('.way-ph-begin-btn').addEventListener('click', function () {
-        _openLiturgySession(_currentPrayerHour().id);
-      });
-      $phCard.querySelectorAll('.way-ph-row').forEach(function (row) {
-        row.addEventListener('click', function () {
-          _openLiturgySession(row.dataset.hour);
-        });
-        row.addEventListener('keydown', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); _openLiturgySession(row.dataset.hour); }
-        });
-      });
-    }
-
     /* Psalm of the day from psalms module */
     _importMod('the_gospel_psalms')
       .then(function (mod) {
@@ -501,6 +482,56 @@
         }
       })
       .catch(function () {});
+
+    /* All Modules quick links */
+    var $rule2 = document.createElement('div');
+    $rule2.className = 'section-rule';
+    $rule2.style.marginTop = '1.25rem';
+    $rule2.innerHTML = '<span class="section-label">ALL MODULES</span>';
+    $aside.appendChild($rule2);
+
+    var $links = document.createElement('div');
+    $links.className = 'way-aside-links';
+    ASIDE_MODULES.forEach(function (item) {
+      var $btn = document.createElement('button');
+      $btn.type = 'button';
+      $btn.className = 'way-aside-link';
+      $btn.style.setProperty('--aside-accent', item.accent || 'var(--accent)');
+      $btn.innerHTML = item.svg
+        ? '<span class="way-aside-link__icon" aria-hidden="true">' + item.svg + '</span>'
+          + '<span class="way-aside-link__label">' + esc(item.label) + '</span>'
+        : esc(item.label);
+      $btn.addEventListener('click', function () {
+        openModule(item.mod, false, item.label);
+      });
+      $links.appendChild($btn);
+    });
+    $aside.appendChild($links);
+
+    /* Daily Prayer Hours card */
+    var $phRule = document.createElement('div');
+    $phRule.className = 'section-rule';
+    $phRule.style.marginTop = '1.25rem';
+    $phRule.innerHTML = '<span class="section-label">PRAYER HOURS</span>';
+    $aside.appendChild($phRule);
+
+    var $phWrap = document.createElement('div');
+    $phWrap.innerHTML = _buildPrayerHoursCard();
+    $aside.appendChild($phWrap.firstElementChild);
+    var $phCard = $aside.querySelector('.way-ph-card');
+    if ($phCard) {
+      $phCard.querySelector('.way-ph-begin-btn').addEventListener('click', function () {
+        _openLiturgySession(_currentPrayerHour().id);
+      });
+      $phCard.querySelectorAll('.way-ph-row').forEach(function (row) {
+        row.addEventListener('click', function () {
+          _openLiturgySession(row.dataset.hour);
+        });
+        row.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); _openLiturgySession(row.dataset.hour); }
+        });
+      });
+    }
 
     /* Edit daily messages button — leaders (role >= 3) only */
     var _editRole = (window.FlockGates && typeof window.FlockGates.getUserRole === 'function')

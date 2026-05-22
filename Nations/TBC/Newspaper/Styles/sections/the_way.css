@@ -1489,6 +1489,52 @@ a.oyb-stream-card:hover .oyb-stream-arrow { color: var(--sc, var(--accent)); }
 }
 .way-today-card__open:hover { opacity: 0.75; }
 
+/* ── All Modules quick links ───────────────────────────────────────────────── */
+.way-aside-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+.way-aside-link {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  padding: 0.5rem 0.25rem;
+  text-align: left;
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--ink);
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  transition: color 0.12s, background 0.12s;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+.way-aside-link__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--aside-accent, var(--accent)) 12%, transparent);
+  color: var(--aside-accent, var(--accent));
+  flex-shrink: 0;
+}
+.way-aside-link__icon svg { width: 0.875rem; height: 0.875rem; display: block; stroke: currentColor; }
+.way-aside-link__label { flex: 1; min-width: 0; }
+.way-aside-link:hover {
+  color: var(--aside-accent, var(--accent));
+  background: color-mix(in srgb, var(--aside-accent, var(--accent)) 6%, transparent);
+  border-radius: var(--radius);
+}
+.way-aside-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-radius: var(--radius);
+}
 
 
 /* ══════════════════════════════════════════════════════════════════════════════
