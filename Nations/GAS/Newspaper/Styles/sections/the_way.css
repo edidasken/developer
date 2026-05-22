@@ -1053,25 +1053,6 @@ a.oyb-stream-card:hover .oyb-stream-arrow { color: var(--sc, var(--accent)); }
 
 .broadsheet-col { min-width: 0; }
 .broadsheet-col--main { }
-.broadsheet-col--aside {
-  position: sticky;
-  top: calc(0.75rem + env(safe-area-inset-top));
-  max-height: calc(100vh - 80px - env(safe-area-inset-top));
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--rule) transparent;
-  padding-top: 0.25rem;
-}
-@media (max-width: 860px) {
-  .broadsheet-col--aside {
-    position: static;
-    max-height: none;
-    overflow-y: visible;
-    border-top: 2px solid var(--rule);
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-  }
-}
 
 /* ══════════════════════════════════════════════════════════════════════════════
    STORY ELEMENTS — newspaper article presentation

@@ -212,5 +212,5 @@
   }
 
   // Expose public API
-  window.FlockGates = { openDrawer, closeDrawer, showToast };
+  window.FlockGates = { openDrawer, closeDrawer, showToast, getUserRole };
 })();

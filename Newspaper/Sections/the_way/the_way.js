@@ -502,7 +502,10 @@
       })
       .catch(function () {});
 
-    /* Edit daily messages button */
+    /* Edit daily messages button — leaders (role >= 3) only */
+    var _editRole = (window.FlockGates && typeof window.FlockGates.getUserRole === 'function')
+      ? window.FlockGates.getUserRole() : -1;
+    if (_editRole < 3) return;
     var $editBtn = document.createElement('button');
     $editBtn.type = 'button';
     $editBtn.className = 'way-edit-daily-btn';
