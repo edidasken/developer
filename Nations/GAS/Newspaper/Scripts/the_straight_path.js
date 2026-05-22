@@ -161,20 +161,83 @@
     ].join('\n');
   }
 
+  // ── Day-of-year helper ────────────────────────────────────────────────────
+  function dayOfYear(date) {
+    var start = new Date(date.getFullYear(), 0, 0);
+    var diff  = date - start + (start.getTimezoneOffset() - date.getTimezoneOffset()) * 60000;
+    return Math.floor(diff / 86400000);
+  }
+
+  var DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+  // ── Phase 1a: window.HERALD_DATA bundle ───────────────────────────────────
+  function loadFromBundle() {
+    try {
+      var bible  = window.HERALD_DATA && window.HERALD_DATA.oneYearBible;
+      var plans  = window.HERALD_DATA && window.HERALD_DATA.teachingPlans;
+      if (!bible) return null;
+
+      var today = new Date();
+      var doy   = dayOfYear(today);
+
+      // Build 7-day reading list starting from this week's Monday
+      var dow     = today.getDay() || 7;           // 1=Mon…7=Sun
+      var monDoy  = doy - dow + 1;
+      var readingDays = [];
+      for (var i = 0; i < 7; i++) {
+        var d    = monDoy + i;
+        var entry = bible[d];
+        if (!entry) continue;
+        var dayName = DAY_NAMES[(i + 1) % 7] || DAY_NAMES[i];  // Mon=1…Sun=0
+        readingDays.push({
+          day:  dayName,
+          ref:  (entry.ot ? entry.ot + ' / ' : '') + (entry.nt || ''),
+          desc: [entry.ps, entry.pr].filter(Boolean).join(' · '),
+        });
+      }
+
+      // Memory verse from first approved teaching plan that has one
+      var memoryVerse = STATIC.memoryVerse;
+      var memoryText  = STATIC.memoryText;
+      var memoryRef   = STATIC.memoryRef;
+      if (plans && plans.length) {
+        var plan = plans.find(function (p) { return p.memoryVerse && p.memoryVerseRef; });
+        if (plan) {
+          memoryVerse = plan.memoryVerseRef;
+          memoryText  = plan.memoryVerse;
+          memoryRef   = plan.planTitle ? plan.planTitle : STATIC.memoryRef;
+        }
+      }
+
+      return Object.assign({}, STATIC, {
+        readingTitle: 'One-Year Bible \u2014 This Week',
+        readingDays:  readingDays.length ? readingDays : STATIC.readingDays,
+        memoryVerse:  memoryVerse,
+        memoryText:   memoryText,
+        memoryRef:    memoryRef,
+      });
+    } catch (_) { return null; }
+  }
+
   function fetchContent(callback) {
+    // Render from bundle immediately
+    var bundleData = loadFromBundle();
+    if (bundleData) { callback(bundleData); }
+
+    // Then try Firestore for any pastor-authored week focus
     try {
       if (typeof firebase !== 'undefined' && firebase.firestore) {
         var d = new Date();
         var weekKey = d.getFullYear() + '-W' + String(Math.ceil((d - new Date(d.getFullYear(), 0, 1)) / 604800000)).padStart(2, '0');
         firebase.firestore().collection('discipleship').doc(weekKey).get()
           .then(function (doc) {
-            callback(doc.exists ? Object.assign({}, STATIC, doc.data()) : STATIC);
+            if (doc.exists) callback(Object.assign({}, bundleData || STATIC, doc.data()));
           })
-          .catch(function () { callback(STATIC); });
+          .catch(function () { /* bundle already rendered */ });
         return;
       }
     } catch (_) {}
-    callback(STATIC);
+    if (!bundleData) callback(STATIC);
   }
 
   function boot() {

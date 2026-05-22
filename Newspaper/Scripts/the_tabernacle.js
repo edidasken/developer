@@ -192,10 +192,41 @@
     ].join('\n');
   }
 
-  // ── Phase 1: Firestore fetch (stubbed — activates when TheVine is ready) ──
+  // ── Parse devotionals.js scripture field ─────────────────────────────────
+  // scripture format: "Verse text here. — Book Chapter:Verse"
+  function parseScripture(str) {
+    if (!str) return { text: '', ref: '' };
+    var sep = str.lastIndexOf(' \u2014 ');
+    if (sep === -1) return { text: str, ref: '' };
+    return { text: str.slice(0, sep).trim(), ref: str.slice(sep + 3).trim() };
+  }
+
+  // ── Phase 1a: window.HERALD_DATA.devotionals (static bundle) ─────────────
+  function loadFromBundle(dateKey) {
+    try {
+      var bundle = window.HERALD_DATA && window.HERALD_DATA.devotionals;
+      if (!bundle || !bundle[dateKey]) return null;
+      var e = bundle[dateKey];
+      var parsed = parseScripture(e.scripture);
+      return Object.assign({}, STATIC, {
+        devotionalTitle: e.title       || STATIC.devotionalTitle,
+        devotionalVerse: parsed.ref    || STATIC.devotionalVerse,
+        devotionalText:  parsed.text   || STATIC.devotionalText,
+        devotionalBody:  e.reflection  ? [e.reflection] : STATIC.devotionalBody,
+        prayerFocus:     e.theme       || STATIC.prayerFocus,
+        prayerBody:      e.prayer      ? [e.prayer]     : STATIC.prayerBody,
+        prayerPrompt:    e.question    || STATIC.prayerPrompt,
+      });
+    } catch (_) { return null; }
+  }
+
+  // ── Phase 1b: Firestore fetch (activates when TheVine is ready) ──────────
   function fetchLiveContent(dateKey, callback) {
-    // Phase 1: read from Firestore devotionals/{dateKey}/sections/tabernacle
-    // For now, always falls back to static content
+    // Try bundle first (always available offline)
+    var bundleData = loadFromBundle(dateKey);
+    if (bundleData) { callback(bundleData); }
+
+    // Then try Firestore for any admin overrides
     try {
       if (typeof firebase !== 'undefined' && firebase.firestore) {
         var db = firebase.firestore();
@@ -204,16 +235,16 @@
           .then(function (doc) {
             if (doc.exists) {
               var d = doc.data();
-              callback(Object.assign({}, STATIC, d));
-            } else {
-              callback(STATIC);
+              // Firestore overrides take precedence over bundle
+              callback(Object.assign({}, bundleData || STATIC, d));
             }
+            // If no Firestore doc, bundle result already rendered — do nothing
           })
-          .catch(function () { callback(STATIC); });
+          .catch(function () { /* already rendered from bundle */ });
         return;
       }
     } catch (_) {}
-    callback(STATIC);
+    if (!bundleData) callback(STATIC);
   }
 
   // ── Boot ──────────────────────────────────────────────────────────────────

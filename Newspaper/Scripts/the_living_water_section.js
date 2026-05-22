@@ -168,7 +168,67 @@
     ].join('\n');
   }
 
+  // ── Day-of-year helper ────────────────────────────────────────────────────
+  function dayOfYear(date) {
+    var start = new Date(date.getFullYear(), 0, 0);
+    var diff  = date - start + (start.getTimezoneOffset() - date.getTimezoneOffset()) * 60000;
+    return Math.floor(diff / 86400000);
+  }
+
+  // ── Phase 1a: window.HERALD_DATA bundle ───────────────────────────────────
+  function loadFromBundle() {
+    try {
+      var bible  = window.HERALD_DATA && window.HERALD_DATA.oneYearBible;
+      var psalms = window.HERALD_DATA && window.HERALD_DATA.psalms;
+      var plans  = window.HERALD_DATA && window.HERALD_DATA.readingPlans;
+      if (!bible) return null;
+
+      var today = new Date();
+      var doy   = dayOfYear(today);
+      var entry = bible[doy];
+      if (!entry) return null;
+
+      // Parse Psalm reference — e.g. "Psalm 141" → number 141
+      var psRef    = entry.ps || '';
+      var psNumStr = psRef.replace(/[^0-9]/g, '');
+      var psNum    = psNumStr ? parseInt(psNumStr, 10) : 0;
+      var psTitle  = '';
+      if (psNum && psalms && psalms.byNumber && psalms.byNumber[psNum]) {
+        psTitle = psalms.byNumber[psNum].title || '';
+      }
+
+      // Build this-week passage list from psalms-30 reading plan
+      // Find the block whose passages include today's psalm
+      var weekPassages = STATIC.passages;
+      if (plans && plans['psalms-30']) {
+        var planDays = plans['psalms-30'];
+        // Each day in psalms-30 covers ~5 psalms; estimate current block by doy
+        // psalms-30 has 30 days × 5 psalms = 150 psalms, cycling ~every 4 months
+        var planDay = (Math.floor((doy - 1) / 5) % planDays.length) + 1;
+        var block   = planDays.find(function (b) { return b.day === planDay; });
+        if (block && block.passages && block.passages.length) {
+          weekPassages = block.passages.map(function (p) {
+            return { ref: p, theme: '' };
+          });
+        }
+      }
+
+      return Object.assign({}, STATIC, {
+        scriptureRef:    psRef || STATIC.scriptureRef,
+        scriptureTrans:  'One-Year Bible \u2014 ' + entry.date,
+        expositionTitle: psTitle || STATIC.expositionTitle,
+        passageTitle:    'This Week in the Psalms',
+        passages:        weekPassages,
+      });
+    } catch (_) { return null; }
+  }
+
   function fetchContent(callback) {
+    // Render from bundle immediately
+    var bundleData = loadFromBundle();
+    if (bundleData) { callback(bundleData); }
+
+    // Then try Firestore for any curated wellspring content
     try {
       if (typeof firebase !== 'undefined' && firebase.firestore) {
         var d = new Date();
@@ -177,13 +237,13 @@
           String(d.getDate()).padStart(2, '0');
         firebase.firestore().collection('wellspring').doc(dateKey).get()
           .then(function (doc) {
-            callback(doc.exists ? Object.assign({}, STATIC, doc.data()) : STATIC);
+            if (doc.exists) callback(Object.assign({}, bundleData || STATIC, doc.data()));
           })
-          .catch(function () { callback(STATIC); });
+          .catch(function () { /* bundle already rendered */ });
         return;
       }
     } catch (_) {}
-    callback(STATIC);
+    if (!bundleData) callback(STATIC);
   }
 
   function boot() {
