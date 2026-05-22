@@ -122,7 +122,7 @@
       '  </div>',
       '  <p class="np-byline">' + esc(verse) + (ref ? ' \u2014 ' + esc(ref) : '') + '</p>',
       '  <hr class="np-column-rule">',
-      '  <p class="np-body" style="font-style:italic;font-size:0.88rem;">',
+      '  <p class="np-body" style="font-style:italic;">',
       '    Each morning the paper opens here \u2014 at the living Word.',
       '    Let it set the tone for everything that follows.',
       '  </p>',
@@ -154,7 +154,7 @@
         '  <a class="np-briefs__link" href="' + href + '"',
         '     data-section="' + sec.slug + '">',
         '    <span class="np-briefs__title">' + esc(sec.label) + '</span>',
-        '    <span class="np-briefs__deck">' + esc(sec.tagline.substring(0, 52)) + (sec.tagline.length > 52 ? '\u2026' : '') + '</span>',
+        '    <span class="np-briefs__deck">' + esc(sec.tagline) + '</span>',
         '  </a>',
         '</li>',
       ].join('\n');
@@ -185,8 +185,8 @@
       return [
         '  <hr class="np-column-rule" style="margin-top:14px">',
         '  <p class="np-col__flag">Question of the Day</p>',
-        '  <p style="font-family:var(--font-headline);font-size:0.88rem;line-height:1.4;margin:4px 0 8px;">' + esc(q.question) + '</p>',
-        '  <p style="font-size:0.78rem;color:var(--ink-dim);font-style:italic;">',
+        '  <p style="font-family:var(--font-headline);font-size:1rem;line-height:1.5;margin:6px 0 10px;">' + esc(q.question) + '</p>',
+        '  <p style="font-size:0.9rem;color:var(--ink-dim);font-style:italic;">',
         '    Answer: ' + corr + '. ' + esc(optMap[corr] || '') +
         (q.reference ? ' &mdash; ' + esc(q.reference) : '') +
         ' &mdash; <a href="Sections/pulpit/index.html" style="color:var(--gold)">See The Pulpit \u2192</a>',
@@ -204,7 +204,7 @@
 
     return [
       '<div class="np-banner">',
-      '  <p class="np-banner__flag">The Flock Herald &mdash; ' + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</p>',
+      '  <p class="np-banner__flag">The Flock Herald &nbsp;&nbsp; ' + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</p>',
       '  <h2 class="np-banner__headline">' + esc(headline) + '</h2>',
       '  <p class="np-banner__deck">' + esc(deck) + '</p>',
       '</div>',

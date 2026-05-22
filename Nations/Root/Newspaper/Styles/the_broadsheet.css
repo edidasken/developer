@@ -28,9 +28,9 @@
 
   /* ── Ink ────────────────────────────────────────────────────── */
   --ink:            #1a100a;   /* Iron gall — near-black with warm brown undertone */
-  --ink-mid:        #3a2510;   /* Deep sepia — subheads, secondary headlines */
-  --ink-dim:        #6a5038;   /* Faded ink — bylines, labels, small-caps metadata */
-  --ink-faint:      #9a8060;   /* Ghost ink — timestamps, tertiary metadata */
+  --ink-mid:        #2a1808;   /* Deep sepia — subheads, secondary headlines */
+  --ink-dim:        #3e2410;   /* Faded ink — bylines, labels, small-caps metadata */
+  --ink-faint:      #5a3a20;   /* Ghost ink — timestamps, tertiary metadata */
 
   /* ── Gold ───────────────────────────────────────────────────── */
   --gold:           #a07818;   /* Altar gold — rich, dark, dignified */
@@ -125,16 +125,14 @@ html {
 
 html, body {
   height: 100%;
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
 }
 
 body {
   background-color: var(--paper);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 1.1rem;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -313,7 +311,7 @@ button {
 
 .np-section-header {
   font-family: var(--font-label);
-  font-size: 0.65rem;
+  font-size: 0.8rem;
   font-variant: small-caps;
   letter-spacing: 0.12em;
   color: var(--ink-dim);
@@ -333,7 +331,7 @@ button {
 
 .np-byline {
   font-family: var(--font-label);
-  font-size: 0.72rem;
+  font-size: 1.05rem;
   font-variant: small-caps;
   color: var(--ink-dim);
   letter-spacing: 0.05em;
@@ -342,7 +340,7 @@ button {
 
 .np-body {
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 1.05rem;
   line-height: 1.7;
   color: var(--ink);
 }
@@ -361,7 +359,7 @@ button {
 .np-pull-quote p {
   font-family: var(--font-headline);
   font-style: italic;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   color: var(--ink-mid);
   line-height: 1.4;
 }
@@ -411,7 +409,7 @@ button {
   border: none;
   color: var(--ink-dim);
   font-family: var(--font-label);
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   padding: 2px 6px;
   border-radius: 3px;
   cursor: pointer;
@@ -426,7 +424,7 @@ button {
 
 .fn-scale-picker__label {
   font-family: var(--font-label);
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   font-variant: small-caps;
   color: var(--ink-faint);
   letter-spacing: 0.05em;
@@ -444,7 +442,7 @@ button {
   background: var(--paper-tint);
   border-bottom: 1px solid var(--rule-faint);
   font-family: var(--font-ui);
-  font-size: 0.75rem;
+  font-size: 0.88rem;
   color: var(--ink-dim);
 }
 
@@ -459,7 +457,7 @@ button {
   background: var(--gold);
   color: var(--paper-white);
   border-radius: 3px;
-  font-size: 0.65rem;
+  font-size: 0.78rem;
   font-variant: small-caps;
   letter-spacing: 0.05em;
   margin-left: 6px;
@@ -551,7 +549,7 @@ button {
 
 .np-banner__flag {
   font-family: var(--font-label);
-  font-size: 0.6rem;
+  font-size: 0.9rem;
   font-variant: small-caps;
   letter-spacing: 0.14em;
   color: var(--ink-dim);
@@ -570,24 +568,35 @@ button {
 .np-banner__deck {
   font-family: var(--font-body);
   font-style: italic;
-  font-size: 0.95rem;
+  font-size: 1.15rem;
   color: var(--ink-mid);
 }
 
 /* Column grid */
 .np-cols {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
   gap: 0;
   align-items: start;
 }
 
 .np-col {
   padding: 20px 20px;
+  min-width: 0;
 }
 
 .np-col + .np-col {
   border-left: 1px solid var(--rule-soft);
+}
+
+/* When columns stack, swap left border for top border */
+@supports (grid-template-columns: repeat(auto-fit, minmax(1px, 1fr))) {
+  @media (max-width: 599px) {
+    .np-col + .np-col {
+      border-left: none;
+      border-top: 1px solid var(--rule-soft);
+    }
+  }
 }
 
 .np-col--wide { grid-column: span 2; }
@@ -596,7 +605,7 @@ button {
 /* Column section flag */
 .np-col__flag {
   font-family: var(--font-label);
-  font-size: 0.6rem;
+  font-size: 0.8rem;
   font-variant: small-caps;
   letter-spacing: 0.12em;
   color: var(--ink-dim);
@@ -641,17 +650,16 @@ button {
 
 .np-briefs__title {
   font-family: var(--font-headline);
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   color: var(--ink);
   line-height: 1.25;
   transition: color 0.15s;
 }
 
 .np-briefs__deck {
-  font-family: var(--font-label);
-  font-size: 0.62rem;
-  font-variant: small-caps;
-  letter-spacing: 0.04em;
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
   color: var(--ink-dim);
   margin-top: 3px;
 }
@@ -941,40 +949,8 @@ button {
    §14/§15 RESPONSIVE OVERRIDES
    ═══════════════════════════════════════════════════════════════ */
 
-/* Tablet: collapse to 2 cols */
-@media (max-width: 900px) {
-  .np-cols {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .np-col--wide {
-    grid-column: span 2;
-  }
-
-  /* Move col 3 (briefs) below cols 1+2 */
-  .np-col:nth-child(3) {
-    grid-column: span 2;
-    border-left: none;
-    border-top: 1px solid var(--rule-soft);
-  }
-}
-
-/* Mobile: single column */
+/* Smaller drop cap on mobile */
 @media (max-width: 600px) {
-  .np-cols {
-    grid-template-columns: 1fr;
-  }
-
-  .np-col + .np-col {
-    border-left: none;
-    border-top: 1px solid var(--rule-soft);
-  }
-
-  .np-col--wide {
-    grid-column: span 1;
-  }
-
-  /* Smaller drop cap on mobile */
   .np-drop-cap::first-letter {
     font-size: 3em;
   }
