@@ -149,8 +149,8 @@
     var title  = mod.title  || 'Untitled';
     var desc   = mod.description || '';
 
-    /* Teaser: up to 2 sentences from description */
-    var teaser = _teaser(desc, 2);
+    /* Teaser: daily seed or fallback to 2 sentences from description */
+    var teaser = _getDailyTeaser(story.mod) || _teaser(desc, 2);
 
     var $art = document.createElement('article');
     $art.className = story.lead ? 'story story--lead story--full' : 'story';
@@ -172,14 +172,24 @@
       + (story.lead ? '<div class="story-body story-body--lead story-dropcap">' : '<div class="story-body">')
       +   esc(teaser)
       + '</div>'
-      + '<hr class="story-rule">'
       + '<p class="story-readmore">'
       +   '<button class="story-readmore-btn" type="button" data-mod="' + esc(story.mod) + '"'
       +     (story.invite ? ' data-invite="1"' : '')
       +   '>'
       +     'Open ' + esc(title) + ' \u2192'
       +   '</button>'
-      + '</p>';
+      + '</p>'
+      + '<div class="story-ornament-divider" aria-hidden="true">'
+      +   '<svg viewBox="0 0 400 16" xmlns="http://www.w3.org/2000/svg">'
+      +     '<line x1="0" y1="8" x2="168" y2="8" stroke="var(--gold,#8B7028)" stroke-width="0.75"/>'
+      +     '<path d="M171 5 L175 8 L171 11 L167 8 Z" fill="var(--gold,#8B7028)"/>'
+      +     '<path d="M200 2 L208 8 L200 14 L192 8 Z" fill="var(--gold,#8B7028)"/>'
+      +     '<rect x="198.5" y="2" width="3" height="12" fill="var(--paper-card,#fff)"/>'
+      +     '<rect x="192" y="6.5" width="16" height="3" fill="var(--paper-card,#fff)"/>'
+      +     '<path d="M229 5 L233 8 L229 11 L225 8 Z" fill="var(--gold,#8B7028)"/>'
+      +     '<line x1="232" y1="8" x2="400" y2="8" stroke="var(--gold,#8B7028)" stroke-width="0.75"/>'
+      +   '</svg>'
+      + '</div>';
 
     /* Wire headline + read-more buttons to open drawer */
     $art.querySelectorAll('[data-mod]').forEach(function ($btn) {
@@ -288,6 +298,14 @@
       })
       .catch(function () {});
 
+    /* Edit daily messages button */
+    var $editBtn = document.createElement('button');
+    $editBtn.type = 'button';
+    $editBtn.className = 'way-edit-daily-btn';
+    $editBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="vertical-align:-2px;margin-right:5px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit Daily Messages';
+    $editBtn.addEventListener('click', _openDailyEditor);
+    $aside.appendChild($editBtn);
+
   }
 
   function _appendAsideCard($parent, label, title, body, verse, color, modName) {
@@ -308,6 +326,216 @@
       });
     }
     $parent.appendChild($card);
+  }
+
+  /* ── Daily teaser lookup (THE_WAY_DAILY seed + localStorage overrides) ───── */
+  function _getDailyTeaser(mod) {
+    var day    = new Date().getDate(); /* 1–31 */
+    var custom = {};
+    try { custom = JSON.parse(localStorage.getItem('the_way_custom') || '{}'); } catch (_e) {}
+    var mc   = custom[mod] || {};
+    var data = window.THE_WAY_DAILY;
+    var seed = (data && data[mod] && data[mod].days) ? data[mod].days : [];
+    var pool = seed.concat(mc.extra || []);
+    if (!pool.length) return '';
+    if (mc.overrides && mc.overrides[day]) return mc.overrides[day];
+    return pool[(day - 1) % pool.length] || '';
+  }
+
+  /* ── Refresh story teasers live after editor saves ────────────────────────── */
+  function _refreshTeasers() {
+    $main.querySelectorAll('.story').forEach(function ($art) {
+      var $btn = $art.querySelector('[data-mod]');
+      if (!$btn) return;
+      var mod = $btn.dataset.mod;
+      var $body = $art.querySelector('.story-body');
+      if (!$body) return;
+      var fresh = _getDailyTeaser(mod);
+      if (fresh) $body.textContent = fresh;
+    });
+  }
+
+  /* ── Toast helper ─────────────────────────────────────────────────────────── */
+  function _showToast(msg) {
+    var $t = document.getElementById('toast-layer');
+    if (!$t) return;
+    var $el = document.createElement('div');
+    $el.className = 'toast-message';
+    $el.textContent = msg;
+    $t.appendChild($el);
+    setTimeout(function () { $el.remove(); }, 2500);
+  }
+
+  /* ── Daily message editor ─────────────────────────────────────────────────── */
+  function _openDailyEditor() {
+    var data   = window.THE_WAY_DAILY || {};
+    var day    = new Date().getDate();
+    var custom = {};
+    try { custom = JSON.parse(localStorage.getItem('the_way_custom') || '{}'); } catch (_e) {}
+
+    var tabs   = '';
+    var panels = '';
+
+    STORIES.forEach(function (story, i) {
+      var mod   = story.mod;
+      var mdata = data[mod] || { title: story.category, why: '', helps: '', days: [] };
+      var mc    = custom[mod] || {};
+      var pool  = mdata.days.concat(mc.extra || []);
+      var curMsg = (mc.overrides && mc.overrides[day])
+        ? mc.overrides[day]
+        : (pool.length ? pool[(day - 1) % pool.length] : '');
+      var extras  = mc.extra || [];
+      var isFirst = (i === 0);
+
+      tabs += '<button class="dly-tab' + (isFirst ? ' is-active' : '') + '" data-dtab="' + esc(mod) + '">'
+           + esc(mdata.title || story.category)
+           + '</button>';
+
+      var extraItems = '';
+      extras.forEach(function (ex, ei) {
+        extraItems += '<div class="dly-extra-row">'
+          + '<span class="dly-extra-text">' + esc(ex) + '</span>'
+          + '<button class="dly-del-extra" data-mod="' + esc(mod) + '" data-idx="' + ei + '" type="button" title="Remove">&times;</button>'
+          + '</div>';
+      });
+
+      panels += '<div class="dly-panel' + (isFirst ? ' is-active' : '') + '" data-dpanel="' + esc(mod) + '">'
+        + (mdata.why ? '<p class="dly-why"><strong>Why it matters:</strong> ' + esc(mdata.why) + '</p>' : '')
+        + '<p class="dly-lbl">Day ' + day + ' message &mdash; edit to override today&rsquo;s card:</p>'
+        + '<textarea class="dly-textarea" data-mod="' + esc(mod) + '" rows="3">' + esc(curMsg) + '</textarea>'
+        + '<div class="dly-btn-row">'
+        +   '<button class="dly-save-btn" data-mod="' + esc(mod) + '" type="button">Save for Day ' + day + '</button>'
+        +   '<button class="dly-reset-btn" data-mod="' + esc(mod) + '" type="button">Reset Default</button>'
+        + '</div>'
+        + '<hr class="dly-rule">'
+        + '<p class="dly-lbl">Extra rotation messages <small>(' + mdata.days.length + '-day cycle + yours)</small>:</p>'
+        + (extraItems || '<p class="dly-empty">No custom messages yet.</p>')
+        + '<textarea class="dly-add-textarea" placeholder="Type a new rotation message and click Add&hellip;" rows="2"></textarea>'
+        + '<button class="dly-add-btn" data-mod="' + esc(mod) + '" type="button">Add to Rotation</button>'
+        + '</div>';
+    });
+
+    var editorStyle = '<style>'
+      + '.dly-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px}'
+      + '.dly-tab{background:transparent;border:1.5px solid var(--rule,#e5e7ef);border-radius:6px;padding:4px 10px;font:600 0.7rem/1 var(--font-ui,sans-serif);color:var(--ink-muted);cursor:pointer;transition:all .15s}'
+      + '.dly-tab.is-active{background:var(--gold,#8B7028);color:#fff;border-color:transparent}'
+      + '.dly-panel{display:none}.dly-panel.is-active{display:block}'
+      + '.dly-why{font-size:.82rem;line-height:1.6;color:var(--ink-muted);background:var(--paper-sunken,#f4f5f9);border-radius:8px;padding:10px 12px;margin:0 0 14px}'
+      + '.dly-lbl{display:block;font:700 0.68rem/1 var(--font-ui,sans-serif);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-muted);margin:0 0 6px}'
+      + '.dly-textarea,.dly-add-textarea{width:100%;box-sizing:border-box;border:1.5px solid var(--rule,#e5e7ef);border-radius:6px;padding:8px 10px;font:0.88rem/1.6 var(--font-body,serif);color:var(--ink);background:var(--paper-card,#fff);resize:vertical;margin-bottom:8px}'
+      + '.dly-textarea:focus,.dly-add-textarea:focus{outline:2px solid var(--gold,#8B7028);border-color:transparent}'
+      + '.dly-btn-row{display:flex;gap:8px;margin-bottom:16px}'
+      + '.dly-save-btn,.dly-add-btn{background:var(--gold,#8B7028);color:#fff;border:none;border-radius:6px;padding:6px 14px;font:600 0.75rem var(--font-ui,sans-serif);cursor:pointer}'
+      + '.dly-reset-btn{background:transparent;border:1.5px solid var(--rule,#e5e7ef);border-radius:6px;padding:6px 12px;font:600 0.75rem var(--font-ui,sans-serif);color:var(--ink-muted);cursor:pointer}'
+      + '.dly-rule{border:none;border-top:1px solid var(--rule,#e5e7ef);margin:0 0 14px}'
+      + '.dly-extra-row{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:var(--paper-sunken,#f4f5f9);border-radius:6px;margin-bottom:5px}'
+      + '.dly-extra-text{flex:1;font-size:.84rem;line-height:1.5;color:var(--ink)}'
+      + '.dly-del-extra{background:none;border:none;color:var(--ink-muted);cursor:pointer;font-size:.9rem;flex-shrink:0;padding:0;line-height:1}'
+      + '.dly-empty{font-style:italic;font-size:.82rem;color:var(--ink-muted);margin:0 0 10px}'
+      + '.dly-add-textarea{margin-top:10px}'
+      + '</style>';
+
+    var html = editorStyle
+      + '<p style="font-size:.84rem;line-height:1.6;color:var(--ink-muted);margin:0 0 16px">'
+      +   'Customize the message shown on each story card. Changes are saved to this device only.'
+      + '</p>'
+      + '<div class="dly-tabs">' + tabs + '</div>'
+      + panels;
+
+    window.FlockGates.openDrawer('Edit Daily Messages', html);
+
+    /* Wire interactions — defer so drawer DOM is painted */
+    setTimeout(function () {
+      var $body = document.querySelector('.drawer-body');
+      if (!$body) return;
+
+      $body.addEventListener('click', function (e) {
+        /* Tab switching */
+        var $tab = e.target.closest('.dly-tab');
+        if ($tab) {
+          $body.querySelectorAll('.dly-tab').forEach(function (t) { t.classList.remove('is-active'); });
+          $body.querySelectorAll('.dly-panel').forEach(function (p) { p.classList.remove('is-active'); });
+          $tab.classList.add('is-active');
+          var $panel = $body.querySelector('.dly-panel[data-dpanel="' + $tab.dataset.dtab + '"]');
+          if ($panel) $panel.classList.add('is-active');
+        }
+
+        /* Save day override */
+        var $save = e.target.closest('.dly-save-btn');
+        if ($save) {
+          var mod2 = $save.dataset.mod;
+          var $ta  = $body.querySelector('.dly-textarea[data-mod="' + mod2 + '"]');
+          if (!$ta) return;
+          var c = {};
+          try { c = JSON.parse(localStorage.getItem('the_way_custom') || '{}'); } catch (_e) {}
+          c[mod2] = c[mod2] || {};
+          c[mod2].overrides = c[mod2].overrides || {};
+          c[mod2].overrides[day] = $ta.value.trim();
+          localStorage.setItem('the_way_custom', JSON.stringify(c));
+          _showToast('Saved for Day ' + day);
+          _refreshTeasers();
+        }
+
+        /* Reset day override */
+        var $reset = e.target.closest('.dly-reset-btn');
+        if ($reset) {
+          var mod3 = $reset.dataset.mod;
+          var c2   = {};
+          try { c2 = JSON.parse(localStorage.getItem('the_way_custom') || '{}'); } catch (_e) {}
+          if (c2[mod3] && c2[mod3].overrides) delete c2[mod3].overrides[day];
+          localStorage.setItem('the_way_custom', JSON.stringify(c2));
+          var $ta2 = $body.querySelector('.dly-textarea[data-mod="' + mod3 + '"]');
+          if ($ta2) $ta2.value = _getDailyTeaser(mod3);
+          _showToast('Reset to default');
+          _refreshTeasers();
+        }
+
+        /* Add extra rotation message */
+        var $add = e.target.closest('.dly-add-btn');
+        if ($add) {
+          var mod4   = $add.dataset.mod;
+          var $panel = $add.closest('.dly-panel');
+          var $addTa = $panel ? $panel.querySelector('.dly-add-textarea') : null;
+          if (!$addTa || !$addTa.value.trim()) return;
+          var msg = $addTa.value.trim();
+          var c3  = {};
+          try { c3 = JSON.parse(localStorage.getItem('the_way_custom') || '{}'); } catch (_e) {}
+          c3[mod4] = c3[mod4] || {};
+          c3[mod4].extra = c3[mod4].extra || [];
+          c3[mod4].extra.push(msg);
+          localStorage.setItem('the_way_custom', JSON.stringify(c3));
+          $addTa.value = '';
+          /* Replace empty placeholder, append new row before Add button */
+          var $empty = $panel.querySelector('.dly-empty');
+          if ($empty) $empty.remove();
+          var $row = document.createElement('div');
+          $row.className = 'dly-extra-row';
+          var newIdx = c3[mod4].extra.length - 1;
+          $row.innerHTML = '<span class="dly-extra-text">' + esc(msg) + '</span>'
+            + '<button class="dly-del-extra" data-mod="' + esc(mod4) + '" data-idx="' + newIdx + '" type="button" title="Remove">&times;</button>';
+          $add.parentNode.insertBefore($row, $add);
+          _showToast('Added to rotation');
+          _refreshTeasers();
+        }
+
+        /* Delete extra rotation message */
+        var $del = e.target.closest('.dly-del-extra');
+        if ($del) {
+          var mod5 = $del.dataset.mod;
+          var idx  = parseInt($del.dataset.idx, 10);
+          var c4   = {};
+          try { c4 = JSON.parse(localStorage.getItem('the_way_custom') || '{}'); } catch (_e) {}
+          if (c4[mod5] && c4[mod5].extra) c4[mod5].extra.splice(idx, 1);
+          localStorage.setItem('the_way_custom', JSON.stringify(c4));
+          $del.closest('.dly-extra-row').remove();
+          /* Re-index remaining delete buttons */
+          var $pnl = $body.querySelector('.dly-panel[data-dpanel="' + mod5 + '"]');
+          if ($pnl) $pnl.querySelectorAll('.dly-del-extra').forEach(function ($b, ii) { $b.dataset.idx = ii; });
+          _showToast('Removed');
+          _refreshTeasers();
+        }
+      });
+    }, 80);
   }
 
   /* ── Invite extras — church card + contact/decision form ─────────────────── */

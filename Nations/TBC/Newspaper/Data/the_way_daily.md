@@ -1,0 +1,909 @@
+# The Way — Daily Story Card Encouragements
+
+> **Source of truth** for the 31-day rotating teaser text shown on each
+> story card in The Way section. Edit this file, then regenerate:
+>
+>     node Newspaper/Data/gen_way_daily.js
+>
+> The generated `the_way_daily.js` is what the browser loads.
+> Add extra lines beyond Day 31 under any module to extend the rotation.
+
+---
+
+## Module: the_gospel_reading
+**Title:** Reading Plans
+**Why:** Daily Scripture reading is the bedrock of a life shaped by the Word. The men and women who have moved history for Christ have almost universally been people of the Book — not occasional readers, but consistent ones. What you give your attention to forms what you become.
+**Helps:** Reading Plans guide you through the whole counsel of God with a personal streak that keeps you accountable and on pace. You will never lose your place, and the chronological record of your progress becomes a testimony in itself.
+
+### Day 1
+The Word of God is living and active — open it today and let it read you.
+
+### Day 2
+A steady hand on the plow begins with showing up. Your streak continues where your heart leads.
+
+### Day 3
+Scripture is not merely information; it is transformation. Begin where you left off and let God complete the work.
+
+### Day 4
+The disciples on the road to Emmaus had their hearts burn within them as He opened the Scriptures — let that fire begin again today.
+
+### Day 5
+Faithful reading over years shapes a life more than any single dramatic moment. Today's passage is part of that long story.
+
+### Day 6
+You don't read the Bible to impress God — you read it to know Him. Come as you are.
+
+### Day 7
+The Word planted in the morning bears fruit through the rest of the day. Give it soil to grow.
+
+### Day 8
+There is no wasted Scripture. Even the verses that confuse you today will illuminate themselves in season.
+
+### Day 9
+God wrote a letter to humanity. Today you read another page.
+
+### Day 10
+Keep the streak alive — not for the number, but because each day you show up, your ear grows more attuned.
+
+### Day 11
+The Psalms, the Prophets, the Epistles — each voice in chorus, calling you deeper into the same story.
+
+### Day 12
+A chapter a day may seem small, but rivers are formed drop by drop. Keep flowing.
+
+### Day 13
+Scripture is your daily bread — not a Sunday meal. Come hungry.
+
+### Day 14
+The promise of Psalm 119:105 is yours today: "Your word is a lamp to my feet and a light to my path."
+
+### Day 15
+Today, read slowly. The goal is not the finish line — it is the encounter along the way.
+
+### Day 16
+What you give your attention to shapes what you become. Give the Word your first attention today.
+
+### Day 17
+You are building a life fluent in the language of God. Each reading is another lesson.
+
+### Day 18
+The Holy Spirit is your teacher — open the text and let the lesson begin.
+
+### Day 19
+Every great man and woman of faith was first a man or woman of the Word. Follow their pattern.
+
+### Day 20
+Come to the Word not just for answers — come for the Author.
+
+### Day 21
+Even a single verse, meditated on deeply, can anchor an entire day.
+
+### Day 22
+The Word is both medicine and food — take it for what ails you and what sustains you.
+
+### Day 23
+Reading plans keep you in the whole counsel of God, not just your favorite passages.
+
+### Day 24
+Today's passage may feel ordinary — but God has a habit of meeting people in the ordinary.
+
+### Day 25
+The Word does not return void. It accomplishes what God intends, including in you.
+
+### Day 26
+Consistency is the secret to spiritual formation. One more reading day.
+
+### Day 27
+Today you read not just for yourself — you read for the person you'll talk to this week who needs what you're learning.
+
+### Day 28
+The Bible is the most historically verified, most transformative text in human history. Open it again with wonder.
+
+### Day 29
+Find a quiet moment and let the text breathe. It has waited all day to speak to you.
+
+### Day 30
+The man who never closes the Book is the man who never stops growing.
+
+### Day 31
+End the month as you began it — in the Word. Let it close this chapter of your life with His voice.
+
+---
+
+## Module: the_gospel_devotionals
+**Title:** Devotionals
+**Why:** A short, daily devotion is one of the most reliable means of grace available to the modern believer. It anchors the morning before the noise begins, creates a rhythm of encounter, and ensures the Word is not merely academic — it is personal.
+**Helps:** Each devotional carries a passage of Scripture, a focused reflection, a question for honest self-examination, and a closing prayer. Five minutes that can recalibrate an entire day.
+
+### Day 1
+A short devotion can reset an entire day. Take five minutes and let God set the tone.
+
+### Day 2
+The scripture for today was written thousands of years ago for a moment exactly like this one.
+
+### Day 3
+Reflection is not weakness — it is the discipline of asking what God is saying before the noise of the day begins.
+
+### Day 4
+Prayer without ceasing begins with a moment of intentional prayer. Start here.
+
+### Day 5
+The best sermons you'll ever hear are often the ones you preach to yourself before 8 AM.
+
+### Day 6
+Today's devotional is a door. Walk through it and see what waits on the other side.
+
+### Day 7
+Short does not mean shallow. A single verse received well can carry you through weeks of trial.
+
+### Day 8
+Consider what the reflection asks of you — then bring an honest answer.
+
+### Day 9
+Pray the prayer as if it is yours — because it is. Someone wrote it for you before they knew your name.
+
+### Day 10
+The theme of today's devotion is not random. God orders the liturgy of those who seek Him.
+
+### Day 11
+A devotional without application is an inspiring thought. Let today's become a changed habit.
+
+### Day 12
+The world rushes. The Word calls you to stillness. Choose stillness for these few minutes.
+
+### Day 13
+What verse anchored you last week? Today could offer the one that anchors you this year.
+
+### Day 14
+Come to the devotion not as a task to complete but as a person who is loved and is learning.
+
+### Day 15
+The scripture in today's reading was preserved, copied, translated, and delivered — for you, today.
+
+### Day 16
+Reflection stretches the mind. The question asks what you actually believe, not what you'd like to believe.
+
+### Day 17
+Let the prayer become a conversation, not a monologue. Speak it — then listen.
+
+### Day 18
+Small doses of deep truth, received faithfully, produce wisdom that decades of casual reading does not.
+
+### Day 19
+What you meditate on sets the frequency of your heart. Tune it this morning.
+
+### Day 20
+Grace is not a concept for theologians. It is the air the devotional asks you to breathe today.
+
+### Day 21
+The title of today's devotion may not seem significant — read it anyway. God is not limited by appearances.
+
+### Day 22
+Bring the question in the Reflect section to God in actual prayer. Then watch what surfaces over the next few days.
+
+### Day 23
+Today's devotional is part of a year's journey. You are not late. You are right on time.
+
+### Day 24
+The theme running through this month's readings is no accident. God is saying something to you in sequence.
+
+### Day 25
+No day is too dark for a word from the Lord. Open the devotional before the day presses in.
+
+### Day 26
+Read the scripture aloud. Something changes when the Word moves through your lips, not just your eyes.
+
+### Day 27
+Gratitude begins in reflection. Let today's prompt lead you somewhere thankful.
+
+### Day 28
+The shortest prayer in the Bible was Peter's: "Lord, save me." Start there if that's all you have.
+
+### Day 29
+God is not impressed by length — He is moved by honesty. Bring your honest heart to the prayer.
+
+### Day 30
+Today's devotion is an invitation to abide. Not to rush through, but to remain.
+
+### Day 31
+You have spent this month opening this door. What is different about you because of it?
+
+---
+
+## Module: the_gospel_missions
+**Title:** World Missions
+**Why:** The Great Commission is not a program — it is the marching order of the church. Until every nation has heard, the work is not done. Informed prayer is one of the most powerful things a believer can contribute to the finishing of that work.
+**Helps:** Each nation profile reveals gospel access, unreached peoples, persecution data, and specific prayer points. What starts as a report becomes intercession — and intercession has turned the course of history.
+
+### Day 1
+There are more unreached people groups today than the entire population of the United States. Pray for them today.
+
+### Day 2
+The Great Commission is not a suggestion for missionaries — it is the charter of every follower of Christ.
+
+### Day 3
+Prayer for the nations is not passive. History has turned on the intercessions of faithful, unknown people.
+
+### Day 4
+Today's nation needs what you already have. Your prayer is the first step toward their hearing.
+
+### Day 5
+The 10/40 Window holds the majority of the world's least-evangelized peoples. Today, let their names move your heart.
+
+### Day 6
+Every nation in this feed has a story of sacrifice — missionaries who went, suffered, stayed, and saw fruit.
+
+### Day 7
+The harvest is plentiful. Your prayer today joins the labor of thousands of workers in the field.
+
+### Day 8
+How do you pray for someone you've never met? Start with their name and their nation. God will carry the rest.
+
+### Day 9
+The gospel spreads through chains of ordinary faithfulness. Today's prayer is one link.
+
+### Day 10
+Some of the most vibrant churches on earth exist in places of severe persecution. Pray for their courage today.
+
+### Day 11
+That the world may know — this was Jesus's prayer in John 17. Make it yours today.
+
+### Day 12
+A church planting movement needs prayer the way a fire needs air. Supply it today.
+
+### Day 13
+Statistics about unreached peoples are not meant to overwhelm you — they are meant to focus your prayer.
+
+### Day 14
+Today's nation may have fewer than 1% evangelical Christians. Your intercession plants something invisible and eternal.
+
+### Day 15
+God is not slow concerning His promise. He is patient, not wanting any to perish. Pray in that same spirit.
+
+### Day 16
+The gospel has crossed every barrier humans erected against it. Prayer is what moves it.
+
+### Day 17
+Persecution does not stop the gospel — it spreads it. Pray for those carrying fire in their hands today.
+
+### Day 18
+The phrase "unreached peoples" means someone has not yet heard the name of Jesus even once. Think on that today.
+
+### Day 19
+The church in the Global South is exploding. Pray it keeps accelerating.
+
+### Day 20
+Pray for Bible translators working on languages that have never had a single verse of Scripture.
+
+### Day 21
+Today, you stand at the edge of a map that Christ said would be filled with His glory.
+
+### Day 22
+Missionaries serve at great personal cost. Pray for their families, their health, and their faith to hold firm.
+
+### Day 23
+The national church is the long-term strategy. Pray for indigenous believers to be raised up in every nation.
+
+### Day 24
+In some nations, a single radio signal carries the gospel to millions who have no church. Pray for those signals to reach.
+
+### Day 25
+Every nation that has ever received the gospel has a name on a prayer list somewhere. Be that person for today's nation.
+
+### Day 26
+What would it mean for your church to adopt an unreached people group? Let today's report begin that question.
+
+### Day 27
+Jesus said the gospel will be preached to all nations before the end. Your prayer today is part of how that happens.
+
+### Day 28
+The commission is not finished. Pray for those who will finish it.
+
+### Day 29
+Behind every country profile is a face. Ask God to give you His heart for one face you'll never meet in this life.
+
+### Day 30
+The persecution index for today's nation tells a story of suffering and endurance. Pray for both to produce gold.
+
+### Day 31
+We stand at the end of a month of praying for the world. The world has changed. You can't always see how — but it has.
+
+---
+
+## Module: the_gospel_theology
+**Title:** Theology
+**Why:** What you believe about God determines how you live before Him. Theology is not an academic luxury — it is the architecture of the soul. Vague doctrine produces vague faith. Clear doctrine produces clear worship, clear ethics, and clear courage.
+**Helps:** The Theology module maps the whole counsel of God — category by category, section by section, scripture by scripture — so that nothing gets lost and every area of doctrine connects to the others. Explore a category today and watch your worship deepen.
+
+### Day 1
+Doctrine is not a cold word — it is the shape of what you love. Let today's category deepen what you hold.
+
+### Day 2
+What you believe about God determines how you live before Him. Theology is the most practical subject there is.
+
+### Day 3
+Explore today's section and ask: does this change how I see Christ? If so, let it.
+
+### Day 4
+The creeds were forged in fire — early believers suffered to define what you now receive freely.
+
+### Day 5
+Theology without devotion becomes pride. Bring humility to every category you open today.
+
+### Day 6
+The category you open today may have been the defining question of a whole century of church history.
+
+### Day 7
+Christian theology is not abstract philosophy — it is the living God describing Himself to His creation.
+
+### Day 8
+Find the scriptures attached to today's doctrine and read them slowly. This is where theology becomes encounter.
+
+### Day 9
+You don't need a seminary degree to understand theology — you need the Holy Spirit and an open Bible.
+
+### Day 10
+Systematic theology maps the whole counsel of God so nothing gets lost. Explore the map today.
+
+### Day 11
+Many Christians can name their favorite verse but not the doctrine that makes it true. Fill that gap today.
+
+### Day 12
+Today's category connects to every other category. Theology is a web, not a list.
+
+### Day 13
+What the early church fought hardest to defend is what costs the least to hold today. Don't let it become cheap.
+
+### Day 14
+Grace and truth came by Jesus Christ. Let today's doctrine add to your understanding of both.
+
+### Day 15
+Theology done well produces worship. If it doesn't, check your posture at the door.
+
+### Day 16
+There are depths in Christian doctrine that scholars have explored for two millennia and still not exhausted.
+
+### Day 17
+The applications in today's section are the bridge from abstract to actual. Cross it.
+
+### Day 18
+Doctrine protects against error. Knowing what you believe is the first defense of your faith.
+
+### Day 19
+Church history is theology lived out in real time by real people in real crises. Let their story teach you.
+
+### Day 20
+Open today's category with a specific question: what does this mean for how I pray?
+
+### Day 21
+The most common heresies of every era are variations of old errors. Knowing truth makes you immune.
+
+### Day 22
+Explore the connection between today's doctrine and the cross. All roads in theology lead there.
+
+### Day 23
+What would you say if someone asked you about this today? Let the answer sharpen as you read.
+
+### Day 24
+Theology gives you a vocabulary for what the Spirit has already taught you in experience.
+
+### Day 25
+The doctrine you understand best is the one you've applied most. Today, apply what you learn.
+
+### Day 26
+Some theological questions have divided the church. Approach them with confidence in the essentials and charity on the rest.
+
+### Day 27
+You are not merely a student of theology — you are its subject. God is the theologian; you are His text.
+
+### Day 28
+Read today's category the way you'd read a letter from someone who loves you — looking for what they want you to know.
+
+### Day 29
+Every application point in this section is God's way of saying: this truth is meant for your life, not just your mind.
+
+### Day 30
+Doctrine is not the destination — it is the road map. Keep walking toward the One it describes.
+
+### Day 31
+A month of doctrine is a month of renovation. Let what you've learned rebuild something in you.
+
+---
+
+## Module: the_gospel_apologetics
+**Title:** Apologetics
+**Why:** Every believer will face hard questions — in their own mind, from a skeptical friend, from a college classroom, from a dying family member grasping for answers. The faith asks to be examined. Apologetics prepares you to examine it well and help others do the same.
+**Helps:** The Apologetics module answers the most common and most piercing objections to the Christian faith — with scripture, reason, and a steady tone. The goal is not to win an argument but to remove barriers between a searching person and Christ.
+
+### Day 1
+Every hard question about faith has been asked before — and answered. Let today's objection strengthen your confidence.
+
+### Day 2
+The goal of apologetics is not to win an argument. It is to remove a barrier between a person and Christ.
+
+### Day 3
+You will face these questions. Having thought them through here prepares you to answer with gentleness and respect.
+
+### Day 4
+1 Peter 3:15 is the charter of every believer: "Always be ready to give a defense." Today, get more ready.
+
+### Day 5
+Doubt is not the enemy of faith — it is often the doorway to a stronger one.
+
+### Day 6
+Behind every objection is a person. Answer the objection, but reach for the person.
+
+### Day 7
+The evidence for the Christian faith is overwhelming to those who will honestly examine it.
+
+### Day 8
+Your neighbor may never come to church, but they will ask you a hard question at the right moment. Be prepared.
+
+### Day 9
+Historical, scientific, and philosophical evidence converges on the same story the Bible tells. Explore the convergence today.
+
+### Day 10
+The most dangerous doubt is the kind that has never had its assumptions challenged. Today's section does exactly that.
+
+### Day 11
+Faith is not the absence of reason — it is reason in its proper relationship to revelation.
+
+### Day 12
+The resurrection is the hinge of history. Everything in the Christian faith turns on whether it happened.
+
+### Day 13
+You don't need a degree to defend your faith — you need an honest mind, a humble spirit, and the Word of God.
+
+### Day 14
+The question in today's section has broken real people's faith. Your preparation today may restore someone else's tomorrow.
+
+### Day 15
+God is not afraid of your questions. Apologetics is what happens when you take Him up on that.
+
+### Day 16
+The moral argument, the cosmological argument, the teleological argument — each is a different window into the same light.
+
+### Day 17
+Most objections to Christianity are objections to a caricature, not the thing itself. Today, show what the thing actually is.
+
+### Day 18
+The best apologetics happens in a living room, not a lecture hall. Prepare for that conversation.
+
+### Day 19
+Archaeology, manuscript evidence, prophetic fulfillment — the Bible asks to be examined. Come examine it.
+
+### Day 20
+A Christian who has never wrestled with the hard questions is a soldier who has never trained for battle.
+
+### Day 21
+Honest skeptics deserve honest answers. Today's section helps you give them.
+
+### Day 22
+The cultural objections to Christianity change with each generation but root in the same few ancient doubts.
+
+### Day 23
+You may not have all the answers — but you can trust the One who does, and explain why.
+
+### Day 24
+Today, read the section not for yourself but for someone you know who is asking this very question.
+
+### Day 25
+Answering a question well is an act of love. Take the time today.
+
+### Day 26
+The reliability of Scripture is not assumed — it is demonstrated. Know the demonstration.
+
+### Day 27
+The history of Christian thought is a history of brilliant minds who could not find a better explanation than God.
+
+### Day 28
+Apologetics builds the confidence to say "I believe" without apology and explain "I believe" with intelligence.
+
+### Day 29
+Every question answered is a stone placed in the wall that protects someone's faith.
+
+### Day 30
+You may never debate a philosopher — but you will explain Christ to someone who is hurting and confused. Prepare now.
+
+### Day 31
+A month of wrestling with hard questions makes you better at holding the truth gently and offering it generously.
+
+---
+
+## Module: the_gospel_heart
+**Title:** Heart Check
+**Why:** David asked God to "search me and know me." The heart is the seat of everything — desire, motive, worship, sin, and grace. Regular self-examination is not morbid introspection; it is the discipline of alignment. What is checked and surrendered regularly does not accumulate into a crisis.
+**Helps:** The Heart Check walks you through honest Yes/No questions across the key categories of the inner life — love, obedience, peace, faithfulness, and more. Every "No" is not a verdict; it is an invitation to bring that area to the Lord.
+
+### Day 1
+David asked God to search him and know him. That is the prayer this section answers — with honesty and grace.
+
+### Day 2
+The heart is deceitful above all things — which is why it needs regular examination by someone wiser than you.
+
+### Day 3
+Answer Yes or No with the same honesty you'd have if you were the only one reading this.
+
+### Day 4
+The categories here are not meant to condemn you. They are meant to show you where the Spirit is already working.
+
+### Day 5
+Sanctification happens fastest in the places we allow to be seen. What are you hiding from yourself today?
+
+### Day 6
+The fruit of the Spirit is the standard — not as a burden, but as a portrait of who you are becoming.
+
+### Day 7
+A quick check of the engine light keeps you from a breakdown on the highway. Do the check.
+
+### Day 8
+The questions you avoid in this section are usually the ones that most need your attention.
+
+### Day 9
+God is not grading you — He is growing you. Come to this with that settled.
+
+### Day 10
+The heart check is not a performance review. It is a conversation between a Father and His child.
+
+### Day 11
+Pride is the last sin we see in ourselves. Let the questions in this section hold up a mirror you can't put down.
+
+### Day 12
+Joy is listed here not as a feeling to manufacture but as a climate to cultivate. How is yours today?
+
+### Day 13
+Every "No" in this section is not a verdict — it is an invitation to bring that area to the Lord.
+
+### Day 14
+Faithfulness is built one honest self-assessment at a time. Do this with regularity and it becomes a habit of grace.
+
+### Day 15
+What you allow yourself to see about yourself is the ceiling of how much you can grow.
+
+### Day 16
+The Spirit is not alarmed by what you find in here. He knew before you checked. He stays.
+
+### Day 17
+Honesty with God about your condition is not dangerous — hiding your condition is.
+
+### Day 18
+Come to this section slowly. The goal is not a high score. The goal is a more yielded heart.
+
+### Day 19
+Consider a category you've avoided for weeks. Return to it today with fresh courage.
+
+### Day 20
+The heart check is a spiritual discipline with the same weight as prayer and Bible reading — it orders the inner life.
+
+### Day 21
+What percentage of your heart is genuinely at peace today? Let the honest answer lead to honest prayer.
+
+### Day 22
+The questions in this section are designed to surface what you already know deep down but haven't named.
+
+### Day 23
+A clean conscience before God and others is not a luxury — it is the foundation of a life of power.
+
+### Day 24
+Give every "No" to God before you close this today. He can handle what you're carrying.
+
+### Day 25
+The Spirit convicts in order to restore — never to condemn. Receive the conviction as a gift today.
+
+### Day 26
+Growth in Christlikeness is not automatic — it requires the willingness to see and the courage to surrender.
+
+### Day 27
+The sections you feel resistance to entering are often the ones where the most healing is waiting.
+
+### Day 28
+Every honest answer is a brick in the wall of a life of integrity. Build well today.
+
+### Day 29
+A clear heart is a powerful heart. Let today's check clear something that has been clouding you.
+
+### Day 30
+What you surrender in this section, God replaces with something better. Trade up today.
+
+### Day 31
+At the end of this month: who are you becoming? The heart check has been taking inventory. Look at the report.
+
+---
+
+## Module: the_gospel_quizzes
+**Title:** Quizzes
+**Why:** You cannot love deeply what you do not know well. Bible knowledge is not the goal — encounter with the living God is — but knowledge opens the doors that make encounter possible. The disciples who walked with Jesus had three years of daily instruction. This is yours.
+**Helps:** Daily quizzes test your knowledge across the whole Bible — history, prophecy, poetry, theology, and application. Gaps are not failures; they are the most useful data points. The score you miss today is the lesson that sticks tomorrow.
+
+### Day 1
+You cannot love what you do not know. Today's quiz is a step deeper into knowing the One you love.
+
+### Day 2
+The student who tests themselves regularly retains what they've learned. Come test yourself.
+
+### Day 3
+Bible knowledge is not the goal — Bible application is. But you can't apply what you haven't learned.
+
+### Day 4
+Surprise yourself today with how much you know. Then let the gaps show you what to pursue next.
+
+### Day 5
+The disciples who traveled with Jesus had three years of daily instruction. This is your daily instruction.
+
+### Day 6
+Testing your knowledge is not about pride — it is about accountability to your own growth.
+
+### Day 7
+Every question you answer correctly is a stone in the foundation. Every one you miss is a stone yet to be laid.
+
+### Day 8
+The Bible is an inexhaustible text — no matter how long you study it, there is always more to discover.
+
+### Day 9
+Don't skip the quiz because you might get it wrong. The wrong answers are the most valuable ones.
+
+### Day 10
+Scripture memorization is the highest form of retention. Let the quiz point you toward what to memorize next.
+
+### Day 11
+The prophets, the patriarchs, the apostles — today's questions may cover any of them. Come ready to learn.
+
+### Day 12
+A Christian who knows their Bible is a Christian who can help someone else in their moment of crisis.
+
+### Day 13
+God honored Solomon's request for wisdom above all else. Pursue wisdom with the same earnestness.
+
+### Day 14
+Let today's quiz be a measurement, not a judgment. Measurements tell you where you are, not who you are.
+
+### Day 15
+The more Scripture you know, the more doors the Spirit has to work with when He speaks to you.
+
+### Day 16
+Knowledge puffs up — but knowledge in the hands of the humble builds up. Come humble today.
+
+### Day 17
+Some of today's questions will be easy. Some will expose gaps. Welcome both equally.
+
+### Day 18
+The quiz tracks your growth over time. Look at where you started and where you are now.
+
+### Day 19
+You are training a mind to think biblically. That mind will serve you in every situation you face.
+
+### Day 20
+Bible trivia graduates to Bible wisdom when you ask what it means and why it matters.
+
+### Day 21
+The early church knew the scriptures deeply — they had no printed Bibles. What is your excuse for not knowing yours?
+
+### Day 22
+Find one fact from today's quiz and locate it in its original biblical context. That is where learning becomes real.
+
+### Day 23
+The Spirit brings Scripture to your remembrance in moments of need — but only what you've put there.
+
+### Day 24
+Don't rush through today's quiz. Pause on the question you had to guess. Go find the answer in the text.
+
+### Day 25
+A month of daily quizzes makes a noticeable difference in your fluency with the Word. Keep the habit.
+
+### Day 26
+Share today's most interesting question with someone. Teaching it once is worth ten times reading it.
+
+### Day 27
+The Bible is not meant to be known about — it is meant to be known. Let the quiz be a prod toward deeper knowing.
+
+### Day 28
+History, poetry, law, prophecy, letter — the quiz covers the whole Bible because the whole Bible is for you.
+
+### Day 29
+The knowledge you carry into prayer makes your intercession more scripturally grounded. Learn well; pray well.
+
+### Day 30
+Today's quiz is a gate. Pass through it and something opens on the other side.
+
+### Day 31
+A month of testing is a month of growing. The person who took Day 1's quiz is not the same person taking today's.
+
+---
+
+## Module: the_gospel_genealogy
+**Title:** Genealogy
+**Why:** The genealogies of Scripture are not filler — they are the skeleton of the redemption story. Every name was a real person, loved by God, known by name, placed in the narrative for a reason. Tracing the lineage of Christ is tracing the faithfulness of God across millennia.
+**Helps:** The Genealogy module profiles every person of Scripture — names, meanings, lifespans, family connections, and how each life moved the promise forward. What looks like a list of names becomes a map of God's unwavering purpose.
+
+### Day 1
+Every name in the genealogies was a real person — loved by God, known by name, placed in the story for a reason.
+
+### Day 2
+The meaning of a biblical name often carries the whole story of the person's life. Look closely today.
+
+### Day 3
+From Adam to Christ, the story of redemption runs through families. Today you trace one thread.
+
+### Day 4
+The men and women of Scripture were not spiritual giants — most were ordinary people through whom God did extraordinary things.
+
+### Day 5
+The lifespan of the patriarchs is not just trivia. It tells a story of time, history, and the patience of God.
+
+### Day 6
+God called every person in Scripture by name. He knows yours too.
+
+### Day 7
+The families of the Old Testament are the cradle of the New. Explore one today and see the arc of the whole story.
+
+### Day 8
+Some of the most powerful people in Scripture appear in the genealogies with barely a mention. Their lives still mattered.
+
+### Day 9
+God chose to enter the story through a specific family, a specific lineage, a specific womb. Trace that lineage today.
+
+### Day 10
+The women in biblical genealogies broke convention just by being there. Each name is an act of grace.
+
+### Day 11
+The promise to Abraham is still being fulfilled in your life. The genealogy is your backstory.
+
+### Day 12
+Every generation in Scripture believed they might be the last. God's timeline is longer than any of theirs — or yours.
+
+### Day 13
+The people in today's profile lived in a specific place, a specific culture, a specific moment. History is the stage God uses.
+
+### Day 14
+A person's name in Scripture sometimes changes as God reshapes their identity. Consider what He would name you.
+
+### Day 15
+The genealogies in Matthew and Luke read like a throne claim. Jesus is heir to everything promised to every name in the list.
+
+### Day 16
+Faith is not a solo sport — it is a relay race. Every biblical figure passed something to the next generation.
+
+### Day 17
+The chronology of Scripture tells us that God's story has been unfolding for thousands of years. You are not an afterthought.
+
+### Day 18
+The tribes of Israel each carried a blessing and a history. Explore one today and see why the promise never died.
+
+### Day 19
+Some people in the genealogies are known only for failure. They are in the list anyway. So are you.
+
+### Day 20
+The New Testament does not begin at Chapter 1 — it begins in Genesis. The genealogy is the continuity proof.
+
+### Day 21
+God did not have to preserve these names. He chose to. Every name in Scripture is there because it belongs.
+
+### Day 22
+Rahab, Ruth, Bathsheba — outsiders and the scandalous made it into the line of Christ. There is room for everyone.
+
+### Day 23
+The promise made to one becomes the inheritance of thousands. Learn the original promise today.
+
+### Day 24
+Behind every name in the genealogy is a birth, a death, a decision, and a God who never lost track of the thread.
+
+### Day 25
+The prophets looked backward to the patriarchs and forward to the Messiah — they read the genealogy as promise.
+
+### Day 26
+You are part of a spiritual genealogy that begins at the cross and extends to the final trumpet. You belong here.
+
+### Day 27
+Study the person in today's profile as if you might one day meet them. What would you ask?
+
+### Day 28
+The spans of time in biblical genealogy remind us that God measures in generations, not quarters.
+
+### Day 29
+Every great move of God in Scripture came through a family. Consider the family you are building and what God wants to do through it.
+
+### Day 30
+The genealogies prove the Bible is a historical document — names, dates, lineages that can be traced and verified.
+
+### Day 31
+The story of Scripture is a family story. You were adopted into it at conversion. You belong on the list.
+
+---
+
+## Module: the_gospel_invitation
+**Title:** The Invitation
+**Why:** Everything in Scripture moves toward a single moment — the moment a person says yes to Jesus. The Invitation exists to hold that door open, to make the gospel clear, and to ensure that every person who comes to The Way understands not just what to believe but Who is doing the inviting.
+**Helps:** Three pillars: His invitations (what He said to those He called), His identity (the I Am statements and what they mean for you now), and His finished work (the cross, the resurrection, and what they accomplished). The door is open. Come.
+
+### Day 1
+Jesus did not merely offer information — He extended an invitation. The door is still open.
+
+### Day 2
+His words "Come to Me" were spoken to the weary and heavy-laden. If that's you today, they are still for you.
+
+### Day 3
+The finished work of Christ is not a theological concept — it is the ground on which you stand right now.
+
+### Day 4
+No biography of Jesus is complete without asking: who do you say that He is? Today, let your answer be clear.
+
+### Day 5
+Grace is not earned — it is received. The only qualification is needing it.
+
+### Day 6
+The invitation of the gospel is the most scandalous thing ever said: the holy God of the universe has made a way for you.
+
+### Day 7
+The "I Am" statements of Jesus are not abstract theology — each one is a direct offer to your specific need today.
+
+### Day 8
+His identity is the basis of His invitation. Explore who He said He was — and why it changes everything.
+
+### Day 9
+The cross was not plan B. It was planned before the foundation of the world, for you, by name.
+
+### Day 10
+The resurrection is His signature on the invitation. The one who signed it cannot be ignored.
+
+### Day 11
+If someone you loved was one step from receiving the gift of eternal life, what would you say to them? Say it to yourself today.
+
+### Day 12
+The invitation does not expire with age, with sin history, or with how long you've been putting it off.
+
+### Day 13
+Christ's claim to be the Way, the Truth, and the Life is either the most important thing ever said or the most dangerous lie. There is no neutral ground.
+
+### Day 14
+The work is finished. The only thing left is receiving what was already given.
+
+### Day 15
+Salvation begins with hearing. Today, let the Word land on the soil of a willing heart.
+
+### Day 16
+Every great testimony in history is a variation of the same story: I was lost, and I was found. Let that story continue today.
+
+### Day 17
+You cannot out-sin the reach of grace. If you believe you can, read this section again.
+
+### Day 18
+God did not send His Son into the world to condemn the world — but that the world through Him might be saved.
+
+### Day 19
+The Spirit and the Bride say "Come." That call is still echoing today.
+
+### Day 20
+The invitation in this section is not for someone else — it was always for you.
+
+### Day 21
+Coming to Christ is not the end of your story. It is the beginning of the one worth telling.
+
+### Day 22
+The promises in this section are backed by the character of God. He cannot lie. He will not fail. Trust what He says.
+
+### Day 23
+If you have never responded to the invitation, today is the day. If you have, bring someone who hasn't.
+
+### Day 24
+Christ stands at the door and knocks — but the door opens from the inside. Only you can open it.
+
+### Day 25
+The gospel is not complicated. A child can understand it. A scholar cannot exhaust it. Both receive the same grace.
+
+### Day 26
+What Jesus offers, nothing else can replicate — not wealth, not achievement, not relationship, not religion.
+
+### Day 27
+The thief on the cross had hours left and a lifetime of regret. The invitation received him anyway.
+
+### Day 28
+The Great Invitation leads to the Great Commission. Those who receive it are compelled to carry it.
+
+### Day 29
+Share this section with one person this week. The invitation was never meant to stop with you.
+
+### Day 30
+The cost of saying yes is everything. The cost of saying no is more.
+
+### Day 31
+This month you have stood before the door of invitation. It is still open. Has anything changed for you?

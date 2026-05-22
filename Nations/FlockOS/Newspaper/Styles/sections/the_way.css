@@ -1184,29 +1184,67 @@ a.oyb-stream-card:hover .oyb-stream-arrow { color: var(--sc, var(--accent)); }
 /* Read more */
 .story-readmore {
   margin: 0;
+  display: flex;
+  justify-content: flex-end;
 }
 .story-readmore-btn {
-  background: none;
-  border: none;
-  padding: 0;
+  background: transparent;
+  border: 1.5px solid var(--story-accent, var(--accent));
+  border-radius: 4px;
+  padding: 0.4375rem 1rem;
   font: inherit;
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-size: 0.75rem;
+  font-weight: 700;
   color: var(--story-accent, var(--accent));
   cursor: pointer;
-  min-height: 44px;
+  min-height: 38px;
   display: inline-flex;
   align-items: center;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  transition: opacity 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
-.story-readmore-btn:hover { opacity: 0.75; }
+.story-readmore-btn:hover { background: var(--story-accent, var(--accent)); color: var(--paper-card, #fff); }
 .story-readmore-btn:focus-visible {
   outline: 2px solid var(--story-accent, var(--accent));
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 4px;
+}
+
+/* Decorative section ornament divider */
+.story-ornament-divider {
+  margin: 1rem 0 1.375rem;
+  width: 100%;
+  overflow: hidden;
+}
+.story-ornament-divider svg {
+  width: 100%;
+  height: 16px;
+  display: block;
+}
+.story:last-child .story-ornament-divider { display: none; }
+
+/* Edit Daily Messages aside button */
+.way-edit-daily-btn {
+  display: block;
+  width: 100%;
+  margin-top: 1.25rem;
+  background: transparent;
+  border: 1.5px solid var(--rule, #e5e7ef);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font: 600 0.7rem/1 var(--font-ui, sans-serif);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .15s, color .15s;
+}
+.way-edit-daily-btn:hover {
+  border-color: var(--gold, #8B7028);
+  color: var(--gold, #8B7028);
 }
 
 /* Skeleton loading */
