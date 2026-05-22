@@ -616,7 +616,8 @@
       + '<span class="way-today-card__label-arrow">&#8599;</span></div>'
       + '<div class="way-today-card__title">' + esc(title) + '</div>'
       + (sub ? '<div class="way-today-card__body">' + esc(sub) + '</div>' : '')
-      + '</div></div>';
+      + '</div></div>'
+      + '<div class="way-today-card__footer"><span>Read more</span><span class="way-today-card__footer-rule"></span><span>&#8594;</span></div>';
     $card.addEventListener('click', onOpen);
     $card.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); }

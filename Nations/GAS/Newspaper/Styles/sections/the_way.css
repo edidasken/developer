@@ -1533,7 +1533,24 @@ a.oyb-stream-card:hover .oyb-stream-arrow { color: var(--sc, var(--accent)); }
   color: var(--ink-muted);
   line-height: 1.45;
 }
-.way-today-card__open { display: none; }
+.way-today-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.5625rem;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tc-accent, var(--accent));
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+.way-today-card__footer-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--tc-accent, var(--accent));
+  opacity: 0.3;
+}
 
 /* ── All Modules quick links ───────────────────────────────────────────────── */
 .way-aside-links {
