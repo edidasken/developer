@@ -56,12 +56,12 @@ export function render() {
       </div>
 
       <div data-bind="tab-plans" style="display:none">
-        ${sectionHead('Your reading streak')}
-        <div class="grow-streak" data-bind="streak"></div>
         ${sectionHead('Choose a plan')}
         <div class="grow-grid grow-grid--reading" data-bind="plans"></div>
         ${sectionHead('Today')}
         <div class="grow-today" data-bind="today"></div>
+        ${sectionHead('Your reading streak')}
+        <div class="grow-streak" data-bind="streak"></div>
       </div>
     </section>
   `;

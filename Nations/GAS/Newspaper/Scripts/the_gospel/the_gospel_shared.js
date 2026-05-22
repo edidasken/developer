@@ -187,7 +187,7 @@ export function helpButton({ label = 'Ask for help', dataAttr = 'help' } = {}) {
   return /* html */`
     <div class="grow-help-row" data-bind="${esc(dataAttr)}">
       <button type="button" class="grow-btn grow-btn--ghost" data-help-btn>
-        🙏 ${esc(label)}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="2" x2="12" y2="22"/><line x1="6" y1="8" x2="18" y2="8"/></svg> ${esc(label)}
       </button>
       <span class="grow-help-status grow-muted" data-help-status></span>
     </div>

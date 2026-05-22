@@ -112,6 +112,46 @@ const ICONS = {
   worldliness:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
 };
 
+/* ─── Bible.com ESV link builder (version 59 = ESV) ─────────────────────── */
+const _USFM = {
+  genesis:'GEN',gen:'GEN',exodus:'EXO',exo:'EXO',ex:'EXO',leviticus:'LEV',lev:'LEV',
+  numbers:'NUM',num:'NUM',deuteronomy:'DEU',deu:'DEU',deut:'DEU',joshua:'JOS',jos:'JOS',
+  josh:'JOS',judges:'JDG',judg:'JDG',ruth:'RUT',rut:'RUT',
+  '1 samuel':'1SA','1sa':'1SA','1sam':'1SA','2 samuel':'2SA','2sa':'2SA','2sam':'2SA',
+  '1 kings':'1KI','1ki':'1KI','1kgs':'1KI','2 kings':'2KI','2ki':'2KI','2kgs':'2KI',
+  '1 chronicles':'1CH','1ch':'1CH','1chr':'1CH','2 chronicles':'2CH','2ch':'2CH','2chr':'2CH',
+  ezra:'EZR',ezr:'EZR',nehemiah:'NEH',neh:'NEH',esther:'EST',est:'EST',job:'JOB',
+  psalm:'PSA',psalms:'PSA',psa:'PSA',ps:'PSA',proverbs:'PRO',prov:'PRO',pro:'PRO',
+  ecclesiastes:'ECC',ecc:'ECC',eccl:'ECC','song of solomon':'SNG','song of songs':'SNG',
+  song:'SNG',sos:'SNG',isaiah:'ISA',isa:'ISA',jeremiah:'JER',jer:'JER',
+  lamentations:'LAM',lam:'LAM',ezekiel:'EZK',ezek:'EZK',ezk:'EZK',daniel:'DAN',dan:'DAN',
+  hosea:'HOS',hos:'HOS',joel:'JOL',jol:'JOL',amos:'AMO',amo:'AMO',obadiah:'OBA',oba:'OBA',
+  jonah:'JON',jon:'JON',micah:'MIC',mic:'MIC',nahum:'NAM',nah:'NAM',nam:'NAM',
+  habakkuk:'HAB',hab:'HAB',zephaniah:'ZEP',zeph:'ZEP',zep:'ZEP',haggai:'HAG',hag:'HAG',
+  zechariah:'ZEC',zech:'ZEC',zec:'ZEC',malachi:'MAL',mal:'MAL',
+  matthew:'MAT',matt:'MAT',mat:'MAT',mark:'MRK',mrk:'MRK',mk:'MRK',luke:'LUK',luk:'LUK',
+  lk:'LUK',john:'JHN',jhn:'JHN',jn:'JHN',acts:'ACT',act:'ACT',romans:'ROM',rom:'ROM',
+  '1 corinthians':'1CO','1co':'1CO','1cor':'1CO','2 corinthians':'2CO','2co':'2CO','2cor':'2CO',
+  galatians:'GAL',gal:'GAL',ephesians:'EPH',eph:'EPH',philippians:'PHP',phil:'PHP',php:'PHP',
+  colossians:'COL',col:'COL','1 thessalonians':'1TH','1th':'1TH','1thes':'1TH',
+  '2 thessalonians':'2TH','2th':'2TH','2thes':'2TH','1 timothy':'1TI','1ti':'1TI','1tim':'1TI',
+  '2 timothy':'2TI','2ti':'2TI','2tim':'2TI',titus:'TIT',tit:'TIT',philemon:'PHM',phm:'PHM',
+  hebrews:'HEB',heb:'HEB',james:'JAS',jas:'JAS','1 peter':'1PE','1pe':'1PE','1pet':'1PE',
+  '2 peter':'2PE','2pe':'2PE','2pet':'2PE','1 john':'1JN','1jn':'1JN','1joh':'1JN',
+  '2 john':'2JN','2jn':'2JN','2joh':'2JN','3 john':'3JN','3jn':'3JN','3joh':'3JN',
+  jude:'JUD',jud:'JUD',revelation:'REV',rev:'REV',
+};
+function _bibleComUrl(ref) {
+  if (!ref) return null;
+  const m = ref.trim().match(/^(\d\s+)?([A-Za-z ]+?)\s+(\d+):(\d+)(?:-\d+)?$/);
+  if (!m) return null;
+  const prefix  = (m[1] || '').trim();
+  const bookRaw = (prefix ? prefix + ' ' + m[2] : m[2]).trim().toLowerCase();
+  const code    = _USFM[bookRaw];
+  if (!code) return null;
+  return `https://www.bible.com/bible/59/${code}.${m[3]}.${m[4]}.ESV`;
+}
+
 const _cache = {};      // id → full doc
 let _stubs   = [];      // catalog stubs
 
@@ -126,7 +166,7 @@ export function render() {
         </div>
       </header>
 
-      <input type="search" class="grow-search" data-bind="search" placeholder="🔍 Search topics…" />
+      <input type="search" class="grow-search" data-bind="search" placeholder="Search topics…" />
       <div class="grow-grid grow-grid--counseling" data-bind="grid">${loadingCards(6)}</div>
     </section>
   `;
@@ -273,16 +313,16 @@ function _detailHtml(item) {
   let h = '';
   if (def) h += `<p class="grow-counsel-def">${esc(def)}</p>`;
   if (scrips.length) {
-    h += `<div class="grow-counsel-section-head" style="--counsel-color:${esc(color)}"><span class="grow-counsel-section-icon">📖</span> Scripture Foundation</div>`;
+    h += `<div class="grow-counsel-section-head" style="--counsel-color:${esc(color)}"><span class="grow-counsel-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span> Scripture Foundation</div>`;
     scrips.forEach((s) => {
       h += `<div class="grow-counsel-scripture" style="--counsel-color:${esc(color)}">`;
-      if (s.ref)  h += `<div class="grow-counsel-ref">${bibleLink(s.ref)}</div>`;
+      if (s.ref) { const _url = _bibleComUrl(s.ref); h += `<div class="grow-counsel-ref">${_url ? `<a href="${_url}" target="_blank" rel="noopener noreferrer">${esc(s.ref)}</a>` : esc(s.ref)}</div>`; }
       if (s.text) h += `<div class="grow-counsel-verse">“${esc(s.text)}”</div>`;
       h += `</div>`;
     });
   }
   if (steps.length) {
-    h += `<div class="grow-counsel-section-head" style="--counsel-color:${esc(color)}"><span class="grow-counsel-section-icon">💡</span> Faith Response Steps</div>`;
+    h += `<div class="grow-counsel-section-head" style="--counsel-color:${esc(color)}"><span class="grow-counsel-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7z"/></svg></span> Faith Response Steps</div>`;
     h += `<ol class="grow-counsel-steps">`;
     steps.forEach((s) => { h += `<li>${esc(s)}</li>`; });
     h += `</ol>`;
