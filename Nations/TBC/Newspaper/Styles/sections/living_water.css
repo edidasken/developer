@@ -1,0 +1,19 @@
+/*
+ * Styles/sections/living_water.css
+ * Section: The Wellspring — Wellspring Navy dark
+ *
+ * ADDITIVE ONLY. Rules here:
+ *   1. Only define --sec-* prefixed custom properties
+ *   2. Never redefine tokens from the_broadsheet.css
+ *   3. Max 80 lines for cosmetic sections; larger only for unique layouts
+ *   4. Accent color: var(--sec-living-water)
+ */
+
+/* Section accent (used by section-specific headers, active chips, etc.) */
+.sec-living_water--accent {
+  color: var(--sec-living-water);
+}
+
+.sec-living_water--border {
+  border-color: var(--sec-living-water);
+}

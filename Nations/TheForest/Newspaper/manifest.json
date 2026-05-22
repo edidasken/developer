@@ -1,0 +1,22 @@
+{
+  "name": "The Forest \u2014 Herald",
+  "short_name": "TheForest",
+  "description": "The Newspaper \u2014 FlockOS Unified Editorial Experience",
+  "start_url": "/Nations/TheForest/Newspaper/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#e8a838",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "Images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "Images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

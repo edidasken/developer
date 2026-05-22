@@ -14,7 +14,7 @@
    Bump the version suffix whenever the precache manifest changes.
    ══════════════════════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'flock-newspaper-v1.0';
+const CACHE_NAME = 'flock-newspaper-gas-v1.0';
 
 /* Derive base path from SW location — works at root or any subpath.
    e.g. '/FlockOS/Newspaper/' on GitHub Pages, or '/' at a Firebase Hosting root */

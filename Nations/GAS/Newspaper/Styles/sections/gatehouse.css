@@ -1,0 +1,19 @@
+/*
+ * Styles/sections/gatehouse.css
+ * Section: The Bulletin Board — Crimson Notice
+ *
+ * ADDITIVE ONLY. Rules here:
+ *   1. Only define --sec-* prefixed custom properties
+ *   2. Never redefine tokens from the_broadsheet.css
+ *   3. Max 80 lines for cosmetic sections; larger only for unique layouts
+ *   4. Accent color: var(--sec-gatehouse)
+ */
+
+/* Section accent (used by section-specific headers, active chips, etc.) */
+.sec-gatehouse--accent {
+  color: var(--sec-gatehouse);
+}
+
+.sec-gatehouse--border {
+  border-color: var(--sec-gatehouse);
+}

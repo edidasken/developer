@@ -1,0 +1,19 @@
+/*
+ * Styles/sections/scroll_room.css
+ * Section: The Archive — Ink & Leather
+ *
+ * ADDITIVE ONLY. Rules here:
+ *   1. Only define --sec-* prefixed custom properties
+ *   2. Never redefine tokens from the_broadsheet.css
+ *   3. Max 80 lines for cosmetic sections; larger only for unique layouts
+ *   4. Accent color: var(--sec-scroll-room)
+ */
+
+/* Section accent (used by section-specific headers, active chips, etc.) */
+.sec-scroll_room--accent {
+  color: var(--sec-scroll-room);
+}
+
+.sec-scroll_room--border {
+  border-color: var(--sec-scroll-room);
+}
