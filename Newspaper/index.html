@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="broadsheet">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="theme-color" content="#faf6ed">
+  <meta name="description" content="The Flock Herald — Your Church, Every Day">
+  <title>The Flock Herald</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="Images/icon-192.png">
+  <link rel="stylesheet" href="Styles/the_broadsheet.css">
+
+  <!-- Flash prevention: restore theme + font scale before paint -->
+  <script>
+    (function () {
+      try {
+        var s = parseFloat(localStorage.getItem('flock_font_scale') || '1');
+        if (s >= 0.85 && s <= 1.25) {
+          document.documentElement.style.setProperty('--fn-scale', s);
+        }
+        var t = localStorage.getItem('flock_theme') || 'broadsheet';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (_) {}
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Masthead -->
+  <header class="np-masthead" id="masthead">
+    <h1 class="np-masthead__title">The Flock Herald</h1>
+    <hr class="np-masthead__rule">
+    <div class="np-masthead__meta">
+      <span id="herald-date"></span>
+      <span id="herald-church"></span>
+      <span id="herald-edition">First Edition</span>
+    </div>
+  </header>
+
+  <!-- Section Navigation Bar -->
+  <nav class="sec-nav-bar" id="sec-nav" aria-label="Paper sections">
+    <!-- Populated by the_gates.js after auth resolves -->
+  </nav>
+
+  <!-- Page Content -->
+  <main class="np-page" id="herald-main">
+    <!-- Populated by the_proclamation.js -->
+    <p class="np-byline" style="text-align:center;margin-top:40px;color:var(--ink-faint);">Loading today's edition…</p>
+  </main>
+
+  <!-- Scripts -->
+  <script src="Scripts/the_living_water.js"></script>
+  <script src="Scripts/firm_foundation.js"></script>
+  <script src="Scripts/the_adornment.js"></script>
+  <script src="Scripts/the_gates.js"></script>
+  <script src="Scripts/the_proclamation.js"></script>
+
+  <!-- Date byline -->
+  <script>
+    (function () {
+      var el = document.getElementById('herald-date');
+      if (el) {
+        el.textContent = new Date().toLocaleDateString('en-US', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+      }
+    })();
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    }
+  </script>
+
+</body>
+</html>

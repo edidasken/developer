@@ -1,0 +1,22 @@
+{
+  "name": "The Flock Herald",
+  "short_name": "Herald",
+  "description": "The Newspaper — FlockOS Unified Editorial Experience",
+  "start_url": "/Newspaper/",
+  "display": "standalone",
+  "background_color": "#faf6ed",
+  "theme_color": "#faf6ed",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "Images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "Images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
