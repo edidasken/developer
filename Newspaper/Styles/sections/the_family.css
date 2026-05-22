@@ -1,0 +1,20 @@
+/* ==========================================================================
+   the_family.css — Section 6: The Family
+   Signature color: --sky (#8abde0)
+   Additive only. Never override tokens already in the_broadsheet.css.
+   ========================================================================== */
+
+.sec-the-family {
+  --sec-color: var(--sky);
+  --sec-color-soft: var(--sky-soft);
+  --sec-heading-font: 'Lora', Georgia, serif;
+  --sec-body-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.sec-the-family .sec-masthead {
+  border-top: 3px solid var(--sky);
+}
+
+.sec-the-family .broadsheet-card {
+  border-top: 3px solid var(--sky);
+}

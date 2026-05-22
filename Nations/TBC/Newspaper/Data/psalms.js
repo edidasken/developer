@@ -1,11 +1,14 @@
-// Herald Data: Psalms
-// Source: New_Covenant/Data/psalms.js
-// byNumber reindexed as { number: entry } for O(1) lookup.
-// DO NOT EDIT — regenerate with: node Newspaper/convert_herald_data.js
-window.HERALD_DATA = window.HERALD_DATA || {};
-window.HERALD_DATA.psalms = {
-  "byNumber": {
-    "1": {
+// psalms.js — Static Psalms study bundle
+// Source:   New_Covenant/Data/The Psalms.md
+// Exported: 2026-04-29T05:44:15Z
+// byNumber: 135 entries  |  byTheme: 11 sections
+//
+// Re-generate: python "Architechtural Docs/New Covenant/Automation/Shepherds/convert_psalms_to_js.py"
+// DO NOT EDIT — regenerate from the source .md instead.
+
+export default {
+  "byNumber": [
+    {
       "number": 1,
       "display": "1",
       "type": "Wisdom",
@@ -14,7 +17,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The way of the righteous and the wicked"
     },
-    "2": {
+    {
       "number": 2,
       "display": "2",
       "type": "Messianic",
@@ -24,7 +27,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s Anointed King"
     },
-    "3": {
+    {
       "number": 3,
       "display": "3",
       "type": "Lament",
@@ -33,7 +36,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for deliverance from enemies"
     },
-    "4": {
+    {
       "number": 4,
       "display": "4",
       "type": "Trust",
@@ -42,7 +45,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God hears the righteous"
     },
-    "5": {
+    {
       "number": 5,
       "display": "5",
       "type": "Imprecatory",
@@ -51,7 +54,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for justice"
     },
-    "6": {
+    {
       "number": 6,
       "display": "6",
       "type": "Penitential",
@@ -60,7 +63,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for mercy in distress"
     },
-    "7": {
+    {
       "number": 7,
       "display": "7",
       "type": "Imprecatory",
@@ -69,7 +72,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God is a righteous judge"
     },
-    "8": {
+    {
       "number": 8,
       "display": "8",
       "type": "Praise",
@@ -79,7 +82,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s majesty in creation"
     },
-    "9": {
+    {
       "number": 9,
       "display": "9",
       "type": "Praise",
@@ -88,7 +91,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s justice and rule"
     },
-    "10": {
+    {
       "number": 10,
       "display": "10",
       "type": "Lament",
@@ -97,7 +100,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God, why do You stand far off?"
     },
-    "11": {
+    {
       "number": 11,
       "display": "11",
       "type": "Trust",
@@ -106,7 +109,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The Lord is in His holy temple"
     },
-    "12": {
+    {
       "number": 12,
       "display": "12",
       "type": "Lament",
@@ -115,7 +118,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The faithful have vanished"
     },
-    "13": {
+    {
       "number": 13,
       "display": "13",
       "type": "Lament",
@@ -124,7 +127,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "How long, O Lord?"
     },
-    "14": {
+    {
       "number": 14,
       "display": "14",
       "type": "Wisdom",
@@ -133,7 +136,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The fool says in his heart, “There is no God”"
     },
-    "15": {
+    {
       "number": 15,
       "display": "15",
       "type": "Wisdom",
@@ -142,7 +145,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Who may dwell with God?"
     },
-    "16": {
+    {
       "number": 16,
       "display": "16",
       "type": "Trust",
@@ -152,7 +155,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God is my portion and cup"
     },
-    "17": {
+    {
       "number": 17,
       "display": "17",
       "type": "Lament",
@@ -161,7 +164,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for vindication"
     },
-    "18": {
+    {
       "number": 18,
       "display": "18",
       "type": "Thanksgiving",
@@ -171,7 +174,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God gives victory to His king"
     },
-    "19": {
+    {
       "number": 19,
       "display": "19",
       "type": "Praise",
@@ -181,7 +184,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s creation and law"
     },
-    "20": {
+    {
       "number": 20,
       "display": "20",
       "type": "Royal",
@@ -190,7 +193,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for the king"
     },
-    "21": {
+    {
       "number": 21,
       "display": "21",
       "type": "Royal",
@@ -199,7 +202,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Thanksgiving for victory"
     },
-    "22": {
+    {
       "number": 22,
       "display": "22",
       "type": "Messianic Lament",
@@ -208,7 +211,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The suffering Savior"
     },
-    "23": {
+    {
       "number": 23,
       "display": "23",
       "type": "Trust",
@@ -217,7 +220,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The Lord is my Shepherd"
     },
-    "24": {
+    {
       "number": 24,
       "display": "24",
       "type": "Messianic",
@@ -227,7 +230,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The King of glory"
     },
-    "25": {
+    {
       "number": 25,
       "display": "25",
       "type": "Lament",
@@ -236,7 +239,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for guidance and forgiveness"
     },
-    "26": {
+    {
       "number": 26,
       "display": "26",
       "type": "Lament",
@@ -245,7 +248,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Plea for vindication"
     },
-    "27": {
+    {
       "number": 27,
       "display": "27",
       "type": "Trust",
@@ -254,7 +257,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The Lord is my light and salvation"
     },
-    "28": {
+    {
       "number": 28,
       "display": "28",
       "type": "Lament",
@@ -263,7 +266,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for help and deliverance"
     },
-    "29": {
+    {
       "number": 29,
       "display": "29",
       "type": "Praise",
@@ -272,7 +275,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The voice of the Lord in the storm"
     },
-    "30": {
+    {
       "number": 30,
       "display": "30",
       "type": "Thanksgiving",
@@ -281,7 +284,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Joy from mourning"
     },
-    "31": {
+    {
       "number": 31,
       "display": "31",
       "type": "Lament",
@@ -290,7 +293,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "In You, O Lord, I take refuge"
     },
-    "32": {
+    {
       "number": 32,
       "display": "32",
       "type": "Penitential",
@@ -300,7 +303,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The blessing of forgiveness"
     },
-    "33": {
+    {
       "number": 33,
       "display": "33",
       "type": "Praise",
@@ -309,7 +312,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s power in creation"
     },
-    "34": {
+    {
       "number": 34,
       "display": "34",
       "type": "Thanksgiving",
@@ -318,7 +321,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God delivers the righteous"
     },
-    "35": {
+    {
       "number": 35,
       "display": "35",
       "type": "Imprecatory",
@@ -327,7 +330,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for justice against enemies"
     },
-    "36": {
+    {
       "number": 36,
       "display": "36",
       "type": "Wisdom",
@@ -336,7 +339,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The wickedness of man and the steadfast love of God"
     },
-    "37": {
+    {
       "number": 37,
       "display": "37",
       "type": "Wisdom",
@@ -345,7 +348,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Trusting God amid evildoers"
     },
-    "38": {
+    {
       "number": 38,
       "display": "38",
       "type": "Penitential",
@@ -354,7 +357,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for God’s mercy"
     },
-    "39": {
+    {
       "number": 39,
       "display": "39",
       "type": "Lament",
@@ -363,7 +366,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The brevity of life"
     },
-    "40": {
+    {
       "number": 40,
       "display": "40",
       "type": "Thanksgiving",
@@ -373,7 +376,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s deliverance and obedience of the Messiah"
     },
-    "41": {
+    {
       "number": 41,
       "display": "41",
       "type": "Lament",
@@ -382,7 +385,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for healing and mercy"
     },
-    "42": {
+    {
       "number": 42,
       "display": "42–43",
       "type": "Lament",
@@ -391,7 +394,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Longing for God’s presence"
     },
-    "44": {
+    {
       "number": 44,
       "display": "44",
       "type": "Lament",
@@ -400,7 +403,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Plea for God’s help in defeat"
     },
-    "45": {
+    {
       "number": 45,
       "display": "45",
       "type": "Royal",
@@ -410,7 +413,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The wedding of the king"
     },
-    "46": {
+    {
       "number": 46,
       "display": "46",
       "type": "Trust",
@@ -419,7 +422,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God is our refuge and strength"
     },
-    "47": {
+    {
       "number": 47,
       "display": "47",
       "type": "Praise",
@@ -428,7 +431,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God reigns over the nations"
     },
-    "48": {
+    {
       "number": 48,
       "display": "48",
       "type": "Praise",
@@ -437,7 +440,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Zion, the city of our God"
     },
-    "49": {
+    {
       "number": 49,
       "display": "49",
       "type": "Wisdom",
@@ -446,7 +449,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The folly of trusting in riches"
     },
-    "50": {
+    {
       "number": 50,
       "display": "50",
       "type": "Wisdom",
@@ -455,7 +458,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God as the righteous judge"
     },
-    "51": {
+    {
       "number": 51,
       "display": "51",
       "type": "Penitential",
@@ -464,7 +467,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "David’s confession of sin"
     },
-    "52": {
+    {
       "number": 52,
       "display": "52",
       "type": "Wisdom",
@@ -473,7 +476,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God will judge the wicked"
     },
-    "53": {
+    {
       "number": 53,
       "display": "53",
       "type": "Wisdom",
@@ -482,7 +485,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The fool says in his heart, “There is no God” (cf. Psalm 14)"
     },
-    "54": {
+    {
       "number": 54,
       "display": "54",
       "type": "Lament",
@@ -491,7 +494,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for deliverance from enemies"
     },
-    "55": {
+    {
       "number": 55,
       "display": "55",
       "type": "Lament",
@@ -500,7 +503,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Betrayal by a friend"
     },
-    "56": {
+    {
       "number": 56,
       "display": "56",
       "type": "Trust",
@@ -509,7 +512,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "In God whose word I praise"
     },
-    "57": {
+    {
       "number": 57,
       "display": "57",
       "type": "Trust",
@@ -518,7 +521,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Refuge under God’s wings"
     },
-    "58": {
+    {
       "number": 58,
       "display": "58",
       "type": "Imprecatory",
@@ -527,7 +530,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "A prayer against unjust rulers"
     },
-    "59": {
+    {
       "number": 59,
       "display": "59",
       "type": "Trust",
@@ -537,7 +540,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Deliverance from enemies"
     },
-    "60": {
+    {
       "number": 60,
       "display": "60",
       "type": "Lament",
@@ -546,7 +549,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for restoration after defeat"
     },
-    "61": {
+    {
       "number": 61,
       "display": "61",
       "type": "Trust",
@@ -555,7 +558,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Lead me to the rock that is higher than I"
     },
-    "62": {
+    {
       "number": 62,
       "display": "62",
       "type": "Trust",
@@ -564,7 +567,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "My soul waits for God alone"
     },
-    "63": {
+    {
       "number": 63,
       "display": "63",
       "type": "Trust",
@@ -573,7 +576,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "My soul thirsts for You"
     },
-    "64": {
+    {
       "number": 64,
       "display": "64",
       "type": "Lament",
@@ -582,7 +585,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Protection from evildoers"
     },
-    "65": {
+    {
       "number": 65,
       "display": "65",
       "type": "Praise",
@@ -591,7 +594,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s bounty in creation"
     },
-    "66": {
+    {
       "number": 66,
       "display": "66",
       "type": "Praise",
@@ -601,7 +604,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Praise for deliverance"
     },
-    "67": {
+    {
       "number": 67,
       "display": "67",
       "type": "Praise",
@@ -610,7 +613,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Let the nations be glad"
     },
-    "68": {
+    {
       "number": 68,
       "display": "68",
       "type": "Praise",
@@ -620,7 +623,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s victorious ascent"
     },
-    "69": {
+    {
       "number": 69,
       "display": "69",
       "type": "Lament",
@@ -630,7 +633,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Zeal for Your house consumes me"
     },
-    "70": {
+    {
       "number": 70,
       "display": "70",
       "type": "Lament",
@@ -639,7 +642,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Make haste to help me, O Lord"
     },
-    "71": {
+    {
       "number": 71,
       "display": "71",
       "type": "Trust",
@@ -648,7 +651,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Forsake me not in old age"
     },
-    "72": {
+    {
       "number": 72,
       "display": "72",
       "type": "Royal",
@@ -658,7 +661,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The reign of the righteous king"
     },
-    "73": {
+    {
       "number": 73,
       "display": "73",
       "type": "Wisdom",
@@ -667,7 +670,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Why do the wicked prosper?"
     },
-    "74": {
+    {
       "number": 74,
       "display": "74",
       "type": "Lament",
@@ -676,7 +679,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Plea for God’s defense of His people"
     },
-    "75": {
+    {
       "number": 75,
       "display": "75",
       "type": "Praise",
@@ -685,7 +688,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God the righteous judge"
     },
-    "76": {
+    {
       "number": 76,
       "display": "76",
       "type": "Praise",
@@ -694,7 +697,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God is to be feared in Zion"
     },
-    "77": {
+    {
       "number": 77,
       "display": "77",
       "type": "Lament",
@@ -703,7 +706,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Remembering the deeds of the Lord"
     },
-    "78": {
+    {
       "number": 78,
       "display": "78",
       "type": "Wisdom",
@@ -712,7 +715,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "A history lesson of God’s faithfulness"
     },
-    "79": {
+    {
       "number": 79,
       "display": "79",
       "type": "Lament",
@@ -721,7 +724,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Plea for God to rescue His people"
     },
-    "80": {
+    {
       "number": 80,
       "display": "80",
       "type": "Lament",
@@ -730,7 +733,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Restore us, O God"
     },
-    "81": {
+    {
       "number": 81,
       "display": "81",
       "type": "Praise",
@@ -739,7 +742,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Call to listen to God"
     },
-    "82": {
+    {
       "number": 82,
       "display": "82",
       "type": "Wisdom",
@@ -748,7 +751,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God judges among the gods"
     },
-    "83": {
+    {
       "number": 83,
       "display": "83",
       "type": "Imprecatory",
@@ -757,7 +760,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer against Israel’s enemies"
     },
-    "84": {
+    {
       "number": 84,
       "display": "84",
       "type": "Trust",
@@ -767,7 +770,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Blessed are those who dwell in Your house"
     },
-    "85": {
+    {
       "number": 85,
       "display": "85",
       "type": "Lament",
@@ -777,7 +780,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for restoration"
     },
-    "86": {
+    {
       "number": 86,
       "display": "86",
       "type": "Lament",
@@ -787,7 +790,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Great is Your steadfast love"
     },
-    "87": {
+    {
       "number": 87,
       "display": "87",
       "type": "Praise",
@@ -796,7 +799,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Glorious things of you are spoken, O city of God"
     },
-    "88": {
+    {
       "number": 88,
       "display": "88",
       "type": "Lament",
@@ -805,7 +808,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Deepest despair"
     },
-    "89": {
+    {
       "number": 89,
       "display": "89",
       "type": "Royal",
@@ -815,7 +818,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s covenant with David"
     },
-    "90": {
+    {
       "number": 90,
       "display": "90",
       "type": "Wisdom",
@@ -824,7 +827,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Teach us to number our days"
     },
-    "91": {
+    {
       "number": 91,
       "display": "91",
       "type": "Trust",
@@ -833,7 +836,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "My refuge and fortress"
     },
-    "92": {
+    {
       "number": 92,
       "display": "92",
       "type": "Praise",
@@ -842,7 +845,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Flourishing of the righteous"
     },
-    "93": {
+    {
       "number": 93,
       "display": "93",
       "type": "Praise",
@@ -851,7 +854,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The Lord reigns in majesty"
     },
-    "94": {
+    {
       "number": 94,
       "display": "94",
       "type": "Lament",
@@ -861,7 +864,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God will not forsake His people"
     },
-    "95": {
+    {
       "number": 95,
       "display": "95",
       "type": "Praise",
@@ -870,7 +873,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Call to worship and obedience"
     },
-    "96": {
+    {
       "number": 96,
       "display": "96",
       "type": "Praise",
@@ -879,7 +882,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Sing to the Lord, all the earth"
     },
-    "97": {
+    {
       "number": 97,
       "display": "97",
       "type": "Praise",
@@ -888,7 +891,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The Lord reigns, let the earth rejoice"
     },
-    "98": {
+    {
       "number": 98,
       "display": "98",
       "type": "Praise",
@@ -897,7 +900,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Sing to the Lord a new song"
     },
-    "99": {
+    {
       "number": 99,
       "display": "99",
       "type": "Praise",
@@ -906,7 +909,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The Lord is holy"
     },
-    "100": {
+    {
       "number": 100,
       "display": "100",
       "type": "Praise",
@@ -916,7 +919,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Enter His gates with thanksgiving"
     },
-    "101": {
+    {
       "number": 101,
       "display": "101",
       "type": "Royal",
@@ -925,7 +928,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Commitment to righteous rule"
     },
-    "102": {
+    {
       "number": 102,
       "display": "102",
       "type": "Lament",
@@ -935,7 +938,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer of the afflicted"
     },
-    "103": {
+    {
       "number": 103,
       "display": "103",
       "type": "Praise",
@@ -945,7 +948,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Bless the Lord, O my soul"
     },
-    "104": {
+    {
       "number": 104,
       "display": "104",
       "type": "Praise",
@@ -954,7 +957,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s providence in creation"
     },
-    "105": {
+    {
       "number": 105,
       "display": "105",
       "type": "Praise",
@@ -963,7 +966,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Remembering God’s deeds"
     },
-    "106": {
+    {
       "number": 106,
       "display": "106",
       "type": "Praise",
@@ -973,7 +976,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Israel’s sin and God’s mercy"
     },
-    "107": {
+    {
       "number": 107,
       "display": "107",
       "type": "Thanksgiving",
@@ -982,7 +985,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s steadfast love endures"
     },
-    "108": {
+    {
       "number": 108,
       "display": "108",
       "type": "Praise",
@@ -991,7 +994,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Steadfast heart in praise"
     },
-    "109": {
+    {
       "number": 109,
       "display": "109",
       "type": "Imprecatory",
@@ -1000,7 +1003,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Plea for God’s justice"
     },
-    "110": {
+    {
       "number": 110,
       "display": "110",
       "type": "Messianic",
@@ -1010,7 +1013,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The Priest-King Messiah"
     },
-    "111": {
+    {
       "number": 111,
       "display": "111",
       "type": "Praise",
@@ -1019,7 +1022,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Great are the Lord’s works"
     },
-    "112": {
+    {
       "number": 112,
       "display": "112",
       "type": "Wisdom",
@@ -1028,7 +1031,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The blessing of the righteous"
     },
-    "113": {
+    {
       "number": 113,
       "display": "113",
       "type": "Praise",
@@ -1037,7 +1040,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God lifts up the lowly"
     },
-    "114": {
+    {
       "number": 114,
       "display": "114",
       "type": "Praise",
@@ -1046,7 +1049,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s power at the exodus"
     },
-    "115": {
+    {
       "number": 115,
       "display": "115",
       "type": "Praise",
@@ -1055,7 +1058,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Glory to God alone"
     },
-    "116": {
+    {
       "number": 116,
       "display": "116",
       "type": "Thanksgiving",
@@ -1064,7 +1067,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God delivers the soul from death"
     },
-    "117": {
+    {
       "number": 117,
       "display": "117",
       "type": "Praise",
@@ -1073,7 +1076,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "All nations called to praise the Lord"
     },
-    "118": {
+    {
       "number": 118,
       "display": "118",
       "type": "Thanksgiving",
@@ -1083,7 +1086,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The cornerstone rejected"
     },
-    "119": {
+    {
       "number": 119,
       "display": "119",
       "type": "Wisdom",
@@ -1092,7 +1095,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The excellency of God’s Word"
     },
-    "120": {
+    {
       "number": 120,
       "display": "120–134",
       "type": "Pilgrimage",
@@ -1101,7 +1104,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Songs of Ascents (trust, praise, community)"
     },
-    "135": {
+    {
       "number": 135,
       "display": "135",
       "type": "Praise",
@@ -1110,7 +1113,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s greatness and deliverance"
     },
-    "136": {
+    {
       "number": 136,
       "display": "136",
       "type": "Thanksgiving",
@@ -1119,7 +1122,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "His steadfast love endures forever"
     },
-    "137": {
+    {
       "number": 137,
       "display": "137",
       "type": "Lament",
@@ -1129,7 +1132,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "By the rivers of Babylon"
     },
-    "138": {
+    {
       "number": 138,
       "display": "138",
       "type": "Thanksgiving",
@@ -1138,7 +1141,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Praise for God’s purposes"
     },
-    "139": {
+    {
       "number": 139,
       "display": "139",
       "type": "Trust",
@@ -1148,7 +1151,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "God’s intimate knowledge of us"
     },
-    "140": {
+    {
       "number": 140,
       "display": "140",
       "type": "Lament",
@@ -1158,7 +1161,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for deliverance from evil men"
     },
-    "141": {
+    {
       "number": 141,
       "display": "141",
       "type": "Lament",
@@ -1167,7 +1170,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for safe speech and actions"
     },
-    "142": {
+    {
       "number": 142,
       "display": "142",
       "type": "Lament",
@@ -1176,7 +1179,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Prayer for deliverance when alone"
     },
-    "143": {
+    {
       "number": 143,
       "display": "143",
       "type": "Penitential",
@@ -1186,7 +1189,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Plea for mercy and guidance"
     },
-    "144": {
+    {
       "number": 144,
       "display": "144",
       "type": "Praise",
@@ -1195,7 +1198,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Blessed are the people whose God is the Lord"
     },
-    "145": {
+    {
       "number": 145,
       "display": "145",
       "type": "Praise",
@@ -1204,7 +1207,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Great is the Lord"
     },
-    "146": {
+    {
       "number": 146,
       "display": "146",
       "type": "Praise",
@@ -1213,7 +1216,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Do not trust in princes"
     },
-    "147": {
+    {
       "number": 147,
       "display": "147",
       "type": "Praise",
@@ -1222,7 +1225,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "The Lord builds up Jerusalem"
     },
-    "148": {
+    {
       "number": 148,
       "display": "148",
       "type": "Praise",
@@ -1231,7 +1234,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Praise from all creation"
     },
-    "149": {
+    {
       "number": 149,
       "display": "149",
       "type": "Praise",
@@ -1240,7 +1243,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Joyful praise of God’s people"
     },
-    "150": {
+    {
       "number": 150,
       "display": "150",
       "type": "Praise",
@@ -1249,7 +1252,7 @@ window.HERALD_DATA.psalms = {
       ],
       "title": "Let everything that has breath praise the Lord!"
     }
-  },
+  ],
   "byTheme": [
     {
       "theme": "Psalms of Praise & Worship",

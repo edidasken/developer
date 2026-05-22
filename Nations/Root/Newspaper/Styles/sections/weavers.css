@@ -1,4 +1,0 @@
-/* weavers.css */
-.np-panel[open] summary.np-panel__hdr {
-  border-left: 3px solid var(--sec-weavers, #1a3d28);
-}

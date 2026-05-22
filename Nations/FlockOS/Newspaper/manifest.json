@@ -1,22 +1,24 @@
 {
   "name": "FlockOS \u2014 Herald",
   "short_name": "FlockOS",
-  "description": "The Newspaper \u2014 FlockOS Unified Editorial Experience",
+  "description": "The Flock Herald \u2014 Pastoral newspaper for FlockOS churches.",
   "start_url": "/Nations/FlockOS/Newspaper/",
   "display": "standalone",
-  "background_color": "#1a1a2e",
+  "orientation": "any",
   "theme_color": "#e8a838",
-  "orientation": "portrait-primary",
+  "background_color": "#1a1a2e",
   "icons": [
     {
       "src": "Images/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "Images/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

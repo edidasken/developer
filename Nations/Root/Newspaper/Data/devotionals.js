@@ -1,10 +1,14 @@
-// Herald Data: Devotionals
-// Source: New_Covenant/Data/devotionals.js — 979 records
-// Reindexed by _id (YYYY-MM-DD) for O(1) lookup.
-// DO NOT EDIT — regenerate with: node Newspaper/convert_herald_data.js
-window.HERALD_DATA = window.HERALD_DATA || {};
-window.HERALD_DATA.devotionals = {
-  "2026-04-28": {
+// devotionals.js — Static devotionals bundle
+// Source:   Firestore project flockos-notify, collection: devotionals
+// Exported: 2026-04-29T05:54:08Z
+// Records:  979
+// Filter:   yesterday onward (re-export periodically to refresh)
+//
+// Re-generate: python "Architechtural Docs/New Covenant/Automation/Shepherds/export_devotionals_to_js.py"
+// DO NOT EDIT — regenerate from Firestore instead.
+
+export default [
+  {
     "theme": "Boundaries",
     "question": "What \"door\" am I standing too close to right now that I need to walk away from?",
     "reflection": "Wisdom doesn't flirt with temptation to see how close it can get. True strength is found in staying as far away from the \"door\" of compromise as possible.",
@@ -14,7 +18,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-04-28",
     "_id": "2026-04-28"
   },
-  "2026-04-29": {
+  {
     "theme": "Consequences",
     "question": "Am I investing my \"years\" in things that build my life up or things that tear it down?",
     "reflection": "Sin is a thief. It doesn't just take your peace; it steals your time, your reputation, and your vitality. Don't trade your years for a moment's impulse.",
@@ -24,7 +28,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-04-29",
     "_id": "2026-04-29"
   },
-  "2026-04-30": {
+  {
     "theme": "Perspective",
     "question": "If I continue on my current trajectory, will I look back with regret or with gratitude?",
     "reflection": "Wisdom starts at the finish line. If you look at the end of a path of disobedience, it always ends in groaning. Choose the path that ends in \"Well done.\"",
@@ -34,7 +38,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-04-30",
     "_id": "2026-04-30"
   },
-  "2026-05-01": {
+  {
     "reflection": "The most painful regret is knowing you had the truth but chose to ignore it. A hard heart is a dangerous place to live.",
     "question": "Is there a specific piece of godly advice I am currently \"hating\" or ignoring?",
     "theme": "Honesty",
@@ -44,7 +48,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-01",
     "_id": "2026-05-01"
   },
-  "2026-05-02": {
+  {
     "theme": "Fidelity",
     "question": "How can I cultivate a deeper sense of gratitude for the blessings already in my \"house\"?",
     "reflection": "Contentment is found in appreciating what God has already given us. Whether in marriage or career, look for joy in your own \"well\" rather than someone else's.",
@@ -54,7 +58,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-02",
     "_id": "2026-05-02"
   },
-  "2026-05-03": {
+  {
     "theme": "Appreciation",
     "question": "Who is a person in my life I have begun to take for granted?",
     "reflection": "We often pine for the \"new\" or the \"next.\" Wisdom calls us to find fresh joy in long-term commitments and the people who have walked with us.",
@@ -64,7 +68,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-03",
     "_id": "2026-05-03"
   },
-  "2026-05-04": {
+  {
     "reflection": "We might hide our choices from others, but God sees every step. He doesn't just see the action; He \"ponders\" the motive behind it.",
     "question": "Does the reality of God's constant presence bring me comfort or conviction today?",
     "theme": "Accountability",
@@ -74,7 +78,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-04",
     "_id": "2026-05-04"
   },
-  "2026-05-05": {
+  {
     "theme": "Bondage",
     "question": "Is there a \"habit\" in my life that has started to feel like a cord tightening around me?",
     "reflection": "Sin promises freedom but delivers \"cords.\" What starts as a choice eventually becomes a habit that is difficult to break without God's help.",
@@ -84,7 +88,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-05",
     "_id": "2026-05-05"
   },
-  "2026-05-06": {
+  {
     "theme": "Responsibility",
     "question": "Have I made any financial commitments that are robbing me of peace or freedom?",
     "reflection": "Wisdom extends to our finances. Be careful about making promises or taking on debts that bind your future and stress your spirit.",
@@ -94,7 +98,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me financial wisdom. Help me to be a person of my word and a wise steward of my means.",
     "_id": "2026-05-06"
   },
-  "2026-05-07": {
+  {
     "reflection": "If you've made a mistake or a bad deal, don't let pride keep you there. Humble yourself and do what is necessary to make it right immediately.",
     "question": "Is there a difficult conversation I’ve been avoiding out of pride?",
     "theme": "Resolution",
@@ -104,7 +108,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, give me the humility to admit when I've messed up and the courage to fix it.",
     "_id": "2026-05-07"
   },
-  "2026-05-08": {
+  {
     "reflection": "Nature is a classroom. Even the tiny ant knows the value of hard work and preparation without needing a \"boss\" to watch over her.",
     "question": "Am I self-motivated to do my best, or do I only work hard when someone is watching?",
     "theme": "Diligence",
@@ -114,7 +118,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, make me diligent. Help me to work with excellence, as if I am working directly for You.",
     "_id": "2026-05-08"
   },
-  "2026-05-09": {
+  {
     "reflection": "Wisdom looks ahead. Don't wait for the crisis to arrive before you start building your spiritual and practical reserves.",
     "question": "What can I do today to prepare for the \"winter\" seasons of life?",
     "theme": "Foresight",
@@ -124,7 +128,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-09",
     "_id": "2026-05-09"
   },
-  "2026-05-10": {
+  {
     "theme": "Sloth",
     "question": "Where am I letting \"a little\" laziness keep me from God's best?",
     "reflection": "Ruin rarely happens all at once; it happens in \"littles.\" A little procrastination here, a little compromise there—it adds up.",
@@ -134,7 +138,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, wake me up. Help me to stay alert and active in the work You’ve called me to.",
     "_id": "2026-05-10"
   },
-  "2026-05-11": {
+  {
     "reflection": "Neglect eventually catches up with us. Wisdom acts with urgency because it knows that the \"robber\" of consequence is always on the way.",
     "question": "Am I being passive about an area of my life that requires urgent attention?",
     "theme": "Urgency",
@@ -144,7 +148,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-11",
     "_id": "2026-05-11"
   },
-  "2026-05-12": {
+  {
     "theme": "Character",
     "question": "Is my \"non-verbal\" communication as honest as my words?",
     "reflection": "Our character is signaled by our communication. Deceptive body language and \"winks\" often hide a heart of mischief.",
@@ -154,7 +158,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "God, let my life be transparent and my character be consistent from the inside out.",
     "_id": "2026-05-12"
   },
-  "2026-05-13": {
+  {
     "theme": "Peace",
     "question": "Am I a person who brings people together, or do I tend to stir up drama?",
     "reflection": "One of the most dangerous things we can do is \"sow discord\"—stirring up trouble between people. Wisdom seeks to be a bridge-builder.",
@@ -164,7 +168,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-13",
     "_id": "2026-05-13"
   },
-  "2026-05-14": {
+  {
     "theme": "Holiness",
     "question": "Do I take the things that \"abominate\" God seriously, or do I brush them off?",
     "reflection": "We must love what God loves, but we must also hate what God hates. Knowing His heart helps us align our own.",
@@ -174,7 +178,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-14",
     "_id": "2026-05-14"
   },
-  "2026-05-15": {
+  {
     "theme": "Pride",
     "question": "Where is \"haughty\" pride creeping into my view of others?",
     "reflection": "Pride (\"haughty eyes\") is listed first among the things God hates. It is the root of almost every other sin.",
@@ -184,7 +188,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-15",
     "_id": "2026-05-15"
   },
-  "2026-05-16": {
+  {
     "reflection": "Wisdom is slow and thoughtful; sin is often impulsive and \"hasty.\" When we rush into decisions, we often rush into trouble.",
     "question": "Am I rushing into a decision or a reaction without praying first?",
     "theme": "Impulse",
@@ -194,7 +198,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-16",
     "_id": "2026-05-16"
   },
-  "2026-05-17": {
+  {
     "reflection": "God values truth because He IS Truth. A lie is not just a \"mistake\"; it is a direct contradiction of God’s nature.",
     "question": "Have I been \"breathing out\" half-truths or exaggerations lately?",
     "theme": "Truth",
@@ -204,7 +208,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-17",
     "_id": "2026-05-17"
   },
-  "2026-05-18": {
+  {
     "theme": "Habit",
     "question": "What scripture can I \"wear\" today to remind me of God's presence?",
     "reflection": "We should keep God's commands as close as our favorite jewelry. They shouldn't just be in our heads, but \"tied\" to our everyday life.",
@@ -214,7 +218,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let Your Word be the most visible part of my life and character.",
     "_id": "2026-05-18"
   },
-  "2026-05-19": {
+  {
     "reflection": "Rules aren't meant to restrict us; they are meant to light the way so we don't fall. God's commands are for our safety.",
     "question": "Do I view God's commands as a \"burden\" or as a \"lamp\" for my benefit?",
     "theme": "Direction",
@@ -224,7 +228,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-19",
     "_id": "2026-05-19"
   },
-  "2026-05-20": {
+  {
     "theme": "Consequences",
     "question": "Am I playing with \"fire\" in some area of my life and expecting to stay safe?",
     "reflection": "You cannot dance with sin and expect not to get burned. The laws of spiritual consequences are as real as the laws of physics.",
@@ -234,7 +238,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-20",
     "_id": "2026-05-20"
   },
-  "2026-05-21": {
+  {
     "theme": "Self-Worth",
     "question": "Am I honoring my \"self\" by staying faithful to God's standards?",
     "reflection": "Sin is ultimately self-destructive. Choosing God's way is the highest form of \"self-care\" because it preserves your soul and your future.",
@@ -244,7 +248,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-21",
     "_id": "2026-05-21"
   },
-  "2026-05-22": {
+  {
     "reflection": "The \"apple of your eye\" is the pupil—the most sensitive and protected part. We should protect God's truth with that same level of care.",
     "question": "How \"protected\" is my time with God and His Word in my daily schedule?",
     "theme": "Focus",
@@ -254,7 +258,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, help me to guard Your truth above everything else. Make it the center of my focus today.",
     "_id": "2026-05-22"
   },
-  "2026-05-23": {
+  {
     "theme": "Memory",
     "question": "What verse have I meditated on long enough for it to be \"written\" on my heart?",
     "reflection": "Knowledge in a book is helpful, but knowledge in the heart is transformative. We must internalize God’s truth until it becomes our first instinct.",
@@ -264,7 +268,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let Your Word sink deep. Move it from my head to my heart so I may not sin against You.",
     "_id": "2026-05-23"
   },
-  "2026-05-24": {
+  {
     "reflection": "Wisdom isn't a dry set of rules; it’s a relationship. Treat it with the same love and loyalty you would give to a cherished family member.",
     "question": "Do I treat God’s wisdom like a stranger I visit occasionally, or like a close friend?",
     "theme": "Relationship",
@@ -274,7 +278,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-24",
     "_id": "2026-05-24"
   },
-  "2026-05-25": {
+  {
     "theme": "Discernment",
     "question": "Am I paying attention to the \"warning signs\" in the lives of those around me?",
     "reflection": "Sometimes the best way to learn is by watching the mistakes of others. Wisdom observes the world and notices the patterns that lead to ruin.",
@@ -284,7 +288,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-25",
     "_id": "2026-05-25"
   },
-  "2026-05-26": {
+  {
     "theme": "Vulnerability",
     "question": "When am I most vulnerable to temptation, and how am I preparing for those \"twilight\" moments?",
     "reflection": "Temptation often waits for the \"twilight\"—those moments when we are tired, lonely, or think no one is watching. Darkness is its favorite camouflage.",
@@ -294,7 +298,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-26",
     "_id": "2026-05-26"
   },
-  "2026-05-27": {
+  {
     "reflection": "Outer appearance often masks inner intent. A \"wily\" heart uses charm and flattery to hide a destructive agenda.",
     "question": "Am I being dazzled by someone’s outward charm while ignoring their inward character?",
     "theme": "Sincerity",
@@ -304,7 +308,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-27",
     "_id": "2026-05-27"
   },
-  "2026-05-28": {
+  {
     "theme": "Hypocrisy",
     "question": "Am I using \"good deeds\" or church attendance to justify a secret sin I’m holding onto?",
     "reflection": "This is the height of deception: using \"religion\" to justify sin. Performing religious rituals doesn't give us a license to disobey God's moral laws.",
@@ -314,7 +318,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Search me, O God, and know my heart. Let my worship be sincere and my obedience complete.",
     "_id": "2026-05-28"
   },
-  "2026-05-29": {
+  {
     "reflection": "Words have power. \"Smooth talk\" can make a wrong path look right. We must weigh every word against the weight of Scripture.",
     "question": "Whose words am I listening to more than God's Word?",
     "theme": "Persuasion",
@@ -324,7 +328,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-05-29",
     "_id": "2026-05-29"
   },
-  "2026-05-30": {
+  {
     "theme": "Blindness",
     "question": "What choice am I making right now that feels harmless but might be leading to \"slaughter\"?",
     "reflection": "Sin numbs our sense of danger. We walk into traps as if we are going to a party, unaware of the \"arrow\" waiting for our heart.",
@@ -334,7 +338,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, open my eyes. Don't let me be led blindly into a trap of my own making.",
     "_id": "2026-05-30"
   },
-  "2026-05-31": {
+  {
     "reflection": "Compromise is a downward slope. It doesn't just lead to a \"mistake\"; it leads to a spiritual dead end. The stakes are eternal.",
     "question": "Do I realize that my small compromises are actually steps on a very dangerous road?",
     "theme": "Gravity",
@@ -344,7 +348,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, turn my feet around. Lead me away from death and back onto the path of life.",
     "_id": "2026-05-31"
   },
-  "2026-06-01": {
+  {
     "reflection": "Wisdom isn't a secret society; it’s a public invitation. God puts His truth in \"high places\" so everyone has the opportunity to hear.",
     "question": "Have I been acting like God's will is a mystery, or am I looking at the \"high places\" where He has spoken?",
     "theme": "Visibility",
@@ -354,7 +358,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for making Your wisdom accessible. Give me the courage to stand for Your truth in public.",
     "_id": "2026-06-01"
   },
-  "2026-06-02": {
+  {
     "reflection": "God's wisdom is \"noble.\" It elevates us and brings dignity to our lives. It is the opposite of the \"cheap\" thrills the world offers.",
     "question": "Does my speech today reflect the \"nobility\" of a child of God?",
     "theme": "Quality",
@@ -364,7 +368,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, let my words be right and my thoughts be noble. May I reflect Your character today.",
     "_id": "2026-06-02"
   },
-  "2026-06-03": {
+  {
     "reflection": "To love the truth, we must learn to \"detest\" the lie. Integrity means our lips are physically uncomfortable with deception.",
     "question": "Do I have a \"distaste\" for dishonesty, or have I become comfortable with it?",
     "theme": "Integrity",
@@ -374,7 +378,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-03",
     "_id": "2026-06-03"
   },
-  "2026-06-04": {
+  {
     "theme": "Worth",
     "question": "If I lost all my \"rubies\" but kept my wisdom, would I still feel rich?",
     "reflection": "We often measure success by what we can \"buy.\" God measures success by what we \"become\" through His wisdom.",
@@ -384,7 +388,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-04",
     "_id": "2026-06-04"
   },
-  "2026-06-05": {
+  {
     "theme": "Strategy",
     "question": "Where do I need more \"prudence\" or practical strategy in my life right now?",
     "reflection": "Wisdom isn't just \"holy\"; it's practical. It gives us \"prudence\"—the ability to manage our affairs with skill and foresight.",
@@ -394,7 +398,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-05",
     "_id": "2026-06-05"
   },
-  "2026-06-06": {
+  {
     "reflection": "We cannot fear God and be full of ourselves at the same time. Pride is the direct enemy of the \"fear of the Lord.\"",
     "question": "Is there any area of my life where I am \"arrogant\" about my own abilities?",
     "theme": "Humility",
@@ -404,7 +408,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-06",
     "_id": "2026-06-06"
   },
-  "2026-06-07": {
+  {
     "theme": "Leadership",
     "question": "Who am I turning to for \"sound wisdom\" before I make my next big move?",
     "reflection": "Real strength isn't muscle; it’s insight. A person with godly counsel can accomplish more than a person with just raw power.",
@@ -414,7 +418,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I lean on Your counsel. Give me the strength that comes from Your insight.",
     "_id": "2026-06-07"
   },
-  "2026-06-08": {
+  {
     "reflection": "Any leader who is truly just is drawing from God's wisdom, whether they realize it or not. God is the source of all true justice.",
     "question": "Am I praying for those in authority to seek God’s \"just decrees\"?",
     "theme": "Authority",
@@ -424,7 +428,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-08",
     "_id": "2026-06-08"
   },
-  "2026-06-09": {
+  {
     "reflection": "Wisdom is responsive. If you pursue it with a \"diligent\" heart, it promises to be found. It’s not playing hard to get.",
     "question": "How \"diligently\" have I searched for God’s perspective this week?",
     "theme": "Reciprocity",
@@ -434,7 +438,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I seek You with all my heart. Thank You for the promise that I will find You.",
     "_id": "2026-06-09"
   },
-  "2026-06-10": {
+  {
     "reflection": "There is \"temporary\" wealth and \"enduring\" wealth. Only the wealth gained through righteousness lasts beyond this life.",
     "question": "Am I building a \"temporary\" kingdom or an \"enduring\" one?",
     "theme": "Eternity",
@@ -444,7 +448,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, help me to invest in things that have eternal value.",
     "_id": "2026-06-10"
   },
-  "2026-06-11": {
+  {
     "theme": "Harvest",
     "question": "What \"fruit\" of wisdom (peace, joy, patience) am I enjoying today that money couldn't buy?",
     "reflection": "Gold can buy a bed, but wisdom buys sleep. Gold can buy a house, but wisdom builds a home. The \"fruit\" is always better than the \"asset.\"",
@@ -454,7 +458,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-11",
     "_id": "2026-06-11"
   },
-  "2026-06-12": {
+  {
     "theme": "Alignment",
     "question": "Is my daily \"walk\" aligned with the paths of justice and righteousness?",
     "reflection": "Wisdom isn't a destination; it's a \"walk.\" It’s a daily movement in a specific direction: toward what is right.",
@@ -464,7 +468,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, keep my feet in Your ways. Don't let me stray from the path of doing what is right.",
     "_id": "2026-06-12"
   },
-  "2026-06-13": {
+  {
     "theme": "Timelessness",
     "question": "Do I trust ancient Scripture more than I trust the \"trending\" advice of today?",
     "reflection": "God’s wisdom is older than the earth itself. It is not a modern \"trend\"; it is an ancient, timeless foundation.",
@@ -474,7 +478,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-13",
     "_id": "2026-06-13"
   },
-  "2026-06-14": {
+  {
     "theme": "Partnership",
     "question": "Am I working \"beside\" God today, or am I trying to build things on my own?",
     "reflection": "Wisdom was God's \"master workman\" in creation. When we use wisdom, we are using the very tool God used to build the world.",
@@ -484,7 +488,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-14",
     "_id": "2026-06-14"
   },
-  "2026-06-15": {
+  {
     "theme": "Joy",
     "question": "Do I find \"delight\" in God's creation and His people, as He does?",
     "reflection": "Wisdom is not somber or boring; it is \"rejoicing\" and \"delighting.\" God finds joy in His world and in us!",
@@ -494,7 +498,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-15",
     "_id": "2026-06-15"
   },
-  "2026-06-16": {
+  {
     "reflection": "We should start every morning \"watching\" for wisdom, like someone waiting for a king to open his gates and speak.",
     "question": "Am I \"watching at the gates\" each morning, or am I rushing past them into my day?",
     "theme": "Expectancy",
@@ -504,7 +508,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I am waiting for You. Speak to me through Your Word before I start my work.",
     "_id": "2026-06-16"
   },
-  "2026-06-17": {
+  {
     "theme": "Favor",
     "question": "Am I seeking \"things\" from God, or am I seeking the Wisdom that brings His favor?",
     "reflection": "Wisdom is the doorway to God’s favor. It isn't just about avoiding \"bad\" things; it's about walking into the \"abundant\" life Christ promised.",
@@ -514,7 +518,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-17",
     "_id": "2026-06-17"
   },
-  "2026-06-18": {
+  {
     "theme": "Stability",
     "question": "What are the \"pillars\" my life is currently resting on? Are they sturdy or shaky?",
     "reflection": "A house is only as strong as its support. God’s wisdom offers a structural integrity to our lives that the world cannot provide.",
@@ -524,7 +528,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, build my life on Your pillars of truth. Let my foundation be unshakable.",
     "_id": "2026-06-18"
   },
-  "2026-06-19": {
+  {
     "reflection": "God has prepared a banquet of insight for us. We don't have to starve for direction; we just have to pull up a chair.",
     "question": "Am I \"feeding\" on the Word of God daily, or am I snacking on the world's opinions?",
     "theme": "Invitation",
@@ -534,7 +538,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-19",
     "_id": "2026-06-19"
   },
-  "2026-06-20": {
+  {
     "reflection": "Growth requires leaving something behind. We cannot walk toward wisdom while clinging to our old, \"simple\" habits.",
     "question": "What \"simple\" or immature habit am I refusing to leave behind?",
     "theme": "Maturity",
@@ -544,7 +548,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-20",
     "_id": "2026-06-20"
   },
-  "2026-06-21": {
+  {
     "reflection": "Our reaction to criticism is the ultimate \"litmus test\" for our character. The wise man sees correction as a gift.",
     "question": "When someone corrects me, is my first instinct to defend myself or to listen?",
     "theme": "Humility",
@@ -554,7 +558,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-21",
     "_id": "2026-06-21"
   },
-  "2026-06-22": {
+  {
     "theme": "Longevity",
     "question": "Am I living in a way that honors the body and life God has given me?",
     "reflection": "While only God knows our final day, wisdom protects us from the \"shortened\" life that comes from stress, sin, and recklessness.",
@@ -564,7 +568,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-22",
     "_id": "2026-06-22"
   },
-  "2026-06-23": {
+  {
     "theme": "Deception",
     "question": "What am I doing \"in secret\" that I wouldn't want the world—or God—to see?",
     "reflection": "Sin always tries to make \"secrecy\" look exciting. It whispers that the \"stolen\" thing is better, but it's a lie that leads to the grave.",
@@ -574,7 +578,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-23",
     "_id": "2026-06-23"
   },
-  "2026-06-24": {
+  {
     "reflection": "Our choices don't just affect us; they affect those who love us. Living wisely is a way to honor our parents and our heritage.",
     "question": "How do my current choices reflect on my family and my God?",
     "theme": "Legacy",
@@ -584,7 +588,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let my life bring joy to those who raised me and glory to my Father in Heaven.",
     "_id": "2026-06-24"
   },
-  "2026-06-25": {
+  {
     "theme": "Worth",
     "question": "Am I more concerned with my \"profit\" or my \"integrity\"?",
     "reflection": "Money earned dishonestly has a \"curse\" attached to it. It can't buy your way out of the ultimate consequences.",
@@ -594,7 +598,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I choose righteousness over easy gain. Deliver me from the lure of the \"quick buck.\"",
     "_id": "2026-06-25"
   },
-  "2026-06-26": {
+  {
     "theme": "Work Ethic",
     "question": "Where have I been \"slack\" in my responsibilities lately?",
     "reflection": "God blesses the \"hand\" that moves. He provides the opportunity, but we must provide the effort and the diligence.",
@@ -604,7 +608,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-26",
     "_id": "2026-06-26"
   },
-  "2026-06-27": {
+  {
     "reflection": "A righteous life attracts God's favor like a magnet. It creates a \"crown\" of blessings that others can clearly see.",
     "question": "Does my \"reputation\" suggest a life that is open and righteous, or one that is hiding something?",
     "theme": "Reputation",
@@ -614,7 +618,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, let Your blessings rest on me as I seek to walk in Your ways.",
     "_id": "2026-06-27"
   },
-  "2026-06-28": {
+  {
     "reflection": "What will people say at your funeral? A wise life leaves a \"scent\" of blessing that lingers long after you are gone.",
     "question": "What kind of \"memory\" am I creating for people today?",
     "theme": "Influence",
@@ -624,7 +628,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, help me to live in a way that leaves a legacy of grace and truth.",
     "_id": "2026-06-28"
   },
-  "2026-06-29": {
+  {
     "theme": "Learning",
     "question": "Am I talking so much that I'm missing what God is trying to tell me?",
     "reflection": "Wisdom listens more than it talks. If your mouth is always moving (\"babbling\"), you aren't hearing the instructions that save.",
@@ -634,7 +638,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-06-29",
     "_id": "2026-06-29"
   },
-  "2026-06-30": {
+  {
     "reflection": "There is a \"rest\" that comes with integrity. You don't have to remember your lies or worry about being \"caught.\"",
     "question": "Is there anything in my life right now that I am afraid will be \"found out\"?",
     "theme": "Confidence",
@@ -644,7 +648,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I choose the secure path of integrity. Keep my heart pure and my ways straight.",
     "_id": "2026-06-30"
   },
-  "2026-07-01": {
+  {
     "theme": "Speech",
     "question": "Did my words today \"water\" someone's soul or \"poison\" it?",
     "reflection": "Our words should be \"refreshing\" to others. Like a fountain, they should bring life, hope, and healing to those who hear them.",
@@ -654,7 +658,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-01",
     "_id": "2026-07-01"
   },
-  "2026-07-02": {
+  {
     "theme": "Grace",
     "question": "Who do I need to \"cover\" with love today instead of pointing out their flaws?",
     "reflection": "We have a choice: we can stir the pot of conflict, or we can use the \"blanket\" of love to cover an offense and move on.",
@@ -664,7 +668,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for covering my sins. Help me to extend that same grace to others.",
     "_id": "2026-07-02"
   },
-  "2026-07-03": {
+  {
     "reflection": "Think of wisdom as a \"savings account.\" You \"lay it up\" now so that you have what you need when the crisis hits.",
     "question": "What \"knowledge\" am I storing up today for my future?",
     "theme": "Preparation",
@@ -674,7 +678,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-03",
     "_id": "2026-07-03"
   },
-  "2026-07-04": {
+  {
     "reflection": "It’s not just about what you earn, but where it leads. A wise person uses their \"wage\" to build life for themselves and others.",
     "question": "How am I using my \"paycheck\" to promote life and godliness?",
     "theme": "Purpose",
@@ -684,7 +688,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, everything I earn is Yours. Direct me in how to use it for Your Kingdom.",
     "_id": "2026-07-04"
   },
-  "2026-07-05": {
+  {
     "theme": "Restraint",
     "question": "Do I know when to \"stop talking\" in a heated or awkward situation?",
     "reflection": "The more we talk, the more likely we are to say something we regret. Silence is often the most \"prudent\" choice we can make.",
@@ -694,7 +698,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-05",
     "_id": "2026-07-05"
   },
-  "2026-07-06": {
+  {
     "reflection": "A wise person’s words are \"valuable.\" They aren't \"cheap talk\"; they are weighted with truth and kindness.",
     "question": "Are my words today \"choice silver\" or \"cheap scrap\"?",
     "theme": "Value",
@@ -704,7 +708,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, refine my tongue. Let my speech be valuable to those who listen.",
     "_id": "2026-07-06"
   },
-  "2026-07-07": {
+  {
     "reflection": "Worldly wealth often comes with \"sorrow\"—stress, broken families, or guilt. God’s blessing brings a \"pure\" kind of richness.",
     "question": "Am I chasing a \"wealth\" that is bringing me sorrow instead of peace?",
     "theme": "Contentment",
@@ -714,7 +718,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-07",
     "_id": "2026-07-07"
   },
-  "2026-07-08": {
+  {
     "theme": "Hope",
     "question": "What is the deepest \"desire\" of my heart, and is it aligned with God's will?",
     "reflection": "The wicked are driven by \"dread,\" but the righteous are pulled by \"desire.\" God loves to fulfill the holy longings of His children.",
@@ -724,7 +728,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, grant me the desires that align with Your heart. I trust You with my hopes.",
     "_id": "2026-07-08"
   },
-  "2026-07-09": {
+  {
     "reflection": "Storms (\"tempests\") reveal our foundation. If we are built on Christ's wisdom, the storm can shake us, but it cannot \"un-establish\" us.",
     "question": "What \"storm\" am I currently facing, and am I trusting in my eternal foundation?",
     "theme": "Permanence",
@@ -734,7 +738,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for being my Rock. When the winds blow, I am secure in You.",
     "_id": "2026-07-09"
   },
-  "2026-07-10": {
+  {
     "reflection": "Irritating! That is how a lazy or unreliable person feels to a boss or a friend. Wisdom makes us \"reliable\" and \"refreshing.\"",
     "question": "Am I a \"smoke to the eyes\" for my coworkers, or am I someone they can count on?",
     "theme": "Reliability",
@@ -744,7 +748,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, make me a person of my word. Help me to follow through on my commitments today.",
     "_id": "2026-07-10"
   },
-  "2026-07-11": {
+  {
     "theme": "Protection",
     "question": "Do I see God's Word as a \"stronghold\" that protects me or as a \"fence\" that limits me?",
     "reflection": "God's \"way\" (His laws) is either your castle or your cage. To the blameless, it is a safe \"stronghold\" that protects them from the world.",
@@ -754,7 +758,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-11",
     "_id": "2026-07-11"
   },
-  "2026-07-12": {
+  {
     "theme": "Honesty",
     "question": "Am I cutting any \"small\" corners in my work or finances that God sees as a \"false balance\"?",
     "reflection": "God cares about the \"small\" details of our integrity—the scales of our business and the fairness of our dealings. He delights in a person who is 100% honest.",
@@ -764,7 +768,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-12",
     "_id": "2026-07-12"
   },
-  "2026-07-13": {
+  {
     "theme": "Posture",
     "question": "Where is pride currently blinding me to the wisdom I actually need?",
     "reflection": "Pride always precedes a fall. Wisdom is found in the \"low places\"—among those who admit they don't have all the answers.",
@@ -774,7 +778,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, clothe me in humility. I recognize that all my insight comes from You, not from myself.",
     "_id": "2026-07-13"
   },
-  "2026-07-14": {
+  {
     "theme": "Direction",
     "question": "Is my \"integrity\" the primary factor in my decision-making process today?",
     "reflection": "Integrity isn't just a trait; it’s a \"GPS.\" When you commit to doing what is right, the next step usually becomes clear automatically.",
@@ -784,7 +788,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let my commitment to Your standards be the compass that points my way.",
     "_id": "2026-07-14"
   },
-  "2026-07-15": {
+  {
     "theme": "Rescue",
     "question": "What \"lust\" or desire is currently trying to take me captive?",
     "reflection": "Doing the right thing is its own form of rescue. It keeps us from being \"kidnapped\" by our own runaway desires.",
@@ -794,7 +798,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are my righteousness. Deliver me from the distractions that try to pull me away.",
     "_id": "2026-07-15"
   },
-  "2026-07-16": {
+  {
     "theme": "Protection",
     "question": "Am I using my words to build a bridge or to \"destroy\" someone's reputation?",
     "reflection": "Words can be weapons of mass destruction. Wisdom teaches us to use \"knowledge\" to protect ourselves and others from toxic talk.",
@@ -804,7 +808,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-16",
     "_id": "2026-07-16"
   },
-  "2026-07-17": {
+  {
     "reflection": "One righteous person can lift the \"atmosphere\" of an entire office, family, or city. Your character has a ripple effect.",
     "question": "How is my \"uprightness\" bringing a blessing to the environment where I work and live?",
     "theme": "Impact",
@@ -814,7 +818,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-17",
     "_id": "2026-07-17"
   },
-  "2026-07-18": {
+  {
     "theme": "Restraint",
     "question": "Do I feel the need to point out everyone else's flaws, or can I be \"silent\" in grace?",
     "reflection": "It takes a \"man of understanding\" to keep his mouth shut when he sees someone else's failure. Belittling others only proves our own lack of wisdom.",
@@ -824,7 +828,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-18",
     "_id": "2026-07-18"
   },
-  "2026-07-19": {
+  {
     "reflection": "A trustworthy person is a safe harbor. They don't trade on \"secrets\" to gain social standing. They protect the confidences of others.",
     "question": "Can people trust me with their \"secrets,\" or am I a \"slander collector\"?",
     "theme": "Loyalty",
@@ -834,7 +838,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, make me a \"trustworthy spirit.\" Help me to honor the privacy and dignity of my friends.",
     "_id": "2026-07-19"
   },
-  "2026-07-20": {
+  {
     "theme": "Guidance",
     "question": "Who are the \"counselors\" I have invited to speak into my current situation?",
     "reflection": "Isolation is the enemy of success. We are \"safe\" when we surround ourselves with multiple godly voices who can see our blind spots.",
@@ -844,7 +848,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the people in my life who offer wise advice. Help me to listen.",
     "_id": "2026-07-20"
   },
-  "2026-07-21": {
+  {
     "reflection": "Kindness isn't just for others; it creates a healthy inner environment for \"yourself.\" Bitterness is a poison we drink hoping someone else dies.",
     "question": "Am I being \"cruel\" to my own soul by holding onto anger or unforgiveness?",
     "theme": "Wellness",
@@ -854,7 +858,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let Your kindness flow through me. Heal me of the cruelty I’ve held toward myself or others.",
     "_id": "2026-07-21"
   },
-  "2026-07-22": {
+  {
     "theme": "Harvest",
     "question": "What am I \"sowing\" today? Am I willing to wait for a \"sure\" reward?",
     "reflection": "Wickedness promises a payout that never arrives. Righteousness is like a seed—it may take time, but the \"reward\" is guaranteed by God.",
@@ -864,7 +868,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-22",
     "_id": "2026-07-22"
   },
-  "2026-07-23": {
+  {
     "theme": "Beauty",
     "question": "Am I spending more time on my \"outer ring\" than on my inner \"discretion\"?",
     "reflection": "Physical beauty without \"discretion\" or character is a waste of a precious gift. True beauty is found in the wisdom of our choices.",
@@ -874,7 +878,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, refine my character. Let my inner beauty be what people notice most.",
     "_id": "2026-07-23"
   },
-  "2026-07-24": {
+  {
     "theme": "Prosperity",
     "question": "Who can I \"water\" with encouragement or resources today?",
     "reflection": "The economy of God is the opposite of the world. We gain by giving away. When you \"water\" others, God makes sure you don't run dry.",
@@ -884,7 +888,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-24",
     "_id": "2026-07-24"
   },
-  "2026-07-25": {
+  {
     "reflection": "Money is a terrible foundation; it can disappear overnight. A righteous life is \"organic\"—it grows and flourishes because it is rooted in God.",
     "question": "Where is my \"trust\" today—in my bank balance or in the Living God?",
     "theme": "Stability",
@@ -894,7 +898,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-25",
     "_id": "2026-07-25"
   },
-  "2026-07-26": {
+  {
     "reflection": "A wise person doesn't just manage their own life; they \"capture\" the hearts and minds of others for God's Kingdom.",
     "question": "How am I using my influence to draw others closer to Christ?",
     "theme": "Influence",
@@ -904,7 +908,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, help me to be a \"fisher of men.\" Let my life be a \"tree of life\" for those who are lost.",
     "_id": "2026-07-26"
   },
-  "2026-07-27": {
+  {
     "reflection": "Solomon doesn't mince words! To grow, we must \"love\" the very things that correct us. Resisting correction is the hallmark of a fool.",
     "question": "When was the last time I thanked someone for correcting me?",
     "theme": "Growth",
@@ -914,7 +918,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me a heart that loves to learn, even when the lesson is painful.",
     "_id": "2026-07-27"
   },
-  "2026-07-28": {
+  {
     "theme": "Stability",
     "question": "Are my current habits providing \"roots\" or just \"leaves\" that will blow away?",
     "reflection": "You can't build a life on \"bad\" dirt. Wickedness is unstable soil. Only righteousness provides the \"roots\" that keep you standing in the storm.",
@@ -924,7 +928,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, deepen my roots in Your Word. Establish me so that I cannot be moved.",
     "_id": "2026-07-28"
   },
-  "2026-07-29": {
+  {
     "theme": "Support",
     "question": "How am I being a \"crown\" to my spouse or the people I am closest to?",
     "reflection": "Character in marriage is vital. A godly spouse is an honor (\"crown\"), while a contentious one is a hidden, painful disease.",
@@ -934,7 +938,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, help me to be a source of honor and health to my family.",
     "_id": "2026-07-29"
   },
-  "2026-07-30": {
+  {
     "reflection": "Godly character extends even to how we treat animals. A righteous heart is naturally compassionate toward all of God's creation.",
     "question": "Does my compassion show up in the \"small\" things, like how I treat pets or nature?",
     "theme": "Compassion",
@@ -944,7 +948,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Creator God, thank You for all Your creatures. Help me to be a kind steward of Your world.",
     "_id": "2026-07-30"
   },
-  "2026-07-31": {
+  {
     "theme": "Contentment",
     "question": "What is the \"land\" God has given me to work, and am I being faithful to it?",
     "reflection": "Success comes from \"working your own land\"—focusing on your specific responsibilities rather than chasing \"get-rich-quick\" fantasies.",
@@ -954,7 +958,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-07-31",
     "_id": "2026-07-31"
   },
-  "2026-08-01": {
+  {
     "theme": "Honesty",
     "question": "Am I \"weaving a web\" with my words, or am I walking in the freedom of the truth?",
     "reflection": "Lies create a \"web\" that eventually traps the liar. Truth acts as a \"get out of jail free\" card because it keeps your path simple.",
@@ -964,7 +968,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-01",
     "_id": "2026-08-01"
   },
-  "2026-08-02": {
+  {
     "theme": "Teachable",
     "question": "Whose advice have I sought this week for the problems I am facing?",
     "reflection": "A fool is \"un-coachable.\" He thinks he knows everything. A wise man knows that his \"own eyes\" might be deceived.",
@@ -974,7 +978,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-02",
     "_id": "2026-08-02"
   },
-  "2026-08-03": {
+  {
     "theme": "Healing",
     "question": "Did I \"stab\" anyone today with a rash comment, or did I bring healing?",
     "reflection": "Words can \"stab\" like a sword. We have the power to either wound people or \"suture\" their wounds with wise, kind speech.",
@@ -984,7 +988,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let my tongue be a medicine for the brokenhearted people I meet today.",
     "_id": "2026-08-03"
   },
-  "2026-08-04": {
+  {
     "theme": "Abomination",
     "question": "Is there a gap between what I say and what I actually do?",
     "reflection": "God finds lies \"disgusting\" (abomination). He takes delight in \"faithfulness\"—when our actions match our words.",
@@ -994,7 +998,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, make me a person of my word. Let my life be a delight to the Father.",
     "_id": "2026-08-04"
   },
-  "2026-08-05": {
+  {
     "theme": "Encouragement",
     "question": "Who can I \"lighten the load\" for today with a simple word of hope?",
     "reflection": "Anxiety is a heavy weight. Sometimes the \"cure\" for someone's heavy heart is simply a \"good word\" of encouragement from you.",
@@ -1004,7 +1008,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-05",
     "_id": "2026-08-05"
   },
-  "2026-08-06": {
+  {
     "theme": "Command",
     "question": "Am I working hard enough today to earn my \"freedom,\" or am I being slothful?",
     "reflection": "Diligence leads to leadership and freedom. Laziness leads to being \"controlled\" by circumstances or by others.",
@@ -1014,7 +1018,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-06",
     "_id": "2026-08-06"
   },
-  "2026-08-07": {
+  {
     "theme": "Life",
     "question": "What \"ruin\" am I inviting by talking too much or too soon?",
     "reflection": "Think of your mouth as a \"gate.\" If you leave it wide open, anything can get in or out. Guarding that gate is a matter of survival.",
@@ -1024,7 +1028,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, set a guard over my mouth. Help me to be \"slow to speak\" and \"quick to think.\"",
     "_id": "2026-08-07"
   },
-  "2026-08-08": {
+  {
     "theme": "Desire",
     "question": "Am I \"craving\" things I am not willing to work for?",
     "reflection": "Desiring success is not the same as achieving it. A \"sluggard\" wants the result without the work. Diligence fills the soul.",
@@ -1034,7 +1038,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-08",
     "_id": "2026-08-08"
   },
-  "2026-08-09": {
+  {
     "reflection": "A righteous life has a \"glow\" that lasts. Wickedness is a temporary \"lamp\" that eventually flickers and dies in the dark.",
     "question": "Does my \"light\" bring joy to those around me, or is it starting to flicker?",
     "theme": "Radiance",
@@ -1044,7 +1048,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, let Your light shine through me. Keep my lamp burning bright for Your glory.",
     "_id": "2026-08-09"
   },
-  "2026-08-10": {
+  {
     "theme": "Conflict",
     "question": "What current \"strife\" in my life could be solved by a little more humility?",
     "reflection": "Almost every argument is rooted in \"insolence\" (pride). If you want to end a conflict, start by asking for advice and listening.",
@@ -1054,7 +1058,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-10",
     "_id": "2026-08-10"
   },
-  "2026-08-11": {
+  {
     "reflection": "The \"little by little\" principle is God's way. Slow, steady growth produces character and lasting wealth. Quick gain usually vanishes.",
     "question": "Am I being faithful in the \"little by little\" process of my life and finances?",
     "theme": "Stewardship",
@@ -1064,7 +1068,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-11",
     "_id": "2026-08-11"
   },
-  "2026-08-12": {
+  {
     "theme": "Fulfillment",
     "question": "What \"deferred hope\" am I currently waiting on, and am I trusting God with the timing?",
     "reflection": "Waiting is hard and can drain our spirits. But when God finally fulfills a promise, it brings a massive surge of life and energy.",
@@ -1074,7 +1078,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-12",
     "_id": "2026-08-12"
   },
-  "2026-08-13": {
+  {
     "reflection": "To \"despise\" God's Word doesn't mean you hate it; it often just means you ignore it. Ignoring the \"instruction manual\" leads to a broken life.",
     "question": "Do I \"revere\" God's commands enough to actually change my behavior today?",
     "theme": "Reaping",
@@ -1084,7 +1088,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, give me a holy respect for Your Word. Let me find my \"reward\" in obeying You.",
     "_id": "2026-08-13"
   },
-  "2026-08-14": {
+  {
     "reflection": "Wisdom is \"contagious.\" So is folly. You are becoming like the five people you spend the most time with.",
     "question": "Are my \"companions\" making me more like Christ or more like a fool?",
     "theme": "Company",
@@ -1094,7 +1098,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, surround me with wise friends. Help me to be a wise companion to others as well.",
     "_id": "2026-08-14"
   },
-  "2026-08-15": {
+  {
     "theme": "Stewardship",
     "question": "What kind of \"inheritance\" (spiritual or financial) am I preparing for the next generation?",
     "reflection": "Wisdom thinks two generations ahead. A \"good man\" manages his life so that his grandchildren are blessed by his choices.",
@@ -1104,7 +1108,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, help me to live for more than just myself. Let my life be a blessing to my future family.",
     "_id": "2026-08-15"
   },
-  "2026-08-16": {
+  {
     "theme": "Love",
     "question": "Am I avoiding a necessary \"correction\" in my home or work because I’m afraid of conflict?",
     "reflection": "True love requires \"discipline.\" Letting someone continue in a destructive path isn't kindness—it's neglect. Discipline is a form of investment.",
@@ -1114,7 +1118,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-16",
     "_id": "2026-08-16"
   },
-  "2026-08-17": {
+  {
     "reflection": "We are either \"builders\" or \"wreckers.\" Our daily words and attitudes either add a brick to our \"house\" or pull one out.",
     "question": "Am I building up my home and my relationships today, or am I \"tearing them down\" with my attitude?",
     "theme": "Construction",
@@ -1124,7 +1128,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, make me a builder. Help me to use my hands and my words to construct something beautiful for You.",
     "_id": "2026-08-17"
   },
-  "2026-08-18": {
+  {
     "reflection": "Your \"walk\" is a direct reflection of your \"worship.\" If you respect God, your path will be upright. If you are devious, you are showing a lack of respect for Him.",
     "question": "Does my \"walk\" today prove that I fear the Lord?",
     "theme": "Respect",
@@ -1134,7 +1138,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, let my integrity be my highest form of worship to You.",
     "_id": "2026-08-18"
   },
-  "2026-08-19": {
+  {
     "theme": "Messiness",
     "question": "Am I avoiding a \"messy\" situation that is actually necessary for my growth?",
     "reflection": "Growth is messy. If you want \"abundant crops,\" you have to deal with the \"mess\" of the ox. Don't let a desire for \"neatness\" stop you from producing.",
@@ -1144,7 +1148,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me the patience to handle the \"mess\" that comes with the blessing of productivity.",
     "_id": "2026-08-19"
   },
-  "2026-08-20": {
+  {
     "reflection": "A \"faithful\" person has a default setting of truth. A \"false\" person \"breathes\" lies—deception is as natural to them as air.",
     "question": "Is truth my \"default setting,\" or do I find myself \"breathing\" out small deceptions?",
     "theme": "Honesty",
@@ -1154,7 +1158,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Spirit of Truth, fill my lungs. Let every word I speak be faithful and true.",
     "_id": "2026-08-20"
   },
-  "2026-08-21": {
+  {
     "reflection": "If you have a \"scoffing\" (arrogant) heart, you can search for wisdom forever and never find it. To the humble, truth is \"easy\" to see.",
     "question": "Is my \"scoffing\" attitude making it harder for me to understand God’s will?",
     "theme": "Ease",
@@ -1164,7 +1168,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, soften my heart. Make Your knowledge \"easy\" for me to grasp through my humility.",
     "_id": "2026-08-21"
   },
-  "2026-08-22": {
+  {
     "reflection": "Some conversations are a waste of time. If there is no \"knowledge\" present, wisdom says it’s time to \"leave the presence\" of that person.",
     "question": "Am I lingering in \"foolish\" conversations that are draining my spirit?",
     "theme": "Association",
@@ -1174,7 +1178,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-22",
     "_id": "2026-08-22"
   },
-  "2026-08-23": {
+  {
     "theme": "Self-Awareness",
     "question": "Am I being honest with myself about where my current path is leading?",
     "reflection": "Wisdom is \"discerning your own way\"—knowing where you are going. Folly is \"deceiving yourself\" into thinking you’re fine when you’re not.",
@@ -1184,7 +1188,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-23",
     "_id": "2026-08-23"
   },
-  "2026-08-24": {
+  {
     "theme": "Seriousness",
     "question": "Do I \"mock\" or minimize my own sin, or do I take it to the cross for forgiveness?",
     "reflection": "A fool makes a joke out of \"guilt\" or sin. The wise person takes it seriously and finds \"acceptance\" and peace through repentance.",
@@ -1194,7 +1198,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for the \"guilt offering\" of Your life. I take my sin seriously and I rest in Your acceptance.",
     "_id": "2026-08-24"
   },
-  "2026-08-25": {
+  {
     "reflection": "There are parts of our internal world that only God can truly see. We are never fully \"alone\" because God \"shares\" the secrets of our hearts.",
     "question": "Am I taking my \"inner bitterness\" to God, who understands it better than any \"stranger\"?",
     "theme": "Empathy",
@@ -1204,7 +1208,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-25",
     "_id": "2026-08-25"
   },
-  "2026-08-26": {
+  {
     "theme": "Deception",
     "question": "Am I following my \"feelings\" or am I following the \"map\" of God's Word?",
     "reflection": "This is one of the most famous warnings in the Bible. Our \"feelings\" are not a reliable guide. What \"feels\" right can be a dead end.",
@@ -1214,7 +1218,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-26",
     "_id": "2026-08-26"
   },
-  "2026-08-27": {
+  {
     "reflection": "It’s okay not to be okay. Even when we are \"laughing\" on the outside, God sees the \"ache\" on the inside. He is a God of reality.",
     "question": "Am I \"masking\" my pain with laughter, or am I being real with God about my \"ache\"?",
     "theme": "Reality",
@@ -1224,7 +1228,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-27",
     "_id": "2026-08-27"
   },
-  "2026-08-28": {
+  {
     "theme": "Backsliding",
     "question": "Am I \"full\" of my own ways, or am I \"hungry\" for God's ways today?",
     "reflection": "Backsliding starts in the \"heart.\" Eventually, you get \"full\" of your own bad choices until you are sick of them.",
@@ -1234,7 +1238,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-28",
     "_id": "2026-08-28"
   },
-  "2026-08-29": {
+  {
     "reflection": "Don't believe everything you hear or read on social media. A \"prudent\" person \"gives thought\"—they verify before they move.",
     "question": "Am I \"simple\" (believing everything) or am I \"prudent\" (thinking through my steps)?",
     "theme": "Verification",
@@ -1244,7 +1248,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-29",
     "_id": "2026-08-29"
   },
-  "2026-08-30": {
+  {
     "reflection": "Wisdom is \"cautious.\" It sees the danger and \"turns away.\" A fool is \"reckless\"—he runs toward the edge and thinks he won't fall.",
     "question": "In what area of my life am I being \"reckless\" instead of \"cautious\"?",
     "theme": "Safety",
@@ -1254,7 +1258,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-30",
     "_id": "2026-08-30"
   },
-  "2026-08-31": {
+  {
     "theme": "Self-Control",
     "question": "What \"triggered\" me yesterday, and did I respond with wisdom or a quick temper?",
     "reflection": "Anger is a temporary madness. When we let our \"fuse\" get too short, we end up doing things that make us look foolish. Wisdom lengthens the fuse.",
@@ -1264,7 +1268,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-08-31",
     "_id": "2026-08-31"
   },
-  "2026-09-01": {
+  {
     "reflection": "Folly is a \"hand-me-down\" from our old nature. Knowledge is a \"crown\"—it’s something we actively put on that changes how people see us.",
     "question": "Am I \"wearing\" my knowledge of God's Word today, or am I still dressed in my old \"folly\"?",
     "theme": "Visibility",
@@ -1274,7 +1278,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, let Your truth be my crown. May my choices today reflect the knowledge of Your ways.",
     "_id": "2026-09-01"
   },
-  "2026-09-02": {
+  {
     "reflection": "We cannot love God and \"despise\" the people He created. Generosity is the practical proof of a heart that values what God values.",
     "question": "Is there someone in my neighborhood or workplace I have been \"despising\" instead of serving?",
     "theme": "Compassion",
@@ -1284,7 +1288,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, give me Your eyes for the \"least of these.\" Help me to be generous with my time and resources.",
     "_id": "2026-09-02"
   },
-  "2026-09-03": {
+  {
     "reflection": "Talking about a dream is easy; \"toiling\" for it is hard. God blesses the action, not just the aspiration.",
     "question": "Am I doing more \"talking\" than \"toiling\" regarding my goals right now?",
     "theme": "Profit",
@@ -1294,7 +1298,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-03",
     "_id": "2026-09-03"
   },
-  "2026-09-04": {
+  {
     "theme": "Security",
     "question": "Does my \"fear of the Lord\" give me confidence, or am I still living in fear of people?",
     "reflection": "Fearing God doesn't make you a coward; it makes you \"confident.\" When you answer to the King of Kings, you don't have to fear anyone else.",
@@ -1304,7 +1308,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, be my refuge and my confidence. I trust in Your power more than my problems.",
     "_id": "2026-09-04"
   },
-  "2026-09-05": {
+  {
     "reflection": "Great understanding is the ability to see the \"why\" behind someone's behavior. This perspective naturally makes us \"slow to anger.\"",
     "question": "Can I stop today to understand \"why\" someone is frustrating me before I get angry?",
     "theme": "Understanding",
@@ -1314,7 +1318,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, broaden my understanding. Help me to see others through Your lens of grace and patience.",
     "_id": "2026-09-05"
   },
-  "2026-09-06": {
+  {
     "theme": "Health",
     "question": "What \"envy\" am I holding onto that is currently making my \"bones rot\"?",
     "reflection": "Jealousy is a physical toxin. It literally \"rots\" your vitality. A \"tranquil heart\" (peace) is better for your health than any supplement.",
@@ -1324,7 +1328,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-06",
     "_id": "2026-09-06"
   },
-  "2026-09-07": {
+  {
     "reflection": "How we treat the \"vulnerable\" is a direct commentary on how we feel about God. To help the poor is a form of high worship.",
     "question": "How have I \"honored my Maker\" by helping someone in need this week?",
     "theme": "Worship",
@@ -1334,7 +1338,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-07",
     "_id": "2026-09-07"
   },
-  "2026-09-08": {
+  {
     "theme": "Righteousness",
     "question": "Am I contributing to the \"righteousness\" of my community or to its \"reproach\"?",
     "reflection": "Nations aren't built on politics alone, but on the \"righteousness\" of the people. Character is the true strength of any society.",
@@ -1344,7 +1348,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-08",
     "_id": "2026-09-08"
   },
-  "2026-09-09": {
+  {
     "theme": "Conflict",
     "question": "When someone speaks harshly to me today, will I respond with \"water\" or \"gasoline\"?",
     "reflection": "You can \"de-escalate\" a fight with the tone of your voice. A \"soft answer\" is like water on a fire; a \"harsh word\" is like gasoline.",
@@ -1354,7 +1358,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, Prince of Peace, help me to speak with softness and grace even when I’m being attacked.",
     "_id": "2026-09-09"
   },
-  "2026-09-11": {
+  {
     "theme": "Life",
     "question": "Whose spirit have I \"broken\" lately with my words, and how can I bring \"healing\" today?",
     "reflection": "Your words can either \"feed\" someone's spirit or \"break\" it. A \"gentle\" tongue is life-giving and restorative.",
@@ -1364,7 +1368,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-11",
     "_id": "2026-09-11"
   },
-  "2026-09-12": {
+  {
     "theme": "Contentment",
     "question": "Am I willing to have \"less\" if it means I have more peace and more of God?",
     "reflection": "Wealth isn't worth it if it comes with \"trouble\" (strife, guilt, or anxiety). \"A little\" with God is always \"more\" than a lot without Him.",
@@ -1374,7 +1378,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-12",
     "_id": "2026-09-12"
   },
-  "2026-09-13": {
+  {
     "reflection": "The \"atmosphere\" of your home is more important than the \"menu.\" A simple meal served in love is better than a feast served in anger.",
     "question": "How am I contributing to the \"atmosphere\" of my home or workplace today?",
     "theme": "Love",
@@ -1384,7 +1388,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let love be the main ingredient in all my relationships today.",
     "_id": "2026-09-13"
   },
-  "2026-09-14": {
+  {
     "theme": "Obstacles",
     "question": "Does my work feel like \"thorns\" because I’m resisting the effort required?",
     "reflection": "For a lazy person, every task feels like \"thorns\"—painful and difficult. For the upright, discipline creates a \"level highway\" of progress.",
@@ -1394,7 +1398,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-14",
     "_id": "2026-09-14"
   },
-  "2026-09-15": {
+  {
     "theme": "Timing",
     "question": "Am I asking God for \"words in season\" before I speak to someone in crisis?",
     "reflection": "Wisdom is about \"timing.\" An \"apt answer\" is the right word at the right time. It brings joy to both the speaker and the hearer.",
@@ -1404,7 +1408,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-15",
     "_id": "2026-09-15"
   },
-  "2026-09-16": {
+  {
     "reflection": "Greed is a \"home-wrecker.\" When we chase money at any cost, our family is the one that pays the price.",
     "question": "Is my \"hustle\" for more gain currently \"troubling\" my family or my peace?",
     "theme": "Trouble",
@@ -1414,7 +1418,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-16",
     "_id": "2026-09-16"
   },
-  "2026-09-17": {
+  {
     "reflection": "Wisdom \"ponders\" (thinks) before it speaks. Foolishness \"pours out\" (blurts) whatever is on its mind. Reflection is the key to righteousness.",
     "question": "Do I have a \"filter\" between my heart and my mouth today?",
     "theme": "Thoughtfulness",
@@ -1424,7 +1428,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-17",
     "_id": "2026-09-17"
   },
-  "2026-09-18": {
+  {
     "reflection": "We can make our spreadsheets and our five-year plans, but God has the final say. True peace comes from surrendering our plans to His \"answer.\"",
     "question": "What plan am I holding onto too tightly that I need to surrender to God's \"final answer\"?",
     "theme": "Sovereignty",
@@ -1434,7 +1438,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I make my plans, but I trust Your direction. Have Your way in my life today.",
     "_id": "2026-09-18"
   },
-  "2026-09-19": {
+  {
     "theme": "Success",
     "question": "Have I \"rolled over\" my current project or problem to the Lord, or am I still carrying it?",
     "reflection": "To \"commit\" means to \"roll over\" the burden to God. When we work with God, He takes responsibility for the outcome.",
@@ -1444,7 +1448,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-19",
     "_id": "2026-09-19"
   },
-  "2026-09-20": {
+  {
     "theme": "Forgiveness",
     "question": "How has God's \"steadfast love\" changed my behavior recently?",
     "reflection": "God’s \"steadfast love\" is what clears our record. When we experience His faithfulness, we find the power to turn away from evil.",
@@ -1454,7 +1458,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for Your atonement. Let Your faithfulness be the reason I turn from sin today.",
     "_id": "2026-09-20"
   },
-  "2026-09-21": {
+  {
     "reflection": "You don't have to \"manage\" your enemies; you just have to \"please\" your God. He can handle the people who are against you.",
     "question": "Am I spending more time worrying about my \"enemies\" than I am pleasing my Lord?",
     "theme": "Peace",
@@ -1464,7 +1468,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-21",
     "_id": "2026-09-21"
   },
-  "2026-09-22": {
+  {
     "theme": "Guidance",
     "question": "Can I trust God with the \"individual steps\" of my day, even if the \"way\" seems unclear?",
     "reflection": "We see the big \"way,\" but God sees the individual \"steps.\" He is in the details of your commute, your meetings, and your conversations.",
@@ -1474,7 +1478,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-22",
     "_id": "2026-09-22"
   },
-  "2026-09-23": {
+  {
     "theme": "Mastery",
     "question": "Which \"city\" am I trying to \"take\" today while my own \"spirit\" is still out of control?",
     "reflection": "Self-mastery is greater than world-mastery. Winning an argument or a promotion is nothing compared to winning the battle over your own temper.",
@@ -1484,7 +1488,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-23",
     "_id": "2026-09-23"
   },
-  "2026-09-24": {
+  {
     "reflection": "There is no such thing as \"luck\" or \"chance\" in God's world. Even the \"random\" things are under His sovereign control.",
     "question": "Can I trust that \"unlucky\" circumstances are actually part of God's \"every decision\"?",
     "theme": "Decision",
@@ -1494,7 +1498,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I trust Your sovereignty over the \"random\" events of my life. Nothing surprises You.",
     "_id": "2026-09-24"
   },
-  "2026-09-25": {
+  {
     "reflection": "God uses \"heat\" (trials) to bring the impurities to the surface of our hearts. The \"furnace\" isn't for our destruction, but for our purification.",
     "question": "What \"heat\" am I currently feeling, and what \"dross\" is God trying to remove from my heart?",
     "theme": "Refinement",
@@ -1504,7 +1508,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, refine me. Use the difficulties of my life to make me more like pure gold.",
     "_id": "2026-09-25"
   },
-  "2026-09-26": {
+  {
     "theme": "Friendship",
     "question": "Am I \"repeating a matter\" today that should be \"covered\" in love?",
     "reflection": "Gossip is a friendship-killer. A wise friend knows how to \"cover\" a mistake with grace rather than \"repeating\" it to others.",
@@ -1514,7 +1518,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-26",
     "_id": "2026-09-26"
   },
-  "2026-09-27": {
+  {
     "reflection": "Life isn't always fair, and sometimes good people get \"fined\" or \"struck.\" But God sees the injustice and He is the ultimate Judge.",
     "question": "How do I react when I am treated \"unfairly\" for doing the right thing?",
     "theme": "Fairness",
@@ -1524,7 +1528,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-27",
     "_id": "2026-09-27"
   },
-  "2026-09-28": {
+  {
     "reflection": "A \"cool spirit\" is the opposite of \"heated\" emotion. Wisdom keeps the temperature low so that \"understanding\" can stay high.",
     "question": "How \"cool\" is my spirit today? Am I letting my emotions dictate my words?",
     "theme": "Intelligence",
@@ -1534,7 +1538,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-28",
     "_id": "2026-09-28"
   },
-  "2026-09-29": {
+  {
     "theme": "Appearance",
     "question": "Am I talking just to \"fill the air,\" or can I be \"silent\" and listen?",
     "reflection": "If you don't know what to say, say nothing! Silence is the best \"camouflage\" for a lack of wisdom.",
@@ -1544,7 +1548,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-09-29",
     "_id": "2026-09-29"
   },
-  "2026-09-30": {
+  {
     "reflection": "Isolation is a warning sign. When we pull away from godly community, we are usually trying to hide a selfish desire that \"sound judgment\" would stop.",
     "question": "Am I \"isolating\" myself right now because I don't want to hear the truth from others?",
     "theme": "Isolation",
@@ -1554,7 +1558,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, keep me connected to Your people. Don't let my selfish desires lead me into isolation.",
     "_id": "2026-09-30"
   },
-  "2026-10-01": {
+  {
     "reflection": "When life gets overwhelming, we have a \"Strong Tower.\" We don't have to build our own security; we just have to \"run into\" His.",
     "question": "What \"tower\" am I trying to build for my own safety? Why not run to God instead?",
     "theme": "Security",
@@ -1564,7 +1568,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-01",
     "_id": "2026-10-01"
   },
-  "2026-10-02": {
+  {
     "theme": "Pride",
     "question": "Is there any \"haughtiness\" in my heart today that is signaling a future fall?",
     "reflection": "Haughtiness (pride) is the \"rumbling\" before the earthquake of destruction. If you want honor, you must first find the path of humility.",
@@ -1574,7 +1578,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, humble me so that I don't have to be humiliated. I want Your honor, not my own.",
     "_id": "2026-10-02"
   },
-  "2026-10-03": {
+  {
     "theme": "Folly",
     "question": "Am I \"listening to understand\" today, or just \"waiting for my turn to speak\"?",
     "reflection": "We often \"pre-load\" our answers while people are still talking. Wisdom listens until the very end before it speaks.",
@@ -1584,7 +1588,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, give me ears that hear and a heart that waits. Let me not be shamed by my \"hasty\" answers.",
     "_id": "2026-10-03"
   },
-  "2026-10-04": {
+  {
     "theme": "Resilience",
     "question": "How is the \"health\" of my spirit today? Am I feeding it with God's Word?",
     "reflection": "Your physical body can handle a lot if your \"spirit\" is strong. But when the spirit is broken, even a small problem feels unbearable.",
@@ -1594,7 +1598,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-04",
     "_id": "2026-10-04"
   },
-  "2026-10-05": {
+  {
     "theme": "Opportunity",
     "question": "Am I using my \"gifts\" to serve others and honor God, or am I letting them go to waste?",
     "reflection": "God has given you \"gifts\" and \"talents\" that are meant to open doors for you. Use them with excellence and they will \"make room\" for your future.",
@@ -1604,7 +1608,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the gifts You’ve given me. Help me to use them for Your glory.",
     "_id": "2026-10-05"
   },
-  "2026-10-06": {
+  {
     "reflection": "There are always two sides to every story. Wisdom waits until it has heard \"the other\" side before it makes a judgment.",
     "question": "Am I \"judging\" a situation based only on the first story I heard?",
     "theme": "Perspective",
@@ -1614,7 +1618,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me a fair and balanced mind. Help me to seek the whole truth before I decide.",
     "_id": "2026-10-06"
   },
-  "2026-10-07": {
+  {
     "reflection": "Your words are not neutral; they are \"seeds.\" You will eventually \"eat the fruit\" of the death or life you’ve been speaking.",
     "question": "What \"fruit\" am I going to be \"eating\" next month based on the words I’m saying today?",
     "theme": "Life and Death",
@@ -1624,7 +1628,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I choose to speak \"life.\" Let my tongue be a source of blessing and growth.",
     "_id": "2026-10-07"
   },
-  "2026-10-08": {
+  {
     "theme": "Favor",
     "question": "Do I view my spouse (or my future spouse) as a \"good thing\" and a sign of God's favor?",
     "reflection": "Marriage is a \"good thing\" designed by God. A godly spouse is a tangible sign of God's \"favor\" on your life.",
@@ -1634,7 +1638,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the gift of companionship. Bless my marriage and help me to be a \"good thing\" for my spouse.",
     "_id": "2026-10-08"
   },
-  "2026-10-09": {
+  {
     "theme": "Loyalty",
     "question": "Am I being a \"stick-closer-than-a-brother\" friend to someone who needs it today?",
     "reflection": "It’s better to have one \"true\" friend than a hundred \"acquaintances.\" Jesus is the ultimate Friend who never leaves.",
@@ -1644,7 +1648,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-09",
     "_id": "2026-10-09"
   },
-  "2026-10-10": {
+  {
     "theme": "Integrity",
     "question": "Is my \"integrity\" more important to me than my \"income\"?",
     "reflection": "It’s better to be \"broke\" and \"honest\" than \"rich\" and \"crooked.\" Your integrity is your true net worth.",
@@ -1654,7 +1658,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-10",
     "_id": "2026-10-10"
   },
-  "2026-10-11": {
+  {
     "reflection": "Being \"excited\" is not the same as being \"right.\" If you rush into a decision without \"knowledge,\" you are likely to \"miss your way.\"",
     "question": "Am I \"rushing\" into something right now because of my \"desire\" rather than my \"knowledge\"?",
     "theme": "Impulse",
@@ -1664,7 +1668,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, slow my feet. Give me the knowledge I need before I make my next move.",
     "_id": "2026-10-11"
   },
-  "2026-10-12": {
+  {
     "theme": "Blame",
     "question": "Am I \"raging against the Lord\" for a problem that I actually created myself?",
     "reflection": "We often make bad choices and then \"blame God\" for the consequences. Wisdom takes responsibility for its own \"folly.\"",
@@ -1674,7 +1678,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, forgive me for blaming You. Help me to take responsibility and seek Your help to fix it.",
     "_id": "2026-10-12"
   },
-  "2026-10-13": {
+  {
     "theme": "Popularity",
     "question": "Am I surrounding myself with people who love \"me\" or people who love what I \"have\"?",
     "reflection": "Fair-weather friends are attracted to your \"stuff,\" not to \"you.\" Wisdom knows the difference between popularity and loyalty.",
@@ -1684,7 +1688,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-13",
     "_id": "2026-10-13"
   },
-  "2026-10-14": {
+  {
     "reflection": "It’s not \"weak\" to let something go; it’s \"glorious.\" \"Good sense\" tells us that most offenses aren't worth the energy of a fight.",
     "question": "What \"offense\" can I \"overlook\" today as an act of \"glory\"?",
     "theme": "Forgiveness",
@@ -1694,7 +1698,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, give me the \"good sense\" to be slow to anger. I choose to overlook this offense and move on.",
     "_id": "2026-10-14"
   },
-  "2026-10-15": {
+  {
     "reflection": "Respect those in authority. Their \"favor\" can be a \"refreshing dew\" that helps you grow and succeed.",
     "question": "How am I responding to the \"authority\" figures in my life today?",
     "theme": "Authority",
@@ -1704,7 +1708,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, help me to be a respectful and honorable citizen and employee. Let Your favor rest on me.",
     "_id": "2026-10-15"
   },
-  "2026-10-16": {
+  {
     "reflection": "Persistence in a \"bad\" thing (like quarreling) is exhausting. It \"drips\" away at the peace and the foundation of a home.",
     "question": "Am I \"dripping\" negativity into my home today, or am I bringing \"sunshine\"?",
     "theme": "Persistence",
@@ -1714,7 +1718,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, stop the \"dripping\" of my complaints. Help me to be a source of peace and joy in my home.",
     "_id": "2026-10-16"
   },
-  "2026-10-17": {
+  {
     "reflection": "You can \"inherit\" a house, but a \"prudent\" (wise) spouse is a direct \"gift\" from God. Value the person more than the property.",
     "question": "Am I thanking God for the \"prudent\" people He has placed in my life?",
     "theme": "Heritage",
@@ -1724,7 +1728,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-17",
     "_id": "2026-10-17"
   },
-  "2026-10-18": {
+  {
     "theme": "Lending",
     "question": "Who can I \"lend to the Lord\" today by helping someone in need?",
     "reflection": "When you give to the poor, God considers it a \"loan\" to Him—and God always pays His debts with interest!",
@@ -1734,7 +1738,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for the opportunity to give. I trust Your promise to repay me in Your way and Your time.",
     "_id": "2026-10-18"
   },
-  "2026-10-19": {
+  {
     "reflection": "There is a \"window of opportunity\" for discipline. Don't wait until it’s too late. Discipline now so that there is \"hope\" for the future.",
     "question": "What \"discipline\" (in my home or my own life) have I been putting off?",
     "theme": "Urgency",
@@ -1744,7 +1748,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-19",
     "_id": "2026-10-19"
   },
-  "2026-10-20": {
+  {
     "theme": "Future",
     "question": "Am I making decisions for \"today's comfort\" or for \"the future's wisdom\"?",
     "reflection": "Wisdom is a long game. The advice you humby accept today is the foundation for the success you will enjoy years from now.",
@@ -1754,7 +1758,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-20",
     "_id": "2026-10-20"
   },
-  "2026-10-21": {
+  {
     "theme": "Sovereignty",
     "question": "Which of my \"plans\" am I holding onto more tightly than God's \"purpose\"?",
     "reflection": "We are the architects of our plans, but God is the contractor of our reality. His purposes are the only things that endure.",
@@ -1764,7 +1768,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, align my plans with Your eternal purpose. Let Your will be done in my life today.",
     "_id": "2026-10-21"
   },
-  "2026-10-22": {
+  {
     "reflection": "Dishonesty feels like a \"win\" initially, but it leaves a lingering, painful bitterness that ruins the taste of success.",
     "question": "Is there any \"bread\" in my life right now that was gained through a half-truth?",
     "theme": "Satisfaction",
@@ -1774,7 +1778,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, keep my hands clean and my mouth free from the gravel of deceit.",
     "_id": "2026-10-22"
   },
-  "2026-10-23": {
+  {
     "theme": "Strength",
     "question": "Am I respecting the \"strength\" of the young and the \"splendor\" of the experienced?",
     "reflection": "Every season of life has its own beauty. Youth has energy; age has experience. Wisdom is honoring both in their time.",
@@ -1784,7 +1788,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-23",
     "_id": "2026-10-23"
   },
-  "2026-10-24": {
+  {
     "theme": "Providence",
     "question": "Am I worrying about \"leaders\" more than I am trusting the One who guides their hearts?",
     "reflection": "No leader is too powerful for God to redirect. He moves the hearts of those in charge just as easily as a gardener moves water.",
@@ -1794,7 +1798,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-24",
     "_id": "2026-10-24"
   },
-  "2026-10-25": {
+  {
     "reflection": "Religious rituals (sacrifice) are empty if they aren't backed by a life of integrity. God prefers our obedience over our \"offerings.\"",
     "question": "Does my daily conduct match the \"sacrifice\" of my Sunday worship?",
     "theme": "Worship",
@@ -1804,7 +1808,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, let my life of justice be the highest form of worship I offer You today.",
     "_id": "2026-10-25"
   },
-  "2026-10-26": {
+  {
     "theme": "Sin",
     "question": "How is pride distorting the way I view the people around me today?",
     "reflection": "Pride is the \"light\" by which the wicked see the world. It distorts everything. Wisdom swaps that lamp for the light of God.",
@@ -1814,7 +1818,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-26",
     "_id": "2026-10-26"
   },
-  "2026-10-27": {
+  {
     "theme": "Diligence",
     "question": "Where am I trying to \"rush\" a process that actually requires more diligence?",
     "reflection": "Shortcuts are usually long-cuts to failure. Abundance is built through steady, patient, and diligent effort over time.",
@@ -1824,7 +1828,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, give me the patience to build slowly and the diligence to work well.",
     "_id": "2026-10-27"
   },
-  "2026-10-28": {
+  {
     "reflection": "Peace is more valuable than square footage. A house full of arguments is smaller and colder than a literal corner of a roof.",
     "question": "Am I making my home a \"mansion of peace\" or a \"shack of strife\"?",
     "theme": "Peace",
@@ -1834,7 +1838,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-28",
     "_id": "2026-10-28"
   },
-  "2026-10-29": {
+  {
     "reflection": "Self-preservation is often as simple as keeping your mouth shut. Silence is the ultimate shield against unnecessary drama.",
     "question": "What \"trouble\" can I avoid today simply by choosing not to comment?",
     "theme": "Silence",
@@ -1844,7 +1848,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-29",
     "_id": "2026-10-29"
   },
-  "2026-10-30": {
+  {
     "reflection": "We must do our part (prepare the horse), but we must never take credit for the win. Preparation is ours; the result is His.",
     "question": "Have I prepared \"the horse\" for today, and have I surrendered the \"victory\" to God?",
     "theme": "Effort",
@@ -1854,7 +1858,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-10-30",
     "_id": "2026-10-30"
   },
-  "2026-10-31": {
+  {
     "theme": "Reputation",
     "question": "If I had to trade my \"riches\" for my \"reputation,\" would I make the deal?",
     "reflection": "Money can be stolen or lost, but your character (your name) stays with you forever. It is your most valuable asset.",
@@ -1864,7 +1868,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "God, help me to value my character above my bank account today.",
     "_id": "2026-10-31"
   },
-  "2026-11-01": {
+  {
     "theme": "Influence",
     "question": "What \"way\" am I training the children or mentees in my life to follow?",
     "reflection": "We are setting the \"trajectory\" for the next generation. Small habits established now become the \"autopilot\" of their future.",
@@ -1874,7 +1878,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, give me wisdom to lead the next generation toward Your truth.",
     "_id": "2026-11-01"
   },
-  "2026-11-02": {
+  {
     "theme": "Debt",
     "question": "Is my \"borrowing\" currently limiting my ability to follow God's lead?",
     "reflection": "Debt is a form of bondage. Wisdom seeks financial freedom so that we can serve God without the \"chains\" of interest and obligation.",
@@ -1884,7 +1888,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-02",
     "_id": "2026-11-02"
   },
-  "2026-11-03": {
+  {
     "theme": "Harmony",
     "question": "Is there a \"scoffing\" attitude in me that I need to \"drive out\" to bring peace?",
     "reflection": "Sometimes peace requires \"subtraction.\" Removing one toxic influence can instantly heal the atmosphere of a group.",
@@ -1894,7 +1898,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, purge my heart of arrogance so that I can be a person of harmony.",
     "_id": "2026-11-03"
   },
-  "2026-11-04": {
+  {
     "reflection": "Laziness is creative; it makes up \"lions\" (excuses) to justify staying inside and doing nothing. Don't believe your own excuses.",
     "question": "What \"lion\" am I using as an excuse to avoid the work I know I need to do?",
     "theme": "Procrastination",
@@ -1904,7 +1908,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-04",
     "_id": "2026-11-04"
   },
-  "2026-11-05": {
+  {
     "reflection": "There is wisdom in tradition. Don't tear down \"boundaries\" just because you didn't build them; understand why they were put there first.",
     "question": "Am I being too quick to \"move landmarks\" of faith or values that have stood the test of time?",
     "theme": "Respect",
@@ -1914,7 +1918,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-05",
     "_id": "2026-11-05"
   },
-  "2026-11-06": {
+  {
     "theme": "Excellence",
     "question": "Am I working with \"skill\" and excellence, or just \"getting by\"?",
     "reflection": "Excellence is an invitation. If you become the best at what you do, the world will make a path for you to lead.",
@@ -1924,7 +1928,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, let my work today be of such high quality that it honors Your name.",
     "_id": "2026-11-06"
   },
-  "2026-11-07": {
+  {
     "reflection": "This describes wealth. It is fleeting. If you \"set your eyes\" on money, you are chasing something that can fly away in a moment.",
     "question": "What am I \"setting my eyes\" on that is temporary instead of eternal?",
     "theme": "Vanity",
@@ -1934,7 +1938,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-07",
     "_id": "2026-11-07"
   },
-  "2026-11-08": {
+  {
     "reflection": "Truth is expensive—it costs our pride and our comfort. But once you have it, don't ever \"sell it\" for a momentary pleasure.",
     "question": "What \"price\" am I willing to pay today to gain more of God's truth?",
     "theme": "Investment",
@@ -1944,7 +1948,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-08",
     "_id": "2026-11-08"
   },
-  "2026-11-09": {
+  {
     "reflection": "A \"house\" (a life, a marriage, a business) is built with wisdom, but it is filled with precious and pleasant riches through knowledge.",
     "question": "What \"rooms\" in my life are currently empty because I’ve neglected understanding?",
     "theme": "Construction",
@@ -1954,7 +1958,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-09",
     "_id": "2026-11-09"
   },
-  "2026-11-10": {
+  {
     "reflection": "Resilience is the mark of the righteous. Being \"good\" doesn't mean you never fail; it means you always get back up.",
     "question": "I fell yesterday; am I going to stay down, or am I going to rise \"the eighth time\"?",
     "theme": "Resilience",
@@ -1964,7 +1968,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, give me the strength to get back up. My failure is not my finish line.",
     "_id": "2026-11-10"
   },
-  "2026-11-11": {
+  {
     "theme": "Compassion",
     "question": "Did I feel a \"spark of joy\" when someone I dislike failed? Why?",
     "reflection": "We must guard our hearts against \"Schadenfreude\"—joy at the misfortune of others. Godly love pities even its enemies.",
@@ -1974,7 +1978,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, forgive my petty heart. Give me Your compassion even for those who oppose me.",
     "_id": "2026-11-11"
   },
-  "2026-11-12": {
+  {
     "theme": "Order",
     "question": "Am I trying to \"build my house\" (comfort) before I’ve \"prepared my field\" (responsibilities)?",
     "reflection": "Order matters. Secure your \"income\" and your \"work\" before you focus on your \"comforts.\" Get the priorities right.",
@@ -1984,7 +1988,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-12",
     "_id": "2026-11-12"
   },
-  "2026-11-13": {
+  {
     "reflection": "Neglect is a slow-motion disaster. Thorns don't grow overnight; they grow because someone stopped \"weeding.\"",
     "question": "What \"thorns\" are starting to grow in my life because I’ve been neglectful?",
     "theme": "Neglect",
@@ -1994,7 +1998,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, help me to \"weed\" the garden of my life today. Don't let neglect ruin Your work in me.",
     "_id": "2026-11-13"
   },
-  "2026-11-14": {
+  {
     "reflection": "God hides things for us, not from us. He wants us to have the \"glory\" of being spiritual detectives, searching His Word for answers.",
     "question": "Am I \"searching out\" God's mysteries today, or just waiting for them to fall in my lap?",
     "theme": "Mystery",
@@ -2004,7 +2008,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-14",
     "_id": "2026-11-14"
   },
-  "2026-11-15": {
+  {
     "theme": "Purity",
     "question": "What \"dross\" is God currently skimming off the surface of my life?",
     "reflection": "You are the silver; your sin is the dross. God can't \"shape\" you into a useful vessel until the fire of trials has removed the impurities.",
@@ -2014,7 +2018,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-15",
     "_id": "2026-11-15"
   },
-  "2026-11-16": {
+  {
     "reflection": "Communication is an art form. The right word, at the right time, with the right tone is a masterpiece of grace.",
     "question": "How can I speak a \"fitly spoken\" word to someone who is struggling today?",
     "theme": "Beauty",
@@ -2024,7 +2028,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let my speech be \"apples of gold.\" Give me the grace to say exactly what is needed.",
     "_id": "2026-11-16"
   },
-  "2026-11-17": {
+  {
     "reflection": "Kindness is the most effective \"weapon\" against an enemy. It \"burns\" their conscience and often wins them over.",
     "question": "Who is my \"enemy\" today, and how can I \"feed\" them with kindness?",
     "theme": "Kindness",
@@ -2034,7 +2038,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-17",
     "_id": "2026-11-17"
   },
-  "2026-11-18": {
+  {
     "theme": "Boundaries",
     "question": "Where are the \"holes\" in my walls today? Where am I lacking self-control?",
     "reflection": "Without self-control, you are vulnerable to every passing thought, temptation, or emotion. Your \"will\" is your defense.",
@@ -2044,7 +2048,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, rebuild my walls. Grant me the fruit of the Spirit: self-control.",
     "_id": "2026-11-18"
   },
-  "2026-11-19": {
+  {
     "theme": "Justice",
     "question": "Am I living in fear of people's opinions, or am I resting in God's protection?",
     "reflection": "You don't have to fear the \"bad vibes\" or \"curses\" of others if you are walking with God. If there's no \"reason\" for the curse, it won't land.",
@@ -2054,7 +2058,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-19",
     "_id": "2026-11-19"
   },
-  "2026-11-20": {
+  {
     "reflection": "If you argue with a fool, you eventually start using his tactics. Don't let a foolish person set the \"rules\" for your behavior.",
     "question": "Am I \"lowering myself\" to someone else's level just to win an argument?",
     "theme": "Response",
@@ -2064,7 +2068,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-20",
     "_id": "2026-11-20"
   },
-  "2026-11-21": {
+  {
     "theme": "Habit",
     "question": "What \"folly\" am I tempted to \"return to\" today?",
     "reflection": "This is a graphic warning! Going back to an old sin is as \"disgusting\" as a dog's habits. Learn the lesson the first time.",
@@ -2074,7 +2078,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, keep me from the sins of my past. I want to move forward, not backward.",
     "_id": "2026-11-21"
   },
-  "2026-11-22": {
+  {
     "reflection": "The most \"hopeless\" person is the one who thinks they already know everything. Teachable-ness is the only path to wisdom.",
     "question": "Where am I acting like an \"expert\" in an area where I actually need to be a \"student\"?",
     "theme": "Blindness",
@@ -2084,7 +2088,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-22",
     "_id": "2026-11-22"
   },
-  "2026-11-23": {
+  {
     "theme": "Motion",
     "question": "Am I \"turning on my hinges\" (busy-work) or am I actually \"walking through the door\"?",
     "reflection": "A door moves, but it goes nowhere. A lazy person is \"busy\" shifting around, but they aren't making any progress.",
@@ -2094,7 +2098,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-23",
     "_id": "2026-11-23"
   },
-  "2026-11-24": {
+  {
     "theme": "Gossip",
     "question": "What \"fire\" can I put out today by simply refusing to repeat a story?",
     "reflection": "You can end a conflict simply by stopping the gossip. If you don't add \"wood\" (whispers), the \"fire\" (fight) will naturally die.",
@@ -2104,7 +2108,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, help me to be a \"fire-extinguisher,\" not a \"wood-gatherer.\"",
     "_id": "2026-11-24"
   },
-  "2026-11-25": {
+  {
     "theme": "Humility",
     "question": "Am I making plans as if I am in total control of the future?",
     "reflection": "We don't own tomorrow; we only have today. Live with a \"holy uncertainty\" that keeps you dependent on God.",
@@ -2114,7 +2118,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I hold my plans loosely. I trust You with tomorrow and I give You my today.",
     "_id": "2026-11-25"
   },
-  "2026-11-26": {
+  {
     "reflection": "A real friend will tell you the hard truth that \"hurts\" so that you can grow. An enemy will \"kiss\" you with lies that lead to ruin.",
     "question": "Who is the friend who \"wounds\" me with the truth? Do I appreciate them?",
     "theme": "Loyalty",
@@ -2124,7 +2128,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-26",
     "_id": "2026-11-26"
   },
-  "2026-11-27": {
+  {
     "theme": "Community",
     "question": "Who is \"sharpening\" me right now? Is it uncomfortable? (That’s good!)",
     "reflection": "Friction is necessary for sharpness. We need the \"rub\" of other people's perspectives to keep our own minds and spirits sharp.",
@@ -2134,7 +2138,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-27",
     "_id": "2026-11-27"
   },
-  "2026-11-28": {
+  {
     "reflection": "Be an expert on your own life. Know your finances, your children's hearts, and your health. Attention is the first step of stewardship.",
     "question": "What area of my \"flock\" (my life) have I been ignoring lately?",
     "theme": "Stewardship",
@@ -2144,7 +2148,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, help me to be an attentive steward of everything You’ve entrusted to me.",
     "_id": "2026-11-28"
   },
-  "2026-11-29": {
+  {
     "theme": "Conscience",
     "question": "Is my \"boldness\" lacking because my conscience isn't clear?",
     "reflection": "A guilty conscience makes you jumpy. A clear conscience gives you a \"lion-like\" courage because you have nothing to hide.",
@@ -2154,7 +2158,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-29",
     "_id": "2026-11-29"
   },
-  "2026-11-30": {
+  {
     "theme": "Mercy",
     "question": "Is there a \"concealed transgression\" that is currently blocking my spiritual prosperity?",
     "reflection": "Prosperity is blocked by hidden sin. To \"obtain mercy,\" we must not only \"confess\" the sin but \"forsake\" (walk away from) it.",
@@ -2164,7 +2168,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-11-30",
     "_id": "2026-11-30"
   },
-  "2026-12-01": {
+  {
     "theme": "Warning",
     "question": "Am I \"stiffening my neck\" against a correction God has been sending my way?",
     "reflection": "This is a sobering warning. If you keep ignoring God's \"nudge,\" there comes a point where the \"break\" is final. Listen while there is time.",
@@ -2174,7 +2178,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I soften my heart. I don't want to be \"broken\"; I want to be \"bent\" by Your hand.",
     "_id": "2026-12-01"
   },
-  "2026-12-02": {
+  {
     "reflection": "What will they think? is a trap. The only opinion that provides \"safety\" is the opinion of the Lord.",
     "question": "Am I trapped in the \"snare\" of people-pleasing today?",
     "theme": "Fear",
@@ -2184,7 +2188,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I trade my fear of man for my trust in You. You are my only audience.",
     "_id": "2026-12-02"
   },
-  "2026-12-03": {
+  {
     "reflection": "God's Word has a \"100% success rate.\" It doesn't just contain truth; it \"proves true\" in the real world every single time.",
     "question": "Can I name one \"word of God\" that has \"proven true\" in my life recently?",
     "theme": "Purity",
@@ -2194,7 +2198,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-03",
     "_id": "2026-12-03"
   },
-  "2026-12-04": {
+  {
     "reflection": "This is the prayer of the \"Golden Mean.\" Too much wealth might make us forget God; too little might make us steal. Pray for \"enough.\"",
     "question": "Am I content with \"enough,\" or am I obsessed with \"more\"?",
     "theme": "Balance",
@@ -2204,7 +2208,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-04",
     "_id": "2026-12-04"
   },
-  "2026-12-05": {
+  {
     "theme": "Instinct",
     "question": "Which of these \"four small things\" do I need to learn from today?",
     "reflection": "The ant (preparation), the rock badger (security), the locust (unity), and the lizard (persistence). Nature is full of small mentors.",
@@ -2214,7 +2218,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-05",
     "_id": "2026-12-05"
   },
-  "2026-12-06": {
+  {
     "theme": "Advocacy",
     "question": "Whose \"voice\" can I be today for someone who cannot speak for themselves?",
     "reflection": "Wisdom isn't just for your own benefit; it’s for the benefit of those who have no voice. Be an advocate.",
@@ -2224,7 +2228,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-06",
     "_id": "2026-12-06"
   },
-  "2026-12-07": {
+  {
     "theme": "Character",
     "question": "Does my character make me \"precious\" in the eyes of God and those who know me?",
     "reflection": "We end the year with the \"Woman of Valor.\" Her \"value\" isn't in her appearance, but in her industrious, generous, and God-fearing character.",
@@ -2234,7 +2238,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, help me to be a person of \"valor\" and \"virtue\" in all I do.",
     "_id": "2026-12-07"
   },
-  "2026-12-08": {
+  {
     "reflection": "To be \"trusted\" by those closest to us is a massive spiritual achievement. Reliability is the bedrock of a good life.",
     "question": "Do the people closest to me \"trust\" my heart and my word implicitly?",
     "theme": "Trust",
@@ -2244,7 +2248,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, make me a person who can be fully trusted by my family and my friends.",
     "_id": "2026-12-08"
   },
-  "2026-12-09": {
+  {
     "reflection": "Wisdom is \"consistent.\" It’s not \"good\" some days and \"harmful\" others. It is a steady stream of blessing \"all the days.\"",
     "question": "Am I a \"consistent\" source of good for the people in my life?",
     "theme": "Consistency",
@@ -2254,7 +2258,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, let Your goodness flow through me consistently, today and every day.",
     "_id": "2026-12-09"
   },
-  "2026-12-10": {
+  {
     "theme": "Attitude",
     "question": "Is my spirit \"willing\" to do the tasks in front of me today, or am I grumbling?",
     "reflection": "The \"hands\" are the same, but the \"will\" makes the difference. A \"willing\" spirit makes the work light and productive.",
@@ -2264,7 +2268,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-10",
     "_id": "2026-12-10"
   },
-  "2026-12-11": {
+  {
     "theme": "Resourcefulness",
     "question": "Am I being resourceful with the opportunities God has given me today?",
     "reflection": "Wisdom is \"resourceful.\" It doesn't just take what is \"easy\"; it searches for the best \"food\" (truth, resources) wherever it can be found.",
@@ -2274,7 +2278,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-11",
     "_id": "2026-12-11"
   },
-  "2026-12-12": {
+  {
     "theme": "Discipline",
     "question": "What \"provision\" (prayer or planning) do I need to do before my day truly starts?",
     "reflection": "Discipline often means doing the work before anyone else sees it. The \"provision\" of the day starts in the quiet hours of the morning.",
@@ -2284,7 +2288,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me the discipline to start my day with You. Feed my soul before I feed my day.",
     "_id": "2026-12-12"
   },
-  "2026-12-13": {
+  {
     "theme": "Investment",
     "question": "What \"field\" am I considering today? Am I ready to invest my \"fruit\" into it?",
     "reflection": "Wisdom is \"entrepreneurial.\" It \"considers\" (thinks) and then \"buys\" (acts). It uses past \"fruit\" to plant future \"vineyards.\"",
@@ -2294,7 +2298,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, give me a vision for the future. Help me to invest my resources wisely for Your Kingdom.",
     "_id": "2026-12-13"
   },
-  "2026-12-14": {
+  {
     "theme": "Vitality",
     "question": "How am I \"strengthening\" myself today—spiritually, mentally, and physically?",
     "reflection": "Spiritual and physical \"strength\" is something we \"put on\" through discipline and exercise. We must \"make our arms strong\" for the task.",
@@ -2304,7 +2308,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-14",
     "_id": "2026-12-14"
   },
-  "2026-12-15": {
+  {
     "theme": "Diligence",
     "question": "Do I \"perceive\" the eternal value of the work I am doing today?",
     "reflection": "This isn't about \"burnout\"; it's about \"perception.\" When you see that your work is \"profitable\" (valuable), you find the energy to finish the job.",
@@ -2314,7 +2318,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-15",
     "_id": "2026-12-15"
   },
-  "2026-12-16": {
+  {
     "theme": "Industry",
     "question": "Am I willing to do the \"repetitive\" work that is necessary to create something beautiful?",
     "reflection": "Wisdom isn't afraid of \"manual labor\" or the \"daily grind.\" The \"distaff\" is the place where the raw material becomes something useful.",
@@ -2324,7 +2328,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, bless the \"work of my hands.\" Let the mundane tasks of today become something useful for You.",
     "_id": "2026-12-16"
   },
-  "2026-12-17": {
+  {
     "reflection": "The same hands that \"work\" are the hands that \"give.\" Our productivity should always fuel our generosity.",
     "question": "Who can I \"reach out my hands\" to today with the fruit of my labor?",
     "theme": "Generosity",
@@ -2334,7 +2338,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-17",
     "_id": "2026-12-17"
   },
-  "2026-12-18": {
+  {
     "reflection": "Preparation removes fear. When the \"snow\" (the storms of life) comes, the wise person is \"not afraid\" because they have prepared.",
     "question": "What \"snow\" am I afraid of, and have I done the \"preparation\" to face it?",
     "theme": "Preparation",
@@ -2344,7 +2348,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-18",
     "_id": "2026-12-18"
   },
-  "2026-12-19": {
+  {
     "theme": "Excellence",
     "question": "Am I doing \"purple-quality\" work today, or am I just doing the bare minimum?",
     "reflection": "Godly character doesn't mean being \"shabby.\" It means doing everything with \"fine linen\" quality. Excellence is a form of testimony.",
@@ -2354,7 +2358,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-19",
     "_id": "2026-12-19"
   },
-  "2026-12-20": {
+  {
     "theme": "Honor",
     "question": "Is my character bringing \"honor\" or \"shame\" to my family and my God?",
     "reflection": "Our character affects the \"reputation\" of those we love. A wise person brings \"honor\" to their family name.",
@@ -2364,7 +2368,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-20",
     "_id": "2026-12-20"
   },
-  "2026-12-21": {
+  {
     "reflection": "This is the ultimate \"outfit\" for a believer. When you are \"clothed\" in God's strength and dignity, you can \"laugh\" at the future because you know Who holds it.",
     "question": "Am I \"laughing\" at the future today, or am I \"trembling\" at it?",
     "theme": "Wardrobe",
@@ -2374,7 +2378,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-21",
     "_id": "2026-12-21"
   },
-  "2026-12-22": {
+  {
     "theme": "Speech",
     "question": "Is the \"law of kindness\" currently governing my tongue, even in difficult conversations?",
     "reflection": "Wisdom and kindness are \"twins.\" You cannot have one without the other. Let the \"law of kindness\" govern every word you speak.",
@@ -2384,7 +2388,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-22",
     "_id": "2026-12-22"
   },
-  "2026-12-23": {
+  {
     "reflection": "Oversight is a full-time job. \"Looking well\" means being alert to the spiritual and emotional needs of those under your care.",
     "question": "How \"well\" am I \"looking\" into the needs of my family or my team today?",
     "theme": "Oversight",
@@ -2394,7 +2398,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-23",
     "_id": "2026-12-23"
   },
-  "2026-12-24": {
+  {
     "reflection": "Honor is the \"echo\" of a life well-lived. You don't have to demand praise; if you live wisely, it will \"rise up\" from those who know you best.",
     "question": "Am I living in a way that my \"children\" (or those closest to me) would call me \"blessed\"?",
     "theme": "Recognition",
@@ -2404,7 +2408,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, let my life speak for itself. I want to be a blessing to those who know me best.",
     "_id": "2026-12-24"
   },
-  "2026-12-25": {
+  {
     "reflection": "On this Christmas Day, we remember the One who \"surpassed them all\"—Jesus. His wisdom is the source of all our excellence.",
     "question": "How does Jesus \"surpass\" everything else in my life today?",
     "theme": "Excellence",
@@ -2414,7 +2418,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-25",
     "_id": "2026-12-25"
   },
-  "2026-12-26": {
+  {
     "theme": "Reality",
     "question": "Am I still trying to \"charm\" people, or am I focusing on \"fearing\" the Lord?",
     "reflection": "Charm is a \"mask\"; beauty is a \"vapor.\" Only the \"fear of the Lord\" is the solid ground of a life worth praising.",
@@ -2424,7 +2428,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-26",
     "_id": "2026-12-26"
   },
-  "2026-12-27": {
+  {
     "theme": "Reward",
     "question": "What \"fruit\" am I harvesting today from the wisdom I’ve practiced this year?",
     "reflection": "At the end of the year, we \"eat the fruit\" of the habits we’ve planted since January. Wisdom ensures the harvest is sweet.",
@@ -2434,7 +2438,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the harvest of this year. Let my works bring praise to Your Name.",
     "_id": "2026-12-27"
   },
-  "2026-12-28": {
+  {
     "theme": "Summary",
     "question": "Am I \"finishing well\" this year, or am I coasting into the new one?",
     "reflection": "As we near the end of the book, we see that wisdom is about \"finishing well.\" It’s not how you start the year; it’s how you end it.",
@@ -2444,7 +2448,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-28",
     "_id": "2026-12-28"
   },
-  "2026-12-29": {
+  {
     "theme": "Conclusion",
     "question": "Is my \"whole duty\" today focused on fearing God and keeping His commands?",
     "reflection": "After 31 chapters of Proverbs, it all boils down to this: Respect God and do what He says. It is the \"whole\" of life.",
@@ -2454,7 +2458,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, simplify my life. Help me to focus on the \"whole duty\" of loving and obeying You.",
     "_id": "2026-12-29"
   },
-  "2026-12-30": {
+  {
     "reflection": "Looking back at the spreadsheet of wisdom, we see God's \"mindfulness\" in every day. He has been our Guide.",
     "question": "What is the #1 piece of \"Proverbs Wisdom\" that has changed me the most this year?",
     "theme": "Gratitude",
@@ -2464,7 +2468,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for Your mindfulness. Thank You for being my Guide through every chapter.",
     "_id": "2026-12-30"
   },
-  "2026-12-31": {
+  {
     "reflection": "We end the book of Proverbs and the year with a \"New Thing.\" The wisdom of the past is the fuel for the new beginning of tomorrow.",
     "question": "Am I ready for the \"new thing\" God has for me in 2027?",
     "theme": "Trust",
@@ -2474,7 +2478,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2026-12-31",
     "_id": "2026-12-31"
   },
-  "2027-01-01": {
+  {
     "reflection": "Jesus didn't begin in a manger; He is the eternal \"Logos.\" To know Jesus is to know the very heart of God from before time began.",
     "question": "How does knowing Jesus is eternal change how I view His authority over my life today?",
     "theme": "Jesus’ Divinity",
@@ -2484,7 +2488,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I worship You as the Eternal Word. Thank You for being the steady foundation of my life.",
     "_id": "2027-01-01"
   },
-  "2027-01-02": {
+  {
     "theme": "Creation",
     "question": "What part of my life feels \"empty\" that I need to invite the Creator to fill and sustain?",
     "reflection": "Every breath is a gift mediated through Christ. He is the Architect of your soul; nothing in your life is outside His reach.",
@@ -2494,7 +2498,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for the gift of life. Help me remember I am Your creation and never abandoned.",
     "_id": "2027-01-02"
   },
-  "2027-01-03": {
+  {
     "theme": "Hope",
     "question": "Where is darkness trying to creep into my heart, and how can I let Christ’s light shine there?",
     "reflection": "Darkness is simply the absence of light. No matter how dark your circumstances seem, the light of Christ cannot be extinguished.",
@@ -2504,7 +2508,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-03",
     "_id": "2027-01-03"
   },
-  "2027-01-04": {
+  {
     "reflection": "Like John the Baptist, we aren't the star; we are the signpost. Our greatest calling is to point others toward the One who truly matters.",
     "question": "Am I trying to shine my own light, or am I content being a witness to His glory?",
     "theme": "Humility",
@@ -2514,7 +2518,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, help me to decrease so that You may increase. May my life be a clear signpost pointing to You.",
     "_id": "2027-01-04"
   },
-  "2027-01-05": {
+  {
     "theme": "Acceptance",
     "question": "When I feel rejected by the world, do I find my identity in being welcomed by Christ?",
     "reflection": "Jesus knows the pain of being misunderstood by those closest to Him. If you feel like an outsider, the King of Kings shares that experience.",
@@ -2524,7 +2528,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for understanding rejection. Help me find my ultimate home and belonging in You.",
     "_id": "2027-01-05"
   },
-  "2027-01-06": {
+  {
     "reflection": "Our standing with God isn't earned; it's a \"right\" given through faith. You are a beloved child of the Father, not just a servant.",
     "question": "Does my internal monologue sound more like a fearful servant or a deeply loved child?",
     "theme": "Adoption",
@@ -2534,7 +2538,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-06",
     "_id": "2027-01-06"
   },
-  "2027-01-07": {
+  {
     "theme": "Presence",
     "question": "How does the \"flesh and blood\" reality of Jesus make God feel more approachable to me?",
     "reflection": "Jesus \"pitched his tent\" in our messy neighborhood. God isn't distant; He entered human skin to be intimately near to you.",
@@ -2544,7 +2548,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-07",
     "_id": "2027-01-07"
   },
-  "2027-01-08": {
+  {
     "reflection": "Legalism is truth without grace; license is grace without truth. Jesus is 100% of both. He sees you fully and loves you totally.",
     "question": "Where do I struggle more: accepting God’s absolute truth, or believing His radical grace?",
     "theme": "God’s Character",
@@ -2554,7 +2558,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for Your balance of grace and truth. Help me live in that same balance today.",
     "_id": "2027-01-08"
   },
-  "2027-01-09": {
+  {
     "reflection": "God’s grace is like ocean waves—as soon as one washes over you, another is right behind it. You cannot exhaust His supply.",
     "question": "In what area of my life do I feel \"depleted,\" and will I ask for a fresh wave of grace today?",
     "theme": "Abundance",
@@ -2564,7 +2568,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-09",
     "_id": "2027-01-09"
   },
-  "2027-01-10": {
+  {
     "reflection": "If you want to know what God is like, look at Jesus. He is the visible image of the invisible God, explaining the Father to us.",
     "question": "When I think of God's character, do I filter it through the lens of Jesus' life and love?",
     "theme": "Revelation",
@@ -2574,7 +2578,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord Jesus, thank You for showing us the Father. Help me see His kindness through Your actions.",
     "_id": "2027-01-10"
   },
-  "2027-01-11": {
+  {
     "theme": "Identity",
     "question": "Am I trying to be the \"Messiah\" in my family, or am I being a \"voice\" pointing to Him?",
     "reflection": "John knew who he wasn't (the Christ) so he could be who he was (the voice). Contentment comes when we stop trying to be the Savior.",
@@ -2584,7 +2588,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, help me embrace the role You’ve given me. Let me be a humble voice for Your glory.",
     "_id": "2027-01-11"
   },
-  "2027-01-12": {
+  {
     "theme": "Redemption",
     "question": "Do I truly believe Jesus has \"taken away\" my sin, or am I still trying to pay for it myself?",
     "reflection": "In the Old Testament, man brought lambs to God. In the New, God brings the Lamb to man. Jesus is the final answer to our sin.",
@@ -2594,7 +2598,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-12",
     "_id": "2027-01-12"
   },
-  "2027-01-13": {
+  {
     "theme": "Presence",
     "question": "How would I live today if I were constantly aware that the Holy Spirit \"remains\" on me?",
     "reflection": "The Spirit \"remained\" on Jesus. As a believer, you are God's dwelling place. You aren't just visited by God; His Spirit abides in you.",
@@ -2604,7 +2608,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-13",
     "_id": "2027-01-13"
   },
-  "2027-01-14": {
+  {
     "theme": "Motivation",
     "question": "If Jesus asked me \"What are you seeking?\" right now, what would my honest answer be?",
     "reflection": "This is Jesus' first question in John. He isn't interested in just \"followers\"; He wants to know the \"why\" behind our pursuit.",
@@ -2614,7 +2618,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, purify my motives. May I seek You for who You are, not just for what You can do.",
     "_id": "2027-01-14"
   },
-  "2027-01-15": {
+  {
     "reflection": "Faith isn't just about learning facts; it’s about spending time in His presence. Jesus offers an experience, not just a lecture.",
     "question": "Will I take the time to \"abide\" with Jesus today rather than just checking off a religious list?",
     "theme": "Invitation",
@@ -2624,7 +2628,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-15",
     "_id": "2027-01-15"
   },
-  "2027-01-16": {
+  {
     "theme": "Witness",
     "question": "Who is the \"Simon\" in my life that needs to hear about the hope I've found in Christ?",
     "reflection": "Andrew’s first instinct was to share Jesus with his family. The best news is meant to be shared with those closest to us.",
@@ -2634,7 +2638,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-16",
     "_id": "2027-01-16"
   },
-  "2027-01-17": {
+  {
     "reflection": "Jesus saw Simon’s past, but spoke to his future. He doesn't just see who you are; He sees who you will become in His hands.",
     "question": "Am I defining myself by my past mistakes or by the new name and future Jesus has given me?",
     "theme": "Vision",
@@ -2644,7 +2648,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-17",
     "_id": "2027-01-17"
   },
-  "2027-01-18": {
+  {
     "theme": "Obedience",
     "question": "What is one specific area today where I feel the nudge to \"follow\" Him instead of my own path?",
     "reflection": "Christianity is an invitation to a journey. \"Follow me\" means moving where He moves and stopping where He stops.",
@@ -2654,7 +2658,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I choose to follow You today. Lead the way, and I will do my best to keep pace.",
     "_id": "2027-01-18"
   },
-  "2027-01-19": {
+  {
     "reflection": "We often limit God by our prejudices. He loves to use \"unlikely\" places and people to do His greatest work.",
     "question": "Am I dismissing a \"Nazareth\" in my life where God might actually be working?",
     "theme": "Openness",
@@ -2664,7 +2668,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-19",
     "_id": "2027-01-19"
   },
-  "2027-01-20": {
+  {
     "reflection": "You are never invisible to God. He sees you in your private moments of prayer and longing. He knew you before you ever called Him.",
     "question": "How does it comfort me to know that Jesus sees my \"private fig tree\" moments?",
     "theme": "Omniscience",
@@ -2674,7 +2678,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-20",
     "_id": "2027-01-20"
   },
-  "2027-01-21": {
+  {
     "reflection": "Jesus promises that the more we walk with Him, the more His glory is revealed. The Christian life is a progression of deeper revelation.",
     "question": "Am I settling for \"small things\" when Jesus wants to show me \"greater things\"?",
     "theme": "Expectation",
@@ -2684,7 +2688,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, expand my spiritual vision. I want to see the fullness of Your glory in my life.",
     "_id": "2027-01-21"
   },
-  "2027-01-22": {
+  {
     "theme": "Joy",
     "question": "Do I invite Jesus into my moments of joy, or only into my moments of crisis?",
     "reflection": "Jesus began His ministry at a celebration. This reminds us that God is a God of joy and cares about our earthly relationships.",
@@ -2694,7 +2698,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-22",
     "_id": "2027-01-22"
   },
-  "2027-01-23": {
+  {
     "theme": "Trust",
     "question": "Is there something \"He told me\" in my heart that I am currently hesitating to do?",
     "reflection": "This is the formula for a miracle: we provide the obedience, Jesus provides the power. Even odd instructions lead to life.",
@@ -2704,7 +2708,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, give me the heart of a servant. I want to do whatever You tell me without delay.",
     "_id": "2027-01-23"
   },
-  "2027-01-24": {
+  {
     "theme": "Transformation",
     "question": "What \"ordinary\" part of my life am I willing to hand over to Jesus to transform?",
     "reflection": "Jesus takes the ordinary (water) used for external cleaning and turns it into extraordinary wine for internal joy.",
@@ -2714,7 +2718,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, take my \"water\"—my mundane tasks—and turn them into something that tastes of Your kingdom.",
     "_id": "2027-01-24"
   },
-  "2027-01-25": {
+  {
     "reflection": "With the world, things often fade. With Jesus, the best is always yet to come. His grace gets richer as the years go by.",
     "question": "Am I living with the hope that my best days with God are still ahead of me?",
     "theme": "Hope",
@@ -2724,7 +2728,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for Your abundant grace. I look forward to the \"new wine\" You are preparing.",
     "_id": "2027-01-25"
   },
-  "2027-01-26": {
+  {
     "theme": "Purity",
     "question": "Is there \"clutter\" in the temple of my heart that Jesus wants to clear out today?",
     "reflection": "Jesus was passionate about the purity of God's worship. As the \"temple\" of the Spirit, He is passionate about your heart's purity too.",
@@ -2734,7 +2738,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-26",
     "_id": "2027-01-26"
   },
-  "2027-01-27": {
+  {
     "reflection": "Jesus pointed to the resurrection early on. He is the ultimate \"place\" where man meets God. His life is indestructible.",
     "question": "Do I find my security in physical things, or in the resurrected person of Jesus?",
     "theme": "Resurrection",
@@ -2744,7 +2748,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-27",
     "_id": "2027-01-27"
   },
-  "2027-01-28": {
+  {
     "reflection": "Jesus isn't fooled by outward appearance. He sees our true motives and hidden fears, not to condemn us, but to heal us.",
     "question": "Am I trying to hide my true self from God, or will I let Him see \"what is in me\" today?",
     "theme": "Discernment",
@@ -2754,7 +2758,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, You know me better than I know myself. Search me and lead me in Your way.",
     "_id": "2027-01-28"
   },
-  "2027-01-29": {
+  {
     "theme": "Seeking",
     "question": "Am I humble enough to admit when my \"religion\" isn't enough and I need an encounter with Christ?",
     "reflection": "Nicodemus was a leader, yet he knew he was missing something. You are never \"too religious\" to ask Jesus for the truth.",
@@ -2764,7 +2768,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-29",
     "_id": "2027-01-29"
   },
-  "2027-01-30": {
+  {
     "reflection": "Spiritual life isn't an upgrade; it’s a new birth. We don't just need to be \"better\"; we need to be made entirely new by the Spirit.",
     "question": "How has my \"new birth\" changed my perspective on the world around me?",
     "theme": "New Life",
@@ -2774,7 +2778,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Spirit of God, breathe new life into me today. Help me live as a citizen of Your Kingdom.",
     "_id": "2027-01-30"
   },
-  "2027-01-31": {
+  {
     "reflection": "You can't control the wind, but you can set your sails. The Spirit’s work is often unpredictable, but His effects are undeniable.",
     "question": "Am I trying to \"manage\" the Holy Spirit, or am I setting my sails to follow His lead?",
     "theme": "Mystery",
@@ -2784,7 +2788,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-01-31",
     "_id": "2027-01-31"
   },
-  "2027-02-01": {
+  {
     "reflection": "In the wilderness, healing came by looking at the serpent. Today, we are saved by looking to Christ. Our healing is found in our focus.",
     "question": "When I am \"bitten\" by sin or shame, do I look at my wound or do I look at the Savior?",
     "theme": "Focus",
@@ -2794,7 +2798,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I look to You today. You are my only source of healing and life.",
     "_id": "2027-02-01"
   },
-  "2027-02-02": {
+  {
     "reflection": "God’s love isn't a vague feeling; it is an actionable sacrifice. He gave His best to rescue those at their worst.",
     "question": "Do I truly believe God loves the \"world\" (including my enemies) as much as He loves me?",
     "theme": "Love",
@@ -2804,7 +2808,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-02-02",
     "_id": "2027-02-02"
   },
-  "2027-02-03": {
+  {
     "reflection": "Jesus didn't come to point a finger; He came to lend a hand. If you feel constant condemnation, it isn't coming from the Savior.",
     "question": "Am I quicker to offer condemnation to others than Jesus was to offer it to me?",
     "theme": "Mission",
@@ -2814,7 +2818,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for Your mercy. Help me to breathe out the same grace I have received.",
     "_id": "2027-02-03"
   },
-  "2027-02-04": {
+  {
     "theme": "Integrity",
     "question": "Is there a corner of my life I’m keeping in the dark? What happens if I bring it to the light?",
     "reflection": "Walking with Jesus means having nothing to hide. Living in the light is vulnerable, but it is the only place where true growth happens.",
@@ -2824,7 +2828,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-02-04",
     "_id": "2027-02-04"
   },
-  "2027-02-05": {
+  {
     "theme": "Joy",
     "question": "Can I find joy in God's work even when I am not the one being recognized for it?",
     "reflection": "John found joy in someone else’s success. True maturity is being happy that Jesus is getting the attention and the glory.",
@@ -2834,7 +2838,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let my joy be complete simply by hearing Your voice and seeing Your fame spread.",
     "_id": "2027-02-05"
   },
-  "2027-02-06": {
+  {
     "theme": "Priorities",
     "question": "In what specific area today does Jesus need to \"increase\" while my ego \"decreases\"?",
     "reflection": "The less we worry about our status and the more we focus on Christ’s, the lighter our load becomes. He is the rightful King.",
@@ -2844,7 +2848,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, be bigger in my thoughts and words today. Take Your rightful place in my heart.",
     "_id": "2027-02-06"
   },
-  "2027-02-07": {
+  {
     "theme": "Generosity",
     "question": "Am I living like I have a \"limited supply\" of God's power, or an immeasurable one?",
     "reflection": "God doesn't \"ration\" His Spirit. He pours it out generously. We are only limited by our willingness to receive what He gives.",
@@ -2854,7 +2858,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-02-07",
     "_id": "2027-02-07"
   },
-  "2027-02-08": {
+  {
     "reflection": "Eternal life isn't just a future destination; it's a present possession. To believe is to step into a new quality of living right now.",
     "question": "How does the reality of \"eternal life\" change how I prioritize my tasks today?",
     "theme": "Destiny",
@@ -2864,7 +2868,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-02-08",
     "_id": "2027-02-08"
   },
-  "2027-02-09": {
+  {
     "theme": "Detours",
     "question": "What \"inconvenience\" in my schedule today might actually be a divine appointment?",
     "reflection": "Geographically, Jesus didn't \"have\" to go through Samaria, but relationally, He did. God often takes us on detours to reach one soul.",
@@ -2874,7 +2878,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me eyes to see the Samarias in my day. Help me see people, not just tasks.",
     "_id": "2027-02-09"
   },
-  "2027-02-10": {
+  {
     "theme": "Humanity",
     "question": "Does it change my prayer life to know that Jesus understands my physical fatigue?",
     "reflection": "Jesus knows what it’s like to be tired. He doesn't just sympathize from a distance; He has felt exhaustion in His own bones.",
@@ -2884,7 +2888,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for being fully human. Thank You for resting with me when I am weary.",
     "_id": "2027-02-10"
   },
-  "2027-02-11": {
+  {
     "theme": "Inclusion",
     "question": "Who have I \"categorized\" as someone I wouldn't normally talk to about my faith?",
     "reflection": "Jesus ignored racial and social barriers to reach one person. His love refuses to play by the rules of prejudice.",
@@ -2894,7 +2898,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, break down the walls in my heart. Help me love with boundary-crossing love.",
     "_id": "2027-02-11"
   },
-  "2027-02-12": {
+  {
     "reflection": "We often dig cisterns that can't hold water. Jesus offers a spring that bubbles up from the inside, independent of circumstances.",
     "question": "What \"well\" am I drinking from that leaves me thirsty again an hour later?",
     "theme": "Satisfaction",
@@ -2904,7 +2908,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me this water. Satisfy the deepest longings of my soul with Your presence.",
     "_id": "2027-02-12"
   },
-  "2027-02-13": {
+  {
     "theme": "Sufficiency",
     "question": "Am I looking for external fixes for my internal thirst today?",
     "reflection": "Most things satisfy from the outside in. Jesus satisfies from the inside out. His peace is an internal resource.",
@@ -2914,7 +2918,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, be the spring in my soul. Let Your peace flow even when my environment is dry.",
     "_id": "2027-02-13"
   },
-  "2027-02-14": {
+  {
     "reflection": "Jesus brought up her secret—not to shame her, but to heal her. He cannot heal what we refuse to reveal.",
     "question": "What secret or part of my past am I holding onto that I need to lay before Jesus?",
     "theme": "Healing",
@@ -2924,7 +2928,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-02-14",
     "_id": "2027-02-14"
   },
-  "2027-02-15": {
+  {
     "theme": "Posture",
     "question": "Is my worship today just \"going through the motions,\" or is my spirit truly engaged?",
     "reflection": "Worship isn't about location; it’s about the heart. It requires our spirit connecting with His Truth in total honesty.",
@@ -2934,7 +2938,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-02-15",
     "_id": "2027-02-15"
   },
-  "2027-02-16": {
+  {
     "reflection": "God is not limited by physical space or human boundaries. He is everywhere, and He is looking for a heart-to-spirit connection.",
     "question": "Do I limit my \"worship\" to a church building, or do I meet God in the \"spirit\" of my day?",
     "theme": "Nature",
@@ -2944,7 +2948,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You that I can worship You anywhere. Be the focus of my heart in every place.",
     "_id": "2027-02-16"
   },
-  "2027-02-17": {
+  {
     "theme": "Transformation",
     "question": "What \"water jar\" (old habit or security) am I still carrying that I need to leave behind?",
     "reflection": "She came for water, but left her jar because she found something better. When we find Jesus, our old \"containers\" become unnecessary.",
@@ -2954,7 +2958,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-02-17",
     "_id": "2027-02-17"
   },
-  "2027-02-18": {
+  {
     "theme": "Purpose",
     "question": "Does serving God feel like a \"chore\" or like \"food\" to me right now?",
     "reflection": "Doing God's will isn't just a duty; it's meant to be our sustenance. Obeying God should actually energize us, not just drain us.",
@@ -2964,7 +2968,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, nourish my soul through my obedience. Let me find strength in doing Your will.",
     "_id": "2027-02-18"
   },
-  "2027-02-19": {
+  {
     "theme": "Urgency",
     "question": "Who in my immediate circle might be \"ripe\" for a word of encouragement today?",
     "reflection": "We often think people are a long way from God. Jesus says the harvest is happening now. We just need to open our eyes to see.",
@@ -2974,7 +2978,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, open my eyes to the harvest around me. Don't let me miss Your opportunities.",
     "_id": "2027-02-19"
   },
-  "2027-02-20": {
+  {
     "reflection": "You might plant the seed or help someone finally say \"yes\" to Jesus. Both roles are vital and celebrated in heaven.",
     "question": "Can I be content with \"sowing\" today even if I don't see the \"reaping\" yet?",
     "theme": "Partnership",
@@ -2984,7 +2988,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-02-20",
     "_id": "2027-02-20"
   },
-  "2027-02-21": {
+  {
     "reflection": "A secondhand faith won't survive a crisis. We must move from \"hearing about Him\" to \"hearing from Him\" personally.",
     "question": "Is my faith based on what others say, or on my own relationship with Jesus?",
     "theme": "Experience",
@@ -2994,7 +2998,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-02-21",
     "_id": "2027-02-21"
   },
-  "2027-02-22": {
+  {
     "theme": "Familiarity",
     "question": "Have I become so \"used\" to Jesus that I’ve lost the wonder of who He is?",
     "reflection": "Sometimes those closest to us are the last to see God's work in us. Don't let the \"familiarity\" of Jesus make you miss His power.",
@@ -3004,7 +3008,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-02-22",
     "_id": "2027-02-22"
   },
-  "2027-02-23": {
+  {
     "reflection": "Real faith is taking God at His word, even when there's no visible proof yet. It is believing the promise before the performance.",
     "question": "Am I waiting for a sign before I obey, or will I trust His Word alone?",
     "theme": "Trust",
@@ -3014,7 +3018,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I believe; help my unbelief. Give me a faith that stands even when I don't see miracles.",
     "_id": "2027-02-23"
   },
-  "2027-02-24": {
+  {
     "theme": "Authority",
     "question": "What promise from Scripture do I need to \"walk home on\" today, even if things haven't changed?",
     "reflection": "The official walked home with nothing but a sentence from Jesus. He traveled for hours on a promise. That is the walk of faith.",
@@ -3024,7 +3028,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-02-24",
     "_id": "2027-02-24"
   },
-  "2027-02-25": {
+  {
     "reflection": "Bethesda means \"House of Mercy,\" yet it was full of hopeless people. Sometimes we are sitting right next to mercy and don't realize it.",
     "question": "Am I sitting in a \"House of Mercy\" but still living like I'm paralyzed?",
     "theme": "Stagnation",
@@ -3034,7 +3038,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, wake me up to the mercy that surrounds me. Help me see the hope that is right here.",
     "_id": "2027-02-25"
   },
-  "2027-02-26": {
+  {
     "reflection": "It’s an odd question, but we can get comfortable in our dysfunction. Healing requires the courage to change our entire lifestyle.",
     "question": "Do I truly want to be free from this habit, or have I become comfortable in my \"paralysis\"?",
     "theme": "Willingness",
@@ -3044,7 +3048,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I want to be healed. Give me the will and the courage to get up and walk.",
     "_id": "2027-02-26"
   },
-  "2027-02-27": {
+  {
     "reflection": "The man looked for a human solution. Jesus offered a divine one. When people fail you, God is still there.",
     "question": "Have I been waiting for a person to rescue me instead of looking to the Savior?",
     "theme": "Isolation",
@@ -3054,7 +3058,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, when I feel like I have \"no one,\" remind me that I have You. You are my deliverer.",
     "_id": "2027-02-27"
   },
-  "2027-02-28": {
+  {
     "theme": "Victory",
     "question": "What \"bed\" (past struggle) am I now carrying as a testimony to God's grace?",
     "reflection": "Jesus told him to carry the very thing that used to carry him. Our former burdens become trophies of His power.",
@@ -3064,7 +3068,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me the strength to stand up. Let my life show Your power today.",
     "_id": "2027-02-28"
   },
-  "2027-03-01": {
+  {
     "reflection": "Critics were more upset about a rule than happy about a healing. Guard against a heart that loves \"rules\" more than \"people.\"",
     "question": "Have I become more concerned with \"religious correctness\" than with God's work of restoration?",
     "theme": "Legalism",
@@ -3074,7 +3078,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, keep my heart soft. May I always celebrate Your work of healing above my traditions.",
     "_id": "2027-03-01"
   },
-  "2027-03-02": {
+  {
     "reflection": "God isn't on vacation. He is constantly active, weaving His purposes together. When we join His work, we find our highest calling.",
     "question": "Where do I see God \"working\" in my life right now, and how can I join Him?",
     "theme": "Purpose",
@@ -3084,7 +3088,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-02",
     "_id": "2027-03-02"
   },
-  "2027-03-03": {
+  {
     "reflection": "Jesus lived by observation and imitation. As His followers, our job is to watch Jesus and do what He does—becoming \"little mirrors\" of His heart.",
     "question": "Whose example am I following today—the world's, or the Father's?",
     "theme": "Imitation",
@@ -3094,7 +3098,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-03",
     "_id": "2027-03-03"
   },
-  "2027-03-04": {
+  {
     "theme": "Wonder",
     "question": "When was the last time I truly \"marveled\" at what God is doing in the world?",
     "reflection": "God doesn't want our faith to be stagnant. He intends to keep revealing His power until we are lost in wonder and awe.",
@@ -3104,7 +3108,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, surprise me today with Your goodness. Keep my heart in a state of holy wonder.",
     "_id": "2027-03-04"
   },
-  "2027-03-05": {
+  {
     "theme": "Vitality",
     "question": "Am I trying to find life in things that are \"dying,\" or am I staying connected to the Source?",
     "reflection": "Jesus is the only \"unplugged\" source of life. Everything else is dependent, but Jesus is the Source. Connection to Him is connection to life.",
@@ -3114,7 +3118,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are the Life. I stay connected to You today so Your vitality can flow through me.",
     "_id": "2027-03-05"
   },
-  "2027-03-06": {
+  {
     "reflection": "Jesus’ voice has the power to wake up a dead soul. If you feel spiritually \"numb,\" ask Him to speak a word of life to you today.",
     "question": "Is there a \"dead\" area of my heart that needs to hear the waking voice of Jesus?",
     "theme": "Awakening",
@@ -3124,7 +3128,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, speak to the quiet places of my soul. Bring Your resurrection life to my heart.",
     "_id": "2027-03-06"
   },
-  "2027-03-07": {
+  {
     "reflection": "Jesus was immune to the need for human applause because He was fully satisfied with His Father's approval.",
     "question": "Whose approval am I chasing today, and how is that affecting my internal peace?",
     "theme": "Approval",
@@ -3134,7 +3138,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, Your \"well done\" is all I need. Free me from the trap of people-pleasing.",
     "_id": "2027-03-07"
   },
-  "2027-03-08": {
+  {
     "reflection": "It is possible to know the Bible but miss the Author. The point of the Word is to lead us to an encounter with the Person of Jesus.",
     "question": "Am I reading the Bible to gain information, or to deepen my relationship with Jesus?",
     "theme": "The Word",
@@ -3144,7 +3148,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-08",
     "_id": "2027-03-08"
   },
-  "2027-03-09": {
+  {
     "theme": "Provision",
     "question": "When I face an \"impossible\" problem, do I remember that God already has the solution ready?",
     "reflection": "When God asks you \"How are we going to fix this?\", He isn't looking for your solution. He’s looking for your trust. He already has the plan.",
@@ -3154,7 +3158,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-09",
     "_id": "2027-03-09"
   },
-  "2027-03-10": {
+  {
     "theme": "Surrender",
     "question": "What \"small\" thing (time, talent) am I holding back because I think it’s not enough?",
     "reflection": "A young boy’s lunch was insignificant in the face of 5,000 people—until it was put in Jesus' hands. Don't underestimate your \"small\" gift.",
@@ -3164,7 +3168,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-10",
     "_id": "2027-03-10"
   },
-  "2027-03-11": {
+  {
     "theme": "Abundance",
     "question": "Do I believe God can provide \"more than enough\" for my current situation?",
     "reflection": "Jesus didn't just meet the need; He exceeded it. There were 12 baskets left over—one for each disciple. God cares for the crowd and the server.",
@@ -3174,7 +3178,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-11",
     "_id": "2027-03-11"
   },
-  "2027-03-12": {
+  {
     "theme": "Solitude",
     "question": "Am I willing to walk away from the \"applause\" of people to spend time alone with God?",
     "reflection": "People wanted to use Jesus for their own agenda. Jesus chose intimacy with God over popularity with the crowd.",
@@ -3184,7 +3188,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, help me value solitude with You more than the attention of the world.",
     "_id": "2027-03-12"
   },
-  "2027-03-13": {
+  {
     "theme": "Presence",
     "question": "What storm am I in right now where I need to hear Jesus say, \"It is I\"?",
     "reflection": "In the storm, the disciples' fear wasn't calmed by the wind stopping, but by Jesus arriving. His presence is the antidote to fear.",
@@ -3194,7 +3198,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, come into my boat. Your presence is my peace in the midst of the waves.",
     "_id": "2027-03-13"
   },
-  "2027-03-14": {
+  {
     "reflection": "Sometimes we follow Jesus for the \"perks\" rather than the Person. He wants to be our Treasure, not just our provider.",
     "question": "Would I still follow Jesus if He didn't give me the \"bread\" I'm currently asking for?",
     "theme": "Motives",
@@ -3204,7 +3208,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-14",
     "_id": "2027-03-14"
   },
-  "2027-03-15": {
+  {
     "theme": "Belief",
     "question": "Am I focusing more on \"doing\" for God today or \"believing\" in God?",
     "reflection": "We often ask \"What should I do?\" God answers, \"Who do you trust?\" The primary \"work\" of the Christian is maintaining a heart of faith.",
@@ -3214,7 +3218,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, strengthen my faith. Help me to rest in the work Jesus has already done.",
     "_id": "2027-03-15"
   },
-  "2027-03-16": {
+  {
     "theme": "Sustenance",
     "question": "Have I \"eaten\" today? Have I fed my soul with the presence and words of Jesus?",
     "reflection": "Bread is a daily necessity. Jesus isn't a luxury item for special occasions; He is the daily sustainer of our souls.",
@@ -3224,7 +3228,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are my Bread. I depend on You for my spiritual strength this day.",
     "_id": "2027-03-16"
   },
-  "2027-03-17": {
+  {
     "reflection": "This is a bedrock promise. If you come to Jesus, you are safe. He won't change His mind about you or throw you away.",
     "question": "Do I live with the fear that God is waiting for a reason to reject me?",
     "theme": "Security",
@@ -3234,7 +3238,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-17",
     "_id": "2027-03-17"
   },
-  "2027-03-18": {
+  {
     "theme": "Grace",
     "question": "How does it feel to know that God was seeking me long before I ever sought Him?",
     "reflection": "If you have a desire for God, it’s because He put it there. You aren't chasing Him; He is drawing you. Faith is a response to His initiative.",
@@ -3244,7 +3248,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-18",
     "_id": "2027-03-18"
   },
-  "2027-03-19": {
+  {
     "theme": "Receptivity",
     "question": "Am I making space to be \"taught by God\" today, or am I only listening to human opinions?",
     "reflection": "God wants to be your personal teacher. Through His Word and Spirit, He is available to guide your thoughts and decisions today.",
@@ -3254,7 +3258,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-19",
     "_id": "2027-03-19"
   },
-  "2027-03-20": {
+  {
     "reflection": "Jesus calls for total consumption of His life. We don't just \"admire\" Him; we let His life become the core of our own.",
     "question": "Is Jesus a \"supplement\" to my life, or is He the very \"food\" that keeps me going?",
     "theme": "Commitment",
@@ -3264,7 +3268,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I take Your life into mine. May Your character be the core of who I am.",
     "_id": "2027-03-20"
   },
-  "2027-03-21": {
+  {
     "theme": "Power",
     "question": "Which \"word\" from Jesus will I choose to meditate on today to bring life to my soul?",
     "reflection": "Human words inform, but only Jesus' words transform. His voice carries the power of the Spirit to bring life.",
@@ -3274,7 +3278,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, speak to me. Your words are the only thing that can truly satisfy my heart.",
     "_id": "2027-03-21"
   },
-  "2027-03-22": {
+  {
     "reflection": "When things get hard, we are tempted to look for exits. Peter realized that even when Jesus is confusing, He is the only one with the Truth.",
     "question": "When I am frustrated or confused, do I run away from Jesus or to Him?",
     "theme": "Loyalty",
@@ -3284,7 +3288,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, there is no one else. Even when I don't understand, I choose to stay with You.",
     "_id": "2027-03-22"
   },
-  "2027-03-23": {
+  {
     "reflection": "If you live like Jesus, you will clash with a world that loves the dark. Don't be surprised when your values are unpopular.",
     "question": "Am I more concerned with being \"liked\" by the world or being \"faithful\" to the Truth?",
     "theme": "Contrast",
@@ -3294,7 +3298,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-23",
     "_id": "2027-03-23"
   },
-  "2027-03-24": {
+  {
     "theme": "Humility",
     "question": "Am I trying to build my own \"brand,\" or am I building God's Kingdom?",
     "reflection": "Jesus didn't feel the need to be \"original.\" He was content being a faithful messenger of the Father.",
@@ -3304,7 +3308,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let my words and actions reflect Your truth, not my own ego.",
     "_id": "2027-03-24"
   },
-  "2027-03-25": {
+  {
     "theme": "Discernment",
     "question": "Who have I judged unfairly today based on their outward \"appearance\"?",
     "reflection": "We often make snap judgments. Jesus calls us to look deeper—at the heart, the fruit, and the truth of a matter.",
@@ -3314,7 +3318,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, help me to see people as You see them. Give me a spirit of true discernment.",
     "_id": "2027-03-25"
   },
-  "2027-03-26": {
+  {
     "reflection": "There is an urgency to the Gospel. We shouldn't put off our response to God. Seek Him while He may be found.",
     "question": "Is there something I've been putting off in my relationship with God?",
     "theme": "Urgency",
@@ -3324,7 +3328,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I seek You today. Don't let me miss the season of Your visitation.",
     "_id": "2027-03-26"
   },
-  "2027-03-27": {
+  {
     "theme": "Overflow",
     "question": "Is the \"water\" of the Spirit flowing out of me today, or am I trying to keep it all for myself?",
     "reflection": "The Holy Spirit isn't meant to be a stagnant pond; He is meant to be a rushing river that flows through us to bless others.",
@@ -3334,7 +3338,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, flow through me. Let Your love and grace reach someone else through my life today.",
     "_id": "2027-03-27"
   },
-  "2027-03-28": {
+  {
     "theme": "Guidance",
     "question": "What \"dark\" decision am I facing where I need to wait for the Light of the World to lead?",
     "reflection": "Following Jesus means always having a light for the next step. You don't need to see the whole path, just the person of Christ.",
@@ -3344,7 +3348,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-28",
     "_id": "2027-03-28"
   },
-  "2027-03-29": {
+  {
     "theme": "Freedom",
     "question": "What habit or thought pattern is still \"enslaving\" me, and will I ask the Son for freedom?",
     "reflection": "Religious rules can't set you free; only a relationship with the Son can. True freedom is the power to be who God created you to be.",
@@ -3354,7 +3358,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord Jesus, set me free. Break the chains of my past and lead me into true liberty.",
     "_id": "2027-03-29"
   },
-  "2027-03-30": {
+  {
     "theme": "Eternal",
     "question": "How does the \"I AM\" nature of Jesus provide stability in my changing world?",
     "reflection": "Jesus uses the divine name of God (I AM). He is the timeless, self-existent Lord who is the same yesterday, today, and forever.",
@@ -3364,7 +3368,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-03-30",
     "_id": "2027-03-30"
   },
-  "2027-03-31": {
+  {
     "theme": "Perspective",
     "question": "Can I trust that God can turn my current struggle into a display of His glory?",
     "reflection": "We often ask \"Why did this happen?\" Jesus shifts the question to \"How can God be glorified in this?\"",
@@ -3374,7 +3378,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, let Your works be displayed in my life, even through my limitations and trials.",
     "_id": "2027-03-31"
   },
-  "2027-04-01": {
+  {
     "theme": "Testimony",
     "question": "What is my \"one thing I know\" that I can share with someone today?",
     "reflection": "You don't need a PhD in theology to be a witness. You just need to tell people what Jesus has done for you.",
@@ -3384,7 +3388,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for opening my eyes. Give me the courage to tell my story of Your grace.",
     "_id": "2027-04-01"
   },
-  "2027-04-02": {
+  {
     "reflection": "A hireling runs when things get tough, but the Shepherd stays. Jesus is committed to your safety at the cost of His own life.",
     "question": "Do I feel like a \"burden\" to God, or do I believe He is a Shepherd who loves to care for me?",
     "theme": "Care",
@@ -3394,7 +3398,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for being my Shepherd. I trust Your protection and Your leading.",
     "_id": "2027-04-02"
   },
-  "2027-04-03": {
+  {
     "reflection": "Christian living is a conversation. He speaks, He knows us by name, and we respond by following. It's built on mutual recognition.",
     "question": "Am I tuning out the Shepherd's voice because of the \"noise\" of the world today?",
     "theme": "Intimacy",
@@ -3404,7 +3408,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Shepherd, help me to recognize Your voice among the many. I want to follow only You.",
     "_id": "2027-04-03"
   },
-  "2027-04-04": {
+  {
     "theme": "Safety",
     "question": "Do I feel secure in God's grip, or am I constantly worried I will \"slip out\"?",
     "reflection": "You are double-locked in safety: in the hand of the Son and the hand of the Father. No enemy and no circumstance can pluck you away.",
@@ -3414,7 +3418,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for Your strong hand. I rest in the security of Your eternal protection.",
     "_id": "2027-04-04"
   },
-  "2027-04-05": {
+  {
     "theme": "Power",
     "question": "In what area of my life do I need to believe in the \"Resurrection\" today?",
     "reflection": "Jesus doesn't just \"give\" resurrection; He is resurrection. He is the answer to the finality of death and the weight of grief.",
@@ -3424,7 +3428,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-05",
     "_id": "2027-04-05"
   },
-  "2027-04-06": {
+  {
     "reflection": "The shortest verse shows the deepest heart. Jesus feels your pain even when He knows He is about to fix it. He is not indifferent to your tears.",
     "question": "Do I believe that Jesus is moved by my current sorrows?",
     "theme": "Empathy",
@@ -3434,7 +3438,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-06",
     "_id": "2027-04-06"
   },
-  "2027-04-07": {
+  {
     "reflection": "Jesus could have moved the stone with a word, but He asks us to do what we can do, so He can do what only He can do.",
     "question": "What \"stone\" (of doubt or disobedience) is Jesus asking me to move today?",
     "theme": "Cooperation",
@@ -3444,7 +3448,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I will do my part. I move the stones and wait for Your miracle.",
     "_id": "2027-04-07"
   },
-  "2027-04-08": {
+  {
     "theme": "Liberty",
     "question": "What \"grave clothes\" from my old life am I still wearing today?",
     "reflection": "Lazarus was alive, but still covered in grave clothes. God brings us to life, then invites us (and the community) to strip away the old habits of death.",
@@ -3454,7 +3458,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-08",
     "_id": "2027-04-08"
   },
-  "2027-04-09": {
+  {
     "reflection": "Real love is never \"efficient.\" It is often \"wasteful\" in its generosity toward God. Mary gave her best, and the house was filled with the fragrance.",
     "question": "Is my devotion to Jesus \"calculated\" and stingy, or is it extravagant?",
     "theme": "Devotion",
@@ -3464,7 +3468,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are worth my very best. May my life be a sweet fragrance of devotion to You.",
     "_id": "2027-04-09"
   },
-  "2027-04-10": {
+  {
     "reflection": "Growth comes through surrender. To bear fruit for the Kingdom, we must be willing to let our own selfish ambitions \"die.\"",
     "question": "What am I holding onto so tightly that it’s preventing me from bearing fruit?",
     "theme": "Sacrifice",
@@ -3474,7 +3478,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-10",
     "_id": "2027-04-10"
   },
-  "2027-04-11": {
+  {
     "reflection": "The more we \"clutch\" our lives, the more they slip through our fingers. The more we \"give\" them to Christ, the more we truly find them.",
     "question": "Am I clutching my life today, or am I offering it freely to the Lord?",
     "theme": "Paradox",
@@ -3484,7 +3488,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I give You my life. Help me find my true self by losing myself in You.",
     "_id": "2027-04-11"
   },
-  "2027-04-12": {
+  {
     "theme": "Attraction",
     "question": "Am I trying to \"push\" people into the Kingdom, or am I lifting up the beauty of the cross?",
     "reflection": "The cross is the ultimate magnet. When we show the world the crucified Christ, His love does the work of drawing hearts.",
@@ -3494,7 +3498,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-12",
     "_id": "2027-04-12"
   },
-  "2027-04-13": {
+  {
     "reflection": "Light is a gift that must be acted upon. When God gives you a moment of clarity or conviction, step into it immediately.",
     "question": "What \"light\" has God given me recently that I haven't fully acted on yet?",
     "theme": "Opportunity",
@@ -3504,7 +3508,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-13",
     "_id": "2027-04-13"
   },
-  "2027-04-14": {
+  {
     "reflection": "This is the great spiritual trap. We cannot seek God's approval and the world's applause at the same time. One will always win.",
     "question": "Whose \"glory\" am I seeking in my work and relationships today?",
     "theme": "Warning",
@@ -3514,7 +3518,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-14",
     "_id": "2027-04-14"
   },
-  "2027-04-15": {
+  {
     "reflection": "The King of the Universe took the place of a slave. True greatness in God's Kingdom is measured by the size of the \"towel\" we carry.",
     "question": "Who is \"under\" me today that I can serve with the humility of Christ?",
     "theme": "Service",
@@ -3524,7 +3528,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for Your example of service. Give me the heart of a servant today.",
     "_id": "2027-04-15"
   },
-  "2027-04-16": {
+  {
     "reflection": "Sometimes it’s harder to receive grace than to give it. We must let Jesus serve us and cleanse us if we want to be close to Him.",
     "question": "Am I too \"proud\" to let Jesus deal with my mess and my failures?",
     "theme": "Receiving",
@@ -3534,7 +3538,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, wash me. I admit my need for Your cleansing every single day.",
     "_id": "2027-04-16"
   },
-  "2027-04-17": {
+  {
     "theme": "Example",
     "question": "How would my interactions change today if I treated everyone as Jesus treated the disciples?",
     "reflection": "Jesus didn't just give us a command; He gave us a demonstration. Our treatment of others should be a direct reflection of His treatment of us.",
@@ -3544,7 +3548,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-17",
     "_id": "2027-04-17"
   },
-  "2027-04-18": {
+  {
     "reflection": "The \"newness\" isn't the command to love, but the standard of love—\"as I have loved you.\" It is a sacrificial, proactive love.",
     "question": "Is my love for other believers a \"witness\" to the world, or is it no different from the world's love?",
     "theme": "Love",
@@ -3554,7 +3558,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-18",
     "_id": "2027-04-18"
   },
-  "2027-04-19": {
+  {
     "theme": "Peace",
     "question": "What \"trouble\" is trying to take up space in my heart, and will I trade it for trust?",
     "reflection": "Peace is a choice of focus. We can look at our troubles, or we can look at the One who has prepared a place for us.",
@@ -3564,7 +3568,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-19",
     "_id": "2027-04-19"
   },
-  "2027-04-20": {
+  {
     "theme": "Exclusivity",
     "question": "Do I trust Jesus as my \"Way\" even when the path ahead looks unclear?",
     "reflection": "Jesus isn't a \"path\"; He is The Way. He is the personification of everything that is real and everything that is alive.",
@@ -3574,7 +3578,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-20",
     "_id": "2027-04-20"
   },
-  "2027-04-21": {
+  {
     "reflection": "Philip wanted to see the Father. Jesus pointed to Himself. All the kindness, power, and holiness of God are perfectly visible in Jesus.",
     "question": "When I think of God, do I picture a distant judge or do I picture the heart of Jesus?",
     "theme": "Revelation",
@@ -3584,7 +3588,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-21",
     "_id": "2027-04-21"
   },
-  "2027-04-22": {
+  {
     "reflection": "This doesn't mean better miracles, but a greater scope. Through the Spirit, the work of Jesus continues through us globally.",
     "question": "Do I believe that Jesus wants to work through me today in a significant way?",
     "theme": "Prayer",
@@ -3594,7 +3598,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-22",
     "_id": "2027-04-22"
   },
-  "2027-04-23": {
+  {
     "reflection": "To ask \"in His name\" is to ask according to His character and His will. It’s like using the King's seal to accomplish the King's business.",
     "question": "Are my prayers focused on my own comfort or on the \"glory of the Father\"?",
     "theme": "Authority",
@@ -3604,7 +3608,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I ask for Your will to be done in my life today, that the Father may be glorified.",
     "_id": "2027-04-23"
   },
-  "2027-04-24": {
+  {
     "theme": "Support",
     "question": "How often today will I consult my \"Helper\" before making a decision or reacting to a problem?",
     "reflection": "Another means one exactly like Jesus. The Holy Spirit is our Counselor, Comforter, and Constant Companion. We are never alone.",
@@ -3614,7 +3618,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, thank You for being with me. Help me to hear Your counsel in every moment.",
     "_id": "2027-04-24"
   },
-  "2027-04-25": {
+  {
     "reflection": "An orphan has no one to advocate for them. A child of God has the King as their Father. You are protected, provided for, and deeply loved.",
     "question": "Am I living today like an \"orphan\" (fending for myself) or like a child with a Father?",
     "theme": "Adoption",
@@ -3624,7 +3628,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-25",
     "_id": "2027-04-25"
   },
-  "2027-04-26": {
+  {
     "theme": "Obedience",
     "question": "What is one command of Jesus I can intentionally \"keep\" today as an act of love?",
     "reflection": "Love for Jesus isn't a feeling; it’s an action. Obedience is the \"language\" of our love for Him. It’s how we show He is our King.",
@@ -3634,7 +3638,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-26",
     "_id": "2027-04-26"
   },
-  "2027-04-27": {
+  {
     "theme": "Serenity",
     "question": "Am I waiting for my problems to go away to have peace, or will I receive His peace now?",
     "reflection": "The world’s peace depends on circumstances. Jesus' peace depends on His presence. It is a stillness that exists even in a storm.",
@@ -3644,7 +3648,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-27",
     "_id": "2027-04-27"
   },
-  "2027-04-28": {
+  {
     "reflection": "We are branches, not the trunk. Our only job is to stay connected. The life-giving sap comes from the Vine, not from our own effort.",
     "question": "How much time am I spending trying to \"produce fruit\" versus simply \"abiding\" in the Vine?",
     "theme": "Connection",
@@ -3654,7 +3658,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I abide in You. Let Your life flow through me today to produce fruit that lasts.",
     "_id": "2027-04-28"
   },
-  "2027-04-29": {
+  {
     "theme": "Pain with Purpose",
     "question": "What \"dead weight\" or \"distraction\" is God pruning from my life right now?",
     "reflection": "Pruning feels like \"losing\" or \"cutting,\" but it is actually God’s kindness to make us more productive. He only cuts what hinders us.",
@@ -3664,7 +3668,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-04-29",
     "_id": "2027-04-29"
   },
-  "2027-04-30": {
+  {
     "theme": "Dependence",
     "question": "Am I trying to \"do\" today \"apart from Him,\" or am I leaning on His strength?",
     "reflection": "This is the most humbling and liberating truth. We are incapable of spiritual good on our own, which means all the pressure is off.",
@@ -3674,7 +3678,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I admit I can do nothing of eternal value without You. I lean on You for everything today.",
     "_id": "2027-04-30"
   },
-  "2027-05-01": {
+  {
     "theme": "Relationship",
     "question": "Do I live today as someone who is fundamentally \"at home\" in the love of Christ?",
     "reflection": "Jesus doesn't just love us; He loves us with the same intensity that the Father loves Him. To \"abide\" is to make that love your permanent home.",
@@ -3684,7 +3688,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I choose to dwell in Your love. Let it be the atmosphere I breathe all day long.",
     "_id": "2027-05-01"
   },
-  "2027-05-02": {
+  {
     "theme": "Happiness",
     "question": "Am I seeking joy in my circumstances, or in the words and presence of Jesus?",
     "reflection": "God’s commands aren't designed to steal our fun; they are designed to protect our joy. True happiness is found in the center of His will.",
@@ -3694,7 +3698,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for wanting me to be joyful. Fill my heart with the gladness of Your Spirit.",
     "_id": "2027-05-02"
   },
-  "2027-05-03": {
+  {
     "theme": "Friendship",
     "question": "Do I treat my relationship with God like a cold duty, or like a warm, shared friendship?",
     "reflection": "A servant just does what he's told; a friend is invited into the heart and \"why\" of the Master. Jesus shares His secrets with those who follow Him.",
@@ -3704,7 +3708,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-03",
     "_id": "2027-05-03"
   },
-  "2027-05-04": {
+  {
     "reflection": "You aren't a follower of Jesus by accident. He looked at you, knew everything about you, and intentionally \"picked\" you for His team.",
     "question": "How does it change my confidence to know that I was \"hand-picked\" by the King?",
     "theme": "Purpose",
@@ -3714,7 +3718,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for choosing me. Help me to bear the fruit You’ve appointed me for.",
     "_id": "2027-05-04"
   },
-  "2027-05-05": {
+  {
     "reflection": "If we never feel friction with the world’s values, we might be blending in too much. Loyalty to Jesus often comes with a social cost.",
     "question": "Where am I compromising my faith just to avoid the \"heat\" of the world's disapproval?",
     "theme": "Perseverance",
@@ -3724,7 +3728,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-05",
     "_id": "2027-05-05"
   },
-  "2027-05-06": {
+  {
     "theme": "Witness",
     "question": "Will I trust the Holy Spirit to give me the right words when I talk about Jesus today?",
     "reflection": "The Holy Spirit’s primary job is to point to Jesus. When we talk about Christ, the Spirit is right there with us, \"backing up\" our testimony.",
@@ -3734,7 +3738,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-06",
     "_id": "2027-05-06"
   },
-  "2027-05-07": {
+  {
     "reflection": "It’s hard to imagine, but having the Spirit inside us is better than having Jesus beside us physically. We have 24/7 access to His power.",
     "question": "Am I taking advantage of the \"Helper\" who lives inside me, or am I trying to do life alone?",
     "theme": "Advantage",
@@ -3744,7 +3748,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for the gift of Your Spirit. I lean on Your internal presence today.",
     "_id": "2027-05-07"
   },
-  "2027-05-08": {
+  {
     "theme": "Guidance",
     "question": "When I feel a \"nudge\" of conviction today, will I see it as God’s kindness leading me to repent?",
     "reflection": "Conviction isn't the same as shame. Shame pushes us away from God; conviction is the Spirit’s \"nudge\" to bring us back to the right path.",
@@ -3754,7 +3758,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Spirit of Truth, thank You for being honest with me. Lead me away from sin and toward Your light.",
     "_id": "2027-05-08"
   },
-  "2027-05-09": {
+  {
     "theme": "Wisdom",
     "question": "What decision am I facing where I need to ask the Spirit to \"guide me into the truth\"?",
     "reflection": "We don't have to figure out life on our own. The Spirit is like a GPS for the soul, showing us the Truth in a confusing world.",
@@ -3764,7 +3768,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, lead me. I don't want to go my own way; I want to follow Your Truth.",
     "_id": "2027-05-09"
   },
-  "2027-05-10": {
+  {
     "reflection": "Jesus doesn't just \"replace\" our sorrow; He \"turns\" it into joy—using the very trial itself to produce a greater blessing.",
     "question": "Can I trust that God is currently \"recycling\" my pain into something beautiful?",
     "theme": "Perspective",
@@ -3774,7 +3778,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-10",
     "_id": "2027-05-10"
   },
-  "2027-05-11": {
+  {
     "reflection": "Jesus doesn't promise an easy life, but He does promise a victorious one. The \"World\" has already been defeated by our King.",
     "question": "Why am I letting a \"defeated enemy\" (the world’s pressure) steal my peace today?",
     "theme": "Victory",
@@ -3784,7 +3788,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-11",
     "_id": "2027-05-11"
   },
-  "2027-05-12": {
+  {
     "theme": "Intimacy",
     "question": "Am I more focused on getting to \"heaven,\" or on getting to \"know God\" right now?",
     "reflection": "Eternal life isn't just about \"duration\" (living forever); it’s about \"relation\" (knowing God). It starts the moment you trust Him.",
@@ -3794,7 +3798,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-12",
     "_id": "2027-05-12"
   },
-  "2027-05-13": {
+  {
     "theme": "Faithful",
     "question": "Am I distracted by \"good\" things while neglecting the \"assigned\" things God has for me?",
     "reflection": "Jesus didn't do everything everyone wanted Him to do; He did what God gave Him to do. Success is finishing God's specific assignment.",
@@ -3804,7 +3808,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, help me to be faithful to the specific work You’ve put in my hands today.",
     "_id": "2027-05-13"
   },
-  "2027-05-14": {
+  {
     "reflection": "You are under the constant, vigilant guard of the Savior. He is more committed to keeping you than you are to keeping yourself.",
     "question": "Do I feel \"vulnerable\" today, or do I feel \"guarded\" by the power of God's name?",
     "theme": "Protection",
@@ -3814,7 +3818,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-14",
     "_id": "2027-05-14"
   },
-  "2027-05-15": {
+  {
     "reflection": "To be \"sanctified\" is to be set apart for a special purpose. God uses His Word to wash us and prepare us for His use.",
     "question": "How much of God's Truth am I \"soaking\" in to counteract the lies of the world?",
     "theme": "Holiness",
@@ -3824,7 +3828,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-15",
     "_id": "2027-05-15"
   },
-  "2027-05-16": {
+  {
     "reflection": "We aren't called to hide in a holy bubble. We are sent into the mess of the world with the same mission and authority that Jesus had.",
     "question": "Where am I being \"sent\" today—at work, in my neighborhood, or at home?",
     "theme": "Mission",
@@ -3834,7 +3838,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I go as Your ambassador. Help me to represent You well in the world today.",
     "_id": "2027-05-16"
   },
-  "2027-05-17": {
+  {
     "reflection": "Our unity as Christians is the greatest evidence that Jesus was sent by God. Division among believers silences our witness.",
     "question": "Am I contributing to the \"unity\" of the body of Christ, or am I being divisive or critical?",
     "theme": "Unity",
@@ -3844,7 +3848,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-17",
     "_id": "2027-05-17"
   },
-  "2027-05-18": {
+  {
     "reflection": "This is Jesus’ deepest desire: to have you with Him. You aren't just an afterthought; you are the object of His longing.",
     "question": "How does it feel to know that Jesus actually wants me to be with Him forever?",
     "theme": "Home",
@@ -3854,7 +3858,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-18",
     "_id": "2027-05-18"
   },
-  "2027-05-19": {
+  {
     "reflection": "The very same love the Father has for the perfect Son is now placed inside of you. You are loved with a \"divine\" intensity.",
     "question": "Can I fathom that the Father loves me just as much as He loves Jesus?",
     "theme": "Revelation",
@@ -3864,7 +3868,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-19",
     "_id": "2027-05-19"
   },
-  "2027-05-20": {
+  {
     "theme": "Surrender",
     "question": "When I see trouble coming, do I shrink back in fear or step forward in faith and surrender?",
     "reflection": "Jesus wasn't a victim of circumstances. He knew exactly what was coming and stepped forward willingly to meet it.",
@@ -3874,7 +3878,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me the courage of Christ. Help me to face my trials with trust in Your plan.",
     "_id": "2027-05-20"
   },
-  "2027-05-21": {
+  {
     "reflection": "Even in the moment of His arrest, Jesus' words carried the weight of deity. He allowed them to arrest Him; they didn't \"overpower\" Him.",
     "question": "Do I remember that my Savior is in total control even when things look like they are falling apart?",
     "theme": "Authority",
@@ -3884,7 +3888,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are the great I AM. I submit to Your authority and trust Your sovereign power.",
     "_id": "2027-05-21"
   },
-  "2027-05-22": {
+  {
     "theme": "Protection",
     "question": "Am I aware of the many ways Jesus has shielded me from things I couldn't handle?",
     "reflection": "Even in His darkest hour, Jesus was looking out for His friends. He took the blow so they (and we) could go free.",
@@ -3894,7 +3898,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Savior, thank You for being my Shield. Thank You for taking the \"arrest\" that I deserved.",
     "_id": "2027-05-22"
   },
-  "2027-05-23": {
+  {
     "reflection": "Peter wanted to fight; Jesus wanted to obey. Sometimes the \"cup\" God gives us is bitter, but it is always for a greater purpose.",
     "question": "Am I trying to \"fight\" my way out of a situation that God wants me to \"walk\" through?",
     "theme": "Submission",
@@ -3904,7 +3908,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-23",
     "_id": "2027-05-23"
   },
-  "2027-05-24": {
+  {
     "reflection": "It's easy to follow in the crowd; it's hard to follow in the courtyard of the enemy. Our faith is truly tested in the places where it's unpopular.",
     "question": "Where is it hardest for me to \"follow Jesus\" right now?",
     "theme": "Courage",
@@ -3914,7 +3918,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me a bold and consistent faith that doesn't hide when things get difficult.",
     "_id": "2027-05-24"
   },
-  "2027-05-25": {
+  {
     "theme": "Failure",
     "question": "Have I \"denied\" knowing Jesus recently through my silence or my actions?",
     "reflection": "Peter's \"I am not\" stands in painful contrast to Jesus' \"I am.\" Fear can make us say things we never thought we would.",
@@ -3924,7 +3928,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-25",
     "_id": "2027-05-25"
   },
-  "2027-05-26": {
+  {
     "theme": "Integrity",
     "question": "Is there any \"secrecy\" in my life that would be embarrassed by the light of Truth?",
     "reflection": "Jesus had nothing to hide. Truth doesn't fear investigation. As His followers, our lives should be transparent and consistent.",
@@ -3934,7 +3938,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, make me a person of integrity. May my \"open\" life match my \"private\" life.",
     "_id": "2027-05-26"
   },
-  "2027-05-27": {
+  {
     "reflection": "Failure often happens in a series. We think we are strong until we are tested by the \"cold\" of the world. But failure isn't the end.",
     "question": "When I fail, do I run away from God in shame, or to Him for restoration?",
     "theme": "Weakness",
@@ -3944,7 +3948,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You that my failures do not surprise You. Thank You for Your restoring grace.",
     "_id": "2027-05-27"
   },
-  "2027-05-28": {
+  {
     "theme": "Blindness",
     "question": "Am I obsessing over small \"religious rules\" while ignoring the weightier matters of love and justice?",
     "reflection": "The leaders were worried about \"ritual defilement\" while they were murdering the Son of God. We can be very \"religious\" and still very wicked.",
@@ -3954,7 +3958,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, save me from hypocrisy. Cleanse my heart, not just my outward \"rituals.\"",
     "_id": "2027-05-28"
   },
-  "2027-05-29": {
+  {
     "theme": "Kingdom",
     "question": "Am I trying to use \"worldy\" methods to accomplish \"Godly\" goals?",
     "reflection": "Jesus' kingdom doesn't operate on power, politics, or violence. It operates on truth, love, and sacrifice.",
@@ -3964,7 +3968,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-29",
     "_id": "2027-05-29"
   },
-  "2027-05-30": {
+  {
     "theme": "Reality",
     "question": "Am I seeking \"Truth\" as an abstract idea, or am I seeking to know the Person of Jesus?",
     "reflection": "Truth was standing right in front of Pilate, but he was too cynical to see it. Truth isn't just a concept; it’s a Person.",
@@ -3974,7 +3978,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, You are the Truth. Open my eyes to see You clearly in the midst of the world's lies.",
     "_id": "2027-05-30"
   },
-  "2027-05-31": {
+  {
     "reflection": "Barabbas was a guilty rebel; Jesus was the innocent King. The guilty man walked free because the innocent Man stayed bound. That is the Gospel story.",
     "question": "Do I realize that I am \"Barabbas\"—the one who was set free at the expense of Jesus?",
     "theme": "Substitution",
@@ -3984,7 +3988,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-05-31",
     "_id": "2027-05-31"
   },
-  "2027-06-01": {
+  {
     "theme": "Suffering",
     "question": "When I feel shamed or mocked, do I \"behold\" the Man who suffered far worse for me?",
     "reflection": "Jesus was mocked, beaten, and shamed. He took the ultimate humiliation so that we could be clothed in His honor.",
@@ -3994,7 +3998,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-01",
     "_id": "2027-06-01"
   },
-  "2027-06-02": {
+  {
     "reflection": "Even the most powerful human leaders are only on a \"leash\" held by God. No one can move against you without God's permission.",
     "question": "How does God's sovereignty over \"human authority\" give me peace in a turbulent world?",
     "theme": "Sovereignty",
@@ -4004,7 +4008,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I trust that You are the King of Kings. No power on earth is greater than Yours.",
     "_id": "2027-06-02"
   },
-  "2027-06-03": {
+  {
     "reflection": "Pilate knew Jesus was innocent, but he was more afraid of the crowd than he was of the truth.",
     "question": "Am I making decisions based on what is \"right\" or based on what will \"keep the peace\"?",
     "theme": "Pressure",
@@ -4014,7 +4018,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-03",
     "_id": "2027-06-03"
   },
-  "2027-06-04": {
+  {
     "reflection": "Jesus carried the instrument of His own execution. He shouldered the weight of our sin and the wooden beam without complaint.",
     "question": "What \"cross\" am I complaining about today that Jesus is asking me to bear with His strength?",
     "theme": "Strength",
@@ -4024,7 +4028,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for carrying the heaviest cross. Give me the grace to carry mine today.",
     "_id": "2027-06-04"
   },
-  "2027-06-05": {
+  {
     "reflection": "Jesus was crucified in a place of death to bring us to a place of life. He met us at our lowest point to raise us to His highest.",
     "question": "Am I willing to meet Jesus at the \"hard places\" of life?",
     "theme": "Sacrifice",
@@ -4034,7 +4038,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for the cross. Thank You for meeting me in the \"place of death\" and bringing me life.",
     "_id": "2027-06-05"
   },
-  "2027-06-06": {
+  {
     "reflection": "Even a pagan governor spoke the truth: Jesus is the King. It was written in three languages so the whole world could see.",
     "question": "Is Jesus the \"King\" of my life in every \"language\"—my thoughts, my words, and my money?",
     "theme": "Finality",
@@ -4044,7 +4048,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-06",
     "_id": "2027-06-06"
   },
-  "2027-06-07": {
+  {
     "theme": "Providence",
     "question": "Do I trust that God is in the \"small details\" of my life, even when things look messy?",
     "reflection": "Even the smallest details of the crucifixion were fulfillments of ancient prophecy. Nothing was happening by accident.",
@@ -4054,7 +4058,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for Your meticulous providence. I trust that You are in control of every detail.",
     "_id": "2027-06-07"
   },
-  "2027-06-08": {
+  {
     "reflection": "Even while dying for the sins of the world, Jesus ensured His mother was cared for. He is never too busy for the needs of His family.",
     "question": "How can I better care for the \"family\" of God around me today?",
     "theme": "Care",
@@ -4064,7 +4068,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-08",
     "_id": "2027-06-08"
   },
-  "2027-06-09": {
+  {
     "reflection": "The One who created the oceans and offered \"Living Water\" experienced the agony of human thirst. He truly understands our physical needs.",
     "question": "Do I bring my physical needs and \"thirsts\" to the One who suffered thirst for me?",
     "theme": "Humanity",
@@ -4074,7 +4078,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for Your shared humanity. You know my needs before I even ask.",
     "_id": "2027-06-09"
   },
-  "2027-06-10": {
+  {
     "theme": "Completion",
     "question": "Am I still trying to \"finish\" a work that Jesus already completed 2,000 years ago?",
     "reflection": "The debt is paid. The work is done. You don't have to work for your salvation; you work from it.",
@@ -4084,7 +4088,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-10",
     "_id": "2027-06-10"
   },
-  "2027-06-11": {
+  {
     "reflection": "Jesus was the perfect Passover Lamb. God’s timing and His Word are always perfect, down to the very last detail.",
     "question": "Can I trust God's timing for my life, even when I am \"waiting\" for a promise to be fulfilled?",
     "theme": "Prophecy",
@@ -4094,7 +4098,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, Your Word is true and Your timing is perfect. I wait on You with hope.",
     "_id": "2027-06-11"
   },
-  "2027-06-12": {
+  {
     "theme": "Reality",
     "question": "Do I realize the physical cost Jesus paid to ensure my spiritual wholeness?",
     "reflection": "This physical detail confirms Jesus' death and points to the \"cleansing\" of our sins. He was pierced so that we could be made whole.",
@@ -4104,7 +4108,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for the blood and the water. Thank You for the sacrifice that heals me.",
     "_id": "2027-06-12"
   },
-  "2027-06-13": {
+  {
     "theme": "Courage",
     "question": "Is it time for me to take my \"secret\" faith and make it public?",
     "reflection": "The cross turned \"secret\" disciples into bold ones. Sometimes the greatest trials are what finally bring our faith into the open.",
@@ -4114,7 +4118,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me the courage of Joseph and Nicodemus. I am not ashamed of the Gospel.",
     "_id": "2027-06-13"
   },
-  "2027-06-14": {
+  {
     "theme": "Honor",
     "question": "Do I see the \"tombs\" in my life as final endings, or as gardens where God is preparing something new?",
     "reflection": "Jesus was buried with honor, fitting for a King. The garden of burial would soon become the garden of resurrection.",
@@ -4124,7 +4128,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-14",
     "_id": "2027-06-14"
   },
-  "2027-06-15": {
+  {
     "theme": "Anticipation",
     "question": "Am I seeking Jesus \"early\"—making Him the first priority of my day and my heart?",
     "reflection": "Mary came seeking a dead body; she was about to find a Living Lord. Our greatest surprises often happen when we are at our lowest.",
@@ -4134,7 +4138,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-15",
     "_id": "2027-06-15"
   },
-  "2027-06-16": {
+  {
     "theme": "Evidence",
     "question": "Do I see the \"evidence\" of God's work in my life, or am I missing the signs He's left for me?",
     "reflection": "Grave robbers don't stop to fold the laundry. The folded cloth was a \"calling card\" that Jesus had calmly and powerfully risen.",
@@ -4144,7 +4148,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, open my eyes to see Your hand at work. Thank You for the \"folded cloths\" in my own story.",
     "_id": "2027-06-16"
   },
-  "2027-06-17": {
+  {
     "reflection": "John didn't need to see Jesus yet; he just needed to see the empty tomb. Faith is often seeing what God isn't doing (the empty space) to realize what He has done.",
     "question": "Do I believe God’s promises even when I haven't seen the \"physical manifestation\" of them yet?",
     "theme": "Faith",
@@ -4154,7 +4158,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-17",
     "_id": "2027-06-17"
   },
-  "2027-06-18": {
+  {
     "reflection": "Heaven is concerned with our tears. Even in the middle of the greatest event in history, God stopped to comfort one grieving woman.",
     "question": "Do I believe that my personal grief matters to the King of the Universe?",
     "theme": "Comfort",
@@ -4164,7 +4168,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for caring about my tears. Comfort my heart today with Your presence.",
     "_id": "2027-06-18"
   },
-  "2027-06-19": {
+  {
     "theme": "Recognition",
     "question": "When I hear the \"whisper\" of God in my heart, do I recognize it as my Savior calling my name?",
     "reflection": "All it took was one word—her name. The Good Shepherd knows His sheep by name. He is calling you today just as personally.",
@@ -4174,7 +4178,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-19",
     "_id": "2027-06-19"
   },
-  "2027-06-20": {
+  {
     "theme": "Adoption",
     "question": "Do I relate to God as a distant \"Deity\" or as \"My Father\"?",
     "reflection": "Because of the resurrection, Jesus’ Father is now our Father. We are brought into the very same family intimacy that Jesus enjoys.",
@@ -4184,7 +4188,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-20",
     "_id": "2027-06-20"
   },
-  "2027-06-21": {
+  {
     "reflection": "The disciples were hiding in fear; Jesus entered through the locked doors to bring peace. No \"locked door\" in your life can keep Jesus out.",
     "question": "What \"locked door\" of fear or shame am I hiding behind today?",
     "theme": "Reassurance",
@@ -4194,7 +4198,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-21",
     "_id": "2027-06-21"
   },
-  "2027-06-22": {
+  {
     "theme": "Commission",
     "question": "How can I \"live sent\" today in my ordinary interactions?",
     "reflection": "Our mission is a continuation of Jesus' mission. We are sent with the same purpose: to show the world the love and truth of God.",
@@ -4204,7 +4208,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-22",
     "_id": "2027-06-22"
   },
-  "2027-06-23": {
+  {
     "theme": "Power",
     "question": "Am I living by my own \"breath\" (effort) or by the \"Spirit's breath\" (power) today?",
     "reflection": "The same breath that gave life to Adam now gives spiritual life to the Church. We have the very \"breath of God\" inside us.",
@@ -4214,7 +4218,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-23",
     "_id": "2027-06-23"
   },
-  "2027-06-24": {
+  {
     "theme": "Doubt",
     "question": "Am I being \"honest\" with God about my doubts, or am I pretending to have it all together?",
     "reflection": "Thomas wasn't a \"bad\" disciple; he was just honest about his struggle. Jesus is patient with our honest doubts and questions.",
@@ -4224,7 +4228,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-24",
     "_id": "2027-06-24"
   },
-  "2027-06-25": {
+  {
     "theme": "Confession",
     "question": "Is Jesus just \"a\" Lord, or is He truly \"my\" Lord and \"my\" God today?",
     "reflection": "Jesus showed Thomas His wounds, and Thomas's doubt melted into worship. Our scars and Jesus' scars often become the place where faith is born.",
@@ -4234,7 +4238,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-25",
     "_id": "2027-06-25"
   },
-  "2027-06-26": {
+  {
     "reflection": "That’s us! We live in the \"blessing\" of believing based on the testimony of others and the work of the Spirit. Our faith is precious to God.",
     "question": "Do I realize that my \"blind\" faith is actually considered a special blessing by Jesus?",
     "theme": "Faith",
@@ -4244,7 +4248,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-26",
     "_id": "2027-06-26"
   },
-  "2027-06-27": {
+  {
     "reflection": "The whole point of the Gospel of John is life. Not just \"existing,\" but the vibrant, abundant life of God's Kingdom.",
     "question": "Is the \"life\" of Jesus growing in me as I read and believe His Word?",
     "theme": "Purpose",
@@ -4254,7 +4258,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-27",
     "_id": "2027-06-27"
   },
-  "2027-06-28": {
+  {
     "theme": "Backsliding",
     "question": "Am I drifting back to old habits because I’m \"waiting\" on God or feeling uncertain?",
     "reflection": "When we don't know what to do, we often drift back to our old, comfortable habits. But Jesus has something better than \"fishing\" for us.",
@@ -4264,7 +4268,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, keep me from drifting. Help me to wait on You rather than going back to my old ways.",
     "_id": "2027-06-28"
   },
-  "2027-06-29": {
+  {
     "theme": "Provision",
     "question": "Am I willing to admit \"No, I don't have it\" so that Jesus can provide what I need?",
     "reflection": "Jesus often meets us in our \"failure\" to remind us that we need Him. He asks the question to make us realize our own insufficiency.",
@@ -4274,7 +4278,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-29",
     "_id": "2027-06-29"
   },
-  "2027-06-30": {
+  {
     "theme": "Obedience",
     "question": "Am I stubbornly fishing on the \"left side\" when Jesus is telling me to cast on the \"right\"?",
     "reflection": "Sometimes the difference between \"nothing\" and \"abundance\" is just a small adjustment made in obedience to Jesus' voice.",
@@ -4284,7 +4288,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-06-30",
     "_id": "2027-06-30"
   },
-  "2027-07-01": {
+  {
     "theme": "Recognition",
     "question": "How many \"God-moments\" did I miss yesterday because I didn't recognize His hand?",
     "reflection": "John recognized Jesus not by His face, but by the miracle. When we see grace and provision, our first thought should be, \"It is the Lord!\"",
@@ -4294,7 +4298,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-01",
     "_id": "2027-07-01"
   },
-  "2027-07-02": {
+  {
     "reflection": "Jesus is interested in our spiritual life, but He also cares that we are hungry and tired. He is the God of the practical and the physical.",
     "question": "Do I let Jesus care for my \"body\" (rest, food, health) or do I think He only cares about my \"soul\"?",
     "theme": "Provision",
@@ -4304,7 +4308,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for Your practical care. Help me to rest and receive Your provision today.",
     "_id": "2027-07-02"
   },
-  "2027-07-03": {
+  {
     "theme": "Heart",
     "question": "If Jesus asked me this morning, \"Do you love Me?\", what would be my honest response?",
     "reflection": "Jesus doesn't ask Peter \"Why did you fail?\" He asks \"Do you love me?\" Love is the only foundation for true service.",
@@ -4314,7 +4318,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-03",
     "_id": "2027-07-03"
   },
-  "2027-07-04": {
+  {
     "theme": "Responsibility",
     "question": "Who are the \"lambs\" in my life that Jesus is asking me to \"feed\" with encouragement or truth?",
     "reflection": "Our love for Jesus is proven by how we care for His people. Service is the natural overflow of a heart that loves the Savior.",
@@ -4324,7 +4328,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-04",
     "_id": "2027-07-04"
   },
-  "2027-07-05": {
+  {
     "reflection": "This was the same call Peter heard at the beginning. Failure doesn't cancel your calling; it just prepares you for a deeper following.",
     "question": "Am I letting a past failure stop me from following Jesus today, or will I accept His restoration?",
     "theme": "Restoration",
@@ -4334,7 +4338,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-05",
     "_id": "2027-07-05"
   },
-  "2027-07-06": {
+  {
     "reflection": "We often get distracted by God's plan for others. Jesus' response is always: \"What is that to you? You follow me!\"",
     "question": "Am I wasting energy comparing my journey to someone else's instead of focusing on my own call?",
     "theme": "Comparison",
@@ -4344,7 +4348,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-06",
     "_id": "2027-07-06"
   },
-  "2027-07-07": {
+  {
     "reflection": "John ends by reminding us that Jesus is bigger than any book. His work in the world is ongoing and infinite.",
     "question": "Do I realize that Jesus is still \"writing\" stories of grace today, and my life is one of the pages?",
     "theme": "Infinity",
@@ -4354,7 +4358,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-07",
     "_id": "2027-07-07"
   },
-  "2027-07-08": {
+  {
     "theme": "Origins",
     "question": "Is Jesus the \"Beginning\" of my decisions today, or do I bring Him in as an afterthought?",
     "reflection": "Returning to the start: Everything begins with Jesus. He is the logic and the reason behind the entire universe.",
@@ -4364,7 +4368,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Eternal Word, be the start of all my thoughts and the foundation of all my plans today.",
     "_id": "2027-07-08"
   },
-  "2027-07-09": {
+  {
     "reflection": "There are many \"false lights\" (fame, money, self-help). Only Jesus is the \"True Light\" that reveals things as they really are.",
     "question": "What \"false light\" have I been following that has led me into a dead end?",
     "theme": "Clarity",
@@ -4374,7 +4378,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, shine Your true light into my heart. Clear away the fog and show me the right path.",
     "_id": "2027-07-09"
   },
-  "2027-07-10": {
+  {
     "reflection": "We don't have to live on \"spiritual crumbs.\" In Christ, there is a fullness of peace, joy, and strength available to us.",
     "question": "Am I living out of a sense of \"scarcity\" or out of Christ's \"fullness\" today?",
     "theme": "Satisfaction",
@@ -4384,7 +4388,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I draw from Your fullness. Fill my cup until it overflows with Your grace.",
     "_id": "2027-07-10"
   },
-  "2027-07-11": {
+  {
     "theme": "Purpose",
     "question": "How can I use my \"voice\" today to stand up for truth or point someone toward hope?",
     "reflection": "You don't have to be the \"Messiah\" to be significant. Being a \"voice\" for the Truth is a high and holy calling.",
@@ -4394,7 +4398,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-11",
     "_id": "2027-07-11"
   },
-  "2027-07-12": {
+  {
     "theme": "Abiding",
     "question": "Have I scheduled \"staying time\" with Jesus today, or just \"request time\"?",
     "reflection": "The disciples didn't just want information; they wanted proximity. Transformation happens when we \"stay\" where Jesus is.",
@@ -4404,7 +4408,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-12",
     "_id": "2027-07-12"
   },
-  "2027-07-13": {
+  {
     "reflection": "Jesus is the bridge between heaven and earth. When we are with Him, we have access to the resources of heaven.",
     "question": "Do I live like \"heaven is open\" to me, or do I feel like the ceiling is closed?",
     "theme": "Perspective",
@@ -4414,7 +4418,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the open heaven. I rely on Your heavenly strength for my earthly tasks.",
     "_id": "2027-07-13"
   },
-  "2027-07-14": {
+  {
     "reflection": "Miracles often begin with very ordinary, even boring, tasks. Obedience in the \"small\" leads to the manifestation of the \"great.\"",
     "question": "What \"mundane\" task is God asking me to do faithfully today?",
     "theme": "Obedience",
@@ -4424,7 +4428,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-14",
     "_id": "2027-07-14"
   },
-  "2027-07-15": {
+  {
     "reflection": "The Christian life isn't about \"fixing\" the old self, but receiving a brand-new nature from God.",
     "question": "Am I trying to \"remodel\" my old habits, or am I leaning into the \"new person\" I am in Christ?",
     "theme": "Transformation",
@@ -4434,7 +4438,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, renew me. Let the \"new life\" of the Spirit be visible in my temper and my talk today.",
     "_id": "2027-07-15"
   },
-  "2027-07-16": {
+  {
     "theme": "Assurance",
     "question": "When I feel worthless, do I look at the \"price tag\" God put on me (His own Son)?",
     "reflection": "This verse never gets old. It is the ultimate insurance of our worth. We are worth the life of the Son of God.",
@@ -4444,7 +4448,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for loving me with an everlasting love. I am secure in Your affection.",
     "_id": "2027-07-16"
   },
-  "2027-07-17": {
+  {
     "reflection": "Walking in the light means we don't have to maintain a \"mask.\" There is immense freedom in being fully known and fully loved.",
     "question": "Is there a \"mask\" I am wearing today that I can take off in the presence of God?",
     "theme": "Exposure",
@@ -4454,7 +4458,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I come to the light. Thank You that I don't have to hide from You.",
     "_id": "2027-07-17"
   },
-  "2027-07-18": {
+  {
     "reflection": "True joy is found in the \"backseat.\" When Jesus is in the driver's seat, the pressure is off, and our joy is full.",
     "question": "Where am I trying to \"increase\" my own status instead of letting Jesus increase?",
     "theme": "Contentment",
@@ -4464,7 +4468,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-18",
     "_id": "2027-07-18"
   },
-  "2027-07-19": {
+  {
     "theme": "Prejudice",
     "question": "Is there a \"type\" of person I am avoiding, and would Jesus want me to reach out to them?",
     "reflection": "Jesus intentionally broke social \"rules\" to save a soul. His love is more important than our comfort zones or traditions.",
@@ -4474,7 +4478,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, give me Your heart for the \"outsiders.\" Help me to love without borders.",
     "_id": "2027-07-19"
   },
-  "2027-07-20": {
+  {
     "reflection": "Everything the world offers has a \"re-thirst\" factor. Only the \"Living Water\" of Christ satisfies the soul's deep ache.",
     "question": "What am I currently using to try and quench my thirst that isn't working?",
     "theme": "Longing",
@@ -4484,7 +4488,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are my Living Water. Satisfy my soul today so I don't go hunting for broken cisterns.",
     "_id": "2027-07-20"
   },
-  "2027-07-21": {
+  {
     "reflection": "We find energy when we align our actions with God's purposes. Living \"on mission\" is the most nourishing way to exist.",
     "question": "What \"task\" for God could I do today that would actually energize my soul?",
     "theme": "Motivation",
@@ -4494,7 +4498,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-21",
     "_id": "2027-07-21"
   },
-  "2027-07-22": {
+  {
     "theme": "Vision",
     "question": "Who is standing right in front of me today that might be ready for a word of hope?",
     "reflection": "We often wait for the \"perfect time\" to share our faith. Jesus says the time is already here; we just need to look up.",
@@ -4504,7 +4508,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-22",
     "_id": "2027-07-22"
   },
-  "2027-07-23": {
+  {
     "reflection": "Success in the Kingdom is a team sport. We don't need the credit; we just need to be faithful in our part of the process.",
     "question": "Can I be happy for someone else's \"harvest\" today, even if I’m only \"sowing\" in the dirt?",
     "theme": "Teamwork",
@@ -4514,7 +4518,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-23",
     "_id": "2027-07-23"
   },
-  "2027-07-24": {
+  {
     "theme": "Power",
     "question": "What \"system\" or \"method\" am I leaning on that Jesus wants to replace with His power?",
     "reflection": "Jesus bypasses human methods and systems to bring direct healing. His word is the only thing that carries ultimate authority.",
@@ -4524,7 +4528,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I hear Your command. I get up and walk in the strength You provide.",
     "_id": "2027-07-24"
   },
-  "2027-07-25": {
+  {
     "theme": "Imitation",
     "question": "Am I trying to \"start\" things on my own today, or am I watching for where the Father is moving?",
     "reflection": "This is the secret to a stress-free life: only doing what we see the Father doing. We are responders, not originators.",
@@ -4534,7 +4538,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-25",
     "_id": "2027-07-25"
   },
-  "2027-07-26": {
+  {
     "theme": "Focus",
     "question": "Is my Bible reading today about \"checking a box\" or \"finding a Friend\"?",
     "reflection": "Bible study is only effective if it leads us to the Person of Jesus. Don't miss the Shepherd while studying the Map.",
@@ -4544,7 +4548,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-26",
     "_id": "2027-07-26"
   },
-  "2027-07-27": {
+  {
     "reflection": "God doesn't need \"much\" to do \"miracles.\" He just needs \"all\" of what you have, no matter how small it is.",
     "question": "What \"small\" resource (money, 10 minutes, a smile) can I hand over to Jesus today?",
     "theme": "Multiplication",
@@ -4554,7 +4558,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-27",
     "_id": "2027-07-27"
   },
-  "2027-07-28": {
+  {
     "reflection": "We need Jesus every single day, just like we need food. Yesterday’s \"manna\" won't sustain today’s challenges.",
     "question": "Have I come to the \"Table\" of Christ yet today to get the strength I need?",
     "theme": "Daily",
@@ -4564,7 +4568,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-28",
     "_id": "2027-07-28"
   },
-  "2027-07-29": {
+  {
     "theme": "Security",
     "question": "What is holding me back from \"coming\" to Jesus right now? Is it fear or shame?",
     "reflection": "God’s door is always open. You don't have to \"clean up\" to come to Him; you come to Him to be cleaned.",
@@ -4574,7 +4578,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-29",
     "_id": "2027-07-29"
   },
-  "2027-07-30": {
+  {
     "reflection": "The world's words are often empty or toxic. Only Jesus' words have the power to feed the soul for eternity.",
     "question": "What \"voices\" am I listening to today that are stealing my peace instead of giving me life?",
     "theme": "Soul-Food",
@@ -4584,7 +4588,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-07-30",
     "_id": "2027-07-30"
   },
-  "2027-07-31": {
+  {
     "reflection": "We aren't meant to be \"reservoirs\" that hold grace, but \"channels\" that pass it on. The more we give, the more we flow.",
     "question": "Who can I \"flow\" toward today with a word of kindness or an act of service?",
     "theme": "Impact",
@@ -4594,7 +4598,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, flow through me. Don't let me be a stagnant pond; make me a refreshing river.",
     "_id": "2027-07-31"
   },
-  "2027-08-01": {
+  {
     "reflection": "We often want a \"floodlight\" for the next ten years. Jesus gives us a \"lamp\" for the next ten minutes.",
     "question": "Can I trust Jesus with the \"next step\" even if I can't see the destination yet?",
     "theme": "Guidance",
@@ -4604,7 +4608,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-01",
     "_id": "2027-08-01"
   },
-  "2027-08-02": {
+  {
     "reflection": "Freedom isn't the ability to do \"whatever we want\"; it's the power to do \"what is right.\" True liberty is found in Christ.",
     "question": "What \"chain\" of habit or thought am I still dragging around that the Son has already broken?",
     "theme": "Liberty",
@@ -4614,7 +4618,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-02",
     "_id": "2027-08-02"
   },
-  "2027-08-03": {
+  {
     "reflection": "Jesus is the \"Great I AM.\" He is not bound by time or limited by our \"now.\" He is already in our \"tomorrow.\"",
     "question": "How does it comfort me to know that the \"I AM\" is already standing in my future?",
     "theme": "Eternity",
@@ -4624,7 +4628,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I worship You as the Eternal One. Thank You for being the same yesterday, today, and forever.",
     "_id": "2027-08-03"
   },
-  "2027-08-04": {
+  {
     "reflection": "Our struggles aren't always because we did something wrong. Sometimes they are the \"canvas\" God is using to paint a miracle.",
     "question": "Can I view my current \"problem\" as a potential display for God's glory?",
     "theme": "Hardship",
@@ -4634,7 +4638,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, let Your works be seen in my life. Transform my trials into a testimony of Your power.",
     "_id": "2027-08-04"
   },
-  "2027-08-05": {
+  {
     "theme": "Testimony",
     "question": "What is the \"one thing\" I can tell someone today about how Jesus has changed my life?",
     "reflection": "You don't need all the answers to be a witness. You just need to be honest about the \"one thing\" Jesus has done for you.",
@@ -4644,7 +4648,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-05",
     "_id": "2027-08-05"
   },
-  "2027-08-06": {
+  {
     "reflection": "Jesus is the only way to safety and the only way to \"green pastures.\" He is the gatekeeper of our souls.",
     "question": "Am I trying to find \"pasture\" (satisfaction) through a door other than Jesus?",
     "theme": "Access",
@@ -4654,7 +4658,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-06",
     "_id": "2027-08-06"
   },
-  "2027-08-07": {
+  {
     "reflection": "Abundance isn't about \"stuff\"; it's about a \"connection.\" Life is abundant when it is filled with the presence of God.",
     "question": "Is my life \"abundant\" today, or am I letting the \"thief\" (stress, comparison) steal my joy?",
     "theme": "Quality",
@@ -4664,7 +4668,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-07",
     "_id": "2027-08-07"
   },
-  "2027-08-08": {
+  {
     "theme": "Care",
     "question": "Do I feel safe under the Shepherd's care, or am I constantly \"bleating\" in worry?",
     "reflection": "A good shepherd doesn't just \"watch\" the sheep; he \"protects\" them at his own expense. You are worth everything to Him.",
@@ -4674,7 +4678,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-08",
     "_id": "2027-08-08"
   },
-  "2027-08-09": {
+  {
     "theme": "Safety",
     "question": "When I feel like \"letting go,\" do I remember that He is the one holding me?",
     "reflection": "We are not holding onto God; He is holding onto us. And His grip is stronger than our struggle.",
@@ -4684,7 +4688,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for Your firm grip. I rest in the security of being held by You.",
     "_id": "2027-08-09"
   },
-  "2027-08-10": {
+  {
     "reflection": "Resurrection isn't just a future event; it's a present Person. Jesus can bring \"life\" to any dead situation right now.",
     "question": "What \"dead\" dream or relationship am I ready to bring to the \"Resurrection\" today?",
     "theme": "Power",
@@ -4694,7 +4698,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are the Life. Breathe Your resurrection power into my circumstances today.",
     "_id": "2027-08-10"
   },
-  "2027-08-11": {
+  {
     "reflection": "God is not a cold machine. He has a heart that breaks with yours. Your pain is felt at the highest levels of heaven.",
     "question": "Do I share my sorrows with Jesus, or do I try to be \"strong\" and hide them?",
     "theme": "Compassion",
@@ -4704,7 +4708,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for weeping with me. It helps to know that You truly care about my heart.",
     "_id": "2027-08-11"
   },
-  "2027-08-12": {
+  {
     "reflection": "God does the miracle, but He often asks us to do the \"manual labor\" of faith first. Move the stone, and watch Him work.",
     "question": "What \"stone\" of fear or disobedience is Jesus asking me to move today?",
     "theme": "Cooperation",
@@ -4714,7 +4718,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-12",
     "_id": "2027-08-12"
   },
-  "2027-08-13": {
+  {
     "reflection": "Once we are given life, we need others to help us get out of our \"grave clothes.\" We are called to help each other walk in freedom.",
     "question": "Who can I help \"unbind\" today by offering forgiveness, a listening ear, or a word of truth?",
     "theme": "Community",
@@ -4724,7 +4728,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, use me to help others walk in freedom. Show me how to be an \"unbinder\" in my church and family.",
     "_id": "2027-08-13"
   },
-  "2027-08-14": {
+  {
     "reflection": "Our worship shouldn't be \"stingy.\" God deserves our best time, our best energy, and our best resources.",
     "question": "Is my \"offering\" to God today a leftover, or is it the \"best of the jar\"?",
     "theme": "Devotion",
@@ -4734,7 +4738,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are worth it all. I offer You my heart and my day as a sweet-smelling sacrifice.",
     "_id": "2027-08-14"
   },
-  "2027-08-15": {
+  {
     "reflection": "We cannot have \"resurrection\" without a \"crucifixion.\" Letting go of our own way is the only way to see God's way grow.",
     "question": "What am I \"holding onto\" so tightly that it is preventing new life from sprouting?",
     "theme": "Growth",
@@ -4744,7 +4748,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-15",
     "_id": "2027-08-15"
   },
-  "2027-08-16": {
+  {
     "theme": "Attraction",
     "question": "Am I lifting up the \"cross\" in my life, or am I trying to be the attraction myself?",
     "reflection": "The cross is the most attractive force in the universe. We don't need \"gimmicks\" to reach people; we just need to show them the cross.",
@@ -4754,7 +4758,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-16",
     "_id": "2027-08-16"
   },
-  "2027-08-17": {
+  {
     "reflection": "Seeking human applause is a \"thirst\" that can never be quenched. Seeking God's \"well done\" is the only thing that satisfies.",
     "question": "Whose \"applause\" am I chasing today, and is it worth the cost?",
     "theme": "Warning",
@@ -4764,7 +4768,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-17",
     "_id": "2027-08-17"
   },
-  "2027-08-18": {
+  {
     "theme": "Humility",
     "question": "Who can I \"wash the feet\" of today—doing a thankless job for someone else's benefit?",
     "reflection": "If the King of the Universe washes feet, no job is \"beneath\" us. True greatness is found in the low places.",
@@ -4774,7 +4778,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, give me Your towel. Help me to serve others with the same humility You showed.",
     "_id": "2027-08-18"
   },
-  "2027-08-19": {
+  {
     "theme": "Intimacy",
     "question": "Am I trying to look \"clean\" for Jesus, or am I letting Him wash the parts of me that are messy?",
     "reflection": "We must be willing to let Jesus see our \"dirty feet\" (our failures) and wash them. Vulnerability is the key to intimacy.",
@@ -4784,7 +4788,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-19",
     "_id": "2027-08-19"
   },
-  "2027-08-20": {
+  {
     "reflection": "Christianity is an \"imitation\" of a Person, not just the \"following\" of a list. We do to others what He did to us.",
     "question": "How would I treat my \"enemies\" today if I followed the example of Jesus washing Judas' feet?",
     "theme": "Example",
@@ -4794,7 +4798,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, help me to love as You loved. Give me the grace to serve even those who might hurt me.",
     "_id": "2027-08-20"
   },
-  "2027-08-21": {
+  {
     "reflection": "Our \"badge\" isn't a cross around our neck; it's the love in our hearts. Kindness is the ultimate apologetic for the Gospel.",
     "question": "Is my \"love\" for other Christians visible enough for an unbeliever to notice?",
     "theme": "Identity",
@@ -4804,7 +4808,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, knit Your people together. Help us to love each other so well that the world takes notice.",
     "_id": "2027-08-21"
   },
-  "2027-08-22": {
+  {
     "theme": "Future",
     "question": "Does the reality of \"Heaven\" make my current \"earthly troubles\" seem smaller?",
     "reflection": "We aren't just \"wandering\" through life. We are headed toward a specific, prepared home. This world is just the waiting room.",
@@ -4814,7 +4818,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-22",
     "_id": "2027-08-22"
   },
-  "2027-08-23": {
+  {
     "reflection": "In a world of \"many paths,\" Jesus is the anchor. He doesn't just \"show\" the way; He is the way.",
     "question": "When I am lost, do I look for a \"map\" or do I look for the \"Person\" of Jesus?",
     "theme": "Clarity",
@@ -4824,7 +4828,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-23",
     "_id": "2027-08-23"
   },
-  "2027-08-24": {
+  {
     "theme": "Presence",
     "question": "How often will I \"check in\" with the Holy Spirit today before I speak or act?",
     "reflection": "We have the \"Spirit of Truth\" living inside our very skin. We are never truly alone, and we are never without counsel.",
@@ -4834,7 +4838,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-24",
     "_id": "2027-08-24"
   },
-  "2027-08-25": {
+  {
     "reflection": "An orphan has no protection and no inheritance. You have both. You are a child of the King, fully claimed and fully loved.",
     "question": "Do I have an \"orphan spirit\" (worried about survival) or a \"son/daughter spirit\" (resting in my Father's wealth)?",
     "theme": "Belonging",
@@ -4844,7 +4848,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-25",
     "_id": "2027-08-25"
   },
-  "2027-08-26": {
+  {
     "theme": "Serenity",
     "question": "Will I \"let\" my heart be troubled today, or will I \"receive\" the peace He has already left for me?",
     "reflection": "Jesus' peace isn't the \"absence of trouble,\" but the \"presence of God\" in the trouble. It is a gift we must choose to receive.",
@@ -4854,7 +4858,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-26",
     "_id": "2027-08-26"
   },
-  "2027-08-27": {
+  {
     "reflection": "This is the ultimate \"power-off\" statement. Any effort we make without Jesus is spiritually zero. Staying connected is our primary job.",
     "question": "How much of my \"striving\" today is actually just \"branch-effort\" instead of \"vine-life\"?",
     "theme": "Connection",
@@ -4864,7 +4868,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-27",
     "_id": "2027-08-27"
   },
-  "2027-08-28": {
+  {
     "reflection": "The standard of our love is the cross. We don't love others because they deserve it; we love them because He loved us first.",
     "question": "Who is the \"hardest\" person for me to love today, and will I love them with \"Jesus-love\"?",
     "theme": "Mandate",
@@ -4874,7 +4878,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, help me to love the unlovable. Give me Your heart for the people around me.",
     "_id": "2027-08-28"
   },
-  "2027-08-29": {
+  {
     "reflection": "The Gospels were just the \"beginning.\" Jesus is still acting and teaching today—but now He does it through you by His Spirit.",
     "question": "Do I realize that my life is a continuation of the \"Acts of Jesus\" in the world today?",
     "theme": "Mission",
@@ -4884,7 +4888,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-29",
     "_id": "2027-08-29"
   },
-  "2027-08-30": {
+  {
     "theme": "Empowerment",
     "question": "Am I asking for God's power just to feel better, or to be a more effective witness for Him?",
     "reflection": "The Spirit’s power isn't for our entertainment; it’s for our assignment. We are empowered specifically to be \"witnesses.\"",
@@ -4894,7 +4898,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-08-30",
     "_id": "2027-08-30"
   },
-  "2027-08-31": {
+  {
     "reflection": "God’s vision is global. He cares about your neighbor and the person on the other side of the planet equally.",
     "question": "How can I broaden my perspective today to care about what God is doing globally?",
     "theme": "Scope",
@@ -4904,7 +4908,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, give me a heart for the nations. Use my prayers and my resources to reach the ends of the earth.",
     "_id": "2027-08-31"
   },
-  "2027-09-01": {
+  {
     "theme": "Action",
     "question": "Am I so focused on the \"future\" return of Christ that I’m neglecting the \"present\" mission of Christ?",
     "reflection": "It’s easy to get caught up in \"spiritual gazing,\" but the angels reminded the disciples that there is work to be done while we wait for His return.",
@@ -4914,7 +4918,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-01",
     "_id": "2027-09-01"
   },
-  "2027-09-02": {
+  {
     "theme": "Unity",
     "question": "Is there any \"discord\" in my heart toward another believer that is blocking the Spirit’s flow?",
     "reflection": "Before the fire fell, there was unity. Power flows where there is peace and shared purpose among believers.",
@@ -4924,7 +4928,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-02",
     "_id": "2027-09-02"
   },
-  "2027-09-03": {
+  {
     "theme": "Stewardship",
     "question": "If God called me to step into a new role of leadership today, would my \"accompaniment\" with Jesus have prepared me for it?",
     "reflection": "God’s work continues even when leaders fail. He always has a \"Matthias\" ready to step up and fill the gap.",
@@ -4934,7 +4938,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, help me to stay close to You so that I am always ready for whatever task You assign.",
     "_id": "2027-09-03"
   },
-  "2027-09-04": {
+  {
     "reflection": "The Spirit doesn't always come in a whisper; sometimes He breaks in with the force of a gale to shake us out of our comfort.",
     "question": "Am I open to God \"disrupting\" my quiet, controlled life with the wind of His Spirit?",
     "theme": "Arrival",
@@ -4944,7 +4948,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-04",
     "_id": "2027-09-04"
   },
-  "2027-09-05": {
+  {
     "reflection": "In the Old Testament, the fire stayed on the Tabernacle. Now, the fire rests on people. You are the new dwelling place of God.",
     "question": "Do I treat my body and my life with the reverence due to a place where God's \"fire\" rests?",
     "theme": "Presence",
@@ -4954,7 +4958,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let Your fire burn in me. Cleanse me and use me as Your living temple.",
     "_id": "2027-09-05"
   },
-  "2027-09-06": {
+  {
     "theme": "Proclamation",
     "question": "When was the last time I spoke out loud about the \"mighty works of God\" to someone else?",
     "reflection": "The first thing the Spirit did was enable people to talk about how great God is. A Spirit-filled life is a God-bragging life.",
@@ -4964,7 +4968,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-06",
     "_id": "2027-09-06"
   },
-  "2027-09-07": {
+  {
     "theme": "Clarity",
     "question": "Does my joy in Christ look \"odd\" to the world, or do I blend in too perfectly?",
     "reflection": "The world often mistakes spiritual joy for something worldly. The Spirit provides a \"sober intoxication\"—pure joy with total clarity.",
@@ -4974,7 +4978,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-07",
     "_id": "2027-09-07"
   },
-  "2027-09-08": {
+  {
     "theme": "Inclusion",
     "question": "Am I underestimating what God can do through me because of my age, gender, or status?",
     "reflection": "The Spirit is no longer for the \"elite\" few. He is for everyone—young, old, male, female. You are included in this outpouring.",
@@ -4984,7 +4988,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-08",
     "_id": "2027-09-08"
   },
-  "2027-09-09": {
+  {
     "reflection": "Salvation isn't a complex ritual; it’s a cry for help. If you can call His name, you can find His grace.",
     "question": "Who do I know that needs to be reminded that \"calling on His name\" is enough to start?",
     "theme": "Salvation",
@@ -4994,7 +4998,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-09",
     "_id": "2027-09-09"
   },
-  "2027-09-10": {
+  {
     "theme": "Sovereignty",
     "question": "Can I trust that the \"chaotic\" parts of my life are still within God's \"definite plan\"?",
     "reflection": "Even the worst day in history (the crucifixion) was part of God’s \"definite plan.\" He can use even the \"wrong\" things to make things \"right.\"",
@@ -5004,7 +5008,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I trust Your sovereignty. Even when I don't understand, I believe You are working for good.",
     "_id": "2027-09-10"
   },
-  "2027-09-11": {
+  {
     "theme": "Resurrection",
     "question": "How does the \"impossibility\" of death holding Jesus give me hope for my own future?",
     "reflection": "Death had no \"grip\" on Jesus because He was sinless. Since we are in Him, death no longer has a permanent grip on us either.",
@@ -5014,7 +5018,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "King Jesus, You conquered the grave. I thank You for the life that death cannot touch.",
     "_id": "2027-09-11"
   },
-  "2027-09-12": {
+  {
     "theme": "Disposition",
     "question": "Is my \"tongue\" rejoicing today, or am I letting my complaints lead the way?",
     "reflection": "Real faith moves from the heart to the tongue. If the heart is glad in God, the words will eventually follow.",
@@ -5024,7 +5028,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-12",
     "_id": "2027-09-12"
   },
-  "2027-09-13": {
+  {
     "reflection": "Jesus isn't just \"risen\"; He is \"reigning.\" He is in the position of ultimate power and authority over the universe.",
     "question": "When I feel overwhelmed by the world's news, do I remember who is sitting at the \"Right Hand\"?",
     "theme": "Authority",
@@ -5034,7 +5038,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-13",
     "_id": "2027-09-13"
   },
-  "2027-09-14": {
+  {
     "theme": "Conviction",
     "question": "Will I allow God's Word to \"cut\" me today, or will I keep my armor up?",
     "reflection": "The Word of God is a sword. Sometimes it hurts when it cuts through our pride, but that \"wound\" is the only way for grace to get in.",
@@ -5044,7 +5048,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-14",
     "_id": "2027-09-14"
   },
-  "2027-09-15": {
+  {
     "reflection": "Faith requires a \"turn\" (repentance) and a \"testimony\" (baptism). It is a public commitment to a new direction.",
     "question": "Is there any area of my life where I need to \"repent\"—to turn around and go God’s way?",
     "theme": "Response",
@@ -5054,7 +5058,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-15",
     "_id": "2027-09-15"
   },
-  "2027-09-16": {
+  {
     "reflection": "God isn't just the God of the past; He is the God of your children’s future. His grace has a long reach.",
     "question": "Am I praying for the \"far off\" people in my life, trusting that the promise is for them too?",
     "theme": "Generations",
@@ -5064,7 +5068,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-16",
     "_id": "2027-09-16"
   },
-  "2027-09-17": {
+  {
     "theme": "Foundation",
     "question": "Am I \"devoted\" to learning God's Word, or is it just something I fit in when I have time?",
     "reflection": "The early church didn't start with programs; they started with the Word. Devotion to Truth is the bedrock of a healthy life.",
@@ -5074,7 +5078,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-17",
     "_id": "2027-09-17"
   },
-  "2027-09-18": {
+  {
     "theme": "Community",
     "question": "Who can I \"break bread\" with this week to encourage them in their faith?",
     "reflection": "We weren't meant to walk alone. Faith is sustained through shared meals, shared lives, and shared prayers.",
@@ -5084,7 +5088,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for the gift of the Church. Help me to be an active and loving part of Your body.",
     "_id": "2027-09-18"
   },
-  "2027-09-19": {
+  {
     "theme": "Atmosphere",
     "question": "Have I lost my sense of \"awe\" for God? How can I recover it today?",
     "reflection": "When God is moving, there is a sense of \"awe.\" It’s a holy respect for the presence of the Almighty.",
@@ -5094,7 +5098,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, restore my wonder. Help me to see Your greatness in the \"signs\" you are doing all around me.",
     "_id": "2027-09-19"
   },
-  "2027-09-20": {
+  {
     "theme": "Generosity",
     "question": "Is there something I \"own\" that God might want me to share with someone in need today?",
     "reflection": "The Spirit-filled life is a generous life. When we realize everything belongs to God, we stop clutching our \"stuff\" so tightly.",
@@ -5104,7 +5108,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, everything I have is Yours. Open my hands to give as freely as You have given to me.",
     "_id": "2027-09-20"
   },
-  "2027-09-21": {
+  {
     "reflection": "You can eat a simple meal with \"gladness\" if Jesus is at the table. Contentment is a fruit of the Spirit, not a result of wealth.",
     "question": "Can I find \"gladness\" in my current circumstances today, simply because I am with Christ?",
     "theme": "Atmosphere",
@@ -5114,7 +5118,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, be the guest at my table. Let Your joy make my simple life feel like a feast.",
     "_id": "2027-09-21"
   },
-  "2027-09-22": {
+  {
     "theme": "Influence",
     "question": "Am I living in a way that makes the Gospel \"attractive\" to those who don't know Him yet?",
     "reflection": "Good character and genuine joy are attractive. When we live for God, He often grants us favor with those around us.",
@@ -5124,7 +5128,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-22",
     "_id": "2027-09-22"
   },
-  "2027-09-23": {
+  {
     "theme": "Growth",
     "question": "Am I trying to \"force\" results, or am I trusting the Lord to \"add\" in His timing?",
     "reflection": "We do the \"praising\" and \"fellowshipping,\" but God does the \"adding.\" We don't have to manufacture growth; we just have to be faithful.",
@@ -5134,7 +5138,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-23",
     "_id": "2027-09-23"
   },
-  "2027-09-24": {
+  {
     "reflection": "Even Spirit-filled apostles kept their \"appointment\" with God. Consistency in prayer is the fuel for a life of power.",
     "question": "Do I have a set \"hour of prayer\" today, or am I just hoping to find a few minutes?",
     "theme": "Discipline",
@@ -5144,7 +5148,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-24",
     "_id": "2027-09-24"
   },
-  "2027-09-25": {
+  {
     "theme": "Attention",
     "question": "Who is \"sitting by the gate\" in my life that I have been walking past without looking?",
     "reflection": "Before Peter could heal the man, he had to give him his full attention. Ministry starts with truly seeing people.",
@@ -5154,7 +5158,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, give me Your eyes for people. Help me to stop and truly see those who are hurting.",
     "_id": "2027-09-25"
   },
-  "2027-09-26": {
+  {
     "theme": "Resources",
     "question": "Am I making excuses about my lack of resources instead of using the \"Power of the Name\" I’ve been given?",
     "reflection": "We often focus on what we don't have. God wants us to focus on what we do have: His Name and His Power.",
@@ -5164,7 +5168,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for the Name of Jesus. I may not have much, but I have Him—and that is enough.",
     "_id": "2027-09-26"
   },
-  "2027-09-27": {
+  {
     "reflection": "The name of Jesus isn't a magic spell; it’s a legal authority. When we speak in His name, the \"Owner\" of the universe backs it up.",
     "question": "Do I speak the name of Jesus with confidence, or with a \"hope-so\" attitude?",
     "theme": "Authority",
@@ -5174,7 +5178,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-27",
     "_id": "2027-09-27"
   },
-  "2027-09-28": {
+  {
     "theme": "Transformation",
     "question": "Is there any \"leaping\" in my walk with God today, or have I become spiritually sluggish?",
     "reflection": "When God heals, the response is unmistakable. A \"leaping\" heart is the sign of a soul that has been set free.",
@@ -5184,7 +5188,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-28",
     "_id": "2027-09-28"
   },
-  "2027-09-29": {
+  {
     "reflection": "Peter was quick to deflect the glory. We are just the \"wires\"; He is the \"Electricity.\" Never mistake the tool for the Craftsman.",
     "question": "If God uses me today, will I be quick to point the glory back to Him?",
     "theme": "Humility",
@@ -5194,7 +5198,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-29",
     "_id": "2027-09-29"
   },
-  "2027-09-30": {
+  {
     "theme": "Paradox",
     "question": "Since Jesus is the \"Author\" of my life, will I let Him hold the pen today?",
     "reflection": "You can't \"kill\" Life itself. Death was outmatched from the start. Because Jesus is the \"Author,\" He gets to write the final chapter of your story too.",
@@ -5204,7 +5208,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-09-30",
     "_id": "2027-09-30"
   },
-  "2027-10-01": {
+  {
     "theme": "Mechanism",
     "question": "Do I really believe in the power of Jesus' name, or is it just a way I end my prayers?",
     "reflection": "It wasn't just the name; it was \"faith in the name.\" Belief is the bridge that brings heaven’s power into earth’s problems.",
@@ -5214,7 +5218,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-01",
     "_id": "2027-10-01"
   },
-  "2027-10-02": {
+  {
     "reflection": "Repentance isn't just about \"stopping sin\"; it’s about \"starting refreshment.\" God's presence is where we find our second wind.",
     "question": "Do I need a \"time of refreshing\" today? Will I turn toward His presence to find it?",
     "theme": "Repentance",
@@ -5224,7 +5228,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I turn to You. Refresh my soul in Your presence and wash away my weariness.",
     "_id": "2027-10-02"
   },
-  "2027-10-03": {
+  {
     "reflection": "Turning from sin is actually a \"blessing.\" God doesn't take away our sin to be a \"killjoy,\" but to make us \"joy-filled.\"",
     "question": "Can I see God's \"No\" to sin as a \"Yes\" to my ultimate blessing?",
     "theme": "Intention",
@@ -5234,7 +5238,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-03",
     "_id": "2027-10-03"
   },
-  "2027-10-04": {
+  {
     "theme": "Opposition",
     "question": "Am I willing to be \"annoying\" to the world if it means being faithful to the Truth?",
     "reflection": "The world is often \"annoyed\" by the hope of the Gospel. Light always irritates eyes that are used to the dark.",
@@ -5244,7 +5248,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, give me a thick skin and a tender heart. Let me speak the truth even when it’s unpopular.",
     "_id": "2027-10-04"
   },
-  "2027-10-05": {
+  {
     "reflection": "You can jail the preacher, but you can't jail the Word. Opposition often only serves to spread the message further.",
     "question": "Am I discouraged by \"opposition,\" or do I see that God's Word is still working in spite of it?",
     "theme": "Fruit",
@@ -5254,7 +5258,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-05",
     "_id": "2027-10-05"
   },
-  "2027-10-06": {
+  {
     "theme": "Identity",
     "question": "Am I trying to stand in my own \"name\" (reputation) or in the \"Name of Jesus\"?",
     "reflection": "The world is obsessed with \"credentials.\" The Apostles’ only credential was a Name. That Name is still our only valid \"ID\" in the spiritual realm.",
@@ -5264,7 +5268,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-06",
     "_id": "2027-10-06"
   },
-  "2027-10-07": {
+  {
     "reflection": "Spirit-filling isn't a one-time event; it’s a repeatable experience for specific moments of need. We can ask for a \"fresh filling\" for today's tasks.",
     "question": "Do I need a \"fresh filling\" of the Spirit to handle a difficult conversation or task today?",
     "theme": "Boldness",
@@ -5274,7 +5278,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, fill me now. Give me the wisdom and the words I need for this very hour.",
     "_id": "2027-10-07"
   },
-  "2027-10-08": {
+  {
     "reflection": "What the \"experts\" rejected, God made the most important part. God loves to use the \"discards\" to hold everything together.",
     "question": "Have I been feeling like a \"rejected stone\"? Will I let the Master Builder put me where I belong?",
     "theme": "Foundation",
@@ -5284,7 +5288,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-08",
     "_id": "2027-10-08"
   },
-  "2027-10-09": {
+  {
     "theme": "Exclusivity",
     "question": "Am I looking for \"salvation\" (peace, worth) in other names, or am I settled in Jesus?",
     "reflection": "Jesus isn't a \"suggested\" path; He is the only rescue. This gives us great confidence—there is no need to look anywhere else.",
@@ -5294,7 +5298,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-09",
     "_id": "2027-10-09"
   },
-  "2027-10-10": {
+  {
     "reflection": "You don't need a degree to look like Christ; you just need to spend time with Him. His \"fragrance\" rubs off on those who stay close.",
     "question": "Will people recognize today that I have \"been with Jesus\" by the way I talk and act?",
     "theme": "Evidence",
@@ -5304,7 +5308,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-10",
     "_id": "2027-10-10"
   },
-  "2027-10-11": {
+  {
     "reflection": "When you truly encounter the Living God, you don't need \"training\" to talk about Him. You just can't keep it in!",
     "question": "Is my heart so full of Jesus today that His name \"leaks out\" of my conversation?",
     "theme": "Compulsion",
@@ -5314,7 +5318,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, fill me so much that I \"cannot but speak\" of Your goodness. Let my life be an overflow of Your grace.",
     "_id": "2027-10-11"
   },
-  "2027-10-12": {
+  {
     "theme": "Prayer",
     "question": "Does my prayer life start with my \"problems\" or with God's \"Sovereignty\"?",
     "reflection": "When the Apostles were threatened, they didn't pray for \"safety\" first; they prayed to the \"Sovereign Lord.\" Perspective changes everything.",
@@ -5324,7 +5328,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Sovereign Lord, You made it all. I start my day by acknowledging Your power over every threat.",
     "_id": "2027-10-12"
   },
-  "2027-10-13": {
+  {
     "reflection": "Human rebellion against God is \"in vain.\" It’s like throwing pebbles at a mountain. God's purposes will always stand.",
     "question": "Why am I worrying about the \"plots\" of the world when I know they are \"in vain\" before God?",
     "theme": "Reality",
@@ -5334,7 +5338,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I trust Your plan. Let the world rage; I will rest in Your peace.",
     "_id": "2027-10-13"
   },
-  "2027-10-14": {
+  {
     "theme": "Boldness",
     "question": "Am I praying for \"easier circumstances\" or for \"more boldness\" in my current ones?",
     "reflection": "They didn't pray for the threats to stop; they prayed for the courage to continue. Boldness is a gift we must ask for.",
@@ -5344,7 +5348,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-14",
     "_id": "2027-10-14"
   },
-  "2027-10-15": {
+  {
     "theme": "Expectation",
     "question": "Am I \"speaking\" enough today for God to have something to \"stretch out His hand\" toward?",
     "reflection": "We speak the Word; God stretches out His hand. It’s a partnership of faith. We do the \"speaking,\" He does the \"stretching.\"",
@@ -5354,7 +5358,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-15",
     "_id": "2027-10-15"
   },
-  "2027-10-16": {
+  {
     "reflection": "Prayer moves the heart of God, and sometimes it moves the very ground we stand on. A praying church is a powerful church.",
     "question": "Is my prayer life \"shaking\" anything lately, or has it become just a formal routine?",
     "theme": "Response",
@@ -5364,7 +5368,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-16",
     "_id": "2027-10-16"
   },
-  "2027-10-17": {
+  {
     "theme": "Unity",
     "question": "How can I contribute to the \"oneness\" of my family or church community today?",
     "reflection": "Unity isn't just \"agreeing\"; it’s sharing the same \"soul\" and \"heart.\" It’s a supernatural bond that the Spirit creates.",
@@ -5374,7 +5378,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, make us one. Remove the selfishness that causes division and give us one heart.",
     "_id": "2027-10-17"
   },
-  "2027-10-18": {
+  {
     "theme": "Abundance",
     "question": "Will I walk today in the \"great grace\" that Jesus provides for His people?",
     "reflection": "Great grace is more than enough for \"great trials.\" There is a specific kind of favor that rests on a unified, praying community.",
@@ -5384,7 +5388,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let Your great grace be upon me. May it be visible to everyone I interact with today.",
     "_id": "2027-10-18"
   },
-  "2027-10-19": {
+  {
     "reflection": "The early church took care of their own. Spiritual health is always reflected in how we handle our material wealth.",
     "question": "Who around me has a \"need\" that I have the \"resource\" to meet today?",
     "theme": "Compassion",
@@ -5394,7 +5398,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-19",
     "_id": "2027-10-19"
   },
-  "2027-10-20": {
+  {
     "reflection": "Barnabas was known for what he gave (encouragement). What \"nickname\" would people give me based on my primary character trait?",
     "question": "Could I be a \"Barnabas\" to someone today who is feeling discouraged or lonely?",
     "theme": "Identity",
@@ -5404,7 +5408,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-20",
     "_id": "2027-10-20"
   },
-  "2027-10-21": {
+  {
     "theme": "Integrity",
     "question": "Is there any \"pretending\" in my spiritual life right now? Will I be honest with God today?",
     "reflection": "God isn't looking for \"perfect\" people, but He is looking for \"honest\" ones. Pretending to be more \"holy\" than we are is a dangerous game.",
@@ -5414,7 +5418,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, I want to be real with You. Search my heart and remove all hypocrisy and pretense.",
     "_id": "2027-10-21"
   },
-  "2027-10-22": {
+  {
     "reflection": "We often worry about what people think, but our primary accountability is to the Creator. All sin is ultimately against Him.",
     "question": "How would my choices change today if I remembered that every action is done \"before God\"?",
     "theme": "Accountability",
@@ -5424,7 +5428,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-22",
     "_id": "2027-10-22"
   },
-  "2027-10-23": {
+  {
     "theme": "Reverence",
     "question": "Do I treat my relationship with God with \"holy awe,\" or have I become too casual with His holiness?",
     "reflection": "Fear here is a holy awe. It’s the realization that God is holy and not to be trifled with. Holiness is the beauty of the Church.",
@@ -5434,7 +5438,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-23",
     "_id": "2027-10-23"
   },
-  "2027-10-24": {
+  {
     "theme": "Channel",
     "question": "What \"wonder\" (kindness, help, prayer) can God do through my hands today?",
     "reflection": "God uses human hands to do His work. You are His \"hands\" in your workplace, your home, and your community today.",
@@ -5444,7 +5448,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-24",
     "_id": "2027-10-24"
   },
-  "2027-10-25": {
+  {
     "theme": "Growth",
     "question": "Do I believe that God can still \"add believers\" in my community, even in a difficult culture?",
     "reflection": "Even in the face of judgment and fear, the Church grew. God’s Truth is unstoppable when it is lived out in purity.",
@@ -5454,7 +5458,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, add to Your Kingdom. Use our purity and our passion to draw people to Yourself.",
     "_id": "2027-10-25"
   },
-  "2027-10-26": {
+  {
     "reflection": "This isn't about Peter’s shadow; it’s about the \"overflow\" of God's presence. When you are full of God, your very \"atmosphere\" changes.",
     "question": "What kind of \"shadow\" (influence) am I casting on the people I walk past today?",
     "theme": "Influence",
@@ -5464,7 +5468,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, fill me so much that my mere presence brings peace and hope to others.",
     "_id": "2027-10-26"
   },
-  "2027-10-27": {
+  {
     "reflection": "When human laws clash with God's commands, our loyalty is clear. We serve a higher Throne.",
     "question": "Is there a \"man-pleasing\" habit I need to break so I can be fully obedient to God?",
     "theme": "Priority",
@@ -5474,7 +5478,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-27",
     "_id": "2027-10-27"
   },
-  "2027-10-28": {
+  {
     "theme": "Character",
     "question": "Does my reputation at work and home reflect a life \"full of the Spirit\"?",
     "reflection": "Even \"practical\" tasks in the church require spiritual depth. God values a good reputation and a wise heart, regardless of the job title.",
@@ -5484,7 +5488,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, build my character. May I be a person of integrity and wisdom in every task I do.",
     "_id": "2027-10-28"
   },
-  "2027-10-29": {
+  {
     "reflection": "To lead others, we must first be led by God. Leaders must protect their time with the Lord to have anything worth giving to people.",
     "question": "Am I protecting my \"inner circle\" of time with God, or letting the \"busyness\" of ministry crowd it out?",
     "theme": "Priorities",
@@ -5494,7 +5498,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, help me keep first things first. Let my service flow from my devotion.",
     "_id": "2027-10-29"
   },
-  "2027-10-30": {
+  {
     "reflection": "Grace and power are a potent combination. Grace opens the door, and power does the work. Stephen didn't have one without the other.",
     "question": "Do I lead with \"grace\" when I use the \"power\" or talents God has given me?",
     "theme": "Impact",
@@ -5504,7 +5508,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, fill me with Your grace so that Your power can work through me without pride.",
     "_id": "2027-10-30"
   },
-  "2027-10-31": {
+  {
     "theme": "Peace",
     "question": "Does my \"face\" show the peace of God when I am under pressure or being criticized?",
     "reflection": "Even under false accusation, Stephen had a supernatural peace. When you are focused on God's glory, the world's attacks can't dim your light.",
@@ -5514,7 +5518,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-10-31",
     "_id": "2027-10-31"
   },
-  "2027-11-01": {
+  {
     "theme": "Warning",
     "question": "Is there any area where I am currently \"stiff-necked\" toward God's direction?",
     "reflection": "Resistance isn't always shouting; sometimes it's just a \"stiff neck\" that refuses to bow. A soft heart is the Spirit's favorite workshop.",
@@ -5524,7 +5528,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-01",
     "_id": "2027-11-01"
   },
-  "2027-11-02": {
+  {
     "reflection": "Stephen looked past the stones and saw the Son. Our perspective determines our endurance.",
     "question": "Am I looking at the \"stones\" being thrown at me, or at the Savior standing for me?",
     "theme": "Vision",
@@ -5534,7 +5538,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I look to You. Show me Your glory so that the trials of this world fade away.",
     "_id": "2027-11-02"
   },
-  "2027-11-03": {
+  {
     "theme": "Support",
     "question": "How does it change my day to know that Jesus is personally attentive to my struggles?",
     "reflection": "Usually, Jesus is described as sitting in authority. Here, He stands—perhaps to welcome His first martyr home. He notices your sacrifice.",
@@ -5544,7 +5548,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Savior, thank You for standing for me. I find my strength in Your personal care.",
     "_id": "2027-11-03"
   },
-  "2027-11-04": {
+  {
     "reflection": "Stephen died exactly like Jesus lived: forgiving His enemies. The ultimate proof of the Spirit is the power to love those who hurt us.",
     "question": "Is there someone I need to release from the \"debt\" of their sin against me today?",
     "theme": "Forgiveness",
@@ -5554,7 +5558,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, forgive them. Don't let bitterness take root in my heart. Fill me with Your mercy.",
     "_id": "2027-11-04"
   },
-  "2027-11-05": {
+  {
     "reflection": "The story looks like it's ending in defeat, but God was already setting the stage for the conversion of the man who would write half the New Testament.",
     "question": "Can I trust God's plan even when it looks like the \"bad guys\" are winning?",
     "theme": "Contrast",
@@ -5564,7 +5568,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-05",
     "_id": "2027-11-05"
   },
-  "2027-11-06": {
+  {
     "theme": "Providence",
     "question": "Is my current \"disruption\" actually a \"distribution\" of God's grace to a new place?",
     "reflection": "Persecution didn't stop the Church; it just \"unpacked\" it. What looked like a disaster was actually a distribution strategy.",
@@ -5574,7 +5578,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-06",
     "_id": "2027-11-06"
   },
-  "2027-11-07": {
+  {
     "reflection": "When the Gospel arrives, joy follows. Healing and hope are the \"calling cards\" of the Kingdom of God.",
     "question": "Does my presence in my city/neighborhood bring \"much joy\" because of the Gospel I carry?",
     "theme": "Fruit",
@@ -5584,7 +5588,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-07",
     "_id": "2027-11-07"
   },
-  "2027-11-08": {
+  {
     "reflection": "Simon wanted the Spirit's power for his own ego. God sees past our \"religious\" activity straight into our motives.",
     "question": "Am I seeking God's power for His glory, or for my own reputation?",
     "theme": "Sincerity",
@@ -5594,7 +5598,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, purify my heart. I don't want Your gifts for my gain; I want them for Your Kingdom.",
     "_id": "2027-11-08"
   },
-  "2027-11-09": {
+  {
     "reflection": "Philip left a massive revival to talk to one man in a desert. God values the \"one\" as much as the \"thousands.\"",
     "question": "Am I sensitive enough to the Spirit's nudge to \"leave the crowd\" for a single soul?",
     "theme": "Sensitivity",
@@ -5604,7 +5608,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-09",
     "_id": "2027-11-09"
   },
-  "2027-11-10": {
+  {
     "reflection": "Ministry often starts with a simple, curious question. We don't have to preach a sermon; we just have to start a conversation.",
     "question": "Who can I ask a \"curiosity question\" to today to open a door for the Gospel?",
     "theme": "Engagement",
@@ -5614,7 +5618,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-10",
     "_id": "2027-11-10"
   },
-  "2027-11-11": {
+  {
     "reflection": "Every part of the Bible is a road that leads to Jesus. We just have to know how to follow the signs.",
     "question": "Do I know the Word well enough to show someone how it points to Jesus?",
     "theme": "Bridge-Building",
@@ -5624,7 +5628,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-11",
     "_id": "2027-11-11"
   },
-  "2027-11-12": {
+  {
     "theme": "Accessibility",
     "question": "Am I putting \"barriers\" in front of people that God hasn't put there?",
     "reflection": "When someone's heart is ready, they don't want to wait. The Gospel is for anyone, anywhere, at any time.",
@@ -5634,7 +5638,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for Your radical accessibility. Help me to welcome anyone who is seeking You.",
     "_id": "2027-11-12"
   },
-  "2027-11-13": {
+  {
     "theme": "Condition",
     "question": "Who have I \"given up on\" that God is still pursuing?",
     "reflection": "Saul was at his most hateful right before he met Love Himself. No one is \"too far gone\" for a Damascus Road encounter.",
@@ -5644,7 +5648,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, have mercy on those who \"breathe threats.\" Intercept them with Your grace just as You did for Saul.",
     "_id": "2027-11-13"
   },
-  "2027-11-14": {
+  {
     "theme": "Connection",
     "question": "Do I realize how closely Jesus identifies with my pain and my struggles?",
     "reflection": "Jesus didn't say \"Why are you hurting the church?\" He said \"Why are you hurting Me?\" To touch a believer is to touch Jesus.",
@@ -5654,7 +5658,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for Your deep connection to me. It gives me courage to know You are with me in every battle.",
     "_id": "2027-11-14"
   },
-  "2027-11-15": {
+  {
     "theme": "Revelation",
     "question": "Is my relationship with God based on \"Religion\" or on the Person of \"Jesus\"?",
     "reflection": "Saul knew about \"God,\" but he didn't know \"Jesus.\" Everything changes when the \"Deity\" we fear becomes the \"Savior\" we love.",
@@ -5664,7 +5668,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord Jesus, reveal Yourself to me more clearly. I want to know You, not just about You.",
     "_id": "2027-11-15"
   },
-  "2027-11-16": {
+  {
     "theme": "Humility",
     "question": "Am I willing to be \"led by the hand\" by others when God makes me realize my own blindness?",
     "reflection": "The \"mighty\" Pharisee became a \"blind\" man who had to be led. God often humbles us so that He can truly lead us.",
@@ -5674,7 +5678,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-16",
     "_id": "2027-11-16"
   },
-  "2027-11-17": {
+  {
     "reflection": "Ananias had to overcome his fear to call his enemy \"Brother.\" Grace turns \"them\" into \"us.\"",
     "question": "Is there someone \"scary\" or \"different\" that God is asking me to reach out to as a \"brother/sister\"?",
     "theme": "Acceptance",
@@ -5684,7 +5688,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-17",
     "_id": "2027-11-17"
   },
-  "2027-11-18": {
+  {
     "theme": "Clarity",
     "question": "What \"scales\" of old thinking or prejudice need to fall from my eyes today?",
     "reflection": "When we meet Jesus and are filled with the Spirit, we see the world—and our own past—completely differently.",
@@ -5694,7 +5698,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-18",
     "_id": "2027-11-18"
   },
-  "2027-11-19": {
+  {
     "theme": "Proclamation",
     "question": "Is my life \"proclaiming\" that Jesus is the Son of God, or am I keeping that truth to myself?",
     "reflection": "True conversion results in a change of message. Saul went from \"arresting the name\" to \"announcing the Name.\"",
@@ -5704,7 +5708,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let my message be clear. May everything I do say, \"Jesus is the Son of God.\"",
     "_id": "2027-11-19"
   },
-  "2027-11-20": {
+  {
     "theme": "Community",
     "question": "Can I be a \"bridge\" for someone today who is being judged or kept at a distance?",
     "reflection": "Everyone was afraid of Saul, but Barnabas took a risk on him. We all need a \"Barnabas\" to speak for us when we are new or misunderstood.",
@@ -5714,7 +5718,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-20",
     "_id": "2027-11-20"
   },
-  "2027-11-21": {
+  {
     "reflection": "Peace and growth come when the Church honors God's holiness. \"Fear of the Lord\" isn't being afraid; it's being \"in awe.\"",
     "question": "Am I \"walking in the fear of the Lord\" today, or have I become too casual with His presence?",
     "theme": "Atmosphere",
@@ -5724,7 +5728,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I reverence You. Build me up and give me peace as I walk in the awe of who You are.",
     "_id": "2027-11-21"
   },
-  "2027-11-22": {
+  {
     "reflection": "The Spirit is our \"Comforter.\" When the Church is comforted by Him, it becomes a magnet for others.",
     "question": "Am I drawing from the \"comfort of the Holy Spirit\" today, or am I seeking comfort in the world?",
     "theme": "Encouragement",
@@ -5734,7 +5738,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-22",
     "_id": "2027-11-22"
   },
-  "2027-11-23": {
+  {
     "theme": "Resurrection",
     "question": "Am I \"imitating\" Jesus in the way I handle the \"dead\" or difficult situations in my life?",
     "reflection": "Peter did exactly what he saw Jesus do. When we walk with the Master, we start to speak and act with His authority.",
@@ -5744,7 +5748,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-23",
     "_id": "2027-11-23"
   },
-  "2027-11-24": {
+  {
     "theme": "Reaching",
     "question": "Who around me is \"seeking\" God, and how can I be the \"Peter\" sent to give them the answer?",
     "reflection": "God hears the prayers of those who are seeking Him, even if they don't have the full picture yet. He is moving to meet the seekers.",
@@ -5754,7 +5758,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You that You hear the seekers. Send me to someone today who is looking for You.",
     "_id": "2027-11-24"
   },
-  "2027-11-25": {
+  {
     "theme": "Prejudice",
     "question": "What \"labels\" am I putting on people that God is asking me to remove?",
     "reflection": "Peter had to unlearn his religious prejudices to reach the Gentiles. God’s grace is broader than our traditions.",
@@ -5764,7 +5768,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, cleanse my perspective. Help me to see every human being as someone made clean by Your potential grace.",
     "_id": "2027-11-25"
   },
-  "2027-11-26": {
+  {
     "theme": "Equality",
     "question": "Do I show partiality in my heart based on race, politics, or status?",
     "reflection": "This was a massive shift. The Gospel is for every tribe, tongue, and nation. There are no \"second-class\" citizens in the Kingdom.",
@@ -5774,7 +5778,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, forgive my partiality. Give me Your heart for all people without exception.",
     "_id": "2027-11-26"
   },
-  "2027-11-27": {
+  {
     "theme": "Summary",
     "question": "If someone summarized my week, would they say I \"went about doing good\"?",
     "reflection": "This is the \"resume\" of Jesus. He didn't just \"talk\" good; He \"did\" good. Our lives should follow that same pattern.",
@@ -5784,7 +5788,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-27",
     "_id": "2027-11-27"
   },
-  "2027-11-28": {
+  {
     "reflection": "The message is simple: Believe and be forgiven. It’s the \"everyone\" that makes the Gospel so powerful.",
     "question": "Do I really believe that \"everyone\" can be forgiven, even those who have done terrible things?",
     "theme": "Inclusion",
@@ -5794,7 +5798,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for the \"everyone.\" Thank You that it included me.",
     "_id": "2027-11-28"
   },
-  "2027-11-29": {
+  {
     "theme": "Surprise",
     "question": "Am I leaving room for God to \"interrupt\" my plans and move in His own way?",
     "reflection": "God didn't wait for Peter to finish his sermon! The Spirit moves whenever hearts are open, regardless of our \"liturgy.\"",
@@ -5804,7 +5808,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-11-29",
     "_id": "2027-11-29"
   },
-  "2027-11-30": {
+  {
     "reflection": "Sometimes the hardest thing for religious people to do is get out of God’s way. Our job is to follow His lead, not police His grace.",
     "question": "Am I \"standing in God's way\" by being too critical or traditional?",
     "theme": "Yielding",
@@ -5814,7 +5818,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, help me to get out of the way. Let Your grace flow wherever You want it to go.",
     "_id": "2027-11-30"
   },
-  "2027-12-01": {
+  {
     "theme": "Revival",
     "question": "Have I fully \"turned\" to the Lord today, or am I still looking back at my old life?",
     "reflection": "Turning is the key. Believing isn't just an intellectual \"yes\"; it's a physical \"turn\" of the whole life toward Jesus.",
@@ -5824,7 +5828,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I turn to You with all my heart. Be the center of my focus and the goal of my life.",
     "_id": "2027-12-01"
   },
-  "2027-12-02": {
+  {
     "theme": "Observation",
     "question": "Do I look for \"the grace of God\" in others, or do I look for their faults?",
     "reflection": "You can \"see\" grace. You see it in changed lives, new joy, and radical generosity. Barnabas looked for the good and celebrated it.",
@@ -5834,7 +5838,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-02",
     "_id": "2027-12-02"
   },
-  "2027-12-03": {
+  {
     "theme": "Steadfastness",
     "question": "Do I have a \"steadfast purpose of heart\" today to be faithful, regardless of my feelings?",
     "reflection": "Feeling \"glad\" isn't enough; we need \"purpose of heart.\" We must decide beforehand that we will be faithful when things get tough.",
@@ -5844,7 +5848,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, strengthen my resolve. Help me to remain faithful to You through every high and low.",
     "_id": "2027-12-03"
   },
-  "2027-12-04": {
+  {
     "reflection": "A \"Christian\" is a \"little Christ.\" People saw so much of Jesus in the disciples that they had to give them a new name.",
     "question": "If someone observed me today, would they think to call me a \"little Christ\"?",
     "theme": "Identity",
@@ -5854,7 +5858,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, be so visible in me that people can't help but see Your character in mine.",
     "_id": "2027-12-04"
   },
-  "2027-12-05": {
+  {
     "reflection": "When the doors are locked, prayer is the key. The Church’s most powerful weapon isn't political influence; it's earnest prayer.",
     "question": "What \"prison\" am I facing (or is someone I know facing) that needs \"earnest prayer\" today?",
     "theme": "Weapon",
@@ -5864,7 +5868,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-05",
     "_id": "2027-12-05"
   },
-  "2027-12-06": {
+  {
     "theme": "Unbelief",
     "question": "Am I \"knocking\" on the door of an answered prayer that I’m too cynical to believe in?",
     "reflection": "Sometimes God answers our prayers so quickly that we don't even believe it's Him. He is better to us than our small faith expects.",
@@ -5874,7 +5878,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-06",
     "_id": "2027-12-06"
   },
-  "2027-12-07": {
+  {
     "reflection": "Taking credit for what God does is dangerous territory. Herod forgot he was just a man; God reminded him.",
     "question": "Am I \"robbing\" God of His glory by taking credit for my successes?",
     "theme": "Warning",
@@ -5884,7 +5888,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, all glory belongs to You. I am just a servant; You are the King.",
     "_id": "2027-12-07"
   },
-  "2027-12-08": {
+  {
     "theme": "Endurance",
     "question": "Am I building my life on things that \"pass away\" or on the \"Word that increases\"?",
     "reflection": "Kings come and go, persecutors rise and fall, but the Word of God just keeps growing. It is the most resilient force on earth.",
@@ -5894,7 +5898,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-08",
     "_id": "2027-12-08"
   },
-  "2027-12-09": {
+  {
     "reflection": "God’s specific direction often comes during corporate worship and fasting. When we focus on Him, He speaks clearly about our next steps.",
     "question": "Am I \"worshiping and fasting\" enough to hear God's specific \"set apart\" calls for my life?",
     "theme": "Call",
@@ -5904,7 +5908,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, I am listening. Set me apart for the work You have for me in this season.",
     "_id": "2027-12-09"
   },
-  "2027-12-10": {
+  {
     "reflection": "There is a difference between \"going\" and \"being sent.\" When the Spirit sends us, He goes before us to prepare the way.",
     "question": "Do I feel \"sent\" into my day today, or am I just \"going\" through the motions?",
     "theme": "Commission",
@@ -5914,7 +5918,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, send me. I want to move under the direction and power of Your Spirit today.",
     "_id": "2027-12-10"
   },
-  "2027-12-11": {
+  {
     "theme": "Discernment",
     "question": "Am I asking for discernment today to see through the lies and deceptions of the world?",
     "reflection": "Paul (Saul) had the discernment to see through spiritual deception. We need the Spirit to help us see the \"wolves\" in \"sheep's clothing.\"",
@@ -5924,7 +5928,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me sharp spiritual eyes. Help me to recognize the truth and expose the lies.",
     "_id": "2027-12-11"
   },
-  "2027-12-12": {
+  {
     "reflection": "It’s not just the miracles that convert; it’s the \"teaching.\" The Word of God has its own \"astonishing\" power to change minds.",
     "question": "When was the last time I was \"astonished\" by a truth from God's Word?",
     "theme": "Authority",
@@ -5934,7 +5938,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, keep me in awe of Your Truth. Let Your Word astonish me and those I share it with.",
     "_id": "2027-12-12"
   },
-  "2027-12-13": {
+  {
     "reflection": "Paul took every opportunity to speak. He didn't wait for a \"perfect\" platform; he just used the one he had.",
     "question": "What \"platform\" (social media, a coffee break, a meeting) do I have today to ask people to \"listen\"?",
     "theme": "Opportunity",
@@ -5944,7 +5948,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me the courage to speak up. Help me to use every opportunity to share Your story.",
     "_id": "2027-12-13"
   },
-  "2027-12-14": {
+  {
     "reflection": "Being \"after God's heart\" means being willing to do \"all His will.\" It’s a heart of total availability.",
     "question": "Is my heart \"after God's heart\" today? Am I ready to do all of His will?",
     "theme": "Character",
@@ -5954,7 +5958,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, make my heart like Yours. I want to be someone who does everything You ask of me.",
     "_id": "2027-12-14"
   },
-  "2027-12-15": {
+  {
     "theme": "Center",
     "question": "Am I keeping Jesus at the center of my \"Good News,\" or am I getting distracted by other things?",
     "reflection": "Everything in the Gospel comes back to \"This Man\"—Jesus. He is the only source of true forgiveness and freedom.",
@@ -5964,7 +5968,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-15",
     "_id": "2027-12-15"
   },
-  "2027-12-16": {
+  {
     "reflection": "Everything means everything. Past guilt, present shame, future fear—the Law couldn't do it, but Jesus did.",
     "question": "Is there \"anything\" I’m still letting hold me captive, even though Jesus has freed me from \"everything\"?",
     "theme": "Liberty",
@@ -5974,7 +5978,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I walk in total freedom. Thank You for breaking every chain that the Law couldn't touch.",
     "_id": "2027-12-16"
   },
-  "2027-12-17": {
+  {
     "theme": "Persistence",
     "question": "Who can I \"urge to continue in grace\" today? Who needs a \"keep going\" word?",
     "reflection": "Starting is easy; \"continuing\" is the work. We need to urge each other to stay in the flow of grace every single day.",
@@ -5984,7 +5988,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-17",
     "_id": "2027-12-17"
   },
-  "2027-12-18": {
+  {
     "reflection": "This happened right after they were kicked out of the city! You can be \"persecuted\" and \"filled with joy\" at the same time.",
     "question": "Is my \"joy\" dependent on how people treat me, or on how the Spirit fills me?",
     "theme": "Paradox",
@@ -5994,7 +5998,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-18",
     "_id": "2027-12-18"
   },
-  "2027-12-19": {
+  {
     "theme": "Reliance",
     "question": "Am I waiting to feel \"bold,\" or will I speak \"boldly\" and trust God to back me up?",
     "reflection": "Boldness isn't self-confidence; it's God-confidence. When we speak, He \"bears witness\" by moving in people's hearts.",
@@ -6004,7 +6008,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-19",
     "_id": "2027-12-19"
   },
-  "2027-12-20": {
+  {
     "theme": "Discernment",
     "question": "Am I looking for the \"faith\" in others that is ready for God's touch?",
     "reflection": "Paul didn't heal everyone; he looked for \"faith.\" There is a spiritual \"readiness\" we should look for in others.",
@@ -6014,7 +6018,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-20",
     "_id": "2027-12-20"
   },
-  "2027-12-21": {
+  {
     "theme": "Humility",
     "question": "Am I letting people \"idolize\" me, or am I pointing them to the \"Living God\"?",
     "reflection": "When the crowd tried to worship them as gods, Paul and Barnabas tore their clothes in protest. We must never accept the praise that belongs to God.",
@@ -6024,7 +6028,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-21",
     "_id": "2027-12-21"
   },
-  "2027-12-22": {
+  {
     "theme": "General Revelation",
     "question": "Do I notice the \"witness\" of God's goodness in the weather and the food I enjoy today?",
     "reflection": "God's kindness in nature (rain, food, sunshine) is a \"witness\" to His goodness. Even \"unbelievers\" are experiencing His grace daily.",
@@ -6034,7 +6038,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for the \"witness\" of Your common grace. Thank You for the rain and the sunshine.",
     "_id": "2027-12-22"
   },
-  "2027-12-23": {
+  {
     "theme": "Discipleship",
     "question": "Who can I \"strengthen\" today through a verse, a prayer, or a shared testimony?",
     "reflection": "Conversion is the birth; strengthening is the growth. We need to \"strengthen the souls\" of those around us.",
@@ -6044,7 +6048,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-23",
     "_id": "2027-12-23"
   },
-  "2027-12-24": {
+  {
     "theme": "Reality",
     "question": "Am I surprised by \"tribulations,\" or do I see them as part of the road to the Kingdom?",
     "reflection": "Paul didn't preach a \"prosperity\" Gospel. He told them the truth: the road to the Kingdom is paved with trials.",
@@ -6054,7 +6058,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me endurance. Help me to walk through the trials with my eyes on the Prize.",
     "_id": "2027-12-24"
   },
-  "2027-12-25": {
+  {
     "theme": "Trust",
     "question": "Is there someone I am \"over-mothering\" spiritually that I need to \"commit to the Lord\" today?",
     "reflection": "Eventually, we have to \"let go\" and trust people to the Lord. He is a better Shepherd for them than we could ever be.",
@@ -6064,7 +6068,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-25",
     "_id": "2027-12-25"
   },
-  "2027-12-26": {
+  {
     "reflection": "The \"year\" (and the block) ends with a report of victory. God opened a \"door of faith\" to the world, and it can't be shut.",
     "question": "As I look back on this season, what is the \"all that God has done\" that I can declare?",
     "theme": "Testimony",
@@ -6074,7 +6078,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-26",
     "_id": "2027-12-26"
   },
-  "2027-12-27": {
+  {
     "reflection": "Not all conflict is bad. Sometimes we have to \"debate\" and stand our ground to protect the purity of the Gospel.",
     "question": "Am I willing to speak up when the truth of \"Grace alone\" is being compromised?",
     "theme": "Conflict",
@@ -6084,7 +6088,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me the wisdom to know when to be flexible and when to stand firm for the Truth.",
     "_id": "2027-12-27"
   },
-  "2027-12-28": {
+  {
     "reflection": "Peter reminds everyone that even the \"experts\" are saved by grace. There is no \"merit-based\" entrance into God's family.",
     "question": "Am I trying to \"earn\" my way today, or am I resting in the finished grace of Jesus?",
     "theme": "Salvation",
@@ -6094,7 +6098,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2027-12-28",
     "_id": "2027-12-28"
   },
-  "2027-12-29": {
+  {
     "reflection": "Religion often adds \"troubles\" (rules) to people. The Gospel is about removing burdens, not adding them.",
     "question": "Am I making it \"troublesome\" for others to find Jesus by adding my own personal rules or preferences?",
     "theme": "Inclusion",
@@ -6104,7 +6108,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, help me clear the way for others to find You. Let me be a bridge, not a barrier.",
     "_id": "2027-12-29"
   },
-  "2027-12-30": {
+  {
     "reflection": "The early church leaders were respected because they had \"skin in the game.\" Sacrifice is the true mark of leadership.",
     "question": "What have I \"risked\" lately for the sake of the Name of Jesus?",
     "theme": "Dedication",
@@ -6114,7 +6118,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You gave Your life for me. Help me to live a life of courageous risk for Your glory.",
     "_id": "2027-12-30"
   },
-  "2027-12-31": {
+  {
     "reflection": "The early church moved in partnership with the Spirit. Their decisions weren't just \"votes,\" they were \"discernment.\"",
     "question": "Am I looking for what \"seems good to the Spirit\" today, or just what seems good to me?",
     "theme": "Guidance",
@@ -6124,7 +6128,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, lead my decisions. May my plans align with what seems good to You.",
     "_id": "2027-12-31"
   },
-  "2028-01-01": {
+  {
     "reflection": "Even \"giants of faith\" like Paul and Barnabas had disagreements. God can still use \"separated paths\" to double the reach of the Gospel.",
     "question": "Can I trust that God is at work even when a relationship ends or changes direction?",
     "theme": "Relationships",
@@ -6134,7 +6138,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, heal my hurts from disagreements. Use every path I take to spread Your love.",
     "_id": "2028-01-01"
   },
-  "2028-01-02": {
+  {
     "theme": "Encouragement",
     "question": "Who is a \"church\" (a believer) near me that I can go and strengthen today?",
     "reflection": "Our job is never just \"conversion.\" We are called to keep showing up to \"strengthen\" those who already believe.",
@@ -6144,7 +6148,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-02",
     "_id": "2028-01-02"
   },
-  "2028-01-03": {
+  {
     "reflection": "Timothy was chosen for the mission because he had a solid reputation in his local community. Character is the foundation of calling.",
     "question": "If Paul were looking for a teammate today, what would my \"local brothers/sisters\" say about me?",
     "theme": "Reputation",
@@ -6154,7 +6158,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let my private character be worthy of a \"good report\" in public.",
     "_id": "2028-01-03"
   },
-  "2028-01-04": {
+  {
     "theme": "Redirection",
     "question": "Am I frustrated by a \"closed door\" right now, or can I trust it’s the Spirit’s redirection?",
     "reflection": "A \"No\" from God is just as much a lead as a \"Yes.\" Closed doors are often God’s way of protecting our time for the best door.",
@@ -6164,7 +6168,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, thank You for Your \"No.\" I trust You to lead me to the right place at the right time.",
     "_id": "2028-01-04"
   },
-  "2028-01-05": {
+  {
     "theme": "Vision",
     "question": "Who is crying out for \"help\" in my world today? Am I listening for the \"Macedonian Call\"?",
     "reflection": "When God closes one door, He opens a \"Macedonia.\" There is always someone, somewhere, crying out for \"help.\"",
@@ -6174,7 +6178,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-05",
     "_id": "2028-01-05"
   },
-  "2028-01-06": {
+  {
     "reflection": "Lydia was a successful businesswoman, but she still needed her heart \"opened.\" God is the one who makes the Word \"click.\"",
     "question": "Am I praying for God to \"open the hearts\" of the people I’ll be talking to today?",
     "theme": "Conversion",
@@ -6184,7 +6188,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-06",
     "_id": "2028-01-06"
   },
-  "2028-01-07": {
+  {
     "reflection": "Jesus has authority over spiritual darkness. We don't have to fear the \"occult\" or \"darkness\" when we stand in His Name.",
     "question": "Am I standing in the authority of Jesus over the \"darkness\" (depression, fear, temptation) in my life?",
     "theme": "Deliverance",
@@ -6194,7 +6198,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-07",
     "_id": "2028-01-07"
   },
-  "2028-01-08": {
+  {
     "theme": "Worship",
     "question": "What is my \"midnight\" song today? Will I sing even if my \"feet are in the stocks\"?",
     "reflection": "You can lock a believer's feet, but you can't lock their song. Worship in the \"midnight\" is the most powerful kind of worship.",
@@ -6204,7 +6208,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me a song in the night. Let my worship be louder than my circumstances.",
     "_id": "2028-01-08"
   },
-  "2028-01-09": {
+  {
     "theme": "Influence",
     "question": "Who is \"listening\" to my response to my current trial? Am I giving them a reason to hope?",
     "reflection": "People are always watching how Christians handle pain. Your response to suffering is your loudest sermon.",
@@ -6214,7 +6218,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-09",
     "_id": "2028-01-09"
   },
-  "2028-01-10": {
+  {
     "reflection": "God can shake the foundations of any prison. He is the God of the \"sudden\" breakthrough.",
     "question": "Do I believe God can \"suddenly\" unfasten the bonds I’ve been struggling with for years?",
     "theme": "Breakthrough",
@@ -6224,7 +6228,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-10",
     "_id": "2028-01-10"
   },
-  "2028-01-11": {
+  {
     "theme": "Compassion",
     "question": "Am I more focused on \"escaping\" my problems or on \"ministering\" to the people around them?",
     "reflection": "Paul cared more about the jailer’s soul than his own escape. True freedom allows us to love our \"enemies.\"",
@@ -6234,7 +6238,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-11",
     "_id": "2028-01-11"
   },
-  "2028-01-12": {
+  {
     "reflection": "This is the ultimate question of humanity. Every heart is asking it, even if they don't use these exact words.",
     "question": "How am I answering the \"What must I do?\" question for people through my life and words?",
     "theme": "The Question",
@@ -6244,7 +6248,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-12",
     "_id": "2028-01-12"
   },
-  "2028-01-13": {
+  {
     "reflection": "The answer is a Person, not a program. Belief is the only requirement for a total life-transformation.",
     "question": "Is my faith still simple? Do I still \"Believe in the Lord Jesus\" as my only hope?",
     "theme": "The Answer",
@@ -6254,7 +6258,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-13",
     "_id": "2028-01-13"
   },
-  "2028-01-14": {
+  {
     "reflection": "The jailer went from \"inflicting\" wounds to \"washing\" them. True repentance always results in practical acts of love.",
     "question": "Is my repentance \"washing the wounds\" of those I have hurt in the past?",
     "theme": "Repentance",
@@ -6264,7 +6268,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, show me where I need to make amends. Turn my heart from \"harming\" to \"healing.\"",
     "_id": "2028-01-14"
   },
-  "2028-01-15": {
+  {
     "reflection": "Salvation is a family affair. One person’s faith can change the \"atmosphere\" of an entire home.",
     "question": "Am I praying for my \"entire household\" to experience the joy of believing in God?",
     "theme": "Joy",
@@ -6274,7 +6278,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-15",
     "_id": "2028-01-15"
   },
-  "2028-01-16": {
+  {
     "reflection": "Faith isn't \"blind\"; it is \"reasoned.\" God invites us to use our minds to understand His Truth.",
     "question": "Am I \"reasoning\" with the Word, or am I just skimming it without thinking?",
     "theme": "Intellect",
@@ -6284,7 +6288,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-16",
     "_id": "2028-01-16"
   },
-  "2028-01-17": {
+  {
     "reflection": "When the Gospel is lived out, it disrupts the status quo. It turns the world \"upside down\" (which is actually \"right-side up\" in God's eyes).",
     "question": "Is my life \"disruptive\" to the world's way of doing things, or am I just blending in?",
     "theme": "Impact",
@@ -6294,7 +6298,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, use me to turn my \"world\" right-side up. Let Your Kingdom values challenge the culture around me.",
     "_id": "2028-01-17"
   },
-  "2028-01-18": {
+  {
     "theme": "Openness",
     "question": "How \"eager\" am I to hear from God today? Am I leaned-in or leaned-back?",
     "reflection": "The \"noble\" heart is the \"eager\" heart. It doesn't come with skepticism, but with a hunger to know the Truth.",
@@ -6304,7 +6308,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-18",
     "_id": "2028-01-18"
   },
-  "2028-01-19": {
+  {
     "reflection": "Don't take a human's word for it—check the Source! Daily examination of the Bible is the only way to stay on track.",
     "question": "Have I \"checked the Source\" for the thoughts and ideas I’ve let into my head today?",
     "theme": "Diligence",
@@ -6314,7 +6318,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-19",
     "_id": "2028-01-19"
   },
-  "2028-01-20": {
+  {
     "reflection": "When we see people following \"fake gods\" (money, fame, comfort), it should \"provoke\" us to share the True God with them.",
     "question": "What \"idols\" in my city/culture are provoking my heart to share the Gospel?",
     "theme": "Compassion",
@@ -6324,7 +6328,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-20",
     "_id": "2028-01-20"
   },
-  "2028-01-21": {
+  {
     "theme": "Starting Point",
     "question": "Where can I find \"common ground\" with a non-believer today to start a spiritual conversation?",
     "reflection": "Paul looked for \"common ground\" to start the conversation. We can find \"echoes\" of God in people's longings and arts.",
@@ -6334,7 +6338,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me wisdom. Help me to see the \"altars\" people have built and point them to the True God.",
     "_id": "2028-01-21"
   },
-  "2028-01-22": {
+  {
     "theme": "Proximity",
     "question": "Do I live today with the awareness that God is \"actually not far\" from me right now?",
     "reflection": "God isn't \"hiding.\" He is right there, waiting to be found. He is closer to you than your own breath.",
@@ -6344,7 +6348,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-22",
     "_id": "2028-01-22"
   },
-  "2028-01-23": {
+  {
     "theme": "Existence",
     "question": "How does it change my confidence to know that I am \"moving\" within the life of God today?",
     "reflection": "We are \"submerged\" in God. Our very existence is sustained by His power. We are never out of His reach.",
@@ -6354,7 +6358,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-23",
     "_id": "2028-01-23"
   },
-  "2028-01-24": {
+  {
     "reflection": "God is patient, but there comes a time when the Truth is clear and a decision must be made. Today is that day.",
     "question": "Is there something I’ve been \"ignoring\" that God is now calling me to \"repent\" of?",
     "theme": "Mercy",
@@ -6364,7 +6368,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for Your patience. I choose to turn from my ignorance and follow Your Light.",
     "_id": "2028-01-24"
   },
-  "2028-01-25": {
+  {
     "reflection": "Justice is coming. This is bad news for the unrepentant, but great news for the oppressed. God will make everything right.",
     "question": "Does the reality of a \"fixed day\" of judgment make me more urgent about sharing the Gospel?",
     "theme": "Judgment",
@@ -6374,7 +6378,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for Your justice. Help me to live in a way that is ready for that Day.",
     "_id": "2028-01-25"
   },
-  "2028-01-26": {
+  {
     "reflection": "Don't be discouraged by \"mockers.\" Paul didn't \"win\" the whole city of Athens, but he found the \"some\" who were ready.",
     "question": "Am I focused on the \"mockers\" who reject me, or the \"seekers\" who need me?",
     "theme": "Results",
@@ -6384,7 +6388,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-26",
     "_id": "2028-01-26"
   },
-  "2028-01-27": {
+  {
     "reflection": "Being \"occupied\" means being \"filled up\" or \"consumed.\" When the Word occupies us, it naturally spills out in our testimony.",
     "question": "What is \"occupying\" my mind today—worries, news, or the Word of God?",
     "theme": "Focus",
@@ -6394,7 +6398,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, occupy my heart with Your Word. Let Your Truth be the main thing on my mind all day long.",
     "_id": "2028-01-27"
   },
-  "2028-01-28": {
+  {
     "theme": "Responsibility",
     "question": "Have I done my part to share the truth with the people in my life?",
     "reflection": "We are responsible for sharing the message; we are not responsible for how people respond to it. Do your part and leave the rest to God.",
@@ -6404,7 +6408,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-28",
     "_id": "2028-01-28"
   },
-  "2028-01-29": {
+  {
     "reflection": "Even the \"Great Apostle\" felt fear. Jesus’ antidote to fear is his Presence: \"For I am with you.\"",
     "question": "What am I \"afraid\" to say today? Will I trust that Jesus is \"with me\" in the conversation?",
     "theme": "Courage",
@@ -6414,7 +6418,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I hear Your voice: \"Do not be silent.\" Give me the courage to keep speaking for You.",
     "_id": "2028-01-29"
   },
-  "2028-01-30": {
+  {
     "reflection": "God sees the \"hidden\" believers and the \"future\" believers that we can't see yet. Every city is full of His potential.",
     "question": "Can I look at my city today with \"Jesus-eyes\"—seeing the \"many people\" who belong to Him?",
     "theme": "Potential",
@@ -6424,7 +6428,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-30",
     "_id": "2028-01-30"
   },
-  "2028-01-31": {
+  {
     "reflection": "Fervent literally means \"boiling.\" Apollos had a heat and a passion for God that couldn't be ignored.",
     "question": "Is my spirit \"boiling\" for God, or has it become lukewarm?",
     "theme": "Energy",
@@ -6434,7 +6438,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-01-31",
     "_id": "2028-01-31"
   },
-  "2028-02-01": {
+  {
     "theme": "Growth",
     "question": "Who am I \"mentoring\" or \"being mentored by\" to understand the way of God \"more accurately\"?",
     "reflection": "Even a great preacher like Apollos needed \"more accurate\" instruction. We should always be in \"learning mode.\"",
@@ -6444,7 +6448,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-01",
     "_id": "2028-02-01"
   },
-  "2028-02-02": {
+  {
     "theme": "Service",
     "question": "How can I be a \"great help\" to someone in my church or small group today?",
     "reflection": "Our goal is to be a \"great help\" to other believers. Grace is the power that enables us to be useful to the Body.",
@@ -6454,7 +6458,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, use my gifts to help Your people. Let my life be a contribution to the strength of Your Church.",
     "_id": "2028-02-02"
   },
-  "2028-02-03": {
+  {
     "theme": "Completeness",
     "question": "Am I living with the \"Power\" of the Spirit today, or just the \"Rules\" of religion?",
     "reflection": "It’s possible to have \"half the story\" (knowing about baptism/repentance) but missing the \"Power\" (the Spirit). We need the whole package.",
@@ -6464,7 +6468,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, I receive You. Fill me completely and give me the power to live for You.",
     "_id": "2028-02-03"
   },
-  "2028-02-04": {
+  {
     "theme": "Focus",
     "question": "Does \"the name of Jesus\" carry the most weight in my identity today?",
     "reflection": "Everything comes back to the Name. Our identity, our power, and our future are all tied up in \"the name of the Lord Jesus.\"",
@@ -6474,7 +6478,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I belong to Your Name. I walk in Your identity and I trust in Your power.",
     "_id": "2028-02-04"
   },
-  "2028-02-05": {
+  {
     "theme": "Channel",
     "question": "Am I making my \"hands\" available for God to do something \"extraordinary\" today?",
     "reflection": "God does the \"extraordinary,\" but He uses \"hands\" to do it. You are the channel; He is the Source.",
@@ -6484,7 +6488,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, here are my hands. Do something through me today that only You can do.",
     "_id": "2028-02-05"
   },
-  "2028-02-06": {
+  {
     "theme": "Authority",
     "question": "Does the \"darkness\" recognize me as someone who belongs to Jesus?",
     "reflection": "You can't \"fake\" spiritual authority. The enemy only respects those who are truly \"in Christ.\"",
@@ -6494,7 +6498,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, make me \"known in hell\" as one of Your faithful warriors. I stand in Your true authority.",
     "_id": "2028-02-06"
   },
-  "2028-02-07": {
+  {
     "reflection": "When God’s power is real, people stop \"playing church.\" The Name of Jesus becomes the most important thing in town.",
     "question": "Am I \"extolling\" (praising/lifting up) the Name of Jesus today in a way that others can see?",
     "theme": "Reverence",
@@ -6504,7 +6508,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-07",
     "_id": "2028-02-07"
   },
-  "2028-02-08": {
+  {
     "reflection": "Real revival involves \"cleaning out the closet.\" We have to drag our hidden sins into the light to be free of them.",
     "question": "Is there a \"secret practice\" I need to \"divulge\" to God (or a trusted friend) today to be free?",
     "theme": "Cleaning",
@@ -6514,7 +6518,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-08",
     "_id": "2028-02-08"
   },
-  "2028-02-09": {
+  {
     "reflection": "They didn't just \"stop\" doing it; they \"burned\" the bridges back to it. Sometimes we have to destroy the things that tempted us.",
     "question": "Is there something I need to \"burn\" (get rid of) today so I can't go back to my old ways?",
     "theme": "Sacrifice",
@@ -6524,7 +6528,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-09",
     "_id": "2028-02-09"
   },
-  "2028-02-10": {
+  {
     "reflection": "No amount of \"magic,\" \"idolatry,\" or \"opposition\" can stop the Word when it starts to \"prevail.\" It is the ultimate winner.",
     "question": "Am I trusting that the Word will \"prevail\" in my difficult situation, or am I giving up?",
     "theme": "Victory",
@@ -6534,7 +6538,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-10",
     "_id": "2028-02-10"
   },
-  "2028-02-11": {
+  {
     "theme": "Disturbance",
     "question": "Am I prepared for the \"stir\" that might happen if I live out the Truth at work or school?",
     "reflection": "The Gospel causes a \"stir\" because it threatens the \"idols\" that make people money. Truth is always a threat to a crooked system.",
@@ -6544,7 +6548,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-11",
     "_id": "2028-02-11"
   },
-  "2028-02-12": {
+  {
     "reflection": "The world has its own \"chants\" and \"idols.\" They are loud, but they are empty. Don't be intimidated by the volume of the crowd.",
     "question": "Am I letting the \"clamor\" of the world drown out the \"whisper\" of the Spirit?",
     "theme": "Clamor",
@@ -6554,7 +6558,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are the only Great One. I refuse to be intimidated by the world's loud idols.",
     "_id": "2028-02-12"
   },
-  "2028-02-13": {
+  {
     "reflection": "Paul’s message was simple: If you can \"make\" it, it isn't \"God.\" We serve a Creator, not a creation.",
     "question": "Am I trusting in \"gods made with hands\" (bank accounts, technology, self-effort) today?",
     "theme": "Reality",
@@ -6564,7 +6568,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Creator God, I worship You. I turn away from everything man-made and I lean on Your eternal power.",
     "_id": "2028-02-13"
   },
-  "2028-02-14": {
+  {
     "theme": "Chaos",
     "question": "Am I getting sucked into the \"confusion\" of the culture, or am I standing in the peace of Christ?",
     "reflection": "Most people in the \"anti-God\" crowd don't even know why they are there. Chaos is the hallmark of the enemy; peace is the hallmark of God.",
@@ -6574,7 +6578,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-14",
     "_id": "2028-02-14"
   },
-  "2028-02-15": {
+  {
     "reflection": "God used a \"town clerk\" to protect His people. God can use anyone—even a secular official—to accomplish His purposes.",
     "question": "Do I trust that God can use \"unlikely\" people to protect and provide for me today?",
     "theme": "Sovereignty",
@@ -6584,7 +6588,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Sovereign Lord, thank You for Your protection. I trust that You have \"town clerks\" and \"officials\" in place to work for my good.",
     "_id": "2028-02-15"
   },
-  "2028-02-16": {
+  {
     "reflection": "Paul’s \"final lap\" was focused on one thing: encouragement. People need \"many words\" of hope to stay the course.",
     "question": "How many \"words of encouragement\" can I give away today? Who needs to hear \"keep going\"?",
     "theme": "Support",
@@ -6594,7 +6598,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-16",
     "_id": "2028-02-16"
   },
-  "2028-02-17": {
+  {
     "theme": "Routine",
     "question": "Am I faithful to the \"routines\" of gathering and breaking bread with other believers?",
     "reflection": "The \"Lord's Day\" (Sunday) was already becoming the rhythm of the Church. Routine is the container for revival.",
@@ -6604,7 +6608,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-17",
     "_id": "2028-02-17"
   },
-  "2028-02-18": {
+  {
     "theme": "Distraction",
     "question": "Am I \"falling asleep\" spiritually? Is it time for me to \"wake up\" and rejoin the mission?",
     "reflection": "Even during the best preaching, people get tired or distracted. But God is the God of the \"second chance\" (and the \"second life\").",
@@ -6614,7 +6618,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, wake me up! Don't let me fall into the \"sleep\" of apathy or distraction.",
     "_id": "2028-02-18"
   },
-  "2028-02-19": {
+  {
     "theme": "Calm",
     "question": "Am I \"alarmed\" by the \"falls\" of others, or do I trust that God can restore their life?",
     "reflection": "Paul didn't panic. A leader who knows God can stay calm in the middle of a tragedy.",
@@ -6624,7 +6628,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me a calm spirit. Help me to speak life into the \"falls\" of those around me.",
     "_id": "2028-02-19"
   },
-  "2028-02-20": {
+  {
     "reflection": "Integrity means telling people what they need to hear, not just what they want to hear. A true friend doesn't \"shrink back.\"",
     "question": "Is there a \"profitable\" truth I’ve been shrinking back from sharing with someone I love?",
     "theme": "Integrity",
@@ -6634,7 +6638,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-20",
     "_id": "2028-02-20"
   },
-  "2028-02-21": {
+  {
     "theme": "Submission",
     "question": "Am I willing to be \"constrained by the Spirit\" to go somewhere, even if I don't know the outcome?",
     "reflection": "Paul was a \"prisoner\" of the Spirit. He didn't know what would happen, but he knew Who was leading him.",
@@ -6644,7 +6648,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-21",
     "_id": "2028-02-21"
   },
-  "2028-02-22": {
+  {
     "theme": "Value",
     "question": "What \"value\" am I placing on my comfort vs. the \"value\" of God's mission for me?",
     "reflection": "Paul’s \"math\" was different. His life was worth nothing compared to the mission of the Gospel.",
@@ -6654,7 +6658,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-22",
     "_id": "2028-02-22"
   },
-  "2028-02-23": {
+  {
     "reflection": "Success isn't \"winning\" the race; it's \"finishing\" it. Stay in your lane and keep running until the end.",
     "question": "Am I focused on my own \"course,\" or am I trying to run someone else's?",
     "theme": "Perseverance",
@@ -6664,7 +6668,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, help me to finish well. I want to be faithful to the specific ministry You’ve given me.",
     "_id": "2028-02-23"
   },
-  "2028-02-24": {
+  {
     "theme": "Sustainment",
     "question": "As this block ends, will I \"commend\" myself to the \"Word of Grace\" for the next season?",
     "reflection": "When the leaders leave, the \"Word of Grace\" remains. It is the only thing that can truly \"build you up\" and give you an inheritance.",
@@ -6674,7 +6678,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I commend myself to You. Build me up by Your Word and lead me into the inheritance You have for me.",
     "_id": "2028-02-24"
   },
-  "2028-02-25": {
+  {
     "reflection": "Sometimes \"love\" tries to talk us out of \"sacrifice.\" True community eventually steps back and trusts God’s difficult path for us.",
     "question": "Is there a \"hard path\" I am avoiding because others are worried for me, or vice versa?",
     "theme": "Surrender",
@@ -6684,7 +6688,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I stop my own persuasion. Let Your will—not my comfort—be the final word today.",
     "_id": "2028-02-25"
   },
-  "2028-02-26": {
+  {
     "theme": "Resolve",
     "question": "What am I still \"holding onto\" so tightly that it makes me afraid of following Jesus fully?",
     "reflection": "Paul’s secret was that he had already \"died\" to himself years ago. You can’t threaten a man who has nothing to lose.",
@@ -6694,7 +6698,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I am Yours. Take my fears and replace them with a resolve that the world cannot shake.",
     "_id": "2028-02-26"
   },
-  "2028-02-27": {
+  {
     "reflection": "Paul didn't just tell stories; he gave God the credit. When we share our \"wins,\" the goal is to make God look big.",
     "question": "Who can I tell today about a \"win\" in my life, ensuring they know it was God's doing?",
     "theme": "Report",
@@ -6704,7 +6708,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-27",
     "_id": "2028-02-27"
   },
-  "2028-02-28": {
+  {
     "reflection": "Truth often causes a \"stir.\" Don't mistake a lack of peace in the room for a lack of God's presence in the person.",
     "question": "Am I okay with \"disturbing the peace\" if it means standing for the Truth of the Gospel?",
     "theme": "Chaos",
@@ -6714,7 +6718,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-28",
     "_id": "2028-02-28"
   },
-  "2028-02-29": {
+  {
     "reflection": "God used a Roman arrest to save Paul from a Jewish lynch mob. God often uses our \"problems\" as His \"protections.\"",
     "question": "Can I see my current \"restriction\" (a job, a rule, a delay) as God’s way of shielding me?",
     "theme": "Providence",
@@ -6724,7 +6728,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-02-29",
     "_id": "2028-02-29"
   },
-  "2028-03-01": {
+  {
     "reflection": "Paul looked for the \"gap.\" Even while being dragged away, he was looking for a way to speak.",
     "question": "What \"barracks\" (difficult environment) am I in right now where I could ask, \"May I say something?\"",
     "theme": "Opportunity",
@@ -6734,7 +6738,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, give me the right words at the most unlikely times. Let me speak hope into the chaos.",
     "_id": "2028-03-01"
   },
-  "2028-03-02": {
+  {
     "reflection": "Paul started his defense with his story. Your personal history with God is the one argument no one can refute.",
     "question": "Do I know my \"before and after\" story well enough to tell it in three minutes?",
     "theme": "Power",
@@ -6744,7 +6748,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for my story. Help me to share how You changed me with clarity and humility.",
     "_id": "2028-03-02"
   },
-  "2028-03-03": {
+  {
     "theme": "Urgency",
     "question": "Is there a step of obedience I’ve been \"waiting\" on? What am I waiting for?",
     "reflection": "Faith isn't a spectator sport. There comes a moment where \"thinking about it\" must turn into \"acting on it.\"",
@@ -6754,7 +6758,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-03",
     "_id": "2028-03-03"
   },
-  "2028-03-04": {
+  {
     "reflection": "God’s plans are often bigger than our comfort zones. He doesn't send us \"near\" just to keep us safe; He sends us \"far\" to make us useful.",
     "question": "Am I willing to go \"far away\" (culturally or physically) for the sake of the Gospel?",
     "theme": "Mission",
@@ -6764,7 +6768,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, send me. My \"Yes\" is on the table before I even know the destination.",
     "_id": "2028-03-04"
   },
-  "2028-03-05": {
+  {
     "reflection": "Paul used his legal rights to further the Gospel. We should use every \"status\" we have (citizenship, education, job) for God's purposes.",
     "question": "How can I use my \"standing\" or \"privilege\" today to protect the vulnerable or share the Truth?",
     "theme": "Standing",
@@ -6774,7 +6778,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-05",
     "_id": "2028-03-05"
   },
-  "2028-03-06": {
+  {
     "theme": "Integrity",
     "question": "Can I say today that I am living \"before God\" with a good conscience?",
     "reflection": "Success is being able to look in the mirror and know you've been faithful to God. A clear conscience is the best pillow.",
@@ -6784,7 +6788,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-06",
     "_id": "2028-03-06"
   },
-  "2028-03-07": {
+  {
     "theme": "Presence",
     "question": "Do I feel the \"standing by\" presence of Jesus in my current struggle?",
     "reflection": "When the room is dark and the future is uncertain, Jesus \"stands by\" His people. You are never truly alone in the \"barracks.\"",
@@ -6794,7 +6798,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-07",
     "_id": "2028-03-07"
   },
-  "2028-03-08": {
+  {
     "reflection": "God’s \"Must\" overrides man’s \"No.\" If God says you are going to Rome, no plot in Jerusalem can stop you.",
     "question": "What \"Rome\" (God-given goal) has God put in my heart that I am worrying about?",
     "theme": "Destination",
@@ -6804,7 +6808,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Sovereign God, Your \"Must\" is my anchor. I trust that You will get me to where You want me to be.",
     "_id": "2028-03-08"
   },
-  "2028-03-09": {
+  {
     "reflection": "God uses \"ordinary\" family members and \"accidental\" eavesdropping to thwart the plans of the enemy.",
     "question": "Do I trust that God is exposing the \"ambushes\" against me before they even reach me?",
     "theme": "Protection",
@@ -6814,7 +6818,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-09",
     "_id": "2028-03-09"
   },
-  "2028-03-10": {
+  {
     "reflection": "God provided 470 Roman soldiers to protect one apostle. When God wants you moved, He will provide the \"escort.\"",
     "question": "Am I worrying about my \"safety\" instead of trusting God's massive \"provision\"?",
     "theme": "Provision",
@@ -6824,7 +6828,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-10",
     "_id": "2028-03-10"
   },
-  "2028-03-11": {
+  {
     "theme": "Identity",
     "question": "Am I letting the world’s \"labels\" for Christians discourage me or define me?",
     "reflection": "Don't let others define your faith with their labels. You aren't part of a \"sect\"; you are walking in \"The Way.\"",
@@ -6834,7 +6838,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I am a follower of The Way. I find my identity in Your Truth, not the world’s opinion.",
     "_id": "2028-03-11"
   },
-  "2028-03-12": {
+  {
     "theme": "Goal",
     "question": "What \"pains\" do I need to take today to clear my conscience with someone?",
     "reflection": "Having a clear conscience takes \"pains\" (effort). It means making things right quickly and living transparently.",
@@ -6844,7 +6848,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-12",
     "_id": "2028-03-12"
   },
-  "2028-03-13": {
+  {
     "reflection": "The Gospel should \"alarm\" the comfortable. We don't just talk about \"love\"; we talk about the \"judgment\" that makes love necessary.",
     "question": "Am I \"toning down\" the Gospel to keep people from being \"alarmed\"?",
     "theme": "Challenge",
@@ -6854,7 +6858,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, give me the boldness to speak the whole Truth—righteousness, self-control, and Your return.",
     "_id": "2028-03-13"
   },
-  "2028-03-14": {
+  {
     "theme": "Procrastination",
     "question": "Is there something God is asking me to do \"today\" that I am pushing off until a \"convenient time\"?",
     "reflection": "Felix waited for a \"convenient time\" that never came. Tomorrow is the devil’s favorite day to repent.",
@@ -6864,7 +6868,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-14",
     "_id": "2028-03-14"
   },
-  "2028-03-15": {
+  {
     "reflection": "Two years! Sometimes God’s \"fast track\" includes a long \"waiting room.\" Silence from God isn't an absence of God.",
     "question": "How am I using my \"prison time\" (waiting for the next season)? Am I bitter or am I building?",
     "theme": "Waiting",
@@ -6874,7 +6878,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I trust You with the clock. Even in the \"two-year\" delays, I believe You are working.",
     "_id": "2028-03-15"
   },
-  "2028-03-16": {
+  {
     "theme": "Authority",
     "question": "Am I wasting my breath on \"small\" critics instead of appealing to my \"High Priest\" in Heaven?",
     "reflection": "Paul knew when to stop arguing with \"small\" leaders and appeal to the Highest Power. He was aiming for the heart of the Empire.",
@@ -6884,7 +6888,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "King Jesus, I appeal to You. You are the ultimate Authority over my life and my case.",
     "_id": "2028-03-16"
   },
-  "2028-03-17": {
+  {
     "theme": "Destination",
     "question": "Do I realize that my \"decisions\" today are the \"vehicles\" God is using to get me to my \"Rome\"?",
     "reflection": "God uses our own \"appeals\" and legal choices to fulfill His ancient promises to us. Your \"choices\" are part of His \"plan.\"",
@@ -6894,7 +6898,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-17",
     "_id": "2028-03-17"
   },
-  "2028-03-18": {
+  {
     "theme": "Vanity",
     "question": "Am I being \"dazzled\" by the world's \"pomp\" (wealth, fame) while ignoring the spiritual power I carry?",
     "reflection": "The world brings \"pomp\"; Paul brought \"Power.\" Never be intimidated by the \"show\" when you have the \"Substance.\"",
@@ -6904,7 +6908,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-18",
     "_id": "2028-03-18"
   },
-  "2028-03-19": {
+  {
     "reflection": "Even a pagan governor recognized that Paul had done nothing \"illegal.\" The only \"charge\" against him was the Gospel.",
     "question": "If I were \"charged\" today, would there be enough \"evidence\" of my faith to convict me?",
     "theme": "Justice",
@@ -6914,7 +6918,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let my only \"crime\" be that I love You too much and serve You too well.",
     "_id": "2028-03-19"
   },
-  "2028-03-20": {
+  {
     "reflection": "Paul didn't see himself as a \"victim,\" but as \"fortunate.\" Gratitude is a weapon that changes the atmosphere of a trial.",
     "question": "Can I find a reason to \"consider myself fortunate\" in the middle of my current challenge?",
     "theme": "Attitude",
@@ -6924,7 +6928,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-20",
     "_id": "2028-03-20"
   },
-  "2028-03-21": {
+  {
     "theme": "Background",
     "question": "How is God using my \"past\" (even the \"strict\" or \"wrong\" parts) to help me reach people today?",
     "reflection": "God doesn't \"waste\" your past. He used Paul’s \"strictest\" training to make him the most effective defender of Grace.",
@@ -6934,7 +6938,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-21",
     "_id": "2028-03-21"
   },
-  "2028-03-22": {
+  {
     "theme": "Possibility",
     "question": "What \"impossible\" thing am I afraid to ask for because I think it’s \"too incredible\" for God?",
     "reflection": "If God is God, \"impossible\" is just a word. Resurrection is only \"incredible\" if your God is too small.",
@@ -6944,7 +6948,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-22",
     "_id": "2028-03-22"
   },
-  "2028-03-23": {
+  {
     "theme": "Resistance",
     "question": "Where am I currently \"kicking\" against God’s direction and only hurting myself?",
     "reflection": "A \"goad\" was a sharp stick used to move oxen. Resisting God’s will only hurts us. Submission is the path to peace.",
@@ -6954,7 +6958,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-23",
     "_id": "2028-03-23"
   },
-  "2028-03-24": {
+  {
     "theme": "Mandate",
     "question": "Who can I help \"see\" the Truth today by simply pointing them to the Light?",
     "reflection": "This is the mission: Eyes opened, Darkness turned, Power switched. We are \"optometrists\" for the soul.",
@@ -6964,7 +6968,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, use me to open eyes. Let my life be a \"flashlight\" that helps others find their way out of the dark.",
     "_id": "2028-03-24"
   },
-  "2028-03-25": {
+  {
     "theme": "Faithfulness",
     "question": "Am I still being faithful to the \"vision\" (the call) God gave me a year ago?",
     "reflection": "Success isn't \"being popular\"; it’s being \"not disobedient.\" Staying true to what God told you in the light is the key to surviving the dark.",
@@ -6974,7 +6978,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, keep me faithful. I want to stand before You and say I was not disobedient to Your call.",
     "_id": "2028-03-25"
   },
-  "2028-03-26": {
+  {
     "reflection": "Paul didn't survive on \"grit\"; he survived on \"Help from God.\" It is a daily delivery that never fails.",
     "question": "Have I asked for my \"Help from God\" today, or am I trying to \"grit\" it out on my own?",
     "theme": "Sustenance",
@@ -6984,7 +6988,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-26",
     "_id": "2028-03-26"
   },
-  "2028-03-27": {
+  {
     "reflection": "Paul didn't need \"new\" revelations; he just needed the \"True\" ones. Stay anchored in the Word and you’ll never go astray.",
     "question": "Am I looking for \"new/shiny\" truths, or am I anchored in the \"Old/True\" Word of God?",
     "theme": "Consistency",
@@ -6994,7 +6998,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-27",
     "_id": "2028-03-27"
   },
-  "2028-03-28": {
+  {
     "reflection": "When the world can't explain your joy or your peace, they call you \"crazy.\" Take it as a compliment.",
     "question": "Does my \"sanity\" look like the world's, or am I \"crazy\" enough to believe the Gospel?",
     "theme": "Reaction",
@@ -7004,7 +7008,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-03-28",
     "_id": "2028-03-28"
   },
-  "2028-03-29": {
+  {
     "reflection": "Agrippa was \"almost\" persuaded. \"Almost\" is the saddest word in the spiritual dictionary. Decisions must be made.",
     "question": "Is there someone in my life who is \"almost\" there? How can I pray for their \"final step\" today?",
     "theme": "Decision",
@@ -7014,7 +7018,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, finish the work in the \"almosts.\" Turn their curiosity into commitment today.",
     "_id": "2028-03-29"
   },
-  "2028-03-30": {
+  {
     "reflection": "Paul wanted everyone to have his \"Joy,\" but none of his \"Chains.\" That is the heart of a true evangelist.",
     "question": "Do I want others to experience the \"freedom\" I have in Christ, regardless of my own \"chains\"?",
     "theme": "Prayer",
@@ -7024,7 +7028,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, bless my \"listeners\" today. Let them find the joy I have found in You.",
     "_id": "2028-03-30"
   },
-  "2028-03-31": {
+  {
     "theme": "Movement",
     "question": "What \"shore\" of safety is God asking me to leave today so I can \"put to sea\" with Him?",
     "reflection": "Every \"embarking\" involves a risk. When we follow God, we have to leave the \"safety\" of the shore and trust the \"Ship\" of His Will.",
@@ -7034,7 +7038,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I’m on board. I trust You with the winds and the waves as we move toward Rome.",
     "_id": "2028-03-31"
   },
-  "2028-04-01": {
+  {
     "theme": "Grace",
     "question": "Am I looking for the \"kindnesses\" God is sending me through \"unlikely\" people today?",
     "reflection": "God can give you \"favor\" even with your \"captors.\" Kindness is a tool God uses to refresh His servants on long journeys.",
@@ -7044,7 +7048,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Thank You, Lord, for the \"Julius\" in my life. Thank You for the unexpected favors and refreshments.",
     "_id": "2028-04-01"
   },
-  "2028-04-02": {
+  {
     "theme": "Discernment",
     "question": "Am I listening to the \"warning signs\" the Spirit is giving me about a certain path?",
     "reflection": "There is a \"spiritual calendar\" and a \"natural calendar.\" Wisdom knows when it’s \"dangerous\" to move, even if others are pushing.",
@@ -7054,7 +7058,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me discernment. Help me to know when to \"wait in the harbor\" and when to sail.",
     "_id": "2028-04-02"
   },
-  "2028-04-03": {
+  {
     "theme": "Warning",
     "question": "Am I prepared to be \"right\" but still have to endure the \"storm\" with those who ignored me?",
     "reflection": "Wisdom is often ignored by those in a hurry. Just because you are \"warned\" doesn't mean you won't have to go through the storm anyway.",
@@ -7064,7 +7068,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-03",
     "_id": "2028-04-03"
   },
-  "2028-04-04": {
+  {
     "reflection": "The \"majority\" is often wrong in spiritual matters. Truth isn't a democracy; it’s a revelation.",
     "question": "Am I following the \"majority\" or am I following the \"Message\" God gave me?",
     "theme": "Warning",
@@ -7074,7 +7078,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-04",
     "_id": "2028-04-04"
   },
-  "2028-04-05": {
+  {
     "theme": "Deception",
     "question": "Am I being \"fooled\" by a \"gentle wind\" in an area where God has already said \"No\"?",
     "reflection": "Don't trust a \"gentle breeze\" if God has already given a \"warning.\" Success isn't always a sign of God’s approval.",
@@ -7084,7 +7088,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, keep me from being deceived by easy circumstances. I want Your will, not just an easy path.",
     "_id": "2028-04-05"
   },
-  "2028-04-06": {
+  {
     "theme": "Trial",
     "question": "Am I \"surprised\" by the \"Northeaster\" in my life right now? Will I stay on the ship?",
     "reflection": "Suddenly the weather changes. Storms don't mean you are \"out of God’s will\"; they just mean you are on the \"high seas.\"",
@@ -7094,7 +7098,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I’m not jumping overboard. I trust You even when the \"tempestuous wind\" strikes.",
     "_id": "2028-04-06"
   },
-  "2028-04-07": {
+  {
     "theme": "Surrender",
     "question": "Is there a \"storm\" I need to stop \"fighting\" and start \"trusting\" God to \"drive\" me through?",
     "reflection": "Sometimes you can't \"row\" against the storm; you just have to \"give way\" and let God \"drive\" you where He wants.",
@@ -7104,7 +7108,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-07",
     "_id": "2028-04-07"
   },
-  "2028-04-08": {
+  {
     "theme": "Despair",
     "question": "Am I at the point of \"abandoning hope\" in my own strength? (Good! Now watch God.)",
     "reflection": "God often waits until \"all hope is abandoned\" to show that He is the only Hope left. Despair is the \"backdoor\" to a miracle.",
@@ -7114,7 +7118,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are my only Hope. When the stars are hidden and the storm is loud, I look to You.",
     "_id": "2028-04-08"
   },
-  "2028-04-09": {
+  {
     "reflection": "One person with \"Word from God\" can change the morale of an entire ship. Your \"Take Heart\" could save someone today.",
     "question": "Who can I tell to \"Take Heart\" today based on a promise I’ve found in God's Word?",
     "theme": "Encouragement",
@@ -7124,7 +7128,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-09",
     "_id": "2028-04-09"
   },
-  "2028-04-10": {
+  {
     "theme": "Identity",
     "question": "Do I live today as someone who \"belongs to God,\" or as someone who is an \"orphan\" in the storm?",
     "reflection": "Security comes from knowing Who you belong to. If you \"belong\" to the Creator of the Sea, the sea cannot swallow you.",
@@ -7134,7 +7138,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I belong to You. I am Your property, and You take care of what is Yours.",
     "_id": "2028-04-10"
   },
-  "2028-04-11": {
+  {
     "theme": "Conviction",
     "question": "Do I believe it will be \"exactly\" as God said, or am I \"hedging my bets\" just in case?",
     "reflection": "Faith isn't \"vague hope\"; it’s the conviction that it will be \"exactly as I have been told.\" God’s Word is literal.",
@@ -7144,7 +7148,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I believe You. Let it be \"exactly\" as You have spoken. I stand on Your literal Word.",
     "_id": "2028-04-11"
   },
-  "2028-04-12": {
+  {
     "theme": "Necessity",
     "question": "Am I willing to \"lose the ship\" if it means \"saving the life\" God has for me?",
     "reflection": "Breakthrough often involves a \"wreck.\" You might lose the \"ship\" (the business, the plan), but you will save the \"life.\"",
@@ -7154,7 +7158,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I’m okay with the \"wreck\" as long as I’m with You. I trust Your \"running aground\" plan.",
     "_id": "2028-04-12"
   },
-  "2028-04-13": {
+  {
     "theme": "Fear",
     "question": "What \"anchors\" am I letting down today to keep me from \"hitting the rocks\" of despair?",
     "reflection": "When we are \"fearing the rocks,\" we need \"anchors.\" Prayer, Word, Fellowship, and Praise are the four anchors for any storm.",
@@ -7164,7 +7168,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-13",
     "_id": "2028-04-13"
   },
-  "2028-04-14": {
+  {
     "reflection": "Sometimes the most spiritual thing you can do is just \"wait for the day.\" The sun will rise; you just have to stay anchored.",
     "question": "Am I \"praying for day\" (patience) or am I trying to \"force the dawn\" in my own strength?",
     "theme": "Patience",
@@ -7174,7 +7178,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I wait for the day. I trust that the morning is coming and Your mercies will be new.",
     "_id": "2028-04-14"
   },
-  "2028-04-15": {
+  {
     "theme": "Persistence",
     "question": "Am I tempted to \"jump ship\" right before the miracle? Will I stay the course?",
     "reflection": "God’s promises often have \"conditions.\" We have to \"stay in the ship\" (stay in the Church, stay in the Word) to see the salvation.",
@@ -7184,7 +7188,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-15",
     "_id": "2028-04-15"
   },
-  "2028-04-16": {
+  {
     "theme": "Practicality",
     "question": "Am I neglecting my \"strength\" (rest/food) while trying to \"believe\" for a miracle?",
     "reflection": "Paul was \"spiritual,\" but he was also \"practical.\" You can't fight a spiritual battle on an empty stomach and no sleep.",
@@ -7194,7 +7198,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-16",
     "_id": "2028-04-16"
   },
-  "2028-04-17": {
+  {
     "reflection": "God is interested in the \"details.\" If He numbers the hairs on your head, He certainly cares about the \"major\" things too.",
     "question": "How does God's \"hair-level\" detail of care give me peace about my \"big\" problems today?",
     "theme": "Security",
@@ -7204,7 +7208,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-17",
     "_id": "2028-04-17"
   },
-  "2028-04-18": {
+  {
     "reflection": "Paul \"said grace\" in the middle of a shipwreck. Gratitude is a witness that transcends our environment.",
     "question": "Will I \"give thanks\" today even if my \"ship\" is currently falling apart?",
     "theme": "Witness",
@@ -7214,7 +7218,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I give You thanks. Right here, in the middle of the mess, I acknowledge Your goodness.",
     "_id": "2028-04-18"
   },
-  "2028-04-19": {
+  {
     "theme": "Atmosphere",
     "question": "Who can I \"infect\" with encouragement today by simply being \"steady\" in my own faith?",
     "reflection": "Courage is contagious. When you eat and give thanks, others feel like they can do it too.",
@@ -7224,7 +7228,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-19",
     "_id": "2028-04-19"
   },
-  "2028-04-20": {
+  {
     "reflection": "It wasn't \"pretty\"—they arrived on planks and pieces of the ship—but they arrived. God’s \"arrival\" isn't always \"elegant,\" but it is always \"certain.\"",
     "question": "Am I \"complaining\" about how I’m arriving (the broken planks) or am I \"celebrating\" that I’m arriving?",
     "theme": "Success",
@@ -7234,7 +7238,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-20",
     "_id": "2028-04-20"
   },
-  "2028-04-21": {
+  {
     "reflection": "God provides \"unusual\" kindness in \"unlikely\" places. Sometimes the \"natives\" (the world) show more grace than the \"religious.\"",
     "question": "Am I open to receiving \"unusual kindness\" from people who don't even know Jesus yet?",
     "theme": "Hospitality",
@@ -7244,7 +7248,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-21",
     "_id": "2028-04-21"
   },
-  "2028-04-22": {
+  {
     "theme": "Resilience",
     "question": "What \"viper\" of criticism or \"bad luck\" am I letting cling to me? Will I shake it off today?",
     "reflection": "After the storm comes the \"viper.\" The enemy always has one last \"bite\" ready. Just \"shake it off\" and keep going.",
@@ -7254,7 +7258,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-22",
     "_id": "2028-04-22"
   },
-  "2028-04-23": {
+  {
     "theme": "Irony",
     "question": "Am I living for the \"mind-changing\" opinions of people, or the \"unchanging\" Word of God?",
     "reflection": "People’s opinions are \"fickle.\" One minute you are a \"murderer,\" the next you are a \"god.\" Don't live for either label.",
@@ -7264,7 +7268,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-23",
     "_id": "2028-04-23"
   },
-  "2028-04-24": {
+  {
     "theme": "Hospitality",
     "question": "How can I be \"hospitable\" to someone today to open a door for the Spirit?",
     "reflection": "As we end this block, we see that \"Hospitality\" is the final bridge to the Gospel in Acts. Kindness opens the door for the Kingdom.",
@@ -7274,7 +7278,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, make me a host for Your Gospel. Use my home, my time, and my kindness to \"entertain\" Your Truth in the hearts of others.",
     "_id": "2028-04-24"
   },
-  "2028-04-25": {
+  {
     "theme": "Healing",
     "question": "Who can I \"lay hands on\" (offer a physical gesture of prayer/comfort) today?",
     "reflection": "Paul didn't just \"wish him well\"; he took action. Prayer combined with the \"laying on of hands\" is a physical sign of spiritual power.",
@@ -7284,7 +7288,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, use my hands to bring Your healing touch to someone who is hurting.",
     "_id": "2028-04-25"
   },
-  "2028-04-26": {
+  {
     "reflection": "When you bless people with God's power, they often respond with \"honors.\" Use those resources to fuel the next leg of the mission.",
     "question": "Am I being a \"blessing\" to my community in a way that makes them want to support God's work?",
     "theme": "Gratitude",
@@ -7294,7 +7298,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the \"provisions\" that come through the people I serve. Let me use them wisely.",
     "_id": "2028-04-26"
   },
-  "2028-04-27": {
+  {
     "theme": "Arrival",
     "question": "What \"Rome\" (long-term goal) have I finally reached? Am I taking a moment to say, \"And so I came\"?",
     "reflection": "Five words that represent years of struggle, shipwrecks, and prayers. God's \"Arrival\" is inevitable, even if the journey is long.",
@@ -7304,7 +7308,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-27",
     "_id": "2028-04-27"
   },
-  "2028-04-28": {
+  {
     "reflection": "Even the \"Great Apostle\" needed to see his friends to \"take courage.\" We are designed for \"face-to-face\" fellowship.",
     "question": "Who can I \"see\" today (in person or video) to give and receive a boost of courage?",
     "theme": "Encouragement",
@@ -7314,7 +7318,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-04-28",
     "_id": "2028-04-28"
   },
-  "2028-04-29": {
+  {
     "reflection": "Paul was \"in Rome,\" but he was still \"chained.\" God can use you even when your \"freedom\" is limited by a soldier (or a circumstance).",
     "question": "How can I be \"effective for the Gospel\" even within the \"chains\" of my current limitations?",
     "theme": "Limitation",
@@ -7324,7 +7328,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I am Your prisoner, not the world’s. Use me right where I am, even in my \"confinement.\"",
     "_id": "2028-04-29"
   },
-  "2028-04-30": {
+  {
     "reflection": "Paul didn't use his platform to \"vent\" about his unfair treatment. He stayed focused on the \"Hope of Israel.\"",
     "question": "Am I \"venting\" about my problems, or am I \"pointing\" to my Hope?",
     "theme": "Forgiveness",
@@ -7334,7 +7338,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, help me to stop talking about my \"chains\" and start talking about Your \"Grace.\"",
     "_id": "2028-04-30"
   },
-  "2028-05-01": {
+  {
     "theme": "Message",
     "question": "Am I living for my \"own kingdom\" today, or am I \"expounding\" the Kingdom of God?",
     "reflection": "The \"Kingdom of God\" is the big picture. It’s not just about \"me and Jesus\"; it’s about \"God and the World.\"",
@@ -7344,7 +7348,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-01",
     "_id": "2028-05-01"
   },
-  "2028-05-02": {
+  {
     "theme": "Reality",
     "question": "Am I \"convinced\" today, or am I letting \"disbelief\" creep in because of my circumstances?",
     "reflection": "The same message produces different results in different hearts. Don't take \"disbelief\" as a personal failure.",
@@ -7354,7 +7358,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, convince me again. I choose to be among the \"some\" who believe.",
     "_id": "2028-05-02"
   },
-  "2028-05-03": {
+  {
     "theme": "Scope",
     "question": "Who is the \"Gentile\" (the person outside my circle) that I need to \"send\" the Gospel to today?",
     "reflection": "The Gospel is \"Sent.\" It is a missionary message that always moves toward the \"outsider.\"",
@@ -7364,7 +7368,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for sending salvation to me. Help me to \"send\" it to someone else.",
     "_id": "2028-05-03"
   },
-  "2028-05-04": {
+  {
     "theme": "Hospitality",
     "question": "Is my \"home\" (or my heart) an \"open door\" where I welcome everyone who comes to me?",
     "reflection": "Acts ends not with a \"period,\" but with an \"open door.\" Paul’s rented house was a \"Welcome Center\" for the Kingdom.",
@@ -7374,7 +7378,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, make me a \"welcomer.\" Let my life be an invitation for others to meet You.",
     "_id": "2028-05-04"
   },
-  "2028-05-05": {
+  {
     "theme": "Final Word",
     "question": "Do I believe that the Gospel is \"unhindered\" in my life today, despite my obstacles?",
     "reflection": "The book of Acts ends with the word \"unhindered\" (in Greek). Nothing can stop the Gospel!",
@@ -7384,7 +7388,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I speak Your Word with boldness. I believe that nothing can \"hinder\" Your work in me.",
     "_id": "2028-05-05"
   },
-  "2028-05-06": {
+  {
     "reflection": "Paul starts his letter to the Romans with his \"ID Card\": Servant and Called. You are first a \"Servant,\" then a \"Leader.\"",
     "question": "Do I see myself as a \"Servant of Christ Jesus\" before I see myself as anything else?",
     "theme": "Identity",
@@ -7394,7 +7398,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-06",
     "_id": "2028-05-06"
   },
-  "2028-05-07": {
+  {
     "theme": "Origin",
     "question": "Am I trying to \"invent\" my own way to God, or am I following the \"Gospel of God\"?",
     "reflection": "The Gospel isn't a human invention; it belongs to God. He is the Author, the Content, and the Power of the message.",
@@ -7404,7 +7408,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-07",
     "_id": "2028-05-07"
   },
-  "2028-05-08": {
+  {
     "reflection": "The Resurrection is the \"Seal\" on Jesus' identity. If He rose, He is who He said He was. Period.",
     "question": "Does the reality of the Resurrection give me \"Power\" for my daily life today?",
     "theme": "Resurrection",
@@ -7414,7 +7418,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are the Son of God. I live in the power of Your Resurrection today.",
     "_id": "2028-05-08"
   },
-  "2028-05-09": {
+  {
     "theme": "Goal",
     "question": "Is my \"faith\" producing \"obedience\" in my choices today?",
     "reflection": "Faith isn't just \"believing\"; it’s \"obeying.\" We trust God so much that we do what He says.",
@@ -7424,7 +7428,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-09",
     "_id": "2028-05-09"
   },
-  "2028-05-10": {
+  {
     "theme": "Security",
     "question": "How does \"belonging to Jesus\" change my sense of security and worth today?",
     "reflection": "You are \"Called to Belong.\" You are not an orphan; you are a member of the Family of God.",
@@ -7434,7 +7438,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-10",
     "_id": "2028-05-10"
   },
-  "2028-05-11": {
+  {
     "theme": "Affection",
     "question": "Can I sit for a moment and just \"feel\" the truth that I am \"Loved by God\"?",
     "reflection": "You are \"Loved by God.\" That is your primary status. You aren't just \"useful\" to Him; You are \"cherished\" by Him.",
@@ -7444,7 +7448,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-11",
     "_id": "2028-05-11"
   },
-  "2028-05-12": {
+  {
     "reflection": "Is your \"faith\" something people talk about? A strong faith leaves a \"scent\" that others notice.",
     "question": "What is being \"proclaimed\" about my faith in my workplace or my neighborhood?",
     "theme": "Influence",
@@ -7454,7 +7458,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let my faith be \"talked about\" because it is real and visible to others.",
     "_id": "2028-05-12"
   },
-  "2028-05-13": {
+  {
     "reflection": "Real service isn't just \"doing things\"; it’s serving with your \"spirit.\" It’s an internal devotion that moves external actions.",
     "question": "Is my \"service\" for God coming from my \"spirit,\" or am I just going through the motions?",
     "theme": "Devotion",
@@ -7464,7 +7468,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-13",
     "_id": "2028-05-13"
   },
-  "2028-05-14": {
+  {
     "theme": "Community",
     "question": "Who can I \"mutually encourage\" today by simply sharing what God is doing in my life?",
     "reflection": "Even the \"Apostle Paul\" needed to be encouraged by the faith of \"ordinary\" Romans. We all need each other.",
@@ -7474,7 +7478,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for the Body of Christ. Help us to \"mutually encourage\" one another today.",
     "_id": "2028-05-14"
   },
-  "2028-05-15": {
+  {
     "theme": "Responsibility",
     "question": "Do I feel an \"obligation\" to share the Grace I’ve received with those who haven't heard it?",
     "reflection": "Paul felt \"indebted\" to share the Gospel. He didn't see it as a \"hobby,\" but as a \"debt\" he owed to the world.",
@@ -7484,7 +7488,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I am a debtor to Your Grace. Help me to \"repay\" that debt by sharing Your Love with everyone.",
     "_id": "2028-05-15"
   },
-  "2028-05-16": {
+  {
     "theme": "Attitude",
     "question": "Am I \"eager\" to share the Good News, or does it feel like a \"chore\"?",
     "reflection": "Eagerness is the opposite of \"duty.\" Paul loved the Gospel so much he couldn't wait to talk about it.",
@@ -7494,7 +7498,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-16",
     "_id": "2028-05-16"
   },
-  "2028-05-17": {
+  {
     "reflection": "The world might think it’s \"foolish,\" but the Gospel is the only thing that actually works. Don't be ashamed of the Truth.",
     "question": "Is there any area of my life where I am \"ashamed\" to be known as a follower of Jesus?",
     "theme": "Confidence",
@@ -7504,7 +7508,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-17",
     "_id": "2028-05-17"
   },
-  "2028-05-18": {
+  {
     "theme": "Mechanism",
     "question": "Am I relying on my \"advice\" to change people, or am I relying on the \"Power\" of the Gospel?",
     "reflection": "The Gospel isn't \"advice\"; it’s \"Power.\" It’s the \"Dynamite\" (Dunamis) of God that blasts through sin and death.",
@@ -7514,7 +7518,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-18",
     "_id": "2028-05-18"
   },
-  "2028-05-19": {
+  {
     "theme": "Lifestyle",
     "question": "Am I \"living by faith\" today, or am I living by \"sight\" and \"worry\"?",
     "reflection": "Faith isn't a one-time \"prayer\"; it’s a \"living.\" We breathe faith, walk faith, and act faith every single day.",
@@ -7524,7 +7528,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-19",
     "_id": "2028-05-19"
   },
-  "2028-05-20": {
+  {
     "reflection": "People don't \"miss\" the truth; they \"suppress\" it. The problem isn't a \"lack of evidence\"; it’s a \"willful rejection.\"",
     "question": "Am I \"suppressing\" any truth in my own life because it’s \"uncomfortable\"?",
     "theme": "Rebellion",
@@ -7534,7 +7538,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-20",
     "_id": "2028-05-20"
   },
-  "2028-05-21": {
+  {
     "theme": "Evidence",
     "question": "Have I taken a moment today to \"clearly perceive\" God's glory in the \"things that have been made\"?",
     "reflection": "Nature is God's \"Billboard.\" The stars, the trees, and the ocean all shout \"Creator!\" No one has an excuse to ignore Him.",
@@ -7544,7 +7548,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-21",
     "_id": "2028-05-21"
   },
-  "2028-05-22": {
+  {
     "reflection": "Human \"wisdom\" that leaves out God is the ultimate \"folly.\" True wisdom begins with the Fear of the Lord.",
     "question": "Am I relying on my \"own wisdom\" today, or am I asking for the \"Wisdom from Above\"?",
     "theme": "Pride",
@@ -7554,7 +7558,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-22",
     "_id": "2028-05-22"
   },
-  "2028-05-23": {
+  {
     "theme": "Trading",
     "question": "What \"bad trades\" am I tempted to make today? (Comfort for Truth? Popularity for Integrity?)",
     "reflection": "Sin is always a \"bad trade.\" We trade the \"Eternal Creator\" for a \"Temporary Creature.\" It’s a losing deal every time.",
@@ -7564,7 +7568,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-23",
     "_id": "2028-05-23"
   },
-  "2028-05-24": {
+  {
     "reflection": "We were made to \"worship.\" If we don't worship God, we will worship \"stuff.\" Idolatry is just \"misplaced worship.\"",
     "question": "What \"creature\" (person, thing, dream) am I tempted to \"worship\" today?",
     "theme": "Idolatry",
@@ -7574,7 +7578,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-24",
     "_id": "2028-05-24"
   },
-  "2028-05-25": {
+  {
     "reflection": "Sometimes God's judgment is simply \"letting us have what we want.\" A heart \"given up\" to its own desires is a dangerous place.",
     "question": "Am I asking God to \"let me have my way,\" or am I asking Him to \"have His way\" in me?",
     "theme": "Consequence",
@@ -7584,7 +7588,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, don't \"give me up\" to my own desires. Keep me close to Your heart and Your will.",
     "_id": "2028-05-25"
   },
-  "2028-05-26": {
+  {
     "reflection": "It’s one thing to \"sin\"; it’s another to \"celebrate\" it. Our culture often \"gives approval\" to what God has decreed against.",
     "question": "Am I \"giving approval\" to things that God calls \"unrighteous\" just to be \"nice\"?",
     "theme": "Accountability",
@@ -7594,7 +7598,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, help me to stand for Your decrees with grace. Let me love the sinner but never \"approve\" the sin.",
     "_id": "2028-05-26"
   },
-  "2028-05-27": {
+  {
     "theme": "Judgment",
     "question": "Am I \"judging others\" for things that I am also doing in my own heart?",
     "reflection": "It’s easy to point at \"the world’s\" sins while ignoring our own \"religious\" ones. We are all on level ground before the Judge.",
@@ -7604,7 +7608,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-05-27",
     "_id": "2028-05-27"
   },
-  "2028-05-28": {
+  {
     "theme": "Strategy",
     "question": "Am I responding to \"God's kindness\" today by \"turning\" (repenting) toward Him?",
     "reflection": "God doesn't \"shame\" us into change; He \"kindnesses\" us into it. His goodness is the most powerful motivation for transformation.",
@@ -7614,7 +7618,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for Your kindness. It softens my heart and makes me want to be like You.",
     "_id": "2028-05-28"
   },
-  "2028-05-29": {
+  {
     "reflection": "God’s \"silence\" isn't \"approval.\" It’s \"patience.\" He is giving us time to turn before the judgment comes.",
     "question": "Am I \"presuming\" on God’s patience, or am I taking my \"turn\" seriously today?",
     "theme": "Waiting",
@@ -7624,7 +7628,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for Your forbearance. I don't take Your patience for granted; I turn to You now.",
     "_id": "2028-05-29"
   },
-  "2028-05-30": {
+  {
     "reflection": "A \"hard heart\" is like a \"spiritual sponge\" that only soaks up judgment. A \"soft heart\" soaks up grace.",
     "question": "Is my heart \"hard\" toward God’s Word today? How can I ask Him to \"soften\" it?",
     "theme": "Resistance",
@@ -7634,7 +7638,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, break the \"hardness\" of my heart. Make me \"repentant\" and \"open\" to Your voice.",
     "_id": "2028-05-30"
   },
-  "2028-05-31": {
+  {
     "reflection": "Faith is the \"root,\" but works are the \"fruit.\" On the final day, God looks for the \"evidence\" of a changed life.",
     "question": "If God \"rendered to me\" based on my \"works\" today, what story would my actions tell?",
     "theme": "Reality",
@@ -7644,7 +7648,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let my \"works\" be a reflection of my \"faith.\" May my actions show that I belong to You.",
     "_id": "2028-05-31"
   },
-  "2028-06-01": {
+  {
     "theme": "Endurance",
     "question": "Am I \"showing up\" to do good today, even if I don't \"feel\" like it?",
     "reflection": "God values \"patient continuance.\" It’s not about \"flashes of brilliance\"; it’s about \"showing up\" every day to do good.",
@@ -7654,7 +7658,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-01",
     "_id": "2028-06-01"
   },
-  "2028-06-02": {
+  {
     "reflection": "God doesn't have \"favorites\" based on race, culture, or religious background. He sees every soul with the same perfect justice.",
     "question": "Am I treating people with the same \"impartiality\" that God shows me?",
     "theme": "Fairness",
@@ -7664,7 +7668,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-02",
     "_id": "2028-06-02"
   },
-  "2028-06-03": {
+  {
     "theme": "Hearing vs. Doing",
     "question": "What \"truth\" did I \"hear\" recently that I still need to \"do\"?",
     "reflection": "Hearing a sermon doesn't make you holy; \"doing\" it does. Knowledge without action is just \"religious entertainment.\"",
@@ -7674,7 +7678,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-03",
     "_id": "2028-06-03"
   },
-  "2028-06-04": {
+  {
     "reflection": "Every human has a \"God-given compass\" called a conscience. It \"accuses\" or \"excuses\" us because we know there is a Right and a Wrong.",
     "question": "Am I listening to my \"conscience\" today, or am I trying to \"drown it out\"?",
     "theme": "Conscience",
@@ -7684,7 +7688,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for my conscience. Keep it sensitive to Your Spirit so I can walk in Your Way.",
     "_id": "2028-06-04"
   },
-  "2028-06-05": {
+  {
     "reflection": "God doesn't just see our \"public\" lives; He sees our \"secret\" thoughts. Integrity is being the same person in the dark.",
     "question": "What \"secrets\" am I keeping that I need to bring into the light of God’s grace today?",
     "theme": "Privacy",
@@ -7694,7 +7698,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, search my \"secrets.\" Cleanse my hidden thoughts and make me \"whole\" inside and out.",
     "_id": "2028-06-05"
   },
-  "2028-06-06": {
+  {
     "reflection": "Knowing the Law is a responsibility. If you know \"what is excellent,\" you are expected to live it out.",
     "question": "Am I living up to the \"instruction\" I’ve received, or am I just \"approving\" it in theory?",
     "theme": "Responsibility",
@@ -7704,7 +7708,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-06",
     "_id": "2028-06-06"
   },
-  "2028-06-07": {
+  {
     "reflection": "The hardest person to \"teach\" is often the \"teacher.\" We must always be the first \"student\" of the truths we preach.",
     "question": "Am I \"teaching myself\" the lessons I am trying to tell others?",
     "theme": "Consistency",
@@ -7714,7 +7718,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-07",
     "_id": "2028-06-07"
   },
-  "2028-06-08": {
+  {
     "reflection": "Religious hypocrisy \"dishonors God\" because it makes the Gospel look \"fake\" to the world.",
     "question": "Is there any area of \"hypocrisy\" in my life that is \"dishonoring\" God’s reputation?",
     "theme": "Witness",
@@ -7724,7 +7728,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, forgive my hypocrisy. Make me \"real\" so that others will see Your honor in my life.",
     "_id": "2028-06-08"
   },
-  "2028-06-09": {
+  {
     "theme": "Warning",
     "question": "How am I \"carrying the Name of God\" today in my interactions with non-believers?",
     "reflection": "This is the ultimate warning: Our \"bad behavior\" causes others to \"hate God.\" We carry His Name; we must carry it well.",
@@ -7734,7 +7738,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let Your Name be \"hallowed\" because of me, not \"blasphemed.\" Help me to represent You well.",
     "_id": "2028-06-09"
   },
-  "2028-06-10": {
+  {
     "theme": "Surgery",
     "question": "Has the Spirit done \"heart surgery\" on me lately, or am I just sticking to the \"letter\" of the rules?",
     "reflection": "God doesn't care about \"external rituals\"; He cares about \"internal surgery.\" The Spirit wants to \"cut away\" our old heart.",
@@ -7744,7 +7748,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, do Your work in my heart. Cut away the pride and the selfishness that the \"rules\" can't reach.",
     "_id": "2028-06-10"
   },
-  "2028-06-11": {
+  {
     "theme": "Audience",
     "question": "Whose \"praise\" am I seeking today—my boss's, my friends', or my Father's?",
     "reflection": "If you live for \"man’s praise,\" you are a slave. If you live for \"God’s praise,\" you are free.",
@@ -7754,7 +7758,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-11",
     "_id": "2028-06-11"
   },
-  "2028-06-12": {
+  {
     "reflection": "People fail. Leaders fall. But God’s faithfulness is \"un-nullify-able.\" He is the one Constant in a shifting world.",
     "question": "Am I letting someone else’s \"faithlessness\" shake my trust in \"God's faithfulness\"?",
     "theme": "Reliability",
@@ -7764,7 +7768,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, let God be true though every man were a liar! I rest in Your unchanging Reliability.",
     "_id": "2028-06-12"
   },
-  "2028-06-13": {
+  {
     "theme": "Silence",
     "question": "Have I stopped making \"excuses\" to God and simply admitted, \"Lord, I need Your help\"?",
     "reflection": "Before the Law of God, we have no \"excuses\" left. We just stand in \"silence\" and admit our need.",
@@ -7774,7 +7778,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I stop talking. I admit my need. I am accountable to You, and I look to You for mercy.",
     "_id": "2028-06-13"
   },
-  "2028-06-14": {
+  {
     "theme": "Equality",
     "question": "Do I really believe that I am \"no better\" than the \"worst\" sinner without God’s grace?",
     "reflection": "This is the \"bad news\" that makes the \"Good News\" so good. We are all \"in the same boat\" of sin.",
@@ -7784,7 +7788,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the \"Equality of the Need.\" I humble myself before You today.",
     "_id": "2028-06-14"
   },
-  "2028-06-15": {
+  {
     "reflection": "We didn't \"find\" God; He \"found\" us. Left to ourselves, we would never even look for Him.",
     "question": "Am I grateful today that God \"sought me out\" when I wasn't even looking for Him?",
     "theme": "Lostness",
@@ -7794,7 +7798,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for finding me. Thank You for seeking the lost and bringing me home.",
     "_id": "2028-06-15"
   },
-  "2028-06-16": {
+  {
     "reflection": "This is the \"root\" of every sin: a lack of \"Awe\" for God. When we don't \"Fear\" Him, we don't follow Him.",
     "question": "How can I cultivate a healthy \"Fear (Awe) of God\" in my heart today?",
     "theme": "Root",
@@ -7804,7 +7808,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-16",
     "_id": "2028-06-16"
   },
-  "2028-06-17": {
+  {
     "theme": "Mirror",
     "question": "Am I using the Word to \"see my need\" (the mirror) or am I trying to \"fix myself\" (self-effort)?",
     "reflection": "The Law is like a \"mirror.\" It shows you that your face is \"dirty,\" but it can't \"wash\" it. Only the Gospel can do the \"washing.\"",
@@ -7814,7 +7818,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for the \"Mirror\" of Your Word. Now, I look to the \"Cross\" for the \"Washing.\"",
     "_id": "2028-06-17"
   },
-  "2028-06-18": {
+  {
     "theme": "Grace",
     "question": "Am I trying to be \"righteous\" by my \"rules,\" or by the \"Righteousness of God\" in Christ?",
     "reflection": "God has provided a \"New Way\" to be right with Him—it’s not through \"trying harder,\" it’s through \"trusting Him.\"",
@@ -7824,7 +7828,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-18",
     "_id": "2028-06-18"
   },
-  "2028-06-19": {
+  {
     "theme": "Shortfall",
     "question": "Am I aware of my \"shortfall\" today? Am I leaning into the \"Grace that closes the gap\"?",
     "reflection": "Sin literally means \"missing the mark.\" We all \"fall short\" of God's perfect standard. But Grace closes the gap.",
@@ -7834,7 +7838,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I fall short. Thank You for being the \"Bridge\" that carries me across to the Father.",
     "_id": "2028-06-19"
   },
-  "2028-06-20": {
+  {
     "reflection": "Justified means \"Declared Righteous.\" And it’s a \"Gift.\" You can't \"buy\" it; you can only \"receive\" it.",
     "question": "Have I truly \"accepted the gift\" of justification today, or am I still trying to \"pay\" for it?",
     "theme": "Free",
@@ -7844,7 +7848,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-20",
     "_id": "2028-06-20"
   },
-  "2028-06-21": {
+  {
     "reflection": "Propitiation means \"the sacrifice that satisfies justice.\" Jesus took the \"hit\" so we could get the \"mercy.\"",
     "question": "Do I realize the \"price\" that was paid for my \"peace\" today?",
     "theme": "Propitiation",
@@ -7854,7 +7858,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-21",
     "_id": "2028-06-21"
   },
-  "2028-06-22": {
+  {
     "reflection": "God didn't \"ignore\" our sin (that would be \"unjust\"); He \"paid\" for our sin (that is \"just\"). He is perfectly Fair and perfectly Kind.",
     "question": "How does God's \"Justice\" and \"Mercy\" meeting at the Cross give me confidence today?",
     "theme": "Character",
@@ -7864,7 +7868,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-22",
     "_id": "2028-06-22"
   },
-  "2028-06-23": {
+  {
     "theme": "Humility",
     "question": "Is there any \"boasting\" (pride) in my heart today? Will I \"exclude\" it by looking at the Cross?",
     "reflection": "There is no room for \"ego\" in the Kingdom. We are all \"beggars telling other beggars where to find bread.\"",
@@ -7874,7 +7878,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I have nothing to boast of except Your Cross. I humble myself and I give You all the praise.",
     "_id": "2028-06-23"
   },
-  "2028-06-24": {
+  {
     "reflection": "Righteousness isn't a \"wage\" earned by work; it's a \"credit\" given for trust. God looks for the heart that takes Him at His word.",
     "question": "Am I trying to \"work off\" my debt to God, or am I \"believing\" it is already paid?",
     "theme": "Trust",
@@ -7884,7 +7888,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-24",
     "_id": "2028-06-24"
   },
-  "2028-06-25": {
+  {
     "reflection": "The greatest blessing isn't a full bank account; it's a \"zeroed-out\" sin account. Joy starts where condemnation ends.",
     "question": "Do I feel \"blessed\" today because my sins are \"not counted,\" or am I still carrying the weight?",
     "theme": "Forgiveness",
@@ -7894,7 +7898,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-25",
     "_id": "2028-06-25"
   },
-  "2028-06-26": {
+  {
     "reflection": "Rituals follow faith; they don't create it. God’s relationship with you is based on your heart long before any \"outward\" religious ceremony.",
     "question": "Am I putting too much stock in my \"religious activities\" and not enough in my \"heart connection\" to God?",
     "theme": "Timing",
@@ -7904,7 +7908,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, keep my heart primary. Let my outward actions be a \"seal\" of an inward reality.",
     "_id": "2028-06-26"
   },
-  "2028-06-27": {
+  {
     "theme": "Inheritance",
     "question": "Am I trying to \"be good enough\" to get God's promise, or am I \"trusting enough\" to receive it?",
     "reflection": "You don't \"inherit\" God's promises by being \"perfect\"; you inherit them by being \"his.\" The promise is a family gift.",
@@ -7914,7 +7918,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-27",
     "_id": "2028-06-27"
   },
-  "2028-06-28": {
+  {
     "theme": "Persistence",
     "question": "What \"impossible\" situation am I facing where I need to \"believe against hope\" today?",
     "reflection": "When the \"natural\" facts say \"No,\" faith says \"God said Yes.\" True hope thrives when the odds are zero.",
@@ -7924,7 +7928,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, my hope is in Your Word, not my circumstances. I believe what You have promised.",
     "_id": "2028-06-28"
   },
-  "2028-06-29": {
+  {
     "theme": "Reality",
     "question": "Am I \"considering\" my problems more than I am \"considering\" my Promise-Keeper?",
     "reflection": "Faith doesn't \"ignore\" the facts; it just \"subordinates\" them to a Higher Truth. Abraham knew he was \"dead,\" but God was \"Life.\"",
@@ -7934,7 +7938,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-06-29",
     "_id": "2028-06-29"
   },
-  "2028-06-30": {
+  {
     "reflection": "Being \"fully convinced\" is the end of the argument. If God said it, He is able to perform it.",
     "question": "Am I \"half-convinced\" or \"fully convinced\" of God's ability to help me today?",
     "theme": "Certainty",
@@ -7944,7 +7948,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I am fully convinced. You are Able. I rest in Your power to do exactly what You said.",
     "_id": "2028-06-30"
   },
-  "2028-07-01": {
+  {
     "reflection": "The Cross paid the \"Fine\"; the Resurrection proved the \"Check cleared.\" You are legally free because He is alive.",
     "question": "How does the \"Live Status\" of Jesus change my confidence in my \"Legal Status\" before God?",
     "theme": "Victory",
@@ -7954,7 +7958,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Savior, thank You for the Resurrection. I walk in total justification because You are alive.",
     "_id": "2028-07-01"
   },
-  "2028-07-02": {
+  {
     "reflection": "The war is over. You don't have to \"make peace\" with God; you already \"have peace\" because of Jesus.",
     "question": "Am I living like a \"soldier at war\" with God, or like a \"child at peace\" with a Father?",
     "theme": "Standing",
@@ -7964,7 +7968,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-02",
     "_id": "2028-07-02"
   },
-  "2028-07-03": {
+  {
     "theme": "Invitation",
     "question": "How am I using my \"access\" today? Am I talking to God, or just thinking about Him?",
     "reflection": "You aren't just \"saved\"; you are \"welcomed.\" You have a \"Backstage Pass\" to the Throne of Grace 24/7.",
@@ -7974,7 +7978,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-03",
     "_id": "2028-07-03"
   },
-  "2028-07-04": {
+  {
     "theme": "Character",
     "question": "What \"suffering\" (difficulty) am I in right now that is \"producing\" something good in me?",
     "reflection": "We don't rejoice for the pain, but in the process. Suffering is the \"gym\" where endurance, character, and hope are built.",
@@ -7984,7 +7988,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, use this trial to build endurance in me. I rejoice in what You are building, even if I don't like the \"gym.\"",
     "_id": "2028-07-04"
   },
-  "2028-07-05": {
+  {
     "reflection": "This isn't just a \"fact\"; it's a \"feeling.\" The Spirit \"pours\" God's affection into our internal experience.",
     "question": "Have I asked the Spirit to \"pour\" a fresh sense of God's love into my heart today?",
     "theme": "Experience",
@@ -7994,7 +7998,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-05",
     "_id": "2028-07-05"
   },
-  "2028-07-06": {
+  {
     "reflection": "Jesus didn't wait for you to \"get strong\" or \"get religious.\" He died for you when you were at your worst.",
     "question": "Does my \"weakness\" today make me run from God or run to Him?",
     "theme": "Mercy",
@@ -8004,7 +8008,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-06",
     "_id": "2028-07-06"
   },
-  "2028-07-07": {
+  {
     "reflection": "Love is a \"verb.\" God didn't just \"say\" He loved us; He \"proved\" it on the Cross.",
     "question": "If I doubt God's love today, will I look at my \"feelings\" or will I look at the \"Cross\"?",
     "theme": "Demonstration",
@@ -8014,7 +8018,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-07",
     "_id": "2028-07-07"
   },
-  "2028-07-08": {
+  {
     "theme": "Security",
     "question": "Am I worrying about \"judgment\" when I have already been \"justified\" by His blood?",
     "reflection": "If Jesus did the \"hard work\" (dying for enemies), He will certainly do the \"easy work\" (keeping His friends).",
@@ -8024,7 +8028,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I am safe in You. Thank You for saving me from the wrath I deserved.",
     "_id": "2028-07-08"
   },
-  "2028-07-09": {
+  {
     "theme": "Friendship",
     "question": "Am I living as a \"friend\" of God today, or am I still keeping my distance?",
     "reflection": "You went from \"Enemy\" to \"Friend\" to \"Family.\" Reconciliation is the \"Happy Ending\" of the Gospel.",
@@ -8034,7 +8038,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-09",
     "_id": "2028-07-09"
   },
-  "2028-07-10": {
+  {
     "theme": "Comparison",
     "question": "Do I see the \"power of one\" decision? Am I choosing the \"Adam way\" or the \"Jesus way\" today?",
     "reflection": "We are all \"connected.\" Adam's one \"No\" broke the world; but Jesus' one \"Yes\" fixed it.",
@@ -8044,7 +8048,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-10",
     "_id": "2028-07-10"
   },
-  "2028-07-11": {
+  {
     "theme": "Contrast",
     "question": "Am I letting the \"trespass\" (the bad news) loom larger in my mind than the \"Free Gift\" (the Good News)?",
     "reflection": "Grace is \"unfair\" in the best way possible. The gift of Life is far more powerful than the curse of Death.",
@@ -8054,7 +8058,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, the Gift is better! I celebrate the \"Much More\" of Your grace over my sin.",
     "_id": "2028-07-11"
   },
-  "2028-07-12": {
+  {
     "theme": "Authority",
     "question": "Am I \"reigning in life\" today, or is \"death\" (fear, habit, sin) still reigning over me?",
     "reflection": "You were meant to \"reign,\" not just \"survive.\" Grace puts you back on the \"throne\" of your own life and choices.",
@@ -8064,7 +8068,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-12",
     "_id": "2028-07-12"
   },
-  "2028-07-13": {
+  {
     "theme": "Substitution",
     "question": "Am I trying to \"get an A+\" today, or am I resting in the \"Perfect Score\" Jesus already got for me?",
     "reflection": "Jesus' life was the \"Perfect Score\" that was put on your \"Report Card.\" You get the credit for His \"A+.\"",
@@ -8074,7 +8078,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-13",
     "_id": "2028-07-13"
   },
-  "2028-07-14": {
+  {
     "theme": "Infinity",
     "question": "Am I afraid that I’ve \"exhausted\" God's grace? (Hint: It’s impossible.)",
     "reflection": "You can't out-sin God's grace. No matter how \"deep\" the hole you dig, His grace is \"deeper\" still.",
@@ -8084,7 +8088,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for \"Abounding Grace.\" Where I failed, Your grace was even bigger.",
     "_id": "2028-07-14"
   },
-  "2028-07-15": {
+  {
     "theme": "Identity",
     "question": "If a \"dead man\" can't sin, why am I still \"listening\" to my old sinful desires today?",
     "reflection": "You aren't a \"sinner trying to be holy\"; you are a \"saint who is dead to sin.\" Your relationship to sin has been \"legally terminated.\"",
@@ -8094,7 +8098,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I am dead to sin. I refuse to respond to its \"voice\" because I don't belong to it anymore.",
     "_id": "2028-07-15"
   },
-  "2028-07-16": {
+  {
     "theme": "Baptism",
     "question": "Am I still \"carrying around\" the guilt of the \"Old Me\" that has already been buried?",
     "reflection": "The \"Old You\" is gone. Baptism is the \"Funeral\" for your past. You don't have to carry a \"corpse\" around.",
@@ -8104,7 +8108,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-16",
     "_id": "2028-07-16"
   },
-  "2028-07-17": {
+  {
     "reflection": "You have a \"New Battery.\" The Resurrection life of Jesus is the \"Power Source\" for your daily walk.",
     "question": "How \"new\" does my life feel today? Am I \"walking\" or am I \"limping\"?",
     "theme": "Vitality",
@@ -8114,7 +8118,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I walk in \"Newness.\" Give me the energy and the joy of Your resurrection life today.",
     "_id": "2028-07-17"
   },
-  "2028-07-18": {
+  {
     "theme": "Connection",
     "question": "Am I staying \"united\" to the Vine today, or am I trying to \"produce\" fruit on my own?",
     "reflection": "You are \"Grafted\" into Jesus. His \"Sap\" (Life) flows into your \"Branches.\" You can't help but produce His fruit.",
@@ -8124,7 +8128,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I stay in You. Let Your life flow through me so that Your character becomes my own.",
     "_id": "2028-07-18"
   },
-  "2028-07-19": {
+  {
     "theme": "Termination",
     "question": "Am I \"plugging in\" to my old habits today, or am I keeping them \"brought to nothing\"?",
     "reflection": "The \"Body of Sin\" has been \"Unplugged.\" It has no power unless you give it permission.",
@@ -8134,7 +8138,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the Cross. My \"Old Self\" is crucified. I am no longer a slave to sin.",
     "_id": "2028-07-19"
   },
-  "2028-07-20": {
+  {
     "theme": "Focus",
     "question": "What does it look like for me to be \"Alive to God\" in my first meeting/task today?",
     "reflection": "Consider is a math term. It means \"Count it as a fact.\" Count yourself as \"Alive to God\" and act accordingly.",
@@ -8144,7 +8148,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I consider myself \"Alive to God.\" I am awake to Your presence and ready for Your lead.",
     "_id": "2028-07-20"
   },
-  "2028-07-21": {
+  {
     "reflection": "Sin is a \"dethroned king.\" It has no \"right\" to rule you. You have the power to say \"No\" to the passions of your body.",
     "question": "Who is \"reigning\" on the throne of my heart this morning—my \"Passions\" or my \"Prince\"?",
     "theme": "Choice",
@@ -8154,7 +8158,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-21",
     "_id": "2028-07-21"
   },
-  "2028-07-22": {
+  {
     "theme": "Purpose",
     "question": "How will I use my \"instruments\" (hands/mouth/mind) to \"do righteousness\" today?",
     "reflection": "Your eyes, hands, and feet are \"Tools.\" You can use them to \"build\" God's Kingdom or to \"break\" it.",
@@ -8164,7 +8168,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-22",
     "_id": "2028-07-22"
   },
-  "2028-07-23": {
+  {
     "reflection": "Law says \"Do this or else.\" \"Grace\" says \"I’ve done this, now follow Me.\" Grace is the \"Atmosphere\" that kills sin's power.",
     "question": "Am I living in the \"Fear of the Law\" or the \"Freedom of Grace\" today?",
     "theme": "Environment",
@@ -8174,7 +8178,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You that Sin has no \"dominion.\" I am safe in the atmosphere of Your Grace.",
     "_id": "2028-07-23"
   },
-  "2028-07-24": {
+  {
     "reflection": "Everyone is a \"slave\" to something. You either serve your \"Urges\" or you serve your \"Creator.\" Choose your Master.",
     "question": "Who/What am I \"obeying\" today? Am I serving a \"dead-end\" master or the \"Living Lord\"?",
     "theme": "Allegiance",
@@ -8184,7 +8188,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I choose to be Your \"Slave.\" Your service is the only true freedom I have ever found.",
     "_id": "2028-07-24"
   },
-  "2028-07-25": {
+  {
     "theme": "Sincerity",
     "question": "Is my obedience today \"from the heart,\" or am I just \"doing my duty\"?",
     "reflection": "God doesn't want \"grudging\" obedience; He wants \"Heart-Obedience.\" He wants you to want what He wants.",
@@ -8194,7 +8198,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, change my \"wants.\" Give me a heart that loves to do Your will.",
     "_id": "2028-07-25"
   },
-  "2028-07-26": {
+  {
     "reflection": "You have been \"Emancipated.\" The shackles are off. Now, use your freedom to do what is Right.",
     "question": "What \"freedom\" will I exercise today? Will I choose the \"Right\" path just because I can?",
     "theme": "Release",
@@ -8204,7 +8208,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for the freedom. I use my liberty to serve You and love others.",
     "_id": "2028-07-26"
   },
-  "2028-07-27": {
+  {
     "reflection": "Sanctification is the process of becoming like Jesus. It’s a \"step-by-step\" presenting of our lives to God.",
     "question": "What is the \"next step\" in my sanctification today? What small area can I \"present\" to Him?",
     "theme": "Progress",
@@ -8214,7 +8218,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-27",
     "_id": "2028-07-27"
   },
-  "2028-07-28": {
+  {
     "reflection": "Sin’s fruit is \"Rot\"; God’s fruit is \"Life.\" Every \"Godly\" choice you make today adds to the \"Life\" in your soul.",
     "question": "What \"fruit\" am I growing today? Is it \"Rot\" or is it \"Life\"?",
     "theme": "Outcome",
@@ -8224,7 +8228,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-07-28",
     "_id": "2028-07-28"
   },
-  "2028-07-29": {
+  {
     "reflection": "A \"Wage\" is what you earn. A \"Gift\" is what you receive. Don't work for the \"Death\" wage; receive the \"Life\" gift.",
     "question": "Am I trying to \"earn\" God's favor? (The pay is terrible.) Will I just \"receive\" the Gift today?",
     "theme": "Finality",
@@ -8234,7 +8238,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I receive the Gift. I thank You that Eternal Life is found in \"Christ Jesus our Lord\" and nowhere else.",
     "_id": "2028-07-29"
   },
-  "2028-07-30": {
+  {
     "theme": "Relationship",
     "question": "Am I trying to \"please the Law\" (the dead husband), or am I \"loving Jesus\" (the Living Groom)?",
     "reflection": "The \"Law\" was a \"Marriage\" to a husband we couldn't please. Now, we are \"Married\" to Jesus, who loves us as we are.",
@@ -8244,7 +8248,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I am Yours. Thank You for releasing me from the pressure of the Law and bringing me into the romance of Grace.",
     "_id": "2028-07-30"
   },
-  "2028-07-31": {
+  {
     "reflection": "The \"Old Way\" is \"Rules\"; the \"New Way\" is \"Relationship.\" The Spirit gives you the \"Want-to\" that the \"Code\" couldn't.",
     "question": "Am I \"serving by the Spirit\" today (with joy), or by the \"Code\" (with a checklist)?",
     "theme": "Method",
@@ -8254,7 +8258,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, lead my service. Let my \"doing\" flow from my \"being\" in You.",
     "_id": "2028-07-31"
   },
-  "2028-08-01": {
+  {
     "theme": "Standard",
     "question": "Am I \"blaming the Law\" (the X-ray) for my \"sin\" (the break)? Will I look for the \"Doctor\"?",
     "reflection": "The Law isn't the \"problem\"; our \"sin\" is. The Law is the \"X-ray\" that shows the \"broken bone\" of our soul.",
@@ -8264,7 +8268,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, Your Law is good. It shows me how much I need You. I come to You for healing today.",
     "_id": "2028-08-01"
   },
-  "2028-08-02": {
+  {
     "reflection": "This is the \"Honest Apostle.\" Even the best Christians struggle with the \"Old Self\" trying to take over. You are not alone in the struggle.",
     "question": "What \"good I want to do\" am I struggling with today? Will I admit my \"powerlessness\" to God?",
     "theme": "Reality",
@@ -8274,7 +8278,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-02",
     "_id": "2028-08-02"
   },
-  "2028-08-03": {
+  {
     "theme": "Battle",
     "question": "Am I \"surprised\" by the spiritual battle today? Will I put on the armor?",
     "reflection": "There is a \"War\" inside you. Don't be surprised by the \"attacks\" of your old nature. It’s a sign that the \"New You\" is alive.",
@@ -8284,7 +8288,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-03",
     "_id": "2028-08-03"
   },
-  "2028-08-04": {
+  {
     "reflection": "This is the \"Bottom of the Pit.\" When you realize you can't \"save yourself,\" you are finally ready for a \"Deliverer.\"",
     "question": "Have I reached the \"Wretched Man\" moment where I stop trying and start crying out for help?",
     "theme": "Despair",
@@ -8294,7 +8298,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I am wretched without You. Deliver me! I can't do this on my own.",
     "_id": "2028-08-04"
   },
-  "2028-08-05": {
+  {
     "reflection": "The answer to \"Who will deliver me?\" is \"Jesus!\" The struggle ends in \"Thanks,\" not \"Trying Harder.\"",
     "question": "Am I saying \"Thanks\" today for the \"Rescue\" Jesus has already provided?",
     "theme": "Rescue",
@@ -8304,7 +8308,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-05",
     "_id": "2028-08-05"
   },
-  "2028-08-06": {
+  {
     "reflection": "This is the \"Great Declaration.\" The Judge has banged the gavel. You are \"Not Guilty\"—not because you are innocent, but because you are \"In Christ.\"",
     "question": "Do I \"feel\" condemned today? Will I listen to my \"Feelings\" or to the \"Verdict\" of Romans 8:1?",
     "theme": "Verdict",
@@ -8314,7 +8318,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-06",
     "_id": "2028-08-06"
   },
-  "2028-08-07": {
+  {
     "reflection": "The \"Law of Aerodynamics\" (the Spirit) overcomes the \"Law of Gravity\" (Sin). You can \"fly\" because a Greater Power is at work.",
     "question": "Am I trying to \"flap my wings\" (self-effort), or am I \"trusting the wind\" of the Spirit to lift me?",
     "theme": "Power",
@@ -8324,7 +8328,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-07",
     "_id": "2028-08-07"
   },
-  "2028-08-08": {
+  {
     "reflection": "Walking is about \"Direction,\" not \"Perfection.\" Keep your face turned toward the Spirit, and your feet will follow.",
     "question": "Which \"direction\" am I \"walking\" in this morning? Toward the \"Flesh\" (self) or the \"Spirit\" (God)?",
     "theme": "Direction",
@@ -8334,7 +8338,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-08",
     "_id": "2028-08-08"
   },
-  "2028-08-09": {
+  {
     "theme": "Focus",
     "question": "What am I \"setting my mind on\" today? (Problems? Politics? Or the Promises of the Spirit?)",
     "reflection": "Your \"Mind\" is the \"Steering Wheel\" of your life. What you \"set your mind on\" is where your life will go.",
@@ -8344,7 +8348,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-09",
     "_id": "2028-08-09"
   },
-  "2028-08-10": {
+  {
     "reflection": "You can \"test\" your focus by your \"feelings.\" If you feel \"death\" (anxiety/guilt), check your mind. if you feel \"Life/Peace,\" you are on track.",
     "question": "Do I have \"Life and Peace\" in my soul right now? If not, what do I need to \"re-set\" my mind on?",
     "theme": "Result",
@@ -8354,7 +8358,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I want Your Life and Your Peace. I re-set my mind on You and Your Word.",
     "_id": "2028-08-10"
   },
-  "2028-08-11": {
+  {
     "theme": "Warning",
     "question": "Is there any \"hostility\" (independence) in my heart today? Will I surrender it to the Father?",
     "reflection": "Self-Focus is actually \"God-Hostility.\" We can't please God while we are trying to be our own \"gods.\"",
@@ -8364,7 +8368,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-11",
     "_id": "2028-08-11"
   },
-  "2028-08-12": {
+  {
     "reflection": "You are a \"Temple.\" The Creator of the Universe has moved into your \"Living Room.\" You are never alone.",
     "question": "Do I live with the \"Awe\" that the Spirit of God is \"dwelling\" inside of me right now?",
     "theme": "Reality",
@@ -8374,7 +8378,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-12",
     "_id": "2028-08-12"
   },
-  "2028-08-13": {
+  {
     "theme": "Family",
     "question": "Am I living with a \"Slave-Mentality\" (fear) or an \"Adopted-Mentality\" (love) today?",
     "reflection": "You aren't a \"Servant\" in the house; you are a \"Son/Daughter.\" You have the \"Keys\" to the Father's heart.",
@@ -8384,7 +8388,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Abba, Father! I cry out to You as Your child. Thank You for adopting me and making me Your own.",
     "_id": "2028-08-13"
   },
-  "2028-08-14": {
+  {
     "reflection": "Abba is the Aramaic word for \"Daddy/Papa.\" It’s the highest form of intimacy. God is your \"Deity,\" but He is also your \"Dad.\"",
     "question": "Have I talked to my \"Abba\" today with the simplicity and trust of a little child?",
     "theme": "Intimacy",
@@ -8394,7 +8398,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-14",
     "_id": "2028-08-14"
   },
-  "2028-08-15": {
+  {
     "reflection": "Everything that belongs to Jesus now belongs to you. You are \"Spiritually Wealthy\" beyond your wildest dreams.",
     "question": "Am I living like a \"Beggarly Orphan\" or like a \"Fellow Heir\" to the Kingdom of God?",
     "theme": "Wealth",
@@ -8404,7 +8408,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for sharing Your inheritance with me. I walk in Your abundance today.",
     "_id": "2028-08-15"
   },
-  "2028-08-16": {
+  {
     "reflection": "Put your \"Trial\" on one side of the scale and \"Glory\" on the other. The Glory side crashes the scale to the floor.",
     "question": "How does the \"future glory\" make my \"present suffering\" look \"light and temporary\" today?",
     "theme": "Perspective",
@@ -8414,7 +8418,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-16",
     "_id": "2028-08-16"
   },
-  "2028-08-17": {
+  {
     "reflection": "The \"brokenness\" of the world (storms, sickness, decay) is not a death rattle; it’s a birth pang. Something new is coming.",
     "question": "Do I hear the \"groaning\" of the world as a sign of despair or a sign of \"labor pains\" for the New Heaven?",
     "theme": "Expectation",
@@ -8424,7 +8428,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, help me to groan with hope. I wait for the day You make all things new and right.",
     "_id": "2028-08-17"
   },
-  "2028-08-18": {
+  {
     "theme": "Taste",
     "question": "How does the \"sample\" of peace I have today make me hungry for the \"full meal\" of eternity?",
     "reflection": "You have a \"down payment\" of Heaven inside you right now. The Spirit’s presence is a \"sample\" of the joy to come.",
@@ -8434,7 +8438,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, thank You for being the \"Firstfruits.\" Give me a deeper hunger for the fullness of God.",
     "_id": "2028-08-18"
   },
-  "2028-08-19": {
+  {
     "theme": "Identity",
     "question": "Am I being patient with my \"aching body,\" knowing that a \"resurrection body\" is on the way?",
     "reflection": "Your soul is saved, but your \"suit\" (your body) is still waiting for the upgrade. Full adoption includes a physical rescue.",
@@ -8444,7 +8448,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You that my redemption is total—body, soul, and spirit. I wait for the final \"reveal.\"",
     "_id": "2028-08-19"
   },
-  "2028-08-20": {
+  {
     "theme": "Faith",
     "question": "What \"unseen\" promise am I holding onto today with the \"hands\" of hope?",
     "reflection": "Hope is specifically for the things we can't see yet. If you could see it, you wouldn't need to hope for it.",
@@ -8454,7 +8458,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-20",
     "_id": "2028-08-20"
   },
-  "2028-08-21": {
+  {
     "reflection": "Patience is the \"fruit\" of hope. When you are sure of the outcome, you can handle the \"wait.\"",
     "question": "Is my \"waiting\" characterized by \"anxiety\" or by \"patience\" today?",
     "theme": "Endurance",
@@ -8464,7 +8468,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, give me Your patience. I trust the \"Not Yet\" because I trust the \"I Am.\"",
     "_id": "2028-08-21"
   },
-  "2028-08-22": {
+  {
     "theme": "Weakness",
     "question": "Where do I feel \"weakest\" today? Will I invite the Spirit to \"help\" me in that specific spot?",
     "reflection": "You don't have to be \"strong\" to be spiritual. The Spirit’s specific job description is to \"help\" the weak.",
@@ -8474,7 +8478,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-22",
     "_id": "2028-08-22"
   },
-  "2028-08-23": {
+  {
     "reflection": "When you are so overwhelmed you can't even \"pray,\" your \"sighs\" are heard by God as perfect intercession.",
     "question": "Am I \"silent\" because I’m far from God, or because I’m letting the Spirit \"groan\" for me?",
     "theme": "Communication",
@@ -8484,7 +8488,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-23",
     "_id": "2028-08-23"
   },
-  "2028-08-24": {
+  {
     "theme": "Intimacy",
     "question": "Am I comfortable with God \"searching my heart\" today? Is there anything I’m trying to hide?",
     "reflection": "God is \"searching\" your heart right now—not to find \"dirt,\" but to find the \"Spirit’s longing.\"",
@@ -8494,7 +8498,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, search me. Know my thoughts. Let my heart’s desire be aligned with the Spirit’s prayer.",
     "_id": "2028-08-24"
   },
-  "2028-08-25": {
+  {
     "reflection": "This is the \"Safety Net\" of the Bible. God takes the \"random\" threads of our lives and weaves them into a masterpiece.",
     "question": "Do I really believe that all things—even the mistakes—are being \"worked for good\" by God?",
     "theme": "Sovereignty",
@@ -8504,7 +8508,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-25",
     "_id": "2028-08-25"
   },
-  "2028-08-26": {
+  {
     "reflection": "The \"8:28 promise\" is for the \"lovers\" and the \"called.\" Your love for God is the \"key\" that unlocks the peace.",
     "question": "Is my \"love for God\" the primary engine of my life today, or am I just \"doing church\"?",
     "theme": "Affection",
@@ -8514,7 +8518,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I love You. I am called by You. I rest in the purpose You have designed for my life.",
     "_id": "2028-08-26"
   },
-  "2028-08-27": {
+  {
     "reflection": "You aren't an \"afterthought.\" God \"knew\" you before time began and \"planned\" your destination.",
     "question": "Does it change my \"identity\" to know that I was \"foreknown\" by the Creator of the Universe?",
     "theme": "Planning",
@@ -8524,7 +8528,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for knowing me. Thank You for choosing me before I ever chose You.",
     "_id": "2028-08-27"
   },
-  "2028-08-28": {
+  {
     "reflection": "The goal of your life isn't \"happiness\"; it’s \"Jesus-likeness.\" Every trial is a \"sculptor's chisel\" for this one goal.",
     "question": "How is my current \"frustration\" or \"trial\" helping me to look a little more like Jesus today?",
     "theme": "Maturity",
@@ -8534,7 +8538,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, make me like Jesus. Whatever it takes, conform my character to His Image.",
     "_id": "2028-08-28"
   },
-  "2028-08-29": {
+  {
     "reflection": "Jesus is your \"Big Brother.\" He cleared the way so we could follow Him into the Father's house.",
     "question": "Do I see Jesus as a \"distant King\" or as my \"Firstborn Brother\" who loves me?",
     "theme": "Family",
@@ -8544,7 +8548,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-08-29",
     "_id": "2028-08-29"
   },
-  "2028-08-30": {
+  {
     "reflection": "Justified means \"Legally Right.\" God’s \"Calling\" is the \"Summons\" that leads to your \"Exoneration.\"",
     "question": "Do I live today as someone who has been \"Justified\" (Declared Not Guilty) by the Highest Court?",
     "theme": "Legal",
@@ -8554,7 +8558,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the \"Call.\" Thank You for \"Justifying\" me by Your Grace.",
     "_id": "2028-08-30"
   },
-  "2028-08-31": {
+  {
     "theme": "Completion",
     "question": "Am I \"worrying\" about a future that God has already \"finalized\" in His eternal plan?",
     "reflection": "In God's mind, your \"Glorification\" is so certain that He speaks of it in the past tense. It’s already \"done.\"",
@@ -8564,7 +8568,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You that the \"end\" is certain. I walk today in the light of my future \"Glory.\"",
     "_id": "2028-08-31"
   },
-  "2028-09-01": {
+  {
     "theme": "Confidence",
     "question": "Who/What am I allowing to be \"against me\" in my mind that is smaller than \"God for me\"?",
     "reflection": "This is the \"Mic-Drop\" of the Bible. If the Creator is \"For\" you, every critic is \"irrevelant.\"",
@@ -8574,7 +8578,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-01",
     "_id": "2028-09-01"
   },
-  "2028-09-02": {
+  {
     "reflection": "If God already gave the \"Best\" (His Son), why would He withhold the \"Rest\" (peace, provision, help)?",
     "question": "Is there any \"good thing\" I think God is \"withholding\" from me? (He already gave me Jesus!)",
     "theme": "Sacrifice",
@@ -8584,7 +8588,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the ultimate Gift. I trust You to \"graciously give me all things\" I truly need.",
     "_id": "2028-09-02"
   },
-  "2028-09-03": {
+  {
     "reflection": "The \"Accuser\" (Satan) is a \"Prosecutor\" with no standing in court. The Judge is on your side.",
     "question": "Am I listening to \"accusations\" in my head that the Judge has already dismissed?",
     "theme": "Defense",
@@ -8594,7 +8598,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for my defense. I refuse to listen to \"charges\" that You have already cleared.",
     "_id": "2028-09-03"
   },
-  "2028-09-04": {
+  {
     "theme": "Pardon",
     "question": "Am I \"condemning myself\" for things that Jesus has already \"died for\"?",
     "reflection": "The only Person with the \"right\" to condemn you is the Person who died to \"save\" you. He isn't condemning; He’s praying.",
@@ -8604,7 +8608,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-04",
     "_id": "2028-09-04"
   },
-  "2028-09-05": {
+  {
     "reflection": "Right now, Jesus is \"speaking your name\" to the Father. You have a 24/7 \"Advocate\" in the Presence of God.",
     "question": "How does it change my \"boldness\" today to know that Jesus is \"praying for me\" right now?",
     "theme": "Presence",
@@ -8614,7 +8618,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-05",
     "_id": "2028-09-05"
   },
-  "2028-09-06": {
+  {
     "theme": "Bond",
     "question": "What \"circumstance\" am I afraid will \"separate\" me from God's love? (Hint: It can't.)",
     "reflection": "God’s love isn't a \"feeling\" that comes and goes; it’s a \"bond\" that nothing in creation can break.",
@@ -8624,7 +8628,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I am glued to Your love. Thank You that no distress can ever pull me away from You.",
     "_id": "2028-09-06"
   },
-  "2028-09-07": {
+  {
     "theme": "Reality",
     "question": "Am I mistaking my \"hard day\" for a \"lack of God's love\"?",
     "reflection": "Being \"Loved by God\" doesn't mean life is \"Easy.\" It means life is \"Victorious\" in the middle of the pain.",
@@ -8634,7 +8638,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I see the reality of the struggle. But I also see the reality of Your Presence in the struggle.",
     "_id": "2028-09-07"
   },
-  "2028-09-08": {
+  {
     "reflection": "A \"Conqueror\" wins the battle. A \"More Than Conqueror\" takes the enemy’s weapons and uses them for good.",
     "question": "How can I be \"More than a Conqueror\" in my current struggle today?",
     "theme": "Victory",
@@ -8644,7 +8648,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for the victory. I don't just \"survive\" this trial; I \"triumph\" through Your love.",
     "_id": "2028-09-08"
   },
-  "2028-09-09": {
+  {
     "reflection": "This is the \"Ultimate List.\" Death can't do it, Life can't do it, Angels and Demons can't do it. You are safe.",
     "question": "Am I \"sure\" (convinced) of this today, or am I still looking for \"loopholes\" in God's love?",
     "theme": "Scope",
@@ -8654,7 +8658,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-09",
     "_id": "2028-09-09"
   },
-  "2028-09-10": {
+  {
     "reflection": "Paul goes from the \"High\" of Romans 8 to the \"Deep Concern\" of Romans 9. Great love for God leads to great sorrow for the lost.",
     "question": "Who is the \"one person\" I have \"unceasing anguish\" for? Am I praying for them today?",
     "theme": "Compassion",
@@ -8664,7 +8668,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-10",
     "_id": "2028-09-10"
   },
-  "2028-09-11": {
+  {
     "theme": "Sacrifice",
     "question": "How far am I willing to go (comfort-wise or ego-wise) for the sake of those who are lost?",
     "reflection": "This is the \"Moses-Heart.\" Paul would trade his own salvation for his people's. That is the true height of spiritual maturity.",
@@ -8674,7 +8678,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-11",
     "_id": "2028-09-11"
   },
-  "2028-09-12": {
+  {
     "reflection": "Heritage is a \"gift,\" but it isn't a \"guarantee.\" Having the \"tools\" of religion doesn't mean you have the \"Truth\" of the Spirit.",
     "question": "Am I relying on my \"Christian heritage\" (parents, upbringing) or on my \"Personal Faith\" today?",
     "theme": "Heritage",
@@ -8684,7 +8688,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for my heritage. But I ask for a \"Fresh Faith\" of my own right now.",
     "_id": "2028-09-12"
   },
-  "2028-09-13": {
+  {
     "theme": "Distinction",
     "question": "Do I \"belong\" to the family because I am \"doing the ritual\" or because I have \"the Promise\" in my heart?",
     "reflection": "God’s family is \"By Promise,\" not \"By Blood.\" It’s an internal \"Yes\" to God, not an external \"Birth Certificate.\"",
@@ -8694,7 +8698,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-13",
     "_id": "2028-09-13"
   },
-  "2028-09-14": {
+  {
     "reflection": "God’s choice is based on His purpose, not Our performance. This is the ultimate \"Ego-Crusher.\"",
     "question": "Does God's \"sovereign choice\" make me \"nervous\" (pride) or \"secure\" (grace)?",
     "theme": "Sovereignty",
@@ -8704,7 +8708,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-14",
     "_id": "2028-09-14"
   },
-  "2028-09-15": {
+  {
     "reflection": "Our idea of \"Fairness\" is limited. God’s \"Justice\" is perfect. He owes no one mercy, yet He gives it freely to many.",
     "question": "Am I trying to \"judge the Judge\"? Can I trust that His \"Fairness\" is higher than mine?",
     "theme": "Fairness",
@@ -8714,7 +8718,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-15",
     "_id": "2028-09-15"
   },
-  "2028-09-16": {
+  {
     "theme": "Freedom",
     "question": "How can I \"celebrate\" the mercy I’ve been given today, rather than \"complaining\" about how God handles others?",
     "reflection": "Mercy is by definition \"undeserved.\" If it were \"fair,\" it wouldn't be \"mercy.\"",
@@ -8724,7 +8728,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for Your mercy. I don't deserve it, and that’s what makes it so beautiful.",
     "_id": "2028-09-16"
   },
-  "2028-09-17": {
+  {
     "theme": "Dependence",
     "question": "Am I \"exerting\" myself today to be \"enough,\" or am I \"resting\" in God's mercy?",
     "reflection": "You can't \"Will\" your way to Heaven and you can't \"Work\" your way to Heaven. You \"Mercy\" your way to Heaven.",
@@ -8734,7 +8738,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I stop the \"exertion.\" I depend entirely on Your mercy today.",
     "_id": "2028-09-17"
   },
-  "2028-09-18": {
+  {
     "theme": "Utility",
     "question": "Am I trusting that God is using the \"Pharaohs\" (difficult bosses/leaders) in my life for His purposes?",
     "reflection": "God can use even a \"hard heart\" to show His power. No one is \"outside\" of God's utility.",
@@ -8744,7 +8748,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Sovereign Lord, show Your power through my situation. I trust that even the \"opposition\" is in Your hands.",
     "_id": "2028-09-18"
   },
-  "2028-09-19": {
+  {
     "reflection": "The \"Clay\" doesn't get to cross-examine the \"Potter.\" Humility is knowing our place in the Universe.",
     "question": "Am I \"answering back\" to God about my \"shape\" or my \"life circumstances\" today?",
     "theme": "Humility",
@@ -8754,7 +8758,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Potter, I am the clay. Mold me as You wish. I trust Your hands and Your design.",
     "_id": "2028-09-19"
   },
-  "2028-09-20": {
+  {
     "theme": "Preparation",
     "question": "What \"glory\" can I hold today if I just \"empty\" myself of my own pride?",
     "reflection": "You are a \"Vessel.\" Your only job is to be \"empty\" enough to be filled with the \"Riches of His Glory.\"",
@@ -8764,7 +8768,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-20",
     "_id": "2028-09-20"
   },
-  "2028-09-21": {
+  {
     "theme": "Inclusion",
     "question": "Who is an \"Outsider\" in my life that I should start viewing as a \"Potential Insider\" for God?",
     "reflection": "God loves \"surprises.\" He specializes in taking \"Outsiders\" and making them \"Insiders.\"",
@@ -8774,7 +8778,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, expand my heart. Help me to see the \"Not My People\" as people You are calling.",
     "_id": "2028-09-21"
   },
-  "2028-09-22": {
+  {
     "reflection": "Jesus is either your \"Cornerstone\" (support) or your \"Stumbling Stone\" (offense). You can't just \"ignore\" Him.",
     "question": "Is Jesus the \"Stone\" I build my life on today, or am I \"tripping\" over His claims?",
     "theme": "Offense",
@@ -8784,7 +8788,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, be my Cornerstone. I build my life, my marriage, and my career on the solid rock of You.",
     "_id": "2028-09-22"
   },
-  "2028-09-23": {
+  {
     "theme": "Warning",
     "question": "Is my \"passion\" today directed by the \"Truth of the Word,\" or just by my \"Feelings\"?",
     "reflection": "You can be \"sincerely wrong.\" Zeal (passion) is dangerous if it isn't anchored in Truth.",
@@ -8794,7 +8798,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-23",
     "_id": "2028-09-23"
   },
-  "2028-09-24": {
+  {
     "theme": "Goal",
     "question": "Have I \"reached the end\" of my self-effort today? Have I found my \"rest\" in Christ?",
     "reflection": "Jesus is the \"Finish Line.\" He did what the Law couldn't. When you have Jesus, you can stop \"running\" the Law-race.",
@@ -8804,7 +8808,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are my \"End.\" I stop trying to satisfy the Law and I start enjoying Your righteousness.",
     "_id": "2028-09-24"
   },
-  "2028-09-25": {
+  {
     "reflection": "You don't have to \"climb to heaven\" or \"go to the abyss.\" The Truth is as close as your next breath.",
     "question": "How \"near\" am I letting the Word be today? Is it \"in my mouth\" and \"in my heart\"?",
     "theme": "Proximity",
@@ -8814,7 +8818,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-25",
     "_id": "2028-09-25"
   },
-  "2028-09-26": {
+  {
     "theme": "Salvation",
     "question": "Have I \"confessed\" Jesus as Lord of my schedule and my wallet today, as well as my soul?",
     "reflection": "This is the \"Simplicity of the Gospel.\" Internal Belief + External Confession = Eternal Life.",
@@ -8824,7 +8828,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-26",
     "_id": "2028-09-26"
   },
-  "2028-09-27": {
+  {
     "reflection": "Faith isn't an \"intellectual nod\"; it’s a \"heart-move.\" You have to \"fall in love\" with the Truth.",
     "question": "Is my \"belief\" today a \"mental fact\" or a \"heart-affection\"?",
     "theme": "Sincerity",
@@ -8834,7 +8838,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I believe with my heart. Let my faith be a \"love story\" between me and You.",
     "_id": "2028-09-27"
   },
-  "2028-09-28": {
+  {
     "theme": "Access",
     "question": "Am I \"creating distinctions\" between people that God has already removed at the Cross?",
     "reflection": "The \"Table of Grace\" has no reserved seating. Anyone, anywhere, can pull up a chair.",
@@ -8844,7 +8848,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-28",
     "_id": "2028-09-28"
   },
-  "2028-09-29": {
+  {
     "reflection": "Everyone means Everyone. Your past, your race, and your failures are swallowed up by the Name of Jesus.",
     "question": "Who can I tell today that \"Everyone\" includes them?",
     "theme": "Promise",
@@ -8854,7 +8858,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-29",
     "_id": "2028-09-29"
   },
-  "2028-09-30": {
+  {
     "theme": "Mission",
     "question": "Who is \"waiting to hear\" the Gospel today, and am I willing to be the \"someone\" who tells them?",
     "reflection": "God uses \"human mouthpieces.\" He has chosen us to be the \"how\" of the Gospel.",
@@ -8864,7 +8868,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-09-30",
     "_id": "2028-09-30"
   },
-  "2028-10-01": {
+  {
     "reflection": "Your \"feet\" (your walk, your travel, your presence) are \"beautiful\" to God when they carry His message.",
     "question": "Where are my \"feet\" taking me today? Are they carrying \"Good News\" or just \"Busy News\"?",
     "theme": "Messenger",
@@ -8874,7 +8878,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, make my feet \"beautiful.\" Let my presence in every room be a delivery of Your Good News.",
     "_id": "2028-10-01"
   },
-  "2028-10-02": {
+  {
     "reflection": "If you want \"more faith,\" you need \"more Word.\" Faith is a \"reaction\" to hearing what God has said.",
     "question": "What am I \"listening to\" today? Am I \"feeding my faith\" or \"feeding my fears\"?",
     "theme": "Intake",
@@ -8884,7 +8888,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I want more faith. I open Your Word and I \"hear\" Your voice today.",
     "_id": "2028-10-02"
   },
-  "2028-10-03": {
+  {
     "theme": "Continuity",
     "question": "Am I afraid God has \"rejected\" me because of my recent failures? (By no means!)",
     "reflection": "God doesn't \"break up\" with His people. His \"Yes\" is eternal. If He was faithful to Israel, He will be faithful to you.",
@@ -8894,7 +8898,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Faithful God, thank You for Your \"Un-Rejecting\" Love. I trust Your commitment to me.",
     "_id": "2028-10-03"
   },
-  "2028-10-04": {
+  {
     "theme": "Grace",
     "question": "Who is part of my \"remnant\" (my core group of believers) that I can connect with today?",
     "reflection": "You are never \"the only one.\" God always has a \"remnant\" of faithful people, even in the darkest times.",
@@ -8904,7 +8908,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-10-04",
     "_id": "2028-10-04"
   },
-  "2028-10-05": {
+  {
     "reflection": "You can't \"mix\" Grace and Works. It’s either \"All Gift\" or \"All Wage.\" You can't have it both ways.",
     "question": "Am I trying to \"add\" a little of my \"work\" to God's \"Grace\" today?",
     "theme": "Definition",
@@ -8914,7 +8918,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I take it as a \"Pure Gift.\" I stop the \"mixing\" and I start the \"receiving.\"",
     "_id": "2028-10-05"
   },
-  "2028-10-06": {
+  {
     "reflection": "God can use a \"Tragedy\" (Israel’s rejection) to create a \"Triumph\" (The World’s salvation). He is the Master of the \"Plot Twist.\"",
     "question": "Can I trust God’s \"Plot Twist\" in my current \"Tragedy\" today?",
     "theme": "Mystery",
@@ -8924,7 +8928,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-10-06",
     "_id": "2028-10-06"
   },
-  "2028-10-07": {
+  {
     "reflection": "You were a \"Wild Olive\" who has been \"Grafted\" into the \"Rich Root.\" You are drinking from a history that isn't yours.",
     "question": "Am I being \"humble\" today, knowing that I am a \"grafted-in\" guest at God's table?",
     "theme": "Adoption",
@@ -8934,7 +8938,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for grafting me in. I humble myself before the \"Root\" that supports me.",
     "_id": "2028-10-07"
   },
-  "2028-10-08": {
+  {
     "theme": "Warning",
     "question": "Is there any \"haughtiness\" (spiritual superiority) in me today? Will I \"fear\" and stay humble?",
     "reflection": "Spiritual pride is a \"branch-breaker.\" Stay \"low\" (humble) and you will stay \"on the tree.\"",
@@ -8944,7 +8948,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, keep me humble. I am only here by Grace. I don't \"deserve\" my spot on the tree.",
     "_id": "2028-10-08"
   },
-  "2028-10-09": {
+  {
     "reflection": "God is not a \"one-sided\" Grandpa. He is Kind to the trusting and Severe to the rebellious. We must respect both.",
     "question": "Am I \"noting\" both the \"Kindness\" and the \"Severity\" of God in my life today?",
     "theme": "Balance",
@@ -8954,7 +8958,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-10-09",
     "_id": "2028-10-09"
   },
-  "2028-10-10": {
+  {
     "theme": "Hope",
     "question": "Who have I \"given up on\" that God is still \"Able to graft in again\"?",
     "reflection": "No one is \"too far gone.\" God is \"Able\" to bring back anyone who turns toward Him.",
@@ -8964,7 +8968,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, bring them back! I pray for the \"broken branches\" in my life to be restored to the Tree.",
     "_id": "2028-10-10"
   },
-  "2028-10-11": {
+  {
     "theme": "Timing",
     "question": "Am I \"patient\" with the \"hardness\" I see in the world, trusting God's \"Fullness\" schedule?",
     "reflection": "God has a \"Schedule.\" The \"Hardness\" of some is creating \"Space\" for others. Everything is moving toward a \"Fullness.\"",
@@ -8974,7 +8978,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-10-11",
     "_id": "2028-10-11"
   },
-  "2028-10-12": {
+  {
     "reflection": "God doesn't \"take back\" what He gives. His \"Call\" on your life is a permanent signature.",
     "question": "How does the \"Irrevocable\" nature of God's call give me security today?",
     "theme": "Irrevocable",
@@ -8984,7 +8988,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-10-12",
     "_id": "2028-10-12"
   },
-  "2028-10-13": {
+  {
     "reflection": "We were all \"trapped\" in sin so that we could all be \"rescued\" by Mercy. The \"Prison\" was the prerequisite for the \"Pardon.\"",
     "question": "Do I realize that my \"failures\" were the very thing that qualified me for God's \"Mercy\"?",
     "theme": "Mercy",
@@ -8994,7 +8998,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for the rescue. I celebrate the \"Mercy on All\" that You have provided.",
     "_id": "2028-10-13"
   },
-  "2028-10-14": {
+  {
     "theme": "Wonder",
     "question": "When was the last time I just stood in \"Wonder\" at the \"Depth of God\"?",
     "reflection": "We finally reach the \"End of the Argument.\" Paul just stops and \"Worships.\" Some things are too deep for \"logic\"—they require \"Awe.\"",
@@ -9004,7 +9008,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, You are too big for my brain. I stop \"analyzing\" and I start \"adoring\" Your deep riches today.",
     "_id": "2028-10-14"
   },
-  "2028-10-15": {
+  {
     "reflection": "This is the \"Full Circle.\" Everything Starts with Him, is Sustained by Him, and Ends with Him. He is the Point.",
     "question": "Is my life \"To Him\" today? Am I living for His glory or my story?",
     "theme": "Source",
@@ -9014,7 +9018,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-10-15",
     "_id": "2028-10-15"
   },
-  "2028-10-16": {
+  {
     "reflection": "In the Old Testament, sacrifices were dead. In the New, we are \"living\" sacrifices—the fire of God consumes our will, not our life.",
     "question": "What part of my \"will\" or \"agenda\" am I refusing to put on the altar today?",
     "theme": "Surrender",
@@ -9024,7 +9028,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I am Yours. I place my body and my plans on Your altar. Burn away the selfish and use the rest.",
     "_id": "2028-10-16"
   },
-  "2028-10-17": {
+  {
     "theme": "Pressure",
     "question": "Am I letting the \"mold\" of culture shape my reactions, or is the Spirit \"renewing\" my perspective?",
     "reflection": "The world is a \"mold\" trying to squeeze you into its shape. Transformation starts by changing what you think about.",
@@ -9034,7 +9038,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, renew my mind. Help me to see the world through Your eyes, not the media's.",
     "_id": "2028-10-17"
   },
-  "2028-10-18": {
+  {
     "theme": "Testing",
     "question": "What \"small step of obedience\" can I \"test\" today to see God’s will in action?",
     "reflection": "You find God's will by \"testing\" it—trying out obedience and seeing His \"good, acceptable, and perfect\" results.",
@@ -9044,7 +9048,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, show me Your \"perfect\" path. I want to walk in what is \"good and acceptable\" to You.",
     "_id": "2028-10-18"
   },
-  "2028-10-19": {
+  {
     "theme": "Ego",
     "question": "Am I \"over-estimating\" my importance today, or am I resting in my \"God-given\" measure of faith?",
     "reflection": "Pride is \"drunk thinking.\" Humility is \"sober judgment\"—knowing exactly who you are in Christ, nothing more and nothing less.",
@@ -9054,7 +9058,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, give me a \"sober\" mind. Keep me from pride and help me to see others as more significant than myself.",
     "_id": "2028-10-19"
   },
-  "2028-10-20": {
+  {
     "theme": "Diversity",
     "question": "Who is a \"different part\" of the body that I’ve been ignoring or criticizing?",
     "reflection": "You aren't meant to be \"everything.\" You are a \"part\" that needs the other parts to function.",
@@ -9064,7 +9068,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-10-20",
     "_id": "2028-10-20"
   },
-  "2028-10-21": {
+  {
     "theme": "Purpose",
     "question": "Am I \"using\" my gift today, or am I \"burying\" it because I’m comparing it to someone else’s?",
     "reflection": "Your \"Gift\" is a \"Grace-Deposit.\" It’s not for your ego; it’s for the church’s health.",
@@ -9074,7 +9078,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the gift You gave me. I commit to using it for Your glory and the good of others.",
     "_id": "2028-10-21"
   },
-  "2028-10-22": {
+  {
     "theme": "Sincerity",
     "question": "Is my \"love\" for people today \"genuine,\" or am I just \"playing the part\" while harboring bitterness?",
     "reflection": "Christian Nice is often fake. \"Christian Love\" is genuine—it hates evil and clings to good with all its might.",
@@ -9084,7 +9088,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-10-22",
     "_id": "2028-10-22"
   },
-  "2028-10-23": {
+  {
     "theme": "Honor",
     "question": "Who can I \"honor\" today in a way that \"outdoes\" their expectations?",
     "reflection": "This is the only \"competition\" allowed in the Kingdom: who can \"honor\" the other person more.",
@@ -9094,7 +9098,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, teach me to honor others. Let me be the first to give credit and the last to take it.",
     "_id": "2028-10-23"
   },
-  "2028-10-24": {
+  {
     "reflection": "Fervent means \"boiling.\" Don't let your spiritual life become \"lukewarm\" or \"slothful.\" Keep the fire stoked.",
     "question": "Is my \"spiritual temperature\" today \"boiling\" or \"barely warm\"? How can I \"re-stoke\" the fire?",
     "theme": "Energy",
@@ -9104,7 +9108,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, set me on fire again. I refuse to be slothful. I want to serve You with everything I have.",
     "_id": "2028-10-24"
   },
-  "2028-10-25": {
+  {
     "reflection": "Prayer isn't an \"event\"; it’s a \"state of being.\" Stay \"plugged in\" to the Father all day long.",
     "question": "How can I practice \"constant prayer\" during my \"mundane\" tasks today?",
     "theme": "Habit",
@@ -9114,7 +9118,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-10-25",
     "_id": "2028-10-25"
   },
-  "2028-10-26": {
+  {
     "theme": "Reaction",
     "question": "Who is \"persecuting\" (annoying/hurting) me today? How can I \"bless\" them in my heart?",
     "reflection": "This is the \"Supernatural Response.\" Anyone can \"curse\" an enemy; only a child of God can \"bless\" one.",
@@ -9124,7 +9128,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-10-26",
     "_id": "2028-10-26"
   },
-  "2028-10-27": {
+  {
     "theme": "Empathy",
     "question": "Whose \"weather\" do I need to step into today? Who needs me to just \"be there\"?",
     "reflection": "Empathy is \"stepping into someone else's weather.\" Don't try to \"fix\" their feelings; just \"be\" with them.",
@@ -9134,7 +9138,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, give me Your heart of empathy. Help me to feel what others feel and love them through it.",
     "_id": "2028-10-27"
   },
-  "2028-10-28": {
+  {
     "reflection": "You can't control \"them,\" but you can control \"you.\" Make sure the \"peace\" isn't broken on your end.",
     "question": "Is there a \"conflict\" I’m keeping alive today? What can I do \"on my end\" to bring peace?",
     "theme": "Effort",
@@ -9144,7 +9148,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I am a peacemaker. I take responsibility for my part and I leave the rest to You.",
     "_id": "2028-10-28"
   },
-  "2028-10-29": {
+  {
     "theme": "Trust",
     "question": "What \"grudge\" am I holding onto today? Will I \"leave it\" in God’s hands instead of my own?",
     "reflection": "Vengeance is a \"Heavy Weight\" that only God is strong enough to carry. When you \"get even,\" you push God out of the way.",
@@ -9154,7 +9158,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-10-29",
     "_id": "2028-10-29"
   },
-  "2028-10-30": {
+  {
     "theme": "Strategy",
     "question": "How can I \"overcome\" a negative situation today by doing something \"unexpectely good\"?",
     "reflection": "You don't \"fight\" darkness with more darkness; you fight it with \"Light.\" Goodness is the ultimate weapon.",
@@ -9164,7 +9168,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, show me the \"Good\" way to respond to evil. Let Your light shine through my actions.",
     "_id": "2028-10-30"
   },
-  "2028-10-31": {
+  {
     "reflection": "Even when we don't \"like\" the leader, we \"respect\" the position. God uses order to prevent chaos.",
     "question": "Am I \"honoring\" the leaders in my life (bosses/government) as an act of obedience to God?",
     "theme": "Order",
@@ -9174,7 +9178,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-10-31",
     "_id": "2028-10-31"
   },
-  "2028-11-01": {
+  {
     "reflection": "Love is a \"Debt\" that you can never fully repay. You are \"indebted\" to every person you meet to show them Christ's love.",
     "question": "Who do I \"owe\" a debt of love to today? How can I \"make a payment\" on that debt?",
     "theme": "Debt",
@@ -9184,7 +9188,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the debt of love. Help me to be \"generous\" with my affection and my service.",
     "_id": "2028-11-01"
   },
-  "2028-11-02": {
+  {
     "reflection": "If you truly \"Love,\" you won't steal, lie, or kill. Love is the \"Shortcut\" to keeping all the rules.",
     "question": "Is my \"love\" protecting my neighbor today, or am I \"justifying\" my behavior?",
     "theme": "Protection",
@@ -9194,7 +9198,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-02",
     "_id": "2028-11-02"
   },
-  "2028-11-03": {
+  {
     "reflection": "Spiritual \"drowsiness\" is dangerous. The \"Dawn\" (Christ's return) is closer than we think. Stay awake!",
     "question": "Am I \"sleepwalking\" through my spiritual life? What do I need to do to \"wake up\" today?",
     "theme": "Awareness",
@@ -9204,7 +9208,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, wake me up! Give me an \"eternal urgency\" for the things that really matter.",
     "_id": "2028-11-03"
   },
-  "2028-11-04": {
+  {
     "theme": "Preparation",
     "question": "What \"darkness\" do I need to \"cast off\" this morning? What \"Light\" am I putting on?",
     "reflection": "You don't just \"stop\" doing bad things; you \"start\" wearing Light. The best \"defense\" against sin is a \"bright\" life.",
@@ -9214,7 +9218,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are my Light. I put You on today like armor. Protect me from the shadows.",
     "_id": "2028-11-04"
   },
-  "2028-11-05": {
+  {
     "reflection": "We often \"quarrel\" over things that don't matter. Welcome the person; leave the \"opinion-argument\" at the door.",
     "question": "Am I being \"welcoming\" to those who disagree with me on \"minor\" issues?",
     "theme": "Inclusion",
@@ -9224,7 +9228,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-05",
     "_id": "2028-11-05"
   },
-  "2028-11-06": {
+  {
     "theme": "Accountability",
     "question": "Am I trying to \"play Holy Spirit\" in someone else's life today? Will I \"mind my own business\"?",
     "reflection": "Every Christian has a \"Master\" (Jesus). It’s not your job to \"supervise\" another person’s walk; that’s Jesus' job.",
@@ -9234,7 +9238,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I stay in my lane. You are the Master. I trust You to lead Your other servants.",
     "_id": "2028-11-06"
   },
-  "2028-11-07": {
+  {
     "reflection": "Some things are \"gray areas.\" In those areas, follow your \"conscience\" before God and let others do the same.",
     "question": "Am I acting out of \"fear of people\" or out of a \"full conviction\" before God?",
     "theme": "Personal Conviction",
@@ -9244,7 +9248,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-07",
     "_id": "2028-11-07"
   },
-  "2028-11-08": {
+  {
     "theme": "Motive",
     "question": "Who am I \"living for\" today? Am I trying to \"impress\" people or \"honor\" the Lord?",
     "reflection": "Your \"Audience\" is a person of One. Whether you are \"Eating\" or \"Fasting,\" do it for Him.",
@@ -9254,7 +9258,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, I live for You. Every breath, every meal, and every task is an offering to You.",
     "_id": "2028-11-08"
   },
-  "2028-11-09": {
+  {
     "reflection": "We will all \"give an account\" of our own lives, not our neighbor’s. Focus on your own \"Report Card.\"",
     "question": "Am I prepared to \"give an account\" for my actions and my attitudes today?",
     "theme": "Perspective",
@@ -9264,7 +9268,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I live with the \"Judgment Seat\" in view. Keep me faithful to my own call.",
     "_id": "2028-11-09"
   },
-  "2028-11-10": {
+  {
     "reflection": "Your \"Freedom\" shouldn't come at the cost of someone else's \"Faith.\" If it \"trips them up,\" it’s not worth doing.",
     "question": "What \"right\" or \"freedom\" am I willing to \"give up\" today to protect a brother/sister?",
     "theme": "Consideration",
@@ -9274,7 +9278,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-10",
     "_id": "2028-11-10"
   },
-  "2028-11-11": {
+  {
     "theme": "Core",
     "question": "Does my \"religion\" today look like \"Rules\" or like \"Peace and Joy in the Holy Spirit\"?",
     "reflection": "Don't get \"stuck\" in the \"Rules.\" The Kingdom is about the \"Character\" (Righteousness) and the \"Atmosphere\" (Peace/Joy) of the Spirit.",
@@ -9284,7 +9288,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-11",
     "_id": "2028-11-11"
   },
-  "2028-11-12": {
+  {
     "reflection": "Jesus didn't \"please himself\"; he served us. We are called to \"build up\" our neighbors, even when it’s inconvenient.",
     "question": "Who can I \"build up\" today by \"pleasing\" them instead of \"insisting\" on my own way?",
     "theme": "Edification",
@@ -9294,7 +9298,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-12",
     "_id": "2028-11-12"
   },
-  "2028-11-13": {
+  {
     "reflection": "Hope is the \"gasoline\" of the Christian life. God \"fills\" us so we can \"overflow\" into a hopeless world.",
     "question": "Is my \"hope-tank\" full today? How can I ask the \"God of Hope\" for a refill?",
     "theme": "Fuel",
@@ -9304,7 +9308,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "God of Hope, fill me! Let me abound in Your joy and peace until it overflows to everyone I meet.",
     "_id": "2028-11-13"
   },
-  "2028-11-14": {
+  {
     "reflection": "Paul’s final chapter is a \"shout-out\" to his friends. Ministry is about \"People,\" not just \"Projects.\"",
     "question": "Who can I \"greet\" today with a \"Holy Kiss\" (a warm, sincere word of affection)?",
     "theme": "Affection",
@@ -9314,7 +9318,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-14",
     "_id": "2028-11-14"
   },
-  "2028-11-15": {
+  {
     "theme": "Discernment",
     "question": "Am I being \"fooled\" by \"smooth talk\" today? Will I ask the Spirit for \"discernment\"?",
     "reflection": "Beware of people who \"sound good\" but \"serve themselves.\" Discernment looks at the \"Fruit,\" not just the \"Words.\"",
@@ -9324,7 +9328,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, give me eyes to see the truth. Keep me from being \"deceived\" by flattery.",
     "_id": "2028-11-15"
   },
-  "2028-11-16": {
+  {
     "theme": "Victory",
     "question": "How does the \"future crushing\" of the enemy give me \"Peace\" in my current battle?",
     "reflection": "The \"God of Peace\" is the one who \"Crushes.\" Victory is coming, and it will be \"Under Your Feet.\"",
@@ -9334,7 +9338,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "God of Peace, I trust Your victory. Crush the enemy’s influence in my life and my family today.",
     "_id": "2028-11-16"
   },
-  "2028-11-17": {
+  {
     "theme": "Foundation",
     "question": "Do I trust God's \"ability to strengthen me\" today, or am I relying on my own \"weak muscles\"?",
     "reflection": "We end Romans with a \"Doxology.\" God is \"Able\" to keep you strong until the very end.",
@@ -9344,7 +9348,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, strengthen me! I give You the glory for my past, my present, and my future. Amen.",
     "_id": "2028-11-17"
   },
-  "2028-11-18": {
+  {
     "reflection": "Welcome to Corinth—the city of \"Chaos.\" Paul starts by reminding them they are \"Sanctified\" (Set Apart), even in the mess.",
     "question": "Do I realize that I am a \"Saint\" (set apart) today, even if my life feels a little \"messy\"?",
     "theme": "Position",
@@ -9354,7 +9358,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for sanctifying me. I am Your \"Saint,\" and I walk in that identity today.",
     "_id": "2028-11-18"
   },
-  "2028-11-19": {
+  {
     "reflection": "You have \"Everything You Need\" to survive and thrive until Jesus returns. God doesn't \"short-change\" His children.",
     "question": "Am I complaining about what I \"lack,\" or am I \"using\" the gifts God has already given me?",
     "theme": "Resource",
@@ -9364,7 +9368,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for Your provision. I have \"no lack\" in You. Help me to use what I have.",
     "_id": "2028-11-19"
   },
-  "2028-11-20": {
+  {
     "theme": "Unity",
     "question": "Is there a \"division\" in my heart toward a fellow believer? How can I \"repair\" the tear?",
     "reflection": "Divisions \"tear\" the Body. Unity is a \"choice\" to have the \"Same Mind\"—the Mind of Christ.",
@@ -9374,7 +9378,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, make us one. Remove the \"factions\" and the \"cliques\" from my heart and my church.",
     "_id": "2028-11-20"
   },
-  "2028-11-21": {
+  {
     "reflection": "To the world, a \"dying God\" is a joke. To us, it’s the \"Dynamite\" that saved our souls.",
     "question": "Am I \"embarrassed\" by the \"foolishness\" of the Cross, or do I glory in its Power?",
     "theme": "Paradox",
@@ -9384,7 +9388,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I glory in the Cross! Thank You for the \"Folly\" that brought me Life.",
     "_id": "2028-11-21"
   },
-  "2028-11-22": {
+  {
     "reflection": "God loves \"Underdogs.\" He uses the \"unlikely\" to prove that the Power is from Him, not us.",
     "question": "Am I \"proud\" of my \"wisdom,\" or am I \"humble\" enough to be used by God as a \"fool\"?",
     "theme": "Choice",
@@ -9394,7 +9398,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-22",
     "_id": "2028-11-22"
   },
-  "2028-11-23": {
+  {
     "reflection": "You don't \"have\" wisdom; you \"have\" Jesus. He is your wisdom, your righteousness, and your life.",
     "question": "Am I \"looking for wisdom\" in a book today, or am I \"looking for Jesus\"?",
     "theme": "Source",
@@ -9404,7 +9408,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, You are my Wisdom. Lead my thoughts and my decisions today.",
     "_id": "2028-11-23"
   },
-  "2028-11-24": {
+  {
     "theme": "Humility",
     "question": "Am I \"waiting to feel confident\" before I serve God? (Hint: Use your \"trembling\" hands!)",
     "reflection": "Even Paul felt \"fear\" and \"trembling\" when he spoke. Being \"used by God\" doesn't mean you have to be \"confident\" in yourself.",
@@ -9414,7 +9418,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-24",
     "_id": "2028-11-24"
   },
-  "2028-11-25": {
+  {
     "reflection": "The Gospel isn't an \"argument\" to be won; it’s a \"Power\" to be demonstrated. Let your \"Life\" be the proof.",
     "question": "Is my faith based on \"clever words\" or on a \"demonstration\" of God's power in my life?",
     "theme": "Evidence",
@@ -9424,7 +9428,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Holy Spirit, demonstrate Your power through me today. Let my life be the \"evidence\" of Your reality.",
     "_id": "2028-11-25"
   },
-  "2028-11-26": {
+  {
     "theme": "Mystery",
     "question": "Am I asking the Spirit to \"unveil\" the \"hidden wisdom\" of God to me today?",
     "reflection": "God has \"Secrets\" for His friends. There is a depth to the Word that only the \"spiritually mature\" can see.",
@@ -9434,7 +9438,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-26",
     "_id": "2028-11-26"
   },
-  "2028-11-27": {
+  {
     "theme": "Future",
     "question": "Am I \"worrying\" about a future that is \"better than I can imagine\"?",
     "reflection": "You can't even \"imagine\" how good the future is. God’s \"Surprises\" are better than your \"Dreams.\"",
@@ -9444,7 +9448,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-27",
     "_id": "2028-11-27"
   },
-  "2028-11-28": {
+  {
     "reflection": "The \"Author\" (the Holy Spirit) is the best \"Teacher.\" Ask Him to explain what He wrote.",
     "question": "Am I reading the Bible with the \"Author\" present, or am I trying to figure it out alone?",
     "theme": "Teacher",
@@ -9454,7 +9458,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-28",
     "_id": "2028-11-28"
   },
-  "2028-11-29": {
+  {
     "reflection": "You have \"Direct Access\" to the thoughts of God. You can think about your problems \"the Jesus way.\"",
     "question": "How can I use the \"Mind of Christ\" to solve a \"problem\" I’m facing today?",
     "theme": "Perspective",
@@ -9464,7 +9468,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-11-29",
     "_id": "2028-11-29"
   },
-  "2028-11-30": {
+  {
     "reflection": "It’s okay to be an \"infant,\" but it’s not okay to \"stay\" one. Growth is the natural result of life.",
     "question": "Am I \"growing up\" in my faith, or am I still \"crying for milk\" (attention/comfort) every day?",
     "theme": "Growth",
@@ -9474,7 +9478,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, help me to \"grow up.\" I want to move from \"milk\" to \"solid food\" in Your Word.",
     "_id": "2028-11-30"
   },
-  "2028-12-01": {
+  {
     "reflection": "Don't \"worship\" the gardener; \"worship\" the One who makes the seeds grow. It’s all about God's Power.",
     "question": "Am I \"comparing\" my leaders, or am I looking to \"God who gives the growth\"?",
     "theme": "Focus",
@@ -9484,7 +9488,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, thank You for the \"planters\" and the \"waterers.\" But I give You the glory for the growth.",
     "_id": "2028-12-01"
   },
-  "2028-12-02": {
+  {
     "reflection": "You aren't \"working for God\"; you are \"working with God.\" He is your \"Partner\" in everything.",
     "question": "How does it change my \"workday\" to know that I am a \"fellow worker\" with the Creator?",
     "theme": "Team",
@@ -9494,7 +9498,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, let’s work together today. I am Your \"field\" and Your \"building.\" Do Your work in me.",
     "_id": "2028-12-02"
   },
-  "2028-12-03": {
+  {
     "theme": "Security",
     "question": "What \"foundation\" am I building my \"happiness\" on today? Is it \"Jesus\" or something else?",
     "reflection": "If you build on \"Money,\" \"Fame,\" or \"Self,\" the house will fall. Build on \"Jesus\" and you are \"Unshakable.\"",
@@ -9504,7 +9508,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-03",
     "_id": "2028-12-03"
   },
-  "2028-12-04": {
+  {
     "theme": "Quality",
     "question": "Is the \"work\" I’m doing today \"Gold\" (love) or \"Stubble\" (ego)?",
     "reflection": "It’s not about \"How Much\" you do; it’s about \"What Kind\" of work you do. Only \"Love-motivated\" work survives the fire.",
@@ -9514,7 +9518,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-04",
     "_id": "2028-12-04"
   },
-  "2028-12-05": {
+  {
     "theme": "Holiness",
     "question": "How would I treat my \"day\" differently if I realized I am a \"walking temple\" of God?",
     "reflection": "You are \"Holy Ground.\" The Spirit \"dwells\" (lives) in you. Treat your body and your mind like a sanctuary.",
@@ -9524,7 +9528,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-05",
     "_id": "2028-12-05"
   },
-  "2028-12-06": {
+  {
     "reflection": "To get \"God's Wisdom,\" you have to \"unlearn\" the world's wisdom. Humility is the prerequisite for insight.",
     "question": "What \"worldly wisdom\" (cynicism/selfishness) do I need to \"unlearn\" to become truly wise?",
     "theme": "Reversal",
@@ -9534,7 +9538,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-06",
     "_id": "2028-12-06"
   },
-  "2028-12-07": {
+  {
     "reflection": "You are a \"joint-heir\" with Christ. You don't need to \"envy\" anyone because you already \"own\" the Kingdom.",
     "question": "Am I living like a \"spiritual billionaire\" today, or am I \"grudging\" others for what they have?",
     "theme": "Wealth",
@@ -9544,7 +9548,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-07",
     "_id": "2028-12-07"
   },
-  "2028-12-08": {
+  {
     "theme": "Responsibility",
     "question": "Am I being a \"faithful manager\" of the \"mysteries\" (truths) God has entrusted to me?",
     "reflection": "A \"Steward\" doesn't \"own\" the stuff; they \"manage\" it for the Owner. You are a \"Manager\" of God's Truth.",
@@ -9554,7 +9558,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-08",
     "_id": "2028-12-08"
   },
-  "2028-12-09": {
+  {
     "reflection": "We don't have the \"full story\" yet. Only the Lord can \"disclose the purposes of the heart.\" Wait for His verdict.",
     "question": "Am I \"judging\" someone’s motives today without having all the facts?",
     "theme": "Patience",
@@ -9564,7 +9568,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-09",
     "_id": "2028-12-09"
   },
-  "2028-12-10": {
+  {
     "reflection": "Everything you are—your brain, your health, your faith—is a \"Gift.\" Boasting is just \"forgetting the Giver.\"",
     "question": "What \"gift\" am I tempted to \"boast about\" today as if I \"earned\" it?",
     "theme": "Gratitude",
@@ -9574,7 +9578,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, everything I have is from You. Thank You for Your \"unmerited\" gifts. I give You all the praise.",
     "_id": "2028-12-10"
   },
-  "2028-12-11": {
+  {
     "reflection": "Paul was willing to \"look like a loser\" so that the Gospel could win. Your \"reputation\" is a small price to pay for the Truth.",
     "question": "Am I willing to \"look foolish\" today to stand up for what is Right?",
     "theme": "Reputation",
@@ -9584,7 +9588,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-11",
     "_id": "2028-12-11"
   },
-  "2028-12-12": {
+  {
     "theme": "Paternity",
     "question": "Who do I need to \"admonish\" (warn) today out of a heart of \"beloved affection\"?",
     "reflection": "Correction should come from \"Love,\" not \"Shame.\" We \"admonish\" (warn) because we \"care.\"",
@@ -9594,7 +9598,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, give me a \"fatherly/motherly\" heart. Help me to speak the truth in love without shaming others.",
     "_id": "2028-12-12"
   },
-  "2028-12-13": {
+  {
     "theme": "Reality",
     "question": "Is my \"faith\" today just \"talk,\" or am I experiencing the \"Power\" of the Kingdom in my actions?",
     "reflection": "Anyone can \"talk\" a good game. The Kingdom is seen in the \"Power\" to change a life, a habit, or a heart.",
@@ -9604,7 +9608,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-13",
     "_id": "2028-12-13"
   },
-  "2028-12-14": {
+  {
     "theme": "Approach",
     "question": "Am I approaching \"difficult people\" today with a \"rod\" (harshness) or with \"gentleness\"?",
     "reflection": "We choose the \"tool\" of our approach. \"Gentleness\" is usually the better choice for restoration.",
@@ -9614,7 +9618,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-14",
     "_id": "2028-12-14"
   },
-  "2028-12-15": {
+  {
     "reflection": "A little sin (leaven) affects the whole batch. Integrity isn't about being \"mostly good\"; it's about removing the \"hidden\" pride.",
     "question": "What \"small compromise\" am I allowing today that might be \"leavening\" my whole character?",
     "theme": "Influence",
@@ -9624,7 +9628,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, search my \"pantry.\" Cleanse out the old habits so I can be \"unleavened\" in Your sight.",
     "_id": "2028-12-15"
   },
-  "2028-12-16": {
+  {
     "reflection": "The blood is on the doorpost. You are safe from judgment because the Lamb took the hit. Celebrate the \"Festival\" of Grace!",
     "question": "Am I living in \"Fear\" of the plague, or in the \"Freedom\" of the Passover Lamb?",
     "theme": "Sacrifice",
@@ -9634,7 +9638,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Jesus, thank You for being my Sacrifice. I feast on Your faithfulness today.",
     "_id": "2028-12-16"
   },
-  "2028-12-17": {
+  {
     "theme": "Accountability",
     "question": "Am I being \"harsh\" on non-believers while \"excusing\" my own brothers and sisters?",
     "reflection": "We often judge the \"world\" and ignore the \"church.\" God calls us to hold each other to a higher standard of love.",
@@ -9644,7 +9648,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, give me a heart that protects the holiness of Your family first.",
     "_id": "2028-12-17"
   },
-  "2028-12-18": {
+  {
     "theme": "Humility",
     "question": "What \"right\" am I fighting for today that I might need to \"surrender\" for the sake of peace?",
     "reflection": "Sometimes \"winning\" a legal battle is \"losing\" a spiritual one. It is better to be \"cheated\" than to ruin the Gospel's name.",
@@ -9654,7 +9658,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-18",
     "_id": "2028-12-18"
   },
-  "2028-12-19": {
+  {
     "theme": "Transformation",
     "question": "Do I still identify with my \"old sins,\" or do I identify with my \"new washing\"?",
     "reflection": "Your \"Past\" is a \"Was.\" You aren't who you were; you are who God says you are now.",
@@ -9664,7 +9668,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-19",
     "_id": "2028-12-19"
   },
-  "2028-12-20": {
+  {
     "theme": "Freedom",
     "question": "Is this habit \"building me up\" or is it just something I’m \"allowed\" to do?",
     "reflection": "Just because you \"can\" do something doesn't mean you \"should.\" Maturity is choosing the \"Helpful\" over the \"Legal.\"",
@@ -9674,7 +9678,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-20",
     "_id": "2028-12-20"
   },
-  "2028-12-21": {
+  {
     "reflection": "If you \"can't quit it,\" it’s your master. True freedom is the power to say \"No\" to a neutral thing.",
     "question": "Is there any \"neutral\" thing (phone, food, hobby) that is \"dominating\" me today?",
     "theme": "Mastery",
@@ -9684,7 +9688,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-21",
     "_id": "2028-12-21"
   },
-  "2028-12-22": {
+  {
     "theme": "Purpose",
     "question": "Am I treating my \"physical self\" today as a \"tool\" for God's purposes?",
     "reflection": "Your \"skin and bones\" are a \"Sacred Space.\" What you do with your body, you do with the Lord.",
@@ -9694,7 +9698,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, my body is Yours. Use my eyes, my hands, and my heart for Your glory.",
     "_id": "2028-12-22"
   },
-  "2028-12-23": {
+  {
     "theme": "Strategy",
     "question": "What situation do I need to \"run away from\" today to protect my integrity?",
     "reflection": "You don't \"fight\" some temptations; you \"run\" from them. Wisdom knows when to \"Flee\" instead of \"Stand.\"",
@@ -9704,7 +9708,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-23",
     "_id": "2028-12-23"
   },
-  "2028-12-24": {
+  {
     "reflection": "You are a \"Mobile Sanctuary.\" God isn't in a \"building\"; He is in \"you.\" Carry Yourself with dignity.",
     "question": "How would I treat my \"temple\" today if I truly believed God was \"sitting\" in my heart?",
     "theme": "Indwelling",
@@ -9714,7 +9718,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-24",
     "_id": "2028-12-24"
   },
-  "2028-12-25": {
+  {
     "reflection": "You are \"Paid For.\" You don't belong to yourself anymore; you belong to the One who bought you.",
     "question": "Since I am \"not my own,\" how should I handle \"my\" schedule and \"my\" money today?",
     "theme": "Ownership",
@@ -9724,7 +9728,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, I am Your \"property.\" Handle me as You wish. I trust Your ownership.",
     "_id": "2028-12-25"
   },
-  "2028-12-26": {
+  {
     "theme": "Christmas Reflection",
     "question": "How can my \"physical actions\" (service/rest/kindness) glorify God on this Christmas Day?",
     "reflection": "On Christmas, God \"became a body\" (Jesus). Now, He wants to \"be glorified\" in your body.",
@@ -9734,7 +9738,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-26",
     "_id": "2028-12-26"
   },
-  "2028-12-27": {
+  {
     "theme": "Contentment",
     "question": "Am I \"waiting for a better life\" to start serving, or am I \"leading the life\" God assigned me right now?",
     "reflection": "You don't have to \"change your circumstances\" to serve God. He \"assigned\" you to this moment for a reason.",
@@ -9744,7 +9748,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Father, I accept my \"assignment.\" I will serve You right where I am, in this season and this place.",
     "_id": "2028-12-27"
   },
-  "2028-12-28": {
+  {
     "reflection": "Your \"Social Status\" doesn't matter to God. If you are a slave on earth, you are a \"Freedman\" in Heaven.",
     "question": "Do I see myself as \"Free\" in Christ, regardless of my \"job title\" or \"bank account\"?",
     "theme": "Status",
@@ -9754,7 +9758,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-28",
     "_id": "2028-12-28"
   },
-  "2028-12-29": {
+  {
     "theme": "Focus",
     "question": "What is \"dividing\" my heart today? What can I \"cut out\" to give God my \"Full Attention\"?",
     "reflection": "Life is full of \"Distractions.\" Paul’s goal (and God’s) is for your heart to be \"Undivided.\"",
@@ -9764,7 +9768,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-29",
     "_id": "2028-12-29"
   },
-  "2028-12-30": {
+  {
     "theme": "Love",
     "question": "Am I using my \"Bible knowledge\" today to \"win arguments\" or to \"build people up\"?",
     "reflection": "Being \"Right\" isn't the goal; being \"Loving\" is. Knowledge without love is just \"spiritual ego.\"",
@@ -9774,7 +9778,7 @@ window.HERALD_DATA.devotionals = {
     "date": "2028-12-30",
     "_id": "2028-12-30"
   },
-  "2028-12-31": {
+  {
     "reflection": "It is better to be \"Known by God\" than to \"Know everything.\" Relationship is the ultimate \"Knowledge.\"",
     "question": "Does it comfort me to know that the Creator of the Universe \"Knows my name\" today?",
     "theme": "Intimacy",
@@ -9784,7 +9788,7 @@ window.HERALD_DATA.devotionals = {
     "prayer": "Lord, thank You for \"Knowing\" me. I love You, and I am secure in Your intimate gaze.",
     "_id": "2028-12-31"
   },
-  "2029-01-01": {
+  {
     "theme": "Final Word",
     "question": "As I look back on 2028, did I \"do it all\" for His glory? How can I start 2029 with this one goal?",
     "reflection": "We end the year with the \"Universal Rule.\" Every meal, every mile, and every moment is an opportunity to say, \"God, You are Great.\"",
@@ -9794,4 +9798,4 @@ window.HERALD_DATA.devotionals = {
     "date": "2029-01-01",
     "_id": "2029-01-01"
   }
-};
+];

@@ -1,0 +1,20 @@
+/* ==========================================================================
+   the_flock.css — Section 4: The Flock
+   Signature color: --mint (#8cc5a2)
+   Additive only. Never override tokens already in the_broadsheet.css.
+   ========================================================================== */
+
+.sec-the-flock {
+  --sec-color: var(--mint);
+  --sec-color-soft: var(--mint-soft);
+  --sec-heading-font: 'Lora', Georgia, serif;
+  --sec-body-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.sec-the-flock .sec-masthead {
+  border-top: 3px solid var(--mint);
+}
+
+.sec-the-flock .broadsheet-card {
+  border-top: 3px solid var(--mint);
+}

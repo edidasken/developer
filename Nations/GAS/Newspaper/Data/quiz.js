@@ -1,8 +1,12 @@
-// Herald Data: Bible Quiz Questions
-// Source: New_Covenant/Data/quiz.js — 50 questions
-// DO NOT EDIT — regenerate with: node Newspaper/convert_herald_data.js
-window.HERALD_DATA = window.HERALD_DATA || {};
-window.HERALD_DATA.quiz = [
+// quiz.js — Static Bible quiz questions bundle
+// Source:   Firestore project flockos-notify, collection: quiz
+// Exported: 2026-04-29T05:54:10Z
+// Records:  50
+//
+// Re-generate: python "Architechtural Docs/New Covenant/Automation/Shepherds/export_quiz_to_js.py"
+// DO NOT EDIT — regenerate from Firestore instead.
+
+export default [
   {
     "quizId": "1",
     "optionA": "Third Day",

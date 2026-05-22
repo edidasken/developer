@@ -35,33 +35,68 @@ const Nehemiah = (() => {
 
   // ── Constants ────────────────────────────────────────────────────────────
 
-  // The Flock Herald is a standalone product. Authentication uses a modal
-  // overlay (the_garments.js) rendered in-place. When guard() needs to
-  // redirect, it returns the user to the Herald root (Newspaper/index.html).
+  // New Covenant is fully separated from the Old Covenant `FlockOS/Pages/`
+  // layout. There is no shared `the_wall.html`. Instead, every app under
+  // `New_Covenant/app.<name>/` provides its own standalone sign-in page at
+  // `app.<name>/index.html` (the "Stand pattern"). The launcher lives at
+  // `New_Covenant/index.html`.
   //
-  // `LOGIN_PAGE` and `APP_PAGE` are resolved from the current URL so that
-  // guard() always lands at the Herald root regardless of section depth.
+  // `LOGIN_PAGE` and `APP_PAGE` are computed per-call from the current URL so
+  // that `guard()` always lands on the correct per-app login screen.
 
-  function _heraldBase() {
-    // Returns the absolute URL of the Newspaper/ root, with trailing slash.
-    // Works from any section depth (Sections/<slug>/index.html) or root.
+  function _currentAppFolder() {
+    // Returns 'app.flockchat', 'app.feed', etc. when inside an app dir, else ''.
+    var m = location.pathname.match(/\/(app\.[a-z0-9_-]+)(\/|$)/i);
+    return m ? m[1] : '';
+  }
+
+  function _newCovenantBase() {
+    // Absolute URL of the deployment root that contains the launcher
+    // (New_Covenant/, Nations/<Church>/, or the site root).
+    // Always ends with a trailing '/'.
     var p = location.pathname;
 
-    // 1. Path contains /Newspaper/ — strip to that prefix
-    var m = p.match(/^(.*\/Newspaper\/)/);
-    if (m) return location.origin + m[1];
+    // 0. Newspaper: /…/Newspaper/…
+    var nipx = p.indexOf('/Newspaper/');
+    if (nipx >= 0) {
+      return location.origin + p.substring(0, nipx + '/Newspaper/'.length);
+    }
 
-    // 2. Dev server at root (localhost:7171/) — no /Newspaper/ in path
-    //    Root index.html is already the entry point.
-    return location.origin + '/';
+    // 1. Dev / source tree: /…/New_Covenant/…
+    var idx = p.indexOf('/New_Covenant/');
+    if (idx >= 0) {
+      return location.origin + p.substring(0, idx + '/New_Covenant/'.length);
+    }
+
+    // 2. Production: /…/Nations/<Church>/…
+    var nm = p.match(/^(.*\/Nations\/[^/]+\/)/);
+    if (nm) {
+      return location.origin + nm[1];
+    }
+
+    // 3. Fallback: strip the current app folder (so we don't double it),
+    //    then strip the file segment so we land at the parent dir.
+    var stripped = p.replace(/\/(app\.[a-z0-9_-]+)\/[^/]*$/i, '/');
+    if (stripped !== p) {
+      return location.origin + stripped;
+    }
+    return location.origin + p.replace(/[^/]*$/, '');
   }
 
   function _resolveLoginPage() {
-    return _heraldBase() + 'index.html';
+    var app = _currentAppFolder();
+    var base = _newCovenantBase();
+    return app
+      ? base + app + '/index.html'   // per-app sign-in
+      : base + 'index.html';          // launcher (public)
   }
 
   function _resolveAppPage() {
-    return _heraldBase() + 'index.html';
+    var app = _currentAppFolder();
+    var base = _newCovenantBase();
+    return app
+      ? base + app + '/' + app + '.html'   // app.flockchat → app.flockchat.html
+      : base + 'index.html';
   }
 
   // Public portal (FlockOS.html) — where users land after logout.

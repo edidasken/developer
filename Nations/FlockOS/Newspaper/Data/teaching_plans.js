@@ -1,8 +1,20 @@
-// Herald Data: Teaching Plans
-// Source: New_Covenant/Data/teaching_plans.js — 2 records
-// DO NOT EDIT — regenerate with: node Newspaper/convert_herald_data.js
-window.HERALD_DATA = window.HERALD_DATA || {};
-window.HERALD_DATA.teachingPlans = [
+// teaching_plans.js — Static snapshot of the 'teachingPlans' Firestore collection.
+// Source:   Firestore project flockos-truth, collection: teachingPlans
+// Exported: 2026-04-29T07:32:58Z
+// Records:  2  (one per session)
+// Filter:   all statuses (Draft + Review + Approved)
+//
+// Each record is one session of one plan. The renderer groups by planId
+// and orders by sessionNumber.
+// Fields: planId, planTitle, planDescription, planAudience, planGoal,
+//         sessionNumber, sessionTitle, memoryVerse, memoryVerseRef, outcome,
+//         durationMinutes, segments[], scriptureRefs, tags[],
+//         status ('Draft'|'Approved'|'Review'), approvedBy, approvedAt, _docId
+//
+// Re-generate: python "Architechtural Docs/New Covenant/Automation/Shepherds/export_teaching_plans_to_js.py"
+// DO NOT EDIT — regenerate from Firestore instead.
+
+export default [
   {
     "planTitle": "Baptism Orientation",
     "planAudience": "New believers preparing for baptism by immersion",

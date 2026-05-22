@@ -1,8 +1,12 @@
-// Herald Data: Counseling Topics
-// Source: New_Covenant/Data/counseling.js — 50 topics
-// DO NOT EDIT — regenerate with: node Newspaper/convert_herald_data.js
-window.HERALD_DATA = window.HERALD_DATA || {};
-window.HERALD_DATA.counseling = [
+// counseling.js — Static biblical counseling bundle
+// Source:   Firestore project flockos-notify, collection: counseling
+// Exported: 2026-04-29T05:54:09Z
+// Topics:   50
+//
+// Re-generate: python "Architechtural Docs/New Covenant/Automation/Shepherds/export_counseling_to_js.py"
+// DO NOT EDIT — regenerate from Firestore instead.
+
+export default [
   {
     "color": "red",
     "steps": "Look to the Lord as your stronghold and refuge in times of trouble (Psalm 9:9). Speak up for yourself and others who are oppressed, ensuring the rights of the destitute are protected (Proverbs 31:8). Seek safety and support from those who can provide a stronghold against the misuse of power (Psalm 9:9).",

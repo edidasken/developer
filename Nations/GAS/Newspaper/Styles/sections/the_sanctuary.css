@@ -1,0 +1,20 @@
+/* ==========================================================================
+   the_sanctuary.css — Section 3: The Sanctuary
+   Signature color: --lilac (#b49bdb)
+   Additive only. Never override tokens already in the_broadsheet.css.
+   ========================================================================== */
+
+.sec-the-sanctuary {
+  --sec-color: var(--lilac);
+  --sec-color-soft: var(--lilac-soft);
+  --sec-heading-font: 'Lora', Georgia, serif;
+  --sec-body-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.sec-the-sanctuary .sec-masthead {
+  border-top: 3px solid var(--lilac);
+}
+
+.sec-the-sanctuary .broadsheet-card {
+  border-top: 3px solid var(--lilac);
+}

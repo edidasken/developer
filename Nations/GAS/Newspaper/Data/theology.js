@@ -1,8 +1,18 @@
-// Herald Data: Theology
-// Source: New_Covenant/Data/theology.js — 27 doctrine sections
-// DO NOT EDIT — regenerate with: node Newspaper/convert_herald_data.js
-window.HERALD_DATA = window.HERALD_DATA || {};
-window.HERALD_DATA.theology = [
+// theology.js — Static snapshot of the 'theology' Firestore collection.
+// Source:   Firestore project flockos-notify, collection: theology
+// Exported: 2026-04-30T22:34:19Z
+// Records:  27
+// Filter:   all statuses (Draft + Review + Approved)
+//
+// Each record is a flat doctrine section; the renderer groups by categoryTitle.
+// Fields: categoryTitle, categorySubtitle, categoryIntro, categoryIcon, categoryColor,
+//         sectionTitle, content, summary, scriptureRefs, keywords,
+//         status ('Draft'|'Approved'|'Review'), approvedBy, approvedAt, _docId
+//
+// Re-generate: python "Architechtural Docs/New Covenant/Automation/Shepherds/export_theology_to_js.py"
+// DO NOT EDIT — regenerate from Firestore instead.
+
+export default [
   {
     "categoryIntro": "\"Hear, O Israel: The LORD our God, the LORD is one.\" — Deuteronomy 6:4",
     "categoryId": "Theology Proper",

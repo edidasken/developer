@@ -1,0 +1,20 @@
+/* ==========================================================================
+   the_mission.css — Section 5: The Mission
+   Signature color: --peach (#f0a889)
+   Additive only. Never override tokens already in the_broadsheet.css.
+   ========================================================================== */
+
+.sec-the-mission {
+  --sec-color: var(--peach);
+  --sec-color-soft: var(--peach-soft);
+  --sec-heading-font: 'Lora', Georgia, serif;
+  --sec-body-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.sec-the-mission .sec-masthead {
+  border-top: 3px solid var(--peach);
+}
+
+.sec-the-mission .broadsheet-card {
+  border-top: 3px solid var(--peach);
+}

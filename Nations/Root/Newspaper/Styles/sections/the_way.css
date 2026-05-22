@@ -1,4 +1,20 @@
-/* the_way.css */
-.np-panel[open] summary.np-panel__hdr {
-  border-left: 3px solid var(--sec-the-way, #4a2808);
+/* ==========================================================================
+   the_way.css — Section 2: The Way
+   Signature color: --accent (#7eaacc)
+   Additive only. Never override tokens already in the_broadsheet.css.
+   ========================================================================== */
+
+.sec-the-way {
+  --sec-color: var(--accent);
+  --sec-color-soft: var(--accent-soft);
+  --sec-heading-font: 'Lora', Georgia, serif;
+  --sec-body-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.sec-the-way .sec-masthead {
+  border-top: 3px solid var(--accent);
+}
+
+.sec-the-way .broadsheet-card {
+  border-top: 3px solid var(--accent);
 }

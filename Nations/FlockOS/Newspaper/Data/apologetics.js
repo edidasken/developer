@@ -1,8 +1,14 @@
-// Herald Data: Apologetics
-// Source: New_Covenant/Data/apologetics.js — 115 Q&As
-// DO NOT EDIT — regenerate with: node Newspaper/convert_herald_data.js
-window.HERALD_DATA = window.HERALD_DATA || {};
-window.HERALD_DATA.apologetics = [
+// apologetics.js — Static apologetics content bundle
+// Source:    Firestore project "flockos-notify", collection "apologetics"
+// Exported:  2026-04-29T05:34:31Z
+// Records:   115
+//
+// Re-export by running:
+//   python "Architechtural Docs/New Covenant/Automation/Shepherds/export_apologetics_to_js.py"
+//
+// DO NOT EDIT — regenerate from Firestore instead.
+
+export default [
   {
     "categoryIntro": "Exploring the origin of sin, the fallen nature of humanity, and why redemption through Christ is necessary.",
     "referenceText": "1 John 3:4 (ESV)",

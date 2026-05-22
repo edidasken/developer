@@ -1,0 +1,20 @@
+/* ==========================================================================
+   the_shepherd.css — Section 7: The Shepherd
+   Signature color: --warning (#946B1C)
+   Additive only. Never override tokens already in the_broadsheet.css.
+   ========================================================================== */
+
+.sec-the-shepherd {
+  --sec-color: var(--warning);
+  --sec-color-soft: var(--warning-soft);
+  --sec-heading-font: 'Lora', Georgia, serif;
+  --sec-body-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.sec-the-shepherd .sec-masthead {
+  border-top: 3px solid var(--warning);
+}
+
+.sec-the-shepherd .broadsheet-card {
+  border-top: 3px solid var(--warning);
+}

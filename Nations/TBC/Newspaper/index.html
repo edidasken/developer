@@ -1,54 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="broadsheet">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <meta name="theme-color" content="#faf6ed">
-  <meta name="description" content="The Flock Herald — Your Church, Every Day">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Trinity Baptist Church — Herald</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="Images/icon-192.png">
-  <link rel="stylesheet" href="Styles/the_broadsheet.css">
-
-  <!-- Flash prevention: restore theme + font scale before paint -->
   <script>
-    (function () {
-      try {
-        var s = parseFloat(localStorage.getItem('flock_font_scale') || '1');
-        if (s >= 0.85 && s <= 1.25) {
-          document.documentElement.style.setProperty('--fn-scale', s);
-        }
-        var t = localStorage.getItem('flock_theme') || 'broadsheet';
-        document.documentElement.setAttribute('data-theme', t);
-      } catch (_) {}
+    // Flash prevention — restore theme + font scale before paint
+    (function() {
+      var scale = localStorage.getItem('flock_font_scale');
+      if (scale) document.documentElement.style.setProperty('--fn-scale', scale);
     })();
   </script>
-</head>
-<body>
-
-  <!-- Masthead -->
-  <header class="np-masthead" id="masthead">
-    <h1 class="np-masthead__title">The Flock Herald</h1>
-    <hr class="np-masthead__rule">
-    <div class="np-masthead__meta">
-      <span id="herald-date"></span>
-      <span id="herald-church"></span>
-      <span id="herald-edition">First Edition</span>
-    </div>
-  </header>
-
-  <!-- Section Navigation Bar -->
-  <nav class="sec-nav-bar" id="sec-nav" aria-label="Paper sections">
-    <!-- Populated by the_gates.js after auth resolves -->
-  </nav>
-
-  <!-- Page Content -->
-  <main class="np-page" id="herald-main">
-    <!-- Populated by the_proclamation.js -->
-    <p class="np-byline" style="text-align:center;margin-top:40px;color:var(--ink-faint);">Loading today's edition…</p>
-  </main>
-
-  <!-- Per-church Firebase config — injected by C-Build_Newspaper.sh -->
+  <link rel="manifest" href="manifest.json">
   <!-- FLOCK_FIREBASE_CONFIG_BLOCK -->
   <!-- Firebase config: trinity -->
   <script>
@@ -65,33 +30,14 @@
     window.HERALD_CHURCH_ID   = "trinity";
   </script>
   <!-- /FLOCK_FIREBASE_CONFIG_BLOCK -->
-
-  <!-- Scripts -->
-  <script src="Scripts/the_true_vine.js"></script>
-  <script src="Scripts/firm_foundation.js"></script>
-  <script src="Scripts/the_adornment.js"></script>
-  <script src="Scripts/the_gates.js?v=2"></script>
-  <script src="Data/devotionals.js"></script>
-  <script src="Data/quiz.js"></script>
-  <script src="Scripts/the_proclamation.js?v=2"></script>
-
-  <!-- Date byline -->
+</head>
+<body>
   <script>
-    (function () {
-      var el = document.getElementById('herald-date');
-      if (el) {
-        el.textContent = new Date().toLocaleDateString('en-US', {
-          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
-      }
-    })();
+    // Redirect to Herald front page
+    window.location.replace('Sections/herald/index.html');
   </script>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(function () {});
-    }
-  </script>
-
+  <noscript>
+    <a href="Sections/herald/index.html">Open The Flock Herald</a>
+  </noscript>
 </body>
 </html>

@@ -1,8 +1,19 @@
-// Herald Data: Missions Registry
-// Source: New_Covenant/Data/missions.js — 238 countries
-// DO NOT EDIT — regenerate with: node Newspaper/convert_herald_data.js
-window.HERALD_DATA = window.HERALD_DATA || {};
-window.HERALD_DATA.missions = [
+// missions.js — Static missions registry bundle
+// Source:    Firestore project flockos-notify, collection: missionsRegistry
+// Exported:  2026-04-29T23:09:14Z
+// Countries: 238  (BAL Restrictions: 88 · BAL Shortage: 76 · Operation World: 15)
+//
+// Layered data:
+//   • Joshua Project — demographics, religion, language, unreached groups
+//   • Bible Access List (bibleaccesslist.org) — Restrictions rank (1–88) +
+//     Shortage rank (1–76)
+//   • Operation World (operationworld.org) — narrative summary + prayer
+//     answers/challenges (curated for BAL Extreme tier)
+//
+// Re-generate: python "Architechtural Docs/New Covenant/Automation/Shepherds/export_missions_to_js.py"
+// DO NOT EDIT — regenerate from Firestore instead.
+
+export default [
   {
     "bibleShortageRank": 76,
     "percentChristian": 0.5,
@@ -59,8 +70,8 @@ window.HERALD_DATA.missions = [
   },
   {
     "bibleShortageRank": 71,
-    "percentChristian": 0,
-    "percentEvangelical": 0,
+    "percentChristian": 0.0,
+    "percentEvangelical": 0.0,
     "unreachedGroups": 58,
     "owSource": "OperationWorld.org",
     "tenFortyWindow": true,
@@ -218,7 +229,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 0.159232418044642,
       "islam": 99.1532888797731,
       "unknown": 0.439271752131161,
-      "other": 0
+      "other": 0.0
     },
     "persecutionTier": "Extreme",
     "profileUrl": "https://joshuaproject.net/countries/MR",
@@ -241,7 +252,7 @@ window.HERALD_DATA.missions = [
   },
   {
     "bibleShortageRank": 35,
-    "percentChristian": 46,
+    "percentChristian": 46.0,
     "percentEvangelical": 2.4,
     "unreachedGroups": 10,
     "owSource": "OperationWorld.org",
@@ -266,7 +277,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 1.56876037878637,
       "islam": 50.1210059281312,
       "unknown": 0.565785242069319,
-      "other": 0
+      "other": 0.0
     },
     "persecutionTier": "Extreme",
     "profileUrl": "https://joshuaproject.net/countries/ER",
@@ -359,7 +370,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 0.0204715707563233,
       "islam": 99.3198040041254,
       "unknown": 0.505016758848565,
-      "other": 0
+      "other": 0.0
     },
     "persecutionTier": "Extreme",
     "profileUrl": "https://joshuaproject.net/countries/DZ",
@@ -457,7 +468,7 @@ window.HERALD_DATA.missions = [
     "continent": "",
     "religionBreakdown": {
       "nonReligious": 1.89099306497844,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 94.0656023730017,
       "unknown": 0.235416371073946,
       "other": 0.0836186011253506
@@ -524,8 +535,8 @@ window.HERALD_DATA.missions = [
   },
   {
     "bibleShortageRank": 75,
-    "percentChristian": 0,
-    "percentEvangelical": 0,
+    "percentChristian": 0.0,
+    "percentEvangelical": 0.0,
     "unreachedGroups": 4,
     "owSource": "OperationWorld.org",
     "tenFortyWindow": true,
@@ -546,7 +557,7 @@ window.HERALD_DATA.missions = [
     "continent": "",
     "religionBreakdown": {
       "nonReligious": 0.0104249474620428,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 97.8495786455833,
       "unknown": 0.314298982298447,
       "other": 0.0767723197770974
@@ -589,11 +600,11 @@ window.HERALD_DATA.missions = [
     "countryName": "Comoros",
     "continent": "",
     "religionBreakdown": {
-      "nonReligious": 0,
+      "nonReligious": 0.0,
       "ethnic": 0.670079714208763,
       "islam": 97.2919091885287,
       "unknown": 0.462032275102047,
-      "other": 0
+      "other": 0.0
     },
     "persecutionTier": "Extreme",
     "profileUrl": "https://joshuaproject.net/countries/KM",
@@ -639,7 +650,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 0.158477130847216,
       "islam": 98.8053975268029,
       "unknown": 0.171830814462496,
-      "other": 0
+      "other": 0.0
     },
     "persecutionTier": "Extreme",
     "profileUrl": "https://joshuaproject.net/countries/TN",
@@ -722,7 +733,7 @@ window.HERALD_DATA.missions = [
     "countryName": "Bhutan",
     "continent": "",
     "religionBreakdown": {
-      "nonReligious": 0,
+      "nonReligious": 0.0,
       "ethnic": 0.0188744140680917,
       "islam": 1.46826872523499,
       "unknown": 0.921363016847356,
@@ -847,9 +858,9 @@ window.HERALD_DATA.missions = [
     "continent": "",
     "religionBreakdown": {
       "nonReligious": 0.136804640553624,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 90.9002812569068,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.418919704484651
     },
     "persecutionTier": "Severe",
@@ -868,7 +879,7 @@ window.HERALD_DATA.missions = [
   },
   {
     "bibleShortageRank": 20,
-    "percentChristian": 1,
+    "percentChristian": 1.0,
     "unreachedGroups": 768,
     "tenFortyWindow": true,
     "persecutionLevel": "Severe",
@@ -886,8 +897,8 @@ window.HERALD_DATA.missions = [
     "countryName": "Pakistan",
     "continent": "",
     "religionBreakdown": {
-      "nonReligious": 0,
-      "ethnic": 0,
+      "nonReligious": 0.0,
+      "ethnic": 0.0,
       "islam": 97.2749335052362,
       "unknown": 0.426180733934198,
       "other": 0.00496319172480196
@@ -972,7 +983,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 2.02224289247995,
       "ethnic": 10.4845284346095,
       "islam": 71.6537760223775,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 1.62673395316679
     },
     "persecutionTier": "Severe",
@@ -1139,10 +1150,10 @@ window.HERALD_DATA.missions = [
     "continent": "",
     "religionBreakdown": {
       "nonReligious": 0.0382690075802163,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 93.3716851004557,
       "unknown": 2.6791648576225,
-      "other": 0
+      "other": 0.0
     },
     "persecutionTier": "Severe",
     "profileUrl": "https://joshuaproject.net/countries/KG",
@@ -1384,7 +1395,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 0.488639917152314,
       "ethnic": 0.0535098584685362,
       "islam": 71.0147609356915,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.180680041423843
     },
     "persecutionTier": "Severe",
@@ -1403,7 +1414,7 @@ window.HERALD_DATA.missions = [
   {
     "bibleShortageRank": 47,
     "percentChristian": 6.4,
-    "percentEvangelical": 1,
+    "percentEvangelical": 1.0,
     "unreachedGroups": 14,
     "tenFortyWindow": true,
     "christianPopulation": 381000,
@@ -1423,9 +1434,9 @@ window.HERALD_DATA.missions = [
     "continent": "",
     "religionBreakdown": {
       "nonReligious": 0.713726681426469,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 82.836236182157,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.568630161793141
     },
     "persecutionTier": "Severe",
@@ -1543,7 +1554,7 @@ window.HERALD_DATA.missions = [
     "continent": "",
     "religionBreakdown": {
       "nonReligious": 1.05752935848218,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 96.247060517502,
       "unknown": 0.42852300722936,
       "other": 0.0278024460690482
@@ -1589,7 +1600,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 1.00535452444413,
       "ethnic": 0.00460402859548596,
       "islam": 81.7842958162968,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.245530474359236
     },
     "persecutionTier": "Considerable",
@@ -1610,7 +1621,7 @@ window.HERALD_DATA.missions = [
   {
     "bibleShortageRank": 2,
     "percentChristian": 1.6,
-    "percentEvangelical": 1,
+    "percentEvangelical": 1.0,
     "tenFortyWindow": true,
     "unreachedGroups": 49,
     "persecutionLevel": "Considerable",
@@ -1670,7 +1681,7 @@ window.HERALD_DATA.missions = [
     "countryName": "Nepal",
     "continent": "",
     "religionBreakdown": {
-      "nonReligious": 0,
+      "nonReligious": 0.0,
       "ethnic": 0.00261675453980959,
       "islam": 3.99950087597491,
       "unknown": 0.212348450123374,
@@ -1692,7 +1703,7 @@ window.HERALD_DATA.missions = [
   },
   {
     "bibleShortageRank": 17,
-    "percentChristian": 56,
+    "percentChristian": 56.0,
     "percentEvangelical": 11.4,
     "unreachedGroups": 2,
     "tenFortyWindow": false,
@@ -1766,7 +1777,7 @@ window.HERALD_DATA.missions = [
   },
   {
     "bibleShortageRank": 4,
-    "percentChristian": 2,
+    "percentChristian": 2.0,
     "unreachedGroups": 2033,
     "tenFortyWindow": true,
     "persecutionLevel": "Considerable",
@@ -1784,7 +1795,7 @@ window.HERALD_DATA.missions = [
     "countryName": "India",
     "continent": "",
     "religionBreakdown": {
-      "nonReligious": 0,
+      "nonReligious": 0.0,
       "ethnic": 0.313949271352126,
       "islam": 14.4812996873508,
       "unknown": 0.965209012046358,
@@ -1830,7 +1841,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 9.08799969221405,
       "islam": 87.7172136787946,
       "unknown": 0.20142781259648,
-      "other": 0
+      "other": 0.0
     },
     "persecutionTier": "Considerable",
     "profileUrl": "https://joshuaproject.net/countries/ML",
@@ -1989,7 +2000,7 @@ window.HERALD_DATA.missions = [
     "countryName": "Bangladesh",
     "continent": "",
     "religionBreakdown": {
-      "nonReligious": 0,
+      "nonReligious": 0.0,
       "ethnic": 0.0831372803762258,
       "islam": 89.7662769649505,
       "unknown": 0.499931730542646,
@@ -2245,7 +2256,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 8.68571783405985,
       "islam": 32.4426490805206,
       "unknown": 0.391610256996831,
-      "other": 0
+      "other": 0.0
     },
     "icon": "🇪🇹",
     "profileUrl": "https://joshuaproject.net/countries/ET",
@@ -2406,7 +2417,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 26.9172695120263,
       "islam": 8.82496164562549,
       "unknown": 0.449770245463867,
-      "other": 0
+      "other": 0.0
     },
     "persecutionTier": "Minimal",
     "profileUrl": "https://joshuaproject.net/countries/SS",
@@ -2621,7 +2632,7 @@ window.HERALD_DATA.missions = [
   {
     "bibleShortageRank": 6,
     "percentChristian": 50.4,
-    "percentEvangelical": 11,
+    "percentEvangelical": 11.0,
     "unreachedGroups": 24,
     "tenFortyWindow": false,
     "persecutionLevel": "Minimal",
@@ -2678,7 +2689,7 @@ window.HERALD_DATA.missions = [
     "continent": "",
     "religionBreakdown": {
       "nonReligious": 3.3737805067889,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 60.5682588601574,
       "unknown": 0.207558592060884,
       "other": 4.15263839833953
@@ -2901,7 +2912,7 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 2.14754558912663,
       "ethnic": 1.64592066677583,
-      "islam": 0,
+      "islam": 0.0,
       "unknown": 0.0890237282029289,
       "other": 0.00638482007648963
     },
@@ -2972,7 +2983,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 2.85312120703941,
       "ethnic": 5.54296742074252,
       "islam": 2.84622857543157,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.547942050362405
     },
     "persecutionTier": "Minimal",
@@ -3082,11 +3093,11 @@ window.HERALD_DATA.missions = [
     "countryName": "Sri Lanka",
     "continent": "",
     "religionBreakdown": {
-      "nonReligious": 0,
-      "ethnic": 0,
+      "nonReligious": 0.0,
+      "ethnic": 0.0,
       "islam": 10.5949585320585,
       "unknown": 0.332589363111533,
-      "other": 0
+      "other": 0.0
     },
     "persecutionTier": "Minimal",
     "profileUrl": "https://joshuaproject.net/countries/LK",
@@ -3230,7 +3241,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 3.04363446268658,
       "islam": 4.84186000131979,
       "unknown": 0.231103371043169,
-      "other": 0
+      "other": 0.0
     },
     "persecutionTier": "Minimal",
     "profileUrl": "https://joshuaproject.net/countries/RW",
@@ -3249,7 +3260,7 @@ window.HERALD_DATA.missions = [
   },
   {
     "bibleShortageRank": 27,
-    "percentChristian": 62,
+    "percentChristian": 62.0,
     "percentEvangelical": 25.9,
     "tenFortyWindow": false,
     "unreachedGroups": 16,
@@ -3271,7 +3282,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 15.0282551710453,
       "islam": 22.2352555378178,
       "unknown": 0.409650514063543,
-      "other": 0
+      "other": 0.0
     },
     "persecutionTier": "Minimal",
     "profileUrl": "https://joshuaproject.net/countries/GH",
@@ -3375,7 +3386,7 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 3.07515062735805,
       "ethnic": 1.47078106443745,
-      "islam": 0,
+      "islam": 0.0,
       "unknown": 0.267332460947792,
       "other": 0.125547061125732
     },
@@ -3444,7 +3455,7 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 4.75057330817519,
       "ethnic": 0.352041274342169,
-      "islam": 0,
+      "islam": 0.0,
       "unknown": 0.409705101376178,
       "other": 0.376890269485403
     },
@@ -3523,7 +3534,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 5.71676121902961,
       "ethnic": 1.21940911529445,
       "islam": 0.802281152375252,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.036729768658995
     },
     "persecutionTier": "Minimal",
@@ -3591,10 +3602,10 @@ window.HERALD_DATA.missions = [
     "unreachedGroups": 2,
     "religionBreakdown": {
       "nonReligious": 11.8572568254886,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 54.489502654423,
-      "unknown": 0,
-      "other": 0
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "Tirana",
     "dominantReligion": "",
@@ -3619,7 +3630,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 1.64698383842862,
       "ethnic": 0.354645620413683,
       "islam": 0.00388853171348128,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.995036247145676
     },
     "capital": "Pago Pago",
@@ -3643,9 +3654,9 @@ window.HERALD_DATA.missions = [
     "unreachedGroups": 2,
     "religionBreakdown": {
       "nonReligious": 7.57738370536258,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 0.843528638543366,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.402813952922276
     },
     "capital": "Andorra la Vella",
@@ -3672,7 +3683,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 6.46758722063638,
       "islam": 0.879055687837794,
       "unknown": 0.409812294509227,
-      "other": 0
+      "other": 0.0
     },
     "capital": "Luanda",
     "dominantReligion": "",
@@ -3696,7 +3707,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 2.03727530898283,
       "ethnic": 4.64414897807253,
       "islam": 0.64450030050118,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 1.0234175757571
     },
     "capital": "The Valley",
@@ -3719,9 +3730,9 @@ window.HERALD_DATA.missions = [
     "christianPercent": 92.9391759058202,
     "religionBreakdown": {
       "nonReligious": 2.53975842817756,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 0.346590268895605,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 4.1744753971066
     },
     "capital": "Saint John's",
@@ -3772,8 +3783,8 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 2.69584902108434,
       "ethnic": 1.33109111445783,
-      "islam": 0,
-      "unknown": 0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 0.14570952560241
     },
     "capital": "Oranjestad",
@@ -3849,8 +3860,8 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 3.21396152750744,
       "ethnic": 0.857818433264111,
-      "islam": 0,
-      "unknown": 0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 1.37072249460577
     },
     "capital": "Nassau",
@@ -3874,9 +3885,9 @@ window.HERALD_DATA.missions = [
     "unreachedGroups": 1,
     "religionBreakdown": {
       "nonReligious": 5.80354769313787,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 1.01019408220164,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.188701861678208
     },
     "capital": "Bridgetown",
@@ -3903,7 +3914,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 0.144104397536788,
       "islam": 0.653446267884384,
       "unknown": 0.620955222676962,
-      "other": 0
+      "other": 0.0
     },
     "capital": "Minsk",
     "dominantReligion": "",
@@ -3977,9 +3988,9 @@ window.HERALD_DATA.missions = [
     "christianPercent": 91.6815322771341,
     "religionBreakdown": {
       "nonReligious": 4.95648931977615,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 3.36197840308978
     },
     "capital": "Hamilton",
@@ -4004,7 +4015,7 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 2.84900486726278,
       "ethnic": 2.13562247567994,
-      "islam": 0,
+      "islam": 0.0,
       "unknown": 0.179623167069375,
       "other": 3.03019498032968
     },
@@ -4032,7 +4043,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 0.0116692247570107,
       "islam": 49.7850750795079,
       "unknown": 0.323471233735571,
-      "other": 0
+      "other": 0.0
     },
     "capital": "Sarajevo",
     "dominantReligion": "",
@@ -4080,8 +4091,8 @@ window.HERALD_DATA.missions = [
     "christianPercent": 79.5594303981401,
     "religionBreakdown": {
       "nonReligious": 18.9828538215635,
-      "ethnic": 0,
-      "islam": 0,
+      "ethnic": 0.0,
+      "islam": 0.0,
       "unknown": 0.508573089218251,
       "other": 0.949142691078175
     },
@@ -4105,9 +4116,9 @@ window.HERALD_DATA.missions = [
     "christianPercent": 90.7939113680154,
     "religionBreakdown": {
       "nonReligious": 3.43028901734104,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 0.847141939627489,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 3.67488760436737
     },
     "capital": "Road Town",
@@ -4209,8 +4220,8 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 3.00034642647764,
       "ethnic": 14.2075760805841,
-      "islam": 0,
-      "unknown": 0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 0.805264350050632
     },
     "capital": "George Town",
@@ -4287,8 +4298,8 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 15.8693163067619,
       "ethnic": 58.6497887723913,
-      "islam": 0,
-      "unknown": 0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 2.10655347215074
     },
     "capital": "Macau",
@@ -4312,9 +4323,9 @@ window.HERALD_DATA.missions = [
     "unreachedGroups": 2,
     "religionBreakdown": {
       "nonReligious": 15.7504761904762,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 46.431746031746,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 1.70285714285714
     },
     "capital": "The Settlement",
@@ -4338,10 +4349,10 @@ window.HERALD_DATA.missions = [
     "unreachedGroups": 1,
     "religionBreakdown": {
       "nonReligious": 8.06057627309043,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 73.1314124230319,
-      "unknown": 0,
-      "other": 0
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "West Island",
     "dominantReligion": "",
@@ -4390,8 +4401,8 @@ window.HERALD_DATA.missions = [
     "unreachedGroups": 1,
     "religionBreakdown": {
       "nonReligious": 1.8797807120962,
-      "ethnic": 0,
-      "islam": 0,
+      "ethnic": 0.0,
+      "islam": 0.0,
       "unknown": 0.424428200896015,
       "other": 0.421933506248526
     },
@@ -4417,7 +4428,7 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 2.57013033913348,
       "ethnic": 0.332151188767947,
-      "islam": 0,
+      "islam": 0.0,
       "unknown": 0.291141248205854,
       "other": 1.22181554898162
     },
@@ -4470,7 +4481,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 10.4285807028914,
       "ethnic": 1.79079771282943,
       "islam": 0.456455585139793,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.207912868137843
     },
     "capital": "Willemstad",
@@ -4496,7 +4507,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 5.46533139587767,
       "ethnic": 0.16112855539527,
       "islam": 20.7444799427483,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.464312427505155
     },
     "capital": "Nicosia",
@@ -4599,7 +4610,7 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 3.01604093294969,
       "ethnic": 3.03034294081563,
-      "islam": 0,
+      "islam": 0.0,
       "unknown": 0.27790147474946,
       "other": 0.00978418459252857
     },
@@ -4626,7 +4637,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 1.90864762902146,
       "ethnic": 4.57342211166876,
       "islam": 3.21576519607696,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.892867526511028
     },
     "capital": "Malabo",
@@ -4650,9 +4661,9 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 51.9559475449041,
       "ethnic": 0.591904173744181,
-      "islam": 0,
-      "unknown": 0,
-      "other": 0
+      "islam": 0.0,
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "Tallinn",
     "dominantReligion": "",
@@ -4700,9 +4711,9 @@ window.HERALD_DATA.missions = [
     "christianPercent": 64.064606741573,
     "religionBreakdown": {
       "nonReligious": 34.311797752809,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 1.62359550561798
     },
     "capital": "Stanley",
@@ -4725,10 +4736,10 @@ window.HERALD_DATA.missions = [
     "christianPercent": 90.9215295065163,
     "religionBreakdown": {
       "nonReligious": 9.07847049348367,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
-      "other": 0
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "Torshavn",
     "dominantReligion": "",
@@ -4753,7 +4764,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 1.46202013766455,
       "ethnic": 0.307709959275777,
       "islam": 4.27204711286435,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 1.00728179615895
     },
     "capital": "Suva",
@@ -4779,7 +4790,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 17.1156726438197,
       "ethnic": 0.1229253187323,
       "islam": 1.95275663702041,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.0171312714018415
     },
     "capital": "Helsinki",
@@ -4831,7 +4842,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 6.00314475796595,
       "ethnic": 6.88292052879502,
       "islam": 1.39621968380648,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 2.13993512285037
     },
     "capital": "Cayenne",
@@ -4856,7 +4867,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 3.14441195460989,
       "ethnic": 7.19120473790846,
       "islam": 0.121134307533601,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.162346095901086
     },
     "capital": "Papeete",
@@ -4883,7 +4894,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 12.3475741376298,
       "islam": 8.43479451922419,
       "unknown": 0.276166755443314,
-      "other": 0
+      "other": 0.0
     },
     "capital": "Libreville",
     "dominantReligion": "",
@@ -4935,7 +4946,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 0.366792594110727,
       "islam": 9.56946125539065,
       "unknown": 0.295856874126886,
-      "other": 0
+      "other": 0.0
     },
     "capital": "T'bilisi",
     "dominantReligion": "",
@@ -4986,7 +4997,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 5.70415759355852,
       "ethnic": 3.21950169646022,
       "islam": 8.46812174001114,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.126880032409986
     },
     "capital": "Gibraltar",
@@ -5036,8 +5047,8 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 3.32352941176471,
       "ethnic": 0.983879212765181,
-      "islam": 0,
-      "unknown": 0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 0.400856245664001
     },
     "capital": "Nuuk (Godthrab)",
@@ -5062,7 +5073,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 3.76796244499474,
       "ethnic": 0.977543603356434,
       "islam": 0.75599045090948,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.100051664855427
     },
     "capital": "Saint George's",
@@ -5088,8 +5099,8 @@ window.HERALD_DATA.missions = [
       "nonReligious": 3.54283677459743,
       "ethnic": 0.177610042773345,
       "islam": 0.287908739165327,
-      "unknown": 0,
-      "other": 0
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "Basse-Terre",
     "dominantReligion": "",
@@ -5113,8 +5124,8 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 3.0562581073521,
       "ethnic": 1.42822188477877,
-      "islam": 0,
-      "unknown": 0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 1.20205826842329
     },
     "capital": "Hagatna",
@@ -5140,8 +5151,8 @@ window.HERALD_DATA.missions = [
       "nonReligious": 1.371780760708,
       "ethnic": 35.454611484484,
       "islam": 51.4669614083403,
-      "unknown": 0,
-      "other": 0
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "Bissau",
     "dominantReligion": "",
@@ -5216,9 +5227,9 @@ window.HERALD_DATA.missions = [
     "unreachedGroups": 1,
     "religionBreakdown": {
       "nonReligious": 8.47229673609164,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 0.0997175489114628,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.671171647989436
     },
     "capital": "Reykjavík",
@@ -5244,7 +5255,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 7.20273238339997,
       "ethnic": 0.318493924878367,
       "islam": 1.03981991930674,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.0960646856634068
     },
     "capital": "Dublin",
@@ -5267,10 +5278,10 @@ window.HERALD_DATA.missions = [
     "christianPercent": 99.1625490847766,
     "religionBreakdown": {
       "nonReligious": 0.837450915223359,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
-      "other": 0
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "Douglas",
     "dominantReligion": "",
@@ -5396,9 +5407,9 @@ window.HERALD_DATA.missions = [
     "christianPercent": 98.409152651018,
     "religionBreakdown": {
       "nonReligious": 0.556576417081286,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 1.03427093190074
     },
     "capital": "Tarawa",
@@ -5448,10 +5459,10 @@ window.HERALD_DATA.missions = [
     "unreachedGroups": 6,
     "religionBreakdown": {
       "nonReligious": 5.74111158194693,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 89.942688431564,
       "unknown": 0.30706683616756,
-      "other": 0
+      "other": 0.0
     },
     "capital": "Pristina",
     "dominantReligion": "",
@@ -5476,7 +5487,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 38.108691221689,
       "ethnic": 0.113784051968474,
       "islam": 1.00554943653674,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.649099204948275
     },
     "capital": "Riga",
@@ -5501,7 +5512,7 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 0.289211742090017,
       "ethnic": 9.08683608037844,
-      "islam": 0,
+      "islam": 0.0,
       "unknown": 0.555844202959579,
       "other": 0.787667946360818
     },
@@ -5552,9 +5563,9 @@ window.HERALD_DATA.missions = [
     "unreachedGroups": 2,
     "religionBreakdown": {
       "nonReligious": 16.6363361166469,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 4.72046618400141,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.214676723594258
     },
     "capital": "Vaduz",
@@ -5579,9 +5590,9 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 14.9305584426569,
       "ethnic": 0.0881589340933299,
-      "islam": 0,
+      "islam": 0.0,
       "unknown": 0.28385184080786,
-      "other": 0
+      "other": 0.0
     },
     "capital": "Vilnius",
     "dominantReligion": "",
@@ -5606,7 +5617,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 16.9652394421197,
       "ethnic": 0.12969089896679,
       "islam": 1.93374823620505,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.310011495902383
     },
     "capital": "Luxembourg",
@@ -5632,8 +5643,8 @@ window.HERALD_DATA.missions = [
       "nonReligious": 1.64259293385439,
       "ethnic": 0.0191880600871252,
       "islam": 1.58191838805097,
-      "unknown": 0,
-      "other": 0
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "Valletta",
     "dominantReligion": "",
@@ -5684,7 +5695,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 2.90714854970597,
       "ethnic": 0.0721033573513905,
       "islam": 0.664000009845798,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.758857154109483
     },
     "capital": "Fort-de-France",
@@ -5710,7 +5721,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 1.22646237608355,
       "ethnic": 2.1443225649516,
       "islam": 17.8833798263251,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 1.0625828248109
     },
     "capital": "Port Louis",
@@ -5786,10 +5797,10 @@ window.HERALD_DATA.missions = [
     "unreachedGroups": 2,
     "religionBreakdown": {
       "nonReligious": 20.2553262956997,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 3.03135897750914,
       "unknown": 0.262796705546195,
-      "other": 0
+      "other": 0.0
     },
     "capital": "Chisinau",
     "dominantReligion": "",
@@ -5814,7 +5825,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 14.0295646965943,
       "ethnic": 2.68913511011897,
       "islam": 0.874412653472354,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.112944763564098
     },
     "capital": "Monaco",
@@ -5841,7 +5852,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 7.2396048896092,
       "islam": 4.83922676289743,
       "unknown": 0.45636682987979,
-      "other": 0
+      "other": 0.0
     },
     "capital": "Ulaanbaatar",
     "dominantReligion": "",
@@ -5864,10 +5875,10 @@ window.HERALD_DATA.missions = [
     "unreachedGroups": 3,
     "religionBreakdown": {
       "nonReligious": 6.51156608282072,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 19.2469117450507,
       "unknown": 0.325988805544418,
-      "other": 0
+      "other": 0.0
     },
     "capital": "Podgorica",
     "dominantReligion": "",
@@ -5889,9 +5900,9 @@ window.HERALD_DATA.missions = [
     "christianPercent": 94.929381443299,
     "religionBreakdown": {
       "nonReligious": 3.13969072164948,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 1.93092783505155
     },
     "capital": "Plymouth",
@@ -5915,8 +5926,8 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 7.66945679658209,
       "ethnic": 5.15180050571105,
-      "islam": 0,
-      "unknown": 0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 0.465951695875839
     },
     "capital": "Yaren",
@@ -5967,7 +5978,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 17.2055476504295,
       "ethnic": 1.9529771248571,
       "islam": 0.84663900066776,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 1.10388734088263
     },
     "capital": "Noumea",
@@ -5993,7 +6004,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 37.1807078240722,
       "ethnic": 1.86777139592049,
       "islam": 2.27784210989448,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 1.19026331623341
     },
     "capital": "Wellington",
@@ -6016,10 +6027,10 @@ window.HERALD_DATA.missions = [
     "christianPercent": 95.9190871369295,
     "religionBreakdown": {
       "nonReligious": 3.08091286307054,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
-      "other": 1
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
+      "other": 1.0
     },
     "capital": "Alofi",
     "dominantReligion": "",
@@ -6041,10 +6052,10 @@ window.HERALD_DATA.missions = [
     "christianPercent": 72.4638989169675,
     "religionBreakdown": {
       "nonReligious": 27.5361010830325,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
-      "other": 0
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "Kingston",
     "dominantReligion": "",
@@ -6069,8 +6080,8 @@ window.HERALD_DATA.missions = [
       "nonReligious": 1.65739328078229,
       "ethnic": 0.00441642911631268,
       "islam": 36.5138037740394,
-      "unknown": 0,
-      "other": 0
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "Skopje",
     "dominantReligion": "",
@@ -6094,8 +6105,8 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 9.0598452439395,
       "ethnic": 7.23384061528391,
-      "islam": 0,
-      "unknown": 0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 1.26757369614512
     },
     "capital": "Saipan",
@@ -6121,7 +6132,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 5.29535364739636,
       "ethnic": 0.204453561208609,
       "islam": 5.96322402633499,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.884102456861774
     },
     "capital": "Oslo",
@@ -6147,7 +6158,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 1.71613321171321,
       "ethnic": 2.50892727508498,
       "islam": 0.309209177368461,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 1.42938284070166
     },
     "capital": "Ngerulmud",
@@ -6224,7 +6235,7 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 1.39551070129816,
       "ethnic": 3.19350169134851,
-      "islam": 0,
+      "islam": 0.0,
       "unknown": 0.214158640644974,
       "other": 0.472020137546091
     },
@@ -6271,17 +6282,17 @@ window.HERALD_DATA.missions = [
     "isoCode": "PN",
     "population": 50,
     "persecutionLevel": "",
-    "christianPercent": 96,
+    "christianPercent": 96.0,
     "religionBreakdown": {
-      "nonReligious": 3,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
-      "other": 1
+      "nonReligious": 3.0,
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
+      "other": 1.0
     },
     "capital": "Adamstown",
     "dominantReligion": "",
-    "evangelicalPercent": 10,
+    "evangelicalPercent": 10.0,
     "region": "Australia and Pacific",
     "jpUpdatedAt": "2026-04-29",
     "gospelAccess": "Limited",
@@ -6353,7 +6364,7 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 3.43236954692213,
       "ethnic": 1.673399218504,
-      "islam": 0,
+      "islam": 0.0,
       "unknown": 0.311892893439619,
       "other": 0.0431098688854097
     },
@@ -6380,7 +6391,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 2.41206498703914,
       "ethnic": 1.41880475794103,
       "islam": 5.13982448141808,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.720308134459948
     },
     "capital": "Saint-Denis",
@@ -6407,7 +6418,7 @@ window.HERALD_DATA.missions = [
       "ethnic": 0.0353919004704542,
       "islam": 0.613464414920929,
       "unknown": 0.129414173744096,
-      "other": 0
+      "other": 0.0
     },
     "capital": "Bucharest",
     "dominantReligion": "",
@@ -6426,13 +6437,13 @@ window.HERALD_DATA.missions = [
     "isoCode": "SH",
     "population": 5000,
     "persecutionLevel": "",
-    "christianPercent": 95,
+    "christianPercent": 95.0,
     "religionBreakdown": {
-      "nonReligious": 5,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
-      "other": 0
+      "nonReligious": 5.0,
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "Jamestown",
     "dominantReligion": "",
@@ -6456,8 +6467,8 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 3.95138497550826,
       "ethnic": 1.90580432615198,
-      "islam": 0,
-      "unknown": 0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 0.291104946031471
     },
     "capital": "Basseterre",
@@ -6483,7 +6494,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 1.42462074679313,
       "ethnic": 1.92169814015942,
       "islam": 0.445847498785818,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.957860754792446
     },
     "capital": "Castries",
@@ -6506,10 +6517,10 @@ window.HERALD_DATA.missions = [
     "christianPercent": 96.4799588900308,
     "religionBreakdown": {
       "nonReligious": 3.52004110996917,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
-      "other": 0
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "Saint-Pierre",
     "dominantReligion": "",
@@ -6533,7 +6544,7 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 1.82024017478829,
       "ethnic": 0.253498101738826,
-      "islam": 0,
+      "islam": 0.0,
       "unknown": 0.277588124474469,
       "other": 1.96952714487303
     },
@@ -6558,9 +6569,9 @@ window.HERALD_DATA.missions = [
     "unreachedGroups": 1,
     "religionBreakdown": {
       "nonReligious": 15.0005182939581,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 0.996579259876228
     },
     "capital": "San Marino",
@@ -6637,7 +6648,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 2.49965042570381,
       "ethnic": 0.203374557205892,
       "islam": 0.296950158473681,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.285774656640358
     },
     "capital": "Victoria",
@@ -6714,7 +6725,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 6.21919001374042,
       "ethnic": 2.39598034420923,
       "islam": 0.105845501758308,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 2.56602622324693
     },
     "capital": "Philipsburg",
@@ -6766,7 +6777,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 41.5921983390797,
       "ethnic": 0.00432589429545531,
       "islam": 4.43262583130166,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.00173723413975004
     },
     "capital": "Ljubljana",
@@ -6869,7 +6880,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 2.45008208001342,
       "ethnic": 2.01174426375229,
       "islam": 1.11800651684973,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 1.13959585182038
     },
     "capital": "Kingstown",
@@ -6895,7 +6906,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 5.76823886283558,
       "ethnic": 10.9296184952057,
       "islam": 16.07197796525,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.97969110867523
     },
     "capital": "Paramaribo",
@@ -6918,9 +6929,9 @@ window.HERALD_DATA.missions = [
     "christianPercent": 90.9038076152305,
     "religionBreakdown": {
       "nonReligious": 7.3250501002004,
-      "ethnic": 0,
+      "ethnic": 0.0,
       "islam": 1.18076152304609,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.590380761523046
     },
     "capital": "Longyearbyen",
@@ -7073,11 +7084,11 @@ window.HERALD_DATA.missions = [
     "christianPercent": 90.6677034137595,
     "unreachedGroups": 1,
     "religionBreakdown": {
-      "nonReligious": 0,
+      "nonReligious": 0.0,
       "ethnic": 8.83802778118297,
       "islam": 0.0591021581497809,
       "unknown": 0.435166646907786,
-      "other": 0
+      "other": 0.0
     },
     "capital": "Dili",
     "dominantReligion": "",
@@ -7096,13 +7107,13 @@ window.HERALD_DATA.missions = [
     "isoCode": "TK",
     "population": 3000,
     "persecutionLevel": "",
-    "christianPercent": 100,
+    "christianPercent": 100.0,
     "religionBreakdown": {
-      "nonReligious": 0,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
-      "other": 0
+      "nonReligious": 0.0,
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
+      "other": 0.0
     },
     "evangelicalPercent": 3.4,
     "dominantReligion": "",
@@ -7124,8 +7135,8 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 0.484503605324479,
       "ethnic": 0.107109639867588,
-      "islam": 0,
-      "unknown": 0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 3.5468892200298
     },
     "capital": "Nuku'alofa",
@@ -7150,7 +7161,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 3.09661098850002,
       "ethnic": 1.18817181251569,
       "islam": 5.13828818134719,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 1.56254654822633
     },
     "capital": "Port-of-Spain",
@@ -7173,10 +7184,10 @@ window.HERALD_DATA.missions = [
     "christianPercent": 90.6844664485899,
     "religionBreakdown": {
       "nonReligious": 6.31553355141013,
-      "ethnic": 3,
-      "islam": 0,
-      "unknown": 0,
-      "other": 0
+      "ethnic": 3.0,
+      "islam": 0.0,
+      "unknown": 0.0,
+      "other": 0.0
     },
     "capital": "Cockburn Town",
     "dominantReligion": "",
@@ -7195,12 +7206,12 @@ window.HERALD_DATA.missions = [
     "isoCode": "TV",
     "population": 9000,
     "persecutionLevel": "",
-    "christianPercent": 98,
+    "christianPercent": 98.0,
     "religionBreakdown": {
       "nonReligious": 0.989698981343711,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 1.01030101865629
     },
     "capital": "Funafuti",
@@ -7226,7 +7237,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 34.2841108884887,
       "ethnic": 0.694734700839358,
       "islam": 4.66047925434079,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.924473321968927
     },
     "capital": "London",
@@ -7303,7 +7314,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 1.17273935218464,
       "ethnic": 5.58663106762884,
       "islam": 0.0615265888093304,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 1.70168068534371
     },
     "capital": "Port-Vila",
@@ -7323,13 +7334,13 @@ window.HERALD_DATA.missions = [
     "isoCode": "VA",
     "population": 1000,
     "persecutionLevel": "",
-    "christianPercent": 100,
+    "christianPercent": 100.0,
     "religionBreakdown": {
-      "nonReligious": 0,
-      "ethnic": 0,
-      "islam": 0,
-      "unknown": 0,
-      "other": 0
+      "nonReligious": 0.0,
+      "ethnic": 0.0,
+      "islam": 0.0,
+      "unknown": 0.0,
+      "other": 0.0
     },
     "evangelicalPercent": 2.5,
     "dominantReligion": "",
@@ -7352,7 +7363,7 @@ window.HERALD_DATA.missions = [
       "nonReligious": 3.91275102595857,
       "ethnic": 0.493282096112285,
       "islam": 0.1354993807824,
-      "unknown": 0,
+      "unknown": 0.0,
       "other": 0.715321386076103
     },
     "capital": "Charlotte Amalie",
@@ -7376,8 +7387,8 @@ window.HERALD_DATA.missions = [
     "religionBreakdown": {
       "nonReligious": 0.582120076065972,
       "ethnic": 0.610191938879108,
-      "islam": 0,
-      "unknown": 0,
+      "islam": 0.0,
+      "unknown": 0.0,
       "other": 0.342868208364368
     },
     "capital": "Mata'utu",
@@ -7400,8 +7411,8 @@ window.HERALD_DATA.missions = [
     "christianPercent": 0.0278119385266618,
     "unreachedGroups": 10,
     "religionBreakdown": {
-      "nonReligious": 0,
-      "ethnic": 0,
+      "nonReligious": 0.0,
+      "ethnic": 0.0,
       "islam": 99.4114063431081,
       "unknown": 0.518727186920167,
       "other": 0.0420545314451215

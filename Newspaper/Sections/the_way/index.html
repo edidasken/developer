@@ -1,77 +1,64 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="broadsheet">
+<html lang="en" class="sec-the-way">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <meta name="theme-color" content="#faf6ed">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>The Way — The Flock Herald</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="../../Styles/the_broadsheet.css">
-  <link rel="stylesheet" href="../../Styles/sections/the_way.css">
   <script>
-    (function () {
-      try {
-        var s = parseFloat(localStorage.getItem('flock_font_scale') || '1');
-        if (s >= 0.85 && s <= 1.25) document.documentElement.style.setProperty('--fn-scale', s);
-        var t = localStorage.getItem('flock_theme') || 'broadsheet';
-        document.documentElement.setAttribute('data-theme', t);
-      } catch (_) {}
+    (function() {
+      var s = localStorage.getItem('flock_font_scale');
+      if (s) document.documentElement.style.setProperty('--fn-scale', s);
     })();
   </script>
+  <link rel="stylesheet" href="../../Styles/the_broadsheet.css">
+  <link rel="stylesheet" href="../../Styles/sections/the_way.css">
+  <link rel="manifest" href="../../manifest.json">
 </head>
-<body>
-  <nav class="sec-nav-bar" id="sec-nav" aria-label="Paper sections"></nav>
+<body class="broadsheet-page sec-the-way">
 
-  <main class="np-page" id="section-main">
-
-    <div class="np-section-banner">
-      <p class="np-section-banner__flag">The Flock Herald &mdash; Discipleship &amp; Scripture</p>
-      <h1 class="np-section-banner__title">The Way</h1>
-      <p class="np-section-banner__deck">Discipleship paths &middot; Reading plans &middot; The living Word</p>
-      <span class="np-section-banner__accent" style="background:var(--sec-the-way,#4a2808)"></span>
+  <header class="sec-masthead" role="banner">
+    <div class="sec-masthead__inner">
+      <div>
+        <h1 class="sec-masthead__title">The Way</h1>
+        <p class="sec-masthead__subtitle">Growth, Discipleship &amp; Outreach</p>
+      </div>
+      <button class="sec-masthead__font-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
     </div>
+    <nav class="sec-nav-bar" role="navigation" aria-label="Herald sections" id="sec-nav"></nav>
+  </header>
 
-    <div class="np-panels">
-
-      <details class="np-panel" id="accordion-wellspring" open>
-        <summary class="np-panel__hdr">
-          <span class="np-panel__icon">&#128214;</span>
-          <span class="np-panel__title">The Wellspring</span>
-          <span class="np-panel__meta">Scripture &amp; one-year Bible reading plan</span>
-          <span class="np-panel__caret">&#9656;</span>
-        </summary>
-        <div class="np-panel__body" id="panel-wellspring"></div>
-      </details>
-
-      <details class="np-panel" id="accordion-path">
-        <summary class="np-panel__hdr">
-          <span class="np-panel__icon">&#128739;</span>
-          <span class="np-panel__title">The Straight Path</span>
-          <span class="np-panel__meta">Discipleship journey &amp; teaching plans</span>
-          <span class="np-panel__caret">&#9656;</span>
-        </summary>
-        <div class="np-panel__body" id="panel-path"></div>
-      </details>
-
-    </div><!-- .np-panels -->
+  <main class="broadsheet-grid" id="the-way-grid">
+    <article class="broadsheet-card broadsheet-card--full">
+      <div class="empty-state">
+        <div class="empty-state__icon">🌱</div>
+        <p class="empty-state__title">The Way — Coming in Phase 3</p>
+        <p class="empty-state__message">Growth modules, devotionals, missions, and the Gospel invitation are being built.</p>
+      </div>
+    </article>
   </main>
+
+  <aside class="right-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <header class="drawer-header">
+      <h2 id="drawer-title" class="drawer-title"></h2>
+      <button class="drawer-close" type="button" aria-label="Close">&#x2715;</button>
+    </header>
+    <div class="drawer-body" id="drawer-body"></div>
+  </aside>
+  <div class="drawer-backdrop" aria-hidden="true"></div>
+  <div class="toast-layer" id="toast-layer" aria-live="polite" aria-atomic="true"></div>
 
   <script src="../../Scripts/the_true_vine.js"></script>
   <script src="../../Scripts/firm_foundation.js"></script>
-  <script>
-    (function () {
-      if (typeof Nehemiah !== 'undefined') {
-        Nehemiah.guard();
-      }
-    })();
-  </script>
+  <script>window._HERALD_AUTH_LEVEL = -1;</script>
   <script src="../../Scripts/the_adornment.js"></script>
-  <script src="../../Scripts/the_gates.js?v=2"></script>
-  <script src="../../Data/one_year_bible.js"></script>
-  <script src="../../Data/psalms.js"></script>
-  <script src="../../Data/reading_plans.js"></script>
-  <script src="../../Data/teaching_plans.js"></script>
-  <script src="../../Scripts/the_living_water_section.js?v=2"></script>
-  <script src="../../Scripts/the_straight_path.js?v=2"></script>
+  <script src="../../Scripts/the_gates.js"></script>
+  <script src="the_way.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('../../sw.js').catch(() => {});
+    }
+  </script>
 </body>
 </html>

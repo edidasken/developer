@@ -1,8 +1,15 @@
-// Herald Data: Genealogy
-// Source: New_Covenant/Data/genealogy.js — 1321 figures
-// DO NOT EDIT — regenerate with: node Newspaper/convert_herald_data.js
-window.HERALD_DATA = window.HERALD_DATA || {};
-window.HERALD_DATA.genealogy = [
+// genealogy.js — Static snapshot of the 'genealogy' Firestore collection.
+// Source:   Firestore project flockos-truth, collection: genealogy
+// Exported: 2026-04-29T07:01:56Z
+// Records:  1321
+//
+// Field names match the Truth Editor schema (camelCase / lowercase):
+//   name, title, meaning, lifespan, bio, reference, children, _docId
+//
+// Re-generate: python "Architechtural Docs/New Covenant/Automation/Shepherds/export_genealogy_to_js.py"
+// DO NOT EDIT — regenerate from Firestore instead.
+
+export default [
   {
     "name": "Aaron",
     "reference": "Exodus 6:20",

@@ -1,880 +1,899 @@
-# The Newspaper — FlockOS Unified Experience Plan
-### Version 4 — As-Built + Remaining Work
-
-**Vision:** The Flock Herald IS the entire FlockOS product. Not a wrapper, not a portal — the newspaper sections ARE the tools. Every section provides the full functionality of the app it replaces, native to the newspaper codebase, styled as broadsheet.
-
-**Naming rule:** Display names are clear English (what the pastor sees). Code names are biblical (file/folder/function names). They are separate concerns.
-
-**Data rule:** All sections work offline via localStorage. Firestore integration is Phase 2 for each section.
+# The Flock Herald — Master Plan
+### Version 6 — May 2026
 
 ---
 
-## AS-BUILT STATUS (as of 2026-05-21)
+## FOR THE EXECUTING AI — READ THIS FIRST
 
-| Section Folder | Display Name | Functional State |
-|---|---|---|
-| `herald/` + `index.html` | The Flock Herald | ✅ Full — daily scripture, quiz widget, section briefs |
-| `tabernacle/` | Daily Devotional | ✅ Full — today's devotional, morning prayer, OYB passage |
-| `pulpit/` | Sermon Prep | ⚠️ Partial — quiz + static notes. **Needs: full sermon builder** |
-| `levites/` | Song Planner | ⚠️ Partial — static Psalm + worship content. **Needs: set list builder, song library** |
-| `stage/` | Service Order | ⚠️ Partial — static production notes. **Needs: runsheet builder** |
-| `epistles/` | Announcements & Prayer | ⚠️ Partial — static letters column. **Needs: announcement board + prayer chain** |
-| `straight_path/` | Discipleship Path | ✅ Full — OYB week, memory verse, teaching plan |
-| `great_commission/` | Nations & Prayer | ✅ Full — nation of week, prayer report, prayercast video |
-| `living_water/` | Scripture & Reflection | ✅ Full — Psalm, reading plan, reflection questions |
-| `scroll_room/` | The Archive | ✅ Full — book of Bible, Strong's word study |
-| `gatehouse/` | Care Board | ⚠️ Partial — static bulletin. **Needs: care notes, pastoral to-dos** |
-| `genealogies/` | Family Tree | ✅ Full — biblical figure of day, heritage record |
-| `harvest/` | Outreach Tracker | ⚠️ Partial — static harvest content. **Needs: conversation log, prayer targets** |
-| `cornerstone/` | Shepherd's Desk | ✅ Full — doctrine, apologetics, heart check, mirror |
-| `editors_desk/` | Editor's Desk | ✅ Full — Herald config via localStorage overrides |
-| `council/` | Editorial Board | ⚠️ Partial — static governance. **Needs: admin tools, analytics links** |
+You are building The Flock Herald newspaper UI for FlockOS. This document is your
+complete specification. Read every section before touching a single file.
 
----
+**Workspace root:** `/Users/greg.granger/Desktop/FlockOS/Software`
 
-## REMAINING BUILDS (active work queue)
+**You are working in:** `Newspaper/` — a standalone product that lives alongside `New_Covenant/`
 
-### Build 1 — Sermon Prep (`pulpit/`) — replaces FEED app
-**Display:** "Sermon Prep"  **Script:** `the_pulpit.js`
-- [ ] Sermon list stored in `localStorage('herald_sermons')`
-- [ ] New sermon: title, scripture reference, date
-- [ ] Sermon body: freeform outline sections (Point 1, Point 2, Illustration, Application, Closing)
-- [ ] Word count display
-- [ ] "Active Sermon" pinned at top of list
-- [ ] Delete + archive sermons
-- [ ] Quiz widget (existing) stays in Col 3 as study tool
-- [ ] BCP after
+**Source of truth for all data, scripts, and styles:** `New_Covenant/` — do not
+reinvent anything. Copy, adapt, reference. Every script that exists in
+`New_Covenant/Scripts/` is available to copy. Every `Data/*.js` file is available.
+Every style token in `New_Covenant/Styles/new_covenant.css` is your palette.
 
-### Build 2 — Song Planner (`levites/`) — replaces Stand app
-**Display:** "Song Planner"  **Script:** `the_cantors.js`
-- [ ] Built-in starter song library (50 hymns/worship songs with key, BPM, CCLI)
-- [ ] Firestore load when UpperRoom available (songs collection)
-- [ ] Set list builder: add songs to "Sunday's Set", reorder, remove
-- [ ] Set list stored in `localStorage('herald_setlist')`
-- [ ] Key display + transpose widget (show in new key)
-- [ ] Song detail: title, artist, key, BPM, CCLI, lyrics hint
-- [ ] Col 3: rotating Psalm (existing) stays as worship reflection
-- [ ] BCP after
+**Build command:** `bash "Iris/Bezalel/Scripts/C-Build_Newspaper.sh"` from workspace root
 
-### Build 3 — Service Order (`stage/`) — replaces FlockShow
-**Display:** "Service Order"  **Script:** `the_stage.js`
-- [ ] Service runsheet items: type (worship/prayer/sermon/offering/communion/other), title, duration
-- [ ] Add/remove/reorder items
-- [ ] Total time calculator
-- [ ] "Sunday's Order" stored in `localStorage('herald_service_order')`
-- [ ] Col 2: rotating visual scripture (existing) stays
-- [ ] Print-friendly layout
-- [ ] BCP after
+**After every file edit:** run `get_errors` on the edited file before running any
+build. Never declare a file clean without it. Do not use `node --check` as a
+substitute — it misses errors the VS Code language server catches.
 
-### Build 4 — Announcements & Prayer Chain (`epistles/`) — replaces FlockChat public feed
-**Display:** "Announcements & Prayer"  **Script:** `the_letters.js`
-- [ ] Announcements board: title, body, date, category (event/announcement/notice)
-- [ ] Stored in `localStorage('herald_announcements')`
-- [ ] Prayer chain: name, request, date — add/mark answered
-- [ ] Stored in `localStorage('herald_prayer_chain')`
-- [ ] Pastoral letter (Col 1) stays as weekly reflection
-- [ ] BCP after
+**After every completed phase:** BCP = run C-Build + `git commit` + `git push` to main
 
-### Build 5 — Care Board (`gatehouse/`) — replaces FlockShamar
-**Display:** "Care Board"  **Script:** `the_bulletin.js`
-- [ ] Care cards: person name, need/situation, assigned to, date, status (active/praying/resolved/closed)
-- [ ] Stored in `localStorage('herald_care_cards')`
-- [ ] To-do list: task, due date, done toggle
-- [ ] Stored in `localStorage('herald_todos')`
-- [ ] Filter by status
-- [ ] "New card" quick-add form
-- [ ] BCP after
+**Do NOT push Newspaper to Nations** until the user explicitly approves the build.
+Multi-church deployment is deferred. See the "Multi-Church Deployment" section.
 
-### Build 6 — Outreach Tracker (`harvest/`) — replaces Multiply
-**Display:** "Outreach Tracker"  **Script:** `the_harvest_report.js`
-- [ ] Gospel conversation log: person name, date, notes, outcome (praying/interested/connected/declined)
-- [ ] Stored in `localStorage('herald_harvest')`
-- [ ] Prayer targets: name + request + date
-- [ ] Stats widget: total conversations, this week, decisions
-- [ ] Missions data (existing rotating nation) stays in Col 1
-- [ ] BCP after
+**Auth bypass for local dev:** call `Nehemiah.enableLocalBypass()` in the browser
+console, then reload. This is the only supported dev bypass.
 
----
+**Script load order on every section page — do not deviate from this:**
+`the_true_vine.js` → `firm_foundation.js` → inline auth guard → `the_adornment.js`
+→ `the_gates.js` → section script
 
-## MASTER TO-DO LIST (original phases — kept for reference)
+**CSS rules — enforce these on every file:**
+- `Newspaper/Styles/the_broadsheet.css` is the shared foundation. Never modify it
+  to add section-specific rules.
+- `Styles/sections/*.css` files are additive only. Never override a token that
+  already exists in `the_broadsheet.css` — use `--sec-*` scoped variables instead.
+- Never write `px` for font sizes. Use `rem` only — `--fn-scale` cascades from root.
+- **Device accessibility rule:** `html` base must be `calc(var(--fn-scale) * 100%)` —
+  never `calc(var(--fn-scale) * 16px)`. The `100%` form preserves the user's OS/browser
+  text-size setting as the base. A user who has set "Large Text" in iOS Accessibility or
+  bumped their browser default to 20px gets that respected automatically. Overriding with
+  a fixed `px` value is an accessibility violation — it silently ignores their setting.
+- Never set `-webkit-text-size-adjust: none` or `text-size-adjust: none`. The correct
+  value is `100%` (prevent auto-scaling on rotation without blocking user preference).
 
-> This list is the source of truth for execution. Mark `[x]` after each task is completed during a work session.
+**Font rule:** `'Lora'` for headlines only. `'Plus Jakarta Sans'` for body text,
+labels, and all UI elements. No other font families. No ornate display fonts.
 
-### Phase 0-A — Project Scaffold (do this first — everything else depends on it)
-- [ ] PA-1: Create `Newspaper/` root folder at `/Users/greg.granger/Desktop/FlockOS/Software/Newspaper/`
-- [ ] PA-2: Create folder structure: `Scripts/`, `Scripts/the_scribes/`, `Scripts/the_priesthood/`, `Styles/`, `Styles/sections/`, `Sections/`, `Images/`, `Data/`
-- [ ] PA-3: Create all 16 section folders: `Sections/herald/`, `tabernacle/`, `pulpit/`, `levites/`, `stage/`, `epistles/`, `straight_path/`, `great_commission/`, `living_water/`, `scroll_room/`, `gatehouse/`, `genealogies/`, `harvest/`, `cornerstone/`, `editors_desk/`, `council/`
-- [ ] PA-4: Copy `New_Covenant/the_living_water.js` → `Newspaper/Scripts/the_living_water.js`
-- [ ] PA-5: Copy `New_Covenant/Scripts/firm_foundation.js` → `Newspaper/Scripts/firm_foundation.js`
-- [ ] PA-6: Copy `New_Covenant/Scripts/the_adornment.js` → `Newspaper/Scripts/the_adornment.js` (update path refs after)
-- [ ] PA-7: Copy `New_Covenant/Scripts/the_cistern.js` + `the_witness.js` → `Newspaper/Scripts/`
-- [ ] PA-8: Copy `New_Covenant/Scripts/the_scribes/` (4 files) → `Newspaper/Scripts/the_scribes/`
-- [ ] PA-9: Copy `New_Covenant/Scripts/the_priesthood/` (4 files) → `Newspaper/Scripts/the_priesthood/`
-- [ ] PA-10: Create `Newspaper/Styles/the_broadsheet.css` with full palette token block (from §5)
-- [ ] PA-11: Create `Newspaper/index.html` — stub Herald entry point
-- [ ] PA-12: Create `Newspaper/manifest.json` + `Newspaper/sw.js`
-- [ ] PA-13: Run get_errors on all copied JS files — confirm zero errors before proceeding
-- [ ] PA-14: BCP
+**Color rule:** Every section signature color is an existing `new_covenant.css`
+token. See the Color Palette table. Do not invent new hex values for sections.
 
-### Phase 0 — Foundation (CSS additions to `the_broadsheet.css`)
-- [ ] P0-1: Create `Newspaper/Styles/sections/_README.md` with additive-only rule documented
-- [ ] P0-2: Add `--fn-scale: 1` to `the_broadsheet.css` `:root`
-- [ ] P0-3: Set `html { font-size: calc(var(--fn-scale) * 100%); }` in `the_broadsheet.css`
-- [ ] P0-4: Implement `Adornment.initFontScale()` in `Newspaper/Scripts/the_adornment.js`
-- [ ] P0-5: Confirm boot-restore pattern (theme + font scale iife) in `the_adornment.js`
-- [ ] P0-6: Add iOS/Samsung safe-area CSS variables to `the_broadsheet.css` `:root`
-- [ ] P0-7: Add `.safe-top/bottom/left/right` utility classes to `the_broadsheet.css`
-- [ ] P0-8: Add `.sec-nav-bar` / `.sec-nav-tab` + active state to `the_broadsheet.css`
-- [ ] P0-9: BCP
+**Dark mode rule:** Never build dark mode unless explicitly instructed. The one
+justified exception is the Service Order panel inside The Sanctuary (projection use).
 
-### Phase 1 — Herald & Section Bar
-- [ ] P1-1: Create `sections/herald.css` with full standard header block
-- [ ] P1-2: Extract Herald-specific typography from `flocknews.css` → `sections/herald.css`
-- [ ] P1-3: Make `flocknews.css` a thin import shim (loads `../sections/herald.css`)
-- [ ] P1-4: Replace "Select an App" dropdown in `flocknews.html` with `.sec-nav-bar`
-- [ ] P1-5: Add font-scale `Aa` button to Herald masthead in `flocknews.html`
-- [ ] P1-6: Add font-scale + theme boot restore to `flocknews.html` flash-prevention script
-- [ ] P1-7: Convert all `flocknews.css` text sizes from `px` → `rem`
-- [ ] P1-8: Apply `env(safe-area-inset-*)` to Herald masthead and section bar
-- [ ] P1-9: Test Herald section bar on: iPhone SE (375px), iPhone 14 Pro (393px Dynamic Island), iPhone 14 Pro Max (430px), Samsung Galaxy S24 (360px)
-- [ ] P1-10: BCP
+**Firestore paths:** Top-level collections only — confirmed live against
+`flockos-notify`. Do not nest reads under `/churches/{id}/`. See Connectivity Model.
 
-### Phase 2 — News Editor Auth + Admin Page
-- [ ] P2-1: Add `Nehemiah.guard()` auth gate to `news_editor.html` — minimum role: `pastor`
-- [ ] P2-2: Add Firebase Auth init + `whoAmI()` boot to `news_editor.html`
-- [ ] P2-3: Add auth header to `news_editor.html` showing user displayName + role badge
-- [ ] P2-4: Add logout button to `news_editor.html`
-- [ ] P2-5: Add font-scale + `env(safe-area-inset-*)` to `news_editor.html`
-- [ ] P2-6: Create `sections/editor.css` — dark newsroom aesthetic (extends current `news_editor.css`)
-- [ ] P2-7: Expand Editor's Desk controls to cover all Herald sections (see §A below)
-- [ ] P2-8: Create `app.flocknews/admin.html` — "The Editorial Board" admin page (pastor+ only)
-- [ ] P2-9: Create `sections/admin_board.css` for admin page
-- [ ] P2-10: Add admin page link to section bar — hidden unless `Nehemiah.hasRole('pastor')` is true
-- [ ] P2-11: BCP
+**Firestore connectivity:** Always check `window.UpperRoom.isReady()` first. Fall
+back to GAS endpoint via `the_living_water_adapter`. Then localStorage. Then
+`Data/*.js` static files. Never block render — show skeleton, swap in data async.
 
-### Phase 3 — Permission Tightening
-- [ ] P3-1: Audit every Tier 1 HTML page — document its current auth state
-- [ ] P3-2: Apply `Nehemiah.guard()` to all Tier 1 pages that require auth (see Permission Map §B)
-- [ ] P3-3: Apply `Nehemiah.requireRole('pastor')` to Tier 1 admin-only sections
-- [ ] P3-4: In the section bar, hide tabs the current user doesn't have access to (client-side via `Nehemiah.hasRole()`)
-- [ ] P3-5: In `the_pillars.js` (FlockOS sidebar), hide nav items below user's role level
-- [ ] P3-6: Confirm GROW learning modules (`the_gospel_*`) remain fully public in `app.grow.html` — no auth gate
-- [ ] P3-7: Confirm The Invitation (`app.invite`) remains fully public
-- [ ] P3-8: Confirm The Wellspring (`app.wellspring`) remains fully public
-- [ ] P3-9: Add "access denied" soft page (newsprint style) for unauthorized section attempts
-- [ ] P3-10: BCP
+**`Architechtural Docs/` is gitignored and private.** Before every commit run:
+`git ls-files "Architechtural Docs/"` — if anything shows up, STOP and alert the
+user. Do not proceed with the commit.
 
-### Phase 4 — FlockOS Comms Absorption
-- [ ] P4-1: Audit `Scripts/the_comms.js` — document all Firestore listeners/writes
-- [ ] P4-2: Confirm each listener is covered by `flockchat-public/flockchat.js`
-- [ ] P4-3: Replace the_comms Pillars entry in `the_pillars.js` with direct `href` link to FlockChat section
-- [ ] P4-4: Remove `the_comms.js` import from `the_ark.js`
-- [ ] P4-5: Add `[DEPRECATED]` notice to `app.flockchat/app.flockchat.html`
-- [ ] P4-6: Create `sections/letters.css` with standard header block
-- [ ] P4-7: Add section bar + section header to `flockchat-public/FlockChat.html`
-- [ ] P4-8: BCP
+**No macOS duplicate files:** After every BCP scan code folders for files named
+`* 2.ext` or `* 3.ext`. List them and ask before deleting. Never auto-delete.
 
-### Phase 5 — Per-Section CSS (one section at a time)
-- [ ] P5-1: `sections/shepherd.css` + section bar in `app.flockos.html` + safe-area
-- [ ] P5-2: `sections/pulpit.css` + section bar in `app.feed/feed.html` + safe-area
-- [ ] P5-3: `sections/cantors.css` + section bar in `app.stand/music_stand.html` + safe-area
-- [ ] P5-4: `sections/stage.css` + section bar in `app.flockshow/app.flockshow.html` + safe-area
-- [ ] P5-5: `sections/the_path.css` + section bar in `app.grow/app.grow.html` + safe-area
-- [ ] P5-6: `sections/invitation.css` + section bar in `app.invite/app.invite.html` + safe-area
-- [ ] P5-7: `sections/wellspring.css` + section bar in `app.wellspring/app.wellspring.html` + safe-area (see §C)
-- [ ] P5-8: `sections/archive.css` + section bar in `app.flockdocs/app.flockdocs.html` + safe-area
-- [ ] P5-9: `sections/bulletin.css` + section bar in `app.flockshamar/app.flockshamar.html` + safe-area
-- [ ] P5-10: `sections/family_tree.css` + section bar in `app.melchizedek/app.melchizedek.html` + safe-area
-- [ ] P5-11: `sections/mission_report.css` + section bar in `app.multiply/multiply.html` + safe-area
-- [ ] P5-12: `sections/codex.css` + section bar in `app.flockcodex/app.flockcodex.html` + safe-area
-- [ ] P5-13: BCP after each section (individual BCPs, not batched)
+**Visual work rule:** If a visual fix is wrong more than twice, stop patching.
+State plainly that the approach is wrong and wait for direction from the user.
 
-### Phase 8 — The Codex (As-Built Documentation Section)
-- [ ] P8-1: Create `app.flockcodex/` folder and `app.flockcodex.html` — auth gate `pastor+`, section bar, `sections/codex.css`
-- [ ] P8-2: Author **Overview** page from Vision & Architecture docs (docs 01, 03)
-- [ ] P8-3: Author **Standards & Structure** page from Development Standards + File Structure docs (docs 02, 04, 07)
-- [ ] P8-4: Author **Data Layer** page from Firestore Schema + Data Layer Inventory + Firestore Rules (docs 09, 10, 11, 19)
-- [ ] P8-5: Author **Scripts & Views** page from Script Inventory + View Inventory + App Dependency Map (docs 05, 07, 08)
-- [ ] P8-6: Author **Backend & Automation** page from GAS Backend + Automation Scripts + Shepherds Automation (docs 06, 14, 15)
-- [ ] P8-7: Author **Build & Operations** page from Build & Ops Guide + Debugging Map (docs 12, 16)
-- [ ] P8-8: Author **Church Setup & Branding** page from Branding Registry + New Church Setup + Seed Database (docs 17, 24, 25)
-- [ ] P8-9: Author **Flows & Policy** page from Flow Policy + Pastor's Guide (docs 13, 23)
-- [ ] P8-10: Author **Parity & Reference** page from NC→OC Parity Map + Subfolder Reference + Doc Index (docs 18, 20, 21, 22)
-- [ ] P8-11: Add sidebar TOC navigation inside The Codex (links between the 9 pages)
-- [ ] P8-12: Add print-friendly `@media print` styles in `sections/codex.css`
-- [ ] P8-13: Create `app.embeds/embed-flockcodex.html` (per new-app rule)
-- [ ] P8-14: BCP
+**Phase discipline:** Execute phases in the exact order listed. Do not start a new
+phase until the previous phase BCP is confirmed clean.
 
-### Phase 6 — ~~Refactor `new_covenant.css`~~ CANCELLED
-> **This phase is cut.** Stripping per-app typography out of a 3,000-line monolith is pure risk with zero user benefit. The section CSS files are additive — they never replace anything already in `new_covenant.css`. `new_covenant.css` is treated as read-only for this entire project except for the three targeted Phase 0 additions (`--fn-scale`, `--safe-*`, `.sec-nav-bar`).
+**Section completion rule:** When building any section, work that section to
+100% completion before moving to the next one. "Complete" means:
+1. All panels built and rendering correctly
+2. All data connections wired (Firestore → GAS fallback → localStorage → static Data/)
+3. All mobile requirements met (safe-area, no side-scroll, readable fonts, 44px targets)
+4. Playwright verification passed — every interactive element tested, every data path
+   exercised, no console errors
+5. `get_errors` returns zero on every file in that section
+6. BCP committed and pushed
 
-### Phase 7 — QA & Device Testing
-- [ ] P7-1: Font-scale picker: all 5 steps on iOS Safari, Android Chrome, Desktop Chrome
-- [ ] P7-2: All sections correct at Compact (0.85×) and XL (1.25×)
-- [ ] P7-3: Section bar: test scroll on 375px (iPhone SE), 393px (iPhone 14 Pro), 360px (Samsung S24)
-- [ ] P7-4: Dynamic Island safe area: test Herald masthead on iPhone 14 Pro / 15 Pro (393px, 59px top inset)
-- [ ] P7-5: Home indicator overlap: test bottom bars on iPhone X/11/12/13/14 (34px bottom inset)
-- [ ] P7-6: Samsung Galaxy notch/punch-hole: test top bar on S24 (approx 24px top inset)
-- [ ] P7-7: Landscape orientation: section bar + masthead on all device profiles
-- [ ] P7-8: Pillars sidebar inside FlockOS unaffected by section bar (no layout overlap)
-- [ ] P7-9: All 47 registered views render without regression inside FlockOS
-- [ ] P7-10: GROW views work in both `app.grow.html` (public) AND inside FlockOS (authenticated)
-- [ ] P7-11: Wellspring — all offline functions work after section bar addition (no JS conflicts)
-- [ ] P7-12: News Editor — auth redirects to login if no session, loads clean if pastor+
-- [ ] P7-13: Admin page — inaccessible to member/volunteer/leader; loads clean for pastor/admin
-- [ ] P7-14: B-Build clean. All nations receive `sections/` folder. Spot-check two nations.
-- [ ] P7-15: BCP (final)
+Do not move to the next section until every item above is checked off.
+A section that is "mostly done" is not done.
 
 ---
 
-## 1. The Core Metaphor
+**What this is:** New_Covenant is the engine. The Newspaper is the face. Every app, every data
+set, every feature built in New_Covenant is re-rendered here as a newspaper section. Nothing is
+lost. Everything is reorganized. The UI is a broadsheet. The data is unchanged.
 
-A great newspaper has:
-- A **masthead** (identity, date, church name)
-- A **front page** (today's most important content — the Herald)
-- **Named sections** (Sports → Worship, Business → Shepherd's Desk, Editorial → FEED, etc.)
-- **A letters column** (FlockChat — church messaging)
-- **An editorial board room** (the News Editor + Admin page — staff only)
-- A **consistent typeface** and **grid** that makes every page feel like the same paper
+**Font rule:** Clean, readable fonts only. No ornate typefaces. The newspaper feel comes from
+layout, columns, and color — not from hard-to-read fonts.
 
-The user never "switches apps" — they flip sections. The nav is a section bar, not an app switcher. And the Editor controls what the front page says.
+**Color rule:** All section colors derive from `new_covenant.css` tokens. No new palette invented.
+
+**Functionality rule:** Every feature in every `app.*` must appear somewhere in this plan.
+If it is not mapped, it is not shipped.
 
 ---
 
-## 2. Two-Tier Navigation — Architecture
+## Quality Standard — Professional Pastoral Software
 
-### Tier 1: Top-Level Sections (standalone HTML pages / PWAs)
-Each is its own HTML file, manifest, and section CSS file. The **section bar** navigates between these.
+This is not a prototype. This is not a demo. This is production software used by
+pastors to shepherd real people — members who are grieving, growing, worshipping,
+serving, and seeking God. Every pixel must reflect that weight.
 
-| Section | HTML Entry Point | Newspaper Name | Min Role |
+### The bar
+- **Every interaction must feel intentional.** Buttons have hover states. Forms give
+  feedback. Loading states are never blank white screens. Errors are human — never raw
+  stack traces or Firestore error codes exposed to the user.
+- **Typography is the design.** The broadsheet layout lives or dies on type. Headlines
+  are set in Lora at correct optical sizes. Body copy is comfortable at 1rem+ with
+  generous line-height (1.6 minimum). Nothing is smaller than `0.8125rem` (13px).
+  No condensed fonts. No tight tracking on body text.
+- **Color is purposeful.** Each section has one signature color, used for accents,
+  borders, and active states — not for drowning the page. Background is always
+  near-white (`--bg`). Text is always near-black (`--ink`). Contrast ratios meet
+  WCAG AA for all body text, AAA where feasible.
+- **Spacing breathes.** Cards have generous internal padding. The 3-column grid has
+  column gaps. Sections are separated with clear dividers. Nothing is cramped.
+- **Mobile is first-class, not an afterthought.** Every section must be fully usable
+  one-handed on a phone in a Sunday morning service. Buttons are 44px minimum. Text
+  is readable at arm's length. No pinch-zoom required for any content.
+- **Drawers and transitions are smooth.** 0.25s ease on all panel transitions. No
+  janky repaints. No layout shift on data load. Skeleton cards hold layout while data
+  loads, then swap in without reflow.
+- **Forms are pastor-friendly.** Labels are large and clear. Required fields marked
+  visibly (not just `*`). Success confirmations are warm ("Saved" with a checkmark,
+  not "200 OK"). Delete actions require explicit confirmation — never one tap.
+- **Data is never stale silently.** If a section is showing cached data, say so with
+  a quiet, non-alarming indicator. If Firestore is unreachable, show the last known
+  state — never a blank card or an error banner that breaks the page.
+- **Accessibility is not optional.** All interactive elements have `aria-label` where
+  the visual label is not sufficient. Focus order is logical. All drawers are
+  `role="dialog" aria-modal="true"`. Color is never the only indicator of state.
+- **The Shepherd section reflects pastoral gravitas.** The dashboard is a real
+  dashboard — live metrics, not placeholders. Every tool a pastor reaches for must
+  be exactly where they expect it. The layout respects the weight of the role.
+
+### Language and tone
+- Labels, headings, and placeholder text must use church-native language:
+  "Member" not "User", "Sermon" not "Post", "Flock" not "Community",
+  "Care Case" not "Ticket", "Service Plan" not "Event Template",
+  "Prayer Request" not "Submission".
+- Error messages are compassionate. "We couldn't save that — please try again."
+  Not "Error 500: Internal Server Error."
+- Empty states are encouraging. "No prayer requests yet — the flock is at peace."
+  Not "No data found."
+- Button labels are active verbs: "Add Member", "Save Sermon", "Submit Prayer",
+  "Open Service", "Send Invitation" — never just "Submit" or "OK".
+
+### Visual consistency checklist (enforce per section)
+- [ ] Section masthead has the correct `--sec-color` 3px top stripe
+- [ ] All card headers use `'Lora'` at the correct weight
+- [ ] All body text and labels use `'Plus Jakarta Sans'`
+- [ ] No raw hex values in section CSS — only `var(--token)` references
+- [ ] All buttons have `:hover` and `:focus-visible` states
+- [ ] All form inputs have `:focus` ring using `--sec-color`
+- [ ] Right drawer `✕` button is 44×44px minimum and sticky
+- [ ] Font scale picker affects all text uniformly via `--fn-scale`
+- [ ] Section nav bar shows active tab with `--sec-color` underline
+- [ ] No horizontal scrollbar at 375px viewport width
+- [ ] iOS safe-area padding applied to masthead and bottom nav
+- [ ] Skeleton loaders match the card layout they replace
+
+---
+
+## The 9 Sections
+
+| # | Section Name | Folder | Min Role | Absorbs |
+|---|---|---|---|---|
+| 1 | The Herald | `herald/` | public | app.flocknews |
+| 2 | The Way | `the_way/` | public | app.grow + app.invite |
+| 3 | The Sanctuary | `the_sanctuary/` | leader (3) | app.feed + app.stand + app.flockshow |
+| 4 | The Flock | `the_flock/` | care (2) | app.flockshamar + epistles |
+| 5 | The Mission | `the_mission/` | pastor (4) | app.multiply + great_commission |
+| 6 | The Family | `the_family/` | member (0) | app.melchizedek |
+| 7 | The Shepherd | `the_shepherd/` | pastor (4) | app.flockos + app.flockdocs |
+| 8 | The Calendar | `the_calendar/` | member (0) | (new) events + calendarEvents |
+| 9 | The Weavers | `the_weavers/` | leader (3) | (new) volunteers + groups |
+
+---
+
+## Color Palette — new_covenant.css Tokens Mapped to Sections
+
+All colors come directly from `new_covenant.css`. No new values invented.
+
+| Section | Signature Color | NC Token | Hex |
 |---|---|---|---|
-| Front Page | `app.flocknews/flocknews.html` | **The Flock Herald** | Public |
-| The Shepherd's Desk | `app.flockos/app.flockos.html` | **The Shepherd's Desk** | `pastor` |
-| The Pulpit | `app.feed/feed.html` | **The Pulpit** | `leader` |
-| The Cantors' Corner | `app.stand/music_stand.html` | **The Cantors' Corner** | `leader` |
-| The Stage | `app.flockshow/app.flockshow.html` | **The Stage** | `leader` |
-| The Letters Column | `flockchat-public/FlockChat.html` | **The Letters Column** | `readonly` (member) |
-| The Path | `app.grow/app.grow.html` | **The Path** | Public |
-| The Invitation | `app.invite/app.invite.html` | **The Invitation** | Public |
-| The Wellspring | `app.wellspring/app.wellspring.html` | **The Wellspring** | Public |
-| The Archive | `app.flockdocs/app.flockdocs.html` | **The Archive** | `pastor` |
-| The Bulletin Board | `app.flockshamar/app.flockshamar.html` | **The Bulletin Board** | `readonly` (member) |
-| The Family Tree | `app.melchizedek/app.melchizedek.html` | **The Family Tree** | `readonly` (member) |
-| The Mission Report | `app.multiply/multiply.html` | **The Mission Report** | `pastor` |
-| **The Codex** | `app.flockcodex/app.flockcodex.html` *(new)* | **The Codex** | `pastor` |
-| **The Editorial Board** | `app.flocknews/admin.html` *(new)* | **The Editorial Board** | `pastor` |
-| *(staff tool)* | `app.flocknews/news_editor.html` | **The Editor's Desk** | `pastor` |
+| The Herald | Gold | `--gold` | `#8B7028` |
+| The Way | Sky Blue | `--accent` | `#7eaacc` |
+| The Sanctuary | Lilac | `--lilac` | `#b49bdb` |
+| The Flock | Mint | `--mint` | `#8cc5a2` |
+| The Mission | Peach | `--peach` | `#f0a889` |
+| The Family | Sky | `--sky` | `#8abde0` |
+| The Shepherd | Warning Gold | `--warning` | `#946B1C` |
+| The Calendar | Success Green | `--success` | `#3d8b4f` |
+| The Weavers | Rose | `--rose` | `#e69aba` |
 
-**Deprecated:** `app.flockchat/app.flockchat.html` — stale mirror. Marked deprecated; live app is `flockchat-public/FlockChat.html`.
+Signature color appears in exactly two places per section:
+1. The active chip in the section nav bar (background)
+2. A 3px top accent stripe on the section masthead
 
-### Tier 2: In-App Views (SPA views rendered inside The Shepherd's Desk)
-`app.flockos.html` is an SPA. All 47 registered views load inside it via `the_scribes` router. The **Pillars sidebar** navigates between these. The section bar handles Tier 1 only.
+Everywhere else: shared paper/ink palette below.
 
-Views are organized under Pillars section headings (editorial sub-section heads within The Shepherd's Desk):
+### Paper & Ink (shared across all light sections)
 
-| Pillars Section | Views |
+```css
+--paper:       #faf9f6;   /* from new_covenant.css --bg */
+--paper-card:  #ffffff;   /* from --bg-raised */
+--paper-sunken:#f0eeea;   /* from --bg-sunken */
+--ink:         #2c2c2c;   /* from new_covenant.css --ink */
+--ink-muted:   #6b6b6b;   /* from --ink-muted */
+--ink-faint:   #a0a0a0;   /* from --ink-faint */
+--rule:        #e4e1dc;   /* from --line */
+--rule-strong: #d0ccc5;   /* from --line-strong */
+```
+
+---
+
+## Typography — Readable Fonts Only
+
+**No ornate display fonts. The newspaper feel comes from layout, not letterforms.**
+
+| Role | Font | Fallback |
+|---|---|---|
+| Section headlines | `'Lora'` | Georgia, serif |
+| Body / article text | `'Plus Jakarta Sans'` | system-ui, sans-serif |
+| Labels / bylines / metadata | `'Plus Jakarta Sans'` | system-ui, sans-serif |
+| Masthead (Herald title only) | `'Lora'` bold italic | Georgia, serif |
+| Monospace (code, data) | system monospace | monospace |
+
+`Lora` is a well-hinted serif designed for screen reading — dignified without being
+fussy. `Plus Jakarta Sans` is already loaded in app.grow and app.invite. No new font
+dependencies beyond these two families.
+
+Font scale multiplier (`--fn-scale`) applies globally. All sizes in `rem`.
+
+---
+
+## Section 1 — The Herald (public)
+
+**Folder:** `herald/` | **Script:** `the_proclamation.js` | **Auth:** none
+
+The front page of the paper. What a visitor or member sees first. Driven by `flockNews`
+Firestore collection + daily auto-content from the data layer.
+
+### Panels
+| Panel | Content | Data Source |
+|---|---|---|
+| Front Page | Daily scripture, church name, date | `flockNews` + `the_living_water.js` |
+| Today's Word | Morning devotional + OYB passage | `psalms`, `oneYearBible` |
+| Announcements | Published church announcements | `flockNews` announcements |
+| Prayer Spotlight | One featured prayer request | `prayers` (public flag) |
+| Nation of the Week | Rotating missions spotlight | `Data/missions.js` (local) |
+| Heart Check | Daily self-reflection question | `Data/heart.js` (local) |
+| Quiz Widget | Daily Bible quiz | `Data/quiz.js` (local) |
+
+### Editor Controls (pastor+)
+The Editor's Desk panel (inside The Shepherd section) controls all Herald overrides:
+- Date banner text override
+- Devotional index override
+- Announcement visibility toggle
+- Nation index override (0–237)
+- Heart check index override
+- Quiz index override
+- "Apply to Paper" button — writes config to `localStorage('flock_herald_config')`
+
+---
+
+## Section 2 — The Way (public)
+
+**Folder:** `the_way/` | **Scripts:** `the_way.js` | **Auth:** none
+
+This is the full consolidation of `app.grow` + `app.invite`. Both are public-facing,
+feature-rich, and critical for outreach. Zero features dropped.
+
+### From app.grow — 14 modules across 4 groups
+
+**Daily Practice**
+| Module | Feature | Data |
+|---|---|---|
+| Reading Plans | Bible reading plans, OYB, progress tracking | `readingPlans`, `oneYearBible` |
+| Devotionals | Daily devotionals with reflection | `Data/devotionals.js` |
+| Heart Check | Spiritual self-inventory | `Data/heart.js` |
+| Shepherd's Mirror | Pastor self-assessment tool | `Data/mirror.js` |
+
+**Global Outreach**
+| Module | Feature | Data |
+|---|---|---|
+| World Missions | Nation-by-nation prayer guide (237 nations) | `Data/missions.js` |
+| The Invitation | Gospel presentation + share link | `the_gospel_invitation.js` |
+
+**Study & Discipleship**
+| Module | Feature | Data |
+|---|---|---|
+| Courses | Structured Bible/discipleship courses | `Data/teaching_plans.js` |
+| Quizzes | Knowledge quizzes across books + topics | `Data/quiz.js` |
+| Theology | Theological topic articles | `Data/theology.js` |
+| Teaching Plans | Lesson and sermon series planning | `Data/teaching_plans.js` |
+| Lexicon | Strong's Greek + Hebrew word study | `Data/strongs-greek.js`, `Data/strongs-hebrew.js` |
+| Library | Books of the Bible reference | `Data/books-of-the-bible.js`, `Data/library.js` |
+| Apologetics | Defense of the faith articles | `Data/apologetics.js` |
+| Psalms | Full Psalms reader with themes | `Data/psalms.js` |
+| Counseling | Biblical counseling resources | `Data/counseling.js` |
+| Genealogy | Biblical genealogy explorer | `Data/genealogy.js` |
+
+**About**
+| Module | Feature | Data |
+|---|---|---|
+| The Why | About FlockOS — mission and vision | static |
+
+### From app.invite — Full Gospel Invitation App
+
+`app.invite` is a standalone public app with its own PWA manifest. It must be fully
+preserved inside The Way. It is the outreach tool a pastor shares with anyone.
+
+| Feature | Description |
 |---|---|
-| **Home** | `the_good_shepherd` |
-| **Word** | `the_upper_room`, `the_growth` |
-| **Comms** | `the_fellowship`, `the_announcements`, `the_prayer_chain` |
-| **Care** | `the_fold`, `the_life`, `the_call_to_forgive`, `prayerful_action`, `the_seasons` |
-| **Worship** | `the_anatomy_of_worship`, `quarterly_worship`, `the_pentecost`, *(link)* FlockStand, *(link)* FEED, *(link)* FlockShow |
-| **Mission** | `the_great_commission`, `the_gospel_invitation`, `the_harvest`, `the_way`, `the_truth`, `fishing_for_men`, `fishing_for_data` |
-| **Discipleship** | `the_growth`, `the_gospel_courses`, `the_gospel_quizzes`, `the_gospel_reading`, `the_gospel_theology`, `the_gospel_teaching_plans`, `the_gospel_lexicon`, `the_gospel_library`, `the_gospel_devotionals`, `the_gospel_apologetics`, `the_gospel_counseling`, `the_gospel_heart`, `the_gospel_mirror`, `the_gospel_genealogy`, `the_gospel_journal`, `the_gospel_certificates`, `the_gospel_analytics` |
-| **Stewardship** | `the_gift_drift`, `the_weavers_plan` |
-| **Legacy** | `the_generations` |
-| **Build (Admin)** | `the_wall`, `bezalel`, `content-admin`, `the_invitation`, `software_deployment_referral`, `learn_more`, `about_flockos` |
+| Gospel presentation | Full "Who is Jesus" content — identity, invitations, finished work |
+| Share URL | Generates a shareable link to this exact page |
+| Church info panel | Displays the church name, address, service times from config |
+| Contact form | Visitor can submit their name + prayer request (writes to `prayers`) |
+| Prayer submit | "I want to follow Jesus" action — writes decision to Firestore |
+| Public embed | Accessible with no login, no FlockOS account |
 
-> **Note on Discipleship duplication:** The `the_gospel_*` views appear inside FlockOS (with member context/progress tracking) AND in `app.grow.html` (public, no-auth). This is intentional. The public GROW app is the outreach tool; the FlockOS views are the pastoral/discipleship tracking tool.
+### The Way — Layout
+Three-column editorial grid on desktop, single-column on mobile.
+- **Col 1:** Module sidebar (grouped nav: Daily Practice / Global Outreach / Study / Invite)
+- **Col 2:** Active module content
+- **Col 3:** Today's Psalm + reading plan progress strip
 
 ---
 
-## § A — The News Editor (Enhanced)
+## Section 3 — The Sanctuary (leader+)
 
-### What Exists Today
-`app.flocknews/news_editor.html` — A dark-sidebar control panel that lets a user toggle sections, pick content indices, and preview the Herald in an iframe. Has accordion sections for: Devotional, Heart Check, Missions, Theology, Apologetics. Loads `news_editor.css`. **No auth gate.** Anyone with the URL can access it.
+**Folder:** `the_sanctuary/` | **Script:** `the_sanctuary.js` | **Auth:** leader (3)
 
-### Required Changes
+Consolidates `app.feed` (sermon builder), `app.stand` (song planner), `app.flockshow`
+(service order). Three collapsible panels on one page. All previously separate apps —
+now one worship prep workspace.
 
-**1. Auth Gate (pastor+ required)**
-Add `Nehemiah.guard()` at the top of the page before anything renders. If the user is not authenticated or is below `pastor` level, redirect to the Herald login. The gate must check both GAS session and Firebase Auth so it works on both data backends.
+### Panel A — Sermon Builder (was app.feed)
+| Feature | Data |
+|---|---|
+| Sermon list | `sermons` Firestore collection |
+| New sermon: title, scripture, date, series | `sermons.create` |
+| Sermon outline: freeform sections (Point, Illustration, Application, Closing) | `sermons.update` |
+| Active sermon pinned at top | `sermons` `isActive` flag |
+| Word count display | client-side |
+| Delete + archive sermons | `sermons.archive` |
+| Theology + apologetics reference panel | `Data/theology.js`, `Data/apologetics.js` |
 
+### Panel B — Song Planner (was app.stand)
+| Feature | Data |
+|---|---|
+| Song library: title, artist, key, BPM, CCLI | `songs` Firestore collection |
+| Search songs by title, key, or CCLI | client-side filter |
+| Set list builder: add songs to "Sunday's Set", reorder, remove | `servicePlans` |
+| Key transpose widget (show chord chart in new key) | client-side |
+| Set list stored and retrieved | `servicePlans` collection |
+| Starter library (50 hymns/worship songs) if Firestore empty | `Data/psalms.js` fallback |
+
+### Panel C — Service Order (was app.flockshow)
+| Feature | Data |
+|---|---|
+| Runsheet items: type (worship/prayer/sermon/offering/communion/other), title, duration | `servicePlans` |
+| Add / remove / reorder items | `servicePlans.update` |
+| Total time calculator | client-side |
+| Sunday's Order saved and retrieved | `servicePlans` collection |
+| Print-friendly layout | `@media print` CSS |
+| Teaching plans + quarterly worship calendar reference | `teachingPlans`, `quarterlyPlans` |
+
+---
+
+## Section 4 — The Flock (care/deacon+)
+
+**Folder:** `the_flock/` | **Script:** `the_flock.js` | **Auth:** care (2)
+
+Consolidates `app.flockshamar` (care + notes) + the prayer chain + compassion.
+Pastoral care is the heartbeat of the church. This section handles all of it.
+
+### Panel A — Care Board
+| Feature | Data |
+|---|---|
+| Care case list: name, type, status, assigned to | `careCases` |
+| 25 care types (Crisis, Grief, Medical, Marriage, Addiction, etc.) | `careCases.type` |
+| Case detail sheet: full history + interaction log | `careInteractions` |
+| Follow-up queue: cases due this week | `careCases.nextFollowUp` |
+| Caregiver assignment | `careAssignments` |
+| New case quick-add form | `careCases.create` |
+| Status filter: active / praying / resolved / closed | client-side |
+
+### Panel B — Prayer Chain
+| Feature | Data |
+|---|---|
+| Prayer request list: name, request, date submitted | `prayers` |
+| Mark answered | `prayers.answer` |
+| Archive old requests | `prayers.archive` |
+| New request form | `prayers.create` |
+
+### Panel C — Compassion (deferred until collections seeded)
+| Feature | Data |
+|---|---|
+| Compassion requests | `compassionRequests` (not yet live — GAS fallback) |
+| Resource matching | `compassionResources` |
+| Compassion log | `compassionLogs` |
+
+---
+
+## Section 5 — The Mission (pastor+)
+
+**Folder:** `the_mission/` | **Script:** `the_mission.js` | **Auth:** pastor (4)
+
+Consolidates `app.multiply` (outreach tracker) + Great Commission missions registry.
+
+### Panel A — Harvest Tracker
+| Feature | Data |
+|---|---|
+| Gospel conversation log: person, date, notes, outcome | `outreachContacts` (GAS fallback) |
+| Outcomes: praying / interested / connected / declined / decision | `outreachContacts.outcome` |
+| Prayer targets: name + request + date | `outreachCampaigns` |
+| Stats: total conversations, this week, decisions | `outreachCampaigns.dashboard` |
+| Follow-up queue | `outreachFollowUps` |
+
+### Panel B — Missions Registry
+| Feature | Data |
+|---|---|
+| Nation-by-nation missions partners | `missionsRegistry` |
+| Prayer focus rotation | `missionsPrayerFocus` |
+| Partner updates | `missionsUpdates` |
+| Missions partners list | `missionsPartners` |
+
+---
+
+## Section 6 — The Family (member+)
+
+**Folder:** `the_family/` | **Script:** `the_family.js` | **Auth:** member (0)
+
+Consolidates `app.melchizedek` (biblical genealogy + member directory). Two distinct
+panels: the church's own family (member directory) and the biblical family (genealogy).
+
+### Panel A — Member Directory
+| Feature | Data |
+|---|---|
+| Member list with search and filter | `members` Firestore collection |
+| Member card: name, photo, contact, role, household | `members` 47-field schema |
+| Milestone view: baptisms, salvations, marriages, births | `members.milestones` |
+| Contact log: last contact, next follow-up | `members.lastContactDate`, `members.nextFollowUp` |
+| Household groupings | `households` (GAS fallback) |
+| Member status: active / inactive / visitor / archived | `members.membershipStatus` |
+
+### Panel B — Biblical Genealogy
+| Feature | Data |
+|---|---|
+| Biblical figure of the day | `Data/genealogy.js` |
+| Genealogy explorer: trace family lines | `Data/genealogy.js` |
+| Heritage records for church families | `members` + local data |
+
+---
+
+## Section 7 — The Shepherd (pastor+)
+
+**Folder:** `the_shepherd/` | **Script:** `the_shepherd.js` | **Auth:** pastor (4)
+
+The pastor's full command center. Absorbs `app.flockos` (all 47 SPA views),
+`app.flockdocs`, and the editorial/admin tools. This is the biggest section.
+
+### Panel A — Dashboard (was the_good_shepherd view)
+| Feature | Data |
+|---|---|
+| Flock summary: members, care cases open, decisions this month | `members`, `careCases`, `outreachContacts` |
+| Attendance KPIs | `attendance` (GAS fallback) |
+| Giving KPIs | `giving` (GAS fallback) |
+| Strategic goals + initiatives | `strategicGoals`, `strategicInitiatives`, `strategicKeyDates` |
+| Next steps / action items | `careCases.nextFollowUp`, `outreachFollowUps` |
+
+### Panel B — Pastoral Tools
+| Feature | Data |
+|---|---|
+| Shepherd's Mirror (pastor self-assessment) | `shepherdsMirror`, `Data/mirror.js` |
+| Heart check personal log | `heartCheck` |
+| Pastoral touches log | `touches` |
+| Confidential pastoral notes | `pastoralNotes` (pastor+ only, role 4) |
+| Reconciliation module | `the_call_to_forgive` view |
+| Seasonal liturgical calendar | `the_seasons` view |
+
+### Panel C — The Archive (was app.flockdocs)
+| Feature | Data |
+|---|---|
+| FlockDocs document library | `flockDocs` Firestore collection |
+| Reference library | `library` collection |
+| Book of Bible browser | `Data/books-of-the-bible.js` |
+| Strong's word study (Greek + Hebrew) | `Data/strongs-greek.js`, `Data/strongs-hebrew.js` |
+
+### Panel D — Editor's Desk (Herald controls)
+| Feature | Data |
+|---|---|
+| Herald section visibility toggles | `localStorage('flock_herald_config')` |
+| Content index overrides (devotional, nation, quiz, heart check) | `localStorage` |
+| Apply to Paper button | writes config, Herald reads on load |
+| Reset all to auto | clears config |
+
+### Panel E — Editorial Board (admin)
+| Feature | Data |
+|---|---|
+| Announcement board: publish/edit/archive | `flockNews` |
+| Prayer board: review + publish requests | `prayers` |
+| User management: view members, assign roles up to leader | `users` (admin only for role > pastor) |
+| Section visibility per-church | church config in Firestore |
+| Herald analytics | Firestore analytics |
+
+### Panel F — The Codex (as-built documentation)
+| Feature | Source |
+|---|---|
+| Overview: vision + architecture | authored HTML from docs 01, 03 |
+| Standards + structure | authored from docs 02, 04, 07 |
+| Data layer | authored from docs 09, 10, 11, 19 |
+| Scripts + views | authored from docs 05, 07, 08 |
+| Backend + automation | authored from docs 06, 14, 15 |
+| Build + operations | authored from docs 12, 16 |
+| Church setup + branding | authored from docs 17, 24, 25 |
+| Flows + policy | authored from docs 13, 23 |
+| Parity + reference | authored from docs 18, 20, 21, 22 |
+
+**Critical:** `Architechtural Docs/` is gitignored and private. Codex pages are
+authored HTML — never a live markdown renderer. Source MDs stay as MDs.
+
+### The 47 FlockOS SPA Views — All Preserved Inside The Shepherd
+
+The Shepherd section hosts the full FlockOS SPA in an embedded shell (or iframe).
+All 47 views remain accessible via the Pillars sidebar inside that shell.
+No views are deleted or demoted. They are organized under these Pillars groups:
+
+| Pillars Group | Views |
+|---|---|
+| Home | `the_good_shepherd` |
+| Word | `the_upper_room`, `the_growth` |
+| Comms | `the_fellowship`, `the_announcements`, `the_prayer_chain` |
+| Care | `the_fold`, `the_life`, `the_call_to_forgive`, `prayerful_action`, `the_seasons` |
+| Worship | `the_anatomy_of_worship`, `quarterly_worship`, `the_pentecost` + links to Sanctuary panels |
+| Mission | `the_great_commission`, `the_gospel_invitation`, `the_harvest`, `the_way`, `the_truth`, `fishing_for_men`, `fishing_for_data` |
+| Discipleship | all 16 `the_gospel_*` views |
+| Stewardship | `the_gift_drift`, `the_weavers_plan` |
+| Legacy | `the_generations` |
+| Build (Admin) | `the_wall`, `bezalel`, `content-admin`, `the_invitation`, `software_deployment_referral`, `learn_more`, `about_flockos` |
+
+---
+
+## Section 8 — The Calendar (member+)
+
+**Folder:** `the_calendar/` | **Script:** `the_calendar.js` | **Auth:** member (0)
+
+New section. Not in New_Covenant today — data collections are live, section is not built.
+
+| Feature | Data |
+|---|---|
+| Upcoming events list | `events` Firestore collection |
+| Calendar grid view (month) | `calendarEvents` |
+| Event detail: title, date, time, location, description | `events` |
+| RSVP support | `events.rsvp` GAS route |
+| Birthdays this week (from member directory) | `members.dob` |
+| Public events visible without auth | `events.public` flag |
+| Service schedule: recurring Sunday services | `calendarEvents` recurring type |
+
+---
+
+## Section 9 — The Weavers (leader+)
+
+**Folder:** `the_weavers/` | **Script:** `the_weavers.js` | **Auth:** leader (3)
+
+New section. Volunteer teams + small groups. Data collections are live, section not built.
+
+| Feature | Data |
+|---|---|
+| Volunteer team roster | `volunteers` Firestore collection |
+| Open positions / needs | `volunteers.openPositions` |
+| Schedule volunteers | `volunteers.schedule` GAS route |
+| Swap volunteers | `volunteers.swap` GAS route |
+| Small group list | `groups` collection |
+| Group detail: members, leader, meeting time | `groups.get` |
+| Add / remove group members | `groups.addMember`, `groups.removeMember` |
+| Ministry teams | `ministries` (GAS fallback) |
+
+---
+
+## Page Layout — The Broadsheet Grid
+
+Every section page uses a responsive 3-column card grid. Cards are the unit of content.
+
+```
+Desktop / Wide Tablet (>900px)
+┌──────────┬──────────┬──────────┐
+│  Col 1   │  Col 2   │  Col 3   │
+│  card    │  card    │  card    │
+│  card    │  card    │  card    │
+│  card    │          │  card    │
+└──────────┴──────────┴──────────┘
+
+Narrow Tablet (600–900px)
+┌──────────┬──────────┐
+│  Col 1   │  Col 2   │
+│  card    │  card    │
+│  card    │  card    │
+└──────────┴──────────┘
+
+Mobile (<600px)
+┌──────────┐
+│  Col 1   │
+│  card    │
+│  card    │
+│  card    │
+└──────────┘
+```
+
+### CSS Implementation (in `the_broadsheet.css`)
+
+```css
+.broadsheet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  padding: 1rem max(1rem, var(--safe-left));
+}
+
+@media (max-width: 900px) {
+  .broadsheet-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .broadsheet-grid { grid-template-columns: 1fr; }
+}
+```
+
+### Card rules
+- Cards are `<article>` elements with class `.broadsheet-card`
+- A card can span 2 columns with `.broadsheet-card--wide` (e.g. a sermon builder)
+- A card can span all 3 columns with `.broadsheet-card--full` (e.g. a map or data table)
+- **No cards are hidden at any breakpoint.** All cards stack vertically on mobile — every
+  card is visible, just reordered into a single column. Nothing disappears.
+- Cards never span columns on mobile — all cards are full-width at `<600px`
+- Card background: `--paper-card` (`#ffffff`), border: `1px solid var(--rule)`
+- Card header: 3px top border in `--sec-color` for the active section
+- Card padding: `1.25rem`
+- Card headline: `'Lora'`, `1.125rem`, `--ink`
+- Card body: `'Plus Jakarta Sans'`, `0.9375rem`, `--ink-muted`
+
+---
+
+## Right Drawer (popout) — global component
+
+Every detail view, edit form, record detail, or expanded panel that would
+otherwise be a modal **must** use the right drawer pattern. No left drawers.
+No center modals (exception: simple single-action confirmation dialogs only).
+
+### Behaviour
+- Drawer slides in from the **right edge** of the viewport
+- Width: `min(480px, 100vw)` — full-width on small phones, capped at 480px
+- Backdrop: semi-transparent `rgba(0,0,0,0.4)` overlay behind drawer
+- Opening: CSS `transform: translateX(100%)` → `translateX(0)`, `transition: 0.25s ease`
+- Closing: reverse transform; backdrop click also closes
+- Scroll: drawer interior scrolls independently (`overflow-y: auto`)
+- z-index: `1000` (above all page content, below any toast/alert layer)
+
+### Close button
+- **Always** an `✕` button rendered **inside the drawer**, pinned to the top-right corner
+- Position: `position: sticky; top: 0;` within the drawer header row so it stays
+  visible as the user scrolls the drawer content
+- Size: minimum **44×44px** tap target
+- Icon: `✕` (UTF-8 U+2715) or an SVG close icon — never an `X` letter
+- Accessible: `aria-label="Close"`, `type="button"`
+- Style: `background: transparent; border: none; color: var(--ink); font-size: 1.25rem;`
+- The close button must remain tappable even when the drawer content is scrolled
+
+### HTML skeleton
 ```html
-<!-- Add to news_editor.html BEFORE any render logic -->
-<script src="../Scripts/firm_foundation.js"></script>
-<script>
-  (function() {
-    // Theme + font scale restore
-    try {
-      var t = localStorage.getItem('flock_theme') || 'america';
-      document.documentElement.setAttribute('data-theme', t);
-      var s = parseFloat(localStorage.getItem('flock_font_scale') || '1');
-      document.documentElement.style.setProperty('--fn-scale', s);
-    } catch (_) {}
-    // Auth gate — pastor+ required
-    if (typeof Nehemiah !== 'undefined') {
-      var sess = Nehemiah.guard();   // redirects if no session
-      if (sess && !Nehemiah.hasRole('pastor')) {
-        window.location.replace('../index.html');
-      }
-    }
-  })();
-</script>
+<div class="drawer-backdrop" aria-hidden="true"></div>
+<aside class="right-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+  <header class="drawer-header">
+    <h2 id="drawer-title" class="drawer-title"><!-- Title injected by JS --></h2>
+    <button class="drawer-close" type="button" aria-label="Close">&#x2715;</button>
+  </header>
+  <div class="drawer-body">
+    <!-- Content injected by JS -->
+  </div>
+</aside>
 ```
 
-**2. Auth Header Bar**
-Add a slim header strip at the top of `news_editor.html` showing:
-- "The Flock Herald — Editor's Desk"
-- User's displayName + role badge (e.g., "Pastor Greg · pastor")
-- Logout link
-
-**3. iOS/Samsung Safe Area**
-`news_editor.html` is accessed from iOS/Android. The sidebar header and the iframe viewport must both account for `env(safe-area-inset-top)` and `env(safe-area-inset-bottom)`.
-
-**4. Section Coverage — Expand the Editor's Controls**
-The current editor controls 5 sections. The target is full newspaper control:
-
-| Section § | Editor Control | Type |
-|---|---|---|
-| §1 Devotional | Date override | Text input (auto by date) |
-| §1b Scripture | Translation select | Dropdown |
-| §1c Heart Check | Question index | Number input |
-| §2 Missions Report | Country index (0–237) | Number input |
-| §3 Theology Corner | Topic index (0–26) | Number input |
-| §4 Apologetics | Topic index | Number input |
-| §5 Discipleship | Module select | Dropdown |
-| §6 Prayer Prompt | Date or custom text | Text input |
-| §7 Announcements | Visibility toggle | Toggle |
-| §8 Gospel Invitation | Style select | Dropdown |
-| §9 Church Header | Date banner text | Text input |
-| All Sections | Show/hide visibility | Toggle eye icon (existing) |
-| All Sections | Reset to auto | Button |
-
-**5. Save/Publish State**
-The editor saves its configuration to `localStorage('flock_herald_config')`. The Herald reads this on load and applies overrides. Changes are not published until "Apply to Paper" is clicked. A "Reset All" button restores auto behavior.
-
----
-
-## § B — Permission Map
-
-### Role Levels (defined in `firm_foundation.js`)
+### CSS in `the_broadsheet.css`
+```css
+.drawer-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+}
+.right-drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: min(480px, 100vw);
+  background: var(--bg-raised);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.18);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  z-index: 1000;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.right-drawer.is-open {
+  transform: translateX(0);
+}
+.right-drawer.is-open ~ .drawer-backdrop {
+  display: block;
+}
+.drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0;
+  background: var(--bg-raised);
+  z-index: 1;
+}
+.drawer-title {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1.125rem;
+  color: var(--ink);
+  margin: 0;
+}
+.drawer-close {
+  min-width: 44px; min-height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: var(--ink); font-size: 1.25rem;
+  cursor: pointer; border-radius: 4px;
+  margin-left: auto;
+}
+.drawer-close:hover { background: var(--bg-sunken); }
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
 ```
-readonly:  0  — authenticated member, view-only
-volunteer: 1  — volunteers
-care:      2  — care team / deacons
-leader:    3  — ministry leaders, treasurers
-pastor:    4  — pastor and above
-admin:     5  — technical admin (full access)
+
+### JS pattern (attach once in `the_gates.js` or section script)
+```js
+function openDrawer(titleText, contentHTML) {
+  document.getElementById('drawer-title').textContent = titleText;
+  document.querySelector('.drawer-body').innerHTML = contentHTML;
+  document.querySelector('.right-drawer').classList.add('is-open');
+}
+function closeDrawer() {
+  document.querySelector('.right-drawer').classList.remove('is-open');
+}
+document.querySelector('.drawer-close').addEventListener('click', closeDrawer);
+document.querySelector('.drawer-backdrop').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 ```
 
-### Tier 1 Section Access
-| Section | Access Rule | Behavior if denied |
-|---|---|---|
-| The Flock Herald | Public (no auth) | Loads for everyone |
-| The Path (GROW) | Public (no auth) | Loads for everyone |
-| The Invitation | Public (no auth) | Loads for everyone |
-| The Wellspring | Public (no auth) | Loads for everyone |
-| The Letters Column | `readonly` (authenticated member) | Redirect to sign-in |
-| The Bulletin Board | `readonly` (authenticated member) | Redirect to sign-in |
-| The Family Tree | `readonly` (authenticated member) | Redirect to sign-in |
-| The Pulpit | `leader` | Show soft "access denied" page |
-| The Cantors' Corner | `leader` | Show soft "access denied" page |
-| The Stage | `leader` | Show soft "access denied" page |
-| The Shepherd's Desk | `pastor` | Redirect to sign-in |
-| The Archive | `pastor` | Show soft "access denied" page |
-| The Mission Report | `pastor` | Show soft "access denied" page |
-| The Editorial Board | `pastor` | Redirect to sign-in |
-| The Editor's Desk | `pastor` | Redirect to sign-in |
+### What must use the right drawer
+- Member detail view (The Family)
+- Care case detail / edit form (The Flock)
+- Prayer request detail / respond form (The Flock)
+- Song detail / edit (The Sanctuary)
+- Sermon notes editor (The Sanctuary)
+- Outreach contact detail (The Mission)
+- Event detail / edit (The Calendar)
+- Volunteer detail / edit (The Weavers)
+- Group detail / edit (The Weavers)
+- Any "Add new ___" form that requires more than 2 fields
+- FlockOS SPA views launched from The Shepherd (embed inside drawer-body)
 
-### Section Bar Visibility
-The section bar renders all tabs by default. On auth resolution (`whoAmI()` completes):
-- Tabs the user cannot access are **hidden** (not greyed — removed from DOM) on the client side
-- Public tabs always visible
-- Member tabs visible if `Nehemiah.isAuthenticated()`
-- Leader+ tabs visible if `Nehemiah.hasRole('leader')`
-- Pastor+ tabs visible if `Nehemiah.hasRole('pastor')`
-- "The Editorial Board" and "The Editor's Desk" are never in the default section bar — they are accessed via a gear/settings icon in the Herald masthead, visible only to pastor+
-
-### Tier 2 In-App View Access (inside FlockOS)
-The Shepherd's Desk already requires `pastor` to access the app itself. Within it, individual view-level role enforcement is handled by the existing `Nehemiah.canAccess()` and `Nehemiah.requireRole()` calls in each view's `index.js`. This plan does not change individual view gates — it only ensures the Pillars sidebar hides items below the user's role level visually.
+### Playwright check (per section)
+- Drawer opens when expected trigger is clicked
+- Close `✕` button is visible and has ≥ 44px tap target
+- Backdrop click closes drawer
+- Escape key closes drawer
+- Drawer content scrolls independently without moving the page behind it
+- iOS safe-area padding applied — content not clipped under notch
 
 ---
 
-## § C — The Wellspring: No Functionality Lost
+## CSS Architecture
 
-### What the Wellspring Does
-`app.wellspring/app.wellspring.html` is a fully offline-capable tool. It lets churches with no internet run FlockOS entirely from local Excel files. It has:
-- A dark navy + gold design (`--ws-navy-bg`, `--ws-gold`) — this is intentional and correct
-- Its own inline `<style>` block with all its own CSS variables
-- No dependency on `new_covenant.css` beyond the import line
-- Offline file-import logic that must not be disturbed
-
-### What Changes
-Only cosmetic. The Wellspring is treated as an exception to the light/newsprint palette:
-- The dark navy design stays exactly as-is
-- `sections/wellspring.css` is a **thin file** that only adds:
-  - The section bar (styled in the Wellspring's own dark palette — navy bar, gold chips)
-  - The `--fn-scale`-based font-size root
-  - `env(safe-area-inset-*)` padding on the top bar and bottom-most element
-- No existing Wellspring CSS variables, layout, or logic are touched
-- The section bar's background on the Wellspring page is `--ws-navy-bg` (matches) — it will not look like newsprint
-
-### Wellspring Isolation Rule
-> All changes to `app.wellspring.html` must be additive only. Do not remove, replace, or reorganize any existing CSS block, JS import, or HTML structure. Add the section bar before the existing first child of `<body>` and add the section CSS link after the existing stylesheet links.
-
----
-
-## § E — Project Structure: `Newspaper/` as a Standalone Product
-
-### Root Location
-`/Users/greg.granger/Desktop/FlockOS/Software/Newspaper/`
-
-This is a **brand-new product** — not a modification of New_Covenant. It lives as a sibling alongside New_Covenant. New_Covenant continues as the backend SPA platform; The Newspaper is the new editorial face of FlockOS. The Shepherd's Desk section inside the paper links into the existing New_Covenant FlockOS SPA rather than duplicating its 47 views.
-
----
-
-### Naming Convention
-
-**Folders** — named clearly so any pastor, developer, or church administrator understands the structure at a glance. Industry-standard where applicable.
-
-**Files** — biblical names following and extending the New_Covenant lexicon. These names make the purpose unmistakable to those who know the system, while presenting an unfamiliar surface to anyone probing the codebase without context.
-
-**UI display names** — always clear English newspaper section names (The Flock Herald, The Pulpit, etc.). The biblical file names are infrastructure; the display names are what pastors and members see.
-
----
-
-### Complete Folder Structure
+### One CSS per section — additive only
 
 ```
 Newspaper/
-  index.html                        ← The Flock Herald — front page of the paper
-  manifest.json                     ← PWA manifest
-  sw.js                             ← Service worker
-
-  Scripts/
-    the_living_water.js             ← Firebase config           [COPY: New_Covenant/the_living_water.js]
-    firm_foundation.js              ← Nehemiah auth system       [COPY: New_Covenant/Scripts/firm_foundation.js]
-    the_adornment.js                ← Theme + font scale engine  [COPY+ADAPT: New_Covenant/Scripts/the_adornment.js]
-    the_gates.js                    ← Section nav bar            [NEW — Neh 3: gates organized city-section life]
-    the_proclamation.js             ← Herald content engine      [NEW — Acts 2:14: heralds proclaim the word]
-    the_standard.js                 ← Masthead component         [NEW — Isa 59:19: lift up a standard]
-    the_cornerstone.js              ← Codex content pages        [NEW — Ps 118:22: cornerstone of knowledge]
-    the_elders.js                   ← Editorial Board admin      [NEW — Acts 15: council of elders governed the church]
-    the_cistern.js                  ← Client-side cache/storage  [COPY: New_Covenant/Scripts/the_cistern.js]
-    the_witness.js                  ← Analytics / event logging  [COPY: New_Covenant/Scripts/the_witness.js]
-
-    the_scribes/                    ← SPA router (Shepherd's Desk only)
-      index.js                      [COPY: New_Covenant/Scripts/the_scribes/index.js]
-      the_chronicle.js              [COPY: New_Covenant/Scripts/the_scribes/the_chronicle.js]
-      the_path.js                   [COPY: New_Covenant/Scripts/the_scribes/the_path.js]
-
-    the_priesthood/                 ← Auth token helpers
-      index.js                      [COPY: New_Covenant/Scripts/the_priesthood/index.js]
-      the_anointing.js              [COPY: New_Covenant/Scripts/the_priesthood/the_anointing.js]
-      the_breastplate.js            [COPY: New_Covenant/Scripts/the_priesthood/the_breastplate.js]
-      the_garments.js               [COPY: New_Covenant/Scripts/the_priesthood/the_garments.js]
-
   Styles/
-    the_broadsheet.css              ← Newspaper design system    [NEW — replaces new_covenant.css for this product]
+    the_broadsheet.css        ← shared foundation: paper/ink tokens, reset, nav bar, grid
     sections/
-      herald.css                    ← The Herald         — Altar Gold signature
-      tabernacle.css                ← Shepherd's Desk    — Church Wine signature
-      pulpit.css                    ← The Pulpit         — Bishop's Purple signature
-      levites.css                   ← Cantors' Corner    — Cedar Green signature
-      stage.css                     ← The Stage          — Vesper Blue signature (dark)
-      epistles.css                  ← Letters Column     — Inkwell Blue signature
-      straight_path.css             ← The Path           — Pilgrim Brown signature
-      great_commission.css          ← The Invitation     — Altar Gold signature
-      living_water.css              ← The Wellspring     — dark navy (additive only)
-      scroll_room.css               ← The Archive        — Ink & Leather signature
-      gatehouse.css                 ← Bulletin Board     — Crimson Notice signature
-      genealogies.css               ← Family Tree        — Cedar & Stone signature
-      harvest.css                   ← Mission Report     — Field Dispatch signature
-      cornerstone.css               ← The Codex          — Blueprint Slate signature
-      editors_desk.css              ← Editor's Desk      — Newsroom dark palette
-      council.css                   ← Editorial Board    — Newsroom dark palette
-
-  Sections/
-    herald/                         ← Display: "The Flock Herald"  [front page]
-      index.html
-      manifest.json
-
-    tabernacle/                     ← Display: "The Shepherd's Desk"  [pastor+ | embeds New_Covenant FlockOS SPA]
-      index.html
-      manifest.json
-
-    pulpit/                         ← Display: "The Pulpit"  [leader+ | sermons / FEED]
-      index.html
-      manifest.json
-
-    levites/                        ← Display: "The Cantors' Corner"  [leader+ | worship music / FlockStand]
-      index.html
-      manifest.json
-
-    stage/                          ← Display: "The Stage"  [leader+ | FlockShow]
-      index.html
-      manifest.json
-
-    epistles/                       ← Display: "The Letters Column"  [readonly+ | FlockChat]
-      index.html
-      manifest.json
-
-    straight_path/                  ← Display: "The Path"  [public | GROW discipleship]
-      index.html
-      manifest.json
-
-    great_commission/               ← Display: "The Invitation"  [public | outreach]
-      index.html
-      manifest.json
-
-    living_water/                   ← Display: "The Wellspring"  [public | offline data engine]
-      index.html
-      manifest.json
-
-    scroll_room/                    ← Display: "The Archive"  [pastor+ | FlockDocs]
-      index.html
-      manifest.json
-
-    gatehouse/                      ← Display: "The Bulletin Board"  [readonly+ | FlockShamar]
-      index.html
-      manifest.json
-
-    genealogies/                    ← Display: "The Family Tree"  [readonly+ | Melchizedek]
-      index.html
-      manifest.json
-
-    harvest/                        ← Display: "The Mission Report"  [pastor+ | Multiply]
-      index.html
-      manifest.json
-
-    cornerstone/                    ← Display: "The Codex"  [pastor+ | as-built documentation]
-      index.html
-      manifest.json
-
-    editors_desk/                   ← Display: "The Editor's Desk"  [pastor+ | Herald controls]
-      index.html
-      manifest.json
-
-    council/                        ← Display: "The Editorial Board"  [pastor+ | admin]
-      index.html
-      manifest.json
-
-  Images/
-  Data/
+      herald.css              ← --sec-color: var(--gold)
+      the_way.css             ← --sec-color: var(--accent)
+      the_sanctuary.css       ← --sec-color: var(--lilac)
+      the_flock.css           ← --sec-color: var(--mint)
+      the_mission.css         ← --sec-color: var(--peach)
+      the_family.css          ← --sec-color: var(--sky)
+      the_shepherd.css        ← --sec-color: var(--warning)
+      the_calendar.css        ← --sec-color: var(--success)
+      the_weavers.css         ← --sec-color: var(--rose)
 ```
 
----
+### What `the_broadsheet.css` contains
+- All paper/ink tokens (sourced from `new_covenant.css` values)
+- CSS reset
+- `.sec-nav-bar` / `.sec-nav-tab` component
+- `--fn-scale` + `html { font-size: calc(var(--fn-scale) * 100%); }`
+- Safe area variables: `--safe-top/bottom/left/right`
+- Shared layout: masthead, page wrapper, article column, 3-col grid
+- Font imports: `'Lora'`, `'Plus Jakarta Sans'`
 
-### Section Folder → Display Name → Biblical Rationale
+### What each `sections/*.css` contains
+- `--sec-color` mapped to the NC token for that section
+- `--sec-heading-font: 'Lora', Georgia, serif`
+- `--sec-body-font: 'Plus Jakarta Sans', system-ui, sans-serif`
+- Section masthead: 3px top stripe using `--sec-color`
+- Any layout specific to that section's panels
+- **Nothing** that already exists in `the_broadsheet.css`
 
-| Folder | Display Name | Biblical Basis |
-|---|---|---|
-| `herald/` | The Flock Herald | Heralds proclaimed the king's word publicly |
-| `tabernacle/` | The Shepherd's Desk | The tabernacle was where God met with the high priest — where the pastor works |
-| `pulpit/` | The Pulpit | Neh 8:4 — Ezra stood on the wooden pulpit to proclaim the Word |
-| `levites/` | The Cantors' Corner | 1 Chr 15 — the Levites led all worship music in the temple |
-| `stage/` | The Stage | Clear projection/performance tool; no misdirection needed |
-| `epistles/` | The Letters Column | The epistles are the letters of the church — Paul's correspondence |
-| `straight_path/` | The Path | Matt 7:14 — "narrow is the way"; Prov 4:11 — "I guide you in the straight path" |
-| `great_commission/` | The Invitation | Matt 28:19 — the Great Commission is the invitation to all |
-| `living_water/` | The Wellspring | John 4:14 — "the water I give will become a spring of living water" |
-| `scroll_room/` | The Archive | The scroll room = the ancient archive; Dead Sea Scrolls |
-| `gatehouse/` | The Bulletin Board | Ruth 4:1, Neh 8:1 — the city gate was where public announcements were made |
-| `genealogies/` | The Family Tree | Gen 5, 1 Chr 1–9 — the Bible's genealogy records |
-| `harvest/` | The Mission Report | John 4:35 — "the fields are already ripe for harvest" |
-| `cornerstone/` | The Codex | Ps 118:22 — the cornerstone = the foundational reference |
-| `editors_desk/` | The Editor's Desk | Clear staff-tool name; no obfuscation needed at this level |
-| `council/` | The Editorial Board | Acts 15 — the council of elders governed the church |
+### Rule
+> A section CSS file may only define CSS that does not exist in `the_broadsheet.css`.
+> Never override shared tokens directly — use `--sec-*` scoped variables.
 
 ---
 
-### New Script Files — Biblical Name Rationale
+## Section Nav Bar
 
-| File | Role | Biblical Basis |
-|---|---|---|
-| `the_gates.js` | Section navigation bar | Neh 3 — Nehemiah rebuilt the city gates; each gate organized a section of community life. The nav bar is the gates between sections. |
-| `the_proclamation.js` | Herald content engine | Acts 2:14 — "Peter stood up and proclaimed." The herald's engine proclaims the day's content. |
-| `the_standard.js` | Masthead component | Isa 59:19 — "When the enemy comes in like a flood, the Spirit of the Lord will lift up a standard." The masthead is the paper's standard/banner. |
-| `the_cornerstone.js` | Codex content pages | Ps 118:22 / Eph 2:20 — Christ as the cornerstone of all things. The Codex is the foundational reference document. |
-| `the_elders.js` | Editorial Board admin | Acts 15:6 — "The apostles and elders met to consider this question." The Editorial Board is the council of elders. |
+Persistent horizontal strip below every section masthead.
 
----
-
-### JS Files to Copy from New_Covenant
-
-| Copy From | Copy To | Notes |
-|---|---|---|
-| `New_Covenant/the_living_water.js` | `Newspaper/Scripts/the_living_water.js` | Firebase config — adapt project IDs if needed |
-| `New_Covenant/Scripts/firm_foundation.js` | `Newspaper/Scripts/firm_foundation.js` | Nehemiah auth — copy unchanged |
-| `New_Covenant/Scripts/the_adornment.js` | `Newspaper/Scripts/the_adornment.js` | Theme + font scale — update any path refs |
-| `New_Covenant/Scripts/the_cistern.js` | `Newspaper/Scripts/the_cistern.js` | Client storage — copy unchanged |
-| `New_Covenant/Scripts/the_witness.js` | `Newspaper/Scripts/the_witness.js` | Analytics — copy unchanged |
-| `New_Covenant/Scripts/the_scribes/` | `Newspaper/Scripts/the_scribes/` | Router — copy all 4 files unchanged |
-| `New_Covenant/Scripts/the_priesthood/` | `Newspaper/Scripts/the_priesthood/` | Auth helpers — copy all 4 files unchanged |
-
----
-
-### The Shepherd's Desk — Embed, Not Duplicate
-
-The FlockOS SPA (47 registered views, deep Firestore) lives in New_Covenant and is not recreated inside Newspaper. `Sections/tabernacle/index.html` is a **thin authenticated shell** that:
-1. Runs `firm_foundation.js` → redirects to login if below `pastor`
-2. Renders the section bar at the top
-3. Loads the New_Covenant FlockOS SPA in an `<iframe>` (or full redirect, TBD)
-
-This keeps the Newspaper lean and the FlockOS SPA maintained in one place.
-
----
-
-### `the_broadsheet.css` — New Design System
-
-`Newspaper/Styles/the_broadsheet.css` is the Newspaper's equivalent of `new_covenant.css`. It contains:
-- All palette tokens from Section 5 (paper, ink, gold, section signatures)
-- Reset + base typography
-- The `.sec-nav-bar` / `.sec-nav-tab` component
-- `--fn-scale` + responsive font-size
-- `--safe-top/bottom/left/right` safe area variables
-- Shared layout primitives (masthead, page wrapper, article column, pull-quote)
-- **Does NOT** contain FlockOS-specific styles (Pillars sidebar, card-grid, badge system) — those remain in `new_covenant.css`
-
----
-
-## § D — The Codex (As-Built Documentation Section)
-
-### What It Is
-A dedicated Tier 1 section of the paper that presents the FlockOS as-built architectural documentation as clean, readable, pastor-facing reference pages. Blueprint Slate signature. Dark, authoritative, reference-shelf aesthetic.
-
-### Critical Constraints
-- **`Architechtural Docs/` is gitignored and private.** Those markdown files are the source material — they are never committed, never deployed, never fetched by the app.
-- **The Codex pages are authored HTML.** The content from the as-built docs is adapted and written directly into `app.flockcodex/` HTML/JS files. Those files ARE tracked in git and deployed via B-Build.
-- **The MDs stay as MDs.** They are the human-readable reference and the writing source. The app pages are the newspaper-formatted presentation layer. They are separate things.
-- **Pastor+ auth gate** (`Nehemiah.guard()` minimum role `pastor`). The section bar tab is hidden for anyone below `pastor`.
-
-### Structure — 9 Authored Pages
-
-| Page | Content drawn from | As-Built Docs |
-|---|---|---|
-| **Overview** | Vision, architecture | 01, 03 |
-| **Standards & Structure** | Dev standards, file structure, script inventory | 02, 04, 07 |
-| **Data Layer** | Firestore schema, data layer inventory, Firestore rules | 09, 10, 11, 19 |
-| **Scripts & Views** | App dependency map, view inventory, script inventory | 05, 07, 08 |
-| **Backend & Automation** | GAS backend, automation scripts, Shepherds automation | 06, 14, 15 |
-| **Build & Operations** | Build & ops guide, debugging map | 12, 16 |
-| **Church Setup & Branding** | Branding registry, new church setup guide, seed database | 17, 24, 25 |
-| **Flows & Policy** | Flow policy, A Pastor's Guide | 13, 23 |
-| **Parity & Reference** | Parity map, subfolder reference, doc index | 18, 20, 21, 22 |
-
-### Layout
-- **Left sidebar:** Table of contents — all 9 pages linked. Active page highlighted in Blueprint Slate.
-- **Main content:** Full-width article column. Section headers use `--sec-heading-font` (Playfair Display). Body in `'IM Fell English'` on newsprint.
-- **Print view:** `@media print` in `sections/codex.css` — clean white + black ink, hides nav and section bar. Suitable for printing reference pages.
-- **No search required for initial build.** Add as Phase 8+ enhancement.
-
-### What The Codex Is NOT
-- Not a markdown renderer — the content is authored HTML, not a live document viewer
-- Not connected to Firebase Storage — no fetching, no upload scripts
-- Not a replacement for `Architechtural Docs/` — the MDs remain the private source of truth
-- Not auto-generated at build time — human-authored, updated manually when the as-built docs change
-
----
-
-## 3. The Front Page — What Changes & What Stays
-
-The main `New_Covenant/index.html` is a full-screen iframe of `app.flocknews/flocknews.html`. **This stays.** The Herald is the correct front page.
-
-### Changes to the Front Page
-1. **Section Bar replaces App Switcher** — The "Select an App" dropdown becomes a horizontal section strip below the masthead. Each chip is a Tier 1 section. Mobile: horizontally scrollable. Desktop: full row, overflow to "More ▾" dropdown.
-2. **Masthead breadcrumb** — When inside any non-Herald Tier 1 page, the section header displays `The Flock Herald · [Section Name]` as an editorial byline.
-3. **Light by default** — Herald and all sections are newsprint (cream + dark ink) by default. The Stage and The Wellspring are the only justified dark exceptions.
-
----
-
-## 4. iOS / Samsung Safe Area — Implementation Standard
-
-Every single HTML page in this project must implement safe area support. This is not optional. Devices affected:
-
-| Device | Inset | Value (approx) |
-|---|---|---|
-| iPhone X / XS / 11 Pro / 12 Mini | Top notch | 44px (`env(safe-area-inset-top)`) |
-| iPhone 12 / 13 / 14 | Top notch | 47px |
-| iPhone 14 Pro / 15 Pro / 15 Pro Max | Dynamic Island | 59px |
-| iPhone SE (3rd gen) | None (home button) | 0px — `env()` falls back to 0 |
-| All Face ID iPhones | Home indicator | 34px (`env(safe-area-inset-bottom)`) |
-| Samsung Galaxy S24 / S24+ | Punch-hole camera | ~24px |
-| Samsung Galaxy S24 Ultra | Punch-hole camera | ~24px |
-| Samsung Galaxy Fold (outer screen) | Various | ~30px |
-
-### Required `<meta>` tag (already in most pages)
-```html
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 ```
-`viewport-fit=cover` is the key — without it, `env(safe-area-inset-*)` returns 0.
-
-### CSS Pattern — apply to every section header, every masthead, every bottom bar
-```css
-/* In new_covenant.css — added to :root */
-:root {
-  --safe-top:    env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left:   env(safe-area-inset-left, 0px);
-  --safe-right:  env(safe-area-inset-right, 0px);
-}
-
-/* Section bar — sits below masthead, above content */
-.sec-nav-bar {
-  /* existing layout styles */
-  padding-left:  max(12px, var(--safe-left));
-  padding-right: max(12px, var(--safe-right));
-}
-
-/* Page masthead (Herald, section headers) */
-.fn-back-bar,
-.sec-header {
-  padding-top: max(8px, var(--safe-top));
-}
-
-/* Any fixed/sticky bottom element */
-.sec-bottom-bar,
-.fn-footer {
-  padding-bottom: max(16px, var(--safe-bottom));
-}
+[ Herald ]  [ The Way ]  [ The Sanctuary ]  [ The Flock ]  [ The Mission ]  [ ··· More ]
 ```
 
-### Wellspring Exception
-The Wellspring's top bar already uses `padding: max(8px, env(safe-area-inset-top, 8px))` in some places. Verify this covers the Dynamic Island before considering it done.
-
-### Herald iframe (the main `index.html`)
-The outer `index.html` uses a full-screen iframe. The iframe's `flocknews.html` must apply safe area insets itself — the outer shell does not pass them through. This is already the correct behavior since each page handles its own safe area.
-
----
-
-## 5. Color Palette — "The Broadsheet"
-
-**Concept:** The warmth of old Bible paper. Iron gall ink. Altar gold catching the light. The feeling of reading something that matters.
+- **Mobile (<600px):** horizontally scrollable, icon + short label
+- **Tablet (600–1024px):** full names, scrollable
+- **Desktop (>1024px):** all visible, overflow → "More ▾" dropdown
+- Active tab: `--sec-color` background, white label text
+- Inactive tab: `--ink-muted` label, transparent background
+- Auth-aware: tabs hidden (not greyed) if user lacks the required role
+- Pastor+ sees gear icon → Editor's Desk + Editorial Board links
 
 ---
 
-### Mode 1 — The Paper (newsprint — default for all sections)
+## Connectivity Model
 
-```css
-/* ── Paper surfaces ─────────────────────────────────────────── */
---paper:          #faf6ed;   /* Old Ivory — light, airy newsprint (slightly lighter than cream today) */
---paper-white:    #fefcf7;   /* Cream letter paper — lifted surfaces, cards */
---paper-tint:     #ede8d8;   /* Aged parchment — column fills, sunken areas */
---paper-dark:     #ddd4be;   /* Deep parchment — column rule fills, borders */
+Every section follows this data resolution order:
 
-/* ── Ink ────────────────────────────────────────────────────── */
---ink:            #1a100a;   /* Iron gall — near-black with a warm brown undertone */
---ink-mid:        #3a2510;   /* Deep sepia — subheads, secondary headlines */
---ink-dim:        #6a5038;   /* Faded ink — bylines, labels, small-caps metadata */
---ink-faint:      #9a8060;   /* Ghost ink — timestamps, tertiary metadata */
-
-/* ── Gold ───────────────────────────────────────────────────── */
---gold:           #a07818;   /* Altar gold — rich, dark, dignified */
---gold-bright:    #c89420;   /* Bright gold — hover, active, interactive states */
---gold-pale:      #e8cc80;   /* Pale gold — disabled states, very subtle fills */
-
-/* ── Rules (column dividers, borders) ─────────────────────── */
---rule:           #3a2510;   /* Sepia rule — hard column dividers (not harsh black) */
---rule-soft:      #c4b090;   /* Soft rule — section separators */
---rule-faint:     #ddd0b8;   /* Ghost rule — visual structure, barely visible */
-
-/* ── Accent ─────────────────────────────────────────────────── */
---burgundy:       #5c1928;   /* Church wine — callout boxes, special notices */
---navy:           #0c1445;   /* Vesper blue — back button badge (already existing) */
+```
+1. window.UpperRoom.isReady()?
+   YES → read from Firestore live collection
+   NO  → fall back to GAS endpoint via the_living_water_adapter
+2. localStorage as tertiary fallback (offline / no GAS URL configured)
+3. Static local Data/*.js as final fallback (always works, no network needed)
+4. Never block render — show skeleton, swap in live data async
 ```
 
-**Typography:**
-- Masthead: `'Pirata One'`
-- Section headlines: `'Playfair Display'`
-- Body text: `'IM Fell English'`
-- Labels / bylines: `'Playfair Display'` in small-caps
+Firestore paths are **top-level collections** (not nested under `/churches/{id}/`).
+Confirmed live against `flockos-notify`: `careCases`, `prayers`, `members`,
+`sermons`, `songs`, `servicePlans`, `outreachCampaigns`, `events`, `calendarEvents`,
+`volunteers`, `groups`, `strategicGoals`, `flockDocs`, `library`, `flockNews`.
 
 ---
 
-### Mode 2 — The Newsroom (Editor's Desk + Editorial Board)
+## Font Scale
 
-Dark. A lamp-lit editorial room late at night. Not flat black — warm charcoal with brown underneath.
+Two-layer system — device accessibility preference is the foundation; in-app
+scale picker sits on top. Both must work independently and together.
 
-```css
---ed-bg:          #120f08;   /* Printer's black — warmer than pure black */
---ed-panel:       #1c1710;   /* Elevated panel surface */
---ed-panel-2:     #252018;   /* Section sub-headers within sidebar */
---ed-rule:        #2e2a1c;   /* Panel dividers */
---ed-rule-hi:     #4a4432;   /* Highlighted rule lines */
---ed-gold:        #c9960a;   /* Editorial gold — punchy on dark */
---ed-gold-hi:     #e2ab18;   /* Hover state gold */
---ed-text:        #e8ddc8;   /* Warm off-white body text */
---ed-text-dim:    #8a7858;   /* Muted — dimmed text, placeholders */
---ed-ink:         #faf6ed;   /* Brightest text (matches --paper) */
-```
+### Layer 1 — Device / OS text-size (automatic, always respected)
+The user's device OS (iOS Large Text, Android Font Size, browser zoom, Windows
+Display settings) sets the browser's default `rem` base. The app **never**
+overrrides this. Implementation:
+- `html { font-size: calc(var(--fn-scale) * 100%); }` — the `100%` inherits the
+  browser default, which already includes the OS preference.
+- `<meta name="viewport" content="..., maximum-scale=5.0">` — `maximum-scale=5.0`
+  (never `1.0`) so the user can still pinch-zoom if they need to.
+- `-webkit-text-size-adjust: 100%; text-size-adjust: 100%;` on `body` — prevents
+  automatic reflow scaling on orientation change, without blocking user preference.
+- Never use `px` units for any `font-size`. If a size is `px` anywhere, it is wrong.
 
-The newsprint preview iframe inside the Editor's Desk renders Mode 1 (the Herald). The two palettes coexist in one viewport.
+### Layer 2 — In-app `Aa` picker (user preference, additive)
 
----
-
-### Mode 3 — The Wellspring (exception — unchanged)
-
-Already correct. Additive-only rule applies. These vars live in the HTML file's inline `<style>` and are never touched:
-
-```css
---ws-navy-bg: #09102e;   /* Deep navy */
---ws-gold:    #e8a838;   /* Wellspring gold */
-```
-
----
-
-### Section Identity — The Illuminated Manuscript Principle
-
-Each section has one **signature color** — a deep jewel tone. It appears in exactly two places:
-1. The active state of the section bar chip (background of the active tab)
-2. A 4px top accent stripe on the section's own masthead
-
-Everywhere else, every section shares the same paper/ink palette. Color is rare, so it lands.
-
-| Section | Signature Name | Hex |
-|---|---|---|
-| **The Herald** | Altar Gold | `#a07818` |
-| **Shepherd's Desk** | Church Wine | `#5c1928` |
-| **The Pulpit** | Bishop's Purple | `#2e1a4a` |
-| **Cantors' Corner** | Cedar Green | `#1a3d28` |
-| **The Stage** | Vesper Blue | `#0c1445` |
-| **The Letters Column** | Inkwell Blue | `#1e3050` |
-| **The Path** | Pilgrim Brown | `#4a2808` |
-| **The Invitation** | Altar Gold | `#a07818` (outreach = Herald's gold) |
-| **The Archive** | Ink & Leather | `#2a1a0e` |
-| **The Bulletin Board** | Crimson Notice | `#3d1818` |
-| **The Family Tree** | Cedar & Stone | `#1a3030` |
-| **The Mission Report** | Field Dispatch | `#0e2818` |
-| **The Codex** | Blueprint Slate | `#1a2a3a` |
-| **The Editorial Board** | Newsroom Charcoal | `#120f08` |
-
-The single thread across all three modes: **gold is always gold.** `#a07818` in newsprint, `#c9960a` in the newsroom, `#e8a838` in the Wellspring.
-
----
-
-### Section Bar — Color Logic by Mode
-
-| Context | Bar background | Active chip bg | Active chip text | Inactive chip text |
-|---|---|---|---|---|
-| Newsprint pages | `--paper-tint` `#ede8d8` | Section signature color | `#faf6ed` | `--ink-dim` `#6a5038` |
-| Newsroom pages | `--ed-panel` `#1c1710` | `--ed-gold` `#c9960a` | `#120f08` | `--ed-text-dim` `#8a7858` |
-| Wellspring | `#0c1445` | `#e8a838` | `#09102e` | `rgba(232,204,128,0.6)` |
-
----
-
-## 6. Responsive Fonts — Device Font Selection
-
-### The Mechanism
-A `--fn-scale` CSS custom property multiplies the root `font-size`. All font sizes are in `rem`. Scaling the root cascades everywhere.
-
-```css
-/* new_covenant.css :root */
---fn-scale: 1;
-
-html { font-size: calc(var(--fn-scale) * 100%); }
-```
-
-### Font Scale Picker — 5 Steps
+User-controlled reading size multiplier. Persists across sessions.
 
 | Step | Label | `--fn-scale` |
 |---|---|---|
@@ -884,969 +903,331 @@ html { font-size: calc(var(--fn-scale) * 100%); }
 | 4 | Large | 1.15 |
 | 5 | XL | 1.25 |
 
-Saves to `localStorage('flock_font_scale')`. Lives in `Scripts/the_adornment.js` as `Adornment.initFontScale()`.
+`Aa` button in every section masthead. Saves to `localStorage('flock_font_scale')`.
+Boot restore in every page's flash-prevention `<script>` block.
 
-### Boot Restore Pattern
-All flash-prevention `<script>` blocks should follow this single pattern:
-```js
-(function() {
-  try {
-    var t = localStorage.getItem('flock_theme') || 'america';
-    document.documentElement.setAttribute('data-theme', t);
-    var s = parseFloat(localStorage.getItem('flock_font_scale') || '1');
-    document.documentElement.style.setProperty('--fn-scale', s);
-  } catch (_) {
-    document.documentElement.setAttribute('data-theme', 'america');
-  }
-})();
-```
+### Result for a user with iOS Large Text enabled + app set to "Comfortable"
+Their OS bumps the browser default from 16px to ~19px. `--fn-scale: 1.1`
+multiplies that: effective base is ~21px. Everything on the page scales
+proportionally — headlines, body, labels, button text, nav chips. No clipping.
 
 ---
 
-## 6. Per-Section CSS Architecture
+## Auth Stack
 
-### The Rule (prevents nightmares)
-> A `sections/*.css` file may **only** define CSS that does not already exist in `new_covenant.css` or `flocknews.css`. If a rule already exists upstream, the section file does not touch it. If a different value is needed for a specific section, the section file uses a `--sec-*` scoped variable — never a direct override of an existing token.
+`the_true_vine.js` → `firm_foundation.js` (Nehemiah). Same stack as current Herald.
 
-### What `new_covenant.css` gets (Phase 0 additions only — three targeted additions, nothing removed)
-```css
-/* 1 — Font scale multiplier */
-:root { --fn-scale: 1; }
-html  { font-size: calc(var(--fn-scale) * 100%); }
-
-/* 2 — iOS/Samsung safe area insets */
-:root {
-  --safe-top:    env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left:   env(safe-area-inset-left, 0px);
-  --safe-right:  env(safe-area-inset-right, 0px);
-}
-
-/* 3 — Section navigation bar component */
-.sec-nav-bar { ... }  /* horizontal chip strip */
-.sec-nav-tab { ... }  /* individual chip */
-.sec-nav-tab[aria-current="page"] { ... }  /* active state */
-```
-`new_covenant.css` is **read-only** for every other change in this project.
-
-### What each section CSS file contains
-
-Each `sections/{name}.css` is **small and additive**. Realistic expected sizes:
-
-| Section CSS | Contents | Est. lines |
+| Role | Level | Access |
 |---|---|---|
-| `herald.css` | `flocknews.css` already handles Herald. This file: `rem` conversion delta + `--fn-scale` note. | ~30 |
-| `editor.css` | Dark newsroom section bar palette. Auth header strip. `--ed-*` scoped vars. | ~60 |
-| `admin_board.css` | Editorial Board page layout. Panel cards. | ~80 |
-| `shepherd.css` | `--sec-heading-font` for Pillars sub-head labels. Section bar override (no special palette). | ~30 |
-| `pulpit.css` | Sermon card editorial columns. Pull-quote style. | ~60 |
-| `cantors.css` | Functional tool — barely anything. Section bar header only. | ~20 |
-| `stage.css` | Dark section bar palette to match existing Stage dark theme. | ~40 |
-| `letters.css` | Thin newsprint shell around FlockChat. Section bar header. | ~40 |
-| `the_path.css` | Discipleship "series" editorial layout. | ~50 |
-| `invitation.css` | Already beautiful — section bar header only. | ~20 |
-| `wellspring.css` | Dark-palette section bar only. Additive. Nothing else. | ~50 |
-| `archive.css` | Archive document card columns. | ~50 |
-| `bulletin.css` | Editorial bulletin board cards. | ~40 |
-| `family_tree.css` | Genealogy record layout. | ~40 |
-| `mission_report.css` | Field report card style. | ~40 |
+| public | -1 | The Herald, The Way |
+| member | 0 | The Family, The Calendar |
+| care | 2 | The Flock |
+| leader | 3 | The Sanctuary, The Weavers |
+| pastor | 4 | The Mission, The Shepherd |
+| admin | 5 | All + user role assignment |
 
-**Most sections will be 20–60 lines.** They are extensions — not replacements.
+Local dev bypass: `Nehemiah.enableLocalBypass()` in browser console, then reload.
 
-### Each file MUST follow this rule
-```
-✅ --sec-heading-font: 'Playfair Display', serif;   /* NEW token, scoped to section */
-✅ .fn-section-header { padding-top: ... }           /* NEW component, does not exist in new_covenant.css */
-❌ --ink: #2c2c2c;                                   /* Already in new_covenant.css — FORBIDDEN */
-❌ h1 { font-size: 2rem; }                           /* Already in new_covenant.css — FORBIDDEN */
-❌ :root { --bg: ... }                               /* Already in new_covenant.css — FORBIDDEN */
-```
+---
 
-### Target File Structure
+## Build
+
+**Script:** `bash "Iris/Bezalel/Scripts/C-Build_Newspaper.sh"` → 5 Nations
+
+Script load order (all section pages):
+`the_true_vine.js` → `firm_foundation.js` → inline auth guard → `the_adornment.js`
+→ `the_gates.js` → section script
+
+---
+
+## Phase Sequence
+
+### Phase 0 — Scaffold & Copy (do this before any other work)
+
+This phase makes `Newspaper/` a fully self-contained product. After this phase,
+`Newspaper/` must have zero runtime dependencies on `New_Covenant/`. Every script,
+every data file, every style it needs must be physically present inside `Newspaper/`.
+
+#### Step 0-A — Create full folder structure
+
 ```
-New_Covenant/
+Newspaper/
+  index.html
+  manifest.json
+  sw.js
+  Scripts/
+    the_scribes/
+    the_priesthood/
+    the_gospel/
   Styles/
-    new_covenant.css              ← FOUNDATION — tokens, reset, shell, card-grid,
-                                     badges, modals, utilities, FlockChat bubbles.
-                                     Only 3 additions made here (fn-scale, safe-area, sec-nav-bar).
-                                     Everything else is untouched.
-
     sections/
-      _README.md                  ← This rule set in writing
-      herald.css                  ← The Flock Herald  — rem delta + fn-scale note
-      editor.css                  ← The Editor's Desk — dark newsroom bar
-      admin_board.css             ← The Editorial Board — admin panels
-      shepherd.css                ← The Shepherd's Desk — Pillars heading font
-      pulpit.css                  ← The Pulpit — sermon columns
-      cantors.css                 ← The Cantors' Corner — minimal
-      stage.css                   ← The Stage — dark section bar
-      letters.css                 ← The Letters Column — newsprint shell
-      the_path.css                ← The Path — discipleship series layout
-      invitation.css              ← The Invitation — section bar header only
-      wellspring.css              ← The Wellspring — dark section bar, additive only
-      archive.css                 ← The Archive — document columns
-      bulletin.css                ← The Bulletin Board — editorial cards
-      family_tree.css             ← The Family Tree — genealogy records
-      mission_report.css          ← The Mission Report — field dispatch cards
+  Sections/
+    herald/
+    the_way/
+    the_sanctuary/
+    the_flock/
+    the_mission/
+    the_family/
+    the_shepherd/
+    the_calendar/
+    the_weavers/
+  Data/
+  Images/
 ```
 
----
+- [ ] Create every folder above
+- [ ] Create stub `index.html` (redirects to `Sections/herald/index.html`)
+- [ ] Create `manifest.json` — name: "The Flock Herald", short_name: "Herald",
+      start_url: "./", display: "standalone", theme_color: `#8B7028`,
+      background_color: `#faf9f6`, icons array (192 + 512)
+- [ ] Create `sw.js` — cache-first service worker, CACHE_NAME: `flock-herald-v1.0`
+- [ ] Create `Styles/the_broadsheet.css` — stub with `:root {}` block only for now
+- [ ] Create all 9 `Styles/sections/*.css` stubs with header comment only
 
-## 7. The Editorial Board (Admin Page — New)
+#### Step 0-B — Copy scripts from New_Covenant (exact source paths listed)
 
-### Purpose
-`app.flocknews/admin.html` is a pastor+ only administration surface living inside the Herald's section. It is the newspaper's "back office." It consolidates the controls a pastor needs that span the whole paper.
-
-### Sections of the Editorial Board
-
-| Panel | Function | Data Source |
+| Copy FROM | Copy TO | Notes |
 |---|---|---|
-| **Edition Controls** | Show/hide Herald sections site-wide | `localStorage` / Firestore config |
-| **Announcement Board** | Publish/edit church announcements | Firestore `announcements` collection |
-| **Prayer Board** | Review and publish prayer requests | Firestore `prayer_chain` collection |
-| **User Management** | View member list, assign roles up to leader | Firestore `users` (Nehemiah-gated: admin only for role assignment above pastor) |
-| **Herald Analytics** | View open/read counts, share stats | Firestore analytics |
-| **Section Visibility** | Show/hide Tier 1 sections from section bar per-church | Church config in Firestore |
-| **Content Calendar** | Upcoming Herald editions / scheduled content | `localStorage` + Firestore |
+| `New_Covenant/the_living_water.js` | `Newspaper/Scripts/the_living_water.js` | Firebase config |
+| `New_Covenant/Scripts/firm_foundation.js` | `Newspaper/Scripts/firm_foundation.js` | Nehemiah auth |
+| `New_Covenant/Scripts/the_adornment.js` | `Newspaper/Scripts/the_adornment.js` | Theme + font scale |
+| `New_Covenant/Scripts/the_cistern.js` | `Newspaper/Scripts/the_cistern.js` | LocalStorage helpers |
+| `New_Covenant/Scripts/the_witness.js` | `Newspaper/Scripts/the_witness.js` | Analytics |
+| `New_Covenant/Scripts/the_living_water_adapter.js` | `Newspaper/Scripts/the_living_water_adapter.js` | GAS fallback |
+| `New_Covenant/Scripts/grow_public.js` | `Newspaper/Scripts/grow_public.js` | GROW module engine |
+| `New_Covenant/Scripts/the_scribes/` (all files) | `Newspaper/Scripts/the_scribes/` | SPA router |
+| `New_Covenant/Scripts/the_priesthood/` (all files) | `Newspaper/Scripts/the_priesthood/` | Auth helpers |
+| `New_Covenant/Scripts/the_gospel/` (all files) | `Newspaper/Scripts/the_gospel/` | All 14 GROW modules |
 
-### Auth Rule
-- `pastor` (level 4): Access to all panels except User Management role assignment
-- `admin` (level 5): Full access including role assignment
+After copying: update any internal path references that point to `New_Covenant/` —
+search each copied file for `New_Covenant` and fix to relative paths within `Newspaper/`.
 
-### Navigation
-The Editorial Board is NOT in the main section bar for regular users. It is accessed via:
-1. A settings gear `⚙` icon in the Herald masthead — visible only when `Nehemiah.hasRole('pastor')` returns true
-2. The existing "Editor" button in the Herald masthead (which currently links to `news_editor.html`) is expanded into a dropdown: "Editor's Desk" and "Editorial Board"
+#### Step 0-C — Copy Data files from New_Covenant
 
----
-
-## 8. Section Navigation Bar — Full Spec
-
-### Design
-Persistent horizontal strip below each section's masthead/header.
-
-```
-[ ✦ Herald ]  [ Shepherd's Desk ]  [ The Pulpit ]  [ The Letters ]  [ The Path ]  [ ··· More ▾ ]
-```
-
-- **Mobile (<600px):** Horizontally scrollable chip strip. Icon + short name. No overflow menu needed — scroll reveals all.
-- **Tablet (600–1024px):** Full section names. Scroll if they overflow.
-- **Desktop (>1024px):** All sections visible. Items that don't fit fall into "More ▾" dropdown.
-
-### Safe Area Application
-```css
-.sec-nav-bar {
-  /* Prevents chips from disappearing behind notch in landscape */
-  padding-left:  max(12px, var(--safe-left));
-  padding-right: max(12px, var(--safe-right));
-}
-```
-
-### Auth-Aware Rendering
-Section bar renders after `whoAmI()` resolves:
-```js
-whoAmI().then(user => {
-  // Render all public tabs immediately
-  // Then add role-gated tabs based on user.role
-  // Pastor+ get gear icon → Editorial Board + Editor's Desk
-});
-```
-
-### Active State
-Active section tab:
-- 3px gold bottom border (`--gold`)
-- Label in `var(--masthead-font)` italic
-- Defined in `new_covenant.css` as `.sec-nav-tab[aria-current="page"]`
-
-### The Pillars (inside FlockOS) — NOT replaced
-The Pillars sidebar handles Tier 2 view navigation inside FlockOS. The section bar handles Tier 1. They coexist without conflict.
-
----
-
-## 9. Lipstick Work Summary — Every Section
-
-| Section CSS | App | Key Changes |
-|---|---|---|
-| `herald.css` | app.flocknews | Section bar. Font-scale picker. `px` → `rem`. Safe area on masthead + back-bar. Auth-aware section bar. |
-| `editor.css` | news_editor.html | Auth gate (pastor+). Auth header. Safe area on sidebar header. Font-scale restore. |
-| `admin_board.css` | admin.html (new) | Pastor+ only. Full admin panels. Dark sidebar like editor + light content area. Safe area. |
-| `shepherd.css` | app.flockos | Section bar above app shell. Pillars section heads as editorial sub-heads. Safe area on topbar. |
-| `pulpit.css` | app.feed | Sermon cards → editorial columns. Pull-quote styling. Section bar. Safe area. |
-| `cantors.css` | app.stand | Functional tool — minimal. Section bar + header. Font tokens. Safe area. |
-| `stage.css` | app.flockshow | Dark (projection justified). Section bar in dark palette. Safe area. |
-| `letters.css` | flockchat-public | Newspaper shell wrapper. `--sec-body-font` = serif for readable threads. Section bar. Safe area. |
-| `the_path.css` | app.grow | Discipleship as editorial "series." Section bar. Reading plans in column layout. Safe area. |
-| `invitation.css` | app.invite | Already beautiful. Section bar. Font tokens. Safe area. |
-| `wellspring.css` | app.wellspring | Additive only. Section bar in Wellspring dark palette. Safe area on existing top bar. Font scale. |
-| `archive.css` | app.flockdocs | Archive-style document cards. Section bar. Safe area. |
-| `bulletin.css` | app.flockshamar | Cork board editorial aesthetic. Section bar. Safe area. |
-| `family_tree.css` | app.melchizedek | Genealogy as editorial family records. Section bar. Safe area. |
-| `mission_report.css` | app.multiply | Field report styling. Mission dispatch aesthetic. Section bar. Safe area. |
-| `codex.css` | app.flockcodex (new) | Blueprint Slate signature. Sidebar TOC. Reference typography. Print-friendly `@media print`. Auth gate (pastor+). Safe area. |
-
----
-
-## 10. FlockOS Comms → The Letters Column
-
-### Today's Situation
-- `the_comms.js` embeds FlockChat inside FlockOS via an iframe/component. This is the specific thing being replaced.
-- `the_fellowship`, `the_announcements`, `the_prayer_chain` are **separate views** — member management tools. They stay.
-- `app.flockchat/app.flockchat.html` is a stale local mirror. Deprecated.
-- `flockchat-public/FlockChat.html` is the live deployed app.
-
-### The Change
-1. The FlockChat embed in FlockOS (`the_comms.js`) becomes a direct Pillars link labeled "The Letters Column" → opens `flockchat-public/FlockChat.html` as a Tier 1 section.
-2. `the_fellowship`, `the_announcements`, `the_prayer_chain` remain in FlockOS Comms Pillars group.
-3. `Scripts/the_comms.js` retired after audit confirms all Firestore listeners are covered by `flockchat.js`.
-4. `app.flockchat/app.flockchat.html` marked `[DEPRECATED]` — excluded from B-Build rsync.
-
----
-
-## 11. Build & Deployment
-
-- `New_Covenant/Styles/sections/` is source of truth for all section CSS files.
-- B-Build must sync `sections/` to all nations — verify the existing Styles rsync glob includes subfolders.
-- All app HTML uses `<base href="../">` — `href="Styles/sections/herald.css"` resolves from any `app.*/` subfolder.
-- `flocknews.html` and `news_editor.html` are in `app.flocknews/` — confirm `../Styles/sections/` resolves correctly.
-- `admin.html` (new) lives in `app.flocknews/` — same base path as above.
-- Font-scale picker: `Adornment.initFontScale()` in `Scripts/the_adornment.js`.
-- No new Firebase projects. No new GAS scripts. No Firestore schema changes.
-
----
-
-## 12. CSS Token Cross-Reference (Quick Edit Guide)
-
-| What to change | Where |
+| Copy FROM | Copy TO |
 |---|---|
-| Headline font — all sections | `new_covenant.css` → `--heading-font` |
-| Body font — all sections | `new_covenant.css` → `--body-serif` or `--body-sans` |
-| Headline font — one section | `Styles/sections/{name}.css` → `--sec-heading-font` |
-| Body font — one section | `Styles/sections/{name}.css` → `--sec-body-font` |
-| User text scale | `localStorage('flock_font_scale')` → `--fn-scale` on `<html>` |
-| Paper/background globally | `new_covenant.css` → `--paper` |
-| Gold accent globally | `new_covenant.css` → `--gold` |
-| Safe area insets | `new_covenant.css` → `--safe-top/bottom/left/right` |
-| Herald masthead font | `sections/herald.css` → `--masthead-font` |
-| FlockChat bubble colors | `new_covenant.css` → FlockChat bubble token block |
-| Section nav active state | `new_covenant.css` → `.sec-nav-tab[aria-current="page"]` |
-| Pillars sidebar (in FlockOS) | `new_covenant.css` → `.veil-side` / `.pillars-*` |
-| FlockOS Tier-2 view typography | `sections/shepherd.css` → inherits to all in-app views |
-| Wellspring palette | `app.wellspring/app.wellspring.html` inline `<style>` → `--ws-*` vars |
-| Editor's Desk palette | `sections/editor.css` → `--ed-*` vars |
-
----
-
-## 13. Module Inventory — Complete Rollcall
-
-**Standalone HTML apps (Tier 1) — 16 total:**
-Herald, Editor's Desk (auth), Editorial Board (auth/new), **The Codex (auth/new)**, Shepherd's Desk, Pulpit, Cantors', Stage, Letters Column, The Path, Invitation, Wellspring, Archive, Bulletin Board, Family Tree, Mission Report.
-
-**In-app SPA views (Tier 2 — inside FlockOS) — 47 routes:**
-`the_good_shepherd`, `the_upper_room`, `the_growth`, `the_fellowship`, `the_announcements`, `the_prayer_chain`, `the_fold`, `the_life`, `the_call_to_forgive`, `prayerful_action`, `the_seasons`, `the_anatomy_of_worship`, `quarterly_worship`, `the_pentecost`, `the_great_commission`, `the_gospel_invitation`, `the_harvest`, `the_way`, `the_truth`, `fishing_for_men`, `fishing_for_data`, `the_gift_drift`, `the_weavers_plan`, `the_generations`, `the_wall`, `bezalel`, `content-admin`, `the_invitation`, `software_deployment_referral`, `learn_more`, `about_flockos`, `the_gospel_courses`, `the_gospel_quizzes`, `the_gospel_reading`, `the_gospel_theology`, `the_gospel_teaching_plans`, `the_gospel_lexicon`, `the_gospel_library`, `the_gospel_devotionals`, `the_gospel_apologetics`, `the_gospel_counseling`, `the_gospel_heart`, `the_gospel_mirror`, `the_gospel_genealogy`, `the_gospel_journal`, `the_gospel_certificates`, `the_gospel_analytics`.
-
-**Intentional public/auth dual presence:**
-`the_gospel_*` discipleship views — public (no auth) in `app.grow.html`, authenticated (with progress tracking) inside FlockOS.
-
-**Deprecated (not built, not synced):**
-`app.flockchat/app.flockchat.html`.
-
----
-
-## 14. What This Is NOT
-
-- ❌ Not a data migration
-- ❌ Not a new Firebase project or Firestore schema change
-- ❌ Not a new GAS backend
-- ❌ Not an SPA rewrite — each Tier 1 section remains its own HTML page
-- ❌ Not a PWA architecture change — each app keeps its own manifest
-- ❌ Not dark mode (except The Stage and The Wellspring — both justified)
-- ❌ Not a redesign of the Pillars sidebar — it stays as in-app navigation for Tier 2
-- ❌ Not a removal of any existing functionality — everything the Wellspring does today, it does tomorrow
-
-This is **lipstick and font work** on a system whose bones are already built, with a proper auth layer on the tools that need it, and safe area support so every phone looks intentional.
-
----
-
-*Plan v3 — May 2026. To-do list at top of document. Mark tasks `[x]` as completed.*
-
-
----
-
-## 1. The Core Metaphor
-
-A great newspaper has:
-- A **masthead** (identity, date, church name)
-- A **front page** (today's most important content — the Herald)
-- **Named sections** (Sports → Worship, Business → Shepherd's Desk, Editorial → FEED, etc.)
-- **A letters column** (FlockChat — church messaging)
-- **Classifieds / Community** (Invite, Multiply, Harvest)
-- A **consistent typeface** and **grid** that makes every page feel like the same paper
-
-The user never "switches apps" — they flip sections. The nav is a section bar, not an app switcher.
-
----
-
-## 2. Two-Tier Navigation — Understanding the Architecture
-
-This is a critical distinction before anything else is planned.
-
-### Tier 1: Top-Level Sections (standalone HTML pages / PWAs)
-Each is its own HTML file, its own manifest, its own CSS. The **section bar** navigates between these.
-
-| Section | HTML Entry Point | Newspaper Name | Auth |
-|---|---|---|---|
-| Front Page | `app.flocknews/flocknews.html` | **The Flock Herald** | Public |
-| The Shepherd's Desk | `app.flockos/app.flockos.html` | **The Shepherd's Desk** | Yes — Pastor/Admin |
-| The Pulpit | `app.feed/feed.html` | **The Pulpit** | Optional |
-| The Cantors' Corner | `app.stand/music_stand.html` | **The Cantors' Corner** | Yes — Worship |
-| The Stage | `app.flockshow/app.flockshow.html` | **The Stage** | Yes — Worship |
-| The Letters Column | `flockchat-public/FlockChat.html` | **The Letters Column** | Yes — Members |
-| The Path | `app.grow/app.grow.html` | **The Path** | Public (no-auth tools) |
-| The Invitation | `app.invite/app.invite.html` | **The Invitation** | Public |
-| The Wellspring | `app.wellspring/app.wellspring.html` | **The Wellspring** | Public |
-| The Archive | `app.flockdocs/app.flockdocs.html` | **The Archive** | Yes — Admin |
-| The Bulletin Board | `app.flockshamar/app.flockshamar.html` | **The Bulletin Board** | Yes — Members |
-| The Family Tree | `app.melchizedek/app.melchizedek.html` | **The Family Tree** | Yes — Members |
-| The Mission Report | `app.multiply/multiply.html` | **The Mission Report** | Yes — Admin |
-
-**Deprecated:** `app.flockchat/app.flockchat.html` — stale local mirror of FlockChat. Marked deprecated; live app is `flockchat-public/FlockChat.html`.
-
-### Tier 2: In-App Views (SPA views rendered inside The Shepherd's Desk)
-`app.flockos.html` is an SPA. All 47 registered views load inside it via `the_scribes` router. The **Pillars sidebar** (`the_veil/the_pillars.js`) navigates between these. The section bar does NOT replace the Pillars — it navigates between Tier 1 apps. The Pillars remains for Tier 2 views inside FlockOS.
-
-These 47 views are organized into Pillars sections (which become editorial sub-sections within The Shepherd's Desk):
-
-#### Home
-| View Route | Label | Notes |
-|---|---|---|
-| `the_good_shepherd` | Home — The Dashboard | Flock feed, counts, next steps, daily call |
-
-#### Word
-| View Route | Label | Notes |
-|---|---|---|
-| `the_upper_room` | The Upper Room | Devotional space + FlockChat integration point |
-| `the_growth` | Grow Hub | Discipleship dashboard (launches gospel/* views) |
-
-#### Comms
-| View Route | Label | Notes |
-|---|---|---|
-| `the_fellowship` | Fellowship | Member directory and connection |
-| `the_announcements` | Announcements | Church announcements |
-| `the_prayer_chain` | Prayer Chain | Prayer requests and chain |
-
-#### Care
-| View Route | Label | Notes |
-|---|---|---|
-| `the_fold` | The Fold | Member care, follow-up, at-risk flagging |
-| `the_life` | Pastoral Care | Pastoral care tracker with open care badge |
-| `the_call_to_forgive` | Reconciliation | Forgiveness and reconciliation module |
-| `prayerful_action` | Prayer Journal | Personal/corporate prayer journal |
-| `the_seasons` | Seasons | Liturgical calendar |
-
-#### Worship
-| View Route | Label | Notes |
-|---|---|---|
-| `the_anatomy_of_worship` | Service Order | Worship service planning |
-| `quarterly_worship` | Worship Plan | Quarterly worship calendar |
-| `the_pentecost` | Special Services | Events, revivals, special occasions |
-| *(external link)* | FlockStand | Opens `app.stand/` in section |
-| *(external link)* | Sermon Builder | Opens `app.feed/feed.html` in section |
-| *(external link)* | FlockShow | Opens `app.flockshow/` in section |
-
-#### Mission
-| View Route | Label | Notes |
-|---|---|---|
-| `the_great_commission` | Missions | Mission board |
-| `the_gospel_invitation` | The Invitation | Gospel page (also accessible public via Tier 1) |
-| `the_harvest` | Harvest | Evangelism and conversion tracking |
-| `the_way` | The Way | Discipleship pathways |
-| `the_truth` | Content Library | Media and content library |
-| `fishing_for_men` | Outreach | Outreach tools |
-| `fishing_for_data` | Analytics | Gospel analytics |
-
-#### Discipleship (GROW learning modules — also available in `app.grow`)
-| View Route | Label | Notes |
-|---|---|---|
-| `the_gospel_courses` | Courses | Bible/discipleship courses |
-| `the_gospel_quizzes` | Quizzes | Knowledge quizzes |
-| `the_gospel_reading` | Reading Plans | Bible reading plans |
-| `the_gospel_theology` | Theology | Theological articles |
-| `the_gospel_teaching_plans` | Teaching Plans | Lesson planning |
-| `the_gospel_lexicon` | Lexicon | Strong's-style biblical lexicon |
-| `the_gospel_library` | The Word Library | Scripture and reference library |
-| `the_gospel_devotionals` | Devotionals | Daily devotionals |
-| `the_gospel_apologetics` | Apologetics | Apologetics content |
-| `the_gospel_counseling` | Counseling | Biblical counseling resources |
-| `the_gospel_heart` | Heart Check | Personal spiritual inventory |
-| `the_gospel_mirror` | Shepherd's Mirror | Self-assessment for pastors |
-| `the_gospel_genealogy` | Biblical Genealogy | Scripture genealogy explorer |
-| `the_gospel_journal` | Journal | Personal spiritual journal |
-| `the_gospel_certificates` | Certificates | Completion certificates |
-| `the_gospel_analytics` | Learning Analytics | Discipleship progress metrics |
-
-#### Stewardship
-| View Route | Label | Notes |
-|---|---|---|
-| `the_gift_drift` | Giving | Stewardship and giving tracking |
-| `the_weavers_plan` | The Weaver's Plan | Strategic planning |
-
-#### Legacy
-| View Route | Label | Notes |
-|---|---|---|
-| `the_generations` | The Generations | Church history and legacy |
-
-#### Build (Admin)
-| View Route | Label | Notes |
-|---|---|---|
-| `the_wall` | Admin | Admin panel |
-| `bezalel` | Bezalel | Design codex |
-| `content-admin` | Truth Editor | Content admin |
-| `the_invitation` | Invitations | New member invitation management |
-| `software_deployment_referral` | Deploy & Refer | Church software deployment referral |
-| `learn_more` | Learn More | Marketing/info |
-| `about_flockos` | The Why | About FlockOS |
-
-**Note on duplication between Tier 1 and Tier 2:** The GROW learning modules (`the_gospel_*`) exist as views inside FlockOS AND as the content of `app.grow.html`. This is intentional — `app.grow` is the public, no-auth version. The views inside FlockOS carry member context (progress tracking, journal sync, etc.). No consolidation needed; they serve different roles.
-
----
-
-## 3. The Front Page — What Changes & What Stays
-
-The main `New_Covenant/index.html` is a full-screen iframe of `app.flocknews/flocknews.html`. **This stays.** The Herald is the correct front page.
-
-### Changes to the Front Page
-1. **Section Bar replaces App Switcher** — The current "Select an App" dropdown in `flocknews.html` becomes a horizontal section strip below the masthead. Each chip is a Tier 1 section name. Mobile: horizontally scrollable. Desktop: full row, overflow to "More" dropdown.
-2. **Masthead date line** — When inside a sub-section (any non-Herald Tier 1 page), the section header displays `The Flock Herald · [Section Name]` as an editorial breadcrumb.
-3. **No dark mode** — The Herald is newsprint (cream + ink). All sections inherit this palette unless there is a specific functional reason. The Stage (`app.flockshow`) is dark by necessity — it is a projection tool. Everything else stays light.
-
----
-
-## 4. Responsive Fonts — Device Font Selection
-
-Every person's device has a preferred reading size. FlockOS must honor it.
-
-### The Mechanism
-
-A `--fn-scale` CSS custom property multiplies the root `font-size`. All font sizes throughout the product are set in `rem` (never `px` for text), so scaling the root cascades everywhere automatically.
-
-```css
-/* new_covenant.css :root */
---fn-scale: 1;   /* default. Range: 0.85 (Compact) → 1.25 (XL) */
-
-html {
-  font-size: calc(var(--fn-scale) * 100%);
-  /* 100% = browser/OS default font size. --fn-scale multiplies it. */
-}
-```
-
-### Font Scale Picker
-
-A small `Aa` button in the Herald masthead bar (and in each section's top bar) opens a 5-step control:
-
-| Step | Label | `--fn-scale` value |
-|---|---|---|
-| 1 | Compact | 0.85 |
-| 2 | Normal | 1.0 |
-| 3 | Comfortable | 1.1 |
-| 4 | Large | 1.15 |
-| 5 | XL | 1.25 |
-
-Selection saves to `localStorage('flock_font_scale')` and applies via `document.documentElement.style.setProperty('--fn-scale', val)`.
-
-### Boot Restore Script
-
-Added to the flash-prevention `<script>` block in **every** HTML file (alongside the existing theme restore):
-
-```js
-(function() {
-  try {
-    var t = localStorage.getItem('flock_theme') || 'america';
-    document.documentElement.setAttribute('data-theme', t);
-    var s = parseFloat(localStorage.getItem('flock_font_scale') || '1');
-    document.documentElement.style.setProperty('--fn-scale', s);
-  } catch (_) {
-    document.documentElement.setAttribute('data-theme', 'america');
-  }
-})();
-```
-
-### Implementation Home
-The picker UI and `initFontScale()` logic live in `Scripts/the_adornment.js` — it is already the font and theme management module. One new export: `Adornment.initFontScale()`.
-
----
-
-## 5. CSS Architecture — Per-Section Files
-
-### The Problem Today
-- `Styles/new_covenant.css` is a monolith (~3,000+ lines): design tokens, reset, app shell, every view's typography, FlockChat bubbles, modals, card grids — all in one file.
-- `app.flocknews/flocknews.css` is standalone and clean. It is the model for how this should work everywhere.
-- Every app HTML loads only `new_covenant.css` — zero per-app typography control. Changing a font anywhere risks everything.
-
-### The Target Architecture
-
-```
-New_Covenant/
-  Styles/
-    new_covenant.css            ← SHARED FOUNDATION only
-                                   Contents: CSS custom properties (tokens), reset,
-                                   app shell (topbar, sidebar, .veil-side), card-grid,
-                                   badges, modals, utilities, FlockChat bubble tokens.
-                                   NO per-app typography. NO per-section color overrides.
-
-    sections/                   ← NEW — one file per Tier 1 standalone app
-      _README.md                ← Architecture guide (this document is the source)
-      herald.css                ← The Flock Herald  (app.flocknews)
-      shepherd.css              ← The Shepherd's Desk  (app.flockos)
-      pulpit.css                ← The Pulpit  (app.feed)
-      cantors.css               ← The Cantors' Corner  (app.stand)
-      stage.css                 ← The Stage  (app.flockshow — dark justified)
-      letters.css               ← The Letters Column  (flockchat-public)
-      the_path.css              ← The Path  (app.grow)
-      invitation.css            ← The Invitation  (app.invite)
-      wellspring.css            ← The Wellspring  (app.wellspring)
-      archive.css               ← The Archive  (app.flockdocs)
-      bulletin.css              ← The Bulletin Board  (app.flockshamar)
-      family_tree.css           ← The Family Tree  (app.melchizedek)
-      mission_report.css        ← The Mission Report  (app.multiply)
-```
-
-**In-app views inside FlockOS** (Tier 2) do NOT get individual section CSS files. They render inside `app.flockos.html`'s shell and inherit `new_covenant.css` + `shepherd.css`. The Pillars sidebar sections (Word, Comms, Care, Worship, etc.) are expressed as editorial sub-section headers within `shepherd.css`.
-
-### Section CSS File Header Convention
-
-Every `sections/*.css` file MUST open with this header block:
-
-```css
-/* ═══════════════════════════════════════════════════════════════════════
-   [SECTION NAME] — sections/[filename].css
-   Newspaper Section: [The Newspaper Name]
-   App: [app folder path]
-
-   DEPENDS ON: ../new_covenant.css  (must be loaded FIRST in the HTML)
-
-   FONT TOKENS (override these here, global tokens live in new_covenant.css):
-     --sec-heading-font:  [font]   — section headlines
-     --sec-body-font:     [font]   — body/article text
-     --sec-label-font:    [font]   — bylines, metadata, labels
-
-   SCALE: All sizes in rem. html font-size = calc(--fn-scale * 100%).
-          --fn-scale is set by font picker, restored from localStorage on boot.
-
-   CROSS-LINKS:
-     Change headline font ALL sections  → new_covenant.css  → --heading-font
-     Change headline font THIS section  → --sec-heading-font below
-     Change body text scale (user)      → localStorage 'flock_font_scale' → --fn-scale
-     Change paper/background globally   → new_covenant.css  → --paper
-     Change gold accent globally        → new_covenant.css  → --gold
-     Change section nav active state    → new_covenant.css  → .sec-nav-tab[aria-current]
-   ═══════════════════════════════════════════════════════════════════════ */
-```
-
----
-
-## 6. FlockOS Comms → FlockChat (The Letters Column)
-
-### Today's Situation
-- `app.flockos.html` has a Comms embed powered by `Scripts/the_comms.js` — this is what embeds the FlockChat UI inside FlockOS.
-- `the_fellowship`, `the_announcements`, `the_prayer_chain` are **separate views** inside the Pillars sidebar under "Comms." These are member-management tools. They are NOT the same as FlockChat. They stay.
-- `app.flockchat/app.flockchat.html` is a stale local mirror of FlockChat. Not deployed. Deprecated.
-- `flockchat-public/FlockChat.html` is the live, deployed FlockChat standalone app.
-
-### The Change
-1. The **FlockChat embed** in FlockOS (the_comms.js) becomes a direct Pillars item labeled "The Letters Column" that navigates to `flockchat-public/FlockChat.html` as a Tier 1 section (not an iframe embed).
-2. `the_fellowship`, `the_announcements`, and `the_prayer_chain` views remain in FlockOS under the Comms Pillars group — they are congregation management tools, not messaging.
-3. `Scripts/the_comms.js` is retired after: (a) auditing its Firestore listeners and verifying each is covered by `flockchat-public/flockchat.js`; (b) removing its registration from `the_ark.js` and its Pillars entry from `the_pillars.js`.
-4. `app.flockchat/app.flockchat.html` is marked `[DEPRECATED — use flockchat-public/FlockChat.html]`. Folder is kept but excluded from builds.
-5. `sections/letters.css` wraps FlockChat in the newspaper shell: masthead-style section header, section bar, `--sec-body-font: var(--body-serif)` for a readable message thread feel.
-
----
-
-## 7. Section Navigation Bar
-
-### Design
-The section bar replaces the "Select an App" dropdown in every Tier 1 standalone HTML page. It is a persistent horizontal strip, positioned just below the section's own header/masthead.
-
-```
-[ ✦ Herald ] [ Shepherd's Desk ] [ The Pulpit ] [ The Letters ] [ The Path ] [ ··· More ]
-```
-
-- **Mobile (<600px):** horizontally scrollable row of icon + short name chips. No overflow menu.
-- **Tablet (600–1024px):** full section names, scroll if they overflow.
-- **Desktop (>1024px):** all sections visible. Items that don't fit fall into a "More ▾" dropdown.
-
-### Active State
-The active section tab:
-- Gets a thick gold bottom border (`--gold`, 3px)
-- Label is set in `var(--masthead-font)` italic
-- Defined once in `new_covenant.css` as `.sec-nav-bar` / `.sec-nav-tab[aria-current="page"]`
-
-### The Pillars (inside FlockOS) — NOT replaced
-The Pillars sidebar inside `app.flockos.html` remains the navigation for Tier 2 in-app views. The section bar sits above the FlockOS shell and handles Tier 1 navigation. They are complementary, not redundant.
-
----
-
-## 8. What "Lipstick" Means for Each Section
-
-UI/presentation refactor only. No data schema changes. No new Firestore collections. No new Firebase projects. No new GAS scripts.
-
-| Section CSS | App | Lipstick Work |
-|---|---|---|
-| `herald.css` | app.flocknews | Section bar replaces "Select an App" dropdown. Font-scale picker in masthead. All `px` font sizes → `rem`. |
-| `shepherd.css` | app.flockos | Section bar above the app shell. Pillars section headers styled as editorial column heads. The Shepherd's Desk masthead header. |
-| `pulpit.css` | app.feed | Sermon cards styled as editorial columns. Pull-quote styling. Section bar. |
-| `cantors.css` | app.stand | Minimal — functional tool. Section bar + section header. Font tokens only. |
-| `stage.css` | app.flockshow | Dark is correct here (projection). Section bar and header in dark theme. |
-| `letters.css` | flockchat-public | Newspaper shell wrapper. Section bar. `--sec-body-font` = serif for message threads. |
-| `the_path.css` | app.grow | Discipleship steps as editorial "series." Section bar. Devotionals/reading plans in column layout. |
-| `invitation.css` | app.invite | Already beautiful. Section bar. Font tokens. |
-| `wellspring.css` | app.wellspring | Offline mode. Thin file — font tokens and section header only. |
-| `archive.css` | app.flockdocs | Archive-style document card layout. Section bar. |
-| `bulletin.css` | app.flockshamar | Notes in a cork board editorial aesthetic. Section bar. |
-| `family_tree.css` | app.melchizedek | Genealogy as editorial family records. Section bar. |
-| `mission_report.css` | app.multiply | Field report styling. Mission dispatch aesthetic. Section bar. |
-
----
-
-## 9. Build & Deployment Notes
-
-- `New_Covenant/Styles/sections/` is the **source of truth** for all section CSS files.
-- B-Build (`Iris/Bezalel/Scripts/B-Build_Nations.sh`) must sync `New_Covenant/Styles/sections/` to all nations. The existing rsync for `New_Covenant/Styles/` should automatically include the `sections/` subfolder — verify this in B-Build before Phase 0 closes.
-- All app HTML files use `<base href="../">`, so `href="Styles/sections/herald.css"` resolves correctly from any `app.*/` subfolder.
-- `flocknews.html` and `news_editor.html` are in `app.flocknews/` and use `<base href>` — verify they can resolve `../Styles/sections/herald.css` correctly before linking.
-- The font-scale picker: `Adornment.initFontScale()` in `Scripts/the_adornment.js`. The HTML `Aa` button markup will be a shared partial — define it once in a comment/snippet in `the_adornment.js` and copy into each app HTML.
-
----
-
-## 10. Phase Sequence
-
-### Phase 0 — Foundation (do first, nothing else starts until complete)
-- [ ] Create `New_Covenant/Styles/sections/` folder
-- [ ] Create `Styles/sections/_README.md` — architecture overview linking to this plan
-- [ ] Add `--fn-scale: 1` to `new_covenant.css` `:root`
-- [ ] Update html base font-size in `new_covenant.css` to `calc(var(--fn-scale) * 100%)`
-- [ ] Add font-scale restore to the flash-prevention boot script pattern (document in `the_adornment.js`)
-- [ ] Implement `Adornment.initFontScale()` — picker UI + localStorage read/write
-- [ ] Verify B-Build rsync includes `Styles/sections/` — add rsync line if missing
-
-### Phase 1 — Herald & Section Bar
-- [ ] Create `sections/herald.css` with full header block
-- [ ] Extract Herald-specific typography from `flocknews.css` into `sections/herald.css`; `flocknews.css` becomes an import shim that loads the section file
-- [ ] Build `.sec-nav-bar` / `.sec-nav-tab` component in `new_covenant.css`
-- [ ] Replace the "Select an App" dropdown in `flocknews.html` with `.sec-nav-bar`
-- [ ] Add font-scale `Aa` button to Herald masthead in `flocknews.html`
-- [ ] Convert all `flocknews.css` text sizes from `px` → `rem`
+| `New_Covenant/Data/apologetics.js` | `Newspaper/Data/apologetics.js` |
+| `New_Covenant/Data/books-of-the-bible.js` | `Newspaper/Data/books-of-the-bible.js` |
+| `New_Covenant/Data/counseling.js` | `Newspaper/Data/counseling.js` |
+| `New_Covenant/Data/devotionals.js` | `Newspaper/Data/devotionals.js` |
+| `New_Covenant/Data/genealogy.js` | `Newspaper/Data/genealogy.js` |
+| `New_Covenant/Data/heart.js` | `Newspaper/Data/heart.js` |
+| `New_Covenant/Data/library.js` | `Newspaper/Data/library.js` |
+| `New_Covenant/Data/mirror.js` | `Newspaper/Data/mirror.js` |
+| `New_Covenant/Data/missions.js` | `Newspaper/Data/missions.js` |
+| `New_Covenant/Data/one_year_bible.js` | `Newspaper/Data/one_year_bible.js` |
+| `New_Covenant/Data/prayercast.js` | `Newspaper/Data/prayercast.js` |
+| `New_Covenant/Data/psalms.js` | `Newspaper/Data/psalms.js` |
+| `New_Covenant/Data/quiz.js` | `Newspaper/Data/quiz.js` |
+| `New_Covenant/Data/reading-plans.js` | `Newspaper/Data/reading-plans.js` |
+| `New_Covenant/Data/strongs-greek.js` | `Newspaper/Data/strongs-greek.js` |
+| `New_Covenant/Data/strongs-hebrew.js` | `Newspaper/Data/strongs-hebrew.js` |
+| `New_Covenant/Data/teaching_plans.js` | `Newspaper/Data/teaching_plans.js` |
+| `New_Covenant/Data/theology.js` | `Newspaper/Data/theology.js` |
+
+#### Step 0-D — Build `the_broadsheet.css` foundations
+
+Fill `the_broadsheet.css` with:
+
+1. **Font imports** — `'Lora'` + `'Plus Jakarta Sans'` from Google Fonts
+2. **CSS reset** — box-sizing, margin/padding zero, `font-family` base
+3. **`:root` token block** — all paper/ink tokens, NC colors as named vars,
+   `--fn-scale: 1`, safe-area variables, radius + shadow tokens
+4. **`html` base font-size** — `calc(var(--fn-scale) * 100%)` — the `100%` form
+   preserves the device/OS text-size preference as the base; never use `16px` here
+   as it silently blocks user accessibility settings
+5. **`body`** — `overflow-x: hidden` (NO side-scrolling, ever), `overflow-y: auto`,
+   `max-width: 100vw`, background: `var(--paper)`
+6. **`.broadsheet-grid`** — 3-col → 2-col → 1-col responsive grid (see Layout section)
+7. **`.broadsheet-card`** — card base styles
+8. **`.sec-nav-bar`** — section navigation bar component
+9. **`.sec-masthead`** — shared masthead with `padding-top: max(1rem, var(--safe-top))`
+   to account for iOS notch and Dynamic Island on every device
+
+#### Step 0-E — Mobile + PWA baseline requirements (verify before Phase 1)
+
+Every section page must pass all of these before any feature work begins:
+
+- [ ] `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">` — `maximum-scale=5.0` (never `1.0`) allows user pinch-zoom; `viewport-fit=cover` mandatory for iOS safe-area
+- [ ] `<meta name="apple-mobile-web-app-capable" content="yes">` present
+- [ ] `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">` present
+- [ ] `body { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; overflow-x: hidden; max-width: 100vw; }` — prevents auto-scaling on rotation without blocking user preference; zero horizontal scroll
+- [ ] `html { font-size: calc(var(--fn-scale) * 100%); }` confirmed — `100%` not `16px`
+- [ ] Zero `px` font-size values anywhere in any CSS file — grep `font-size.*px` to verify
+- [ ] Section masthead uses `padding-top: max(1rem, var(--safe-top))` — content never hides behind notch or Dynamic Island
+- [ ] All font sizes ≥ `0.9375rem` (15px equivalent at default scale) — readable on mobile without zooming
+- [ ] Line height ≥ `1.6` on body text — comfortable reading on small screens
+- [ ] Touch targets ≥ `44px` height on all interactive elements (buttons, nav chips, links)
+- [ ] Verify with iOS Accessibility → Larger Text set to maximum: app text must scale up with no clipping or overflow
+- [ ] `manifest.json` valid — install prompt works on Chrome Android and iOS Safari
+- [ ] `sw.js` registered — app loads offline after first visit
+- [ ] Flash prevention `<script>` in every page `<head>` — restores theme + font scale before paint
+
+- [ ] Run `get_errors` on every file created in Phase 0 — zero errors before proceeding
 - [ ] BCP
 
-### Phase 2 — FlockOS Comms Absorption
-- [ ] Audit `Scripts/the_comms.js` — document all Firestore listeners and writes
-- [ ] Confirm each is covered by `flockchat-public/flockchat.js`
-- [ ] Replace the_comms entry in `the_pillars.js` with a direct `href` link to FlockChat as Tier 1 section
-- [ ] Remove `the_comms.js` import from `the_ark.js`
-- [ ] Add `[DEPRECATED]` notice to `app.flockchat/app.flockchat.html`
-- [ ] Create `sections/letters.css`
+---
+
+### Phase 1 — Foundation CSS (complete the_broadsheet.css + all section stubs)
+- [ ] Fill `the_broadsheet.css` with full token block, grid, card, nav bar, masthead (from Phase 0-D above if not yet done)
+- [ ] Add `'Lora'` + `'Plus Jakarta Sans'` Google Fonts imports
+- [ ] All 9 `sections/*.css` stubs populated with `--sec-color` token + heading/body font vars
+- [ ] Implement `Adornment.initFontScale()` in copied `the_adornment.js` — 5-step picker, localStorage read/write
+- [ ] Verify C-Build rsync includes `Newspaper/Styles/sections/` subfolder
 - [ ] BCP
 
-### Phase 3 — Section CSS (one section at a time, in order)
+### Phase 2 — The Herald (wire existing stubs to live data)
+- [ ] Wire `flockNews` Firestore collection to front page
+- [ ] Wire `psalms` + `oneYearBible` to Today's Word panel
+- [ ] Wire `prayers` (public flag) to Prayer Spotlight
+- [ ] Replace static content with live data, static `Data/*.js` as fallback
+- [ ] `herald.css` — apply `--sec-color: var(--gold)`, Lora headlines
+- [ ] BCP
 
-**Order:** Herald (done in Phase 1) → FlockOS → GROW → FEED → FlockChat → FlockStand → FlockShow → Invite → Wellspring → FlockDocs → FlockShamar → Melchizedek → Multiply
+### Phase 3 — The Way (public — highest traffic, most features)
+- [ ] Port all 14 `app.grow` modules into `the_way/` section
+- [ ] Port full `app.invite` gospel presentation + share + church info + contact form
+- [ ] Wire `readingPlans`, `lexiconGreek/Hebrew` to live Firestore where available
+- [ ] All 14 modules functional with `Data/*.js` static fallback
+- [ ] `the_way.css` — `--sec-color: var(--accent)`
+- [ ] BCP
 
-For each section:
-- [ ] Create `sections/{name}.css` with the standard header block
-- [ ] Add section header markup to the app's HTML
-- [ ] Add `.sec-nav-bar` section bar to the app's HTML
-- [ ] Link `Styles/sections/{name}.css` after `Styles/new_covenant.css` in the HTML `<head>`
-- [ ] Convert inline `px` text sizes → `rem` in the app's HTML `<style>` blocks
-- [ ] Add font-scale boot restore to the app's flash-prevention script
-- [ ] Add `Adornment.initFontScale()` call to the app's boot sequence
-- [ ] BCP after each section
+### Phase 4 — The Sanctuary
+- [ ] Sermon builder wired to `sermons` Firestore collection
+- [ ] Song planner wired to `songs` + `servicePlans`
+- [ ] Service order wired to `servicePlans`
+- [ ] All three panels collapsible on one page
+- [ ] `the_sanctuary.css` — `--sec-color: var(--lilac)`
+- [ ] BCP
 
-### Phase 4 — Refactor `new_covenant.css`
-- [ ] Strip per-app typography rules now owned by section CSS files
-- [ ] Strip per-app color overrides now owned by section CSS files
-- [ ] Confirm remaining content is: tokens, reset, shell, card-grid, badges, modals, utilities, FlockChat bubble tokens
-- [ ] Add a `/* ── TABLE OF CONTENTS ── */` comment block at the top listing every `--var` group
+### Phase 5 — The Flock
+- [ ] Care board wired to `careCases` + `careInteractions` + `careAssignments`
+- [ ] Prayer chain wired to `prayers`
+- [ ] Compassion panel deferred (stub with "coming soon" — collections not seeded)
+- [ ] `the_flock.css` — `--sec-color: var(--mint)`
+- [ ] BCP
 
-### Phase 5 — QA Pass
-- [ ] Font-scale picker: test all 5 steps on iOS Safari, Android Chrome, Desktop Chrome
-- [ ] All sections correct at Compact (0.85×) and XL (1.25×)
-- [ ] Section bar scrolls correctly on 375px mobile viewport
-- [ ] Pillars sidebar inside FlockOS unaffected by section bar (no layout conflict)
-- [ ] All 47 registered views render without regression inside FlockOS
-- [ ] No GROW views broken in either `app.grow.html` or inside FlockOS (both must work)
-- [ ] B-Build clean. All nations receive `sections/` folder. Spot-check two nations.
+### Phase 6 — The Mission + The Family
+- [ ] Harvest tracker wired to `outreachCampaigns` (GAS fallback for `outreachContacts`)
+- [ ] Missions registry wired to `missionsRegistry` / `missionsPrayerFocus`
+- [ ] Member directory wired to `members` collection
+- [ ] Biblical genealogy from `Data/genealogy.js`
+- [ ] `the_mission.css` + `the_family.css`
+- [ ] BCP
+
+### Phase 7 — The Shepherd
+- [ ] Dashboard KPIs wired to `members`, `careCases`, `attendance` (GAS), `giving` (GAS)
+- [ ] Strategic goals wired to `strategicGoals/Initiatives/KeyDates`
+- [ ] Archive wired to `flockDocs` + `library`
+- [ ] Editor's Desk controls wired to `localStorage('flock_herald_config')`
+- [ ] Editorial Board panels wired to Firestore
+- [ ] Codex pages authored (HTML, not live fetch)
+- [ ] `the_shepherd.css` — `--sec-color: var(--warning)`
+- [ ] BCP
+
+### Phase 8 — The Calendar + The Weavers (new sections)
+- [ ] Calendar wired to `events` + `calendarEvents`
+- [ ] RSVP support via GAS `events.rsvp`
+- [ ] Weavers wired to `volunteers` + `groups`
+- [ ] `the_calendar.css` + `the_weavers.css`
+- [ ] BCP
+
+### Phase 9 — QA
+- [ ] Font scale: all 5 steps on iOS Safari, Android Chrome, Desktop Chrome
+- [ ] Section nav bar scrolls correctly on 375px (iPhone SE)
+- [ ] Safe area correct on iPhone 14 Pro (Dynamic Island, 59px top inset)
+- [ ] All 14 GROW modules functional in The Way
+- [ ] app.invite full flow: gospel → prayer submit → writes to `prayers`
+- [ ] All 47 FlockOS SPA views accessible inside The Shepherd
+- [ ] Playwright full regression: every section, every panel, every data path, zero console errors
+- [ ] C-Build clean — all nations receive updated sections (only after user approval)
+- [ ] BCP (final)
 
 ---
 
-## 11. CSS Token Cross-Reference (Quick Edit Guide)
+## Playwright Verification — Standard Per Section
 
-> For any future developer or AI: when you need to change fonts or colors, use this table. Do not guess.
+Every section must pass this Playwright checklist before it is considered done.
+Run with `npx playwright test` from workspace root. Tests live in `Newspaper/tests/`.
 
-| What you want to change | Where |
+| Check | What to verify |
 |---|---|
-| Headline font — all sections | `new_covenant.css` → `--heading-font` |
-| Body font — all sections | `new_covenant.css` → `--body-serif` or `--body-sans` |
-| Headline font — one section | `Styles/sections/{name}.css` → `--sec-heading-font` |
-| Body font — one section | `Styles/sections/{name}.css` → `--sec-body-font` |
-| User text scale | `localStorage('flock_font_scale')` → `--fn-scale` on `<html>` |
-| Paper/background — global | `new_covenant.css` → `--paper` |
-| Gold accent — global | `new_covenant.css` → `--gold` |
-| Herald masthead typeface | `sections/herald.css` → `--masthead-font` |
-| FlockChat bubble colors | `new_covenant.css` → FlockChat bubble token block |
-| Section nav active state | `new_covenant.css` → `.sec-nav-tab[aria-current="page"]` |
-| Pillars sidebar styles (in FlockOS) | `new_covenant.css` → `.veil-side` / `.pillars-*` |
-| FlockOS Tier-2 view typography | `sections/shepherd.css` → inherits to all in-app views |
+| Page loads | No console errors, no 404s, no uncaught exceptions |
+| Auth gate | Unauthenticated user redirected correctly for gated sections |
+| Section nav bar | All visible tabs render, active tab highlighted, clicking navigates |
+| Cards render | All cards present, no blank/skeleton states left unfilled |
+| Data loads | Live Firestore data appears OR GAS fallback fires OR static Data/* renders |
+| Forms submit | Any add/create form writes to correct Firestore collection without error |
+| Mobile viewport | Test at 375px width — no horizontal scroll, all text readable, all buttons tappable |
+| iOS safe area | Masthead not clipped — content starts below notch/Dynamic Island |
+| Font scale | `--fn-scale` changes cascade correctly at all 5 steps |
+| Offline | After first load, page renders from service worker cache with no network |
 
 ---
 
-## 12. Module Inventory — No Redundancy Check
+## Multi-Church Deployment — Deferred
 
-Every module, view, and standalone app in New_Covenant appears exactly once in this plan:
+The Newspaper will eventually be built out to all registered Nations churches via
+C-Build. **This does not happen until the build is approved by the lead pastor.**
 
-**Standalone HTML apps (Tier 1) — 16 sections:**
-Herald, Editor's Desk (auth), Editorial Board (auth/new), The Codex (auth/new), Shepherd's Desk, Pulpit, Cantors', Stage, Letters Column, The Path, Invitation, Wellspring, Archive, Bulletin Board, Family Tree, Mission Report.
-
-**In-app SPA views (Tier 2 — inside FlockOS) — 47 routes:**
-`the_good_shepherd`, `the_upper_room`, `the_growth`, `the_fellowship`, `the_announcements`, `the_prayer_chain`, `the_fold`, `the_life`, `the_call_to_forgive`, `prayerful_action`, `the_seasons`, `the_anatomy_of_worship`, `quarterly_worship`, `the_pentecost`, `the_great_commission`, `the_gospel_invitation`, `the_harvest`, `the_way`, `the_truth`, `fishing_for_men`, `fishing_for_data`, `the_gift_drift`, `the_weavers_plan`, `the_generations`, `the_wall`, `bezalel`, `content-admin`, `the_invitation`, `software_deployment_referral`, `learn_more`, `about_flockos`, `the_gospel_courses`, `the_gospel_quizzes`, `the_gospel_reading`, `the_gospel_theology`, `the_gospel_teaching_plans`, `the_gospel_lexicon`, `the_gospel_library`, `the_gospel_devotionals`, `the_gospel_apologetics`, `the_gospel_counseling`, `the_gospel_heart`, `the_gospel_mirror`, `the_gospel_genealogy`, `the_gospel_journal`, `the_gospel_certificates`, `the_gospel_analytics`.
-
-**Intentional overlap:** The `the_gospel_*` learning modules appear in BOTH `app.grow.html` (public, no-auth) AND inside FlockOS (member context, progress tracking). This is by design — not redundancy.
-
-**Deprecated:** `app.flockchat/app.flockchat.html` (stale mirror — marked deprecated, not built).
+- Phase 1–9 targets a single church instance only (the primary `flockos-notify` project)
+- C-Build will NOT push Newspaper to Nations until explicitly authorized
+- The build must be stable, fully QA'd, and signed off before any other church receives it
+- When the time comes: C-Build handles the rsync + branding injection automatically
+- No church will receive a half-built or unapproved version
 
 ---
 
-## 13. What This Is NOT
+## What Is Not Changing
 
-- ❌ Not a data migration
-- ❌ Not a new Firebase project or Firestore schema change
-- ❌ Not a new GAS backend
-- ❌ Not an SPA rewrite — each Tier 1 section remains its own HTML page
-- ❌ Not a PWA architecture change — each app keeps its own manifest
-- ❌ Not dark mode — Herald and all sections are light/newsprint by default; only The Stage is dark (projection requirement)
-- ❌ Not a redesign of the Pillars sidebar — it stays as the in-app navigation for Tier 2 views inside FlockOS
-
-This is exactly what it says: **lipstick and font work** on a system whose bones are already built. The data is there. The wiring is there. We are giving the building a beautiful facade and a consistent editorial design language.
+- No new Firebase projects
+- No new Firestore schema — all collections already defined
+- No new GAS scripts — all routes already exist
+- No SPA rewrite — Pillars sidebar stays inside The Shepherd shell
+- No dark mode except The Sanctuary service order panel (projection use case)
+- No removal of any existing functionality — every feature from every `app.*` is mapped above
+- `Architechtural Docs/` stays gitignored and private — never committed, never deployed
 
 ---
 
-*Plan authored: May 2026. Revised: accuracy pass — 47 registered views confirmed against `the_ark.js`, 16 Tier 1 sections, The Codex added, palette finalized. Start with Phase 0.*
+*Plan v6 — May 2026. Old plan archived as ThePlan.OLD.md.*
 
 ---
 
-## VERSION 5 — Consolidation, Gap Analysis & Phase 2–3 Build Plan (2026-05-21)
+---
 
-### As-Built Reality (Herald standalone, all 16 sections deployed)
+# AS-BUILT LOG
 
-The Herald is a fully standalone newspaper PWA with its own design system (`the_broadsheet.css`),
-auth stack (`the_true_vine.js` + `firm_foundation.js` / Nehemiah), and section scripts.
-The original two-tier architecture (Herald wrapping FlockOS apps) has been superseded —
-the Herald IS the application. Every section is its own HTML page. IIFEs only, no ES modules.
-
-**Auth stack:** `the_true_vine.js` + `firm_foundation.js` (Nehemiah). Local dev bypass:
-call `Nehemiah.enableLocalBypass()` in browser console, then reload.
-
-**Build:** `bash "Iris/Bezalel/Scripts/C-Build_Newspaper.sh"` → 5 Nations.
-
-**Script load order (all pages):**
-`the_true_vine.js` → `firm_foundation.js` → inline auth guard → `the_adornment.js` → `the_gates.js?v=2` → section script
+> **Instructions for the executing AI:** After every completed step — no matter how
+> small — append an entry to this log BEFORE running BCP. Every git commit must be
+> referenced by its full SHA after the push confirms. If a step spans multiple commits,
+> list each one. Never summarize multiple steps into one entry. If a step was attempted
+> and failed, log the failure and what changed before logging the recovery. This log is
+> the permanent build record for The Flock Herald and will be distilled into a clean
+> AS-Built document after the build is complete.
+>
+> **Entry format:**
+> ```
+> ### [Phase X — Step Name]
+> **Date:** YYYY-MM-DD
+> **Commit:** `<full 40-char SHA>` — "<commit message>"
+> **Files created/modified:**
+> - path/to/file — what was done
+> **What was built:**
+> [2–5 sentences describing exactly what was implemented, decisions made, deviations from plan if any]
+> **Verified:**
+> - [ ] get_errors: zero errors on all files in this step
+> - [ ] Playwright: [list which checks passed]
+> - [ ] Visual: [what was confirmed in browser]
+> **Notes / deviations from plan:**
+> [anything that differed from the spec, or "None"]
+> ```
 
 ---
 
-### Firestore Verification — flockos-notify (2026-05-21)
+## Build Log
 
-Live collections confirmed by `admin.firestore().listCollections()` against `flockos-notify`.
-
-#### ✅ Herald-relevant collections that ARE live
-
-| Collection | Herald Section |
-|---|---|
-| `careCases` | The Flock — Care |
-| `careInteractions` | The Flock — Care interactions |
-| `careAssignments` | The Flock — Care assignments |
-| `prayers` | The Flock — Prayer requests |
-| `members` | The Family |
-| `outreachCampaigns` | The Mission |
-| `events` + `calendarEvents` | The Calendar |
-| `sermons` + `servicePlans` + `songs` | The Sanctuary |
-| `volunteers` | The Weavers |
-| `groups` | The Weavers |
-| `discipleshipPaths` | The Way |
-| `strategicGoals/Initiatives/KeyDates` | The Shepherd |
-| `psalms` + `psalmThemes` | The Tabernacle — devotional content |
-| `readingPlans` + `readingPlanDays` + `oneYearBible` | The Way — reading plans |
-| `teachingPlans` + `quarterlyPlans` | The Sanctuary — sermon series planning |
-| `flockDocs` + `library` | The Archive / The Shepherd |
-| `flockNews` | The Herald front page |
-| `lexiconGreek` + `lexiconHebrew` | The Way — scripture depth |
-| `shepherdsMirror` | The Shepherd — pastoral reflection |
-| `heartCheck` + `touches` | The Flock — pastoral contact tracking |
-
-#### ❌ Schema-defined but NOT yet in live Firestore (GAS fallback required)
-
-| Collection | Herald Section | Fallback |
-|---|---|---|
-| `compassionRequests` + `compassionLogs` + `compassionResources` | The Flock — Compassion | defer until seeded |
-| `outreachContacts` + `outreachFollowUps` | The Mission list | GAS `outreach.contacts.*` |
-| `giving` + `pledges` | The Shepherd — giving KPIs | GAS `giving.*` |
-| `attendance` | The Shepherd — attendance | GAS `attendance.*` |
-| `households` | The Family | GAS `members.*` |
-| `ministries` | The Weavers teams | GAS `volunteers.*` |
-| `pastoralNotes` | The Flock — confidential notes | GAS `care.notes` perm |
+*(No entries yet — build has not started. First entry will be Phase 0, Step 0-A.)*
 
 ---
 
-### Section Consolidation — 16 Thin Stubs → 9 Rich Sections
-
-The original 16 sections are replaced with 9 consolidated sections.
-Each section is a longer, multi-panel page instead of a thin stub.
-
-| New Section | Absorbs (old keys) | minRole | Data |
-|---|---|---|---|
-| **The Herald** | `herald` | -1 (public) | Front page — `flockNews`, announcements |
-| **The Sanctuary** | `pulpit` + `levites` + `stage` | 3 (leader) | Sermon builder + song planner + service order |
-| **The Flock** | `gatehouse` + `epistles` | 2 (care/deacon) | Care cases + prayer requests + compassion |
-| **The Mission** | `great_commission` + `harvest` | 4 (pastor) | Outreach contacts + decisions + missions registry |
-| **The Family** | `genealogies` | 0 (member) | Member directory + households + milestones |
-| **The Way** | `straight_path` + `living_water` | -1 (public) | Discipleship + reading plans + scripture |
-| **The Shepherd** | `cornerstone` + `editors_desk` + `council` + `scroll_room` | 4 (pastor) | Giving + attendance + pastoral tools + codex |
-| **The Calendar** | *(new)* | 0 (member) | Events, services, birthdays — `events` + `calendarEvents` |
-| **The Weavers** | *(new)* | 3 (leader) | Volunteer teams + ministries + small groups |
-
-**Retired section folders** (7 sections absorbed — keep HTML as redirect to new parent):
-`pulpit/`, `levites/`, `stage/`, `epistles/`, `great_commission/`, `scroll_room/`,
-`cornerstone/`, `editors_desk/`, `council/`
-
----
-
-### Full GAS API Surface — Per Section
-
-#### The Flock (care + prayer + compassion)
-
-**Care — 3 Firestore collections (`careCases`, `careInteractions`, `careAssignments`)**
-GAS routes: `care.list`, `care.get`, `care.create`, `care.update`, `care.resolve`,
-`care.interactions.list`, `care.interactions.create`, `care.interactions.followUpDone`,
-`care.followUps.due`, `care.assignments.list`, `care.assignments.myFlock`,
-`care.assignments.create`, `care.assignments.end`, `care.assignments.reassign`,
-`care.caregivers.list`, `care.dashboard`
-
-Permission levels: `care`=2, `care.view-all`=3, `care.edit-all`=4, `care.notes`=4 (confidential)
-
-**Care case schema (25 care types):**
-Shepherding, Elder Care, Crisis, Abuse / Domestic Violence, Immigration / Deportation,
-Incarceration & Re-Entry, Grief, Pregnancy & Infant Loss, Marriage, Pre-Marriage,
-Addiction, Pornography / Sexual Addiction, Hospital Visit, Medical,
-Terminal Illness / End of Life, New Believer, New Member Integration, Restoration,
-Counseling, Mental Health, Gender Identity / Sexuality, Discipleship, Family, Financial, Other
-
-**Prayer — `prayers` collection**
-GAS routes: `prayer.list`, `prayer.create`, `prayer.update`, `prayer.answer`, `prayer.archive`
-
-**Compassion — defer (collections not yet seeded in Firestore)**
-GAS routes when ready: `compassion.requests.*` (13 routes), `compassion.resources.*`, `compassion.log.*`
-
-#### The Sanctuary (worship + service prep)
-
-Three collapsible panels on one page:
-1. **Sermon Builder** (`sermons` collection) — GAS `sermons.list/get/create/update`
-2. **Song Planner** (`songs` collection) — GAS `songs.list/search/add` + `servicePlans.*`
-3. **Service Order** (`servicePlans` collection) — GAS `serviceOrders.get/save`
-
-Also available: `teachingPlans`, `quarterlyPlans` for series planning context
-
-#### The Mission (outreach + missions)
-
-Two panels:
-1. **Harvest Tracker** — `outreachCampaigns` (live) + `outreachContacts` (GAS fallback)
-   GAS `outreach.contacts.*`, `outreach.campaigns.*`, `outreach.followUps.*`, `outreach.dashboard`
-2. **Missions Registry** — `missionsRegistry`, `missionsPrayerFocus`, `missionsUpdates`, `missionsPartners`
-
-#### The Family (members)
-
-`members` collection — full 47-field schema:
-name, dob, email, phone, address, membershipStatus, memberSince, baptismDate,
-salvationDate, householdId, familyRole, ministryTeams, volunteerRoles, spiritualGifts,
-smallGroup, pastoralNotes, lastContactDate, nextFollowUp, followUpPriority, assignedTo, tags
-
-GAS `members.list/get/create/update/archive` + `milestones.*` + `contactLog.*`
-
-#### The Shepherd (pastor dashboard)
-
-Four panels:
-1. **Giving KPIs** — `giving` (GAS fallback: `giving.summary`, `giving.list`)
-2. **Attendance** — `attendance` (GAS fallback: `attendance.summary`, `attendance.list`)
-3. **Strategic** — `strategicGoals`, `strategicInitiatives`, `strategicKeyDates`
-4. **Pastoral tools** — `shepherdsMirror`, `heartCheck`, `touches`, `flockDocs`, `library`
-
-#### The Calendar (events)
-
-`events` + `calendarEvents` collections
-GAS `events.list/get/create/update/cancel/rsvp` + `events.public` (no auth — public events)
-
-#### The Weavers (teams + volunteers)
-
-`volunteers` + `groups` collections
-GAS `volunteers.list/schedule/create/update/swap` + `groups.list/get/addMember/removeMember`
-
-#### The Way (discipleship + scripture)
-
-`discipleshipPaths` + `readingPlans` + `readingPlanDays` + `oneYearBible`
-`lexiconGreek` + `lexiconHebrew` + `psalms` + `psalmThemes`
-
-#### The Tabernacle (worship + devotional)
-
-`devotionals` + `psalms` + `psalmThemes` + `theology` + `theologyCategories`
-
----
-
-### The Flock — Care Board minRole Decision
-
-**OPEN:** `gatehouse` (The Bulletin / care cases) is currently `minRole: 0`.
-Care cases include: Medical, Crisis, Addiction, Grief, Abuse — sensitive pastoral data.
-**Recommendation:** bump to `minRole: 2` (care/deacon) in `the_gates.js` SECTIONS registry.
-**Requires explicit user confirmation before changing.**
-
----
-
-### Phase 2 — Connect Existing Sections to Live Firestore
-
-1. **The Flock** — wire `careCases/careInteractions/careAssignments` + `prayers`;
-   full case detail sheet, interaction log, follow-up queue, caregiver assignment panel;
-   GAS fallback for `compassionRequests` (defer until collections seeded)
-2. **The Sanctuary** — wire `sermons`, `songs`, `servicePlans`; replace localStorage sermon builder
-3. **The Mission** — wire `outreachCampaigns` + `missionsRegistry` + `missionsPrayerFocus`;
-   GAS fallback for `outreachContacts`
-4. **The Family** — wire `members` collection, add search/filter, milestones panel
-
-### Phase 3 — Build New Sections
-
-5. **The Calendar** (`the_calendar/`) — `events` + `calendarEvents`; upcoming events,
-   services, birthdays this week; RSVP support; minRole: 0
-6. **The Weavers** (`the_weavers/`) — `volunteers` + `groups`; teams roster, open positions,
-   small group list; minRole: 3
-7. **The Shepherd upgrade** — connect `giving`/`attendance` (GAS fallback); add
-   `shepherdsMirror`, `heartCheck`, `touches`; strategic goals display
-
-### Phase 4 — Content Depth
-
-8. **The Way** — wire `readingPlans`, `lexiconGreek/Hebrew`, `psalmThemes`
-9. **The Tabernacle** — wire `devotionals`, `psalms`, liturgical calendar
-10. **Compassion panel** — build once `compassionRequests` collections are seeded
-
----
-
-### Connectivity Model (applies to all sections)
-
-```
-1. Check window.UpperRoom.isReady() — Firestore initialized?
-   YES → read from live collection (same paths as FlockOS)
-   NO  → fall back to GAS endpoint via the_living_water_adapter
-2. localStorage as tertiary fallback (offline / no GAS URL configured)
-3. Never block render — show placeholder/skeleton, swap in live data async
-4. Firestore paths are TOP-LEVEL collections (not nested under /churches/{id}/)
-   confirmed against flockos-notify: careCases, prayers, members, etc.
-```
-
----
-
-*Version 5 authored: 2026-05-21. Based on live Firestore verification of flockos-notify,
-full GAS API audit (06 — GAS Backend Master Code.md), and schema cross-check
-(19 — Firestore Data Schema.sql). 93 collections in schema; 71 confirmed live.*

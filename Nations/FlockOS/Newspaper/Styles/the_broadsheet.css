@@ -1,1003 +1,593 @@
-/*
- * the_broadsheet.css
- * The Newspaper — FlockOS Unified Editorial Experience
- * Design system for the Newspaper product.
- * Isaiah 59:19 — "the Spirit of the Lord will lift up a standard."
- *
- * This file is the Newspaper's equivalent of new_covenant.css.
- * It does NOT contain FlockOS SPA styles (Pillars, card-grid, badge system).
- * Section CSS files in Styles/sections/ are additive-only (--sec-* vars, never override tokens here).
- */
+/* ==========================================================================
+   the_broadsheet.css — The Flock Herald shared foundation
+   DO NOT add section-specific rules here. Sections use Styles/sections/*.css
+   ========================================================================== */
 
-/* ═══════════════════════════════════════════════════════════════
-   §1 — GOOGLE FONTS
-   ═══════════════════════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IM+Fell+English:ital@0;1&display=swap');
+/* ── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
-
-/* ═══════════════════════════════════════════════════════════════
-   §2 — DESIGN TOKENS
-   ═══════════════════════════════════════════════════════════════ */
-:root {
-
-  /* ── Paper surfaces ─────────────────────────────────────────── */
-  --paper:          #faf6ed;   /* Old Ivory — light, airy newsprint */
-  --paper-white:    #fefcf7;   /* Cream letter paper — lifted surfaces, cards */
-  --paper-tint:     #ede8d8;   /* Aged parchment — column fills, sunken areas */
-  --paper-dark:     #ddd4be;   /* Deep parchment — column rule fills, borders */
-
-  /* ── Ink ────────────────────────────────────────────────────── */
-  --ink:            #1a100a;   /* Iron gall — near-black with warm brown undertone */
-  --ink-mid:        #2a1808;   /* Deep sepia — subheads, secondary headlines */
-  --ink-dim:        #3e2410;   /* Faded ink — bylines, labels, small-caps metadata */
-  --ink-faint:      #5a3a20;   /* Ghost ink — timestamps, tertiary metadata */
-
-  /* ── Gold ───────────────────────────────────────────────────── */
-  --gold:           #a07818;   /* Altar gold — rich, dark, dignified */
-  --gold-bright:    #c89420;   /* Bright gold — hover, active, interactive states */
-  --gold-pale:      #e8cc80;   /* Pale gold — disabled states, very subtle fills */
-
-  /* ── Column rules (dividers, borders) ──────────────────────── */
-  --rule:           #3a2510;   /* Sepia rule — hard column dividers */
-  --rule-soft:      #c4b090;   /* Soft rule — section separators */
-  --rule-faint:     #ddd0b8;   /* Ghost rule — visual structure, barely visible */
-
-  /* ── Accent ─────────────────────────────────────────────────── */
-  --burgundy:       #5c1928;   /* Church wine — callout boxes, special notices */
-  --navy:           #0c1445;   /* Vesper blue — back button badge */
-
-  /* ── Section signature colors (jewel tones) ─────────────────── */
-  --sec-herald:         #a07818;   /* Altar Gold */
-  --sec-tabernacle:     #5c1928;   /* Church Wine */
-  --sec-pulpit:         #2e1a4a;   /* Bishop's Purple */
-  --sec-levites:        #1a3d28;   /* Cedar Green */
-  --sec-stage:          #0c1445;   /* Vesper Blue */
-  --sec-epistles:       #1e3050;   /* Inkwell Blue */
-  --sec-straight-path:  #4a2808;   /* Pilgrim Brown */
-  --sec-commission:     #a07818;   /* Altar Gold (matches Herald) */
-  --sec-living-water:   #09102e;   /* Wellspring Navy */
-  --sec-scroll-room:    #2a1a0e;   /* Ink & Leather */
-  --sec-gatehouse:      #3d1818;   /* Crimson Notice */
-  --sec-genealogies:    #1a3030;   /* Cedar & Stone */
-  --sec-harvest:        #0e2818;   /* Field Dispatch */
-  --sec-cornerstone:    #1a2a3a;   /* Blueprint Slate */
-
-  /* ── Consolidated section accents (v5, 2026-05-21) ─────────── */
-  --sec-sanctuary:      #2e1a4a;   /* Bishop's Purple (worship + preaching) */
-  --sec-flock:          #3d1818;   /* Crimson Notice  (care + prayer) */
-  --sec-mission:        #0e2818;   /* Field Dispatch  (outreach + missions) */
-  --sec-family:         #1a3030;   /* Cedar & Stone   (members + households) */
-  --sec-the-way:        #4a2808;   /* Pilgrim Brown   (discipleship + scripture) */
-  --sec-shepherd:       #1a2a3a;   /* Blueprint Slate (pastor dashboard) */
-  --sec-calendar:       #204060;   /* Schedule Blue   (events + seasons) */
-  --sec-weavers:        #1a3d28;   /* Cedar Green     (teams + volunteers) */
-
-  /* ── Newsroom palette (Editor's Desk + Editorial Board) ─────── */
-  --ed-bg:          #120f08;
-  --ed-panel:       #1c1710;
-  --ed-gold:        #c9960a;
-  --ed-text:        #e8ddc8;
-
-  /* ── Typography ─────────────────────────────────────────────── */
-  --font-masthead:  'Pirata One', 'Georgia', serif;
-  --font-headline:  'Playfair Display', 'Georgia', serif;
-  --font-body:      'IM Fell English', 'Georgia', serif;
-  --font-label:     'Playfair Display', 'Georgia', serif;
-  --font-ui:        -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-
-  /* ── Font scale (controlled by the_adornment.js) ────────────── */
-  --fn-scale: 1;
-
-  /* ── Safe area insets (iOS Dynamic Island, Samsung punch-hole) ─ */
-  --safe-top:    env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left:   env(safe-area-inset-left, 0px);
-  --safe-right:  env(safe-area-inset-right, 0px);
-
-  /* ── Section bar dimensions ─────────────────────────────────── */
-  --sec-bar-height: 44px;
-  --sec-bar-bg:     var(--paper-tint);
-  --sec-bar-border: var(--rule-soft);
-
-  /* ── Layout ─────────────────────────────────────────────────── */
-  --page-max-width:   960px;
-  --column-gap:       24px;
-  --article-padding:  16px;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §3 — FONT SCALE
-   ═══════════════════════════════════════════════════════════════ */
-html {
-  font-size: calc(var(--fn-scale) * 115%);
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §4 — RESET & BASE
-   ═══════════════════════════════════════════════════════════════ */
+/* ── CSS Reset ────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
-  height: 100%;
+/* ── Root Tokens ──────────────────────────────────────────────────────────── */
+:root {
+  /* Font scale — Layer 2 (device/OS preference is Layer 1 via 100% base) */
+  --fn-scale: 1;
+
+  /* Paper & Ink (sourced from new_covenant.css values) */
+  --paper:        #faf9f6;   /* NC --bg */
+  --paper-card:   #ffffff;   /* NC --bg-raised */
+  --paper-sunken: #f0eeea;   /* NC --bg-sunken */
+  --paper-hover:  #f5f3ef;   /* NC --bg-hover */
+  --ink:          #2c2c2c;   /* NC --ink */
+  --ink-muted:    #6b6b6b;   /* NC --ink-muted */
+  --ink-faint:    #a0a0a0;   /* NC --ink-faint */
+  --ink-inverse:  #faf9f6;   /* NC --ink-inverse */
+  --rule:         #e4e1dc;   /* NC --line */
+  --rule-strong:  #d0ccc5;   /* NC --line-strong */
+
+  /* Section signature colors (NC tokens mirrored) */
+  --gold:    #8B7028;
+  --accent:  #7eaacc;
+  --lilac:   #b49bdb;
+  --mint:    #8cc5a2;
+  --peach:   #f0a889;
+  --sky:     #8abde0;
+  --warning: #946B1C;
+  --success: #3d8b4f;
+  --rose:    #e69aba;
+
+  /* Soft tints */
+  --gold-soft:    rgba(139,112,40,0.15);
+  --accent-soft:  rgba(126,170,204,0.12);
+  --lilac-soft:   rgba(180,155,219,0.12);
+  --mint-soft:    rgba(140,197,162,0.12);
+  --peach-soft:   rgba(240,168,137,0.12);
+  --sky-soft:     rgba(138,189,224,0.12);
+  --warning-soft: rgba(148,107,28,0.12);
+  --success-soft: rgba(61,139,79,0.10);
+  --rose-soft:    rgba(230,154,186,0.12);
+
+  /* iOS safe area */
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
+
+  /* Spacing & shape */
+  --radius:     0.5rem;
+  --radius-lg:  0.75rem;
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08);
+
+  /* Typography */
+  --font-headline: 'Lora', Georgia, serif;
+  --font-body:     'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
+/* ── Base Font Size ───────────────────────────────────────────────────────── */
+/* CRITICAL: 100% inherits the browser default which includes the OS/device   */
+/* text-size preference. Never use 16px here — it silently blocks user A11y.  */
+html {
+  font-size: calc(var(--fn-scale) * 100%);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ── Body ─────────────────────────────────────────────────────────────────── */
 body {
-  background-color: var(--paper);
-  color: var(--ink);
   font-family: var(--font-body);
-  font-size: 1.1rem;
-  line-height: 1.7;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-width: 100vw;
+  min-height: 100dvh;
+}
+
+/* ── Scrollbar (Webkit) ───────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+* { scrollbar-width: thin; scrollbar-color: var(--rule-strong) transparent; }
+
+/* ── Focus Ring ───────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--sec-color, var(--gold));
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── Typography Utilities ─────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headline);
+  color: var(--ink);
+  line-height: 1.3;
 }
 
 a {
-  color: var(--gold);
+  color: var(--sec-color, var(--gold));
   text-decoration: none;
 }
+a:hover { text-decoration: underline; }
 
-a:hover {
-  color: var(--gold-bright);
-  text-decoration: underline;
-}
-
-img {
-  max-width: 100%;
-  display: block;
-}
-
-button {
-  cursor: pointer;
-  font-family: inherit;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §5 — SAFE AREA UTILITY CLASSES
-   ═══════════════════════════════════════════════════════════════ */
-.safe-top    { padding-top:    max(8px,  var(--safe-top));    }
-.safe-bottom { padding-bottom: max(16px, var(--safe-bottom)); }
-.safe-left   { padding-left:   max(12px, var(--safe-left));   }
-.safe-right  { padding-right:  max(12px, var(--safe-right));  }
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §6 — SECTION NAVIGATION BAR  (.sec-nav-bar)
-   ═══════════════════════════════════════════════════════════════ */
-
-/*
- * The section bar sits below the masthead, above page content.
- * Horizontally scrollable on mobile. Full row on desktop.
- * Each chip is a .sec-nav-tab. Active tab has .is-active.
- * Role-gated tabs are removed from the DOM by the_gates.js before render.
- */
-.sec-nav-bar {
+/* ── Page Wrapper ─────────────────────────────────────────────────────────── */
+.broadsheet-page {
   display: flex;
-  align-items: center;
-  height: var(--sec-bar-height);
-  background: var(--sec-bar-bg);
-  border-bottom: 1px solid var(--sec-bar-border);
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;          /* Firefox */
-  padding-left:  max(12px, var(--safe-left));
-  padding-right: max(12px, var(--safe-right));
-  gap: 4px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  flex-direction: column;
+  min-height: 100dvh;
 }
 
-.sec-nav-bar::-webkit-scrollbar {
-  display: none;                  /* Chrome/Safari */
+/* ── Section Masthead ─────────────────────────────────────────────────────── */
+.sec-masthead {
+  background: var(--paper-card);
+  border-bottom: 1px solid var(--rule);
+  padding: max(1rem, var(--safe-top)) max(1rem, var(--safe-right)) 0 max(1rem, var(--safe-left));
+  /* 3px top accent stripe applied by each section via border-top in sections/*.css */
 }
 
-.sec-nav-tab {
-  display: inline-flex;
-  align-items: center;
-  height: 30px;
-  padding: 0 14px;
-  border-radius: 4px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--ink-dim);
-  font-family: var(--font-label);
-  font-size: 1rem;
-  font-variant: small-caps;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-  text-decoration: none;
-}
-
-.sec-nav-tab:hover {
-  background: var(--paper-dark);
-  color: var(--ink);
-  border-color: var(--rule-soft);
-  text-decoration: none;
-}
-
-.sec-nav-tab.is-active {
-  background: var(--gold);
-  color: var(--paper-white);
-  border-color: var(--gold);
-  font-weight: 600;
-}
-
-/* Section-specific active accent colors */
-.sec-nav-tab.is-active[data-section="herald"]         { background: var(--sec-herald);        border-color: var(--sec-herald); }
-.sec-nav-tab.is-active[data-section="tabernacle"]     { background: var(--sec-tabernacle);    border-color: var(--sec-tabernacle); }
-.sec-nav-tab.is-active[data-section="pulpit"]         { background: var(--sec-pulpit);        border-color: var(--sec-pulpit); }
-.sec-nav-tab.is-active[data-section="levites"]        { background: var(--sec-levites);       border-color: var(--sec-levites); }
-.sec-nav-tab.is-active[data-section="stage"]          { background: var(--sec-stage);         border-color: var(--sec-stage); }
-.sec-nav-tab.is-active[data-section="epistles"]       { background: var(--sec-epistles);      border-color: var(--sec-epistles); }
-.sec-nav-tab.is-active[data-section="straight_path"]  { background: var(--sec-straight-path); border-color: var(--sec-straight-path); }
-.sec-nav-tab.is-active[data-section="great_commission"]{ background: var(--sec-commission);   border-color: var(--sec-commission); }
-.sec-nav-tab.is-active[data-section="living_water"]   { background: var(--sec-living-water);  border-color: var(--sec-living-water); }
-.sec-nav-tab.is-active[data-section="scroll_room"]    { background: var(--sec-scroll-room);   border-color: var(--sec-scroll-room); }
-.sec-nav-tab.is-active[data-section="gatehouse"]      { background: var(--sec-gatehouse);     border-color: var(--sec-gatehouse); }
-.sec-nav-tab.is-active[data-section="genealogies"]    { background: var(--sec-genealogies);   border-color: var(--sec-genealogies); }
-.sec-nav-tab.is-active[data-section="harvest"]        { background: var(--sec-harvest);       border-color: var(--sec-harvest); }
-.sec-nav-tab.is-active[data-section="cornerstone"]    { background: var(--sec-cornerstone);   border-color: var(--sec-cornerstone); }
-/* Consolidated sections (v5) */
-.sec-nav-tab.is-active[data-section="sanctuary"]      { background: var(--sec-sanctuary);     border-color: var(--sec-sanctuary); }
-.sec-nav-tab.is-active[data-section="flock"]          { background: var(--sec-flock);         border-color: var(--sec-flock); }
-.sec-nav-tab.is-active[data-section="mission"]        { background: var(--sec-mission);       border-color: var(--sec-mission); }
-.sec-nav-tab.is-active[data-section="family"]         { background: var(--sec-family);        border-color: var(--sec-family); }
-.sec-nav-tab.is-active[data-section="the_way"]        { background: var(--sec-the-way);       border-color: var(--sec-the-way); }
-.sec-nav-tab.is-active[data-section="shepherd"]       { background: var(--sec-shepherd);      border-color: var(--sec-shepherd); }
-.sec-nav-tab.is-active[data-section="calendar"]       { background: var(--sec-calendar);      border-color: var(--sec-calendar); }
-.sec-nav-tab.is-active[data-section="weavers"]        { background: var(--sec-weavers);       border-color: var(--sec-weavers); }
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §7 — MASTHEAD  (.np-masthead)
-   ═══════════════════════════════════════════════════════════════ */
-.np-masthead {
-  background: var(--paper-white);
-  border-bottom: 2px solid var(--rule);
-  padding-top:    max(12px, var(--safe-top));
-  padding-bottom: 12px;
-  padding-left:   max(16px, var(--safe-left));
-  padding-right:  max(16px, var(--safe-right));
-  text-align: center;
-}
-
-.np-masthead__title {
-  font-family: var(--font-masthead);
-  font-size: clamp(2rem, 7vw, 4.5rem);
-  color: var(--ink);
-  letter-spacing: 0.02em;
-  line-height: 1.1;
-}
-
-.np-masthead__rule {
-  border: none;
-  border-top: 3px double var(--rule);
-  margin: 6px auto;
-  width: 80%;
-}
-
-.np-masthead__meta {
-  font-family: var(--font-label);
-  font-size: 1rem;
-  font-variant: small-caps;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--ink);
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §8 — PAGE WRAPPER & ARTICLE LAYOUT
-   ═══════════════════════════════════════════════════════════════ */
-.np-page {
-  max-width: var(--page-max-width);
-  margin: 0 auto;
-  padding: 20px var(--article-padding);
-  padding-bottom: max(20px, var(--safe-bottom));
-}
-
-.np-section-header {
-  font-family: var(--font-label);
-  font-size: 0.8rem;
-  font-variant: small-caps;
-  letter-spacing: 0.12em;
-  color: var(--ink-dim);
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--rule-soft);
-  padding-bottom: 4px;
-  margin-bottom: 16px;
-}
-
-.np-headline {
-  font-family: var(--font-headline);
-  font-size: clamp(1.4rem, 4vw, 2.2rem);
-  color: var(--ink);
-  line-height: 1.2;
-  margin-bottom: 8px;
-}
-
-.np-byline {
-  font-family: var(--font-label);
-  font-size: 1.05rem;
-  font-variant: small-caps;
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: 0.05em;
-  margin-bottom: 12px;
-}
-
-.np-body {
-  font-family: var(--font-body);
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: var(--ink);
-}
-
-.np-body p + p {
-  text-indent: 1.5em;
-}
-
-.np-pull-quote {
-  border-left: 3px solid var(--gold);
-  margin: 20px 0;
-  padding: 8px 16px;
-  background: var(--paper-tint);
-}
-
-.np-pull-quote p {
-  font-family: var(--font-headline);
-  font-style: italic;
-  font-size: 1.25rem;
-  color: var(--ink-mid);
-  line-height: 1.4;
-}
-
-.np-column-rule {
-  border: none;
-  border-top: 1px solid var(--rule-soft);
-  margin: 24px 0;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §9 — CARD (article card, announcement card)
-   ═══════════════════════════════════════════════════════════════ */
-.np-card {
-  background: var(--paper-white);
-  border: 1px solid var(--rule-faint);
-  border-radius: 2px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.np-card--gold {
-  border-left: 3px solid var(--gold);
-}
-
-.np-card--burgundy {
-  border-left: 3px solid var(--burgundy);
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §10 — FONT SCALE PICKER  (.fn-scale-picker)
-   ═══════════════════════════════════════════════════════════════ */
-.fn-scale-picker {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  background: var(--paper-tint);
-  border: 1px solid var(--rule-soft);
-  border-radius: 4px;
-}
-
-.fn-scale-picker__btn {
-  background: transparent;
-  border: none;
-  color: var(--ink-dim);
-  font-family: var(--font-label);
-  font-size: 0.9rem;
-  padding: 2px 6px;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: background 0.1s, color 0.1s;
-}
-
-.fn-scale-picker__btn:hover,
-.fn-scale-picker__btn.is-active {
-  background: var(--gold);
-  color: var(--paper-white);
-}
-
-.fn-scale-picker__label {
-  font-family: var(--font-label);
-  font-size: 0.85rem;
-  font-variant: small-caps;
-  color: var(--ink-faint);
-  letter-spacing: 0.05em;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §11 — AUTH HEADER BAR  (.np-auth-bar)
-   ═══════════════════════════════════════════════════════════════ */
-.np-auth-bar {
+.sec-masthead__inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px max(12px, var(--safe-right)) 6px max(12px, var(--safe-left));
-  background: var(--paper-tint);
-  border-bottom: 1px solid var(--rule-faint);
-  font-family: var(--font-ui);
-  font-size: 0.88rem;
-  color: var(--ink-dim);
+  padding-bottom: 0.75rem;
+  gap: 0.75rem;
 }
 
-.np-auth-bar__name {
+.sec-masthead__title {
+  font-family: var(--font-headline);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ink);
+  flex: 1;
+}
+
+.sec-masthead__subtitle {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  margin-top: 0.125rem;
+}
+
+/* Font scale Aa button */
+.sec-masthead__font-btn {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0 0.625rem;
+  height: 2.25rem;
+  min-width: 44px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sec-masthead__font-btn:hover { background: var(--paper-sunken); }
+
+/* ── Section Nav Bar ──────────────────────────────────────────────────────── */
+.sec-nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0.5rem max(1rem, var(--safe-right)) 0 max(1rem, var(--safe-left));
+  background: var(--paper-card);
+  border-bottom: 1px solid var(--rule);
+}
+.sec-nav-bar::-webkit-scrollbar { display: none; }
+
+.sec-nav-tab {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 0.5rem 0.75rem 0.625rem;
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 44px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.sec-nav-tab:hover {
+  color: var(--ink);
+  background: var(--paper-sunken);
+}
+.sec-nav-tab.is-active {
+  color: var(--ink-inverse);
+  background: var(--sec-color, var(--gold));
+  border-bottom-color: var(--sec-color, var(--gold));
+}
+.sec-nav-tab[hidden] { display: none; }
+
+/* ── Broadsheet Grid ──────────────────────────────────────────────────────── */
+.broadsheet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  padding: 1.25rem max(1rem, var(--safe-right)) 2rem max(1rem, var(--safe-left));
+  flex: 1;
+}
+
+@media (max-width: 900px) {
+  .broadsheet-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .broadsheet-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+.broadsheet-card {
+  background: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  /* 3px top accent applied per-section in section CSS */
+}
+
+.broadsheet-card--wide {
+  grid-column: span 2;
+}
+.broadsheet-card--full {
+  grid-column: 1 / -1;
+}
+
+/* Collapse wide/full on mobile — all cards full-width single column */
+@media (max-width: 600px) {
+  .broadsheet-card--wide,
+  .broadsheet-card--full {
+    grid-column: 1;
+  }
+}
+
+/* ── Card internals ───────────────────────────────────────────────────────── */
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.card-title {
+  font-family: var(--font-headline);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.card-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  margin-top: 0.125rem;
+}
+
+.card-body {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* ── Skeleton Loader ──────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--paper-sunken) 25%,
+    var(--rule) 50%,
+    var(--paper-sunken) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+  border-radius: var(--radius);
+}
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-line {
+  height: 0.9rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  border-radius: var(--radius);
+}
+.skeleton-line--short { width: 60%; }
+.skeleton-line--heading { height: 1.25rem; width: 80%; }
+
+/* ── Right Drawer ─────────────────────────────────────────────────────────── */
+.drawer-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+}
+
+.right-drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: min(480px, 100vw);
+  background: var(--paper-card);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.18);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.right-drawer.is-open {
+  transform: translateX(0);
+}
+
+.right-drawer.is-open ~ .drawer-backdrop {
+  display: block;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  background: var(--paper-card);
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.drawer-title {
+  font-family: var(--font-headline);
+  font-size: 1.125rem;
+  color: var(--ink);
+  margin: 0;
+  flex: 1;
+}
+
+.drawer-close {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--ink);
+  font-size: 1.25rem;
+  cursor: pointer;
+  border-radius: var(--radius);
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+}
+.drawer-close:hover { background: var(--paper-sunken); }
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+.btn {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.625rem 1.25rem;
+  min-height: 44px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--sec-color, var(--gold));
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) { opacity: 0.88; }
+.btn-primary:focus-visible { outline-color: var(--sec-color, var(--gold)); }
+
+.btn-secondary {
+  background: var(--paper-sunken);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+}
+.btn-secondary:hover:not(:disabled) { background: var(--rule); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-muted);
+  border: 1px solid var(--rule);
+}
+.btn-ghost:hover:not(:disabled) { background: var(--paper-sunken); }
+
+.btn-danger {
+  background: #c0392b;
+  color: #fff;
+}
+.btn-danger:hover:not(:disabled) { background: #a93226; }
+
+.btn-sm {
+  font-size: 0.8125rem;
+  padding: 0.375rem 0.875rem;
+  min-height: 36px;
+}
+
+.btn-icon {
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+}
+
+/* ── Form Inputs ──────────────────────────────────────────────────────────── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.form-label {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--ink);
 }
-
-.np-auth-bar__role {
-  display: inline-block;
-  padding: 1px 6px;
-  background: var(--gold);
-  color: var(--paper-white);
-  border-radius: 3px;
-  font-size: 0.78rem;
-  font-variant: small-caps;
-  letter-spacing: 0.05em;
-  margin-left: 6px;
+.form-label--required::after {
+  content: ' (required)';
+  font-weight: 400;
+  color: var(--ink-muted);
+  font-size: 0.8125rem;
 }
 
-.np-auth-bar__logout {
-  color: var(--ink-dim);
-  text-decoration: underline;
-  cursor: pointer;
-  background: none;
-  border: none;
-  font-family: var(--font-ui);
-  font-size: 0.75rem;
+.form-input,
+.form-select,
+.form-textarea {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--ink);
+  background: var(--paper-sunken);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  padding: 0.625rem 0.875rem;
+  width: 100%;
+  min-height: 44px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--sec-color, var(--gold));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sec-color, var(--gold)) 20%, transparent);
 }
 
+.form-textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
 
-/* ═══════════════════════════════════════════════════════════════
-   §12 — ACCESS DENIED PAGE  (.np-access-denied)
-   ═══════════════════════════════════════════════════════════════ */
-.np-access-denied {
+.form-hint {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+.form-error {
+  font-size: 0.8125rem;
+  color: #c0392b;
+}
+
+/* ── Toast / Notification ─────────────────────────────────────────────────── */
+.toast-layer {
+  position: fixed;
+  bottom: max(1.5rem, var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.toast {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ink-inverse);
+  background: var(--ink);
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  pointer-events: auto;
+  animation: toast-in 0.25s ease;
+  max-width: min(400px, 90vw);
+  text-align: center;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Utility ──────────────────────────────────────────────────────────────── */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 60vh;
-  text-align: center;
-  padding: 32px 20px;
-}
-
-.np-access-denied__headline {
-  font-family: var(--font-headline);
-  font-size: 2rem;
-  color: var(--ink-mid);
-  margin-bottom: 12px;
-}
-
-.np-access-denied__body {
-  font-family: var(--font-body);
-  color: var(--ink-dim);
-  font-size: 1rem;
-  max-width: 360px;
-  line-height: 1.6;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §13 — RESPONSIVE
-   ═══════════════════════════════════════════════════════════════ */
-@media (max-width: 600px) {
-  .np-masthead__title {
-    font-size: clamp(1.8rem, 10vw, 3rem);
-  }
-
-  .np-page {
-    padding: 12px 12px;
-    padding-bottom: max(12px, var(--safe-bottom));
-  }
-
-  .np-headline {
-    font-size: clamp(1.2rem, 5vw, 1.8rem);
-  }
-}
-
-@media (min-width: 900px) {
-  .sec-nav-bar {
-    justify-content: center;
-    overflow-x: visible;
-  }
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §14 — BROADSHEET COLUMN GRID
-   ═══════════════════════════════════════════════════════════════ */
-
-/* Outer wrapper — replaces .np-page on broadsheet pages */
-.np-broadsheet {
-  max-width: var(--page-max-width);
-  margin: 0 auto;
-  padding-bottom: max(24px, var(--safe-bottom));
-}
-
-/* Banner — spans full width above the columns */
-.np-banner {
-  padding: 20px var(--article-padding) 16px;
-  text-align: center;
-  border-bottom: 3px double var(--rule);
-}
-
-.np-banner__flag {
-  font-family: var(--font-label);
-  font-size: 0.9rem;
-  font-variant: small-caps;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: var(--ink);
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.np-banner__headline {
-  font-family: var(--font-headline);
-  font-size: clamp(1.8rem, 5vw, 3.2rem);
-  color: var(--ink);
-  line-height: 1.1;
-  margin-bottom: 8px;
-}
-
-.np-banner__deck {
-  font-family: var(--font-body);
-  font-style: italic;
-  font-size: 1.4rem;
-  color: var(--ink-mid);
-}
-
-/* Secret date picker */
-.np-banner__flag {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 28px;
-}
-
-.np-date-btn {
-  background: none;
-  border: none;
-  padding: 2px 6px;
-  font-family: var(--font-label);
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--ink);
-  opacity: 0.18;
-  cursor: pointer;
-  line-height: 1;
-  transition: opacity 0.2s;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-}
-
-.np-date-btn:hover {
-  opacity: 0.7;
-}
-
-.np-date-btn--disabled {
-  opacity: 0.06;
-  cursor: default;
-  pointer-events: none;
-}
-
-/* Column grid */
-.np-cols {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
-  gap: 0;
-  align-items: start;
-}
-
-.np-col {
-  padding: 20px 20px;
-  min-width: 0;
-}
-
-.np-col + .np-col {
-  border-left: 1px solid var(--rule-soft);
-}
-
-/* When columns stack, swap left border for top border */
-@supports (grid-template-columns: repeat(auto-fit, minmax(1px, 1fr))) {
-  @media (max-width: 599px) {
-    .np-col + .np-col {
-      border-left: none;
-      border-top: 1px solid var(--rule-soft);
-    }
-  }
-}
-
-.np-col--wide { grid-column: span 2; }
-.np-col--full { grid-column: 1 / -1; border-left: none !important; }
-
-/* Column section flag */
-.np-col__flag {
-  font-family: var(--font-label);
-  font-size: 1rem;
-  font-variant: small-caps;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--ink);
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--rule-soft);
-  padding-bottom: 4px;
-  margin-bottom: 14px;
-}
-
-/* Drop cap on lead article */
-.np-drop-cap::first-letter {
-  font-family: var(--font-masthead);
-  font-size: 4.2em;
-  line-height: 0.75;
-  float: left;
-  margin-right: 8px;
-  margin-top: 6px;
-  color: var(--ink);
-}
-
-/* Section brief links (col 3) */
-.np-briefs {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.np-briefs__item {
-  border-bottom: 1px solid var(--rule-faint);
-  padding: 10px 0;
-}
-
-.np-briefs__item:last-child { border-bottom: none; }
-
-.np-briefs__link {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-}
-
-.np-briefs__link:hover .np-briefs__title { color: var(--gold); text-decoration: none; }
-
-.np-briefs__title {
-  font-family: var(--font-headline);
-  font-size: 1.1rem;
-  color: var(--ink);
-  line-height: 1.25;
-  transition: color 0.15s;
-}
-
-.np-briefs__deck {
-  display: block;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  color: var(--ink-dim);
-  margin-top: 3px;
-}
-
-/* Section splash page (empty stub pages) */
-.np-section-splash {
-  padding: 32px var(--article-padding) 24px;
-  border-bottom: 1px solid var(--rule-soft);
-}
-
-.np-section-splash__flag {
-  font-family: var(--font-label);
-  font-size: 0.6rem;
-  font-variant: small-caps;
-  letter-spacing: 0.14em;
-  color: var(--ink-dim);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.np-section-splash__title {
-  font-family: var(--font-headline);
-  font-size: clamp(2.2rem, 8vw, 4.5rem);
-  color: var(--ink);
-  line-height: 1.05;
-}
-
-.np-section-splash__rule {
-  border: none;
-  border-top: 3px double var(--rule);
-  margin: 14px 0;
-  width: 60%;
-}
-
-.np-section-splash__tagline {
-  font-family: var(--font-body);
-  font-style: italic;
-  color: var(--ink-mid);
-  font-size: 1.1rem;
-  line-height: 1.5;
-}
-
-.np-section-splash__coming {
-  font-family: var(--font-label);
-  font-size: 0.68rem;
-  font-variant: small-caps;
-  letter-spacing: 0.08em;
-  color: var(--ink-dim);
-  margin-top: 24px;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   §14b — ACCORDION PANELS  (.np-panel) — consolidated sections
-   ═══════════════════════════════════════════════════════════════ */
-.np-panel {
-  border: 1px solid var(--rule-soft);
-  border-radius: 4px;
-  margin: 0 0 10px 0;
-  overflow: hidden;
-}
-.np-panel[open] { border-color: var(--rule); }
-
-.np-panel summary.np-panel__hdr {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  cursor: pointer;
-  list-style: none;
-  background: var(--paper-tint);
-  border-bottom: 1px solid transparent;
-  font-family: var(--font-label);
-  font-size: 0.82rem;
-  font-variant: small-caps;
-  letter-spacing: 0.06em;
-  color: var(--ink);
-  user-select: none;
-  transition: background 0.15s;
-}
-.np-panel[open] summary.np-panel__hdr {
-  border-bottom-color: var(--rule-soft);
-  background: var(--paper-white);
-}
-.np-panel summary.np-panel__hdr::-webkit-details-marker { display: none; }
-.np-panel summary.np-panel__hdr::marker { display: none; }
-
-.np-panel__icon   { font-size: 1rem; flex-shrink: 0; }
-.np-panel__title  { flex: 1; font-weight: 700; }
-.np-panel__meta   { font-size: 0.72rem; color: var(--ink-muted); font-variant: normal; letter-spacing: 0; }
-.np-panel__caret  { font-size: 0.65rem; color: var(--ink-dim); transition: transform 0.2s; }
-.np-panel[open] .np-panel__caret { transform: rotate(90deg); }
-
-.np-panel__body   { padding: 14px 16px; }
-.np-panel__body:empty::after {
-  content: 'Loading\2026';
-  display: block;
-  font-size: 0.8rem;
-  color: var(--ink-dim);
-  font-style: italic;
-  padding: 20px 0;
-}
-
-/* Section banner for consolidated pages */
-.np-section-banner {
-  padding: 16px var(--gutter, 16px) 12px;
-  border-bottom: 2px solid var(--rule);
-  margin-bottom: 12px;
-}
-.np-section-banner__flag {
-  font-family: var(--font-label);
-  font-size: 0.68rem;
-  font-variant: small-caps;
-  letter-spacing: 0.1em;
+  gap: 0.75rem;
+  padding: 2.5rem 1rem;
   color: var(--ink-muted);
-  margin: 0 0 4px;
-}
-.np-section-banner__title {
-  font-family: var(--font-headline);
-  font-size: clamp(1.5rem, 4vw, 2.2rem);
-  font-weight: 700;
-  color: var(--ink);
-  margin: 0 0 4px;
-  line-height: 1.15;
-}
-.np-section-banner__deck {
-  font-family: var(--font-body);
-  font-size: 0.84rem;
-  color: var(--ink-muted);
-  margin: 0;
-  font-style: italic;
-}
-.np-section-banner__accent {
-  display: block;
-  height: 3px;
-  border-radius: 2px;
-  margin-top: 10px;
-}
-
-/* Panel container */
-.np-panels {
-  padding: 12px var(--gutter, 16px);
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §15 — PAGE FLIP NAVIGATION  (.np-flip-nav)
-   ═══════════════════════════════════════════════════════════════ */
-
-.np-flip-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  max-width: var(--page-max-width);
-  margin: 0 auto;
-  padding: 6px var(--article-padding);
-  border-bottom: 1px solid var(--rule-faint);
-  background: var(--paper);
-  gap: 12px;
-}
-
-.np-flip-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 14px;
-  font-family: var(--font-label);
-  font-size: 1rem;
-  font-variant: small-caps;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--ink);
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 3px;
-  cursor: pointer;
-  text-decoration: none;
-  line-height: 1;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
-  -webkit-tap-highlight-color: transparent;
-  white-space: nowrap;
-  min-width: 80px;
-}
-
-.np-flip-btn:hover {
-  border-color: var(--rule-soft);
-  color: var(--ink);
-  background: var(--paper-dark);
-  text-decoration: none;
-}
-
-.np-flip-btn:active {
-  background: var(--paper-tint);
-}
-
-.np-flip-btn--disabled {
-  opacity: 0.2;
-  pointer-events: none;
-}
-
-.np-flip-btn--next {
-  text-align: right;
-  justify-content: flex-end;
-}
-
-.np-flip-btn svg {
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  flex-shrink: 0;
-}
-
-.np-flip-counter {
-  font-family: var(--font-label);
-  font-size: 0.95rem;
-  font-variant: small-caps;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--ink);
   text-align: center;
-  flex: 1;
-  user-select: none;
+}
+.empty-state__icon { font-size: 2rem; opacity: 0.5; }
+.empty-state__title {
+  font-family: var(--font-headline);
+  font-size: 1.0625rem;
+  color: var(--ink-muted);
+}
+.empty-state__message { font-size: 0.9375rem; line-height: 1.5; }
+
+/* ── Dividers ─────────────────────────────────────────────────────────────── */
+hr, .broadsheet-rule {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 1rem 0;
 }
 
-
-/* ═══════════════════════════════════════════════════════════════
-   §16 — VIEW TRANSITIONS (cross-document page flip)
-   ═══════════════════════════════════════════════════════════════ */
-
-@view-transition {
-  navigation: auto;
-}
-
-/* Forward flip: old slides/tilts left, new comes from right */
-@keyframes np-flip-out-fwd {
-  to {
-    opacity: 0;
-    transform: perspective(1200px) translateX(-6%) rotateY(-8deg);
-    transform-origin: left center;
-  }
-}
-
-@keyframes np-flip-in-fwd {
-  from {
-    opacity: 0;
-    transform: perspective(1200px) translateX(6%) rotateY(8deg);
-    transform-origin: right center;
-  }
-}
-
-/* Backward flip: old slides/tilts right, new comes from left */
-@keyframes np-flip-out-bck {
-  to {
-    opacity: 0;
-    transform: perspective(1200px) translateX(6%) rotateY(8deg);
-    transform-origin: right center;
-  }
-}
-
-@keyframes np-flip-in-bck {
-  from {
-    opacity: 0;
-    transform: perspective(1200px) translateX(-6%) rotateY(-8deg);
-    transform-origin: left center;
-  }
-}
-
-/* Default: forward direction */
-::view-transition-old(root) {
-  animation: 300ms cubic-bezier(0.4, 0, 0.2, 1) both np-flip-out-fwd;
-}
-::view-transition-new(root) {
-  animation: 300ms cubic-bezier(0.4, 0, 0.2, 1) both np-flip-in-fwd;
-}
-
-/* Backward navigation — set data-nav-dir="back" on <html> before navigating */
-:root[data-nav-dir="back"] ::view-transition-old(root) {
-  animation: 300ms cubic-bezier(0.4, 0, 0.2, 1) both np-flip-out-bck;
-}
-:root[data-nav-dir="back"] ::view-transition-new(root) {
-  animation: 300ms cubic-bezier(0.4, 0, 0.2, 1) both np-flip-in-bck;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   §14/§15 RESPONSIVE OVERRIDES
-   ═══════════════════════════════════════════════════════════════ */
-
-/* Smaller drop cap on mobile */
+/* ── Responsive helpers ───────────────────────────────────────────────────── */
 @media (max-width: 600px) {
-  .np-drop-cap::first-letter {
-    font-size: 3em;
-  }
-
-  /* Hide prev/next labels on very small screens, keep icons */
-  .np-flip-btn__label {
-    display: none;
-  }
+  .hide-mobile { display: none !important; }
+}
+@media (min-width: 601px) {
+  .show-mobile-only { display: none !important; }
 }

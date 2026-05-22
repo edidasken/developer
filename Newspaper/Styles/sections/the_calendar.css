@@ -1,0 +1,20 @@
+/* ==========================================================================
+   the_calendar.css — Section 8: The Calendar
+   Signature color: --success (#3d8b4f)
+   Additive only. Never override tokens already in the_broadsheet.css.
+   ========================================================================== */
+
+.sec-the-calendar {
+  --sec-color: var(--success);
+  --sec-color-soft: var(--success-soft);
+  --sec-heading-font: 'Lora', Georgia, serif;
+  --sec-body-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.sec-the-calendar .sec-masthead {
+  border-top: 3px solid var(--success);
+}
+
+.sec-the-calendar .broadsheet-card {
+  border-top: 3px solid var(--success);
+}

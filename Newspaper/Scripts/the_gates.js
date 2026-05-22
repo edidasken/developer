@@ -1,329 +1,179 @@
-/**
- * the_gates.js — Newspaper Section Navigation + Page Flip
- *
- * Responsibilities:
- *  1. Builds the .sec-nav-bar with role-filtered section tabs
- *  2. Injects the .np-flip-nav prev/next bar below the sec-nav
- *  3. Handles swipe gestures (left/right) + keyboard (← →) to flip pages
- *  4. Navigates with direction-aware View Transitions (CSS cross-document flip)
- *  5. Injects a default section splash on empty stub section pages
- *  6. Sets #herald-church from window.HERALD_CHURCH_NAME
- *
- * Exposes window.HERALD_SECTIONS for use by the_proclamation.js
- *
- * Role levels (from firm_foundation.js):
- *   unauthenticated:-1  readonly:0  volunteer:1  care:2  deacon:2
- *   leader:3  treasurer:3  pastor:4  admin:5
- */
+// the_gates.js — The Flock Herald
+// Shared page controller: section nav bar, right drawer, font scale picker, toasts.
+// Loaded on every section page after the_adornment.js.
 
-(function () {
+(function() {
   'use strict';
 
-  // ── Restore nav direction IMMEDIATELY (before DOMContentLoaded) ──────────
-  // Must run before view-transition-new animations play on the incoming page.
-  (function () {
-    try {
-      var dir = sessionStorage.getItem('np-nav-dir') || 'forward';
-      document.documentElement.setAttribute('data-nav-dir', dir);
-      sessionStorage.removeItem('np-nav-dir');
-    } catch (_) {}
-  })();
-
-  // ── Section Registry ──────────────────────────────────────────────────────
-  var SECTIONS = [
-    { slug: 'herald',     label: 'The Herald',      tagline: 'All the news of the congregation, set in type each morning.',                               path: 'index.html',                   minRole: -1 },
-    { slug: 'tabernacle', label: 'The Tabernacle',   tagline: 'Worship, devotional, and the life of prayer.',                                              path: 'Sections/tabernacle/index.html', minRole:  0 },
-    { slug: 'sanctuary',  label: 'The Sanctuary',    tagline: 'Sermon prep, song planning, and service order — all in one place.',                         path: 'Sections/sanctuary/index.html',  minRole:  3 },
-    { slug: 'flock',      label: 'The Flock',        tagline: 'Pastoral care, prayer requests, and the shepherding of the congregation.',                   path: 'Sections/flock/index.html',      minRole:  2 },
-    { slug: 'family',     label: 'The Family',       tagline: 'Congregation records, households, and the generations of the church.',                       path: 'Sections/family/index.html',     minRole:  0 },
-    { slug: 'the_way',    label: 'The Way',           tagline: 'Discipleship paths, reading plans, scripture, and the journey of faith.',                   path: 'Sections/the_way/index.html',    minRole: -1 },
-    { slug: 'mission',    label: 'The Mission',      tagline: 'Outreach contacts, campaigns, and the global missions registry.',                            path: 'Sections/mission/index.html',    minRole:  4 },
-    { slug: 'shepherd',   label: 'The Shepherd',     tagline: "The pastor's dashboard — giving, attendance, strategic goals, and pastoral tools.",          path: 'Sections/shepherd/index.html',   minRole:  4 },
-    { slug: 'calendar',   label: 'The Calendar',     tagline: 'Upcoming services, events, and the rhythms of the church year.',                             path: 'Sections/calendar/index.html',   minRole:  0 },
-    { slug: 'weavers',    label: 'The Weavers',      tagline: 'Volunteer teams, ministry assignments, and small group coordination.',                       path: 'Sections/weavers/index.html',    minRole:  3 },
+  // ── Section Registry ────────────────────────────────────────────────────────
+  // Each entry: { id, label, shortLabel, url, minRole, icon }
+  // minRole: -1 = public, 0 = member, 2 = care, 3 = leader, 4 = pastor
+  const SECTIONS = [
+    { id: 'herald',        label: 'The Herald',    shortLabel: 'Herald',    url: '../herald/index.html',        minRole: -1, icon: '📰' },
+    { id: 'the_way',      label: 'The Way',       shortLabel: 'The Way',   url: '../the_way/index.html',       minRole: -1, icon: '🌱' },
+    { id: 'the_sanctuary',label: 'The Sanctuary', shortLabel: 'Sanctuary', url: '../the_sanctuary/index.html', minRole:  3, icon: '🕊' },
+    { id: 'the_flock',    label: 'The Flock',     shortLabel: 'The Flock', url: '../the_flock/index.html',     minRole:  2, icon: '🐑' },
+    { id: 'the_mission',  label: 'The Mission',   shortLabel: 'Mission',   url: '../the_mission/index.html',   minRole:  4, icon: '🌍' },
+    { id: 'the_family',   label: 'The Family',    shortLabel: 'Family',    url: '../the_family/index.html',    minRole:  0, icon: '👨‍👩‍👧‍👦' },
+    { id: 'the_shepherd', label: 'The Shepherd',  shortLabel: 'Shepherd',  url: '../the_shepherd/index.html',  minRole:  4, icon: '🔑' },
+    { id: 'the_calendar', label: 'The Calendar',  shortLabel: 'Calendar',  url: '../the_calendar/index.html',  minRole:  0, icon: '📅' },
+    { id: 'the_weavers',  label: 'The Weavers',   shortLabel: 'Weavers',   url: '../the_weavers/index.html',   minRole:  3, icon: '🧵' }
   ];
 
-  // Expose for use by the_proclamation.js (loads after this script)
-  window.HERALD_SECTIONS = SECTIONS;
-
-  // ── Role helpers ─────────────────────────────────────────────────────────
-  var ROLE_MAP = { readonly: 0, volunteer: 1, care: 2, deacon: 2,
-                   leader: 3, treasurer: 3, pastor: 4, admin: 5 };
-
-  function getUserRoleLevel() {
-    if (typeof Nehemiah !== 'undefined' && Nehemiah.getSession) {
-      try {
-        var sess = Nehemiah.getSession();
-        if (sess && typeof sess.roleLevel === 'number') return sess.roleLevel;
-        if (sess && sess.role && ROLE_MAP[sess.role] !== undefined) return ROLE_MAP[sess.role];
-      } catch (_) {}
+  // ── Detect active section from current URL ───────────────────────────────────
+  function getActiveSectionId() {
+    const path = window.location.pathname;
+    for (const sec of SECTIONS) {
+      if (path.includes('/' + sec.id + '/')) return sec.id;
     }
-    return -1;
-  }
-
-  function visibleSections(userLevel) {
-    return SECTIONS.filter(function (s) {
-      return s.minRole === -1 || (userLevel >= 0 && userLevel >= s.minRole);
-    });
-  }
-
-  // ── Determine active section slug from URL ────────────────────────────────
-  function getActiveSlug() {
-    var path = window.location.pathname;
-    if (/\/Newspaper\/?$/.test(path) || /\/Newspaper\/index\.html$/.test(path)) return 'herald';
-    // local dev server (no /Newspaper/ prefix)
-    if (/^\/?$/.test(path) || /\/index\.html$/.test(path) && !/Sections/.test(path)) return 'herald';
-    var m = path.match(/\/Sections\/([^/]+)\//);
-    if (m) return m[1];
+    // Fallback: herald
     return 'herald';
   }
 
-  var _activeSlug = getActiveSlug();
-
-  // ── Build hrefs ──────────────────────────────────────────────────────────
-  // Resolve from current location to a section path (relative)
-  function hrefTo(sec) {
-    var inSection = /\/Sections\//.test(window.location.pathname);
-    if (sec.slug === 'herald') {
-      return inSection ? '../../index.html' : 'index.html';
+  // ── Get user role from Nehemiah / firm_foundation ────────────────────────────
+  function getUserRole() {
+    // Nehemiah exposes current role. Local bypass sets role to 5.
+    if (window.Nehemiah && typeof window.Nehemiah.getRole === 'function') {
+      return window.Nehemiah.getRole();
     }
-    if (inSection) {
-      return '../' + sec.slug + '/index.html';
-    }
-    return sec.path; // from root: Sections/{slug}/index.html
+    // Fallback: check session storage for dev bypass
+    if (window._HERALD_AUTH_LEVEL !== undefined) return window._HERALD_AUTH_LEVEL;
+    return -1; // public
   }
 
-  // ── Section nav bar ──────────────────────────────────────────────────────
-  function renderGates(userLevel) {
-    var nav = document.getElementById('sec-nav');
+  // ── Build section nav bar ───────────────────────────────────────────────────
+  function buildNavBar() {
+    const nav = document.getElementById('sec-nav');
     if (!nav) return;
 
-    var visible = visibleSections(userLevel);
-    var fragment = document.createDocumentFragment();
+    const activeId = getActiveSectionId();
+    const userRole = getUserRole();
 
-    visible.forEach(function (sec) {
-      var a = document.createElement('a');
-      a.className = 'sec-nav-tab' + (sec.slug === _activeSlug ? ' is-active' : '');
-      a.setAttribute('data-section', sec.slug);
-      a.setAttribute('href', hrefTo(sec));
-      a.textContent = sec.label;
-      a.addEventListener('click', function (e) {
-        e.preventDefault();
-        flipTo(hrefTo(sec), sec.slug, _activeSlug);
-      });
-      fragment.appendChild(a);
+    SECTIONS.forEach(sec => {
+      if (sec.minRole > userRole) return; // hide tabs user doesn't have access to
+
+      const btn = document.createElement('a');
+      btn.href = sec.url;
+      btn.className = 'sec-nav-tab' + (sec.id === activeId ? ' is-active' : '');
+      btn.setAttribute('role', 'tab');
+      btn.setAttribute('aria-selected', sec.id === activeId ? 'true' : 'false');
+      btn.setAttribute('aria-label', sec.label);
+
+      // Icon + label
+      const icon = document.createElement('span');
+      icon.textContent = sec.icon;
+      icon.setAttribute('aria-hidden', 'true');
+
+      const label = document.createElement('span');
+      label.textContent = sec.shortLabel;
+
+      btn.appendChild(icon);
+      btn.appendChild(label);
+      nav.appendChild(btn);
     });
 
-    nav.innerHTML = '';
-    nav.appendChild(fragment);
-
-    var activeTab = nav.querySelector('.is-active');
+    // Scroll active tab into view
+    const activeTab = nav.querySelector('.is-active');
     if (activeTab) {
-      setTimeout(function () {
-        activeTab.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
-      }, 80);
+      setTimeout(() => activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }), 100);
     }
   }
 
-  // ── Flip navigation bar (prev / next) ────────────────────────────────────
-  function injectFlipNav(userLevel) {
-    // Don't inject twice
-    if (document.getElementById('np-flip-nav')) return;
+  // ── Right Drawer ────────────────────────────────────────────────────────────
+  function openDrawer(titleText, contentHTML) {
+    const drawer = document.querySelector('.right-drawer');
+    const titleEl = document.getElementById('drawer-title');
+    const bodyEl = document.getElementById('drawer-body');
+    if (!drawer || !titleEl || !bodyEl) return;
 
-    var visible = visibleSections(userLevel);
-    var idx     = visible.findIndex(function (s) { return s.slug === _activeSlug; });
+    titleEl.textContent = titleText;
+    bodyEl.innerHTML = contentHTML;
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
 
-    // If the active section isn't in the visible list (e.g. auth hasn't resolved yet
-    // or user navigated directly to a gated URL), fall back to full SECTIONS order
-    // so the counter and prev/next still make sense.
-    if (idx === -1) {
-      var fullIdx  = SECTIONS.findIndex(function (s) { return s.slug === _activeSlug; });
-      var prevFull = fullIdx > 0 ? SECTIONS[fullIdx - 1] : null;
-      var nextFull = fullIdx < SECTIONS.length - 1 ? SECTIONS[fullIdx + 1] : null;
-      // Use adjacent sections that ARE visible, or the full list neighbors
-      var prevSec = prevFull;
-      var nextSec = nextFull;
-      var total   = SECTIONS.length;
-      var pos     = fullIdx + 1;
-    } else {
-      var prevSec = idx > 0 ? visible[idx - 1] : null;
-      var nextSec = idx < visible.length - 1 ? visible[idx + 1] : null;
-      var total   = visible.length;
-      var pos     = idx + 1;
-    }
-
-    var chevLeft  = '<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>';
-    var chevRight = '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
-
-    var prevBtn = '<a id="np-flip-prev" class="np-flip-btn' + (prevSec ? '' : ' np-flip-btn--disabled') + '"' +
-      (prevSec ? ' href="' + hrefTo(prevSec) + '"' : '') + '>' +
-      chevLeft + '<span class="np-flip-btn__label">' + (prevSec ? prevSec.label : 'First Page') + '</span></a>';
-
-    var nextBtn = '<a id="np-flip-next" class="np-flip-btn np-flip-btn--next' + (nextSec ? '' : ' np-flip-btn--disabled') + '"' +
-      (nextSec ? ' href="' + hrefTo(nextSec) + '"' : '') + '>' +
-      '<span class="np-flip-btn__label">' + (nextSec ? nextSec.label : 'Last Page') + '</span>' + chevRight + '</a>';
-
-    var counter = '<span class="np-flip-counter">Section ' + pos + ' of ' + total + '</span>';
-
-    var nav = document.createElement('div');
-    nav.id = 'np-flip-nav';
-    nav.className = 'np-flip-nav';
-    nav.innerHTML = prevBtn + counter + nextBtn;
-
-    // Insert right after sec-nav
-    var secNav = document.getElementById('sec-nav');
-    if (secNav && secNav.parentNode) {
-      secNav.parentNode.insertBefore(nav, secNav.nextSibling);
-    } else {
-      var body = document.body;
-      body.insertBefore(nav, body.firstChild);
-    }
-
-    // Wire clicks to flipTo
-    var prevEl = nav.querySelector('#np-flip-prev');
-    var nextEl = nav.querySelector('#np-flip-next');
-    if (prevEl && prevSec) {
-      prevEl.addEventListener('click', function (e) {
-        e.preventDefault();
-        flipTo(hrefTo(prevSec), prevSec.slug, _activeSlug);
-      });
-    }
-    if (nextEl && nextSec) {
-      nextEl.addEventListener('click', function (e) {
-        e.preventDefault();
-        flipTo(hrefTo(nextSec), nextSec.slug, _activeSlug);
-      });
-    }
-
-    _prevSec = prevSec;
-    _nextSec = nextSec;
+    // Focus first focusable element in drawer
+    const firstFocusable = drawer.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (firstFocusable) firstFocusable.focus();
   }
 
-  var _prevSec = null;
-  var _nextSec = null;
-
-  // ── Page flip navigation ─────────────────────────────────────────────────
-  // Determines direction by comparing section indices in the master list
-  function flipTo(href, targetSlug, fromSlug) {
-    var fromIdx   = SECTIONS.findIndex(function (s) { return s.slug === fromSlug; });
-    var targetIdx = SECTIONS.findIndex(function (s) { return s.slug === (targetSlug || 'herald'); });
-    var dir = (targetIdx >= fromIdx) ? 'forward' : 'back';
-
-    try { sessionStorage.setItem('np-nav-dir', dir); } catch (_) {}
-    document.documentElement.setAttribute('data-nav-dir', dir);
-    window.location.href = href;
+  function closeDrawer() {
+    const drawer = document.querySelector('.right-drawer');
+    if (!drawer) return;
+    drawer.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
   }
 
-  // ── Swipe gesture handler ────────────────────────────────────────────────
-  function initSwipe() {
-    var startX = 0, startY = 0, moved = false;
-
-    document.addEventListener('touchstart', function (e) {
-      startX = e.changedTouches[0].clientX;
-      startY = e.changedTouches[0].clientY;
-      moved  = false;
-    }, { passive: true });
-
-    document.addEventListener('touchmove', function () {
-      moved = true;
-    }, { passive: true });
-
-    document.addEventListener('touchend', function (e) {
-      if (!moved) return;
-      var dx = e.changedTouches[0].clientX - startX;
-      var dy = e.changedTouches[0].clientY - startY;
-      // Only horizontal swipes with more horizontal travel than vertical
-      if (Math.abs(dx) < 48 || Math.abs(dy) > Math.abs(dx) * 0.8) return;
-
-      if (dx < 0 && _nextSec) {
-        // Swipe left = next section
-        flipTo(hrefTo(_nextSec), _nextSec.slug, _activeSlug);
-      } else if (dx > 0 && _prevSec) {
-        // Swipe right = previous section
-        flipTo(hrefTo(_prevSec), _prevSec.slug, _activeSlug);
-      }
-    }, { passive: true });
-  }
-
-  // ── Keyboard navigation ──────────────────────────────────────────────────
-  function initKeyboard() {
-    document.addEventListener('keydown', function (e) {
-      // Don't hijack keyboard when focus is in an input
-      var tag = document.activeElement ? document.activeElement.tagName : '';
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-
-      if (e.key === 'ArrowRight' && _nextSec) {
-        flipTo(hrefTo(_nextSec), _nextSec.slug, _activeSlug);
-      } else if (e.key === 'ArrowLeft' && _prevSec) {
-        flipTo(hrefTo(_prevSec), _prevSec.slug, _activeSlug);
-      }
+  function initDrawer() {
+    const closeBtn = document.querySelector('.drawer-close');
+    const backdrop = document.querySelector('.drawer-backdrop');
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeDrawer();
     });
   }
 
-  // ── Default section splash for empty stub pages ──────────────────────────
-  function injectSectionSplash() {
-    var main = document.getElementById('section-main');
-    if (!main) return;
-    if (main.children.length > 0) return; // already has content
+  // ── Font Scale Picker ───────────────────────────────────────────────────────
+  const FONT_STEPS = [0.85, 1.0, 1.1, 1.15, 1.25];
+  const FONT_LABELS = ['Compact', 'Normal', 'Comfortable', 'Large', 'XL'];
 
-    var sec = SECTIONS.find(function (s) { return s.slug === _activeSlug; });
-    if (!sec) return;
-
-    main.innerHTML =
-      '<div class="np-section-splash">' +
-        '<p class="np-section-splash__flag">The Flock Herald &mdash; ' + sec.label + '</p>' +
-        '<h2 class="np-section-splash__title">' + sec.label + '</h2>' +
-        '<hr class="np-section-splash__rule">' +
-        '<p class="np-section-splash__tagline">' + sec.tagline + '</p>' +
-        '<p class="np-section-splash__coming">This section is coming in a future edition.</p>' +
-      '</div>';
+  function getCurrentScaleIndex() {
+    const saved = parseFloat(localStorage.getItem('flock_font_scale') || '1.0');
+    const idx = FONT_STEPS.indexOf(saved);
+    return idx >= 0 ? idx : 1; // default Normal
   }
 
-  // ── Set church name in masthead ──────────────────────────────────────────
-  function setChurchName() {
-    var churchName = (window.HERALD_CHURCH_NAME && window.HERALD_CHURCH_NAME !== 'The Flock Herald')
-      ? window.HERALD_CHURCH_NAME
-      : null;
-    if (!churchName && typeof Nehemiah !== 'undefined' && Nehemiah.getSession) {
-      try {
-        var sess = Nehemiah.getSession();
-        if (sess && sess.churchName) churchName = sess.churchName;
-      } catch (_) {}
-    }
-    var el = document.getElementById('herald-church');
-    if (el && churchName) el.textContent = churchName;
+  function applyScale(scale) {
+    document.documentElement.style.setProperty('--fn-scale', scale);
+    localStorage.setItem('flock_font_scale', scale);
   }
 
-  // ── Boot ─────────────────────────────────────────────────────────────────
-  function boot() {
-    setChurchName();
+  function initFontScale() {
+    const btn = document.getElementById('font-scale-btn');
+    if (!btn) return;
 
-    var initialLevel = getUserRoleLevel();
-    renderGates(initialLevel);
-    injectFlipNav(initialLevel);
-    initSwipe();
-    initKeyboard();
-    injectSectionSplash();
+    // Restore saved scale
+    const saved = parseFloat(localStorage.getItem('flock_font_scale') || '1.0');
+    applyScale(saved);
 
-    // Re-render on auth resolution (reveals gated sections)
-    if (typeof Nehemiah !== 'undefined' && typeof Nehemiah.onAuthResolved === 'function') {
-      Nehemiah.onAuthResolved(function (sess) {
-        setChurchName();
-        var level = (sess && sess.role && ROLE_MAP[sess.role] !== undefined)
-          ? ROLE_MAP[sess.role] : 0;
-        renderGates(level);
-        // Remove and re-inject flip nav with updated section list
-        var old = document.getElementById('np-flip-nav');
-        if (old) old.remove();
-        injectFlipNav(level);
-      });
-    }
+    btn.addEventListener('click', () => {
+      const currentIdx = getCurrentScaleIndex();
+      const nextIdx = (currentIdx + 1) % FONT_STEPS.length;
+      applyScale(FONT_STEPS[nextIdx]);
+      showToast('Text size: ' + FONT_LABELS[nextIdx]);
+    });
+  }
+
+  // ── Toast ───────────────────────────────────────────────────────────────────
+  function showToast(message, durationMs) {
+    const layer = document.getElementById('toast-layer');
+    if (!layer) return;
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    layer.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.3s ease';
+      setTimeout(() => toast.remove(), 350);
+    }, durationMs || 2200);
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────────────────
+  function init() {
+    buildNavBar();
+    initDrawer();
+    initFontScale();
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    boot();
+    init();
   }
 
+  // Expose public API
+  window.FlockGates = { openDrawer, closeDrawer, showToast };
 })();

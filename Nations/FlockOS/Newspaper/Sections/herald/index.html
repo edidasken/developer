@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="broadsheet">
+<html lang="en" class="sec-herald">
 <head>
   <script>
     window.FLOCK_FIREBASE_CONFIG = null;
@@ -8,33 +8,91 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <meta name="theme-color" content="#faf6ed">
-  <title>The Flock Herald — The Flock Herald</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="../../Styles/the_broadsheet.css">
-  <link rel="stylesheet" href="../../Styles/sections/herald.css">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>The Herald — The Flock Herald</title>
   <script>
-    (function () {
-      try {
-        var s = parseFloat(localStorage.getItem('flock_font_scale') || '1');
-        if (s >= 0.85 && s <= 1.25) document.documentElement.style.setProperty('--fn-scale', s);
-        var t = localStorage.getItem('flock_theme') || 'broadsheet';
-        document.documentElement.setAttribute('data-theme', t);
-      } catch (_) {}
+    // Flash prevention — restore font scale before paint
+    (function() {
+      var s = localStorage.getItem('flock_font_scale');
+      if (s) document.documentElement.style.setProperty('--fn-scale', s);
     })();
   </script>
+  <link rel="stylesheet" href="../../Styles/the_broadsheet.css">
+  <link rel="stylesheet" href="../../Styles/sections/herald.css">
+  <link rel="manifest" href="../../manifest.json">
 </head>
-<body>
-  <nav class="sec-nav-bar" id="sec-nav" aria-label="Paper sections"></nav>
-  <main class="np-page" id="herald-main">
-    <!-- The Flock Herald — content loads here -->
+<body class="broadsheet-page sec-herald">
+
+  <!-- Masthead -->
+  <header class="sec-masthead" role="banner">
+    <div class="sec-masthead__inner">
+      <div>
+        <h1 class="sec-masthead__title">The Flock Herald</h1>
+        <p class="sec-masthead__subtitle" id="herald-date">Loading…</p>
+      </div>
+      <button class="sec-masthead__font-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
+    </div>
+    <!-- Section Nav Bar -->
+    <nav class="sec-nav-bar" role="navigation" aria-label="Herald sections" id="sec-nav">
+      <!-- Tabs injected by the_gates.js -->
+    </nav>
+  </header>
+
+  <!-- Main content -->
+  <main class="broadsheet-grid" id="herald-grid">
+    <!-- Skeleton placeholders while data loads -->
+    <article class="broadsheet-card" aria-label="Loading front page">
+      <div class="card-header">
+        <div class="skeleton skeleton-line skeleton-line--heading"></div>
+      </div>
+      <div class="card-body">
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line skeleton-line--short"></div>
+      </div>
+    </article>
+    <article class="broadsheet-card" aria-label="Loading today's word">
+      <div class="skeleton skeleton-line skeleton-line--heading"></div>
+      <div class="skeleton skeleton-line"></div>
+      <div class="skeleton skeleton-line skeleton-line--short"></div>
+    </article>
+    <article class="broadsheet-card" aria-label="Loading announcements">
+      <div class="skeleton skeleton-line skeleton-line--heading"></div>
+      <div class="skeleton skeleton-line"></div>
+      <div class="skeleton skeleton-line"></div>
+    </article>
   </main>
+
+  <!-- Right Drawer (global) -->
+  <aside class="right-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <header class="drawer-header">
+      <h2 id="drawer-title" class="drawer-title"></h2>
+      <button class="drawer-close" type="button" aria-label="Close">&#x2715;</button>
+    </header>
+    <div class="drawer-body" id="drawer-body"></div>
+  </aside>
+  <div class="drawer-backdrop" aria-hidden="true"></div>
+
+  <!-- Toast layer -->
+  <div class="toast-layer" id="toast-layer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Script load order: the_true_vine → firm_foundation → auth guard → the_adornment → the_gates → section script -->
   <script src="../../Scripts/the_true_vine.js"></script>
   <script src="../../Scripts/firm_foundation.js"></script>
+  <script>
+    // Inline auth guard — Herald is public, no redirect needed
+    // Nehemiah.enableLocalBypass() in console for dev
+    window._HERALD_AUTH_LEVEL = -1; // public
+  </script>
   <script src="../../Scripts/the_adornment.js"></script>
-  <script src="../../Scripts/the_gates.js?v=2"></script>
-  <script src="../../Data/devotionals.js"></script>
-  <script src="../../Data/quiz.js"></script>
-  <script src="../../Scripts/the_proclamation.js?v=2"></script>
+  <script src="../../Scripts/the_gates.js"></script>
+  <script src="the_proclamation.js"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('../../sw.js').catch(() => {});
+    }
+  </script>
 </body>
 </html>

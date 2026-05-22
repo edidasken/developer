@@ -47,7 +47,7 @@ export async function renderGarments(/* { mode } */) {
         <p class="garments-request-access">
           Not set up yet? <button type="button" class="garments-request-link" data-act="request-access">Request access</button>
           <span class="garments-request-sep">·</span>
-          or <a href="${(function(){ var m = location.pathname.match(/^(.*\/Newspaper\/)/); return m ? m[1] : '/'; })()}index.html" class="garments-request-link">Return to Herald</a>
+          or <a href="../app.flocknews/flocknews.html" class="garments-request-link">Return to Home</a>
         </p>
       </form>
     `;
