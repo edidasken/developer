@@ -138,10 +138,25 @@
 
     var visible = visibleSections(userLevel);
     var idx     = visible.findIndex(function (s) { return s.slug === _activeSlug; });
-    var prevSec = idx > 0 ? visible[idx - 1] : null;
-    var nextSec = idx < visible.length - 1 ? visible[idx + 1] : null;
-    var total   = visible.length;
-    var pos     = idx + 1;
+
+    // If the active section isn't in the visible list (e.g. auth hasn't resolved yet
+    // or user navigated directly to a gated URL), fall back to full SECTIONS order
+    // so the counter and prev/next still make sense.
+    if (idx === -1) {
+      var fullIdx  = SECTIONS.findIndex(function (s) { return s.slug === _activeSlug; });
+      var prevFull = fullIdx > 0 ? SECTIONS[fullIdx - 1] : null;
+      var nextFull = fullIdx < SECTIONS.length - 1 ? SECTIONS[fullIdx + 1] : null;
+      // Use adjacent sections that ARE visible, or the full list neighbors
+      var prevSec = prevFull;
+      var nextSec = nextFull;
+      var total   = SECTIONS.length;
+      var pos     = fullIdx + 1;
+    } else {
+      var prevSec = idx > 0 ? visible[idx - 1] : null;
+      var nextSec = idx < visible.length - 1 ? visible[idx + 1] : null;
+      var total   = visible.length;
+      var pos     = idx + 1;
+    }
 
     var chevLeft  = '<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>';
     var chevRight = '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
