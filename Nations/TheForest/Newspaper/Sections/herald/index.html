@@ -42,7 +42,6 @@
     <div class="herald-compact-folio">
       <div class="herald-compact__center">
         <h2 class="herald-compact__title">The Flock Herald</h2>
-        <p class="herald-compact__tagline">Shepherding the Flock by the Power of the Word</p>
         <p class="herald-compact__date" id="herald-compact-date"></p>
       </div>
     </div>
@@ -51,7 +50,6 @@
     <!-- Nameplate -->
     <div class="herald-nameplate">
       <h1 class="herald-nameplate__title">The Flock Herald</h1>
-      <p class="herald-nameplate__tagline">Shepherding the Flock by the Power of the Word</p>
       <p class="herald-nameplate__date" id="herald-date">Loading…</p>
     </div>
 
@@ -108,15 +106,7 @@
       }
 
       function onScroll() {
-        var y = window.scrollY;
-        var compact = masthead.classList.contains('is-compact');
-        if (!compact && y > 100) {
-          masthead.classList.add('is-compact');
-          setTimeout(updatePadding, 360);
-        } else if (compact && y < 50) {
-          masthead.classList.remove('is-compact');
-          setTimeout(updatePadding, 360);
-        }
+        // compact collapse disabled — nameplate stays full size always
       }
 
       window.addEventListener('scroll', onScroll, { passive: true });
