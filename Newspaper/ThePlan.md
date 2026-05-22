@@ -1485,3 +1485,19 @@ Phase 3 delivers The Way as a true broadsheet newspaper page — not a SPA. The 
 
 ---
 
+### [Phase 3 — Herald: Broadsheet Newspaper Layout]
+
+**Commit:** `406cfadf` — "Herald: broadsheet newspaper layout — story treatment replaces card grid"
+
+**Files changed:**
+- `Newspaper/Styles/the_broadsheet.css` — EXTENDED: added full shared broadsheet newspaper layout system (~200 lines): `.broadsheet-columns` (2fr + 1fr responsive grid), `.broadsheet-col`, `.broadsheet-col--aside` (sticky, overflow scrollable), `.story`, `.story--lead`, `.story-kicker`, `.story-hed`, `.story-hed-btn`, `.story-deck`, `.story-byline`, `.story-body`, `.story-body--lead`, `.story-dropcap`, `.story-rule`, `.story-readmore-btn`, `.section-rule`, `.section-label`, `.broadsheet-story-loading` shimmer skeleton
+- `Newspaper/Styles/sections/herald.css` — UPDATED: added `--story-accent: var(--gold)` to `.sec-herald` block; removed `.sec-herald .broadsheet-card` rule (card grid gone)
+- `Newspaper/Sections/herald/the_proclamation.js` — FULL REWRITE: card-grid pattern completely replaced with newspaper story treatment. `_story(opts)` builder returns `<article class="story">` with kicker / headline button / deck / byline / body. `_drawers` registry stores drawer HTML keyed by name. 4 main-col builders (Lead, OYB §1, Announcements §2, Prayer §3) + 3 aside builders (Nation §4, Heart Check §5, Quiz §6). All return HTML strings. `init()` runs all 7 concurrently via `Promise.allSettled`, injects to `#herald-main` + `#herald-aside`. Event delegation for drawer opens + quiz answers wired once before data loads.
+- `Newspaper/Sections/herald/index.html` — UPDATED: `<main class="broadsheet-grid">` with 3 skeleton cards replaced by `<main class="broadsheet-columns">` containing `<div id="herald-main">` (main col) + `<div id="herald-aside">` (aside col) with shimmer skeleton placeholders.
+- Nations/*/Newspaper rebuilt via C-Build across all 5 nations.
+
+**What this delivers:**
+The Herald (Section 1) now renders as a true broadsheet newspaper — matching the story treatment already established for The Way. Each panel becomes a full `.story` article with gold kicker, clickable headline button (opens drawer), italic deck, uppercase byline, and body teaser. Story headlines fire `FlockGates.openDrawer()` with panel-specific HTML. The aside column (Nation of the Week, Heart Check, Bible Quiz) is separated by `.section-rule` / `.section-label` dividers. Quiz remains interactive inline (no drawer). The layout is a 2fr + 1fr responsive grid — stacks to single column at ≤860px. `--story-accent: var(--gold)` is bound on `.sec-herald`, so all story kickers, dropcaps, and hover states use The Herald's gold signature color. The story system now lives in the shared `the_broadsheet.css` foundation, so future sections can adopt it without duplicating CSS.
+
+---
+
