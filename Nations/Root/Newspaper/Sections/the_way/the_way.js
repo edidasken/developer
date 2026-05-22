@@ -457,8 +457,10 @@
     import('../../Data/apologetics.js').then(function (m) {
       var rows = m.default || []; if (!rows.length) return;
       var q = rows[_day % rows.length];
-      var $el = _buildTodayItem('Apologetic', q.shortTitle || q.questionTitle,
-        q.categoryTitle || '', '#6b5b9a',
+      var _apoSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>';
+      var _qTitle = (q.shortTitle || q.questionTitle || '').replace(/^\d+\.\s*/, '');
+      var $el = _buildTodayItem('Apologetic', _qTitle,
+        q.categoryTitle || '', '#6b5b9a', _apoSvg,
         function () { window.FlockGates.openDrawer('Apologetic', _apoDrawerHtml(q)); });
       $ph1.parentNode && $ph1.parentNode.replaceChild($el, $ph1);
     }).catch(function () {});
@@ -468,8 +470,9 @@
     import('../../Data/counseling.js').then(function (m) {
       var rows = m.default || []; if (!rows.length) return;
       var t = rows[_day % rows.length];
-      var $el = _buildTodayItem('Counseling', (t.icon ? t.icon + '\u00a0' : '') + (t.title || ''),
-        t.definition ? t.definition.substring(0, 72) + '\u2026' : '', '#16a34a',
+      var _couSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M20.84 4.6a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.07a5.5 5.5 0 0 0-7.78 7.78L12 21l8.84-8.62a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+      var $el = _buildTodayItem('Counseling', t.title || '',
+        t.definition ? t.definition.substring(0, 72) + '\u2026' : '', '#16a34a', _couSvg,
         function () { window.FlockGates.openDrawer('Counseling \u00b7 ' + (t.title || ''), _couDrawerHtml(t)); });
       $ph2.parentNode && $ph2.parentNode.replaceChild($el, $ph2);
     }).catch(function () {});
@@ -482,8 +485,11 @@
       var w = arr[_day % arr.length];
       var _la = _lexGreek ? 'Greek' : 'Hebrew';
       var _ac = _lexGreek ? '#0891b2' : '#b45309';
+      var _lexSvg = _lexGreek
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 13l2-5 2 5"/><line x1="10" y1="11" x2="13" y2="11"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4"/><line x1="10" y1="7" x2="18" y2="7"/><line x1="10" y1="11" x2="18" y2="11"/><line x1="10" y1="15" x2="14" y2="15"/></svg>';
       var $el = _buildTodayItem('Lexicon \u00b7 ' + _la, w.lemma || '',
-        (w.translit || w.xlit || '') + (w.kjv_def ? ' \u2014 ' + w.kjv_def.substring(0, 40) : ''), _ac,
+        (w.translit || w.xlit || '') + (w.kjv_def ? ' \u2014 ' + w.kjv_def.substring(0, 40) : ''), _ac, _lexSvg,
         function () { window.FlockGates.openDrawer('Lexicon \u00b7 ' + _la, _lexDrawerHtml(w, _la, _ac)); });
       $ph3.parentNode && $ph3.parentNode.replaceChild($el, $ph3);
     }).catch(function () {});
@@ -493,8 +499,9 @@
     import('../../Data/books-of-the-bible.js').then(function (m) {
       var rows = m.default || []; if (!rows.length) return;
       var b = rows[_day % rows.length];
+      var _bibSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/><line x1="12" y1="9" x2="12" y2="17"/><line x1="8" y1="13" x2="16" y2="13"/></svg>';
       var $el = _buildTodayItem('Bible Book', b.bookName || '',
-        b.genre || '', '#b45309',
+        b.genre || '', '#b45309', _bibSvg,
         function () { window.FlockGates.openDrawer(b.bookName || 'Bible Book', _bibDrawerHtml(b)); });
       $ph4.parentNode && $ph4.parentNode.replaceChild($el, $ph4);
     }).catch(function () {});
@@ -504,8 +511,9 @@
     import('../../Data/heart.js').then(function (m) {
       var rows = m.default || []; if (!rows.length) return;
       var q = rows[_day % rows.length];
+      var _hrtSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M20.84 4.6a5.5 5.5 0 0 0-7.78 0L12 5.66l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21l8.84-8.62a5.5 5.5 0 0 0 0-7.78z"/><polyline points="9 12 11 14 15 10"/></svg>';
       var $el = _buildTodayItem('Heart Check', q['Question'] || '',
-        q['Category'] || '', '#dc2626',
+        q['Category'] || '', '#dc2626', _hrtSvg,
         function () { window.FlockGates.openDrawer('Heart Check', _hrtDrawerHtml(q)); });
       $ph5.parentNode && $ph5.parentNode.replaceChild($el, $ph5);
     }).catch(function () {});
@@ -594,16 +602,21 @@
   }
 
   /* ── TODAY item builder ─────────────────────────────────────────────────────── */
-  function _buildTodayItem(label, title, sub, color, onOpen) {
+  function _buildTodayItem(label, title, sub, color, svg, onOpen) {
     var $card = document.createElement('div');
     $card.className = 'way-today-card';
-    $card.style.cssText = 'border-left-color:' + color + ';cursor:pointer;';
+    $card.style.setProperty('--tc-accent', color);
     $card.setAttribute('role', 'button');
     $card.setAttribute('tabindex', '0');
-    $card.innerHTML = '<span class="way-today-card__label" style="color:' + esc(color) + '">' + esc(label) + '</span>'
+    $card.innerHTML =
+      '<div class="way-today-card__head">'
+      + '<div class="way-today-card__icon" aria-hidden="true">' + svg + '</div>'
+      + '<div class="way-today-card__meta">'
+      + '<div class="way-today-card__label">' + esc(label)
+      + '<span class="way-today-card__label-arrow">&#8599;</span></div>'
       + '<div class="way-today-card__title">' + esc(title) + '</div>'
       + (sub ? '<div class="way-today-card__body">' + esc(sub) + '</div>' : '')
-      + '<div class="way-today-card__open" aria-hidden="true">Open \u2192</div>';
+      + '</div></div>';
     $card.addEventListener('click', onOpen);
     $card.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); }
@@ -642,7 +655,7 @@
   function _apoDrawerHtml(q) {
     return '<div style="' + _dStyle() + '">'
       + _dLabel(q.categoryTitle || 'Apologetics', '#6b5b9a')
-      + _dH2(q.questionTitle || '')
+      + _dH2((q.questionTitle || '').replace(/^\d+\.\s*/, ''))
       + _dP(q.answerContent || '')
       + _dBQ(q.quoteText || '', q.referenceText || '', '#6b5b9a')
       + (q.referenceUrl ? '<a href="' + esc(q.referenceUrl) + '" target="_blank" rel="noopener" style="font-size:0.75rem;color:#6b5b9a;font-weight:600">View Reference \u2192</a>' : '')
