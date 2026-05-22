@@ -95,15 +95,20 @@
       var dov = window.HERALD_DATA && window.HERALD_DATA.devotionals;
       if (dov && !(cfg && cfg.scriptureVerse)) {
         var today = new Date();
-        var mm = String(today.getMonth() + 1).padStart(2, '0');
-        var dd = String(today.getDate()).padStart(2, '0');
-        var key = mm + '/' + dd;
+        var key = today.getFullYear() + '-' +
+                  String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                  String(today.getDate()).padStart(2, '0');
         var entry = dov[key];
         if (entry && entry.scripture) {
-          var parts = entry.scripture.split(' \u2014 ');
+          var parts = entry.scripture.split(/\s+[—\u2014]\s+/);
           if (parts.length > 1) {
-            text  = parts[0].trim().replace(/^["""]/,'').replace(/["""]$/,'');
+            text  = parts[0].trim().replace(/^["""]/, '').replace(/["""]$/, '');
             verse = parts[1].trim();
+            ref   = '';
+          } else if (entry.title) {
+            text  = entry.reflection || entry.scripture;
+            verse = entry.title;
+            ref   = '';
           }
         }
       }
@@ -115,7 +120,7 @@
       '  <div class="np-pull-quote">',
       '    <p>\u201c' + esc(text) + '\u201d</p>',
       '  </div>',
-      '  <p class="np-byline">' + esc(verse) + ' \u2014 ' + esc(ref) + '</p>',
+      '  <p class="np-byline">' + esc(verse) + (ref ? ' \u2014 ' + esc(ref) : '') + '</p>',
       '  <hr class="np-column-rule">',
       '  <p class="np-body" style="font-style:italic;font-size:0.88rem;">',
       '    Each morning the paper opens here \u2014 at the living Word.',

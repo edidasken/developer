@@ -186,25 +186,6 @@
     ].filter(Boolean).join('\n');
   }
 
-    return [
-      '<div class="np-col">',
-      '  <p class="np-col__flag" style="color:var(--sec-cornerstone)">',
-      '    Today\u2019s Doctrine &mdash; ' + todayLong(),
-      '  </p>',
-      '  <h2 class="np-headline">' + esc(d.sectionTitle) + '</h2>',
-      '  <p class="np-byline" style="font-variant:small-caps;letter-spacing:.06em;">' + esc(d.categoryTitle) + '</p>',
-      '  <hr class="np-column-rule">',
-      '  <div class="np-body np-drop-cap">',
-      '    <p>' + esc(p1) + '</p>',
-      p2 ? '    <p>' + esc(p2) + '</p>' : '',
-      '  </div>',
-      d.scriptureRefs
-        ? '  <p class="np-byline" style="margin-top:14px;font-size:0.82rem;font-variant:small-caps;">' + esc(d.scriptureRefs) + '</p>'
-        : '',
-      '</div>',
-    ].filter(Boolean).join('\n');
-  }
-
   // ── Col 2: Apologetics Q&A ────────────────────────────────────────────────
   function buildApologeticsCol(a) {
     return [
