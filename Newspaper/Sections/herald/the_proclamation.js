@@ -95,36 +95,40 @@
       }
     } catch (_) {}
 
-    let psalmRef = '', psalmTitle = '', psalmSummary = '';
+    let devTitle = '', devTheme = '', devReflection = '', devScripture = '', devQuestion = '', devPrayer = '';
     try {
-      const { default: psalms } = await import('../../Data/psalms.js');
-      if (psalms && psalms.byNumber) {
-        const all = psalms.byNumber;
+      const { default: devotionals } = await import('../../Data/devotionals.js');
+      if (Array.isArray(devotionals) && devotionals.length) {
         const override = cfg.devotionalIndex != null ? cfg.devotionalIndex : null;
-        const entry = all[idx(override != null ? override : dayIndex(), all.length)];
+        const entry = devotionals[idx(override != null ? override : dayIndex(), devotionals.length)];
         if (entry) {
-          psalmRef    = `Psalm ${entry.display || entry.number}`;
-          psalmTitle  = entry.title || '';
-          psalmSummary = entry.summary || '';
+          devTitle      = entry.title || '';
+          devTheme      = entry.theme || '';
+          devReflection = entry.reflection || '';
+          devScripture  = entry.scripture || '';
+          devQuestion   = entry.question || '';
+          devPrayer     = entry.prayer || '';
           _drawers['front-page'] = `
-            <p class="story-kicker">DAILY DEVOTIONAL · ${esc(shortDate)}</p>
-            <h2 style="font-family:'Lora',Georgia,serif;font-size:1.375rem;line-height:1.25;margin:0.5rem 0 0.25rem">${esc(psalmRef)}</h2>
-            ${psalmTitle ? `<p style="font-family:'Lora',Georgia,serif;font-style:italic;color:var(--ink-muted);font-size:1rem;margin:0 0 1rem">${esc(psalmTitle)}</p>` : ''}
-            ${psalmSummary ? `<p style="line-height:1.75;color:var(--ink)">${esc(psalmSummary)}</p>` : ''}`;
+            <p class="story-kicker">DAILY DEVOTIONAL \u00b7 ${esc(shortDate)}</p>
+            ${devTheme ? `<p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:0.6875rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--story-accent);margin:0.5rem 0 0.25rem">${esc(devTheme)}</p>` : ''}
+            <h2 style="font-family:'Lora',Georgia,serif;font-size:1.375rem;line-height:1.25;margin:0 0 0.75rem">${esc(devTitle)}</h2>
+            ${devScripture ? `<blockquote style="border-left:3px solid var(--story-accent);padding:0.5rem 0 0.5rem 1rem;margin:0 0 1rem;font-style:italic;color:var(--ink-muted);font-family:'Lora',Georgia,serif">${esc(devScripture)}</blockquote>` : ''}
+            ${devReflection ? `<p style="line-height:1.75;color:var(--ink);margin:0 0 1rem">${esc(devReflection)}</p>` : ''}
+            ${devQuestion ? `<p style="font-style:italic;color:var(--ink-muted);border-top:1px solid var(--rule);padding-top:0.75rem;margin:0 0 1rem">${esc(devQuestion)}</p>` : ''}
+            ${devPrayer ? `<p style="font-size:0.875rem;color:var(--ink-muted);font-style:italic"><strong style="font-style:normal;color:var(--story-accent)">Prayer:</strong> ${esc(devPrayer)}</p>` : ''}`;
         }
       }
     } catch (_) {}
 
-    const hed  = psalmTitle || psalmRef || `The Flock Herald — ${shortDate}`;
-    const deck = psalmRef
-      ? `${psalmRef}${psalmTitle ? ' \u2014 ' + psalmTitle : ''}`
-      : 'Shepherding the flock by the power of the Word.';
+    const hed  = devTitle || `The Flock Herald \u2014 ${shortDate}`;
+    const deck = devTheme && devScripture
+      ? `${devTheme} \u2014 ${devScripture.split('\u2014').pop().trim() || devScripture}`
+      : devTheme || 'Shepherding the flock by the power of the Word.';
 
-    // Scripture pull-quote block (uses existing .herald-scripture styles in herald.css)
-    const scriptureBlock = psalmRef
+    // Scripture pull-quote block
+    const scriptureBlock = devScripture
       ? `<div class="herald-scripture">
-          <p class="herald-scripture__ref">${esc(psalmRef)}</p>
-          ${psalmTitle ? `<p class="herald-scripture__title">${esc(psalmTitle)}</p>` : ''}
+          <p class="herald-scripture__ref">${esc(devScripture)}</p>
          </div>`
       : '';
 
@@ -133,11 +137,11 @@
       : `<span class="story-hed-btn" style="cursor:default;pointer-events:none">${esc(hed)}</span>`;
 
     return `<article class="story story--lead">
-      <p class="story-kicker">THE FLOCK HERALD \u00b7\u00a0${esc(dateStr.toUpperCase())}</p>
+      <p class="story-kicker">DAILY DEVOTIONAL \u00b7\u00a0${esc(dateStr.toUpperCase())}</p>
       <h2 class="story-hed">${hedInner}</h2>
       <p class="story-deck">${esc(deck)}</p>
       <p class="story-byline">${esc(churchName)} \u00b7 ${esc(shortDate)}</p>
-      <p class="story-body story-body--lead story-dropcap">Today the flock gathers around the living Word. May God's truth shepherd your steps, strengthen your hands, and fill your heart with his peace as you read this edition.</p>
+      ${devReflection ? `<p class="story-body story-body--lead story-dropcap">${esc(devReflection)}</p>` : '<p class="story-body story-body--lead">Today the flock gathers around the living Word. May God\'s truth shepherd your steps, strengthen your hands, and fill your heart with his peace as you read this edition.</p>'}
       ${scriptureBlock}
       <hr class="story-rule">
     </article>`;

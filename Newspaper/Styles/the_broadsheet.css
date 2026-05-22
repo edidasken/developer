@@ -770,7 +770,6 @@ hr, .broadsheet-rule {
   gap: 0.5rem;
   margin: 0 0 0.75rem;
 }
-.section-rule::before,
 .section-rule::after {
   content: '';
   flex: 1;
@@ -785,7 +784,7 @@ hr, .broadsheet-rule {
   color: var(--ink-muted);
   white-space: nowrap;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  text-align: center;
+  text-align: left;
 }
 
 /* ── Broadsheet skeleton loading ──────────────────────────────────────────── */
