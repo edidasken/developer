@@ -103,6 +103,178 @@
       svg: '<svg ' + _S + '><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' },
   ];
 
+  /* ── Daily Prayer Hours data ─────────────────────────────────────────────────── */
+  var WAY_PRAYER_HOURS = [
+    {
+      id: 'dawn',
+      time: 'Dawn',
+      label: 'Morning Watch',
+      icon: '\uD83C\uDF05', /* 🌅 */
+      range: [4, 11],
+      text: '\u201cO LORD, in the morning you hear my voice.\u201d \u2014 Psalm 5:3',
+      callToPrayer: 'Lord, open my lips, and my mouth shall declare Your praise.',
+      scripture: {
+        ref: 'Psalm 5:1\u20133 (ESV)',
+        text: 'Give ear to my words, O LORD; consider my groaning. Give attention to the sound of my cry, my King and my God, for to you do I pray. O LORD, in the morning you hear my voice; in the morning I prepare a sacrifice for you and watch.'
+      },
+      intercession: [
+        'For the work of my hands today \u2014 may it be done as unto the Lord.',
+        'For my family, that the Lord would go before them.',
+        'For my pastors, elders, and the church.',
+        'For one person who does not yet know Christ.',
+      ],
+      closing: 'Direct, control, suggest this day all I design, do, or say; that all my powers, with all their might, in Thy sole glory may unite. Amen.'
+    },
+    {
+      id: 'midday',
+      time: '12:00 PM',
+      label: 'Midday Pause',
+      icon: '\u2600\uFE0F', /* ☀️ */
+      range: [11, 14],
+      text: '\u201cSeven times a day I praise you.\u201d \u2014 Psalm 119:164',
+      callToPrayer: 'In the middle of the day, I lift my eyes to the hills.',
+      scripture: {
+        ref: 'Psalm 121:1\u20132 (ESV)',
+        text: 'I lift up my eyes to the hills. From where does my help come? My help comes from the LORD, who made heaven and earth.'
+      },
+      intercession: [
+        'A pause of thanksgiving for what God has already done today.',
+        'For wisdom in this afternoon\u2019s decisions and conversations.',
+        'For the poor, the hungry, and the weary.',
+        'For peace where there is conflict.',
+      ],
+      closing: 'Father, You who never slumber nor sleep, sustain me through this day. Amen.'
+    },
+    {
+      id: 'three',
+      time: '3:00 PM',
+      label: 'Hour of Prayer',
+      icon: '\u26EA', /* ⛪ */
+      range: [14, 17],
+      text: '\u201cNow Peter and John were going up to the temple at the hour of prayer.\u201d \u2014 Acts 3:1',
+      callToPrayer: 'At the ninth hour, the hour our Savior bowed His head and gave up His Spirit.',
+      scripture: {
+        ref: 'Luke 23:44\u201346 (ESV)',
+        text: 'It was now about the sixth hour, and there was darkness over the whole land until the ninth hour, while the sun\u2019s light failed. And the curtain of the temple was torn in two. Then Jesus, calling out with a loud voice, said, \u201cFather, into your hands I commit my spirit!\u201d And having said this he breathed his last.'
+      },
+      intercession: [
+        'Thanksgiving for the cross, the empty tomb, the open way.',
+        'For the lost \u2014 that the Lord would send laborers into His harvest.',
+        'For the sick, the dying, and those who tend them.',
+        'For my own soul \u2014 search me, O God, and know my heart.',
+      ],
+      closing: 'Jesus, by Your death You have abolished death; by Your rising again You have restored to us everlasting life. Amen.'
+    },
+    {
+      id: 'vespers',
+      time: 'Evening',
+      label: 'Evening Prayers',
+      icon: '\uD83C\uDF19', /* 🌙 */
+      range: [17, 23],
+      text: '\u201cLet my prayer be counted as incense before you.\u201d \u2014 Psalm 141:2',
+      callToPrayer: 'O God, make speed to save me; O Lord, make haste to help me.',
+      scripture: {
+        ref: 'Psalm 141:1\u20132 (ESV)',
+        text: 'O LORD, I call upon you; hasten to me! Give ear to my voice when I call to you! Let my prayer be counted as incense before you, and the lifting up of my hands as the evening sacrifice!'
+      },
+      intercession: [
+        'A confession of today\u2019s failures \u2014 in thought, word, and deed.',
+        'Thanksgiving for the mercies of this day.',
+        'For all who travel, who labor through the night, who cannot sleep.',
+        'For peaceful rest, and waking to serve You again.',
+      ],
+      closing: 'Lighten our darkness, we beseech thee, O Lord; and by thy great mercy defend us from all perils and dangers of this night. Amen.'
+    },
+  ];
+
+  /* Return current prayer hour from LITURGY based on local clock */
+  function _currentPrayerHour() {
+    var h = new Date().getHours();
+    for (var i = 0; i < WAY_PRAYER_HOURS.length; i++) {
+      var l = WAY_PRAYER_HOURS[i];
+      if (h >= l.range[0] && h < l.range[1]) return l;
+    }
+    return WAY_PRAYER_HOURS[0];
+  }
+
+  /* Build the prayer hours card HTML for the aside */
+  function _buildPrayerHoursCard() {
+    var now  = _currentPrayerHour();
+    var rows = '';
+    WAY_PRAYER_HOURS.forEach(function (l) {
+      var isNow = (l.id === now.id);
+      rows += '<div class="way-ph-row' + (isNow ? ' is-now' : '') + '" data-hour="' + esc(l.id) + '" tabindex="0" role="button" aria-label="Begin ' + esc(l.label) + '">'
+           + '<div class="way-ph-icon">' + l.icon + '</div>'
+           + '<div class="way-ph-body">'
+           +   '<div class="way-ph-time">' + esc(l.time) + ' \u2014 ' + esc(l.label)
+           +     (isNow ? ' <span class="way-ph-now-pill">Now</span>' : '')
+           +   '</div>'
+           +   '<div class="way-ph-text">' + esc(l.text) + '</div>'
+           + '</div>'
+           + '</div>';
+    });
+    return '<div class="way-ph-card">'
+      + '<div class="way-ph-title">Daily Prayer Hours</div>'
+      + '<div class="way-ph-verse">\u201cEvening, morning and noon I cry out in distress, and he hears my voice.\u201d \u2014 Psalm 55:17</div>'
+      + '<div class="way-ph-list">' + rows + '</div>'
+      + '<button class="way-ph-begin-btn" type="button">Begin ' + esc(now.label) + '</button>'
+      + '</div>';
+  }
+
+  /* Open a guided prayer session for a given liturgy hour in the drawer */
+  function _openLiturgySession(hourId) {
+    var hour = null;
+    for (var i = 0; i < WAY_PRAYER_HOURS.length; i++) {
+      if (WAY_PRAYER_HOURS[i].id === hourId) { hour = WAY_PRAYER_HOURS[i]; break; }
+    }
+    if (!hour) return;
+
+    var items = hour.intercession.map(function (line, idx) {
+      return '<label class="pray-lit-prompt">'
+        + '<input type="checkbox" data-prompt="' + idx + '">'
+        + '<span>' + esc(line) + '</span>'
+        + '</label>';
+    }).join('');
+
+    var html = '<div class="pray-lit-session">'
+      + '<div class="pray-lit-step">'
+      +   '<div class="pray-lit-step-label">Step 1 \u2014 Call to Prayer</div>'
+      +   '<div class="pray-lit-call">' + esc(hour.callToPrayer) + '</div>'
+      + '</div>'
+      + '<div class="pray-lit-step">'
+      +   '<div class="pray-lit-step-label">Step 2 \u2014 Scripture Reading</div>'
+      +   '<div class="pray-lit-scripture-ref">' + esc(hour.scripture.ref) + '</div>'
+      +   '<div class="pray-lit-scripture-text">' + esc(hour.scripture.text) + '</div>'
+      + '</div>'
+      + '<div class="pray-lit-step">'
+      +   '<div class="pray-lit-step-label">Step 3 \u2014 Intercession</div>'
+      +   '<div class="pray-lit-intercession">' + items + '</div>'
+      + '</div>'
+      + '<div class="pray-lit-step">'
+      +   '<div class="pray-lit-step-label">Step 4 \u2014 Closing Prayer</div>'
+      +   '<div class="pray-lit-closing">' + esc(hour.closing) + '</div>'
+      + '</div>'
+      + '<button class="way-amen-btn" type="button" id="way-amen-btn">\u271D Mark Complete \u2014 Amen</button>'
+      + '</div>';
+
+    window.FlockGates.openDrawer(hour.icon + ' ' + hour.label, html);
+
+    setTimeout(function () {
+      var $btn = document.getElementById('way-amen-btn');
+      if ($btn) {
+        $btn.addEventListener('click', function () {
+          try {
+            var key = 'flockos:liturgy:' + new Date().toISOString().slice(0, 10);
+            var done = JSON.parse(localStorage.getItem(key) || '[]');
+            if (!done.includes(hourId)) done.push(hourId);
+            localStorage.setItem(key, JSON.stringify(done));
+          } catch (_e) {}
+          _showToast('\u271D Amen \u2014 prayer complete.');
+        });
+      }
+    }, 80);
+  }
+
   /* ── Module cache ────────────────────────────────────────────────────────── */
   var _modCache  = {};
   var _unmount   = null;
@@ -263,6 +435,25 @@
     $hd.className = 'section-rule';
     $hd.innerHTML = '<span class="section-label">TODAY</span>';
     $aside.appendChild($hd);
+
+    /* Daily Prayer Hours card */
+    var $phWrap = document.createElement('div');
+    $phWrap.innerHTML = _buildPrayerHoursCard();
+    $aside.appendChild($phWrap.firstElementChild);
+    var $phCard = $aside.querySelector('.way-ph-card');
+    if ($phCard) {
+      $phCard.querySelector('.way-ph-begin-btn').addEventListener('click', function () {
+        _openLiturgySession(_currentPrayerHour().id);
+      });
+      $phCard.querySelectorAll('.way-ph-row').forEach(function (row) {
+        row.addEventListener('click', function () {
+          _openLiturgySession(row.dataset.hour);
+        });
+        row.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); _openLiturgySession(row.dataset.hour); }
+        });
+      });
+    }
 
     /* Psalm of the day from psalms module */
     _importMod('the_gospel_psalms')
