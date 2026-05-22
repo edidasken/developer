@@ -65,15 +65,17 @@
   // ── Get user role level ────────────────────────────────────────────────────
   function getUserRoleLevel() {
     if (typeof Nehemiah !== 'undefined' && Nehemiah.getSession) {
-      var sess = Nehemiah.getSession();
-      if (sess && typeof sess.roleLevel === 'number') return sess.roleLevel;
-      if (sess && sess.role) {
-        var LEVELS = { readonly: 0, volunteer: 1, care: 2, deacon: 2,
-                       leader: 3, treasurer: 3, pastor: 4, admin: 5 };
-        return LEVELS[sess.role] !== undefined ? LEVELS[sess.role] : -1;
-      }
+      try {
+        var sess = Nehemiah.getSession();
+        if (sess && typeof sess.roleLevel === 'number') return sess.roleLevel;
+        if (sess && sess.role) {
+          var LEVELS = { readonly: 0, volunteer: 1, care: 2, deacon: 2,
+                         leader: 3, treasurer: 3, pastor: 4, admin: 5 };
+          return LEVELS[sess.role] !== undefined ? LEVELS[sess.role] : -1;
+        }
+      } catch (_) {}
     }
-    return -1; // unauthenticated
+    return -1; // unauthenticated or Firebase not loaded
   }
 
   // ── Render Section Bar ─────────────────────────────────────────────────────
@@ -120,8 +122,10 @@
       ? window.HERALD_CHURCH_NAME
       : null;
     if (!churchName && typeof Nehemiah !== 'undefined' && Nehemiah.getSession) {
-      var sess = Nehemiah.getSession();
-      if (sess && sess.churchName) churchName = sess.churchName;
+      try {
+        var sess = Nehemiah.getSession();
+        if (sess && sess.churchName) churchName = sess.churchName;
+      } catch (_) {}
     }
     var el = document.getElementById('herald-church');
     if (el && churchName) el.textContent = churchName;

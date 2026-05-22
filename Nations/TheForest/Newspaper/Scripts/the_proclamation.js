@@ -117,13 +117,15 @@
   // ── Helpers ────────────────────────────────────────────────────────────────
   function getUserRoleLevel() {
     if (typeof Nehemiah !== 'undefined' && Nehemiah.getSession) {
-      var sess = Nehemiah.getSession();
-      if (sess && typeof sess.roleLevel === 'number') return sess.roleLevel;
-      if (sess && sess.role) {
-        var LEVELS = { readonly: 0, volunteer: 1, care: 2, deacon: 2,
-                       leader: 3, treasurer: 3, pastor: 4, admin: 5 };
-        return LEVELS[sess.role] !== undefined ? LEVELS[sess.role] : -1;
-      }
+      try {
+        var sess = Nehemiah.getSession();
+        if (sess && typeof sess.roleLevel === 'number') return sess.roleLevel;
+        if (sess && sess.role) {
+          var LEVELS = { readonly: 0, volunteer: 1, care: 2, deacon: 2,
+                         leader: 3, treasurer: 3, pastor: 4, admin: 5 };
+          return LEVELS[sess.role] !== undefined ? LEVELS[sess.role] : -1;
+        }
+      } catch (_) {}
     }
     return -1;
   }
