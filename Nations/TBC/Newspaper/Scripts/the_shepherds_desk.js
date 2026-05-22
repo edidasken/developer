@@ -113,17 +113,78 @@
       }
     } catch (_) {}
 
+    try {
+      var heart = window.HERALD_DATA && window.HERALD_DATA.heart;
+      if (heart && heart.length) {
+        var h = heart[doy % heart.length];
+        if (h) result.heart = {
+          category:     h['Category']     || '',
+          question:     h['Question']     || '',
+          prescription: h['Prescription'] || '',
+          verse:        h['Verse Reference'] || '',
+        };
+      }
+    } catch (_) {}
+
+    try {
+      var mirror = window.HERALD_DATA && window.HERALD_DATA.mirror;
+      if (mirror && mirror.length) {
+        var m = mirror[doy % mirror.length];
+        if (m) result.mirror = {
+          category:     m['Category Title'] || '',
+          question:     m['Question']       || '',
+          prescription: m['Prescription']   || '',
+          scripture:    m['Scripture']      || '',
+        };
+      }
+    } catch (_) {}
+
     return result;
   }
 
   // ── Col 1: Today's Doctrine ───────────────────────────────────────────────
-  function buildDoctrineCol(d) {
+  function buildDoctrineCol(d, mirror) {
     // Break content into ~2 paragraphs at sentence boundaries
     var raw   = d.content;
     var mid   = Math.floor(raw.length / 2);
     var split = raw.indexOf('. ', mid);
     var p1    = split > -1 ? raw.slice(0, split + 1) : raw;
     var p2    = split > -1 ? raw.slice(split + 2)    : '';
+
+    var mirrorHTML = '';
+    if (mirror && mirror.question) {
+      mirrorHTML = [
+        '  <hr class="np-column-rule" style="margin-top:18px">',
+        '  <p class="np-col__flag" style="margin-top:0">Shepherd\u2019s Mirror \u2014 ' + esc(mirror.category) + '</p>',
+        '  <p style="font-size:0.85rem;font-style:italic;line-height:1.5;margin:6px 0 8px;">' + esc(mirror.question) + '</p>',
+        mirror.prescription
+          ? '  <p style="font-size:0.82rem;color:var(--ink-dim);">' + esc(mirror.prescription) + '</p>'
+          : '',
+        mirror.scripture
+          ? '  <p class="np-byline" style="margin-top:8px;font-size:0.8rem;font-variant:small-caps;">' + esc(mirror.scripture) + '</p>'
+          : '',
+      ].filter(Boolean).join('\n');
+    }
+
+    return [
+      '<div class="np-col">',
+      '  <p class="np-col__flag" style="color:var(--sec-cornerstone)">',
+      '    Today\u2019s Doctrine &mdash; ' + todayLong(),
+      '  </p>',
+      '  <h2 class="np-headline">' + esc(d.sectionTitle) + '</h2>',
+      '  <p class="np-byline" style="font-variant:small-caps;letter-spacing:.06em;">' + esc(d.categoryTitle) + '</p>',
+      '  <hr class="np-column-rule">',
+      '  <div class="np-body np-drop-cap">',
+      '    <p>' + esc(p1) + '</p>',
+      p2 ? '    <p>' + esc(p2) + '</p>' : '',
+      '  </div>',
+      d.scriptureRefs
+        ? '  <p class="np-byline" style="margin-top:14px;font-size:0.82rem;font-variant:small-caps;">' + esc(d.scriptureRefs) + '</p>'
+        : '',
+      mirrorHTML,
+      '</div>',
+    ].filter(Boolean).join('\n');
+  }
 
     return [
       '<div class="np-col">',
@@ -165,13 +226,28 @@
   }
 
   // ── Col 3: Pastoral Care Topic ────────────────────────────────────────────
-  function buildCareCol(c) {
+  function buildCareCol(c, heart) {
     var scriptureItems = (c.scriptures || '').split(/[;,]/).map(function (s) { return s.trim(); }).filter(Boolean);
     var scriptureHTML  = scriptureItems.length
       ? '<ul class="np-briefs">' + scriptureItems.map(function (s) {
           return '<li class="np-briefs__item"><span class="np-briefs__title" style="font-size:0.85rem">' + esc(s) + '</span></li>';
         }).join('') + '</ul>'
       : '';
+
+    var heartHTML = '';
+    if (heart && heart.question) {
+      heartHTML = [
+        '  <hr class="np-column-rule" style="margin-top:18px">',
+        '  <p class="np-col__flag" style="margin-top:0">Heart Check \u2014 ' + esc(heart.category) + '</p>',
+        '  <p style="font-size:0.85rem;font-style:italic;line-height:1.5;margin:6px 0 8px;">' + esc(heart.question) + '</p>',
+        heart.prescription
+          ? '  <p style="font-size:0.82rem;color:var(--ink-dim);">' + esc(heart.prescription) + '</p>'
+          : '',
+        heart.verse
+          ? '  <p class="np-byline" style="margin-top:8px;font-size:0.8rem;font-variant:small-caps;">' + esc(heart.verse) + '</p>'
+          : '',
+      ].filter(Boolean).join('\n');
+    }
 
     return [
       '<div class="np-col">',
@@ -187,6 +263,7 @@
       scriptureHTML
         ? '  <p class="np-col__flag" style="margin-top:16px">Key Scriptures</p>' + scriptureHTML
         : '',
+      heartHTML,
       '</div>',
     ].filter(Boolean).join('\n');
   }
@@ -215,9 +292,9 @@
       '<div class="np-broadsheet">',
       buildBanner(churchName),
       '<div class="np-cols">',
-      buildDoctrineCol(data.doctrine),
+      buildDoctrineCol(data.doctrine, data.mirror),
       buildApologeticsCol(data.apologetic),
-      buildCareCol(data.care),
+      buildCareCol(data.care, data.heart),
       '</div>',
       '</div>',
     ].join('\n');

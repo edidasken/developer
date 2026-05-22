@@ -273,4 +273,19 @@ function stripExport(src) {
   console.log('✓ mirror.js — ' + arr.length + ' mirror questions');
 })();
 
+// ── 16. quiz — export default array ──────────────────────────────────────
+(function () {
+  const raw = stripExport('quiz.js');
+  const arr = eval(raw.replace(/;$/, ''));
+  const out = [
+    '// Herald Data: Bible Quiz Questions',
+    '// Source: New_Covenant/Data/quiz.js — ' + arr.length + ' questions',
+    '// DO NOT EDIT — regenerate with: node Newspaper/convert_herald_data.js',
+    'window.HERALD_DATA = window.HERALD_DATA || {};',
+    'window.HERALD_DATA.quiz = ' + JSON.stringify(arr, null, 2) + ';',
+  ].join('\n');
+  fs.writeFileSync(path.join(DST, 'quiz.js'), out);
+  console.log('✓ quiz.js — ' + arr.length + ' questions');
+})();
+
 console.log('\n✅ Herald data bundle complete → Newspaper/Data/');

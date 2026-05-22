@@ -90,6 +90,25 @@
       'an end; they are new every morning; great is your faithfulness.';
     var ref   = (cfg && cfg.scriptureRef)   || 'ESV';
 
+    // Try to pull today's devotional scripture from the data bundle
+    try {
+      var dov = window.HERALD_DATA && window.HERALD_DATA.devotionals;
+      if (dov && !(cfg && cfg.scriptureVerse)) {
+        var today = new Date();
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var dd = String(today.getDate()).padStart(2, '0');
+        var key = mm + '/' + dd;
+        var entry = dov[key];
+        if (entry && entry.scripture) {
+          var parts = entry.scripture.split(' \u2014 ');
+          if (parts.length > 1) {
+            text  = parts[0].trim().replace(/^["""]/,'').replace(/["""]$/,'');
+            verse = parts[1].trim();
+          }
+        }
+      }
+    } catch (_) {}
+
     return [
       '<div class="np-col">',
       '  <p class="np-col__flag">This Morning\u2019s Scripture</p>',
@@ -142,8 +161,33 @@
       '  <ul class="np-briefs">',
       items,
       '  </ul>',
+      buildQuizWidget(),
       '</div>',
     ].join('\n');
+  }
+
+  // ── Quiz widget (Question of the Day) ─────────────────────────────────────
+  function buildQuizWidget() {
+    try {
+      var arr = window.HERALD_DATA && window.HERALD_DATA.quiz;
+      if (!arr || !arr.length) return '';
+      var today = new Date();
+      var doy   = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+      var q     = arr[doy % arr.length];
+      if (!q || !q.question) return '';
+      var corr  = (q.correctAnswer || '').toUpperCase();
+      var optMap = { A: q.optionA, B: q.optionB, C: q.optionC, D: q.optionD };
+      return [
+        '  <hr class="np-column-rule" style="margin-top:14px">',
+        '  <p class="np-col__flag">Question of the Day</p>',
+        '  <p style="font-family:var(--font-headline);font-size:0.88rem;line-height:1.4;margin:4px 0 8px;">' + esc(q.question) + '</p>',
+        '  <p style="font-size:0.78rem;color:var(--ink-dim);font-style:italic;">',
+        '    Answer: ' + corr + '. ' + esc(optMap[corr] || '') +
+        (q.reference ? ' &mdash; ' + esc(q.reference) : '') +
+        ' &mdash; <a href="Sections/pulpit/index.html" style="color:var(--gold)">See The Pulpit \u2192</a>',
+        '  </p>',
+      ].join('\n');
+    } catch (_) { return ''; }
   }
 
   // ── Banner ────────────────────────────────────────────────────────────────
