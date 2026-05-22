@@ -459,7 +459,7 @@
     const optButtons = opts
       .filter(o => optKeys[o.toLowerCase()])
       .map(o => `<button class="quiz-option" type="button" data-opt="${o.toLowerCase()}" aria-label="Option ${o}: ${esc(optKeys[o.toLowerCase()])}">
-        <span class="quiz-opt-letter">${o}</span>
+        <span class="quiz-opt-letter" aria-hidden="true"><svg class="quiz-opt-svg" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="12.5" stroke="currentColor" stroke-width="1.6"/><text x="14" y="19" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor" font-family="inherit">${o}</text></svg></span>
         <span class="quiz-opt-text">${esc(optKeys[o.toLowerCase()])}</span>
       </button>`).join('');
 
