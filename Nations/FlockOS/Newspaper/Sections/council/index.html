@@ -30,6 +30,14 @@
     <!-- The Editorial Board — content loads here -->
   </main>
   <script src="../../Scripts/firm_foundation.js"></script>
+  <script>
+    (function () {
+      if (typeof Nehemiah !== 'undefined') {
+        var sess = Nehemiah.guard();
+        if (sess && !Nehemiah.hasRole('pastor')) { window.location.replace('../../index.html'); }
+      }
+    })();
+  </script>
   <script src="../../Scripts/the_adornment.js"></script>
   <script src="../../Scripts/the_gates.js?v=2"></script>
   <script src="../../Scripts/the_council.js?v=1"></script>

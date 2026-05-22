@@ -38,6 +38,14 @@
     <!-- The Cantors' Corner — content loads here -->
   </main>
   <script src="../../Scripts/firm_foundation.js"></script>
+  <script>
+    (function () {
+      if (typeof Nehemiah !== 'undefined') {
+        var sess = Nehemiah.guard();
+        if (sess && !Nehemiah.hasRole('leader')) { window.location.replace('../../index.html'); }
+      }
+    })();
+  </script>
   <script src="../../Scripts/the_adornment.js"></script>
   <script src="../../Scripts/the_gates.js?v=2"></script>
   <script src="../../Data/psalms.js"></script>
