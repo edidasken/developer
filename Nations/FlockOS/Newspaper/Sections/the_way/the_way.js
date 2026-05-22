@@ -70,21 +70,37 @@
     },
   ];
 
+  /* ── SVG icon helper (24×24 Lucide-style) ─────────────────────────────────── */
+  var _S = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+
   /* ── Aside strip modules (col 3) ─────────────────────────────────────────── */
   var ASIDE_MODULES = [
-    { mod: 'the_gospel_psalms',        label: 'Psalm of the Day',     accent: '#8B7028' },
-    { mod: 'the_gospel_reading',       label: "Today's Reading",      accent: '#059669' },
-    { mod: 'the_gospel_courses',       label: 'Courses',              accent: '#6b5b9a' },
-    { mod: 'the_gospel_teaching_plans',label: 'Teaching Plans',       accent: '#7eaacc' },
-    { mod: 'the_gospel_counseling',    label: 'Counseling',           accent: '#c0445e' },
-    { mod: 'the_gospel_mirror',        label: "Shepherd's Mirror",    accent: '#946B1C' },
-    { mod: 'the_gospel_lexicon',       label: 'Lexicon',              accent: '#059669' },
-    { mod: 'the_gospel_library',       label: 'Library',              accent: '#7eaacc' },
-    { mod: 'the_gospel_journal',       label: 'Journal',              accent: '#8B7028' },
-    { mod: 'the_gospel_analytics',     label: 'My Progress',          accent: '#946B1C' },
-    { mod: 'the_gospel_certificates',  label: 'Certificates',         accent: '#059669' },
-    { mod: 'the_gospel_sermons',       label: 'Sermons',              accent: '#7eaacc' },
-    { mod: 'the_gospel_why',           label: 'Why This?',            accent: '#6b5b9a' },
+    { mod: 'the_gospel_psalms',        label: 'Psalm of the Day',     accent: '#8B7028',
+      svg: '<svg ' + _S + '><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>' },
+    { mod: 'the_gospel_reading',       label: "Today's Reading",      accent: '#059669',
+      svg: '<svg ' + _S + '><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>' },
+    { mod: 'the_gospel_courses',       label: 'Courses',              accent: '#6b5b9a',
+      svg: '<svg ' + _S + '><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>' },
+    { mod: 'the_gospel_teaching_plans',label: 'Teaching Plans',       accent: '#7eaacc',
+      svg: '<svg ' + _S + '><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' },
+    { mod: 'the_gospel_counseling',    label: 'Counseling',           accent: '#c0445e',
+      svg: '<svg ' + _S + '><path d="M20.84 4.6a5.5 5.5 0 0 0-7.78 0L12 5.66l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78L12 21l8.84-8.62a5.5 5.5 0 0 0 0-7.78z"/></svg>' },
+    { mod: 'the_gospel_mirror',        label: "Shepherd's Mirror",    accent: '#946B1C',
+      svg: '<svg ' + _S + '><rect x="3" y="2" width="18" height="20" rx="3"/><path d="M9 22v-4h6v4"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>' },
+    { mod: 'the_gospel_lexicon',       label: 'Lexicon',              accent: '#059669',
+      svg: '<svg ' + _S + '><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' },
+    { mod: 'the_gospel_library',       label: 'Library',              accent: '#7eaacc',
+      svg: '<svg ' + _S + '><path d="M12 6.25V19.25M12 6.25C10.83 5.48 9.25 5 7.5 5S4.17 5.48 3 6.25V19.25C4.17 18.48 5.75 18 7.5 18S10.83 18.48 12 19.25M12 6.25C13.17 5.48 14.75 5 16.5 5S19.83 5.48 21 6.25V19.25C19.83 18.48 18.25 18 16.5 18S13.17 18.48 12 19.25"/></svg>' },
+    { mod: 'the_gospel_journal',       label: 'Journal',              accent: '#8B7028',
+      svg: '<svg ' + _S + '><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' },
+    { mod: 'the_gospel_analytics',     label: 'My Progress',          accent: '#946B1C',
+      svg: '<svg ' + _S + '><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>' },
+    { mod: 'the_gospel_certificates',  label: 'Certificates',         accent: '#059669',
+      svg: '<svg ' + _S + '><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>' },
+    { mod: 'the_gospel_sermons',       label: 'Sermons',              accent: '#7eaacc',
+      svg: '<svg ' + _S + '><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>' },
+    { mod: 'the_gospel_why',           label: 'Why This?',            accent: '#6b5b9a',
+      svg: '<svg ' + _S + '><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>' },
   ];
 
   /* ── Module cache ────────────────────────────────────────────────────────── */
@@ -286,7 +302,11 @@
       var $btn = document.createElement('button');
       $btn.type = 'button';
       $btn.className = 'way-aside-link';
-      $btn.textContent = item.label;
+      $btn.style.setProperty('--aside-accent', item.accent || 'var(--accent)');
+      $btn.innerHTML = item.svg
+        ? '<span class="way-aside-link__icon" aria-hidden="true">' + item.svg + '</span>'
+          + '<span class="way-aside-link__label">' + esc(item.label) + '</span>'
+        : esc(item.label);
       $btn.addEventListener('click', function () {
         openModule(item.mod, false, item.label);
       });
