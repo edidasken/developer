@@ -103,29 +103,16 @@ export function render() {
         .dv-today-dateline { display:inline-flex; align-items:center; gap:5px; font:600 0.78rem var(--font-ui); color:#b45309; letter-spacing:.04em; }
         .dv-today-dateline .dv-ico { color:#b45309; }
         .dv-theme-chip { display:inline-flex; align-items:center; gap:4px; padding:3px 11px; border-radius:20px; font:700 0.65rem var(--font-ui); letter-spacing:.07em; text-transform:uppercase; border:1.5px solid currentColor; opacity:.85; }
-        .dv-today-title { font:800 1.5rem var(--font-ui); color:var(--ink,#1a1d2e); margin:0 0 20px; line-height:1.22; }
-        /* ── Section blocks ── */
-        .dv-block { margin-bottom:16px; }
-        .dv-block-head { display:flex; align-items:center; gap:6px; font:700 0.64rem var(--font-ui); letter-spacing:.14em; text-transform:uppercase; margin-bottom:9px; }
-        /* ── Scripture ── */
-        .dv-scripture-block { border-left:3px solid #b45309; padding:14px 18px; background:linear-gradient(90deg,rgba(180,83,9,.05),rgba(180,83,9,.01)); border-radius:0 10px 10px 0; }
-        .dv-scripture-block .dv-block-head { color:#b45309; }
-        .dv-scripture-block .dv-block-head .dv-ico { color:#b45309; }
-        .dv-scripture-text { font:italic 1.04rem/1.72 Georgia,"Times New Roman",serif; color:var(--ink,#1a1d2e); margin:0; }
-        /* ── Reflection ── */
-        .dv-reflection-block .dv-block-head { color:#6366f1; }
-        .dv-reflection-block .dv-block-head .dv-ico { color:#6366f1; }
-        .dv-reflection-text { font:0.94rem/1.78 var(--font-body,sans-serif); color:var(--ink,#1a1d2e); margin:0; }
-        /* ── Reflect question ── */
-        .dv-question-block { background:rgba(99,102,241,.06); border:1.5px solid rgba(99,102,241,.18); border-radius:12px; padding:14px 16px; }
-        .dv-question-block .dv-block-head { color:#6366f1; }
-        .dv-question-block .dv-block-head .dv-ico { color:#6366f1; }
-        .dv-question-text { font:italic 0.93rem/1.65 Georgia,"Times New Roman",serif; color:var(--ink,#1a1d2e); margin:0; }
-        /* ── Prayer ── */
-        .dv-prayer-block { background:linear-gradient(135deg,rgba(5,150,105,.07),rgba(5,150,105,.02)); border-left:3px solid #059669; border-radius:0 12px 12px 0; padding:14px 18px; }
-        .dv-prayer-block .dv-block-head { color:#059669; }
-        .dv-prayer-block .dv-block-head .dv-ico { color:#059669; }
-        .dv-prayer-text { font:0.91rem/1.7 var(--font-ui); color:var(--ink,#1a1d2e); margin:0; }
+        .dv-today-title { font-family:var(--font-headline,'Lora',Georgia,serif); font-size:2.05rem; font-weight:700; color:var(--ink,#1a1d2e); margin:6px 0 16px; line-height:1.16; letter-spacing:-.01em; }
+        /* ── Flowing today/feed layout ── */
+        .dv-verse { font-family:var(--font-headline,'Lora',Georgia,serif); font-style:italic; font-size:1.08rem; line-height:1.72; color:var(--ink,#1a1d2e); border-left:3px solid #b45309; padding:10px 16px; background:rgba(180,83,9,.04); border-radius:0 8px 8px 0; margin:0 0 14px; }
+        .dv-reflection-para { font-size:0.93rem; line-height:1.8; color:var(--ink,#1a1d2e); margin:0; }
+        .dv-today-rule { border:none; border-top:1px solid var(--line,#e5e7ef); margin:14px 0 12px; }
+        .dv-respond-line { font-size:0.88rem; line-height:1.65; color:var(--ink,#1a1d2e); margin:0 0 7px; }
+        .dv-respond-line:last-child { margin-bottom:0; }
+        .dv-respond-label { font-weight:700; font-size:0.68rem; letter-spacing:.08em; text-transform:uppercase; margin-right:5px; }
+        .dv-respond-label--reflect { color:#6366f1; }
+        .dv-respond-label--pray { color:#059669; }
         /* ── Mission of the Day ── */
         .dv-mission { background:linear-gradient(135deg,rgba(8,145,178,.06),rgba(8,145,178,.01)); border:1.5px solid rgba(8,145,178,.22); border-radius:16px; padding:18px 20px; margin:0 0 28px; }
         .dv-mission-head { display:flex; align-items:center; gap:6px; font:700 0.64rem var(--font-ui); letter-spacing:.14em; text-transform:uppercase; color:#0891b2; margin-bottom:14px; border-bottom:1px solid rgba(8,145,178,.15); padding-bottom:10px; }
@@ -294,29 +281,15 @@ function _todayCard(d) {
       </div>
       <h2 class="dv-today-title">${esc(ttl)}</h2>
 
-      ${scripture ? /* html */`
-        <div class="dv-block dv-scripture-block">
-          <div class="dv-block-head">${I.book} Scripture</div>
-          <p class="dv-scripture-text">"${esc(scripture)}"</p>
-        </div>` : ''}
+      ${scripture ? `<blockquote class="dv-verse">"${esc(scripture)}"</blockquote>` : ''}
 
-      ${reflection ? /* html */`
-        <div class="dv-block dv-reflection-block">
-          <div class="dv-block-head">${I.bulb} Reflection</div>
-          <p class="dv-reflection-text">${esc(reflection)}</p>
-        </div>` : ''}
+      ${reflection ? `<p class="dv-reflection-para">${esc(reflection)}</p>` : ''}
 
-      ${question ? /* html */`
-        <div class="dv-block dv-question-block">
-          <div class="dv-block-head">${I.question} Reflect</div>
-          <p class="dv-question-text">${esc(question)}</p>
-        </div>` : ''}
+      ${(question || prayer) ? '<hr class="dv-today-rule">' : ''}
 
-      ${prayer ? /* html */`
-        <div class="dv-block dv-prayer-block" style="margin-bottom:0">
-          <div class="dv-block-head">${I.pray} Prayer</div>
-          <p class="dv-prayer-text">${esc(prayer)}</p>
-        </div>` : ''}
+      ${question ? `<p class="dv-respond-line"><span class="dv-respond-label dv-respond-label--reflect">Reflect —</span>${esc(question)}</p>` : ''}
+
+      ${prayer ? `<p class="dv-respond-line"><span class="dv-respond-label dv-respond-label--pray">Pray —</span>${esc(prayer)}</p>` : ''}
     </div>
   `;
 }
@@ -399,26 +372,11 @@ function _feedCard(d, isToday) {
         </div>
       </button>
       <div class="dv-feed-body">
-        ${scripture ? /* html */`
-          <div class="dv-block dv-scripture-block">
-            <div class="dv-block-head">${I.book} Scripture</div>
-            <p class="dv-scripture-text">"${esc(scripture)}"</p>
-          </div>` : ''}
-        ${reflection ? /* html */`
-          <div class="dv-block dv-reflection-block">
-            <div class="dv-block-head">${I.bulb} Reflection</div>
-            <p class="dv-reflection-text">${esc(reflection)}</p>
-          </div>` : ''}
-        ${question ? /* html */`
-          <div class="dv-block dv-question-block">
-            <div class="dv-block-head">${I.question} Reflect</div>
-            <p class="dv-question-text">${esc(question)}</p>
-          </div>` : ''}
-        ${prayer ? /* html */`
-          <div class="dv-block dv-prayer-block" style="margin-bottom:0">
-            <div class="dv-block-head">${I.pray} Prayer</div>
-            <p class="dv-prayer-text">${esc(prayer)}</p>
-          </div>` : ''}
+        ${scripture ? `<blockquote class="dv-verse" style="font-size:.97rem">"${esc(scripture)}"</blockquote>` : ''}
+        ${reflection ? `<p class="dv-reflection-para" style="font-size:.88rem">${esc(reflection)}</p>` : ''}
+        ${(question || prayer) ? '<hr class="dv-today-rule">' : ''}
+        ${question ? `<p class="dv-respond-line" style="font-size:.84rem"><span class="dv-respond-label dv-respond-label--reflect">Reflect —</span>${esc(question)}</p>` : ''}
+        ${prayer ? `<p class="dv-respond-line" style="font-size:.84rem;margin-bottom:0"><span class="dv-respond-label dv-respond-label--pray">Pray —</span>${esc(prayer)}</p>` : ''}
       </div>
     </div>
   `;
