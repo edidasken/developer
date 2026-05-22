@@ -75,10 +75,17 @@
   <script>
     (function() {
       var masthead = document.querySelector('.sec-masthead');
+      var secNav  = document.getElementById('sec-nav');
       if (!masthead) return;
 
       function updatePadding() {
-        document.body.style.paddingTop = masthead.offsetHeight + 'px';
+        var mh = masthead.offsetHeight;
+        if (secNav) {
+          secNav.style.top = mh + 'px';
+          document.body.style.paddingTop = (mh + secNav.offsetHeight) + 'px';
+        } else {
+          document.body.style.paddingTop = mh + 'px';
+        }
       }
 
       function onScroll() {

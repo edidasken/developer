@@ -39,6 +39,15 @@
 /* Hide the generic inner layout — nameplate replaces it */
 .sec-herald .sec-masthead__inner { display: none; }
 
+/* Tabs nav — fixed directly below the masthead (top set via JS updatePadding) */
+.sec-herald .sec-nav-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 99;
+}
+
 /* Aa button — fixed bottom-right FAB */
 .herald-aa-btn {
   position: fixed;
