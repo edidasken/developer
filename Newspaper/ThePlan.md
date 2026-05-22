@@ -1158,43 +1158,43 @@ Every section page must pass all of these before any feature work begins:
 ---
 
 ### Phase 1 — Foundation CSS (complete the_broadsheet.css + all section stubs)
-- [ ] Fill `the_broadsheet.css` with full token block, grid, card, nav bar, masthead (from Phase 0-D above if not yet done)
-- [ ] Add `'Lora'` + `'Plus Jakarta Sans'` Google Fonts imports
-- [ ] All 9 `sections/*.css` stubs populated with `--sec-color` token + heading/body font vars
-- [ ] Implement `Adornment.initFontScale()` in copied `the_adornment.js` — 5-step picker, localStorage read/write
-- [ ] Verify C-Build rsync includes `Newspaper/Styles/sections/` subfolder
-- [ ] BCP
+- [x] Fill `the_broadsheet.css` with full token block, grid, card, nav bar, masthead (from Phase 0-D above if not yet done)
+- [x] Add `'Lora'` + `'Plus Jakarta Sans'` Google Fonts imports
+- [x] All 9 `sections/*.css` stubs populated with `--sec-color` token + heading/body font vars
+- [x] Implement `Adornment.initFontScale()` in copied `the_adornment.js` — 5-step picker, localStorage read/write
+- [x] Verify C-Build rsync includes `Newspaper/Styles/sections/` subfolder
+- [x] BCP
 
 ### Phase 2 — The Herald (wire existing stubs to live data)
-- [ ] Wire `flockNews` Firestore collection to front page
-- [ ] Wire `psalms` + `oneYearBible` to Today's Word panel
-- [ ] Wire `prayers` (public flag) to Prayer Spotlight
-- [ ] Replace static content with live data, static `Data/*.js` as fallback
-- [ ] `herald.css` — apply `--sec-color: var(--gold)`, Lora headlines
-- [ ] BCP
+- [x] Wire `flockNews` Firestore collection to front page
+- [x] Wire `psalms` + `oneYearBible` to Today's Word panel
+- [x] Wire `prayers` (public flag) to Prayer Spotlight
+- [x] Replace static content with live data, static `Data/*.js` as fallback
+- [x] `herald.css` — apply `--sec-color: var(--gold)`, Lora headlines
+- [x] BCP
 
 ### Phase 3 — The Way (public — highest traffic, most features)
-- [ ] Port all 14 `app.grow` modules into `the_way/` section
-- [ ] Port full `app.invite` gospel presentation + share + church info + contact form
-- [ ] Wire `readingPlans`, `lexiconGreek/Hebrew` to live Firestore where available
-- [ ] All 14 modules functional with `Data/*.js` static fallback
-- [ ] `the_way.css` — `--sec-color: var(--accent)`
-- [ ] BCP
+- [x] Port all 14 `app.grow` modules into `the_way/` section
+- [x] Port full `app.invite` gospel presentation + share + church info + contact form
+- [x] Wire `readingPlans`, `lexiconGreek/Hebrew` to live Firestore where available
+- [x] All 14 modules functional with `Data/*.js` static fallback
+- [x] `the_way.css` — `--sec-color: var(--accent)`
+- [x] BCP
 
 #### Phase 3 — Newspaper Layout Polish (complete after all modules wired)
-- [ ] The Way page uses `.broadsheet-columns` grid — not a card grid
+- [x] The Way page uses `.broadsheet-columns` grid — not a card grid
 - [ ] Lead story (Today's Reading / Devotional) spans 2 columns with drop cap on desktop
 - [ ] Module sub-sections each open with a `.section-rule` / `.section-label` header
-- [ ] Story headlines use `.story-hed`, body uses `.story-body` with `text-align: justify` at ≥480px
+- [x] Story headlines use `.story-hed`, body uses `.story-body` with `text-align: justify` at ≥480px
 - [ ] Column rules (hairline `border-right: 1px solid var(--rule)`) between all columns
 - [ ] Horizontal `<hr class="story-rule">` between every story
 - [ ] Pull quotes (mission spotlight, invitation quote) use `.pull-quote` class
-- [ ] Bylines and datelines present on all data-driven stories
-- [ ] Section kickers (`.story-kicker`) above every sub-section headline
+- [x] Bylines and datelines present on all data-driven stories
+- [x] Section kickers (`.story-kicker`) above every sub-section headline
 - [ ] Mobile: justified disabled at <480px, masthead scales down but nameplate never hidden
-- [ ] Tap on any story headline opens right drawer with full module content
+- [x] Tap on any story headline opens right drawer with full module content
 - [ ] Playwright: verify column rules visible on desktop, absent on mobile; drop cap renders; no horizontal scroll at 375px
-- [ ] BCP
+- [x] BCP
 
 ### Phase 4 — The Sanctuary
 - [x] Sermon builder wired to `sermons` Firestore collection
@@ -1314,19 +1314,19 @@ The Way page must be a broadsheet newspaper with stories — NOT a sidebar-nav S
 - The aside (col 3) shows: Today's Psalm, OYB summary, Person of Scripture, quick links to all modules
 
 - [x] The Way page uses `.broadsheet-columns` grid (index.html rewritten — `.way-layout` sidebar replaced with `.broadsheet-columns way-broadsheet`)
-- [ ] `the_way.js` rewritten — build newspaper stories per module; lead story + supporting stories; tap headline → drawer; today aside strip
+- [x] `the_way.js` rewritten — build newspaper stories per module; lead story + supporting stories; tap headline → drawer; today aside strip
 - [ ] Lead story (Today's Reading / Devotional) spans 2 columns with drop cap on desktop
 - [ ] Module sub-sections each open with a `.section-rule` / `.section-label` header
-- [ ] Story headlines use `.story-hed`, body uses `.story-body` with `text-align: justify` at ≥480px
+- [x] Story headlines use `.story-hed`, body uses `.story-body` with `text-align: justify` at ≥480px
 - [ ] Column rules (hairline `border-right: 1px solid var(--rule)`) between all columns
 - [ ] Horizontal `<hr class="story-rule">` between every story
 - [ ] Pull quotes (mission spotlight, invitation quote) use `.pull-quote` class
-- [ ] Bylines and datelines present on all data-driven stories
-- [ ] Section kickers (`.story-kicker`) above every sub-section headline
+- [x] Bylines and datelines present on all data-driven stories
+- [x] Section kickers (`.story-kicker`) above every sub-section headline
 - [ ] Mobile: justified disabled at <480px, masthead scales down but nameplate never hidden
-- [ ] Tap on any story headline opens right drawer with full module content
+- [x] Tap on any story headline opens right drawer with full module content
 - [ ] Playwright: column rules visible on desktop, absent on mobile; drop cap renders; no horizontal scroll at 375px
-- [ ] BCP
+- [x] BCP
 
 ---
 

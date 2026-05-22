@@ -34,29 +34,17 @@
     </nav>
   </header>
 
-  <!-- Main content -->
-  <main class="broadsheet-grid" id="herald-grid">
-    <!-- Skeleton placeholders while data loads -->
-    <article class="broadsheet-card" aria-label="Loading front page">
-      <div class="card-header">
-        <div class="skeleton skeleton-line skeleton-line--heading"></div>
-      </div>
-      <div class="card-body">
-        <div class="skeleton skeleton-line"></div>
-        <div class="skeleton skeleton-line"></div>
-        <div class="skeleton skeleton-line skeleton-line--short"></div>
-      </div>
-    </article>
-    <article class="broadsheet-card" aria-label="Loading today's word">
-      <div class="skeleton skeleton-line skeleton-line--heading"></div>
-      <div class="skeleton skeleton-line"></div>
-      <div class="skeleton skeleton-line skeleton-line--short"></div>
-    </article>
-    <article class="broadsheet-card" aria-label="Loading announcements">
-      <div class="skeleton skeleton-line skeleton-line--heading"></div>
-      <div class="skeleton skeleton-line"></div>
-      <div class="skeleton skeleton-line"></div>
-    </article>
+  <!-- Main content — broadsheet newspaper layout -->
+  <main class="broadsheet-columns" id="herald-grid" role="main">
+    <!-- Main column: Lead · OYB · Announcements · Prayer Spotlight -->
+    <div class="broadsheet-col broadsheet-col--main" id="herald-main" aria-live="polite" aria-label="Main stories">
+      <div class="broadsheet-story-loading" aria-hidden="true"></div>
+      <div class="broadsheet-story-loading" style="height:120px" aria-hidden="true"></div>
+    </div>
+    <!-- Aside column: Nation · Heart Check · Quiz -->
+    <div class="broadsheet-col broadsheet-col--aside" id="herald-aside" aria-live="polite" aria-label="Aside features">
+      <div class="broadsheet-story-loading" style="height:200px" aria-hidden="true"></div>
+    </div>
   </main>
 
   <!-- Right Drawer (global) -->

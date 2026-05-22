@@ -4,21 +4,17 @@
    Additive only. Never override tokens already in the_broadsheet.css.
    ========================================================================== */
 
-/* Section color binding */
+/* Section color + story accent binding */
 .sec-herald {
-  --sec-color: var(--gold);
+  --sec-color:      var(--gold);
   --sec-color-soft: var(--gold-soft);
+  --story-accent:   var(--gold);
   --sec-heading-font: 'Lora', Georgia, serif;
-  --sec-body-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --sec-body-font:    'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 /* 3px top accent stripe on section masthead */
 .sec-herald .sec-masthead {
-  border-top: 3px solid var(--gold);
-}
-
-/* Card accent stripe */
-.sec-herald .broadsheet-card {
   border-top: 3px solid var(--gold);
 }
 
