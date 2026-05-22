@@ -377,47 +377,284 @@
 
   // ── Aside column panel builders ───────────────────────────────────────────────
 
-  /** § 4 — Nation of the Week */
+  // ── Joshua Project API helpers ──────────────────────────────────────────────
+  const _JP_API_BASE = 'https://api.joshuaproject.net/v1';
+
+  async function _getJpApiKey() {
+    // 1. Cached in localStorage
+    const cached = localStorage.getItem('flock_jp_api_key');
+    if (cached) return cached;
+    // 2. Read from flockos-notify root appConfig — baked into the platform
+    try {
+      const fb = window.firebase;
+      if (!fb) return null;
+      const fbCfg = {
+        apiKey:    'AIzaSyBA-fkxjABbwIHn0i6MPiXbGwahfJmuJeo',
+        authDomain:'flockos-notify.firebaseapp.com',
+        projectId: 'flockos-notify',
+      };
+      const appName = 'herald-missions';
+      const app = fb.apps.find(function(a) { return a.name === appName; })
+                  || fb.initializeApp(fbCfg, appName);
+      const db  = app.firestore();
+      const doc = await db.collection('appConfig').doc('jp_api_key').get();
+      if (doc.exists && doc.data().value) {
+        const key = doc.data().value;
+        localStorage.setItem('flock_jp_api_key', key);
+        return key;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  async function _fetchJpGroups(isoCode, apiKey) {
+    try {
+      const fields = 'PeopNameInCountry,Population,PercentEvangelical,PrimaryReligion,JPScaleText,Ctry';
+      const url = `${_JP_API_BASE}/people_groups.json`
+        + `?api_key=${encodeURIComponent(apiKey)}`
+        + `&countries=${encodeURIComponent(isoCode)}`
+        + `&is_frontier=1&limit=5&fields=${fields}`;
+      const res = await Promise.race([
+        fetch(url),
+        new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 5000); })
+      ]);
+      if (!res.ok) return [];
+      return await res.json();
+    } catch (_) { return []; }
+  }
+
+  function _fmtPop(n) {
+    if (!n) return '';
+    return n >= 1e9 ? (n / 1e9).toFixed(1) + 'B'
+         : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M'
+         : n >= 1e3 ? (n / 1e3).toFixed(0) + 'K'
+         : String(n);
+  }
+
+  function _relLabel(key) {
+    const map = { islam:'Islam', christianity:'Christianity', hinduism:'Hinduism',
+      buddhism:'Buddhism', nonReligious:'Non-Religious', ethnic:'Ethnic Religions',
+      other:'Other', unknown:'Unknown' };
+    return map[key] || (key.charAt(0).toUpperCase() + key.slice(1));
+  }
+
+  // ── Dossier section SVG icons ────────────────────────────────────────────
+  const _SVG_SHIELD  = '<svg class="nation-section__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+  const _SVG_BOOK    = '<svg class="nation-section__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
+  const _SVG_GLOBE   = '<svg class="nation-section__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
+  const _SVG_COMPASS = '<svg class="nation-section__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>';
+  const _SVG_CROSS   = '<svg class="nation-section__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="2" x2="12" y2="22"/><line x1="5" y1="9" x2="19" y2="9"/></svg>';
+
+  /** § 4 — Nation of the Day */
   async function buildNationAside(cfg) {
     let nation = null;
     try {
       const { default: missions } = await import('../../Data/missions.js');
       if (Array.isArray(missions) && missions.length) {
         const override = cfg.nationIndex != null ? cfg.nationIndex : null;
-        nation = missions[idx(override != null ? override : weekIndex(), missions.length)];
+        nation = missions[idx(override != null ? override : dayIndex(), missions.length)];
       }
     } catch (_) {}
 
     if (!nation) {
       return `<div class="section-rule"><span class="section-label">§\u00a04 · MISSIONS</span></div>
-        <p class="story-kicker">NATION OF THE WEEK</p>
+        <p class="story-kicker">NATION OF THE DAY</p>
         <p class="story-body" style="color:var(--ink-muted)">Missions data unavailable — pray for all nations.</p>
         <hr class="story-rule">`;
     }
 
-    const popFmt  = nation.population
-      ? (nation.population >= 1e6 ? (nation.population / 1e6).toFixed(1) + 'M' : (nation.population / 1e3).toFixed(0) + 'K')
-      : '';
-    const christPct  = nation.percentChristian != null ? Number(nation.percentChristian).toFixed(1) + '% Christian' : '';
-    const nationName = (nation.icon ? nation.icon + ' ' : '') + (nation.countryName || nation.name || 'Unknown Nation');
-    const summary    = nation.owSummary ? nation.owSummary.slice(0, 180) + (nation.owSummary.length > 180 ? '…' : '') : '';
-    const challenge  = Array.isArray(nation.owPrayerChallenges) && nation.owPrayerChallenges.length ? nation.owPrayerChallenges[0] : '';
+    // ── Format core fields ──────────────────────────────────────────────────
+    const popRaw      = nation.population || nation.jpPopulation || 0;
+    const popFmt      = _fmtPop(popRaw);
+    const jpPopRaw    = nation.jpPopulation != null && nation.jpPopulation !== nation.population ? nation.jpPopulation : 0;
+    const jpPopFmt    = jpPopRaw ? _fmtPop(jpPopRaw) : '';
+    const popUnrRaw   = nation.populationUnreached || 0;
+    const popUnrFmt   = _fmtPop(popUnrRaw);
+    // Field aliases: some countries use percentChristian, others use christianPercent
+    const xChrist     = nation.percentChristian   != null ? nation.percentChristian   : nation.christianPercent;
+    const xEval       = nation.percentEvangelical != null ? nation.percentEvangelical : nation.evangelicalPercent;
+    const christPct   = xChrist != null ? (+xChrist).toFixed(1) + '%' : '';
+    const evalPct     = xEval   != null ? (+xEval).toFixed(1)   + '%' : '';
+    const unreached   = nation.unreachedGroups   != null ? nation.unreachedGroups   : null;
+    const totalGroups = nation.totalPeopleGroups != null ? nation.totalPeopleGroups : null;
+    const nameRaw     = nation.countryName || nation.name || 'Unknown Nation';
+    const nationName  = (nation.icon ? nation.icon + '\u00a0' : '') + nameRaw;
+    const isoCode     = nation.isoCode || '';
+    const capital     = nation.capital || '';
+    const region      = nation.region  || '';
+    const continent   = nation.continent || '';
+    const in1040      = !!nation.tenFortyWindow;
+    const domRel      = nation.dominantReligion || '';
+    const gospelAccess= nation.gospelAccess || '';
+    const perLabel    = nation.persecutionLabel || nation.persecutionLevel || '';
+    const perTier     = nation.persecutionTier  || nation.persecutionLevel || '';
+    const perRank     = nation.persecutionRank  != null ? nation.persecutionRank  : null;
+    const wwlRank     = nation.worldWatchListRank != null ? nation.worldWatchListRank : null;
+    const balRank     = nation.restrictionsRank   != null ? nation.restrictionsRank   : null;
+    const balSource   = nation.restrictionsSource || '';
+    const bsRank      = nation.bibleShortageRank  != null ? nation.bibleShortageRank  : null;
+    const shortageTier= nation.bibleShortageTier  || '';
+    const shortageRange= nation.bibleShortageRange || '';
+    const shortageNeed = nation.bibleShortageNeed || '';
+    const shortageSource = nation.bibleShortageSource || '';
+    const profileUrl  = nation.jpProfileUrl || nation.profileUrl || '';
+    const jpUpdatedAt = nation.jpUpdatedAt || '';
 
-    _drawers['nation'] = `
-      <p class="story-kicker">§\u00a04 · NATION OF THE WEEK · MISSIONS</p>
-      <h2 style="font-family:'Lora',Georgia,serif;font-size:1.25rem;margin:0.5rem 0">${esc(nationName)}</h2>
-      <p style="font-size:0.8125rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;margin:0 0 0.75rem">${[popFmt, christPct].filter(Boolean).join(' · ')}</p>
-      ${summary ? `<p style="line-height:1.75;margin-bottom:1rem">${esc(summary)}</p>` : ''}
-      ${challenge ? `<div class="nation-prayer"><p class="nation-prayer__label">Pray for:</p><p class="nation-prayer__text">${esc(challenge)}</p></div>` : ''}
-      ${nation.persecutionLevel ? `<p class="nation-persecution" style="margin-top:0.5rem">⚠ ${esc(nation.persecutionLevel)} restrictions</p>` : ''}`;
+    const summaryFull = nation.owSummary || '';
+    const summaryCard = summaryFull ? summaryFull.slice(0, 200) + (summaryFull.length > 200 ? '\u2026' : '') : '';
+    const owSource    = nation.owSource || '';
+    const challenges  = Array.isArray(nation.owPrayerChallenges) ? nation.owPrayerChallenges : [];
+    const answers     = Array.isArray(nation.owPrayerAnswers)    ? nation.owPrayerAnswers    : [];
+
+    // ── Religion breakdown bars — synthesize full breakdown incl. Christianity ─
+    let relBarsHtml = '';
+    {
+      const breakdown = Object.assign({}, nation.religionBreakdown || {});
+      // religionBreakdown never includes Christianity — inject it from percent field
+      if (!('christianity' in breakdown) && xChrist != null && +xChrist > 0) {
+        breakdown.christianity = +xChrist;
+      }
+      const entries = Object.entries(breakdown)
+        .filter(function(e) { return +e[1] >= 0.1; })
+        .sort(function(a, b) { return b[1] - a[1]; });
+      if (entries.length) {
+        relBarsHtml = '<div class="nation-rel-list">'
+          + entries.map(function(e) {
+              const pct = Math.min(+e[1], 100).toFixed(1);
+              return `<div class="nation-rel-row">
+                <span class="nation-rel-name">${esc(_relLabel(e[0]))}</span>
+                <div class="nation-rel-track"><div class="nation-rel-fill" style="width:${Math.min(+e[1],100)}%"></div></div>
+                <span class="nation-rel-pct">${pct}%</span>
+              </div>`;
+            }).join('')
+          + '</div>';
+      }
+    }
+
+    // ── JP API — fetch frontier groups ──────────────────────────────────────
+    let jpGroupsHtml = '';
+    if (isoCode) {
+      const jpKey = await _getJpApiKey();
+      if (jpKey) {
+        const groups = await _fetchJpGroups(isoCode, jpKey);
+        if (groups.length) {
+          jpGroupsHtml = groups.map(function(g) {
+            const gName = g.PeopNameInCountry || g.PeopName || '';
+            const gPop  = _fmtPop(g.Population);
+            const gRel  = g.PrimaryReligion || '';
+            const gEval = g.PercentEvangelical != null ? (+g.PercentEvangelical).toFixed(2) + '% evangelical' : '';
+            const gScale= g.JPScaleText || '';
+            return `<div class="nation-jp-group">
+              <span class="nation-jp-group__name">${esc(gName)}</span>
+              <span class="nation-jp-group__meta">${[gPop, gRel, gEval].filter(Boolean).join(' · ')}</span>
+              ${gScale ? `<span class="nation-jp-group__scale">${esc(gScale)}</span>` : ''}
+            </div>`;
+          }).join('');
+        }
+      }
+    }
+
+    // ── Build drawer dossier HTML ───────────────────────────────────────────
+    const persecutionColor = perTier === 'Extreme' ? 'var(--error,#b00020)'
+      : perTier === 'Very High' ? '#c0580a'
+      : 'var(--ink-muted)';
+
+    // Build location line: capital · region / continent
+    const locationParts = [capital, region, (continent && continent !== region) ? continent : ''].filter(Boolean);
+
+    _drawers['nation'] = `<div class="nation-dossier">
+      <p class="story-kicker">§\u00a04 · NATION OF THE DAY · MISSIONS</p>
+
+      <div class="nation-dossier__header">
+        <h2 class="nation-dossier__title">${esc(nationName)}</h2>
+        ${locationParts.length ? `<p class="nation-dossier__meta">${locationParts.map(esc).join(' · ')}</p>` : ''}
+        <div class="nation-dossier__badges">
+          ${in1040 ? `<span class="nation-badge nation-badge--1040">10/40 Window</span>` : ''}
+          ${perLabel ? `<span class="nation-badge nation-badge--persecution" style="--per-color:${persecutionColor}">⚠ ${esc(perLabel)}</span>` : ''}
+        </div>
+      </div>
+
+      <div class="nation-stats-grid">
+        ${popFmt      ? `<div class="nation-stat"><span class="nation-stat__val">${esc(popFmt)}</span><span class="nation-stat__label">Population</span></div>` : ''}
+        ${jpPopFmt    ? `<div class="nation-stat"><span class="nation-stat__val">${esc(jpPopFmt)}</span><span class="nation-stat__label">JP Population</span></div>` : ''}
+        ${popUnrFmt   ? `<div class="nation-stat"><span class="nation-stat__val">${esc(popUnrFmt)}</span><span class="nation-stat__label">Unreached Pop.</span></div>` : ''}
+        ${christPct   ? `<div class="nation-stat"><span class="nation-stat__val">${esc(christPct)}</span><span class="nation-stat__label">Christian</span></div>` : ''}
+        ${evalPct     ? `<div class="nation-stat"><span class="nation-stat__val">${esc(evalPct)}</span><span class="nation-stat__label">Evangelical</span></div>` : ''}
+        ${unreached != null ? `<div class="nation-stat"><span class="nation-stat__val">${totalGroups != null ? esc(String(unreached)) + ' / ' + esc(String(totalGroups)) : esc(String(unreached))}</span><span class="nation-stat__label">Unreached Groups${totalGroups != null ? ' / Total' : ''}</span></div>` : ''}
+        ${gospelAccess ? `<div class="nation-stat"><span class="nation-stat__val">${esc(gospelAccess)}</span><span class="nation-stat__label">Gospel Access</span></div>` : ''}
+      </div>
+
+      ${(wwlRank != null || perRank != null || perTier || perLabel) ? `<div class="nation-section">
+        <p class="nation-section__head">${_SVG_SHIELD} World Watch</p>
+        <div class="nation-access-grid">
+          ${wwlRank != null ? `<div class="nation-access-item"><span class="nation-access-item__val">#${esc(String(wwlRank))}</span><span class="nation-access-item__label">World Watch Rank</span></div>` : ''}
+          ${perRank != null && perRank !== wwlRank ? `<div class="nation-access-item"><span class="nation-access-item__val">#${esc(String(perRank))}</span><span class="nation-access-item__label">Persecution Rank</span></div>` : ''}
+          ${perTier ? `<div class="nation-access-item"><span class="nation-access-item__val">${esc(perTier)}</span><span class="nation-access-item__label">Persecution Level</span></div>` : ''}
+        </div>
+        ${perLabel && perLabel !== perTier ? `<p class="nation-shortage-note">${esc(perLabel)}</p>` : ''}
+      </div>` : ''}
+
+      ${domRel ? `<p class="nation-dom-religion">Dominant religion: <strong>${esc(domRel)}</strong></p>` : ''}
+
+      ${relBarsHtml ? `<div class="nation-section">
+        <p class="nation-section__head">${_SVG_CROSS} Religion Breakdown</p>
+        ${relBarsHtml}
+      </div>` : ''}
+
+      ${(balRank != null || bsRank != null || shortageTier || shortageRange || shortageNeed) ? `<div class="nation-section">
+        <p class="nation-section__head">${_SVG_BOOK} Bible Access</p>
+        <div class="nation-access-grid">
+          ${balRank != null  ? `<div class="nation-access-item"><span class="nation-access-item__val">#${esc(String(balRank))}</span><span class="nation-access-item__label">BAL Restrictions Rank</span></div>` : ''}
+          ${bsRank != null   ? `<div class="nation-access-item"><span class="nation-access-item__val">#${esc(String(bsRank))}</span><span class="nation-access-item__label">Shortage Rank</span></div>` : ''}
+          ${shortageTier     ? `<div class="nation-access-item"><span class="nation-access-item__val">${esc(shortageTier)}</span><span class="nation-access-item__label">Shortage Tier</span></div>` : ''}
+        </div>
+        ${shortageRange ? `<p class="nation-shortage-note">${esc(shortageRange)}</p>` : ''}
+        ${shortageNeed && shortageNeed !== shortageRange ? `<p class="nation-shortage-note">${esc(shortageNeed)}</p>` : ''}
+        ${balSource || shortageSource ? `<p class="nation-data-source">${[balSource, shortageSource].filter(function(s,i,a){ return s && a.indexOf(s)===i; }).map(esc).join(' · ')}</p>` : ''}
+      </div>` : ''}
+
+      ${summaryFull ? `<div class="nation-section">
+        <p class="nation-section__head">${_SVG_GLOBE} Operation World — Country Overview</p>
+        <p class="nation-ow-body">${esc(summaryFull)}</p>
+        ${challenges.length ? `<p class="nation-section__subhead">Prayer Challenges</p>
+        <ol class="nation-challenge-list">
+          ${challenges.map(function(c) { return `<li>${esc(c)}</li>`; }).join('')}
+        </ol>` : ''}
+        ${answers.length ? `<p class="nation-section__subhead">Prayer Answers</p>
+        <ol class="nation-challenge-list nation-prayer-answers">
+          ${answers.map(function(a) { return `<li>${esc(a)}</li>`; }).join('')}
+        </ol>` : ''}
+        ${owSource ? `<p class="nation-data-source">${esc(owSource)}</p>` : ''}
+      </div>` : ''}
+
+      ${jpGroupsHtml ? `<div class="nation-section nation-jp-section">
+        <p class="nation-section__head">${_SVG_COMPASS} Joshua Project · Frontier Groups</p>
+        ${jpGroupsHtml}
+      </div>` : ''}
+
+      ${profileUrl ? `<a class="nation-jp-link" href="${esc(profileUrl)}" target="_blank" rel="noopener noreferrer">View on Joshua Project ↗</a>` : ''}
+      ${jpUpdatedAt ? `<p class="nation-data-source" style="margin-top:0.75rem">JP data: ${esc(jpUpdatedAt)}</p>` : ''}
+    </div>`;
+
+    // ── Build aside card HTML ───────────────────────────────────────────────
+    const cardStats = [
+      popFmt     ? popFmt + ' people'   : '',
+      christPct  ? christPct + ' Christian' : '',
+      evalPct    ? evalPct  + ' Evangelical' : '',
+    ].filter(Boolean).join(' · ');
+
+    const unreachedLine = unreached != null
+      ? `<p class="story-body" style="font-size:0.8125rem;color:var(--ink-muted);margin:0.25rem 0">${totalGroups != null ? unreached + ' of ' + totalGroups + ' groups unreached' : unreached + ' unreached people groups'}</p>` : '';
 
     return `<div class="section-rule"><span class="section-label">§\u00a04 · MISSIONS</span></div>
       <article class="story">
-        <p class="story-kicker">NATION OF THE WEEK</p>
+        <p class="story-kicker">NATION OF THE DAY</p>
         <h2 class="story-hed"><button class="story-hed-btn" type="button" data-open-drawer="nation" style="font-size:1.0625rem">${esc(nationName)}</button></h2>
-        <p class="story-byline">${[popFmt, christPct].filter(Boolean).join(' · ')}</p>
-        ${summary ? `<p class="story-body">${esc(summary)}</p>` : ''}
-        ${nation.persecutionLevel ? `<p class="nation-persecution" style="margin-top:0.25rem">⚠ ${esc(nation.persecutionLevel)} restrictions</p>` : ''}
+        ${locationParts.length ? `<p class="story-byline">${locationParts.map(esc).join(' · ')}</p>` : ''}
+        ${cardStats ? `<p class="story-body" style="font-size:0.8125rem;color:var(--ink-muted);margin:0.25rem 0 0">${esc(cardStats)}</p>` : ''}
+        ${unreachedLine}
+        ${summaryCard ? `<p class="story-body">${esc(summaryCard)}</p>` : ''}
+        ${perLabel ? `<p class="nation-persecution">⚠ ${esc(perLabel)}</p>` : ''}
         <hr class="story-rule">
       </article>`;
   }

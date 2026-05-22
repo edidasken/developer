@@ -288,31 +288,6 @@
       })
       .catch(function () {});
 
-    /* Quick links rule */
-    var $rule2 = document.createElement('div');
-    $rule2.className = 'section-rule';
-    $rule2.style.marginTop = '1.25rem';
-    $rule2.innerHTML = '<span class="section-label">ALL MODULES</span>';
-    $aside.appendChild($rule2);
-
-    /* Quick link buttons for remaining modules */
-    var $links = document.createElement('div');
-    $links.className = 'way-aside-links';
-    ASIDE_MODULES.forEach(function (item) {
-      var $btn = document.createElement('button');
-      $btn.type = 'button';
-      $btn.className = 'way-aside-link';
-      $btn.style.setProperty('--aside-accent', item.accent || 'var(--accent)');
-      $btn.innerHTML = item.svg
-        ? '<span class="way-aside-link__icon" aria-hidden="true">' + item.svg + '</span>'
-          + '<span class="way-aside-link__label">' + esc(item.label) + '</span>'
-        : esc(item.label);
-      $btn.addEventListener('click', function () {
-        openModule(item.mod, false, item.label);
-      });
-      $links.appendChild($btn);
-    });
-    $aside.appendChild($links);
   }
 
   function _appendAsideCard($parent, label, title, body, verse, color, modName) {

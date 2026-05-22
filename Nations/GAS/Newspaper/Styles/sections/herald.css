@@ -33,7 +33,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: padding 0.18s ease;
+  transition: padding 0.18s ease-in-out;
 }
 
 /* Hide the generic inner layout — nameplate replaces it */
@@ -85,7 +85,7 @@
   overflow: visible;
   max-height: 200px;
   opacity: 1;
-  transition: max-height 0.35s ease, opacity 0.28s ease, padding 0.35s ease, margin 0.35s ease;
+  transition: max-height 0.3s ease-in-out, opacity 0.24s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out;
 }
 .herald-nameplate__title {
   font-family: 'Great Vibes', cursive;
@@ -134,7 +134,7 @@
   overflow: visible;
   max-height: 200px;
   opacity: 1;
-  transition: max-height 0.35s ease, opacity 0.28s ease, padding 0.35s ease, margin 0.35s ease;
+  transition: max-height 0.3s ease-in-out, opacity 0.24s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out;
 }
 
 /* Compact folio — slides in from under the double gold rule */
@@ -147,7 +147,7 @@
   overflow: hidden;
   pointer-events: none;
   transform: translateY(-6px);
-  transition: max-height 0.35s ease, opacity 0.3s ease, transform 0.3s ease;
+  transition: max-height 0.3s ease-in-out, opacity 0.24s ease-in-out, transform 0.24s ease-in-out;
 }
 .herald-compact__brand {
   position: absolute;
@@ -418,12 +418,285 @@
   min-height: 44px;
 }
 
-/* ── Nation of the Week panel ──────────────────────────────────────────────── */
+/* ── Nation of the Day — dossier layout ────────────────────────────────────── */
 .nation-summary {
   font-size: 0.875rem;
   color: var(--ink-muted);
   line-height: 1.6;
   margin: 0 0 0.75rem;
+}
+
+/* Badges */
+.nation-dossier__badges { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-top: 0.5rem; }
+
+.nation-badge {
+  display: inline-block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.175rem 0.5rem;
+  border-radius: 99px;
+}
+
+.nation-badge--1040 {
+  background: color-mix(in srgb, var(--gold) 15%, transparent);
+  color: var(--gold);
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+}
+
+.nation-badge--persecution {
+  color: var(--per-color, var(--error, #b00020));
+  background: color-mix(in srgb, var(--per-color, var(--error, #b00020)) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--per-color, var(--error, #b00020)) 30%, transparent);
+}
+
+/* Dossier header */
+.nation-dossier { padding: 0; }
+
+.nation-dossier__header { margin-bottom: 1rem; }
+
+.nation-dossier__title {
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(1.25rem, 3vw, 1.625rem);
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 0.25rem;
+  line-height: 1.2;
+}
+
+.nation-dossier__meta {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
+/* Stats grid */
+.nation-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.nation-stat {
+  background: var(--paper-sunken);
+  border-radius: 6px;
+  padding: 0.5rem 0.625rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.nation-stat__val {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.nation-stat__label {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+}
+
+/* Section headers within drawer */
+.nation-section {
+  margin-bottom: 1.25rem;
+}
+
+.nation-section__head {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.3rem;
+  margin: 0 0 0.625rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nation-section__icon {
+  flex-shrink: 0;
+  color: var(--gold);
+  display: inline-block;
+}
+
+.nation-section__subhead {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  margin: 0.875rem 0 0.4rem;
+}
+
+/* Religion breakdown bars */
+.nation-rel-list { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.nation-rel-row {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr 2.5rem;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.nation-rel-name {
+  font-size: 0.75rem;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nation-rel-track {
+  height: 5px;
+  background: var(--rule);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.nation-rel-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.nation-rel-pct {
+  font-size: 0.6875rem;
+  color: var(--ink-muted);
+  text-align: right;
+}
+
+/* Bible access grid */
+.nation-access-grid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.375rem;
+}
+
+.nation-access-item { display: flex; flex-direction: column; gap: 0.1rem; }
+
+.nation-access-item__val {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.nation-access-item__label {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+}
+
+.nation-shortage-note {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* OW body text */
+.nation-ow-body {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--ink);
+  margin: 0 0 0.25rem;
+}
+
+/* Prayer challenge numbered list */
+.nation-challenge-list {
+  padding-left: 1.25rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.nation-challenge-list li {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+/* Joshua Project live section */
+.nation-jp-section { }
+
+.nation-jp-group {
+  background: var(--paper-sunken);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.nation-jp-group__name {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.nation-jp-group__meta {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+
+.nation-jp-group__scale {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+}
+
+/* Joshua Project link */
+.nation-jp-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+  padding-bottom: 0.1rem;
+}
+.nation-jp-link:hover { opacity: 0.75; }
+
+/* Dominant religion note */
+.nation-dom-religion {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  margin: 0.25rem 0 0.75rem;
+}
+.nation-dom-religion strong { color: var(--ink); }
+
+/* Prayer answers list (same as challenges, distinct accent) */
+.nation-prayer-answers li::marker { color: var(--gold); }
+
+/* Data source attribution line */
+.nation-data-source {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  margin-top: 0.35rem;
+  font-style: italic;
 }
 
 .nation-prayer {
