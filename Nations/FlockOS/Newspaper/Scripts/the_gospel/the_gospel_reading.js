@@ -110,6 +110,45 @@ export async function mount(root) {
   return () => {};
 }
 
+// ── Bible.com URL builder (ESV version 59) ───────────────────────────────
+const _BC = {
+  'genesis':'GEN','exodus':'EXO','leviticus':'LEV','numbers':'NUM','deuteronomy':'DEU',
+  'joshua':'JOS','judges':'JDG','ruth':'RUT',
+  '1 samuel':'1SA','2 samuel':'2SA','1 kings':'1KI','2 kings':'2KI',
+  '1 chronicles':'1CH','2 chronicles':'2CH','ezra':'EZR','nehemiah':'NEH','esther':'EST',
+  'job':'JOB','psalm':'PSA','psalms':'PSA','proverbs':'PRO','ecclesiastes':'ECC',
+  'song of solomon':'SNG','song of songs':'SNG','isaiah':'ISA','jeremiah':'JER',
+  'lamentations':'LAM','ezekiel':'EZK','daniel':'DAN','hosea':'HOS','joel':'JOL',
+  'amos':'AMO','obadiah':'OBA','jonah':'JON','micah':'MIC','nahum':'NAM',
+  'habakkuk':'HAB','zephaniah':'ZEP','haggai':'HAG','zechariah':'ZEC','malachi':'MAL',
+  'matthew':'MAT','mark':'MRK','luke':'LUK','john':'JHN','acts':'ACT','romans':'ROM',
+  '1 corinthians':'1CO','2 corinthians':'2CO','galatians':'GAL','ephesians':'EPH',
+  'philippians':'PHP','colossians':'COL','1 thessalonians':'1TH','2 thessalonians':'2TH',
+  '1 timothy':'1TI','2 timothy':'2TI','titus':'TIT','philemon':'PHM','hebrews':'HEB',
+  'james':'JAS','1 peter':'1PE','2 peter':'2PE','1 john':'1JN','2 john':'2JN',
+  '3 john':'3JN','jude':'JUD','revelation':'REV',
+};
+
+function _oybUrl(ref) {
+  const s = ref.toLowerCase().replace(/[\u2013\u2014-]/g, '-').trim();
+  const m = s.match(/^((?:[1-3]\s+)?)([a-z]+(?:\s+[a-z]+)*)\s+(\d+)/);
+  if (!m) return null;
+  const bookKey = ((m[1] || '').trim() + ' ' + m[2].trim()).replace(/^\s/, '').trim();
+  const chapter = m[3];
+  const code = _BC[bookKey] || _BC[m[2].trim()];
+  if (!code) return null;
+  return `https://www.bible.com/bible/59/${code}.${chapter}.1.ESV`;
+}
+
+// ── Stream SVG icons ──────────────────────────────────────────────────────
+const _S = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+const _OYB_ICONS = {
+  ot: `<svg ${_S}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+  nt: `<svg ${_S}><line x1="12" y1="3" x2="12" y2="21"/><line x1="4" y1="9" x2="20" y2="9"/></svg>`,
+  ps: `<svg ${_S}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+  pr: `<svg ${_S}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.6-1.4 4.8-3.5 6.1L15 17H9l-.5-1.9C6.4 13.8 5 11.6 5 9a7 7 0 0 1 7-7z"/></svg>`,
+};
+
 // ── One Year Bible rendering ──────────────────────────────────────────────
 function _todayDayNumber() {
   const now  = new Date();
@@ -143,29 +182,40 @@ function _paintOYB(root) {
 }
 
 function _oybTodayCard(e) {
+  const pct  = Math.round((e.day / 365) * 100);
   const streams = [
-    { label: 'Old Testament', val: e.ot, color: '#c2410c', icon: '📜' },
-    { label: 'New Testament', val: e.nt, color: '#1d4ed8', icon: '✝️' },
-    { label: 'Psalms',        val: e.ps, color: '#059669', icon: '🎶' },
-    { label: 'Proverbs',      val: e.pr, color: '#d97706', icon: '💡' },
+    { key: 'ot', label: 'Old Testament', val: e.ot, color: '#b45309' },
+    { key: 'nt', label: 'New Testament', val: e.nt, color: '#1d4ed8' },
+    { key: 'ps', label: 'Psalms',        val: e.ps, color: '#059669' },
+    { key: 'pr', label: 'Proverbs',      val: e.pr, color: '#7c3aed' },
   ].filter((s) => s.val);
 
+  const cards = streams.map((s) => {
+    const url = _oybUrl(s.val);
+    const tag  = url ? 'a' : 'div';
+    const attrs = url ? ` href="${url}" target="_blank" rel="noopener noreferrer"` : '';
+    return `<${tag} class="oyb-stream-card" style="--sc:${s.color}"${attrs}>
+      <span class="oyb-stream-icon" aria-hidden="true">${_OYB_ICONS[s.key]}</span>
+      <span class="oyb-stream-body">
+        <span class="oyb-stream-label">${s.label}</span>
+        <span class="oyb-stream-ref">${esc(s.val)}</span>
+      </span>
+      ${url ? '<span class="oyb-stream-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg></span>' : ''}
+    </${tag}>`;
+  }).join('');
+
   return /* html */`
-    <div class="grow-oyb-hero">
-      <div class="grow-oyb-hero-left">
-        <div class="grow-oyb-hero-label">Today</div>
-        <div class="grow-oyb-hero-day">Day ${e.day}</div>
-        <div class="grow-oyb-hero-date">${esc(e.date)}</div>
+    <div class="oyb-day-banner">
+      <div class="oyb-day-info">
+        <span class="oyb-day-pill">Day ${e.day}</span>
+        <span class="oyb-day-of">of 365</span>
+        <span class="oyb-day-date">${esc(e.date)}</span>
       </div>
-      <div class="grow-oyb-hero-streams">
-        ${streams.map((s) => `
-          <div class="grow-oyb-hero-stream">
-            <span class="grow-oyb-hero-stream-label" style="--stream-color:${s.color}">${s.label}</span>
-            <span class="grow-oyb-hero-stream-val">${esc(s.val)}</span>
-          </div>
-        `).join('')}
+      <div class="oyb-progress-track" title="${pct}% through the year">
+        <div class="oyb-progress-fill" style="width:${pct}%"></div>
       </div>
     </div>
+    <div class="oyb-stream-list">${cards}</div>
     <div style="text-align:center; margin: 14px 0 2px;">
       <button class="grow-btn grow-btn--ghost" data-oyb-toggle style="font-size:13px; padding:8px 20px;">See all 365 days ▼</button>
     </div>

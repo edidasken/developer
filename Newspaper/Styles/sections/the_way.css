@@ -575,7 +575,7 @@
 .grow-today  { padding: 0.625rem 0.75rem; border-radius: var(--radius); background: var(--paper-sunken); }
 .grow-muted  { color: var(--ink-muted); font-size: 0.8125rem; margin: 0; }
 
-/* OYB card */
+/* OYB card (legacy) */
 .grow-oyb-card { border: 1px solid var(--rule); border-radius: var(--radius-lg); padding: 1.125rem; background: var(--paper-card); margin-bottom: 0.25rem; }
 .grow-oyb-card-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.875rem; }
 .grow-oyb-day  { font-size: 1.25rem; font-weight: 700; color: var(--ink); }
@@ -585,7 +585,37 @@
 .grow-oyb-stream { display: flex; flex-direction: column; gap: 0.1875rem; padding: 0.625rem 0.75rem; border-radius: var(--radius); background: var(--paper-sunken); }
 .grow-oyb-stream-label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); }
 .grow-oyb-stream-val   { font-size: 0.9rem; font-weight: 500; color: var(--ink); }
-.grow-oyb-hero-stream-label { color: var(--stream-color, var(--grow-accent, var(--accent))); }
+
+/* OYB day banner + progress */
+.oyb-day-banner { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.875rem 1rem; background: var(--paper-card); border: 1px solid var(--rule); border-radius: var(--radius-lg); margin-bottom: 0.75rem; }
+.oyb-day-info { display: flex; align-items: baseline; gap: 0.5rem; }
+.oyb-day-pill { display: inline-flex; align-items: center; padding: 0.1875rem 0.625rem; background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); border-radius: 999px; font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.02em; }
+.oyb-day-of   { font-size: 0.75rem; color: var(--ink-muted); }
+.oyb-day-date { font-size: 0.75rem; color: var(--ink-faint); margin-left: auto; }
+.oyb-progress-track { height: 5px; background: var(--rule); border-radius: 999px; overflow: hidden; }
+.oyb-progress-fill  { height: 100%; background: linear-gradient(90deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 70%, #7c3aed) 100%); border-radius: 999px; transition: width 0.6s ease; }
+
+/* OYB stream cards */
+.oyb-stream-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.25rem; }
+.oyb-stream-card {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.6875rem 0.875rem;
+  background: var(--paper-card); border: 1px solid var(--rule);
+  border-left: 3px solid var(--sc, var(--accent));
+  border-radius: 0 var(--radius) var(--radius) 0;
+  text-decoration: none; color: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  cursor: default;
+}
+a.oyb-stream-card { cursor: pointer; }
+a.oyb-stream-card:hover { background: color-mix(in srgb, var(--sc, var(--accent)) 5%, var(--paper-card)); border-color: var(--sc, var(--accent)); }
+.oyb-stream-icon { display: flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border-radius: 8px; background: color-mix(in srgb, var(--sc, var(--accent)) 12%, transparent); color: var(--sc, var(--accent)); flex-shrink: 0; }
+.oyb-stream-icon svg { width: 1rem; height: 1rem; display: block; }
+.oyb-stream-body { display: flex; flex-direction: column; gap: 0.125rem; flex: 1; min-width: 0; }
+.oyb-stream-label { font-size: 0.625rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--sc, var(--accent)); line-height: 1; }
+.oyb-stream-ref   { font-size: 0.9rem; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.oyb-stream-arrow { display: flex; align-items: center; color: var(--ink-faint); flex-shrink: 0; }
+a.oyb-stream-card:hover .oyb-stream-arrow { color: var(--sc, var(--accent)); }
 
 /* OYB table */
 .grow-oyb-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; color: var(--ink); }
