@@ -34,15 +34,15 @@
     <nav class="sec-nav-bar" role="navigation" aria-label="Herald sections" id="sec-nav"></nav>
   </header>
 
-  <main class="broadsheet-grid" id="the-way-grid">
-    <article class="broadsheet-card broadsheet-card--full">
-      <div class="empty-state">
-        <div class="empty-state__icon">🌱</div>
-        <p class="empty-state__title">The Way — Coming in Phase 3</p>
-        <p class="empty-state__message">Growth modules, devotionals, missions, and the Gospel invitation are being built.</p>
-      </div>
-    </article>
-  </main>
+  <div class="broadsheet-columns way-broadsheet" id="the-way-grid">
+    <div class="broadsheet-col broadsheet-col--main" id="way-main">
+      <!-- Lead story + module stories injected by the_way.js -->
+      <div class="way-loading">Loading today&rsquo;s edition&hellip;</div>
+    </div>
+    <div class="broadsheet-col broadsheet-col--aside" id="way-aside">
+      <!-- Today strip: psalm, OYB, quick links -->
+    </div>
+  </div>
 
   <aside class="right-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
     <header class="drawer-header">

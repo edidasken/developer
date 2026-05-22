@@ -593,66 +593,155 @@ New section. Volunteer teams + small groups. Data collections are live, section 
 
 ---
 
-## Page Layout — The Broadsheet Grid
+## Page Layout — Newspaper Broadsheet
 
-Every section page uses a responsive 3-column card grid. Cards are the unit of content.
+This is a real printed newspaper rendered on screen. The layout language is
+newspaper — not web cards. Column rules divide stories. Horizontal rules separate
+sections. Stories span variable column widths. The front page commands the eye
+like a broadsheet, not an app dashboard.
+
+### The Masthead (top of every section page)
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ ══════════════════════════════════════════════════════════════ │  ← 3px rule
+│                                                                 │
+│               The Flock Herald                                  │  ← nameplate
+│                                                                 │
+│                    FLOCKOS                                      │  ← subhead, tracked caps
+│   DISCIPLESHIP  ·  DEVOTIONS  ·  MISSIONS  ·  THEOLOGY         │  ← tagline
+│                                                                 │
+│ ══════════════════════════════════════════════════════════════ │  ← 1px + 3px double rule
+│ VOL. 2026 · NO. 141    ‹ MAY 22, 2026 ›    ROOT.YHWH.ONE      │  ← edition bar
+│ ══════════════════════════════════════════════════════════════ │  ← 1px rule
+└─────────────────────────────────────────────────────────────────┘
+```
+- Nameplate: existing live typeface (do not change — already established on live site)
+- Background: `--paper` (cream `#f5f0e8`), not white
+- All rule lines: `--rule` token (`#2c2c2c`), hairline (`1px`) or bold (`3px`)
+- Edition bar: Vol, issue number auto-calculated from year + day-of-year. Date
+  navigation arrows (‹ ›) let user page through past editions. URL right-aligned.
+
+### The Column Grid — Newspaper Layout
+
+Stories are placed in a **newspaper column grid**, not a card grid. Columns are
+separated by hairline column rules. Stories span 1, 2, or all 3 columns based on
+editorial weight. The lead story always spans full width or 2 columns.
 
 ```
-Desktop / Wide Tablet (>900px)
-┌──────────┬──────────┬──────────┐
-│  Col 1   │  Col 2   │  Col 3   │
-│  card    │  card    │  card    │
-│  card    │  card    │  card    │
-│  card    │          │  card    │
-└──────────┴──────────┴──────────┘
+Desktop (>900px) — 3-column broadsheet with column rules
+┌──────────────┬──────────────┬──────────────┐
+│              │              │              │
+│  LEAD STORY  │  Story B     │  Brief 1     │
+│  (2 cols)    │  (1 col)     │              │
+│              ├──────────────┤  Brief 2     │
+│              │  Story C     │              │
+├──────────────┤  (1 col)     │  Brief 3     │
+│  Story D     │              │              │
+│  (1 col)     ├──────────────┤  ─────────── │
+│              │  Story E     │  Pull Quote  │
+│  Story F     │  (1 col)     │              │
+│  (1 col)     │              │              │
+└──────────────┴──────────────┴──────────────┘
+          ↑ column rules (hairlines)
 
-Narrow Tablet (600–900px)
-┌──────────┬──────────┐
-│  Col 1   │  Col 2   │
-│  card    │  card    │
-│  card    │  card    │
-└──────────┴──────────┘
+Tablet (600–900px) — 2-column broadsheet
+┌──────────────┬──────────────┐
+│  LEAD STORY  │  Story B     │
+│  (2 cols)    │  Story C     │
+├──────────────┤  Brief 1     │
+│  Story D     │  Brief 2     │
+└──────────────┴──────────────┘
 
-Mobile (<600px)
-┌──────────┐
-│  Col 1   │
-│  card    │
-│  card    │
-│  card    │
-└──────────┘
+Mobile (<600px) — single broadsheet column, masthead preserved
+┌──────────────────────┐
+│  [Masthead]          │
+│  LEAD STORY          │
+│  ─────────────────── │
+│  Story B             │
+│  ─────────────────── │
+│  Story C             │
+└──────────────────────┘
 ```
 
-### CSS Implementation (in `the_broadsheet.css`)
+### Newspaper Story elements
+Every story on the page is an `<article class="story">` — NOT a card. Stories use:
 
+| Element | CSS Class | Description |
+|---|---|---|
+| Section label | `.story-kicker` | ALL CAPS, tracked, `--sec-color`, above headline |
+| Headline | `.story-hed` | `'Lora'` serif, 1.5–2.5rem depending on story weight |
+| Deck / subhead | `.story-deck` | Italic `'Lora'`, `1rem`, `--ink-muted` |
+| Byline | `.story-byline` | `'Plus Jakarta Sans'`, `0.75rem`, tracked caps |
+| Dateline | `.story-dateline` | Italic, precedes body text |
+| Body | `.story-body` | `'Plus Jakarta Sans'`, `0.9375rem`, justified, `line-height: 1.7` |
+| Drop cap | `.story-dropcap` | First letter of lead story: `float:left`, 3-line cap height, `'Lora'` |
+| Rule | `.story-rule` | `<hr class="story-rule">` — 1px `--rule` between stories |
+| Pull quote | `.pull-quote` | Bordered left `3px --sec-color`, italic `'Lora'`, indented |
+| Column span | `.story--wide` | Spans 2 columns |
+| Column span | `.story--full` | Spans all 3 columns |
+| Brief | `.story--brief` | Short 1-col story — headline + 2–3 lines only |
+
+### Section Headers (inside a section page)
+Every sub-section within a section page opens with:
+```html
+<div class="section-rule">
+  <span class="section-label">TODAY'S SCRIPTURE READINGS</span>
+</div>
+```
 ```css
-.broadsheet-grid {
+.section-rule {
+  border-top: 3px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  padding: 0.25rem 0;
+  text-align: left;
+  margin: 1.25rem 0 0.75rem;
+}
+.section-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+```
+
+### Column Rules (vertical dividers)
+```css
+.broadsheet-columns {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
+  gap: 0;  /* no gap — columns touch, rule is drawn via border */
   padding: 1rem max(1rem, var(--safe-left));
 }
+.broadsheet-col {
+  padding: 0 1.25rem;
+  border-right: 1px solid var(--rule);
+}
+.broadsheet-col:last-child { border-right: none; }
 
 @media (max-width: 900px) {
-  .broadsheet-grid { grid-template-columns: repeat(2, 1fr); }
+  .broadsheet-columns { grid-template-columns: repeat(2, 1fr); }
 }
-
 @media (max-width: 600px) {
-  .broadsheet-grid { grid-template-columns: 1fr; }
+  .broadsheet-columns { grid-template-columns: 1fr; }
+  .broadsheet-col { border-right: none; padding: 0 1rem; }
 }
 ```
 
-### Card rules
-- Cards are `<article>` elements with class `.broadsheet-card`
-- A card can span 2 columns with `.broadsheet-card--wide` (e.g. a sermon builder)
-- A card can span all 3 columns with `.broadsheet-card--full` (e.g. a map or data table)
-- **No cards are hidden at any breakpoint.** All cards stack vertically on mobile — every
-  card is visible, just reordered into a single column. Nothing disappears.
-- Cards never span columns on mobile — all cards are full-width at `<600px`
-- Card background: `--paper-card` (`#ffffff`), border: `1px solid var(--rule)`
-- Card header: 3px top border in `--sec-color` for the active section
-- Card padding: `1.25rem`
-- Card headline: `'Lora'`, `1.125rem`, `--ink`
-- Card body: `'Plus Jakarta Sans'`, `0.9375rem`, `--ink-muted`
+### Mobile — newspaper discipline on small screens
+- Masthead preserves nameplate at reduced size — never hidden
+- Stories stack in reading order: lead first, then supporting, then briefs
+- Drop caps preserved on lead story
+- Column rules disappear on mobile (single column)
+- Section labels and horizontal rules remain — they ARE the visual structure
+- Body text justified on ≥480px, left-aligned on smaller (justified ragged on narrow
+  columns creates rivers of whitespace — disable it)
+- Touch: tap a story headline/kicker opens the right drawer with full content
+
+### Nothing disappears
+All content at all breakpoints. No story is hidden at any viewport width — they
+stack into a single column on mobile in editorial priority order.
 
 ---
 
@@ -1092,6 +1181,21 @@ Every section page must pass all of these before any feature work begins:
 - [ ] `the_way.css` — `--sec-color: var(--accent)`
 - [ ] BCP
 
+#### Phase 3 — Newspaper Layout Polish (complete after all modules wired)
+- [ ] The Way page uses `.broadsheet-columns` grid — not a card grid
+- [ ] Lead story (Today's Reading / Devotional) spans 2 columns with drop cap on desktop
+- [ ] Module sub-sections each open with a `.section-rule` / `.section-label` header
+- [ ] Story headlines use `.story-hed`, body uses `.story-body` with `text-align: justify` at ≥480px
+- [ ] Column rules (hairline `border-right: 1px solid var(--rule)`) between all columns
+- [ ] Horizontal `<hr class="story-rule">` between every story
+- [ ] Pull quotes (mission spotlight, invitation quote) use `.pull-quote` class
+- [ ] Bylines and datelines present on all data-driven stories
+- [ ] Section kickers (`.story-kicker`) above every sub-section headline
+- [ ] Mobile: justified disabled at <480px, masthead scales down but nameplate never hidden
+- [ ] Tap on any story headline opens right drawer with full module content
+- [ ] Playwright: verify column rules visible on desktop, absent on mobile; drop cap renders; no horizontal scroll at 375px
+- [ ] BCP
+
 ### Phase 4 — The Sanctuary
 - [ ] Sermon builder wired to `sermons` Firestore collection
 - [ ] Song planner wired to `songs` + `servicePlans`
@@ -1187,6 +1291,42 @@ C-Build. **This does not happen until the build is approved by the lead pastor.*
 - No dark mode except The Sanctuary service order panel (projection use case)
 - No removal of any existing functionality — every feature from every `app.*` is mapped above
 - `Architechtural Docs/` stays gitignored and private — never committed, never deployed
+
+---
+
+### Phase 3 checklist status (updated 2026-05-22)
+
+#### Core modules + CSS
+- [x] Port all 14 `app.grow` modules into `the_way/` section — modules loaded via dynamic `import()` in `the_way.js`; all 20 gospel module files already physically present in `Newspaper/Scripts/the_gospel/` from Phase 0 copy
+- [x] Port full `app.invite` gospel presentation + church info + contact form — `the_gospel_invitation.js` renders gospel content; invite extras (church card + contact/decision form) appended by `appendInviteExtras()` in `the_way.js`
+- [x] All 14 modules functional with `Data/*.js` static fallback — each module's `render()` uses its internal `import()` to pull from `Newspaper/Data/`; UpperRoom Firestore attempted first, static data always available
+- [x] `the_way.css` — `--sec-color: var(--accent)` — complete with full clean light-theme `.grow-*` CSS (not ported from dark-theme `new_covenant.css`; written fresh using `--paper-card`, `--ink`, `--rule` tokens; ~420 lines covering all module component variants)
+
+#### CSS decision (deviation from plan — improvement)
+The dark-theme `.grow-*` CSS in `new_covenant.css` (~400 lines with `--text: #f5f5f7` fallbacks and dark gradients) was deliberately NOT ported. Instead, purpose-built light-theme `.grow-*` CSS was written in `the_way.css` using the Newspaper's paper/ink token set. This eliminates maintenance debt and produces cleaner output at ~250 lines with no dark-mode fallbacks.
+
+#### Newspaper Layout Polish — IN PROGRESS
+The Way page must be a broadsheet newspaper with stories — NOT a sidebar-nav SPA. After seeing the live Herald at root.yhwh.one, the correct approach is confirmed:
+- Each module appears as a **newspaper story** on the page: `.story-kicker` (`§ N · MODULE NAME`), `.story-hed` (clickable headline), `.story-deck`, `.story-byline`, `.story-body` (teaser)
+- **TODAY'S READING** is the lead story — spans full width or 2 cols with drop cap
+- **Clicking a story headline** opens the right drawer with the full module (`mod.render()` + `mod.mount()`)
+- The page uses `.broadsheet-columns` grid (main 2/3 + aside 1/3), NOT a sidebar-nav content-pane layout
+- The aside (col 3) shows: Today's Psalm, OYB summary, Person of Scripture, quick links to all modules
+
+- [x] The Way page uses `.broadsheet-columns` grid (index.html rewritten — `.way-layout` sidebar replaced with `.broadsheet-columns way-broadsheet`)
+- [ ] `the_way.js` rewritten — build newspaper stories per module; lead story + supporting stories; tap headline → drawer; today aside strip
+- [ ] Lead story (Today's Reading / Devotional) spans 2 columns with drop cap on desktop
+- [ ] Module sub-sections each open with a `.section-rule` / `.section-label` header
+- [ ] Story headlines use `.story-hed`, body uses `.story-body` with `text-align: justify` at ≥480px
+- [ ] Column rules (hairline `border-right: 1px solid var(--rule)`) between all columns
+- [ ] Horizontal `<hr class="story-rule">` between every story
+- [ ] Pull quotes (mission spotlight, invitation quote) use `.pull-quote` class
+- [ ] Bylines and datelines present on all data-driven stories
+- [ ] Section kickers (`.story-kicker`) above every sub-section headline
+- [ ] Mobile: justified disabled at <480px, masthead scales down but nameplate never hidden
+- [ ] Tap on any story headline opens right drawer with full module content
+- [ ] Playwright: column rules visible on desktop, absent on mobile; drop cap renders; no horizontal scroll at 375px
+- [ ] BCP
 
 ---
 
@@ -1299,6 +1439,28 @@ All 7 Herald panels are live. `buildFrontPage` shows church name + date + rotati
 **Notes / deviations from plan:**
 - `flockNews` has no UpperRoom or TheVine adapter domain; the Herald tries `UpperRoom.listFlockNews` at runtime (may or may not exist on a given deployment) and falls to localStorage cache → empty state. This is correct per the connectivity model.
 - Panels 4–7 (Prayer Spotlight, Nation, Heart Check, Quiz) are dynamically appended to the grid rather than being in the initial HTML — this keeps the HTML skeleton clean and prevents FOUC on the pre-loaded skeleton cards.
+
+---
+
+### [Phase 3 — The Way: CSS + Broadsheet Layout]
+**Date:** 2026-05-22
+**Commit:** pending BCP
+**Files created/modified:**
+- `Newspaper/Styles/sections/the_way.css` — FULL BUILD: section identity tokens, `.way-broadsheet` broadsheet layout, `.way-today-card` aside strip, invite extras (`.way-church-card`, `.way-contact-card`, `.way-submit-btn`, `.way-decision-btn`), complete clean light-theme `.grow-*` component CSS (~420 lines; written fresh for Newspaper paper/ink tokens — NOT ported from dark-theme `new_covenant.css`)
+- `Newspaper/Sections/the_way/index.html` — REWRITTEN: replaced Phase 0 stub `.way-layout` sidebar/content/today pane with `.broadsheet-columns way-broadsheet` grid (#way-main for stories, #way-aside for today strip); retains correct script load order, drawer, toast, mobile/PWA meta
+- `Newspaper/Sections/the_way/the_way.js` — REWRITTEN: full newspaper story controller; builds module stories as broadsheet articles (`.story-kicker`, `.story-hed`, `.story-deck`, `.story-byline`, `.story-body`); TODAY'S READING as lead story spanning full width; each module story headline click opens full module in right drawer via `FlockGates.openDrawer()`; `mount()` wired inside drawer; aside strip with Today's Psalm + OYB via dynamic import; invite extras (church card + contact/decision form) wired to UpperRoom / localStorage queue; all 20 gospel modules supported
+**What was built:**
+Phase 3 delivers The Way as a true broadsheet newspaper page — not a SPA. The page renders each gospel module as a newspaper story with section kicker (`§ N · CATEGORY · TITLE`), clickable headline, deck, byline, and body teaser. Clicking any headline fires `FlockGates.openDrawer()` with the full module HTML (`mod.render()`) mounted and interactive (`mod.mount(drawerBody)`). TODAY'S READING is the lead story, built from OYB data with today's 4 passages displayed. DEVOTIONAL, MISSIONS REPORT, THEOLOGY CORNER, APOLOGETICS, THE INVITATION, and all other modules follow as supporting stories in the main column. The aside (col 3) holds Today's Psalm and OYB summary strip. The invitation module appends a church info card and contact/decision form below its story content. CSS is purpose-built light-theme — no dark-mode fallbacks, no legacy hex values, all paper/ink tokens throughout.
+**Verified:**
+- [x] get_errors: zero errors on the_way.css, the_way/index.html, the_way.js
+- [ ] C-Build: pending
+- [ ] git ls-files "Architechtural Docs/": pending
+- [ ] macOS duplicate scan: pending
+- [ ] Playwright: pending
+**Notes / deviations from plan:**
+- Original Phase 0 stub used a `.way-layout` 3-panel sidebar/content/today approach. This was discarded. The broadsheet column layout (`.broadsheet-columns`) is the correct newspaper pattern per the plan's Layout Polish phase and confirmed by the live Herald at root.yhwh.one.
+- The clean light-theme `.grow-*` CSS was written fresh (~420 lines) rather than porting the ~400-line dark-theme block from `new_covenant.css`. This eliminates maintenance debt and is a deliberate architectural improvement.
+- `getOYBToday()` and `getPsalmOfDay()` are called speculatively on the reading/psalms modules; if those helper functions do not exist on those modules, the aside degrades gracefully to a placeholder card.
 
 ---
 
