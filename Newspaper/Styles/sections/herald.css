@@ -41,7 +41,7 @@
   color: var(--ink-muted);
   padding-bottom: 0.5rem;
 }
-.herald-folio__label { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.herald-folio__label { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: none; font-weight: 700; }
 .herald-folio__date  { text-align: center; }
 .herald-folio__btn   { text-align: right; display: flex; justify-content: flex-end; }
 
