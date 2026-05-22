@@ -39,6 +39,16 @@
     return DAYS[d.getDay()] + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
   }
 
+  function fmtNum(n) {
+    if (!n && n !== 0) return '';
+    return Number(n).toLocaleString('en-US');
+  }
+
+  function fmtPct(n) {
+    if (!n && n !== 0) return '';
+    return Number(n).toFixed(1) + '%';
+  }
+
   function dayOfYear(date) {
     var start = new Date(date.getFullYear(), 0, 0);
     var diff  = date - start + (start.getTimezoneOffset() - date.getTimezoneOffset()) * 60000;
@@ -99,13 +109,15 @@
   // ── Col 1: Nation Profile ─────────────────────────────────────────────────
   function buildProfileCol(n, wk) {
     var stats = [
+      { label: 'Capital',          value: n.capital },
       { label: 'Region',           value: n.region },
-      { label: 'Continent',        value: n.continent },
-      { label: 'Population',       value: n.population },
-      { label: 'Evangelical',      value: n.percentEvangelical },
-      { label: 'Christian',        value: n.percentChristian },
+      { label: 'Population',       value: n.population ? fmtNum(n.population) : '' },
+      { label: 'Evangelical',      value: n.percentEvangelical != null ? fmtPct(n.percentEvangelical) : '' },
+      { label: 'Christian',        value: n.percentChristian != null ? fmtPct(n.percentChristian) : '' },
       { label: 'Persecution',      value: n.persecutionLabel },
-      { label: 'Unreached Groups', value: n.unreachedGroups },
+      { label: 'Unreached Groups', value: n.unreachedGroups != null ? String(n.unreachedGroups) : '' },
+      { label: 'Bible Access',     value: n.bibleShortageTier },
+      { label: '10/40 Window',     value: n.tenFortyWindow ? 'Yes' : '' },
     ].filter(function (s) { return s.value; });
 
     var rows = stats.map(function (s) {

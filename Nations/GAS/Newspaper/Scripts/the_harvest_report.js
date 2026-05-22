@@ -1,184 +1,284 @@
 /**
- * the_harvest_report.js — The Harvest Section Content Engine
+ * the_harvest_report.js — Outreach Tracker Section Engine
  *
- * Renders the harvest section (#section-main) as a broadsheet page.
- * Restricted section (minRole: 4) — pastor and admin only.
+ * Renders the harvest/ section (#section-main) as a full Outreach Tracker.
+ * Display name: "Outreach Tracker"   Code name: harvest / the_harvest_report
+ * Accent: var(--sec-harvest,#0e2818) (Field Dispatch)
  *
  * Layout:
- *   ┌──────────────── BANNER ──────────────────┐
- *   │  The Harvest · giving & stewardship      │
- *   └──────────────────────────────────────────┘
- *   ┌── COL 1 (2fr) ──┬── COL 2 (1fr) ──┬── COL 3 (1fr) ──┐
- *   │  Giving Report  │  Stewardship     │  Scripture on    │
- *   │  (Firestore     │  Principle       │  Generosity      │
- *   │   hook)         │                  │                  │
- *   └─────────────────┴──────────────────┴──────────────────┘
+ *   COL 1 (2.5fr): Conversation Log  |  COL 2 (2fr): Prayer Targets  |  COL 3 (1fr): Stats + Mission
  *
- * Accent: var(--sec-harvest) = #0e2818 (Field Dispatch)
- *
- * Data: No live data — static editorial + Firestore hook for giving reports.
+ * Persistence:
+ *   localStorage('herald_harvest')     — gospel conversation log
+ *   localStorage('herald_pray_targets') — prayer targets
  */
 
 (function () {
   'use strict';
 
-  function esc(str) {
-    return String(str || '')
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  var LS_HARVEST  = 'herald_harvest';
+  var LS_TARGETS  = 'herald_pray_targets';
+  var ACC = 'var(--sec-harvest,#0e2818)';
+
+  function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  var MONTHS = ['January','February','March','April','May','June',
-                'July','August','September','October','November','December'];
-
   function todayLong() {
     var d = new Date();
     return DAYS[d.getDay()] + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
   }
-
-  function dayOfYear(date) {
-    var start = new Date(date.getFullYear(), 0, 0);
-    var diff  = date - start + (start.getTimezoneOffset() - date.getTimezoneOffset()) * 60000;
-    return Math.floor(diff / 86400000);
+  function todayISO() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function fmtDate(iso) {
+    if (!iso) return '';
+    var p = iso.split('-');
+    if (p.length !== 3) return iso;
+    return MONTHS[parseInt(p[1],10)-1].slice(0,3) + ' ' + parseInt(p[2],10);
   }
 
-  // ── Stewardship principles (rotates weekly) ───────────────────────────────
-  var PRINCIPLES = [
-    {
-      title: 'The Tithe Is the Beginning',
-      body:  'The tithe (10%) is not the ceiling of generosity \u2014 it is the floor. It is the act of acknowledging that everything already belongs to God. When Malachi says \u201cbring the full tithe into the storehouse,\u201d he is not describing a payment to God; he is describing the return of what is already his.',
-      ref:   'Malachi 3:10; Leviticus 27:30',
-    },
-    {
-      title: 'The Widow\u2019s Two Coins',
-      body:  'Jesus did not praise the widow\u2019s offering because it was large \u2014 it was small. He praised it because it was everything. The principle of proportional generosity is not percentage; it is posture. God looks at what you kept, not what you gave.',
-      ref:   'Mark 12:41\u201344',
-    },
-    {
-      title: 'Generosity Breaks the Power of Mammon',
-      body:  'Paul does not say the love of money is a symptom of sin. He says it is the root. Radical generosity is the antidote \u2014 not because God needs our money, but because we need to be freed from it. Every act of giving is a declaration that we serve God and not wealth.',
-      ref:   '1 Timothy 6:10, 17\u201319',
-    },
-    {
-      title: 'The Grace of Giving',
-      body:  'In 2 Corinthians 8, Paul calls the Macedonians\u2019 generosity a \u201cgrace.\u201d They begged to participate in the gift. Giving is not a burden to fulfill; it is a grace to pursue. The most generous people in the church are usually those who have experienced the most.',
-      ref:   '2 Corinthians 8:1\u20135',
-    },
+  var OUTCOMES = {
+    praying:    { label: 'Praying',    color: '#2980b9' },
+    interested: { label: 'Interested', color: '#8e44ad' },
+    connected:  { label: 'Connected',  color: '#27ae60' },
+    declined:   { label: 'Not Open',   color: '#7f8c8d' },
+  };
+
+  var state = {
+    convos:     [],
+    targets:    [],
+    showAddConvo:  false,
+    showAddTarget: false,
+  };
+
+  function loadConvos() {
+    try { state.convos = JSON.parse(localStorage.getItem(LS_HARVEST) || '[]'); } catch (_) { state.convos = []; }
+  }
+  function saveConvos() {
+    try { localStorage.setItem(LS_HARVEST, JSON.stringify(state.convos)); } catch (_) {}
+  }
+  function loadTargets() {
+    try { state.targets = JSON.parse(localStorage.getItem(LS_TARGETS) || '[]'); } catch (_) { state.targets = []; }
+  }
+  function saveTargets() {
+    try { localStorage.setItem(LS_TARGETS, JSON.stringify(state.targets)); } catch (_) {}
+  }
+
+  var HARVEST_VERSES = [
+    { ref:'Matthew 9:37',   text:'The harvest is plentiful, but the laborers are few; therefore pray earnestly to the Lord of the harvest to send out laborers into his harvest.' },
+    { ref:'John 4:35',      text:'Do you not say, "There are yet four months, then comes the harvest"? Look, I tell you, lift up your eyes, and see that the fields are white for harvest.' },
+    { ref:'Luke 15:7',      text:'Just so, I tell you, there will be more joy in heaven over one sinner who repents than over ninety-nine righteous persons who need no repentance.' },
+    { ref:'Romans 10:14',   text:'How then will they call on him in whom they have not believed? And how are they to believe in him of whom they have never heard?' },
+    { ref:'Acts 1:8',       text:'You will receive power when the Holy Spirit has come upon you, and you will be my witnesses in Jerusalem and in all Judea and Samaria, and to the end of the earth.' },
+    { ref:'2 Cor 5:20',     text:'We are ambassadors for Christ, God making his appeal through us.' },
+    { ref:'1 Peter 3:15',   text:'In your hearts honor Christ the Lord as holy, always being prepared to make a defense to anyone who asks you for a reason for the hope that is in you.' },
   ];
 
-  function thisPrinciple() {
-    return PRINCIPLES[Math.floor(dayOfYear(new Date()) / 7) % PRINCIPLES.length];
+  function injectStyles() {
+    if (document.getElementById('hr-styles')) return;
+    var css =
+'.hr-convo{border:1px solid rgba(0,0,0,0.12);border-radius:4px;padding:9px 12px;margin-bottom:7px;position:relative;}' +
+'.hr-convo-name{font-weight:700;font-size:0.9rem;}' +
+'.hr-convo-notes{font-size:0.83rem;margin:3px 0;color:var(--ink,#1a100a);}' +
+'.hr-convo-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:5px;}' +
+'.hr-outcome{font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:10px;color:#fff;}' +
+'.hr-date{font-size:0.74rem;color:var(--ink-muted,#666);}' +
+'.hr-actions{position:absolute;top:7px;right:7px;display:flex;gap:3px;}' +
+'.hr-sel{border:1px solid rgba(0,0,0,0.15);border-radius:3px;background:var(--paper,#faf6ed);font-family:inherit;font-size:0.74rem;padding:2px 4px;cursor:pointer;}' +
+'.hr-del{border:none;background:transparent;cursor:pointer;font-size:0.8rem;padding:2px 4px;color:var(--ink-muted,#666);}' +
+'.hr-del:hover{color:#c00;}' +
+'.hr-target{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-bottom:1px solid rgba(0,0,0,0.08);}' +
+'.hr-target:last-child{border-bottom:none;}' +
+'.hr-target-check{margin-top:2px;cursor:pointer;flex-shrink:0;}' +
+'.hr-target-label{flex:1;font-size:0.86rem;}' +
+'.hr-target-label.answered{text-decoration:line-through;color:var(--ink-muted,#666);}' +
+'.hr-target-del{border:none;background:transparent;cursor:pointer;color:var(--ink-muted,#666);font-size:0.8rem;}' +
+'.hr-target-del:hover{color:#c00;}' +
+'.hr-target-list{border:1px solid rgba(0,0,0,0.12);border-radius:4px;max-height:280px;overflow-y:auto;}' +
+'.hr-add-form{margin-top:12px;border-top:1px solid rgba(0,0,0,0.1);padding-top:10px;}' +
+'.hr-add-form input,.hr-add-form select,.hr-add-form textarea{width:100%;box-sizing:border-box;padding:5px 8px;font-family:inherit;font-size:0.83rem;border:1px solid rgba(0,0,0,0.2);border-radius:3px;margin-bottom:5px;background:var(--paper,#faf6ed);}' +
+'.hr-add-form textarea{resize:vertical;min-height:55px;}' +
+'.hr-add-btn{background:var(--sec-harvest,#0e2818);color:#fff;border:none;border-radius:3px;padding:6px 14px;cursor:pointer;font-family:inherit;font-size:0.83rem;width:100%;}' +
+'.hr-add-btn:hover{opacity:0.85;}' +
+'.hr-toggle{background:transparent;border:1px solid rgba(0,0,0,0.2);border-radius:3px;padding:5px 12px;cursor:pointer;font-family:inherit;font-size:0.82rem;margin-bottom:8px;width:100%;}' +
+'.hr-toggle:hover{background:rgba(0,0,0,0.06);}' +
+'.hr-empty{padding:18px;text-align:center;color:var(--ink-muted,#666);font-style:italic;font-size:0.84rem;border:1px solid rgba(0,0,0,0.1);border-radius:4px;}' +
+'.hr-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}' +
+'.hr-stat{text-align:center;border:1px solid rgba(0,0,0,0.1);border-radius:4px;padding:8px 4px;}' +
+'.hr-stat-num{font-size:1.6rem;font-weight:700;color:var(--sec-harvest,#0e2818);line-height:1;}' +
+'.hr-stat-lbl{font-size:0.7rem;color:var(--ink-muted,#666);margin-top:3px;}';
+    var el = document.createElement('style'); el.id = 'hr-styles'; el.textContent = css; document.head.appendChild(el);
   }
 
-  // ── Generosity scriptures (rotates daily) ────────────────────────────────
-  var GEN_SCRIPTURES = [
-    { ref: '2 Corinthians 9:6\u20137', text: 'Whoever sows sparingly will also reap sparingly, and whoever sows bountifully will also reap bountifully. Each one must give as he has decided in his heart, not reluctantly or under compulsion, for God loves a cheerful giver.' },
-    { ref: 'Proverbs 11:24\u201325',   text: 'One gives freely, yet grows all the richer; another withholds what he should give, and only suffers want. Whoever brings blessing will be enriched, and one who waters will himself be watered.' },
-    { ref: 'Luke 6:38',              text: 'Give, and it will be given to you. Good measure, pressed down, shaken together, running over, will be put into your lap. For with the measure you use it will be measured back to you.' },
-    { ref: 'Acts 4:34\u201335',       text: 'There was not a needy person among them, for as many as were owners of lands or houses sold them and brought the proceeds of what was sold and laid it at the apostles\u2019 feet, and it was distributed to each as any had need.' },
-    { ref: 'Matthew 6:19\u201321',    text: 'Do not lay up for yourselves treasures on earth, where moth and rust destroy and where thieves break in and steal, but lay up for yourselves treasures in heaven.' },
-    { ref: '1 Chronicles 29:14',     text: '\u201cBut who am I, and what is my people, that we should be able thus to offer willingly? For all things come from you, and of your own have we given you.\u201d' },
-    { ref: 'Proverbs 3:9\u201310',    text: 'Honor the Lord with your wealth and with the firstfruits of all your produce; then your barns will be filled with plenty, and your vats will be bursting with wine.' },
-  ];
-
-  function buildGenerosityCol() {
-    var sc = GEN_SCRIPTURES[new Date().getDay()];
-    return [
-      '<div class="np-col">',
-      '  <p class="np-col__flag">Scripture on Generosity</p>',
-      '  <div class="np-pull-quote" style="border-left-color:var(--sec-harvest)">',
-      '    <p>\u201c' + esc(sc.text) + '\u201d</p>',
-      '    <footer>' + esc(sc.ref) + ' (ESV)</footer>',
-      '  </div>',
-      '  <hr class="np-column-rule">',
-      '  <div class="np-body" style="font-size:0.87rem;">',
-      '    <p>The harvest is the fruit of sowing. Every financial decision the church makes either reflects or undermines its theology. These pages exist to help the pastor steward the harvest well.</p>',
-      '  </div>',
-      '</div>',
-    ].join('\n');
+  function renderConvo(c) {
+    var oc = OUTCOMES[c.outcome] || { label: c.outcome, color:'#999' };
+    return '<div class="hr-convo">' +
+      '<div class="hr-actions">' +
+        '<select class="hr-sel" data-action="change-outcome" data-convo-id="' + esc(c.id) + '">' +
+          Object.keys(OUTCOMES).map(function(k){ return '<option value="'+k+'"'+(c.outcome===k?' selected':'')+'>'+OUTCOMES[k].label+'</option>'; }).join('') +
+        '</select>' +
+        '<button class="hr-del" data-action="delete-convo" data-convo-id="' + esc(c.id) + '">\u2715</button>' +
+      '</div>' +
+      '<div class="hr-convo-name">' + esc(c.name) + '</div>' +
+      (c.notes ? '<div class="hr-convo-notes">' + esc(c.notes) + '</div>' : '') +
+      '<div class="hr-convo-meta">' +
+        '<span class="hr-outcome" style="background:' + oc.color + '">' + esc(oc.label) + '</span>' +
+        '<span class="hr-date">' + fmtDate(c.date) + '</span>' +
+      '</div>' +
+    '</div>';
   }
 
-  // ── Col 1: Giving Report ──────────────────────────────────────────────────
-  function buildGivingCol() {
-    return [
-      '<div class="np-col">',
-      '  <p class="np-col__flag" style="color:var(--sec-harvest)">',
-      '    Giving Report &mdash; ' + todayLong(),
-      '  </p>',
-      '  <h2 class="np-headline">The Harvest</h2>',
-      '  <p class="np-byline" style="font-variant:small-caps;">Stewardship &middot; Generosity &middot; Financial Health</p>',
-      '  <hr class="np-column-rule">',
-      '  <div class="np-body np-drop-cap">',
-      '    <p>This section is the financial dashboard of the church \u2014 a place for the pastor and administrator to track the harvest. Giving reports, budget status, and generosity trends live here in a future phase.</p>',
-      '    <p>The church\u2019s financial health is a spiritual indicator. A generous congregation is a healthy congregation. These numbers matter because people\u2019s hearts matter \u2014 and where the treasure goes, the heart follows.</p>',
-      '  </div>',
-      '  <hr class="np-column-rule">',
-      '  <p class="np-col__flag" style="margin-top:0">Giving Data</p>',
-      '  <p class="np-body" style="font-size:0.85rem;font-style:italic;">',
-      '    Live giving reports will be published here from your church\u2019s giving platform. Contact your administrator to enable financial reporting.',
-      '  </p>',
-      '</div>',
-    ].join('\n');
+  function renderTarget(t, idx) {
+    return '<div class="hr-target">' +
+      '<input type="checkbox" class="hr-target-check" data-action="toggle-target" data-target-idx="' + idx + '"' + (t.answered?' checked':'') + '>' +
+      '<div class="hr-target-label' + (t.answered?' answered':'') + '">' + esc(t.name) +
+        (t.request ? '<div style="font-size:0.78rem;color:var(--ink-muted,#666);margin-top:2px;">' + esc(t.request) + '</div>' : '') +
+      '</div>' +
+      '<button class="hr-target-del" data-action="delete-target" data-target-idx="' + idx + '">\u2715</button>' +
+    '</div>';
   }
 
-  // ── Col 2: Stewardship Principle ──────────────────────────────────────────
-  function buildPrincipleCol() {
-    var p = thisPrinciple();
-    return [
-      '<div class="np-col">',
-      '  <p class="np-col__flag">Stewardship Principle</p>',
-      '  <h2 class="np-headline" style="font-size:1.3rem;">' + esc(p.title) + '</h2>',
-      '  <hr class="np-column-rule">',
-      '  <div class="np-body" style="font-size:0.88rem;">',
-      '    <p>' + esc(p.body) + '</p>',
-      '  </div>',
-      '  <p class="np-byline" style="margin-top:14px;font-size:0.82rem;font-variant:small-caps;">' + esc(p.ref) + '</p>',
-      '</div>',
-    ].join('\n');
+  function calcStats() {
+    var total = state.convos.length;
+    var now = new Date();
+    var weekAgo = new Date(now - 7 * 86400000);
+    var thisWeek = state.convos.filter(function(c) { return c.date && new Date(c.date + 'T00:00:00') >= weekAgo; }).length;
+    var connected = state.convos.filter(function(c) { return c.outcome === 'connected'; }).length;
+    var open = state.targets.filter(function(t) { return !t.answered; }).length;
+    return { total: total, thisWeek: thisWeek, connected: connected, open: open };
   }
 
-  // ── Banner ────────────────────────────────────────────────────────────────
-  function buildBanner(churchName) {
-    return [
-      '<div class="np-banner" style="border-bottom-color:var(--sec-harvest)">',
-      '  <p class="np-banner__flag" style="color:var(--sec-harvest)">',
-      '    The Flock Herald &mdash; The Harvest',
-      '  </p>',
-      '  <h2 class="np-banner__headline">' + esc(churchName) + '</h2>',
-      '  <p class="np-banner__deck">Giving, stewardship, and the fruit of a generous congregation.</p>',
-      '</div>',
-    ].join('\n');
-  }
-
-  // ── Render ────────────────────────────────────────────────────────────────
   function render() {
     var main = document.getElementById('section-main');
     if (!main) return;
+    injectStyles();
+    loadConvos(); loadTargets();
+
     var churchName = (window.HERALD_CHURCH_NAME && window.HERALD_CHURCH_NAME !== 'The Flock Herald')
-      ? window.HERALD_CHURCH_NAME : 'The Harvest';
-    main.innerHTML = [
-      '<div class="np-broadsheet">',
-      buildBanner(churchName),
-      '<div class="np-cols">',
-      buildGivingCol(),
-      buildPrincipleCol(),
-      buildGenerosityCol(),
-      '</div>',
-      '</div>',
-    ].join('\n');
+      ? window.HERALD_CHURCH_NAME : '';
+    var stats = calcStats();
+
+    // Col 1: Conversation Log
+    var col1 = '<div class="np-col">' +
+      '<p class="np-col__flag" style="color:' + ACC + '">Outreach Tracker &mdash; ' + todayLong() + '</p>' +
+      '<h2 class="np-headline">Conversation Log</h2>' +
+      '<p class="np-byline" style="font-variant:small-caps;">Gospel Conversations &middot; Follow-Up &middot; Decisions</p>' +
+      '<hr class="np-column-rule">' +
+      (state.convos.length
+        ? '<div style="max-height:340px;overflow-y:auto;">' + state.convos.map(renderConvo).join('') + '</div>'
+        : '<div class="hr-empty">No conversations logged yet.<br>Record your first gospel conversation below.</div>') +
+      '<button class="hr-toggle" id="hr-toggle-convo">' + (state.showAddConvo ? '\u2212 Cancel' : '+ Log Conversation') + '</button>' +
+      (state.showAddConvo ? '<div class="hr-add-form">' +
+        '<input id="hr-convo-name" type="text" placeholder="Person\'s name *">' +
+        '<textarea id="hr-convo-notes" placeholder="Notes on the conversation\u2026"></textarea>' +
+        '<select id="hr-convo-outcome">' + Object.keys(OUTCOMES).map(function(k){ return '<option value="'+k+'">'+OUTCOMES[k].label+'</option>'; }).join('') + '</select>' +
+        '<button class="hr-add-btn" id="hr-save-convo">Save Conversation</button>' +
+      '</div>' : '') +
+    '</div>';
+
+    // Col 2: Prayer Targets
+    var col2 = '<div class="np-col">' +
+      '<p class="np-col__flag">Prayer Targets</p>' +
+      '<h2 class="np-headline" style="font-size:1.45rem;">Unsaved Neighbors</h2>' +
+      '<hr class="np-column-rule">' +
+      (state.targets.length
+        ? '<div class="hr-target-list">' + state.targets.map(renderTarget).join('') + '</div>'
+        : '<div class="hr-empty">No prayer targets yet.</div>') +
+      '<button class="hr-toggle" id="hr-toggle-target" style="margin-top:10px">' + (state.showAddTarget ? '\u2212 Cancel' : '+ Add Prayer Target') + '</button>' +
+      (state.showAddTarget ? '<div class="hr-add-form">' +
+        '<input id="hr-target-name" type="text" placeholder="Name *">' +
+        '<input id="hr-target-request" type="text" placeholder="Prayer request or context">' +
+        '<button class="hr-add-btn" id="hr-save-target">Add Target</button>' +
+      '</div>' : '') +
+    '</div>';
+
+    // Col 3: Stats + verse
+    var verse = HARVEST_VERSES[new Date().getDay() % HARVEST_VERSES.length];
+    var col3 = '<div class="np-col">' +
+      '<p class="np-col__flag">This Week</p>' +
+      '<div class="hr-stats">' +
+        '<div class="hr-stat"><div class="hr-stat-num">' + stats.total + '</div><div class="hr-stat-lbl">Total Convos</div></div>' +
+        '<div class="hr-stat"><div class="hr-stat-num">' + stats.thisWeek + '</div><div class="hr-stat-lbl">This Week</div></div>' +
+        '<div class="hr-stat"><div class="hr-stat-num">' + stats.connected + '</div><div class="hr-stat-lbl">Connected</div></div>' +
+        '<div class="hr-stat"><div class="hr-stat-num">' + stats.open + '</div><div class="hr-stat-lbl">Praying For</div></div>' +
+      '</div>' +
+      '<hr class="np-column-rule">' +
+      '<div class="np-pull-quote" style="border-left-color:' + ACC + '">' +
+        '<p>\u201c' + esc(verse.text) + '\u201d</p>' +
+        '<footer>' + esc(verse.ref) + ' (ESV)</footer>' +
+      '</div>' +
+    '</div>';
+
+    var banner = '<div class="np-banner" style="border-bottom-color:' + ACC + '">' +
+      '<p class="np-banner__flag" style="color:' + ACC + '">The Flock Herald &mdash; Outreach Tracker</p>' +
+      '<h2 class="np-banner__headline">' + esc(churchName || 'Outreach Tracker') + '</h2>' +
+      '<p class="np-banner__deck">Gospel conversations &middot; Prayer targets &middot; The harvest report</p>' +
+    '</div>';
+
+    main.innerHTML = '<div class="np-broadsheet">' + banner +
+      '<div class="np-cols" style="grid-template-columns:2.5fr 2fr 1fr">' +
+      col1 + col2 + col3 + '</div></div>';
+
+    attachEvents();
   }
 
-  function boot() {
-    render();
-    if (typeof Nehemiah !== 'undefined' && typeof Nehemiah.onAuthResolved === 'function') {
-      Nehemiah.onAuthResolved(render);
-    }
+  function attachEvents() {
+    var main = document.getElementById('section-main');
+    if (!main) return;
+
+    main.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      var action = btn.dataset.action;
+
+      if (action === 'delete-convo') {
+        if (!confirm('Delete this conversation log?')) return;
+        state.convos = state.convos.filter(function(c){ return c.id !== btn.dataset.convoId; });
+        saveConvos(); render(); return;
+      }
+      if (action === 'toggle-target') {
+        var idx = parseInt(btn.dataset.targetIdx, 10);
+        if (state.targets[idx]) { state.targets[idx].answered = btn.checked; saveTargets(); render(); } return;
+      }
+      if (action === 'delete-target') {
+        var tidx = parseInt(btn.dataset.targetIdx, 10);
+        state.targets.splice(tidx, 1); saveTargets(); render(); return;
+      }
+      if (btn.id === 'hr-toggle-convo')   { state.showAddConvo  = !state.showAddConvo;  render(); return; }
+      if (btn.id === 'hr-toggle-target')  { state.showAddTarget = !state.showAddTarget; render(); return; }
+      if (btn.id === 'hr-save-convo') {
+        var name = (document.getElementById('hr-convo-name').value || '').trim();
+        if (!name) { alert('Name is required.'); return; }
+        var notes   = (document.getElementById('hr-convo-notes').value || '').trim();
+        var outcome = document.getElementById('hr-convo-outcome').value || 'praying';
+        state.convos.unshift({ id: 'hv' + Date.now(), name: name, notes: notes, outcome: outcome, date: todayISO() });
+        saveConvos(); state.showAddConvo = false; render(); return;
+      }
+      if (btn.id === 'hr-save-target') {
+        var tname = (document.getElementById('hr-target-name').value || '').trim();
+        if (!tname) { alert('Name is required.'); return; }
+        var req = (document.getElementById('hr-target-request').value || '').trim();
+        state.targets.push({ id: 'pt' + Date.now(), name: tname, request: req, answered: false });
+        saveTargets(); state.showAddTarget = false; render(); return;
+      }
+    });
+
+    main.addEventListener('change', function(e) {
+      var sel = e.target.closest('[data-action="change-outcome"]');
+      if (!sel) return;
+      var cid = sel.dataset.convoId;
+      var c = state.convos.find(function(x){ return x.id === cid; });
+      if (c) { c.outcome = sel.value; saveConvos(); render(); }
+    });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
+  render();
+  if (window.Nehemiah && typeof Nehemiah.onAuthResolved === 'function') {
+    Nehemiah.onAuthResolved(render);
   }
+
 })();

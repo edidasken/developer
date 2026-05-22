@@ -1,11 +1,102 @@
 # The Newspaper — FlockOS Unified Experience Plan
-### Version 3 — Comprehensive Build Document
+### Version 4 — As-Built + Remaining Work
 
-**Vision:** The entire FlockOS product becomes one beautiful, newspaper-style unified experience. The Flock Herald is the front door and the editorial design language for everything. Every section of the paper is a FlockOS tool. You open the paper; you are already home.
+**Vision:** The Flock Herald IS the entire FlockOS product. Not a wrapper, not a portal — the newspaper sections ARE the tools. Every section provides the full functionality of the app it replaces, native to the newspaper codebase, styled as broadsheet.
+
+**Naming rule:** Display names are clear English (what the pastor sees). Code names are biblical (file/folder/function names). They are separate concerns.
+
+**Data rule:** All sections work offline via localStorage. Firestore integration is Phase 2 for each section.
 
 ---
 
-## MASTER TO-DO LIST
+## AS-BUILT STATUS (as of 2026-05-21)
+
+| Section Folder | Display Name | Functional State |
+|---|---|---|
+| `herald/` + `index.html` | The Flock Herald | ✅ Full — daily scripture, quiz widget, section briefs |
+| `tabernacle/` | Daily Devotional | ✅ Full — today's devotional, morning prayer, OYB passage |
+| `pulpit/` | Sermon Prep | ⚠️ Partial — quiz + static notes. **Needs: full sermon builder** |
+| `levites/` | Song Planner | ⚠️ Partial — static Psalm + worship content. **Needs: set list builder, song library** |
+| `stage/` | Service Order | ⚠️ Partial — static production notes. **Needs: runsheet builder** |
+| `epistles/` | Announcements & Prayer | ⚠️ Partial — static letters column. **Needs: announcement board + prayer chain** |
+| `straight_path/` | Discipleship Path | ✅ Full — OYB week, memory verse, teaching plan |
+| `great_commission/` | Nations & Prayer | ✅ Full — nation of week, prayer report, prayercast video |
+| `living_water/` | Scripture & Reflection | ✅ Full — Psalm, reading plan, reflection questions |
+| `scroll_room/` | The Archive | ✅ Full — book of Bible, Strong's word study |
+| `gatehouse/` | Care Board | ⚠️ Partial — static bulletin. **Needs: care notes, pastoral to-dos** |
+| `genealogies/` | Family Tree | ✅ Full — biblical figure of day, heritage record |
+| `harvest/` | Outreach Tracker | ⚠️ Partial — static harvest content. **Needs: conversation log, prayer targets** |
+| `cornerstone/` | Shepherd's Desk | ✅ Full — doctrine, apologetics, heart check, mirror |
+| `editors_desk/` | Editor's Desk | ✅ Full — Herald config via localStorage overrides |
+| `council/` | Editorial Board | ⚠️ Partial — static governance. **Needs: admin tools, analytics links** |
+
+---
+
+## REMAINING BUILDS (active work queue)
+
+### Build 1 — Sermon Prep (`pulpit/`) — replaces FEED app
+**Display:** "Sermon Prep"  **Script:** `the_pulpit.js`
+- [ ] Sermon list stored in `localStorage('herald_sermons')`
+- [ ] New sermon: title, scripture reference, date
+- [ ] Sermon body: freeform outline sections (Point 1, Point 2, Illustration, Application, Closing)
+- [ ] Word count display
+- [ ] "Active Sermon" pinned at top of list
+- [ ] Delete + archive sermons
+- [ ] Quiz widget (existing) stays in Col 3 as study tool
+- [ ] BCP after
+
+### Build 2 — Song Planner (`levites/`) — replaces Stand app
+**Display:** "Song Planner"  **Script:** `the_cantors.js`
+- [ ] Built-in starter song library (50 hymns/worship songs with key, BPM, CCLI)
+- [ ] Firestore load when UpperRoom available (songs collection)
+- [ ] Set list builder: add songs to "Sunday's Set", reorder, remove
+- [ ] Set list stored in `localStorage('herald_setlist')`
+- [ ] Key display + transpose widget (show in new key)
+- [ ] Song detail: title, artist, key, BPM, CCLI, lyrics hint
+- [ ] Col 3: rotating Psalm (existing) stays as worship reflection
+- [ ] BCP after
+
+### Build 3 — Service Order (`stage/`) — replaces FlockShow
+**Display:** "Service Order"  **Script:** `the_stage.js`
+- [ ] Service runsheet items: type (worship/prayer/sermon/offering/communion/other), title, duration
+- [ ] Add/remove/reorder items
+- [ ] Total time calculator
+- [ ] "Sunday's Order" stored in `localStorage('herald_service_order')`
+- [ ] Col 2: rotating visual scripture (existing) stays
+- [ ] Print-friendly layout
+- [ ] BCP after
+
+### Build 4 — Announcements & Prayer Chain (`epistles/`) — replaces FlockChat public feed
+**Display:** "Announcements & Prayer"  **Script:** `the_letters.js`
+- [ ] Announcements board: title, body, date, category (event/announcement/notice)
+- [ ] Stored in `localStorage('herald_announcements')`
+- [ ] Prayer chain: name, request, date — add/mark answered
+- [ ] Stored in `localStorage('herald_prayer_chain')`
+- [ ] Pastoral letter (Col 1) stays as weekly reflection
+- [ ] BCP after
+
+### Build 5 — Care Board (`gatehouse/`) — replaces FlockShamar
+**Display:** "Care Board"  **Script:** `the_bulletin.js`
+- [ ] Care cards: person name, need/situation, assigned to, date, status (active/praying/resolved/closed)
+- [ ] Stored in `localStorage('herald_care_cards')`
+- [ ] To-do list: task, due date, done toggle
+- [ ] Stored in `localStorage('herald_todos')`
+- [ ] Filter by status
+- [ ] "New card" quick-add form
+- [ ] BCP after
+
+### Build 6 — Outreach Tracker (`harvest/`) — replaces Multiply
+**Display:** "Outreach Tracker"  **Script:** `the_harvest_report.js`
+- [ ] Gospel conversation log: person name, date, notes, outcome (praying/interested/connected/declined)
+- [ ] Stored in `localStorage('herald_harvest')`
+- [ ] Prayer targets: name + request + date
+- [ ] Stats widget: total conversations, this week, decisions
+- [ ] Missions data (existing rotating nation) stays in Col 1
+- [ ] BCP after
+
+---
+
+## MASTER TO-DO LIST (original phases — kept for reference)
 
 > This list is the source of truth for execution. Mark `[x]` after each task is completed during a work session.
 
