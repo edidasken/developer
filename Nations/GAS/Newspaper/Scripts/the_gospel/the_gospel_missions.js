@@ -13,6 +13,22 @@ export const accent      = '#059669';
 
 let _state = { nations: [], query: '', filter: 'all', openId: null };
 
+/* ─── SVG Icon Set ────────────────────────────────────────────────────────── */
+const I = {
+  pin:     `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5a4 4 0 0 1 4 4c0 3.5-4 9-4 9s-4-5.5-4-9a4 4 0 0 1 4-4z"/><circle cx="8" cy="5.5" r="1.3"/></svg>`,
+  people:  `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="5" r="2.2"/><path d="M1.5 14c0-2.5 2-4.2 4.5-4.2S10.5 11.5 10.5 14"/><circle cx="12" cy="5.5" r="1.8"/><path d="M14.5 14c0-2-1.4-3.4-2.7-3.6"/></svg>`,
+  cross:   `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="8" y1="1.5" x2="8" y2="14.5"/><line x1="2.5" y1="5.5" x2="13.5" y2="5.5"/></svg>`,
+  shield:  `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5 L14 4 L14 9C14 12.5 8 14.5 8 14.5C8 14.5 2 12.5 2 9L2 4Z"/></svg>`,
+  book:    `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h5a2 2 0 0 1 2 2v9a1.5 1.5 0 0 0-1.5-1.5H2z"/><path d="M14 3H9a2 2 0 0 0-2 2v9a1.5 1.5 0 0 1 1.5-1.5H14z"/></svg>`,
+  globe:   `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><line x1="2" y1="8" x2="14" y2="8"/><path d="M8 2a9 9 0 0 1 2.5 6A9 9 0 0 1 8 14 9 9 0 0 1 5.5 8 9 9 0 0 1 8 2z"/></svg>`,
+  compass: `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><polygon points="10.5,5.5 6.5,8 5.5,10.5 9.5,8" fill="currentColor" stroke="none"/></svg>`,
+  warn:    `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1.5 L15 14.5 H1 Z"/><line x1="8" y1="7" x2="8" y2="10.5"/><circle cx="8" cy="12.5" r=".6" fill="currentColor" stroke="none"/></svg>`,
+  window:  `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="1.5"/><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>`,
+  pray:    `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 13.5 C5.5 9.5 2.5 8 2.5 5a3 3 0 0 1 6 0"/><path d="M10.5 13.5 C10.5 9.5 13.5 8 13.5 5a3 3 0 0 0-6 0"/><line x1="8" y1="5" x2="8" y2="13.5"/></svg>`,
+  mail:    `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><path d="M1.5 4.5 L8 9.5 L14.5 4.5"/></svg>`,
+  church:  `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14 V7.5 L8 3.5 L14 7.5 V14"/><rect x="6" y="9" width="4" height="5"/><line x1="8" y1="1" x2="8" y2="4.5"/><line x1="6.5" y1="2.5" x2="9.5" y2="2.5"/></svg>`,
+};
+
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 function _dayOfYear() {
   const now = new Date();
@@ -57,24 +73,200 @@ function _filtered() {
   });
 }
 
+/* ─── Religion label normaliser (mirrors herald) ──────────────────────────── */
+function _relLabel(key) {
+  const map = { islam:'Islam', christianity:'Christianity', hinduism:'Hinduism',
+    buddhism:'Buddhism', ethnic:'Ethnic Religions', nonreligious:'Non-Religious',
+    other:'Other', unknown:'Unknown', jewish:'Judaism', sikh:'Sikhism',
+    spiritist:'Spiritism', bahai:'Baháʼí' };
+  return map[key.toLowerCase()] || key;
+}
+
+/* ─── Full Dossier HTML builder ───────────────────────────────────────────── */
+function _dossierHTML(n) {
+  const xChrist     = n.christianPercent ?? n.percentChristian;
+  const xEvan       = n.evangelicalPercent;
+  const wwlRank     = n.worldWatchListRank != null ? n.worldWatchListRank : null;
+  const perRank     = n.persecutionRank    != null ? n.persecutionRank    : null;
+  const perTier     = n.persecutionTier    || n.persecutionLevel || '';
+  const perLabel    = n.persecutionLabel   || n.persecutionLevel || '';
+  const balRank     = n.restrictionsRank   != null ? n.restrictionsRank   : null;
+  const balSource   = n.restrictionsSource || '';
+  const bsRank      = n.bibleShortageRank  != null ? n.bibleShortageRank  : null;
+  const bsTier      = n.bibleShortageTier  || '';
+  const bsRange     = n.bibleShortageRange || '';
+  const bsNeed      = n.bibleShortageNeed  || '';
+  const bsSource    = n.bibleShortageSource || '';
+  const owSum       = n.owSummary          || '';
+  const owSource    = n.owSource           || '';
+  const owChall     = Array.isArray(n.owPrayerChallenges) ? n.owPrayerChallenges : [];
+  const owAns       = Array.isArray(n.owPrayerAnswers)    ? n.owPrayerAnswers    : [];
+  const profileUrl  = n.jpProfileUrl || n.profileUrl || '';
+  const jpUpdatedAt = n.jpUpdatedAt  || '';
+  const unreached   = n.unreachedGroups  != null ? n.unreachedGroups  : null;
+  const totalGroups = n.totalPeopleGroups != null ? n.totalPeopleGroups : null;
+  const domRel      = n.dominantReligion || '';
+
+  // Religion breakdown — inject Christianity if missing
+  const breakdown = Object.assign({}, n.religionBreakdown || {});
+  if (!('christianity' in breakdown) && xChrist != null && +xChrist > 0) {
+    breakdown.christianity = +xChrist;
+  }
+  const relEntries = Object.entries(breakdown)
+    .filter(e => +e[1] >= 0.1)
+    .sort((a, b) => b[1] - a[1]);
+
+  const relBarsHTML = relEntries.map(e => {
+    const pct = Math.min(+e[1], 100).toFixed(1);
+    return /* html */`
+      <div class="ms-rel-row">
+        <span class="ms-rel-name">${esc(_relLabel(e[0]))}</span>
+        <div class="ms-rel-track"><div class="ms-rel-fill" style="width:${pct}%"></div></div>
+        <span class="ms-rel-pct">${pct}%</span>
+      </div>`;
+  }).join('');
+
+  const prayId = esc(n._id || n.countryName);
+
+  return /* html */`
+    <!-- Stats grid -->
+    <div class="ms-stats-grid">
+      ${n.population      ? `<div class="ms-stat-cell"><div class="ms-stat-val">${_fmtPop(n.population)}</div><div class="ms-stat-lbl">Population</div></div>` : ''}
+      ${n.jpPopulation && n.jpPopulation !== n.population ? `<div class="ms-stat-cell"><div class="ms-stat-val">${_fmtPop(n.jpPopulation)}</div><div class="ms-stat-lbl">JP Population</div></div>` : ''}
+      ${n.unreavedPopulation ? `<div class="ms-stat-cell"><div class="ms-stat-val">${_fmtPop(n.unreavedPopulation)}</div><div class="ms-stat-lbl">Unreached Pop.</div></div>` : ''}
+      ${xChrist != null   ? `<div class="ms-stat-cell"><div class="ms-stat-val">${_pct(xChrist)}</div><div class="ms-stat-lbl">Christian</div></div>` : ''}
+      ${xEvan   != null   ? `<div class="ms-stat-cell"><div class="ms-stat-val">${_pct(xEvan)}</div><div class="ms-stat-lbl">Evangelical</div></div>` : ''}
+      ${unreached != null ? `<div class="ms-stat-cell"><div class="ms-stat-val">${unreached}${totalGroups != null ? ' / ' + totalGroups : ''}</div><div class="ms-stat-lbl">Unreached${totalGroups != null ? ' / Total' : ''} Groups</div></div>` : ''}
+      ${n.gospelAccess    ? `<div class="ms-stat-cell"><div class="ms-stat-val">${esc(n.gospelAccess)}</div><div class="ms-stat-lbl">Gospel Access</div></div>` : ''}
+    </div>
+
+    <!-- Badge row -->
+    <div class="ms-badge-row">
+      ${n.tenFortyWindow ? `<span class="ms-tag ms-tag--window">${I.window} 10/40 Window</span>` : ''}
+      ${perLabel         ? `<span class="ms-tag ms-tag--warn">${I.warn} ${esc(perLabel)}</span>` : ''}
+    </div>
+
+    <!-- World Watch -->
+    ${(wwlRank != null || perRank != null || perTier) ? /* html */`
+      <div class="ms-section">
+        <div class="ms-section-head">${I.shield} World Watch</div>
+        <div class="ms-access-grid">
+          ${wwlRank != null ? `<div class="ms-access-cell"><div class="ms-access-val">#${wwlRank}</div><div class="ms-access-lbl">World Watch Rank</div></div>` : ''}
+          ${perRank != null && perRank !== wwlRank ? `<div class="ms-access-cell"><div class="ms-access-val">#${perRank}</div><div class="ms-access-lbl">Persecution Rank</div></div>` : ''}
+          ${perTier ? `<div class="ms-access-cell"><div class="ms-access-val">${esc(perTier)}</div><div class="ms-access-lbl">Persecution Level</div></div>` : ''}
+        </div>
+        ${perLabel && perLabel !== perTier ? `<p class="ms-note">${esc(perLabel)}</p>` : ''}
+      </div>
+    ` : ''}
+
+    <!-- Religion Breakdown -->
+    ${relEntries.length ? /* html */`
+      <div class="ms-section">
+        <div class="ms-section-head">${I.cross} Religion Breakdown</div>
+        ${domRel ? `<p class="ms-note" style="margin-bottom:8px">Dominant: <strong>${esc(domRel)}</strong></p>` : ''}
+        <div class="ms-rel-list">${relBarsHTML}</div>
+      </div>
+    ` : ''}
+
+    <!-- Bible Access -->
+    ${(balRank != null || bsRank != null || bsTier || bsRange) ? /* html */`
+      <div class="ms-section">
+        <div class="ms-section-head">${I.book} Bible Access</div>
+        <div class="ms-access-grid">
+          ${balRank != null ? `<div class="ms-access-cell"><div class="ms-access-val">#${balRank}</div><div class="ms-access-lbl">BAL Restrictions Rank</div></div>` : ''}
+          ${bsRank  != null ? `<div class="ms-access-cell"><div class="ms-access-val">#${bsRank}</div><div class="ms-access-lbl">Shortage Rank</div></div>` : ''}
+          ${bsTier          ? `<div class="ms-access-cell"><div class="ms-access-val">${esc(bsTier)}</div><div class="ms-access-lbl">Shortage Tier</div></div>` : ''}
+        </div>
+        ${bsRange                         ? `<p class="ms-note">${esc(bsRange)}</p>` : ''}
+        ${bsNeed && bsNeed !== bsRange    ? `<p class="ms-note">${esc(bsNeed)}</p>` : ''}
+        ${balSource || bsSource ? `<p class="ms-source">${[balSource, bsSource].filter((s,i,a) => s && a.indexOf(s) === i).map(esc).join(' · ')}</p>` : ''}
+      </div>
+    ` : ''}
+
+    <!-- Operation World -->
+    ${(owSum || owChall.length) ? /* html */`
+      <div class="ms-section">
+        <div class="ms-section-head">${I.globe} Operation World — Country Overview</div>
+        ${owSum ? `<p class="ms-ow-body">${esc(owSum)}</p>` : ''}
+        ${owChall.length ? /* html */`
+          <p class="ms-sub-head">Prayer Challenges</p>
+          <ol class="ms-list">${owChall.map(c => `<li>${esc(c)}</li>`).join('')}</ol>
+        ` : ''}
+        ${owAns.length ? /* html */`
+          <p class="ms-sub-head">Prayer Answers</p>
+          <ol class="ms-list">${owAns.map(a => `<li>${esc(a)}</li>`).join('')}</ol>
+        ` : ''}
+        ${owSource ? `<p class="ms-source">${esc(owSource)}</p>` : `<p class="ms-source">OperationWorld.org</p>`}
+      </div>
+    ` : ''}
+
+    <!-- Joshua Project -->
+    ${profileUrl ? /* html */`
+      <div class="ms-section ms-section--jp">
+        <a class="ms-jp-link" href="${esc(profileUrl)}" target="_blank" rel="noopener">
+          ${I.compass} View on Joshua Project ↗
+        </a>
+        ${jpUpdatedAt ? `<p class="ms-source">JP data: ${esc(jpUpdatedAt)}</p>` : ''}
+      </div>
+    ` : ''}
+
+    <!-- Pray button -->
+    <button class="ms-pray-btn${_prayCount(prayId) ? ' prayed' : ''}" data-pray-btn data-nation-id="${prayId}">
+      ${I.pray} Pray with Us${_prayCount(prayId) ? ` · ${_prayCount(prayId)}` : ''}
+    </button>
+  `;
+}
+
 /* ─── Render ──────────────────────────────────────────────────────────────── */
 export function render() {
   return /* html */`
     <section class="grow-page" data-grow="missions">
       <style>
-        /* ── Nation of the Day card ── */
-        .ms-focus { background:var(--surface-raised,#fff); border-radius:16px; padding:20px 20px 16px; margin:0 0 24px; box-shadow:0 2px 14px rgba(0,0,0,0.08); border:1.5px solid rgba(5,150,105,.12); }
+        /* ── SVG icons ── */
+        .ms-ico { width:12px; height:12px; flex-shrink:0; display:inline-block; vertical-align:middle; }
+        /* ── Featured nation of the day ── */
+        .ms-focus { background:var(--surface-raised,#fff); border-radius:16px; padding:20px 20px 16px; margin:0 0 24px; box-shadow:0 2px 14px rgba(0,0,0,0.08); border:1.5px solid rgba(5,150,105,.15); }
         .ms-focus-flag { font-size:3rem; line-height:1; display:block; margin-bottom:10px; }
         .ms-focus-name { font:700 1.25rem var(--font-ui); color:var(--ink,#1a1d2e); margin:0 0 2px; }
-        .ms-focus-region { font:0.8rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin:0 0 4px; }
-        .ms-focus-detail { font:0.8rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin:0 0 4px; }
-        .ms-focus-meta { display:flex; flex-wrap:wrap; gap:7px; margin:12px 0 14px; }
-        .ms-stat-pill { background:var(--surface,#f4f5f9); border-radius:20px; padding:4px 12px; font:0.78rem var(--font-ui); color:var(--ink-sub,#4a4f68); }
-        .ms-stat-pill--warn { background:rgba(234,88,12,.08); color:#c2410c; }
-        .ms-prayer-box { background:linear-gradient(135deg,rgba(5,150,105,.07),rgba(5,150,105,.02)); border-left:3px solid #059669; border-radius:0 10px 10px 0; padding:12px 14px; font:0.87rem/1.65 var(--font-body,sans-serif); color:var(--ink,#1a1d2e); margin:0 0 16px; }
-        .ms-prayer-label { font:600 0.7rem var(--font-ui); letter-spacing:.07em; text-transform:uppercase; color:#059669; margin:0 0 6px; }
-        .ms-pray-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; background:#059669; color:#fff; border:none; border-radius:20px; font:600 0.83rem var(--font-ui); cursor:pointer; transition:background .15s; }
+        .ms-focus-region { font:0.8rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin:0 0 14px; }
+        /* ── Dossier shared components ── */
+        .ms-stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:7px; margin:0 0 10px; }
+        .ms-stat-cell { background:var(--surface,#f4f5f9); border-radius:8px; padding:8px 10px; text-align:center; }
+        .ms-stat-val { font:700 1rem var(--font-ui); color:var(--ink,#1a1d2e); line-height:1.2; }
+        .ms-stat-lbl { font:0.66rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin-top:2px; }
+        .ms-badge-row { display:flex; flex-wrap:wrap; gap:6px; margin:0 0 12px; }
+        .ms-tag { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font:600 0.7rem var(--font-ui); letter-spacing:.04em; }
+        .ms-tag--window { background:rgba(99,102,241,.1); color:#4338ca; }
+        .ms-tag--window .ms-ico { color:#4338ca; }
+        .ms-tag--warn { background:rgba(220,38,38,.08); color:#b91c1c; }
+        .ms-tag--warn .ms-ico { color:#b91c1c; }
+        .ms-section { margin:0 0 12px; padding:10px 13px; background:var(--surface,#f4f5f9); border-radius:10px; }
+        .ms-section--jp { background:none; padding:6px 0 0; }
+        .ms-section-head { display:flex; align-items:center; gap:5px; font:700 0.68rem var(--font-ui); letter-spacing:.12em; text-transform:uppercase; color:#059669; border-bottom:1px solid var(--line,#e5e7ef); padding-bottom:7px; margin-bottom:9px; }
+        .ms-section-head .ms-ico { color:#059669; }
+        .ms-access-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(95px,1fr)); gap:6px; margin-bottom:6px; }
+        .ms-access-cell { background:var(--surface-raised,#fff); border-radius:6px; padding:6px 8px; text-align:center; }
+        .ms-access-val { font:700 0.88rem var(--font-ui); color:var(--ink,#1a1d2e); }
+        .ms-access-lbl { font:0.63rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin-top:1px; }
+        .ms-rel-list { display:flex; flex-direction:column; gap:5px; }
+        .ms-rel-row { display:grid; grid-template-columns:90px 1fr 42px; align-items:center; gap:6px; }
+        .ms-rel-name { font:0.78rem var(--font-ui); color:var(--ink,#1a1d2e); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .ms-rel-track { background:rgba(0,0,0,0.08); border-radius:4px; height:6px; overflow:hidden; }
+        .ms-rel-fill { height:100%; background:#059669; border-radius:4px; }
+        .ms-rel-pct { font:700 0.72rem var(--font-ui); color:var(--ink-sub,#4a4f68); text-align:right; }
+        .ms-ow-body { font:0.86rem/1.7 var(--font-body,serif); color:var(--ink,#1a1d2e); margin:0 0 8px; text-align:justify; hyphens:auto; }
+        .ms-sub-head { font:700 0.68rem var(--font-ui); letter-spacing:.08em; text-transform:uppercase; color:var(--ink-muted,#7a7f96); margin:8px 0 4px; }
+        .ms-list { padding-left:1.2rem; font:0.83rem/1.6 var(--font-body,serif); color:var(--ink,#1a1d2e); }
+        .ms-list li { margin-bottom:3px; }
+        .ms-note { font:0.78rem var(--font-ui); color:var(--ink-sub,#4a4f68); margin:3px 0; }
+        .ms-source { font:0.68rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin:5px 0 0; }
+        .ms-jp-link { display:inline-flex; align-items:center; gap:5px; font:600 0.83rem var(--font-ui); color:#059669; text-decoration:none; }
+        .ms-jp-link:hover { text-decoration:underline; }
+        .ms-jp-link .ms-ico { color:#059669; }
+        .ms-pray-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; background:#059669; color:#fff; border:none; border-radius:20px; font:600 0.83rem var(--font-ui); cursor:pointer; transition:background .15s; margin-top:12px; }
         .ms-pray-btn:hover { background:#047857; }
+        .ms-pray-btn.prayed { background:#047857; }
+        .ms-pray-btn .ms-ico { color:#fff; }
         /* ── Filters ── */
         .ms-filters { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 14px; }
         .ms-search { flex:1; min-width:160px; padding:9px 14px; border:1.5px solid var(--line,#e5e7ef); border-radius:10px; font:0.88rem var(--font-ui); background:var(--surface-raised,#fff); color:var(--ink,#1a1d2e); }
@@ -83,10 +275,10 @@ export function render() {
         .ms-filter-btn.is-active { background:#059669; color:#fff; border-color:#059669; }
         /* ── Nations grid ── */
         .ms-count { font:0.78rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin:0 0 10px; }
-        .ms-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px; }
+        .ms-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; align-items:start; }
         .ms-card { background:var(--surface-raised,#fff); border-radius:12px; border:1.5px solid var(--line,#e5e7ef); padding:14px 16px; cursor:pointer; transition:box-shadow .15s,border-color .15s; text-align:left; width:100%; }
         .ms-card:hover { box-shadow:0 4px 18px rgba(0,0,0,0.09); border-color:#059669; }
-        .ms-card.is-open { border-color:#059669; box-shadow:0 2px 12px rgba(5,150,105,.12); }
+        .ms-card.is-open { border-color:#059669; box-shadow:0 2px 16px rgba(5,150,105,.14); grid-column:1/-1; cursor:default; }
         .ms-card-flag { font-size:1.7rem; display:block; margin-bottom:6px; }
         .ms-card-name { font:600 0.93rem var(--font-ui); color:var(--ink,#1a1d2e); margin:0 0 2px; }
         .ms-card-region { font:0.73rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin:0 0 8px; }
@@ -97,21 +289,17 @@ export function render() {
         .ms-badge--partial { background:#fef3c7; color:#92400e; }
         .ms-badge--limited { background:#fee2e2; color:#991b1b; }
         .ms-badge--hostile { background:#1f2937; color:#f9fafb; }
-        /* ── Expanded panel ── */
-        .ms-expand { margin-top:12px; padding-top:12px; border-top:1px solid var(--line,#e5e7ef); display:none; }
+        .ms-stat-pill { background:var(--surface,#f4f5f9); border-radius:20px; padding:2px 8px; font:0.7rem var(--font-ui); color:var(--ink-sub,#4a4f68); }
+        /* ── Expanded dossier panel ── */
+        .ms-expand { margin-top:14px; padding-top:14px; border-top:1px solid var(--line,#e5e7ef); display:none; }
         .ms-card.is-open .ms-expand { display:block; }
-        .ms-expand-stat { font:0.83rem/1.5 var(--font-ui); color:var(--ink-sub,#4a4f68); margin:0 0 5px; }
-        .ms-expand-prayer { font:0.82rem/1.6 var(--font-body,sans-serif); color:var(--ink,#1a1d2e); margin:8px 0 12px; }
-        .ms-expand-pray-btn { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; background:#059669; color:#fff; border:none; border-radius:16px; font:600 0.78rem var(--font-ui); cursor:pointer; transition:background .15s; }
-        .ms-expand-pray-btn:hover { background:#047857; }
-        .ms-expand-pray-btn.prayed { background:#047857; }
-        /* ── Prayer CTA (single, before nations grid) ── */
+        /* ── Prayer CTA ── */
         .ms-prayer-cta { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; background:linear-gradient(135deg,rgba(5,150,105,.08),rgba(5,150,105,.02)); border:1.5px solid rgba(5,150,105,.25); border-radius:14px; padding:16px 20px; margin:0 0 22px; }
         .ms-prayer-cta-text { font:0.88rem/1.5 var(--font-ui); color:var(--ink,#1a1d2e); }
         .ms-prayer-cta-text strong { display:block; font-size:0.95rem; margin-bottom:2px; }
         .ms-prayer-cta-btn { display:inline-flex; align-items:center; gap:6px; padding:9px 20px; background:#059669; color:#fff; border:none; border-radius:20px; font:700 0.85rem var(--font-ui); cursor:pointer; white-space:nowrap; transition:background .15s; flex-shrink:0; }
         .ms-prayer-cta-btn:hover { background:#047857; }
-
+        .ms-prayer-cta-btn .ms-ico { color:#fff; }
       </style>
       <header class="grow-hero" style="--grow-accent:${accent}">
         <div class="grow-hero-icon">${icon}</div>
@@ -156,10 +344,7 @@ async function _load(root) {
 
 /* ─── Paint ───────────────────────────────────────────────────────────────── */
 function _paint(view) {
-  // Rotate featured nation by day of year
   const featured = _state.nations[_dayOfYear() % _state.nations.length];
-  const prayer   = (featured.owPrayerChallenges || [])[0] || '';
-  const evPct    = _pct(featured.evangelicalPercent);
 
   view.innerHTML = /* html */`
     <div class="grow-section-head">
@@ -169,26 +354,8 @@ function _paint(view) {
     <div class="ms-focus">
       <span class="ms-focus-flag">${featured.icon || '🌍'}</span>
       <h2 class="ms-focus-name">${esc(featured.countryName)}</h2>
-      <p class="ms-focus-region">${esc(featured.region || '')}</p>
-      ${featured.capital ? `<p class="ms-focus-detail">📍 ${esc(featured.capital)}</p>` : ''}
-      ${featured.population ? `<p class="ms-focus-detail">👥 Pop. ${_fmtPop(featured.population)}</p>` : ''}
-      <div class="ms-focus-meta">
-        ${featured.gospelAccess ? `<span class="ms-badge ${_accessClass(featured.gospelAccess)}">${esc(featured.gospelAccess)} Access</span>` : ''}
-        ${evPct ? `<span class="ms-stat-pill">⛪ ${evPct} Evangelical</span>` : ''}
-        ${_pct(featured.christianPercent) ? `<span class="ms-stat-pill">✝️ ${_pct(featured.christianPercent)} Christian</span>` : ''}
-        ${featured.unreachedGroups != null ? `<span class="ms-stat-pill">👥 ${featured.unreachedGroups} unreached groups</span>` : ''}
-        ${featured.tenFortyWindow ? `<span class="ms-stat-pill">🕊 10/40 Window</span>` : ''}
-        ${featured.persecutionLabel ? `<span class="ms-stat-pill ms-stat-pill--warn">⚠️ ${esc(featured.persecutionLabel)}</span>` : ''}
-      </div>
-      ${prayer ? /* html */`
-        <div class="ms-prayer-box">
-          <div class="ms-prayer-label">Today's Prayer Point</div>
-          ${esc(prayer)}
-        </div>
-      ` : ''}
-      <button class="ms-pray-btn" data-pray-btn data-nation-id="${esc(featured._id || featured.countryName)}">
-        🙏 Pray with Us${_prayCount(featured._id || featured.countryName) ? ` · ${_prayCount(featured._id || featured.countryName)}` : ''}
-      </button>
+      <p class="ms-focus-region">${esc(featured.region || '')}${featured.capital ? ` · ${I.pin} ${esc(featured.capital)}` : ''}</p>
+      ${_dossierHTML(featured)}
     </div>
 
     <div class="grow-section-head">
@@ -200,7 +367,7 @@ function _paint(view) {
         <strong>Need prayer or want to connect?</strong>
         Share a request — a shepherd will follow up with you personally.
       </div>
-      <button class="ms-prayer-cta-btn" data-help-btn>✉️ Send a Prayer Request</button>
+      <button class="ms-prayer-cta-btn" data-help-btn>${I.mail} Send a Prayer Request</button>
     </div>
 
     <div class="ms-filters">
@@ -217,24 +384,19 @@ function _paint(view) {
   _renderGrid(view);
   _wireControls(view);
 
-  /* Attach prayer summary so the public prayer hook has meaningful context */
   const prayerBtn = view.querySelector('[data-help-btn]');
   if (prayerBtn) {
     prayerBtn._prayerSummaryFn = () => {
-      const featured = _state.nations[0];
-      const region   = featured?.region  || '';
-      const name     = featured?.countryName || '';
-      const prayer   = (featured?.owPrayerChallenges || [])[0] || '';
-      const lines    = ['I\'m reading about World Missions and have a prayer request.'];
-      if (name)   lines.push(`Featured nation: ${name}${region ? ' (' + region + ')' : ''}.`);
-      if (prayer) lines.push(`Today\'s prayer point: ${prayer}`);
+      const f      = _state.nations[0];
+      const lines  = ['I\'m reading about World Missions and have a prayer request.'];
+      if (f?.countryName) lines.push(`Featured nation: ${f.countryName}${f.region ? ' (' + f.region + ')' : ''}.`);
+      const p = (f?.owPrayerChallenges || [])[0] || '';
+      if (p) lines.push(`Today's prayer point: ${p}`);
       lines.push('\nI\'d love to connect with a pastor about missions, outreach, or prayer.');
       return lines.join('\n');
     };
   }
 }
-
-/* _injectJpWidget removed — widget now uses a static <iframe> in _paint() HTML */
 
 /* ─── Grid ────────────────────────────────────────────────────────────────── */
 function _renderGrid(view) {
@@ -253,7 +415,6 @@ function _renderGrid(view) {
     </div>
   `;
 
-  // Toggle expand on card click (ignore clicks on the pray button)
   gridEl.querySelectorAll('.ms-card').forEach(card => {
     const _toggle = () => {
       const id = card.dataset.id;
@@ -261,16 +422,18 @@ function _renderGrid(view) {
       gridEl.querySelectorAll('.ms-card').forEach(c =>
         c.classList.toggle('is-open', c.dataset.id === _state.openId)
       );
+      if (_state.openId === id) {
+        setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+      }
     };
-    card.addEventListener('click', (e) => { if (!e.target.closest('[data-pray-btn]')) _toggle(); });
+    card.addEventListener('click', (e) => { if (!e.target.closest('[data-pray-btn]') && !e.target.closest('a')) _toggle(); });
     card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); _toggle(); } });
   });
 }
 
 function _cardHTML(n) {
-  const evPct   = _pct(n.evangelicalPercent);
-  const prayer  = (n.owPrayerChallenges || [])[0] || '';
-  const isOpen  = _state.openId === (n._id || n.countryName);
+  const evPct  = _pct(n.evangelicalPercent);
+  const isOpen = _state.openId === (n._id || n.countryName);
 
   return /* html */`
     <div class="ms-card${isOpen ? ' is-open' : ''}" data-id="${esc(n._id || n.countryName)}" role="button" tabindex="0">
@@ -279,22 +442,10 @@ function _cardHTML(n) {
       <div class="ms-card-region">${esc(n.region || '')}</div>
       <div class="ms-card-row">
         ${n.gospelAccess ? `<span class="ms-badge ${_accessClass(n.gospelAccess)}">${esc(n.gospelAccess)}</span>` : ''}
-        ${evPct ? `<span class="ms-stat-pill" style="font-size:.7rem;padding:2px 8px;">${evPct} Evangelical</span>` : ''}
+        ${evPct ? `<span class="ms-stat-pill">${evPct} Evangelical</span>` : ''}
       </div>
       <div class="ms-expand">
-        ${n.capital    ? `<p class="ms-expand-stat">📍 Capital: ${esc(n.capital)}</p>` : ''}
-        ${n.population ? `<p class="ms-expand-stat">👥 Pop. ${_fmtPop(n.population)}</p>` : ''}
-        ${_pct(n.christianPercent) ? `<p class="ms-expand-stat">✝️ ${_pct(n.christianPercent)} Christian</p>` : ''}
-        ${n.persecutionLabel ? `<p class="ms-expand-stat">⚠️ ${esc(n.persecutionLabel)}</p>` : ''}
-        ${n.unreachedGroups != null ? `<p class="ms-expand-stat"><strong>${n.unreachedGroups}</strong> unreached people group${n.unreachedGroups !== 1 ? 's' : ''}${n.totalPeopleGroups ? ` of ${n.totalPeopleGroups} total` : ''}</p>` : ''}
-        ${n.tenFortyWindow ? `<p class="ms-expand-stat" style="color:#059669;">🕊 In the 10/40 Window</p>` : ''}
-        ${prayer ? /* html */`
-          <div class="ms-prayer-label" style="margin-top:10px;">Prayer Point</div>
-          <p class="ms-expand-prayer">${esc(prayer)}</p>
-        ` : ''}
-        <button class="ms-expand-pray-btn${_prayCount(n._id || n.countryName) ? ' prayed' : ''}" data-pray-btn data-nation-id="${esc(n._id || n.countryName)}">
-          🙏 Pray with Us${_prayCount(n._id || n.countryName) ? ` · ${_prayCount(n._id || n.countryName)}` : ''}
-        </button>
+        ${_dossierHTML(n)}
       </div>
     </div>
   `;
@@ -312,13 +463,11 @@ function _prayBump(id) {
 
 /* ─── Controls ────────────────────────────────────────────────────────────── */
 function _wireControls(view) {
-  // Search
   view.querySelector('[data-bind="search"]').addEventListener('input', function () {
     _state.query = this.value;
     _renderGrid(view);
   });
 
-  // Filter buttons
   view.querySelectorAll('[data-filter]').forEach(btn => {
     btn.addEventListener('click', () => {
       _state.filter = btn.dataset.filter;
@@ -329,15 +478,12 @@ function _wireControls(view) {
     });
   });
 
-  // Delegated pray-counter (all [data-pray-btn] anywhere in view)
   view.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-pray-btn]');
     if (!btn) return;
-    const id = btn.dataset.nationId;
+    const id    = btn.dataset.nationId;
     const count = _prayBump(id);
-    btn.textContent = `🙏 Pray with Us · ${count}`;
+    btn.innerHTML = `${I.pray} Pray with Us · ${count}`;
     btn.classList.add('prayed');
   });
 }
-
-
