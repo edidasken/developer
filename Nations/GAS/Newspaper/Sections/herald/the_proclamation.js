@@ -80,10 +80,10 @@
 
   // ── Main column panel builders (return HTML strings) ─────────────────────────
 
-  /** Lead story: today's Psalm + church name as front-page banner */
+  /** Lead story: today's Psalm as front-page banner with scripture pull quote */
   async function buildLeadStory(cfg) {
-    const now      = new Date();
-    const dateStr  = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    const now       = new Date();
+    const dateStr   = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
     const shortDate = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
     let churchName = 'The Flock';
@@ -95,7 +95,7 @@
       }
     } catch (_) {}
 
-    let psalmRef = '', psalmTitle = '';
+    let psalmRef = '', psalmTitle = '', psalmSummary = '';
     try {
       const { default: psalms } = await import('../../Data/psalms.js');
       if (psalms && psalms.byNumber) {
@@ -103,32 +103,44 @@
         const override = cfg.devotionalIndex != null ? cfg.devotionalIndex : null;
         const entry = all[idx(override != null ? override : dayIndex(), all.length)];
         if (entry) {
-          psalmRef   = `Psalm ${entry.display || entry.number}`;
-          psalmTitle = entry.title || '';
+          psalmRef    = `Psalm ${entry.display || entry.number}`;
+          psalmTitle  = entry.title || '';
+          psalmSummary = entry.summary || '';
           _drawers['front-page'] = `
             <p class="story-kicker">DAILY SCRIPTURE · ${esc(shortDate)}</p>
             <h2 style="font-family:'Lora',Georgia,serif;font-size:1.375rem;line-height:1.25;margin:0.5rem 0 0.25rem">${esc(psalmRef)}</h2>
             ${psalmTitle ? `<p style="font-family:'Lora',Georgia,serif;font-style:italic;color:var(--ink-muted);font-size:1rem;margin:0 0 1rem">${esc(psalmTitle)}</p>` : ''}
-            ${entry.summary ? `<p style="line-height:1.75;color:var(--ink)">${esc(entry.summary)}</p>` : ''}`;
+            ${psalmSummary ? `<p style="line-height:1.75;color:var(--ink)">${esc(psalmSummary)}</p>` : ''}`;
         }
       }
     } catch (_) {}
 
     const hed  = psalmTitle || psalmRef || `The Flock Herald — ${shortDate}`;
     const deck = psalmRef
-      ? `${psalmRef}${psalmTitle ? ' — ' + psalmTitle : ''}`
+      ? `${psalmRef}${psalmTitle ? ' \u2014 ' + psalmTitle : ''}`
       : 'Shepherding the flock by the power of the Word.';
 
-    return _story({
-      category:  'THE FLOCK HERALD',
-      section:   dateStr.toUpperCase(),
-      hed,
-      deck,
-      byline:    `${esc(churchName)} · ${esc(shortDate)}`,
-      bodyHtml:  'Shepherding the flock by the power of the Word. May this edition equip you for the day ahead.',
-      isLead:    true,
-      drawer:    _drawers['front-page'] ? 'front-page' : null,
-    });
+    // Scripture pull-quote block (uses existing .herald-scripture styles in herald.css)
+    const scriptureBlock = psalmRef
+      ? `<div class="herald-scripture">
+          <p class="herald-scripture__ref">${esc(psalmRef)}</p>
+          ${psalmTitle ? `<p class="herald-scripture__title">${esc(psalmTitle)}</p>` : ''}
+         </div>`
+      : '';
+
+    const hedInner = _drawers['front-page']
+      ? `<button class="story-hed-btn" type="button" data-open-drawer="front-page">${esc(hed)}</button>`
+      : `<span class="story-hed-btn" style="cursor:default;pointer-events:none">${esc(hed)}</span>`;
+
+    return `<article class="story story--lead">
+      <p class="story-kicker">THE FLOCK HERALD \u00b7\u00a0${esc(dateStr.toUpperCase())}</p>
+      <h2 class="story-hed">${hedInner}</h2>
+      <p class="story-deck">${esc(deck)}</p>
+      <p class="story-byline">${esc(churchName)} \u00b7 ${esc(shortDate)}</p>
+      <p class="story-body story-body--lead story-dropcap">Today the flock gathers around the living Word. May God's truth shepherd your steps, strengthen your hands, and fill your heart with his peace as you read this edition.</p>
+      ${scriptureBlock}
+      <hr class="story-rule">
+    </article>`;
   }
 
   /** § 1 — Today's Readings (One Year Bible) */

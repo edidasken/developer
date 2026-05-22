@@ -32,15 +32,30 @@
 </head>
 <body class="broadsheet-page sec-herald">
 
-  <!-- Masthead -->
+  <!-- Masthead — newspaper nameplate -->
   <header class="sec-masthead" role="banner">
-    <div class="sec-masthead__inner">
-      <div>
-        <h1 class="sec-masthead__title">The Flock Herald</h1>
-        <p class="sec-masthead__subtitle" id="herald-date">Loading…</p>
-      </div>
-      <button class="sec-masthead__font-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
+
+    <!-- Folio row: church label · date · Aa -->
+    <div class="herald-folio">
+      <span class="herald-folio__label">The Flock</span>
+      <span class="herald-folio__date" id="herald-date">Loading…</span>
+      <span class="herald-folio__btn">
+        <button class="sec-masthead__font-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
+      </span>
     </div>
+
+    <!-- Double rule -->
+    <div class="herald-nameplate-rule" aria-hidden="true"></div>
+
+    <!-- Nameplate -->
+    <div class="herald-nameplate">
+      <h1 class="herald-nameplate__title">The Flock Herald</h1>
+      <p class="herald-nameplate__tagline">Shepherding the Flock by the Power of the Word</p>
+    </div>
+
+    <!-- Closing rule -->
+    <div class="herald-masthead-rule" aria-hidden="true"></div>
+
     <!-- Section Nav Bar -->
     <nav class="sec-nav-bar" role="navigation" aria-label="Herald sections" id="sec-nav">
       <!-- Tabs injected by the_gates.js -->

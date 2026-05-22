@@ -6,16 +6,96 @@
 
 /* Section color + story accent binding */
 .sec-herald {
-  --sec-color:      var(--gold);
-  --sec-color-soft: var(--gold-soft);
-  --story-accent:   var(--gold);
+  --sec-color:        var(--gold);
+  --sec-color-soft:   var(--gold-soft);
+  --story-accent:     var(--gold);
   --sec-heading-font: 'Lora', Georgia, serif;
   --sec-body-font:    'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
-/* 3px top accent stripe on section masthead */
+/* ── Herald Newspaper Nameplate ─────────────────────────────────────────────
+   Replace the generic sec-masthead with a proper broadsheet nameplate:
+   Folio row → double rule → centered Lora italic title → tagline → rule → nav
+   ─────────────────────────────────────────────────────────────────────────── */
 .sec-herald .sec-masthead {
-  border-top: 3px solid var(--gold);
+  border-top: none;     /* nameplate uses its own top gold rule below */
+  background: var(--paper-card);
+  border-bottom: none;  /* .sec-nav-bar has its own bottom border */
+  padding: max(0.75rem, var(--safe-top)) max(1.25rem, var(--safe-right)) 0 max(1.25rem, var(--safe-left));
+  text-align: center;
+}
+
+/* Hide the generic inner layout — nameplate replaces it */
+.sec-herald .sec-masthead__inner { display: none; }
+
+/* Folio row: church/edition label · date · Aa button */
+.herald-folio {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--ink-muted);
+  padding-bottom: 0.5rem;
+}
+.herald-folio__label { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.herald-folio__date  { text-align: center; }
+.herald-folio__btn   { text-align: right; display: flex; justify-content: flex-end; }
+
+/* Double rule: gold accent line above nameplate */
+.herald-nameplate-rule {
+  border: none;
+  border-top: 5px double var(--gold);
+  margin: 0;
+}
+
+/* Nameplate: large italic Lora title */
+.herald-nameplate {
+  padding: 0.5rem 0 0.375rem;
+}
+.herald-nameplate__title {
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(2rem, 8vw, 3.75rem);
+  font-weight: 700;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.0;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.herald-nameplate__tagline {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink-muted);
+  margin: 0.375rem 0 0;
+}
+
+/* Thin rule between nameplate and nav bar */
+.herald-masthead-rule {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 0.375rem 0 0;
+}
+
+/* Override sec-masthead font-btn when used standalone in folio */
+.herald-folio .sec-masthead__font-btn {
+  font-size: 0.6875rem;
+  padding: 0 0.5rem;
+  height: 1.75rem;
+  min-width: 36px;
+}
+
+/* ── Column separator (desktop only) ───────────────────────────────────────── */
+@media (min-width: 861px) {
+  .sec-herald .broadsheet-col--aside {
+    border-left: 1px solid var(--rule);
+    padding-left: 1.75rem;
+  }
 }
 
 /* ── Front Page panel ──────────────────────────────────────────────────────── */
