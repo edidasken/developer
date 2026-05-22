@@ -785,6 +785,7 @@ hr, .broadsheet-rule {
   color: var(--ink-muted);
   white-space: nowrap;
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  text-align: center;
 }
 
 /* ── Broadsheet skeleton loading ──────────────────────────────────────────── */
