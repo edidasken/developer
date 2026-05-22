@@ -761,6 +761,26 @@ hr, .broadsheet-rule {
 }
 .story:last-child .story-rule { display: none; }
 
+/* ── Read more strip (rule + arrow, shown when story opens a drawer) ───────── */
+.story-readmore-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.625rem;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+.story-readmore-strip__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.3;
+}
+
 /* ── Read more ────────────────────────────────────────────────────────────── */
 .story-readmore { margin: 0; }
 .story-readmore-btn {

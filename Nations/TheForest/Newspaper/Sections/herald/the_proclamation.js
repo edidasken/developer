@@ -74,6 +74,7 @@
       ${opts.deck   ? `<p class="story-deck">${esc(opts.deck)}</p>` : ''}
       ${opts.byline ? `<p class="story-byline">${esc(opts.byline)}</p>` : ''}
       ${opts.bodyHtml ? `<div class="story-body${bodyCls}">${opts.bodyHtml}</div>` : ''}
+      ${opts.drawer ? `<p class="story-readmore-strip"><span>Read more</span><span class="story-readmore-strip__rule"></span><span>&#8594;</span></p>` : ''}
       <hr class="story-rule">
     </article>`;
   }
