@@ -241,10 +241,21 @@
       entry.pr ? _oybRow('Proverbs',      entry.pr, 'pr') : '',
     ].filter(Boolean).join('');
 
-    _drawers['oyb'] = `
-      <p class="story-kicker">§\u00a01 · DAILY READINGS · ONE YEAR BIBLE</p>
-      <h2 style="font-family:'Lora',Georgia,serif;font-size:1.25rem;margin:0.5rem 0 1rem">Today's Readings</h2>
-      <dl class="oyb-list">${rows}</dl>`;
+    _drawers['oyb'] = `<div class="drawer-article">
+      <div class="dwr-head">
+        <div class="dwr-chip" style="--chip:#2B4C8C">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+          </svg>
+        </div>
+        <div class="dwr-head__meta">
+          <p class="drawer-article__kicker">§\u00a01 · ONE YEAR BIBLE</p>
+          <h2 class="drawer-article__hed">Today\u2019s Readings</h2>
+        </div>
+      </div>
+      <dl class="oyb-list">${rows}</dl>
+    </div>`;
 
     const SPURGEON_QUOTES = [
       '\u201cA Bible that\u2019s falling apart usually belongs to someone who isn\u2019t.\u201d',
@@ -314,14 +325,25 @@
            </li>`).join('')}</ul>`
       : '';
 
-    _drawers['announcements'] = `
-      <p class="story-kicker">§\u00a02 · FROM THE CHURCH · ANNOUNCEMENTS</p>
-      <ul class="announcement-list" style="margin-top:1rem">${items.map(item =>
+    _drawers['announcements'] = `<div class="drawer-article">
+      <div class="dwr-head">
+        <div class="dwr-chip" style="--chip:#5B3B8C">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 11l19-9-9 19-2-8-8-2z"/>
+          </svg>
+        </div>
+        <div class="dwr-head__meta">
+          <p class="drawer-article__kicker">§\u00a02 · FROM THE CHURCH</p>
+          <h2 class="drawer-article__hed">Announcements</h2>
+        </div>
+      </div>
+      <ul class="announcement-list">${items.map(item =>
         `<li class="announcement-item">
           <p class="announcement-title">${esc(item.title || item.subject || 'Announcement')}</p>
           ${item.body ? `<p class="announcement-body">${esc(item.body)}</p>` : ''}
           ${item.date ? `<p class="announcement-date">${esc(item.date)}</p>` : ''}
-         </li>`).join('')}</ul>`;
+         </li>`).join('')}</ul>
+    </div>`;
 
     return _story({
       num:      2,
@@ -356,12 +378,27 @@
     const text    = prayer.request || prayer.body || prayer.content || '';
     const dateStr = prayer.createdAt ? _fmtDate(prayer.createdAt) : '';
 
-    _drawers['prayer'] = `
-      <p class="story-kicker">§\u00a03 · THE PRAYER WALL · SPOTLIGHT</p>
-      <h2 style="font-family:'Lora',Georgia,serif;font-size:1.25rem;margin:0.5rem 0">${esc(name)}</h2>
-      ${dateStr ? `<p style="font-size:0.75rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:0.05em;margin:0 0 0.75rem">Submitted ${esc(dateStr)}</p>` : ''}
-      ${text ? `<p class="prayer-text">"${esc(text)}"</p>` : ''}
-      <button class="prayer-pray-btn btn btn--ghost" type="button" id="drawer-pray-btn" style="margin-top:0.5rem">🙏 Pray for this</button>`;
+    _drawers['prayer'] = `<div class="drawer-article">
+      <div class="dwr-head">
+        <div class="dwr-chip" style="--chip:#16a34a">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 3a3 3 0 0 0-3 3l-4 9-4-9a3 3 0 1 0-2.7 4.3L9 20h6l4.7-9.7A3 3 0 0 0 18 3z"/>
+          </svg>
+        </div>
+        <div class="dwr-head__meta">
+          <p class="drawer-article__kicker">§\u00a03 · PRAYER WALL · SPOTLIGHT</p>
+          <h2 class="drawer-article__hed">${esc(name)}</h2>
+          ${dateStr ? `<p class="drawer-article__theme">Submitted ${esc(dateStr)}</p>` : ''}
+        </div>
+      </div>
+      ${text ? `<blockquote class="drawer-article__scripture">
+        <span class="drawer-article__scripture-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1.1rem;height:1.1rem"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </span>
+        <span>\u201c${esc(text)}\u201d</span>
+      </blockquote>` : ''}
+      <button class="prayer-pray-btn btn btn--ghost" type="button" id="drawer-pray-btn">\u{1F64F} Pray for this</button>
+    </div>`;
 
     const deckText = text ? `"${text.slice(0, 100)}${text.length > 100 ? '…' : ''}"` : 'A request from your church family.';
 
@@ -563,16 +600,24 @@
     // Build location line: capital · region / continent
     const locationParts = [capital, region, (continent && continent !== region) ? continent : ''].filter(Boolean);
 
-    _drawers['nation'] = `<div class="nation-dossier">
-      <p class="story-kicker">§\u00a04 · NATION OF THE DAY · MISSIONS</p>
-
-      <div class="nation-dossier__header">
-        <h2 class="nation-dossier__title">${esc(nationName)}</h2>
+    _drawers['nation'] = `<div class="drawer-article"><div class="nation-dossier">
+      <div class="dwr-head">
+        <div class="dwr-chip" style="--chip:#8B7028">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+        </div>
+        <div class="dwr-head__meta">
+          <p class="drawer-article__kicker">§\u00a04 · NATION OF THE DAY · MISSIONS</p>
+        <h2 class="drawer-article__hed">${esc(nationName)}</h2>
         ${locationParts.length ? `<p class="nation-dossier__meta">${locationParts.map(esc).join(' · ')}</p>` : ''}
         <div class="nation-dossier__badges">
           ${in1040 ? `<span class="nation-badge nation-badge--1040">10/40 Window</span>` : ''}
-          ${perLabel ? `<span class="nation-badge nation-badge--persecution" style="--per-color:${persecutionColor}">⚠ ${esc(perLabel)}</span>` : ''}
+          ${perLabel ? `<span class="nation-badge nation-badge--persecution" style="--per-color:${persecutionColor}">\u26a0 ${esc(perLabel)}</span>` : ''}
         </div>
+      </div>
       </div>
 
       <div class="nation-stats-grid">
@@ -635,7 +680,7 @@
 
       ${profileUrl ? `<a class="nation-jp-link" href="${esc(profileUrl)}" target="_blank" rel="noopener noreferrer">View on Joshua Project ↗</a>` : ''}
       ${jpUpdatedAt ? `<p class="nation-data-source" style="margin-top:0.75rem">JP data: ${esc(jpUpdatedAt)}</p>` : ''}
-    </div>`;
+    </div></div>`;
 
     // ── Build aside card HTML ───────────────────────────────────────────────
     const cardStats = [
@@ -683,11 +728,33 @@
     const verse    = question['Verse Reference'] || question.verseReference || '';
     const rx       = question['Prescription']    || question.prescription   || '';
 
-    _drawers['heart'] = `
-      <p class="story-kicker">§\u00a05 · HEART CHECK · DAILY SELF-INVENTORY</p>
-      <h2 style="font-family:'Lora',Georgia,serif;font-size:1.125rem;line-height:1.4;margin:0.5rem 0">${esc(qText)}</h2>
-      ${verse ? `<p class="heart-verse">— ${esc(verse)}</p>` : ''}
-      ${rx ? `<p style="font-size:0.9375rem;line-height:1.7;color:var(--ink-muted);margin-top:0.75rem">${esc(rx)}</p>` : ''}`;
+    _drawers['heart'] = `<div class="drawer-article">
+      <div class="dwr-head">
+        <div class="dwr-chip" style="--chip:#dc2626">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </div>
+        <div class="dwr-head__meta">
+          <p class="drawer-article__kicker">§\u00a05 · HEART CHECK</p>
+          ${category ? `<p class="drawer-article__theme">${esc(category)}</p>` : ''}
+          <h2 class="drawer-article__hed">${esc(qText)}</h2>
+        </div>
+      </div>
+      ${verse ? `<blockquote class="drawer-article__scripture">
+        <span class="drawer-article__scripture-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1.1rem;height:1.1rem"><line x1="12" y1="2" x2="12" y2="22"/><line x1="5" y1="9" x2="19" y2="9"/></svg>
+        </span>
+        <span>\u2014 ${esc(verse)}</span>
+      </blockquote>` : ''}
+      ${rx ? `<div class="drawer-article__prayer">
+        <span class="drawer-article__prayer-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="herald-devo-icon"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          Prescription
+        </span>
+        <p>${esc(rx)}</p>
+      </div>` : ''}
+    </div>`;
 
     return `<div class="section-rule"><span class="section-label">§\u00a05 · HEART CHECK</span></div>
       <article class="story">

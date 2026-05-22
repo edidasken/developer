@@ -856,6 +856,40 @@ details.heart-rx[open] .heart-rx__toggle::before { content: '▾ '; }
   font-style: italic;
 }
 
+/* ── Drawer Icon-Chip Header Row ────────────────────────────────────────────
+   Shared across all Herald drawer types: OYB, Announcements, Prayer, Nation,
+   Heart Check. Each gets a colored chip + meta column (kicker / theme / hed).
+   ─────────────────────────────────────────────────────────────────────────── */
+.dwr-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  margin-bottom: 1.375rem;
+}
+.dwr-chip {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--chip, var(--gold)) 14%, transparent);
+  color: var(--chip, var(--gold));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.dwr-chip svg {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+.dwr-head__meta {
+  flex: 1;
+  min-width: 0;
+  padding-top: 0.125rem;
+}
+.dwr-head .drawer-article__kicker { margin-bottom: 0.1875rem; }
+.dwr-head .drawer-article__theme  { margin: 0.125rem 0 0.25rem; }
+.dwr-head .drawer-article__hed    { margin: 0.25rem 0 0; font-size: clamp(1.125rem, 2.5vw, 1.5rem); }
+
 /* ── Drawer Article Layout ──────────────────────────────────────────────────
    Styled newspaper-article format for all Herald drawer popouts.
    ─────────────────────────────────────────────────────────────────────────── */
