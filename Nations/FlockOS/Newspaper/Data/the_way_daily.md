@@ -760,97 +760,97 @@ At the end of this month: who are you becoming? The Heart Check has been taking 
 **Helps:** Daily quizzes test your knowledge across the whole Bible — history, prophecy, poetry, theology, and application. Gaps are not failures; they are the most useful data points. The score you miss today is the lesson that sticks tomorrow.
 
 ### Day 1
-You cannot love what you do not know. Today's quiz is a step deeper into knowing the One you love.
+Today's quiz draws from the Pentateuch — the five foundational books of Moses that lay the bedrock of everything that follows. Creation, covenant, exodus, law, and the long journey toward a promised land all begin here. Before the prophets could call Israel back, before the psalmists could cry out, before Christ could fulfill it all — this foundation had to be laid. See how well you know the ground you are standing on.
 
 ### Day 2
-The student who tests themselves regularly retains what they've learned. Come test yourself.
+Today's questions come from the sweep of Old Testament history — the judges and kings, the rises and the falls, the faithfulness and the repeated failure of God's covenant people. These are not ancient stories filed away under religion; they are the unfiltered record of what happens when human beings are given grace and still choose their own way. There is more of your own story here than you might expect.
 
 ### Day 3
-Bible knowledge is not the goal — Bible application is. But you can't apply what you haven't learned.
+Today the quiz moves into Wisdom Literature — Job, Psalms, Proverbs, Ecclesiastes, and the Song of Solomon. These books do not argue theology from the outside; they live it from the inside. They cry out, question, wonder, celebrate, grieve, and give counsel. They are the Bible's honest interior voice. See how fluent you are in the language of wisdom, worship, and lament.
 
 ### Day 4
-Surprise yourself today with how much you know. Then let the gaps show you what to pursue next.
+The Prophets speak today. Isaiah, Jeremiah, Ezekiel, Daniel, and the twelve who carry the word of the Lord into crisis after crisis — they are the conscience of the covenant, the messengers who would not be silent when everyone else had grown comfortable. Their words burned in their bones and still burn on the page. See how well you know the men who refused to soften the truth.
 
 ### Day 5
-The disciples who traveled with Jesus had three years of daily instruction. This is your daily instruction.
+Today's quiz opens the Gospels — Matthew, Mark, Luke, and John. This is the center of everything. The One who is the Way, the Truth, and the Life walks these pages, and the quiz will test how closely you have followed. His words, His miracles, His parables, His confrontations, His cross, and His resurrection are the hinge of all human history. Come and see how well you know the One who knows you completely.
 
 ### Day 6
-Testing your knowledge is not about pride — it is about accountability to your own growth.
+Today's questions cover the Acts of the Apostles and the explosion of the early church. In a few decades, a handful of terrified disciples became a movement that turned the Roman world inside out. They went without armies, without wealth, without political power — armed with nothing but the resurrection and the Spirit. Today's quiz will test how well you know that story. It is the story you are still living inside.
 
 ### Day 7
-Every question you answer correctly is a stone in the foundation. Every one you miss is a stone yet to be laid.
+Today the Epistles take the floor — Paul, Peter, James, John, and the others who wrote letters that shaped the theology and practice of the church for two thousand years. These letters answered real questions from real congregations facing real pressure. Their doctrine was not abstract; it was the difference between standing firm and falling away. See how well you know the letters that formed the church you belong to.
 
 ### Day 8
-The Bible is an inexhaustible text — no matter how long you study it, there is always more to discover.
+Today's quiz covers Theology — the great doctrines that give shape to everything you believe. The nature of God, the reality of sin, the meaning of salvation, the work of the Spirit, the promise of resurrection — these are not academic categories reserved for seminary classrooms. They are the structure of your faith, the grammar of your prayer, and the architecture of your hope. Find out where your foundation is solid and where it still needs to be built.
 
 ### Day 9
-Don't skip the quiz because you might get it wrong. The wrong answers are the most valuable ones.
+Today's questions come from Revelation — the final word, the apocalyptic vision given to John on Patmos. This is the book many Christians avoid and the one they may need most. It is not primarily a timeline of disasters; it is a revelation of Jesus Christ as Lord over all history, all empires, all powers, and all endings. The Lamb wins. The city comes down. Come test how well you know the last chapter of the story.
 
 ### Day 10
-Scripture memorization is the highest form of retention. Let the quiz point you toward what to memorize next.
+The Pentateuch returns today. Every time you revisit these opening books, you see more — the typology runs deeper, the covenants are more precise, the mercy is more costly than you noticed the first time. Moses at the burning bush, Abraham on the mountain, Israel at Sinai — these moments carry more weight the more of the rest of Scripture you have read. Come back to the foundation with fresh eyes.
 
 ### Day 11
-The prophets, the patriarchs, the apostles — today's questions may cover any of them. Come ready to learn.
+Old Testament history returns for today's quiz. The kingdom divides, the prophets are ignored, exile comes, and yet somehow the people return and the story continues. Every generation had to decide whether they would trust the Lord or lean on what they could see. Today's questions will test your knowledge of the people who made that decision badly, well, or somewhere in between — and what happened as a result.
 
 ### Day 12
-A Christian who knows their Bible is a Christian who can help someone else in their moment of crisis.
+Wisdom Literature appears again today. There is no such thing as reading these books too many times. Proverbs has a word for the decision you will make this week. The Psalms have language for what you are feeling right now but cannot yet name. Job has an argument for the suffering you have not yet explained. Ecclesiastes has already thought through the vanity you are tempted to chase. Come back to wisdom. It is still speaking.
 
 ### Day 13
-God honored Solomon's request for wisdom above all else. Pursue wisdom with the same earnestness.
+The Prophets return. Read them and hear what God said to His people when they had grown comfortable in their religion but cold in their hearts. The prophets did not tolerate the gap between confession and conduct, between Sabbath attendance and marketplace justice. They named it, confronted it, and wept over it. Today's quiz will ask you what you know about the men who loved God enough to say the hard thing.
 
 ### Day 14
-Let today's quiz be a measurement, not a judgment. Measurements tell you where you are, not who you are.
+The Gospels again. You cannot know the Gospels too well. Jesus is the same in all four accounts — and yet each writer opens a different window. Matthew shows the King. Mark shows the Servant. Luke shows the Son of Man who came for the least and the lost. John shows the eternal Word made flesh. Come back to the story. Every reading adds another layer, another word He has spoken that is still waiting to land.
 
 ### Day 15
-The more Scripture you know, the more doors the Spirit has to work with when He speaks to you.
+Acts and the early church come back into view today. This is what the resurrection looked like when it hit the street. Pentecost, the lame man at the gate, Ananias and Sapphira, Stephen's sermon, Saul's conversion, the council at Jerusalem, Paul's journeys — these events are not only history. They are the template. The same Spirit who raised Jesus from the dead is the one your church is asking to move today.
 
 ### Day 16
-Knowledge puffs up — but knowledge in the hands of the humble builds up. Come humble today.
+The Epistles return today. Paul writes to Corinth because they are fractured by pride and confused by spiritual gifts. He writes to Galatia because they have traded grace for law. He writes to Philippi from prison with more joy than most free men have. He writes to Timothy because the next generation needs to be prepared to carry the truth forward. Today's questions will test how well you know what these letters actually say.
 
 ### Day 17
-Some of today's questions will be easy. Some will expose gaps. Welcome both equally.
+Theology draws the quiz today. Here is where the pieces come together — where the stories of Genesis, the poetry of Psalms, the vision of Isaiah, the teaching of Jesus, and the doctrine of Paul converge into a coherent understanding of God, humanity, redemption, and hope. Theology is not the ceiling of faith. It is the skeleton that lets the whole body stand and move. Test how strong that skeleton is today.
 
 ### Day 18
-The quiz tracks your growth over time. Look at where you started and where you are now.
+Revelation again. The church in Ephesus has lost its first love. The church in Sardis is alive in name only. The church in Philadelphia has held fast with little strength and great faithfulness. The church in Laodicea is lukewarm and does not yet know it. These seven letters are not addressed only to the ancient world. They are addressed to every church in every era that carries the name of Jesus. Which one is yours?
 
 ### Day 19
-You are training a mind to think biblically. That mind will serve you in every situation you face.
+The Pentateuch one more time. The law is not what saves — Paul makes that unmistakably clear. But the law is holy, righteous, and good, and it is a tutor that leads to Christ. The commands reveal the character of the God who gave them. The sacrifices point forward to the one sacrifice that ends all sacrifice. The tabernacle is a shadow of the dwelling God is preparing. Come back to Moses and see how much of Christ is already here.
 
 ### Day 20
-Bible trivia graduates to Bible wisdom when you ask what it means and why it matters.
+OT History again. The question the historical books keep asking is simple: will God's people trust Him or not? They are tested by abundance as much as by scarcity, by victory as much as by defeat, by the temptation to be like other nations as much as by persecution. You are asked the same question in your own generation. Today's quiz tests your knowledge of the people who answered it before you.
 
 ### Day 21
-The early church knew the scriptures deeply — they had no printed Bibles. What is your excuse for not knowing yours?
+Wisdom Literature for the third time in this rotation. The book of Job alone contains more sustained wrestling with suffering, theodicy, and the silence of God than most entire theological systems. The psalmists know how to lament without losing faith. Proverbs builds a life line by line, choice by choice. Ecclesiastes knows the emptiness of every earthly substitute for God. This is the Bible at its most honest. See how well you know it.
 
 ### Day 22
-Find one fact from today's quiz and locate it in its original biblical context. That is where learning becomes real.
+The Prophets are back. Some of them preached for decades and saw no visible fruit. Isaiah preached to a nation that would not listen. Jeremiah wept over a city that would not repent. Ezekiel proclaimed restoration to exiles who could barely imagine it. Hosea loved an unfaithful wife to illustrate God's love for an unfaithful nation. These are not remote figures. They are the patron saints of everyone who keeps speaking truth into silence.
 
 ### Day 23
-The Spirit brings Scripture to your remembrance in moments of need — but only what you've put there.
+The Gospels return once more. Today's questions may come from a parable, a miracle, a confrontation, a prayer, or a word spoken quietly to one person on the edge of the crowd. Every scene in the Gospels is worth examining slowly — the detail is never accidental, the timing is never random, and Jesus is never reacting. He is always acting from the fullness of divine love and the perfect clarity of divine purpose.
 
 ### Day 24
-Don't rush through today's quiz. Pause on the question you had to guess. Go find the answer in the text.
+Acts and the early church today. Think of what these people carried and what it cost them. They were not well-resourced, widely respected, or numerically significant for most of the first century. They were a movement of former fishermen, tentmakers, tax collectors, and Gentile converts who believed a crucified rabbi had risen from the dead. And they turned the world upside down. Today's quiz asks: how well do you know the people who carried your faith to you?
 
 ### Day 25
-A month of daily quizzes makes a noticeable difference in your fluency with the Word. Keep the habit.
+The Epistles close out this week's rotation. James asks whether your faith is visible in your works. John asks whether you love the brothers and sisters you can see. Peter writes from the shadow of his own denial to strengthen those about to be tested. Hebrews calls you to hold fast to the high priest who has gone through every temptation you will face and emerged without sin. There is a word here for exactly where you are today.
 
 ### Day 26
-Share today's most interesting question with someone. Teaching it once is worth ten times reading it.
+Theology again, with a month of quizzes behind you. What has sharpened? What has humbled you? Every theological category you have revisited this month is connected to every other one — the doctrine of God shapes the doctrine of salvation, which shapes the doctrine of the church, which shapes the doctrine of last things. Knowledge that stays disconnected stays useless. Come today with the larger picture in view.
 
 ### Day 27
-The Bible is not meant to be known about — it is meant to be known. Let the quiz be a prod toward deeper knowing.
+Revelation for the third pass. The vision is vast, but the message is simple: hold on. The Lamb is Lord. The empire will fall. The city will come. The tears will be wiped away. The tree of life whose leaves are for the healing of the nations is not a metaphor for something smaller than it sounds. It is the final answer to every form of exile, estrangement, sickness, and separation that has ever broken a human heart. Today's quiz tests the edges of that vision.
 
 ### Day 28
-History, poetry, law, prophecy, letter — the quiz covers the whole Bible because the whole Bible is for you.
+The Pentateuch closes the rotation. In the beginning, God created. In the end, He will make all things new. And in the long middle — the law, the sacrifices, the wilderness, the covenant, the failures, the mercy that kept beginning again — He was already preparing what the fullness of time would finally reveal. Come back to the beginning of the story and see how much of the ending is already there, written in seed and shadow.
 
 ### Day 29
-The knowledge you carry into prayer makes your intercession more scripturally grounded. Learn well; pray well.
+Old Testament history one last time this cycle. The final word on this material is not that Israel kept failing — it is that God kept being faithful. Every time the people broke the covenant, He made a way back. Every time the exile came, He promised return. Every time it looked like the line was cut, He preserved it. The story is not primarily about human faithfulness. It is about a God who cannot be stopped from keeping His word.
 
 ### Day 30
-Today's quiz is a gate. Pass through it and something opens on the other side.
+The Prophets carry the last question of the month. They end with a forward lean — Isaiah pointing to the Servant who would bear the sins of many, Malachi pointing to the messenger who would prepare the way, Ezekiel pointing to the valley of dry bones that would breathe again. The Old Testament ends in anticipation. Every question from the prophets today is one the New Testament has already answered. Trace the line between the promise and the fulfillment.
 
 ### Day 31
-A month of testing is a month of growing. The person who took Day 1's quiz is not the same person taking today's.
+The full Bible is yours. Pentateuch, history, wisdom, prophecy, gospels, acts, epistles, theology, and the final vision — you have tested yourself across all of it this month. The person who sat down on Day 1 has been stretched, corrected, reminded, and equipped. That is what the Word does when you return to it faithfully. Come to the last quiz of the rotation not to finish well, but to begin well — because the rotation starts again tomorrow, and there is always more to know.
 
 
 ---
