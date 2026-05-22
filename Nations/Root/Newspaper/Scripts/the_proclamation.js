@@ -1,130 +1,40 @@
 /**
- * the_proclamation.js — Flock Herald Content Engine
+ * the_proclamation.js — Flock Herald Front Page (broadsheet layout)
  *
- * Populates the #herald-main element with the Herald front page.
+ * Renders the Herald front page (#herald-main) in a proper 3-column newspaper
+ * broadsheet layout:
  *
- * Architecture:
- * - Reads window.HERALD_CHURCH_NAME + window.HERALD_CHURCH_ID (injected by C-Build)
- * - Reads localStorage('flock_herald_config') for editor overrides set by Editor's Desk
- * - Renders: lead article block, section preview grid, daily scripture card
- * - All content is organized into editorial "columns" matching the Newspaper design system
+ *   ┌──────────────────── BANNER (full width) ─────────────────────┐
+ *   │  Today's Edition flag + church banner headline + deck        │
+ *   └──────────────────────────────────────────────────────────────┘
+ *   ┌─── COL 1 (2fr) ───┬── COL 2 (1fr) ──┬── COL 3 (1fr) ───────┐
+ *   │ Lead article with  │  This morning's  │  Sections of         │
+ *   │ drop cap & body    │  scripture       │  the paper           │
+ *   │                    │  + tagline       │  (brief links)       │
+ *   └────────────────────┴─────────────────┴──────────────────────┘
  *
- * Phase progression:
- *   Phase 0 (now):  Static skeleton with today's date, church name, section previews
- *   Phase 1:        Live scripture via Wellspring API, dynamic devotional
- *   Phase 2+:       Editor-driven overrides, Firestore announcements, etc.
+ * Reads:
+ *   - window.HERALD_CHURCH_NAME  (from C-Build Firebase injection)
+ *   - window.HERALD_SECTIONS     (from the_gates.js — loaded before this)
+ *   - localStorage('flock_herald_config') for Editor's Desk overrides
+ *
+ * Phase 0/1: static content with editor overrides.
+ * Phase 2+: live Firestore content, dynamic scripture via Wellspring API.
  */
 
 (function () {
   'use strict';
 
-  // ── Section Preview Registry ───────────────────────────────────────────────
-  // Each card in the front-page section grid.
-  var SECTION_PREVIEWS = [
-    {
-      slug: 'tabernacle',
-      label: 'The Tabernacle',
-      deck: 'Worship & Devotional',
-      color: 'var(--sec-tabernacle)',
-      minRole: 0,
-    },
-    {
-      slug: 'epistles',
-      label: 'The Letters',
-      deck: 'Church Communications',
-      color: 'var(--sec-epistles)',
-      minRole: 0,
-    },
-    {
-      slug: 'straight_path',
-      label: 'The Path',
-      deck: 'Discipleship & Growth',
-      color: 'var(--sec-straight-path)',
-      minRole: -1,
-    },
-    {
-      slug: 'living_water',
-      label: 'The Wellspring',
-      deck: 'Scripture & Reflection',
-      color: 'var(--sec-living-water)',
-      minRole: -1,
-    },
-    {
-      slug: 'gatehouse',
-      label: 'The Bulletin',
-      deck: 'Announcements & Events',
-      color: 'var(--sec-gatehouse)',
-      minRole: 0,
-    },
-    {
-      slug: 'pulpit',
-      label: 'The Pulpit',
-      deck: 'Sermons & Teaching',
-      color: 'var(--sec-pulpit)',
-      minRole: 3,
-    },
-    {
-      slug: 'levites',
-      label: 'The Cantors',
-      deck: 'Music & Worship Planning',
-      color: 'var(--sec-levites)',
-      minRole: 3,
-    },
-    {
-      slug: 'stage',
-      label: 'The Stage',
-      deck: 'Media & Presentation',
-      color: 'var(--sec-stage)',
-      minRole: 3,
-    },
-    {
-      slug: 'genealogies',
-      label: 'The Family Tree',
-      deck: 'Congregation Records',
-      color: 'var(--sec-genealogies)',
-      minRole: 0,
-    },
-    {
-      slug: 'great_commission',
-      label: 'The Mission',
-      deck: 'Outreach & Evangelism',
-      color: 'var(--sec-commission)',
-      minRole: 4,
-    },
-    {
-      slug: 'harvest',
-      label: 'The Harvest',
-      deck: 'Giving & Stewardship',
-      color: 'var(--sec-harvest)',
-      minRole: 4,
-    },
-    {
-      slug: 'scroll_room',
-      label: 'The Archive',
-      deck: 'Documents & Records',
-      color: 'var(--sec-scroll-room)',
-      minRole: 4,
-    },
-    {
-      slug: 'cornerstone',
-      label: "The Shepherd's Desk",
-      deck: 'Pastoral Dashboard',
-      color: 'var(--sec-cornerstone)',
-      minRole: 4,
-    },
-  ];
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  var ROLE_MAP = { readonly: 0, volunteer: 1, care: 2, deacon: 2,
+                   leader: 3, treasurer: 3, pastor: 4, admin: 5 };
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
   function getUserRoleLevel() {
     if (typeof Nehemiah !== 'undefined' && Nehemiah.getSession) {
       try {
         var sess = Nehemiah.getSession();
         if (sess && typeof sess.roleLevel === 'number') return sess.roleLevel;
-        if (sess && sess.role) {
-          var LEVELS = { readonly: 0, volunteer: 1, care: 2, deacon: 2,
-                         leader: 3, treasurer: 3, pastor: 4, admin: 5 };
-          return LEVELS[sess.role] !== undefined ? LEVELS[sess.role] : -1;
-        }
+        if (sess && sess.role && ROLE_MAP[sess.role] !== undefined) return ROLE_MAP[sess.role];
       } catch (_) {}
     }
     return -1;
@@ -134,132 +44,140 @@
     try {
       var raw = localStorage.getItem('flock_herald_config');
       return raw ? JSON.parse(raw) : {};
-    } catch (_) {
-      return {};
-    }
+    } catch (_) { return {};  }
   }
 
-  function sectionHref(slug) {
-    return 'Sections/' + slug + '/index.html';
+  function esc(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
-  // ── Build Section Preview Card HTML ───────────────────────────────────────
-  function buildSectionCard(sec) {
-    return [
-      '<a class="np-section-card" href="' + sectionHref(sec.slug) + '"',
-      '   data-section="' + sec.slug + '"',
-      '   style="border-left-color:' + sec.color + '">',
-      '  <span class="np-section-card__label">' + sec.label + '</span>',
-      '  <span class="np-section-card__deck">' + sec.deck + '</span>',
-      '</a>',
-    ].join('\n');
-  }
-
-  // ── Build Today's Scripture Placeholder ───────────────────────────────────
-  function buildScriptureCard(cfg) {
-    var verse = (cfg && cfg.scriptureVerse) || '';
-    var text  = (cfg && cfg.scriptureText)  || '';
-
-    if (!verse) {
-      // Default to a classic morning verse for Phase 0
-      verse = 'Lamentations 3:22–23';
-      text  = 'The steadfast love of the Lord never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness.';
-    }
+  // ── Column 1: Lead Article ────────────────────────────────────────────────
+  function buildLeadCol(churchName, cfg) {
+    var headline = (cfg && cfg.leadHeadline) || ('Welcome to ' + churchName);
+    var subhead  = (cfg && cfg.leadSubhead)  || 'Your church, every day.';
+    var body1    = (cfg && cfg.leadBody1)    ||
+      'The Flock Herald is the daily newspaper of the congregation \u2014 every section ' +
+      'a chapter of the life you share together. Flip through the pages each morning ' +
+      'to see what\u2019s happening across the church.';
+    var body2    = (cfg && cfg.leadBody2)    ||
+      'Scripture is the front page. Worship is the culture section. ' +
+      'The letters column never closes. Turn the page and find your place ' +
+      'in the story God is writing here.';
 
     return [
-      '<div class="np-card np-card--gold" id="herald-scripture">',
-      '  <p class="np-section-header">This Morning\u2019s Scripture</p>',
-      '  <blockquote class="np-pull-quote">',
-      '    <p>\u201c' + text + '\u201d</p>',
-      '  </blockquote>',
-      '  <p class="np-byline">' + verse + ' \u2014 ESV</p>',
+      '<div class="np-col">',
+      '  <p class="np-col__flag">Today\u2019s Edition</p>',
+      '  <h2 class="np-headline">' + esc(headline) + '</h2>',
+      '  <p class="np-byline">' + esc(subhead) + '</p>',
+      '  <hr class="np-column-rule">',
+      '  <div class="np-body">',
+      '    <p class="np-drop-cap">' + body1 + '</p>',
+      '    <p>' + body2 + '</p>',
+      '  </div>',
       '</div>',
     ].join('\n');
   }
 
-  // ── Build Lead Article ─────────────────────────────────────────────────────
-  function buildLeadArticle(churchName, cfg) {
-    var headline = (cfg && cfg.leadHeadline) || 'Welcome to ' + churchName;
-    var subhead  = (cfg && cfg.leadSubhead)  || 'Your daily church paper, organized for the whole congregation.';
+  // ── Column 2: Scripture ───────────────────────────────────────────────────
+  function buildScriptureCol(cfg) {
+    var verse = (cfg && cfg.scriptureVerse) || 'Lamentations 3:22\u201323';
+    var text  = (cfg && cfg.scriptureText)  ||
+      'The steadfast love of the Lord never ceases; his mercies never come to ' +
+      'an end; they are new every morning; great is your faithfulness.';
+    var ref   = (cfg && cfg.scriptureRef)   || 'ESV';
 
     return [
-      '<div class="np-card np-card--gold" id="herald-lead">',
-      '  <p class="np-section-header">Today\u2019s Edition</p>',
-      '  <h2 class="np-headline">' + headline + '</h2>',
-      '  <p class="np-byline">' + subhead + '</p>',
+      '<div class="np-col">',
+      '  <p class="np-col__flag">This Morning\u2019s Scripture</p>',
+      '  <div class="np-pull-quote">',
+      '    <p>\u201c' + esc(text) + '\u201d</p>',
+      '  </div>',
+      '  <p class="np-byline">' + esc(verse) + ' \u2014 ' + esc(ref) + '</p>',
       '  <hr class="np-column-rule">',
-      '  <p class="np-body">',
-      '    The Flock Herald brings together everything your church does into one',
-      '    beautifully organized paper. Each section below is a chapter of your',
-      '    congregation\u2019s life \u2014 flip through and see what\u2019s on today.',
+      '  <p class="np-body" style="font-style:italic;font-size:0.88rem;">',
+      '    Each morning the paper opens here \u2014 at the living Word.',
+      '    Let it set the tone for everything that follows.',
       '  </p>',
       '</div>',
     ].join('\n');
   }
 
-  // ── Build Section Grid ─────────────────────────────────────────────────────
-  function buildSectionGrid(userLevel) {
-    var visible = SECTION_PREVIEWS.filter(function (s) {
-      return s.minRole === -1 || (userLevel >= 0 && userLevel >= s.minRole);
-    });
+  // ── Column 3: Section Briefs ──────────────────────────────────────────────
+  function buildBriefsCol(userLevel) {
+    var sections = window.HERALD_SECTIONS || [];
+    var visible  = sections.filter(function (s) {
+      return s.slug !== 'herald' &&
+             (s.minRole === -1 || (userLevel >= 0 && userLevel >= s.minRole));
+    }).slice(0, 8); // show at most 8 briefs
 
-    if (!visible.length) return '';
+    if (!visible.length) {
+      return [
+        '<div class="np-col">',
+        '  <p class="np-col__flag">Sections</p>',
+        '  <p class="np-byline" style="margin-top:8px;">Sign in to see all sections.</p>',
+        '</div>',
+      ].join('\n');
+    }
 
-    var cards = visible.map(buildSectionCard).join('\n');
+    var items = visible.map(function (sec) {
+      var href = 'Sections/' + sec.slug + '/index.html';
+      return [
+        '<li class="np-briefs__item">',
+        '  <a class="np-briefs__link" href="' + href + '"',
+        '     data-section="' + sec.slug + '">',
+        '    <span class="np-briefs__title">' + esc(sec.label) + '</span>',
+        '    <span class="np-briefs__deck">' + esc(sec.tagline.substring(0, 52)) + (sec.tagline.length > 52 ? '\u2026' : '') + '</span>',
+        '  </a>',
+        '</li>',
+      ].join('\n');
+    }).join('\n');
 
     return [
-      '<div class="np-section-header" style="margin-top:32px;">Sections of the Paper</div>',
-      '<div class="np-section-grid" id="herald-section-grid">',
-      cards,
+      '<div class="np-col">',
+      '  <p class="np-col__flag">Sections of the Paper</p>',
+      '  <ul class="np-briefs">',
+      items,
+      '  </ul>',
       '</div>',
     ].join('\n');
   }
 
-  // ── Inject Section Grid CSS (inline, additive) ────────────────────────────
-  // the_broadsheet.css may not have .np-section-grid yet (Phase 1 CSS task);
-  // inject a minimal inline style so Phase 0 looks correct now.
-  function injectGridStyles() {
-    if (document.getElementById('__proclamation_styles')) return;
-    var style = document.createElement('style');
-    style.id = '__proclamation_styles';
-    style.textContent = [
-      '.np-section-grid {',
-      '  display: grid;',
-      '  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));',
-      '  gap: 12px;',
-      '  margin-bottom: 32px;',
-      '}',
-      '.np-section-card {',
-      '  display: flex;',
-      '  flex-direction: column;',
-      '  gap: 4px;',
-      '  padding: 14px 16px;',
-      '  background: var(--paper-white);',
-      '  border: 1px solid var(--rule-faint);',
-      '  border-left: 3px solid var(--gold);',
-      '  border-radius: 2px;',
-      '  text-decoration: none;',
-      '  transition: background 0.15s;',
-      '}',
-      '.np-section-card:hover { background: var(--paper-tint); }',
-      '.np-section-card__label {',
-      '  font-family: var(--font-headline);',
-      '  font-size: 0.95rem;',
-      '  color: var(--ink);',
-      '  line-height: 1.3;',
-      '}',
-      '.np-section-card__deck {',
-      '  font-family: var(--font-label);',
-      '  font-size: 0.65rem;',
-      '  font-variant: small-caps;',
-      '  letter-spacing: 0.05em;',
-      '  color: var(--ink-dim);',
-      '}',
+  // ── Banner ────────────────────────────────────────────────────────────────
+  function buildBanner(churchName, cfg) {
+    var headline = (cfg && cfg.bannerHeadline) ||
+      (churchName !== 'The Church' ? churchName + ' \u2014 The Flock Herald' : 'The Flock Herald');
+    var deck = (cfg && cfg.bannerDeck) ||
+      'All the news of the congregation, set in type each morning.';
+
+    return [
+      '<div class="np-banner">',
+      '  <p class="np-banner__flag">The Flock Herald &mdash; ' + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</p>',
+      '  <h2 class="np-banner__headline">' + esc(headline) + '</h2>',
+      '  <p class="np-banner__deck">' + esc(deck) + '</p>',
+      '</div>',
     ].join('\n');
-    document.head.appendChild(style);
   }
 
-  // ── Render Herald ──────────────────────────────────────────────────────────
+  // ── Wire section brief clicks through flipTo ──────────────────────────────
+  function wireBriefClicks() {
+    var briefs = document.querySelectorAll('.np-briefs__link[data-section]');
+    briefs.forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var href = a.getAttribute('href');
+        var slug = a.getAttribute('data-section');
+        try { sessionStorage.setItem('np-nav-dir', 'forward'); } catch (_) {}
+        document.documentElement.setAttribute('data-nav-dir', 'forward');
+        window.location.href = href;
+      });
+    });
+  }
+
+  // ── Main render ───────────────────────────────────────────────────────────
   function renderHerald(userLevel) {
     var main = document.getElementById('herald-main');
     if (!main) return;
@@ -270,13 +188,18 @@
 
     var cfg = getEditorConfig();
 
-    injectGridStyles();
-
     main.innerHTML = [
-      buildLeadArticle(churchName, cfg),
-      buildScriptureCard(cfg),
-      buildSectionGrid(userLevel),
+      '<div class="np-broadsheet">',
+      buildBanner(churchName, cfg),
+      '<div class="np-cols">',
+      buildLeadCol(churchName, cfg),
+      buildScriptureCol(cfg),
+      buildBriefsCol(userLevel),
+      '</div>',
+      '</div>',
     ].join('\n');
+
+    wireBriefClicks();
   }
 
   // ── Boot ──────────────────────────────────────────────────────────────────
@@ -284,13 +207,12 @@
     var initialLevel = getUserRoleLevel();
     renderHerald(initialLevel);
 
-    // Re-render with full role once Nehemiah auth resolves
     if (typeof Nehemiah !== 'undefined' && typeof Nehemiah.onAuthResolved === 'function') {
       Nehemiah.onAuthResolved(function (sess) {
-        var LEVELS = { readonly: 0, volunteer: 1, care: 2, deacon: 2,
-                       leader: 3, treasurer: 3, pastor: 4, admin: 5 };
-        var level = (sess && sess.role) ? (LEVELS[sess.role] !== undefined ? LEVELS[sess.role] : 0) : -1;
+        var level = (sess && sess.role && ROLE_MAP[sess.role] !== undefined)
+          ? ROLE_MAP[sess.role] : 0;
         renderHerald(level);
+        wireBriefClicks();
       });
     }
   }

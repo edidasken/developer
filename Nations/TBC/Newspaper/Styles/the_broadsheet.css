@@ -510,3 +510,366 @@ button {
     overflow-x: visible;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   §14 — BROADSHEET COLUMN GRID
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Outer wrapper — replaces .np-page on broadsheet pages */
+.np-broadsheet {
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding-bottom: max(24px, var(--safe-bottom));
+}
+
+/* Banner — spans full width above the columns */
+.np-banner {
+  padding: 20px var(--article-padding) 16px;
+  text-align: center;
+  border-bottom: 3px double var(--rule);
+}
+
+.np-banner__flag {
+  font-family: var(--font-label);
+  font-size: 0.6rem;
+  font-variant: small-caps;
+  letter-spacing: 0.14em;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.np-banner__headline {
+  font-family: var(--font-headline);
+  font-size: clamp(1.8rem, 5vw, 3.2rem);
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.np-banner__deck {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--ink-mid);
+}
+
+/* Column grid */
+.np-cols {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 0;
+  align-items: start;
+}
+
+.np-col {
+  padding: 20px 20px;
+}
+
+.np-col + .np-col {
+  border-left: 1px solid var(--rule-soft);
+}
+
+.np-col--wide { grid-column: span 2; }
+.np-col--full { grid-column: 1 / -1; border-left: none !important; }
+
+/* Column section flag */
+.np-col__flag {
+  font-family: var(--font-label);
+  font-size: 0.6rem;
+  font-variant: small-caps;
+  letter-spacing: 0.12em;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--rule-soft);
+  padding-bottom: 4px;
+  margin-bottom: 14px;
+}
+
+/* Drop cap on lead article */
+.np-drop-cap::first-letter {
+  font-family: var(--font-masthead);
+  font-size: 4.2em;
+  line-height: 0.75;
+  float: left;
+  margin-right: 8px;
+  margin-top: 6px;
+  color: var(--ink);
+}
+
+/* Section brief links (col 3) */
+.np-briefs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.np-briefs__item {
+  border-bottom: 1px solid var(--rule-faint);
+  padding: 10px 0;
+}
+
+.np-briefs__item:last-child { border-bottom: none; }
+
+.np-briefs__link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.np-briefs__link:hover .np-briefs__title { color: var(--gold); text-decoration: none; }
+
+.np-briefs__title {
+  font-family: var(--font-headline);
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.25;
+  transition: color 0.15s;
+}
+
+.np-briefs__deck {
+  font-family: var(--font-label);
+  font-size: 0.62rem;
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  color: var(--ink-dim);
+  margin-top: 3px;
+}
+
+/* Section splash page (empty stub pages) */
+.np-section-splash {
+  padding: 32px var(--article-padding) 24px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.np-section-splash__flag {
+  font-family: var(--font-label);
+  font-size: 0.6rem;
+  font-variant: small-caps;
+  letter-spacing: 0.14em;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.np-section-splash__title {
+  font-family: var(--font-headline);
+  font-size: clamp(2.2rem, 8vw, 4.5rem);
+  color: var(--ink);
+  line-height: 1.05;
+}
+
+.np-section-splash__rule {
+  border: none;
+  border-top: 3px double var(--rule);
+  margin: 14px 0;
+  width: 60%;
+}
+
+.np-section-splash__tagline {
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--ink-mid);
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.np-section-splash__coming {
+  font-family: var(--font-label);
+  font-size: 0.68rem;
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+  margin-top: 24px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   §15 — PAGE FLIP NAVIGATION  (.np-flip-nav)
+   ═══════════════════════════════════════════════════════════════ */
+
+.np-flip-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: 6px var(--article-padding);
+  border-bottom: 1px solid var(--rule-faint);
+  background: var(--paper);
+  gap: 12px;
+}
+
+.np-flip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  font-family: var(--font-label);
+  font-size: 0.72rem;
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+  color: var(--ink-dim);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.np-flip-btn:hover {
+  border-color: var(--rule-soft);
+  color: var(--ink);
+  background: var(--paper-dark);
+  text-decoration: none;
+}
+
+.np-flip-btn:active {
+  background: var(--paper-tint);
+}
+
+.np-flip-btn--disabled {
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.np-flip-btn--next {
+  text-align: right;
+  justify-content: flex-end;
+}
+
+.np-flip-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.np-flip-counter {
+  font-family: var(--font-label);
+  font-size: 0.62rem;
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  text-align: center;
+  flex: 1;
+  user-select: none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   §16 — VIEW TRANSITIONS (cross-document page flip)
+   ═══════════════════════════════════════════════════════════════ */
+
+@view-transition {
+  navigation: auto;
+}
+
+/* Forward flip: old slides/tilts left, new comes from right */
+@keyframes np-flip-out-fwd {
+  to {
+    opacity: 0;
+    transform: perspective(1200px) translateX(-6%) rotateY(-8deg);
+    transform-origin: left center;
+  }
+}
+
+@keyframes np-flip-in-fwd {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) translateX(6%) rotateY(8deg);
+    transform-origin: right center;
+  }
+}
+
+/* Backward flip: old slides/tilts right, new comes from left */
+@keyframes np-flip-out-bck {
+  to {
+    opacity: 0;
+    transform: perspective(1200px) translateX(6%) rotateY(8deg);
+    transform-origin: right center;
+  }
+}
+
+@keyframes np-flip-in-bck {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) translateX(-6%) rotateY(-8deg);
+    transform-origin: left center;
+  }
+}
+
+/* Default: forward direction */
+::view-transition-old(root) {
+  animation: 300ms cubic-bezier(0.4, 0, 0.2, 1) both np-flip-out-fwd;
+}
+::view-transition-new(root) {
+  animation: 300ms cubic-bezier(0.4, 0, 0.2, 1) both np-flip-in-fwd;
+}
+
+/* Backward navigation — set data-nav-dir="back" on <html> before navigating */
+:root[data-nav-dir="back"] ::view-transition-old(root) {
+  animation: 300ms cubic-bezier(0.4, 0, 0.2, 1) both np-flip-out-bck;
+}
+:root[data-nav-dir="back"] ::view-transition-new(root) {
+  animation: 300ms cubic-bezier(0.4, 0, 0.2, 1) both np-flip-in-bck;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   §14/§15 RESPONSIVE OVERRIDES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Tablet: collapse to 2 cols */
+@media (max-width: 900px) {
+  .np-cols {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .np-col--wide {
+    grid-column: span 2;
+  }
+
+  /* Move col 3 (briefs) below cols 1+2 */
+  .np-col:nth-child(3) {
+    grid-column: span 2;
+    border-left: none;
+    border-top: 1px solid var(--rule-soft);
+  }
+}
+
+/* Mobile: single column */
+@media (max-width: 600px) {
+  .np-cols {
+    grid-template-columns: 1fr;
+  }
+
+  .np-col + .np-col {
+    border-left: none;
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  .np-col--wide {
+    grid-column: span 1;
+  }
+
+  /* Smaller drop cap on mobile */
+  .np-drop-cap::first-letter {
+    font-size: 3em;
+  }
+
+  /* Hide prev/next labels on very small screens, keep icons */
+  .np-flip-btn__label {
+    display: none;
+  }
+}
