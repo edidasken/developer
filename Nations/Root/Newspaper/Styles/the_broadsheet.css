@@ -4,7 +4,7 @@
    ========================================================================== */
 
 /* ── Google Fonts ─────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
 /* ── CSS Reset ────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
@@ -142,9 +142,9 @@ a:hover { text-decoration: underline; }
 }
 
 .sec-masthead__title {
-  font-family: var(--font-headline);
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-family: 'Great Vibes', cursive;
+  font-size: 2rem;
+  font-weight: 400;
   color: var(--ink);
   flex: 1;
 }
@@ -418,10 +418,12 @@ a:hover { text-decoration: underline; }
 .drawer-close:hover { background: var(--paper-sunken); }
 
 .drawer-body {
-  flex: 1;
+  flex: 1 1 0%;     /* 0% basis lets flex properly constrain the height */
+  min-height: 0;    /* critical: prevents flex child overflow on iOS Safari */
   overflow-y: auto;
   padding: 1rem;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 /* ── Buttons ──────────────────────────────────────────────────────────────── */

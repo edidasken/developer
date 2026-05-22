@@ -32,15 +32,21 @@
 <body class="broadsheet-page sec-the-way">
 
   <header class="sec-masthead" role="banner">
-    <div class="sec-masthead__inner">
-      <div>
-        <h1 class="sec-masthead__title">The Way</h1>
-        <p class="sec-masthead__subtitle">Growth, Discipleship &amp; Outreach</p>
+    <!-- Aa button: absolute top-right, safe area aware -->
+    <button class="sec-masthead__font-btn way-aa-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
+
+    <div class="way-masthead__folio">
+      <div class="way-masthead__center">
+        <h1 class="way-masthead__title">The Flock Herald</h1>
+        <p class="way-masthead__tagline">Shepherding the Flock by the Power of the Word</p>
+        <p class="way-masthead__date" id="way-header-date"></p>
       </div>
-      <button class="sec-masthead__font-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
     </div>
-    <nav class="sec-nav-bar" role="navigation" aria-label="Herald sections" id="sec-nav"></nav>
+    <div class="way-masthead__rule" aria-hidden="true"></div>
   </header>
+
+  <!-- Section Nav Bar — scrolls with page content -->
+  <nav class="sec-nav-bar" role="navigation" aria-label="Herald sections" id="sec-nav"></nav>
 
   <div class="broadsheet-columns way-broadsheet" id="the-way-grid">
     <div class="broadsheet-col broadsheet-col--main" id="way-main">
@@ -62,6 +68,27 @@
   <div class="drawer-backdrop" aria-hidden="true"></div>
   <div class="toast-layer" id="toast-layer" aria-live="polite" aria-atomic="true"></div>
 
+  <script>
+    (function() {
+      var el = document.getElementById('way-header-date');
+      if (el) {
+        el.textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase();
+      }
+      var masthead = document.querySelector('.sec-masthead');
+      if (masthead) {
+        function updatePadding() {
+          document.body.style.paddingTop = masthead.offsetHeight + 'px';
+        }
+        if (document.fonts) {
+          document.fonts.ready.then(updatePadding);
+        } else {
+          setTimeout(updatePadding, 300);
+        }
+        window.addEventListener('resize', updatePadding);
+        updatePadding();
+      }
+    })();
+  </script>
   <script src="../../Scripts/the_true_vine.js"></script>
   <script src="../../Scripts/firm_foundation.js"></script>
   <script>window._HERALD_AUTH_LEVEL = -1;</script>

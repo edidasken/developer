@@ -103,12 +103,16 @@ function _paint(root) {
   if (!list.length) { listEl.innerHTML = emptyState({ icon: '🔎', title: 'No matches', body: 'Try another search term or testament filter.' }); return; }
   const page = list.slice(0, PAGE_SIZE);
   const overflow = list.length > PAGE_SIZE ? `<p class="grow-muted" style="padding:.5rem 1rem;font-size:.8rem">Showing ${PAGE_SIZE} of ${list.length} — type to narrow results.</p>` : '';
-  listEl.innerHTML = page.map((w, i) => `
-    <button class="grow-lex-row ${_state.selectedId === (w.id || i) ? 'is-active' : ''}" data-w="${esc(String(w.id || i))}">
+  listEl.innerHTML = page.map((w, i) => {
+    const isG = (w.Testament || '').toLowerCase().includes('new');
+    const lc  = isG ? '#0891b2' : '#7c3aed';
+    const act = String(_state.selectedId) === String(w.id || i) ? 'is-active' : '';
+    return `<button class="grow-lex-row ${act}" data-w="${esc(String(w.id || i))}">
+      <span class="grow-lex-dot" style="background:${lc}" aria-hidden="true"></span>
       <span class="grow-lex-en">${esc(w.English || w.english || '')}</span>
-      <span class="grow-lex-orig">${esc(w.Original || w.original || '')}</span>
-    </button>
-  `).join('') + overflow;
+      <span class="grow-lex-orig" dir="auto">${esc(w.Original || w.original || '')}</span>
+    </button>`;
+  }).join('') + overflow;
   listEl.querySelectorAll('[data-w]').forEach((b) => b.addEventListener('click', () => {
     _state.selectedId = b.dataset.w;
     _paintDetail(root);
@@ -123,37 +127,77 @@ function _paintDetail(root) {
   const list = _filtered();
   const w = list.find((x, i) => String(x.id || i) === String(_state.selectedId));
   if (!w) return;
+
   const testament = w.Testament || '';
-  const isGreek  = testament.toLowerCase().includes('new') || testament.toLowerCase().includes('greek');
-  const lang     = isGreek ? 'Greek' : 'Hebrew';
-  const langColor = isGreek ? '#0891b2' : '#7c3aed';
-  const kjvChips = (w.KJVRenderings || '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map((r) => `<span class="grow-lex-kjv-chip">${esc(r)}</span>`)
-    .join('');
+  const isGreek   = testament.toLowerCase().includes('new') || testament.toLowerCase().includes('greek');
+  const lang      = isGreek ? 'Greek · NT' : 'Hebrew · OT';
+  const lc        = isGreek ? '#0891b2' : '#7c3aed';
+  const _PS       = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+
+  // Language icon: cross for Greek/NT, flame for Hebrew/OT
+  const langSvg = isGreek
+    ? `<svg ${_PS}><path d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0 0 4h5v5a2 2 0 0 0 4 0v-5h5a2 2 0 0 0 0-4h-5V4a2 2 0 0 0-2-2z"/></svg>`
+    : `<svg ${_PS}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>`;
+
+  const kjvRaw   = (w.KJVRenderings || '').split(',').map((s) => s.trim()).filter(Boolean);
+  const kjvChips = kjvRaw.map((r) => `<span class="grow-lex-kjv-chip">${esc(r)}</span>`).join('');
 
   det.innerHTML = /* html */`
-    <div class="grow-lex-hero" style="--lex-color:${langColor}">
-      ${w.Original ? `<div class="grow-lex-big-word">${esc(w.Original)}</div>` : ''}
-      <div class="grow-lex-hero-text">
-        <h2 class="grow-lex-english">${esc(w.English || w.english || '')}</h2>
-        ${w.Transliteration ? `<p class="grow-lex-transliteration">/${esc(w.Transliteration)}/</p>` : ''}
-        ${w.Pronunciation   ? `<p class="grow-lex-pronunciation">Pronounced: <em>${esc(w.Pronunciation)}</em></p>` : ''}
-      </div>
-    </div>
-    <div class="grow-lex-meta">
-      ${w["Strong's"] ? chip("Strong's " + w["Strong's"], 'neutral') : ''}
-      ${w.Testament   ? chip(lang, 'level') : ''}
-      ${w.Theme       ? chip(w.Theme, 'topic') : ''}
-    </div>
-    ${w.Definition ? `<h4 class="grow-detail-h4">Definition</h4><p class="grow-detail-body">${esc(w.Definition)}</p>` : ''}
-    ${w.Etymology  ? `<h4 class="grow-detail-h4">Etymology</h4><p class="grow-detail-body grow-detail-body--muted">${esc(w.Etymology)}</p>` : ''}
-    ${kjvChips     ? `<h4 class="grow-detail-h4">KJV Renderings</h4><div class="grow-lex-kjv-chips">${kjvChips}</div>` : ''}
-    ${w.Verses     ? `<h4 class="grow-detail-h4">Verse appearances</h4><p class="grow-detail-body">${esc(w.Verses)}</p>` : ''}
-  `;
+    <div class="grow-lex-detail-wrap" style="--lex-color:${lc}">
 
+      <div class="grow-lex-lang-row">
+        <span class="grow-lex-lang-badge">${langSvg}<span>${esc(lang)}</span></span>
+        ${w["Strong's"] ? `<span class="grow-lex-strongs-badge">${esc(w["Strong's"])}</span>` : ''}
+        ${w.Theme       ? `<span class="grow-lex-theme-badge">${esc(w.Theme)}</span>` : ''}
+      </div>
+
+      <div class="grow-lex-word-display">
+        ${w.Original ? `<div class="grow-lex-big-word" dir="auto" lang="${isGreek ? 'el' : 'he'}">${esc(w.Original)}</div>` : ''}
+        <div class="grow-lex-word-en-block">
+          <h2 class="grow-lex-english">${esc(w.English || w.english || '')}</h2>
+          ${w.Transliteration ? `<p class="grow-lex-transliteration">/${esc(w.Transliteration)}/</p>` : ''}
+          ${w.Pronunciation   ? `<p class="grow-lex-pronunciation">${esc(w.Pronunciation)}</p>` : ''}
+        </div>
+      </div>
+
+      ${w.Definition ? `
+      <div class="grow-lex-block">
+        <div class="grow-lex-block-label">
+          <svg ${_PS}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          Definition
+        </div>
+        <p class="grow-lex-block-body">${esc(w.Definition)}</p>
+      </div>` : ''}
+
+      ${w.Etymology ? `
+      <div class="grow-lex-block">
+        <div class="grow-lex-block-label">
+          <svg ${_PS}><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>
+          Etymology
+        </div>
+        <p class="grow-lex-block-body grow-lex-block-body--muted">${esc(w.Etymology)}</p>
+      </div>` : ''}
+
+      ${kjvChips ? `
+      <div class="grow-lex-block">
+        <div class="grow-lex-block-label">
+          <svg ${_PS}><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          KJV Renderings
+        </div>
+        <div class="grow-lex-kjv-chips">${kjvChips}</div>
+      </div>` : ''}
+
+      ${w.Verses ? `
+      <div class="grow-lex-block">
+        <div class="grow-lex-block-label">
+          <svg ${_PS}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          Verse Appearances
+        </div>
+        <p class="grow-lex-block-body grow-lex-block-body--muted">${esc(w.Verses)}</p>
+      </div>` : ''}
+
+    </div>
+  `;
 }
 
 function _filtered() {

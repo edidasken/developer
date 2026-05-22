@@ -35,32 +35,39 @@
   <!-- Masthead — newspaper nameplate -->
   <header class="sec-masthead" role="banner">
 
-    <!-- Folio row: church label · date · Aa -->
+    <!-- Aa button: absolute top-right, safe area aware -->
+    <button class="sec-masthead__font-btn herald-aa-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
+
+    <!-- Folio row: church label only -->
     <div class="herald-folio">
       <span class="herald-folio__label">Powered By FlockOS</span>
-      <span class="herald-folio__date" id="herald-date">Loading…</span>
-      <span class="herald-folio__btn">
-        <button class="sec-masthead__font-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
-      </span>
     </div>
 
-    <!-- Double rule -->
-    <div class="herald-nameplate-rule" aria-hidden="true"></div>
+    <!-- Compact mini-nameplate — revealed when scrolled -->
+    <div class="herald-compact-folio">
+      <span class="herald-compact__brand">Powered By FlockOS</span>
+      <div class="herald-compact__center">
+        <h2 class="herald-compact__title">The Flock Herald</h2>
+        <p class="herald-compact__tagline">Shepherding the Flock by the Power of the Word</p>
+        <p class="herald-compact__date" id="herald-compact-date"></p>
+      </div>
+    </div>
+    <div class="herald-compact-rule" aria-hidden="true"></div>
 
     <!-- Nameplate -->
     <div class="herald-nameplate">
       <h1 class="herald-nameplate__title">The Flock Herald</h1>
       <p class="herald-nameplate__tagline">Shepherding the Flock by the Power of the Word</p>
+      <p class="herald-nameplate__date" id="herald-date">Loading…</p>
     </div>
 
-    <!-- Closing rule -->
-    <div class="herald-masthead-rule" aria-hidden="true"></div>
+    <!-- Double gold rule — permanent bottom of fixed header -->
+    <div class="herald-nameplate-rule" aria-hidden="true"></div>
 
-    <!-- Section Nav Bar -->
-    <nav class="sec-nav-bar" role="navigation" aria-label="Herald sections" id="sec-nav">
-      <!-- Tabs injected by the_gates.js -->
-    </nav>
   </header>
+
+  <!-- Section Nav Bar — scrolls with page content, below fixed header -->
+  <nav class="sec-nav-bar" role="navigation" aria-label="Herald sections" id="sec-nav"></nav>
 
   <!-- Main content — broadsheet newspaper layout -->
   <main class="broadsheet-columns" id="herald-grid" role="main">
@@ -89,6 +96,38 @@
   <div class="toast-layer" id="toast-layer" aria-live="polite" aria-atomic="true"></div>
 
   <!-- Script load order: the_true_vine → firm_foundation → auth guard → the_adornment → the_gates → section script -->
+  <script>
+    (function() {
+      var masthead = document.querySelector('.sec-masthead');
+      if (!masthead) return;
+
+      function updatePadding() {
+        document.body.style.paddingTop = masthead.offsetHeight + 'px';
+      }
+
+      function onScroll() {
+        masthead.classList.toggle('is-compact', window.scrollY > 80);
+        setTimeout(updatePadding, 360);
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', updatePadding);
+      if (document.fonts) {
+        document.fonts.ready.then(updatePadding);
+      } else {
+        setTimeout(updatePadding, 300);
+      }
+      updatePadding();
+      onScroll();
+
+      var fmt = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+      var dateStr = new Date().toLocaleDateString('en-US', fmt).toUpperCase();
+      var d = document.getElementById('herald-date');
+      if (d) d.textContent = dateStr;
+      var cd = document.getElementById('herald-compact-date');
+      if (cd) cd.textContent = dateStr;
+    })();
+  </script>
   <script src="../../Scripts/the_true_vine.js"></script>
   <script src="../../Scripts/firm_foundation.js"></script>
   <script>
