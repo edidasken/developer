@@ -32,11 +32,14 @@
   background: var(--paper-card);
 }
 
-/* Aa button — absolute top-right, inside iOS safe area */
+/* Aa button — fixed bottom-right FAB */
 .way-aa-btn {
-  position: absolute;
-  top: max(0.6rem, env(safe-area-inset-top));
-  right: max(0.75rem, env(safe-area-inset-right));
+  position: fixed;
+  bottom: max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem));
+  right: max(1rem, env(safe-area-inset-right));
+  z-index: 200;
+  background: var(--paper) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
   font-size: 0.9375rem !important;
   padding: 0 0.75rem !important;
   height: 2.25rem !important;
