@@ -126,6 +126,7 @@
       '    Each morning the paper opens here \u2014 at the living Word.',
       '    Let it set the tone for everything that follows.',
       '  </p>',
+      buildQuizWidget(),
       '</div>',
     ].join('\n');
   }
@@ -166,7 +167,6 @@
       '  <ul class="np-briefs">',
       items,
       '  </ul>',
-      buildQuizWidget(),
       '</div>',
     ].join('\n');
   }
