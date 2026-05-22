@@ -27,22 +27,83 @@
     <div class="sec-masthead__inner">
       <div>
         <h1 class="sec-masthead__title">The Sanctuary</h1>
-        <p class="sec-masthead__subtitle">Sermons, Songs &amp; Service Order</p>
+        <p class="sec-masthead__subtitle">Sermons · Songs · Service Order</p>
       </div>
       <button class="sec-masthead__font-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
     </div>
     <nav class="sec-nav-bar" role="navigation" aria-label="Herald sections" id="sec-nav"></nav>
   </header>
 
-  <main class="broadsheet-grid" id="the-sanctuary-grid">
-    <article class="broadsheet-card broadsheet-card--full">
-      <div class="empty-state">
-        <div class="empty-state__icon">🕊</div>
-        <p class="empty-state__title">The Sanctuary — Coming in Phase 4</p>
-        <p class="empty-state__message">Sermon builder, song planner, and service order are being built. Requires leader access.</p>
+  <!-- Three-column broadsheet: Sermon Builder | Song Planner | Service Order -->
+  <main class="sanctuary-columns" id="the-sanctuary-grid" role="main">
+
+    <!-- ── Col 1 · Sermon Builder ──────────────────────────────────────── -->
+    <div class="sanctuary-col" id="sanc-col-sermons">
+
+      <div class="sanc-panel-header" data-collapse-target="sanc-sermon-body">
+        <span class="sanc-panel-label">Sermon Builder</span>
+        <button class="sanc-panel-toggle" type="button" data-collapse-panel="sermons" aria-label="Collapse Sermon Builder">▼</button>
       </div>
-    </article>
-  </main>
+
+      <div id="sanc-sermon-body">
+        <div class="sanc-toolbar">
+          <input id="sanc-sermon-search" class="sanc-search" type="search" placeholder="Search sermons…" aria-label="Search sermons">
+          <select id="sanc-sermon-filter" class="sanc-select" aria-label="Filter by status">
+            <option value="all">All</option>
+            <option value="draft">Draft</option>
+            <option value="ready">Ready</option>
+            <option value="preached">Preached</option>
+          </select>
+          <button class="sanc-btn" id="sanc-new-sermon-btn" type="button">+ New Sermon</button>
+        </div>
+        <!-- Sermon list — rendered by the_sanctuary.js -->
+        <div id="sanc-sermon-list-inner">
+          <div class="sanc-empty" style="padding:2rem 0 1rem">Loading…</div>
+        </div>
+      </div>
+
+    </div><!-- /col-sermons -->
+
+    <!-- ── Col 2 · Song Planner ────────────────────────────────────────── -->
+    <div class="sanctuary-col" id="sanc-col-songs">
+
+      <div class="sanc-panel-header" data-collapse-target="sanc-song-body">
+        <span class="sanc-panel-label">Song Planner</span>
+        <button class="sanc-panel-toggle" type="button" data-collapse-panel="songs" aria-label="Collapse Song Planner">▼</button>
+      </div>
+
+      <div id="sanc-song-body">
+        <div class="sanc-tabs" id="sanc-song-tabs">
+          <button class="sanc-tab is-active" data-tab="library" type="button">Library</button>
+          <button class="sanc-tab" data-tab="setlist" type="button">Sunday's Set</button>
+        </div>
+        <div class="sanc-toolbar">
+          <input id="sanc-song-search" class="sanc-search" type="search" placeholder="Search songs, key, CCLI…" aria-label="Search songs">
+        </div>
+        <!-- Song library / setlist — rendered by the_sanctuary.js -->
+        <div id="sanc-song-list-inner">
+          <div class="sanc-empty" style="padding:2rem 0 1rem">Loading…</div>
+        </div>
+      </div>
+
+    </div><!-- /col-songs -->
+
+    <!-- ── Col 3 · Service Order ──────────────────────────────────────── -->
+    <div class="sanctuary-col" id="sanc-col-order">
+
+      <div class="sanc-panel-header" data-collapse-target="sanc-order-body">
+        <span class="sanc-panel-label">Service Order</span>
+        <button class="sanc-panel-toggle" type="button" data-collapse-panel="order" aria-label="Collapse Service Order">▼</button>
+      </div>
+
+      <!-- Service order — rendered by the_sanctuary.js -->
+      <div id="sanc-order-body">
+        <div class="sanc-empty" style="padding:2rem 0 1rem">Loading…</div>
+      </div>
+
+    </div><!-- /col-order -->
+
+  </main><!-- /sanctuary-columns -->
 
   <aside class="right-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
     <header class="drawer-header">
@@ -58,7 +119,6 @@
   <script src="../../Scripts/firm_foundation.js"></script>
   <script>
     // Auth guard — requires leader (3)
-    // firm_foundation.js (Nehemiah) will redirect if role < 3
     window._HERALD_AUTH_LEVEL = 3;
   </script>
   <script src="../../Scripts/the_adornment.js"></script>
@@ -71,3 +131,4 @@
   </script>
 </body>
 </html>
+

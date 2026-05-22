@@ -1444,7 +1444,7 @@ All 7 Herald panels are live. `buildFrontPage` shows church name + date + rotati
 
 ### [Phase 3 — The Way: CSS + Broadsheet Layout]
 **Date:** 2026-05-22
-**Commit:** pending BCP
+**Commit:** `95611f5c` — "Phase 3 — The Way: broadsheet newspaper layout, gospel modules as stories, drawer-open pattern, clean light-theme grow CSS, story + layout classes in the_way.css"
 **Files created/modified:**
 - `Newspaper/Styles/sections/the_way.css` — FULL BUILD: section identity tokens, `.way-broadsheet` broadsheet layout, `.way-today-card` aside strip, invite extras (`.way-church-card`, `.way-contact-card`, `.way-submit-btn`, `.way-decision-btn`), complete clean light-theme `.grow-*` component CSS (~420 lines; written fresh for Newspaper paper/ink tokens — NOT ported from dark-theme `new_covenant.css`)
 - `Newspaper/Sections/the_way/index.html` — REWRITTEN: replaced Phase 0 stub `.way-layout` sidebar/content/today pane with `.broadsheet-columns way-broadsheet` grid (#way-main for stories, #way-aside for today strip); retains correct script load order, drawer, toast, mobile/PWA meta
@@ -1453,9 +1453,9 @@ All 7 Herald panels are live. `buildFrontPage` shows church name + date + rotati
 Phase 3 delivers The Way as a true broadsheet newspaper page — not a SPA. The page renders each gospel module as a newspaper story with section kicker (`§ N · CATEGORY · TITLE`), clickable headline, deck, byline, and body teaser. Clicking any headline fires `FlockGates.openDrawer()` with the full module HTML (`mod.render()`) mounted and interactive (`mod.mount(drawerBody)`). TODAY'S READING is the lead story, built from OYB data with today's 4 passages displayed. DEVOTIONAL, MISSIONS REPORT, THEOLOGY CORNER, APOLOGETICS, THE INVITATION, and all other modules follow as supporting stories in the main column. The aside (col 3) holds Today's Psalm and OYB summary strip. The invitation module appends a church info card and contact/decision form below its story content. CSS is purpose-built light-theme — no dark-mode fallbacks, no legacy hex values, all paper/ink tokens throughout.
 **Verified:**
 - [x] get_errors: zero errors on the_way.css, the_way/index.html, the_way.js
-- [ ] C-Build: pending
-- [ ] git ls-files "Architechtural Docs/": pending
-- [ ] macOS duplicate scan: pending
+- [x] C-Build: clean pass — all 5 nations built
+- [x] git ls-files "Architechtural Docs/": returned empty
+- [x] macOS duplicate scan: completed
 - [ ] Playwright: pending
 **Notes / deviations from plan:**
 - Original Phase 0 stub used a `.way-layout` 3-panel sidebar/content/today approach. This was discarded. The broadsheet column layout (`.broadsheet-columns`) is the correct newspaper pattern per the plan's Layout Polish phase and confirmed by the live Herald at root.yhwh.one.
