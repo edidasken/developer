@@ -13,12 +13,23 @@ export const accent      = '#059669';
 
 let _oyb = [];   // one_year_bible bundle, loaded once
 
+const _PS = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
 const PLANS = [
-  { id: 'm-pro',     title: 'Proverbs in a Month',        days: 31,  category: 'Wisdom',     description: 'A chapter of Proverbs for every day of the month.' },
-  { id: 'gospels-90',title: 'Gospels in 90 Days',         days: 90,  category: 'Gospels',    description: 'Walk through Matthew, Mark, Luke, and John in three months.' },
-  { id: 'psalms-150',title: 'Psalms in 150 Days',         days: 150, category: 'Psalms',     description: 'A psalm a day for the seasons of the heart.' },
-  { id: 'b-year',    title: 'The Bible in a Year',        days: 365, category: 'Whole Bible', description: 'A balanced OT/NT/Psalms reading every day for a full year.' },
-  { id: 'nt-90',     title: 'New Testament in 90 Days',   days: 90,  category: 'NT',         description: 'A focused walk through the apostolic witness.' },
+  { id: 'm-pro',     title: 'Proverbs in a Month',        days: 31,  category: 'Wisdom',      color: '#b45309',
+    description: 'A chapter of Proverbs for every day of the month.',
+    svg: `<svg ${_PS}><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.6-1.4 4.8-3.5 6.1L15 17H9l-.5-1.9C6.4 13.8 5 11.6 5 9a7 7 0 0 1 7-7z"/></svg>` },
+  { id: 'gospels-90',title: 'Gospels in 90 Days',         days: 90,  category: 'Gospels',     color: '#1d4ed8',
+    description: 'Walk through Matthew, Mark, Luke, and John in three months.',
+    svg: `<svg ${_PS}><line x1="12" y1="3" x2="12" y2="21"/><line x1="4" y1="9" x2="20" y2="9"/></svg>` },
+  { id: 'psalms-150',title: 'Psalms in 150 Days',         days: 150, category: 'Psalms',      color: '#059669',
+    description: 'A psalm a day for the seasons of the heart.',
+    svg: `<svg ${_PS}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>` },
+  { id: 'b-year',    title: 'The Bible in a Year',        days: 365, category: 'Whole Bible', color: '#7c3aed',
+    description: 'A balanced OT/NT/Psalms reading every day for a full year.',
+    svg: `<svg ${_PS}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>` },
+  { id: 'nt-90',     title: 'New Testament in 90 Days',   days: 90,  category: 'NT',          color: '#4f46e5',
+    description: 'A focused walk through the apostolic witness.',
+    svg: `<svg ${_PS}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>` },
 ];
 
 const STORAGE = 'tw_reading_progress';
@@ -254,30 +265,26 @@ function _save(p) { try { localStorage.setItem(STORAGE, JSON.stringify(p)); } ca
 function _planCard(p, prog) {
   const done = prog ? Object.values(prog.days || {}).filter(Boolean).length : 0;
   const pct  = Math.min(100, Math.round((done / p.days) * 100));
-  const r    = 28; // circle radius
-  const circ = 2 * Math.PI * r;
-  const dash = circ - (pct / 100) * circ;
+  const c    = p.color || accent;
   return /* html */`
-    <article class="grow-plan-card" data-id="${esc(p.id)}">
-      <div class="grow-plan-card-top">
-        <div class="grow-plan-ring">
-          <svg viewBox="0 0 72 72" width="72" height="72">
-            <circle cx="36" cy="36" r="${r}" fill="none" stroke="var(--border,rgba(255,255,255,.1))" stroke-width="6"/>
-            <circle cx="36" cy="36" r="${r}" fill="none" stroke="${accent}" stroke-width="6"
-              stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${dash.toFixed(1)}"
-              stroke-linecap="round" transform="rotate(-90 36 36)"/>
-          </svg>
-          <span class="grow-plan-ring-pct">${pct}%</span>
-        </div>
-        <div class="grow-plan-info">
-          <div class="grow-plan-cat">${esc(p.category)} · ${p.days} days</div>
+    <article class="grow-plan-card" data-id="${esc(p.id)}" style="--pc:${c}">
+      <div class="grow-plan-card-head">
+        <span class="grow-plan-icon" aria-hidden="true">${p.svg || ''}</span>
+        <div class="grow-plan-head-body">
+          <span class="grow-plan-cat-pill">${esc(p.category)} · ${p.days}d</span>
           <h3 class="grow-plan-title">${esc(p.title)}</h3>
-          <p class="grow-plan-desc">${esc(p.description)}</p>
         </div>
       </div>
+      <p class="grow-plan-desc">${esc(p.description)}</p>
       <div class="grow-plan-card-foot">
-        <span class="grow-plan-done">${done} / ${p.days} days</span>
-        <button class="grow-btn grow-btn--ghost" data-toggle="${esc(p.id)}" style="font-size:12px; padding:6px 14px;">✓ Mark today</button>
+        <div class="grow-plan-prog">
+          <div class="grow-plan-prog-track"><div class="grow-plan-prog-fill" style="width:${pct}%"></div></div>
+          <span class="grow-plan-done">${done} / ${p.days} days</span>
+        </div>
+        <button class="grow-plan-mark" data-toggle="${esc(p.id)}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>
+          Mark today
+        </button>
       </div>
     </article>
   `;
@@ -287,6 +294,7 @@ function _renderStreak(progress) {
   // 12-week heatmap (84 cells) — count any plan checked on the day.
   const cells = [];
   const today = new Date();
+  let totalDays = 0;
   for (let i = 83; i >= 0; i--) {
     const d = new Date(today); d.setDate(today.getDate() - i);
     const k = d.toISOString().slice(0, 10);
@@ -294,10 +302,17 @@ function _renderStreak(progress) {
     for (const pid in progress) {
       if (progress[pid] && progress[pid].days && progress[pid].days[k]) count++;
     }
+    if (count > 0) totalDays++;
     const lvl = count === 0 ? 0 : count === 1 ? 1 : count === 2 ? 2 : 3;
     cells.push(`<i class="grow-heat grow-heat--${lvl}" title="${k}: ${count} read"></i>`);
   }
-  return `<div class="grow-heat-grid">${cells.join('')}</div>`;
+  const label = totalDays === 0
+    ? 'No days read in the last 12 weeks'
+    : `${totalDays} day${totalDays !== 1 ? 's' : ''} read in the last 12 weeks`;
+  return `<div class="grow-streak-wrap">
+    <div class="grow-streak-label">${label}</div>
+    <div class="grow-heat-grid">${cells.join('')}</div>
+  </div>`;
 }
 
 function _renderToday(progress) {
