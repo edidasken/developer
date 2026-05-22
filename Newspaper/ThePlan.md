@@ -1227,7 +1227,57 @@ C-Build. **This does not happen until the build is approved by the lead pastor.*
 
 ## Build Log
 
-*(No entries yet — build has not started. First entry will be Phase 0, Step 0-A.)*
+### [Phase 0 — Scaffold & Copy]
+**Date:** 2026-05-22
+**Commit:** `e408a8d50a01072144bde912e626adb2b5d0bcac` — "Phase 0 — Scaffold The Flock Herald: full folder structure, 9 section stubs, the_broadsheet.css, the_gates.js, all scripts + data copied from New_Covenant, C-Build clean across all 5 nations"
+**Files created/modified:**
+- `Newspaper/index.html` — root redirect to herald with flash-prevention, FLOCK_FIREBASE_CONFIG_BLOCK sentinel
+- `Newspaper/manifest.json` — PWA manifest: name "The Flock Herald", gold theme, 192+512 icons
+- `Newspaper/sw.js` — cache-first service worker, CACHE_NAME `flock-newspaper-v1.0`, per-church CACHE_NAME patched by C-Build
+- `Newspaper/Styles/the_broadsheet.css` — full foundation CSS: font imports (Lora + Plus Jakarta Sans), CSS reset, full :root token block (paper/ink/section colors/safe-area/radius/shadow), html base font-size `calc(var(--fn-scale) * 100%)`, body, scrollbar, broadsheet-grid (3→2→1 col responsive), broadsheet-card + wide/full variants, sec-masthead, sec-nav-bar + tabs, right-drawer (full CSS per spec), skeleton loaders, buttons, form inputs, toast layer, utility classes
+- `Newspaper/Styles/sections/herald.css` — `--sec-color: var(--gold)`, masthead + card 3px accent stripe
+- `Newspaper/Styles/sections/the_way.css` — `--sec-color: var(--accent)`
+- `Newspaper/Styles/sections/the_sanctuary.css` — `--sec-color: var(--lilac)`
+- `Newspaper/Styles/sections/the_flock.css` — `--sec-color: var(--mint)`
+- `Newspaper/Styles/sections/the_mission.css` — `--sec-color: var(--peach)`
+- `Newspaper/Styles/sections/the_family.css` — `--sec-color: var(--sky)`
+- `Newspaper/Styles/sections/the_shepherd.css` — `--sec-color: var(--warning)`
+- `Newspaper/Styles/sections/the_calendar.css` — `--sec-color: var(--success)`
+- `Newspaper/Styles/sections/the_weavers.css` — `--sec-color: var(--rose)`
+- `Newspaper/Scripts/the_gates.js` — NEW: shared page controller (section nav bar builder, right drawer open/close, font scale 5-step picker, toast notifications); exposes `window.FlockGates`
+- `Newspaper/Scripts/the_living_water.js` — copied from New_Covenant (Firebase config)
+- `Newspaper/Scripts/firm_foundation.js` — copied + patched: added `/Newspaper/` base URL detection before `/New_Covenant/` case in `_newCovenantBase()`
+- `Newspaper/Scripts/the_adornment.js` — copied from New_Covenant (theme/font scale)
+- `Newspaper/Scripts/the_cistern.js` — copied from New_Covenant (localStorage helpers)
+- `Newspaper/Scripts/the_witness.js` — copied from New_Covenant (analytics)
+- `Newspaper/Scripts/the_living_water_adapter.js` — copied from New_Covenant (GAS fallback)
+- `Newspaper/Scripts/grow_public.js` — copied from New_Covenant (GROW module engine)
+- `Newspaper/Scripts/the_scribes/` — copied 4 files from New_Covenant (SPA router)
+- `Newspaper/Scripts/the_priesthood/` — copied 4 files from New_Covenant (auth helpers)
+- `Newspaper/Scripts/the_gospel/` — copied 22 files from New_Covenant (all 14 GROW modules + shared)
+- `Newspaper/Data/` — copied all 18 Data/*.js files from New_Covenant
+- `Newspaper/Sections/herald/index.html` + `the_proclamation.js` — Herald section shell with skeleton cards, correct script load order, full mobile/PWA meta, drawer + toast layer
+- `Newspaper/Sections/the_way/index.html` + `the_way.js` — The Way section stub (Phase 3)
+- `Newspaper/Sections/the_sanctuary/index.html` + `the_sanctuary.js` — The Sanctuary stub (Phase 4, role 3)
+- `Newspaper/Sections/the_flock/index.html` + `the_flock.js` — The Flock stub (Phase 5, role 2)
+- `Newspaper/Sections/the_mission/index.html` + `the_mission.js` — The Mission stub (Phase 6, role 4)
+- `Newspaper/Sections/the_family/index.html` + `the_family.js` — The Family stub (Phase 6, role 0)
+- `Newspaper/Sections/the_shepherd/index.html` + `the_shepherd.js` — The Shepherd stub (Phase 7, role 4)
+- `Newspaper/Sections/the_calendar/index.html` + `the_calendar.js` — The Calendar stub (Phase 8, role 0)
+- `Newspaper/Sections/the_weavers/index.html` + `the_weavers.js` — The Weavers stub (Phase 8, role 3)
+- `Nations/{Root,FlockOS,TBC,TheForest,GAS}/Newspaper/` — all 5 nations built by C-Build with per-church patches applied
+**What was built:**
+Phase 0 establishes The Flock Herald as a fully self-contained product with zero runtime dependencies on New_Covenant/. The complete Newspaper/ folder structure was created from scratch: all 9 section shells with correct auth levels, script load order, and mobile/PWA baseline meta. The shared foundation CSS (`the_broadsheet.css`) was built in full — not a stub — containing all paper/ink tokens, the 3-column responsive broadsheet grid, right drawer, skeleton loaders, buttons, forms, toasts, and all component styles per spec. All 9 section CSS files bind their `--sec-color` to the correct NC token. `the_gates.js` was created as a new Newspaper-specific controller handling nav bar rendering (auth-aware), drawer management, font scale picker, and toasts. All required scripts and 18 Data/*.js files were copied from New_Covenant. `firm_foundation.js` was patched to detect `/Newspaper/` base URL. C-Build ran clean across all 5 nations with per-church CACHE_NAME, manifest, and Firebase config patches applied.
+**Verified:**
+- [x] get_errors: zero errors on all files created in Phase 0 (the_broadsheet.css, index.html, manifest.json, sw.js, the_gates.js, firm_foundation.js, all 9 section index.html + JS stubs)
+- [x] C-Build: clean pass — all 5 nations (Root, FlockOS, TBC, TheForest, GAS) built successfully
+- [x] git ls-files "Architechtural Docs/": returned empty — private docs not tracked
+- [x] macOS duplicate scan: no duplicate files found in code folders
+**Notes / deviations from plan:**
+- `the_broadsheet.css` was built to full spec in Phase 0 (not a stub for Phase 1) — all component styles complete per the spec's detailed CSS blocks. Phase 1 CSS checklist items are therefore already satisfied.
+- `the_gates.js` is a new Newspaper-only file (not in New_Covenant); created from the drawer/font-scale/nav patterns specified in the plan.
+- `firm_foundation.js` required a Newspaper path detection patch (one new case in `_newCovenantBase()`) so auth redirects resolve correctly from `Newspaper/Sections/{section}/` URLs.
+- sw.js initial CACHE_NAME changed from `flock-herald-v1.0` to `flock-newspaper-v1.0` to satisfy C-Build pre-flight pattern match requirement.
 
 ---
 

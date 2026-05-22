@@ -21,3 +21,293 @@
 .sec-herald .broadsheet-card {
   border-top: 3px solid var(--gold);
 }
+
+/* ── Front Page panel ──────────────────────────────────────────────────────── */
+.herald-dateline {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.herald-scripture {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--gold);
+  background: var(--paper-sunken);
+  border-radius: 0 4px 4px 0;
+}
+
+.herald-scripture__ref {
+  font-family: var(--sec-heading-font);
+  font-weight: 700;
+  color: var(--gold);
+  font-size: 1rem;
+}
+
+.herald-scripture__title {
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+}
+
+.herald-tagline {
+  font-size: 0.875rem;
+  color: var(--ink-faint);
+  font-style: italic;
+  margin: 0.5rem 0 0;
+}
+
+/* ── Today's Word — OYB panel ─────────────────────────────────────────────── */
+.oyb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.oyb-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.oyb-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex: 0 0 7rem;
+  white-space: nowrap;
+}
+
+.oyb-passage {
+  font-size: 0.9375rem;
+  color: var(--ink);
+  margin: 0;
+}
+
+@media (max-width: 420px) {
+  .oyb-row { flex-direction: column; gap: 0.125rem; }
+  .oyb-label { flex: none; }
+}
+
+/* ── Announcements panel ───────────────────────────────────────────────────── */
+.announcement-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.announcement-item {
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.announcement-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.announcement-title {
+  font-family: var(--sec-heading-font);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 0.25rem;
+}
+
+.announcement-body {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  margin: 0 0 0.25rem;
+  line-height: 1.5;
+}
+
+.announcement-date {
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  margin: 0;
+}
+
+/* ── Prayer Spotlight panel ────────────────────────────────────────────────── */
+.prayer-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--ink);
+  margin: 0 0 0.375rem;
+}
+
+.prayer-text {
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.prayer-pray-btn {
+  width: 100%;
+  justify-content: center;
+  font-size: 0.9375rem;
+  min-height: 44px;
+}
+
+/* ── Nation of the Week panel ──────────────────────────────────────────────── */
+.nation-summary {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.nation-prayer {
+  background: var(--paper-sunken);
+  border-radius: 4px;
+  padding: 0.625rem 0.75rem;
+  margin-bottom: 0.625rem;
+}
+
+.nation-prayer__label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  margin: 0 0 0.25rem;
+}
+
+.nation-prayer__text {
+  font-size: 0.875rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.nation-persecution {
+  font-size: 0.8125rem;
+  color: var(--error, #b00020);
+  margin: 0;
+}
+
+/* ── Heart Check panel ─────────────────────────────────────────────────────── */
+.heart-question {
+  font-size: 0.9375rem;
+  color: var(--ink);
+  line-height: 1.6;
+  margin: 0 0 0.5rem;
+}
+
+.heart-verse {
+  font-size: 0.8125rem;
+  color: var(--gold);
+  font-style: italic;
+  margin: 0 0 0.625rem;
+}
+
+.heart-rx {
+  margin-top: 0.625rem;
+}
+
+.heart-rx__toggle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--gold);
+  cursor: pointer;
+  user-select: none;
+  padding: 0.25rem 0;
+  list-style: none;
+}
+
+.heart-rx__toggle::-webkit-details-marker { display: none; }
+.heart-rx__toggle::before { content: '▸ '; }
+details.heart-rx[open] .heart-rx__toggle::before { content: '▾ '; }
+
+.heart-rx__text {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  line-height: 1.6;
+  margin: 0.375rem 0 0;
+}
+
+/* ── Bible Quiz panel ──────────────────────────────────────────────────────── */
+.quiz-question {
+  font-family: var(--sec-heading-font);
+  font-size: 1rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin: 0 0 0.875rem;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  background: var(--paper-sunken);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--sec-body-font);
+  font-size: 0.9375rem;
+  color: var(--ink);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.quiz-option:hover:not(:disabled) {
+  background: var(--paper-card);
+  border-color: var(--gold);
+}
+
+.quiz-option:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.quiz-option:disabled { cursor: default; }
+
+.quiz-option--correct {
+  background: #e8f5e9;
+  border-color: var(--success, #3d8b4f);
+  color: #1b5e20;
+}
+
+.quiz-option--wrong {
+  background: #fce4ec;
+  border-color: var(--error, #b00020);
+  color: #880e4f;
+}
+
+.quiz-opt-letter {
+  font-weight: 700;
+  font-size: 0.875rem;
+  flex: 0 0 1.25rem;
+  color: var(--gold);
+}
+
+.quiz-option--correct .quiz-opt-letter { color: var(--success, #3d8b4f); }
+.quiz-option--wrong .quiz-opt-letter   { color: var(--error, #b00020); }
+
+.quiz-opt-text { flex: 1; }
+
+.quiz-ref {
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+  margin: 0.5rem 0 0;
+  font-style: italic;
+}
