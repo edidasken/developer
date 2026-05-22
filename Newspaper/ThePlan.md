@@ -1281,3 +1281,24 @@ Phase 0 establishes The Flock Herald as a fully self-contained product with zero
 
 ---
 
+### [Phase 2 — The Herald: Wire Live Data]
+**Date:** 2026-05-22
+**Commit:** `6c865808` — "Phase 2 — The Herald: wire all 7 panels to live data (OYB, missions, heart check, quiz, prayer spotlight, announcements, front page)"
+**Files created/modified:**
+- `Newspaper/Scripts/the_true_vine.js` — ADDED: was missing from Phase 0 scaffold; copied from `New_Covenant/Scripts/the_true_vine.js` (TheVine GAS client, required by firm_foundation.js)
+- `Newspaper/Sections/herald/the_proclamation.js` — FULL REWRITE: all 7 Herald panels built and wired; replaced Phase 0 stub
+- `Newspaper/Styles/sections/herald.css` — EXTENDED: added full Herald panel styles (front page, OYB, announcements, prayer spotlight, nation of week, heart check, quiz)
+- `Nations/{Root,FlockOS,TBC,TheForest,GAS}/Newspaper/` — all 5 nations updated by C-Build
+**What was built:**
+All 7 Herald panels are live. `buildFrontPage` shows church name + date + rotating Psalm title (by day index) with a gold left-border scripture block. `buildTodaysWord` imports OYB data and displays all 4 daily passages (OT/NT/Psalm/Proverbs) in a clean definition-list layout. `buildAnnouncements` attempts `UpperRoom.listFlockNews` if available, falls back to a localStorage cache, then shows an encouraging empty state. `buildPrayerSpotlight` calls `UpperRoom.listPrayers` and shows a day-rotated unanswered prayer with a "Pray for this" button that fires a toast. `buildNationOfWeek` imports missions.js and rotates by week index, showing country name, population, Christian %, persecution level, Operation World summary and a prayer challenge. `buildHeartCheck` imports heart.js and rotates by day, showing question + verse + expandable prescription. `buildQuiz` imports quiz.js with fully interactive A/B/C/D buttons — correct answer highlights green, wrong answer red, scripture reference revealed on answer. All panels run concurrently via `Promise.allSettled`. Editor's Desk config overrides (devotionalIndex, nationIndex, heartIndex, quizIndex, showAnnouncements) are respected by every panel. `the_true_vine.js` addition resolves the missing script that was breaking the load chain.
+**Verified:**
+- [x] get_errors: zero errors on the_proclamation.js, herald.css, the_true_vine.js
+- [x] C-Build: clean pass — all 5 nations built
+- [x] git ls-files "Architechtural Docs/": returned empty
+- [x] macOS duplicate scan: no duplicates found
+**Notes / deviations from plan:**
+- `flockNews` has no UpperRoom or TheVine adapter domain; the Herald tries `UpperRoom.listFlockNews` at runtime (may or may not exist on a given deployment) and falls to localStorage cache → empty state. This is correct per the connectivity model.
+- Panels 4–7 (Prayer Spotlight, Nation, Heart Check, Quiz) are dynamically appended to the grid rather than being in the initial HTML — this keeps the HTML skeleton clean and prevents FOUC on the pre-loaded skeleton cards.
+
+---
+
