@@ -1041,6 +1041,7 @@
 
   /** § 5 — Missions Spotlight (static editorial) */
   function buildMissionsSpotlight() {
+    // Inline preview — up through "A Life Shaped by the Sent God"
     const bodyHtml = `
       <p>The Great Commission was not a suggestion.</p>
       <p>When Jesus stood before His disciples on that Galilean hillside and declared, <em>"Go therefore and make disciples of all nations"</em> (Matthew 28:19), He was not addressing a select class of professional missionaries. He was speaking to ordinary men and women who had encountered the living God — and He was calling them to carry that encounter to the ends of the earth.</p>
@@ -1048,19 +1049,37 @@
       <h3 class="story-subhed">A Life Shaped by the Sent God</h3>
       <p>Mission is not an activity the Church does on weekends. It is the very nature of God poured into the shape of daily life. The Father sent the Son. The Son sent the Spirit. The Spirit sends the Church. You are part of a sending chain that stretches back to eternity itself.</p>
       <p>This means that mission happens at the school pickup line. It happens across a back fence, over a dinner table, in a text message sent at the right moment. The missional life is not reserved for those who board planes — it belongs to anyone who has been given new eyes to see the people God has placed in their path.</p>
-      <h3 class="story-subhed">Outreach Is Not a Program</h3>
-      <p>The American church has largely domesticated mission into a calendar event: the annual outreach night, the canned food drive, the Christmas outreach. These are good things — but they can quietly train us to think that mission belongs to the institution, not to us personally.</p>
-      <p>Jesus modeled something far more disruptive. He went to where people were hurting. He ate with tax collectors. He stopped for one blind man on a crowded road. He crossed ethnic and religious fault lines that His own disciples thought were uncrossable. His outreach was not scheduled — it was a posture, a constant availability to the person right in front of Him.</p>
-      <p>What would change in your neighborhood if you adopted that posture? If you slowed down enough to ask, <em>Who has God placed in front of me today — and do they know they are loved?</em></p>
-      <h3 class="story-subhed">The Stakes Are Eternal</h3>
-      <p>Paul writes in Romans 10:14, <em>"How then will they call on him in whom they have not believed? And how are they to believe in him of whom they have never heard? And how are they to hear without someone preaching?"</em></p>
-      <p>There is a world — quite literally — that is waiting for someone to go. According to the latest research, more than 3.2 billion people remain in people groups with no meaningful access to the Gospel. They are not waiting on a strategy summit. They are waiting on people — people like you — who take seriously that the Good News is meant for all nations, all peoples, all tongues.</p>
-      <p>Even if God never calls you abroad, your prayers, your giving, and your faithfulness in your own corner of the world are threads in a tapestry of global mission that is being woven right now.</p>
-      <h3 class="story-subhed">Start Where You Stand</h3>
-      <p>Missional living does not require a passport. It requires a willing heart. Introduce yourself to the neighbor you have never met. Invite the coworker who always eats alone. Pray by name for someone far from God. Show up to serve in a way that costs you something.</p>
-      <p>The world is not saved by Christians who wait for the perfect moment. It is reached by those who are present, available, and convinced that the Gospel is worth interrupting their plans for.</p>
-      <p>You were saved for this. Go.</p>
     `;
+
+    // Full article in drawer — all sections
+    _drawers['missions-spotlight'] = `
+      <div style="padding:1.25rem 1.25rem 2rem">
+        <p class="story-kicker" style="margin-bottom:0.75rem">\u00a7\u00a08 \u00b7 THE MISSION \u00b7 MISSIONS SPOTLIGHT</p>
+        <h2 style="font-family:'Lora',Georgia,serif;font-size:1.35rem;font-weight:700;line-height:1.25;margin-bottom:0.35rem">You Are the Sent One</h2>
+        <p style="font-size:0.8125rem;color:var(--ink-muted);font-style:italic;margin-bottom:1rem">Herald Editorial \u00b7 The Flock Herald</p>
+        <div class="story-body">
+          <p>The Great Commission was not a suggestion.</p>
+          <p>When Jesus stood before His disciples on that Galilean hillside and declared, <em>"Go therefore and make disciples of all nations"</em> (Matthew 28:19), He was not addressing a select class of professional missionaries. He was speaking to ordinary men and women who had encountered the living God — and He was calling them to carry that encounter to the ends of the earth.</p>
+          <p>Every follower of Christ is, by definition, a missionary. The word itself is simply Latin for <em>sent one</em> — and if you have been redeemed, you have been sent.</p>
+          <h3 class="story-subhed">A Life Shaped by the Sent God</h3>
+          <p>Mission is not an activity the Church does on weekends. It is the very nature of God poured into the shape of daily life. The Father sent the Son. The Son sent the Spirit. The Spirit sends the Church. You are part of a sending chain that stretches back to eternity itself.</p>
+          <p>This means that mission happens at the school pickup line. It happens across a back fence, over a dinner table, in a text message sent at the right moment. The missional life is not reserved for those who board planes — it belongs to anyone who has been given new eyes to see the people God has placed in their path.</p>
+          <h3 class="story-subhed">Outreach Is Not a Program</h3>
+          <p>The American church has largely domesticated mission into a calendar event: the annual outreach night, the canned food drive, the Christmas outreach. These are good things — but they can quietly train us to think that mission belongs to the institution, not to us personally.</p>
+          <p>Jesus modeled something far more disruptive. He went to where people were hurting. He ate with tax collectors. He stopped for one blind man on a crowded road. He crossed ethnic and religious fault lines that His own disciples thought were uncrossable. His outreach was not scheduled — it was a posture, a constant availability to the person right in front of Him.</p>
+          <p>What would change in your neighborhood if you adopted that posture? If you slowed down enough to ask, <em>Who has God placed in front of me today — and do they know they are loved?</em></p>
+          <h3 class="story-subhed">The Stakes Are Eternal</h3>
+          <p>Paul writes in Romans 10:14, <em>"How then will they call on him in whom they have not believed? And how are they to believe in him of whom they have never heard? And how are they to hear without someone preaching?"</em></p>
+          <p>There is a world — quite literally — that is waiting for someone to go. According to the latest research, more than 3.2 billion people remain in people groups with no meaningful access to the Gospel. They are not waiting on a strategy summit. They are waiting on people — people like you — who take seriously that the Good News is meant for all nations, all peoples, all tongues.</p>
+          <p>Even if God never calls you abroad, your prayers, your giving, and your faithfulness in your own corner of the world are threads in a tapestry of global mission that is being woven right now.</p>
+          <h3 class="story-subhed">Start Where You Stand</h3>
+          <p>Missional living does not require a passport. It requires a willing heart. Introduce yourself to the neighbor you have never met. Invite the coworker who always eats alone. Pray by name for someone far from God. Show up to serve in a way that costs you something.</p>
+          <p>The world is not saved by Christians who wait for the perfect moment. It is reached by those who are present, available, and convinced that the Gospel is worth interrupting their plans for.</p>
+          <p>You were saved for this. Go.</p>
+        </div>
+      </div>
+    `;
+
     const article = _story({
       num:      null,
       category: 'THE MISSION',
@@ -1069,6 +1088,7 @@
       deck:     'Why every follower of Jesus is called to live a missional life — in their neighborhood, their city, and to the ends of the earth.',
       byline:   'Herald Editorial · The Flock Herald',
       bodyHtml,
+      drawer:   'missions-spotlight',
     });
     return `<div class="section-rule"><span class="section-label">\u00a7\u00a08 \u00b7 MISSIONS SPOTLIGHT</span></div>${article}`;
   }
