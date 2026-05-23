@@ -297,36 +297,142 @@
   color: var(--ink);
 }
 
-/* ── Prayer card: summary text ──────────────────────────────────────────── */
-.prayer-card__summary {
+/* ── Prayer card: natural name + pronunciation ──────────────────────────── */
+.prayer-card__natural-name {
   font-family: var(--font-body);
-  font-size: 0.9rem;
-  line-height: 1.65;
+  font-size: 0.8125rem;
+  font-weight: 400;
   color: var(--ink-muted);
+  margin-left: 0.375rem;
+}
+
+.prayer-card__pronunc {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-style: italic;
+  color: var(--ink-faint);
+  margin-top: 0.125rem;
+}
+
+/* ── Joshua Project link ────────────────────────────────────────────────── */
+.prayer-card__jp-link {
+  display: inline-block;
+  margin-top: 0.375rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--peach);
+  text-decoration: none;
+}
+.prayer-card__jp-link:hover { text-decoration: underline; }
+
+/* ── Feature badges (10/40 window, audio, etc.) ─────────────────────────── */
+.prayer-card__features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-sunken);
+}
+
+.feature-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1875rem 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+  background: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+}
+
+/* ── Info table (language, religion, etc.) ──────────────────────────────── */
+.prayer-card__info-table {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--rule);
+}
+
+.info-row {
+  display: flex;
+  padding: 0.4375rem 1rem;
+  border-bottom: 1px solid var(--rule);
+  gap: 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+}
+
+.info-row:last-child { border-bottom: none; }
+
+.info-row__label {
+  flex: 0 0 6.5rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+}
+
+.info-row__value {
+  flex: 1;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+/* ── Distribution map ───────────────────────────────────────────────────── */
+.prayer-card__map-wrap {
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-sunken);
+}
+
+.prayer-card__map {
+  display: block;
+  width: 100%;
+  max-height: 12rem;
+  object-fit: contain;
+}
+
+/* ── Section blocks (summary / prayer points) ───────────────────────────── */
+.prayer-card__section {
   padding: 0.875rem 1rem;
   border-bottom: 1px solid var(--rule);
 }
 
-/* ── Prayer card: prayer points ─────────────────────────────────────────── */
-.prayer-card__prayers {
-  padding: 0.875rem 1rem 1rem;
-}
+.prayer-card__section:last-child { border-bottom: none; }
 
-.prayer-card__prayers-title {
+.prayer-card__section-title {
   font-family: var(--font-headline);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--peach);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.625rem;
 }
 
-.prayer-card__prayers-text {
+.prayer-card__text {
   font-family: var(--font-body);
   font-size: 0.9rem;
   line-height: 1.7;
   color: var(--ink-muted);
+}
+
+/* ── Prayer sub-sections (per prayer type) ──────────────────────────────── */
+.prayer-subsection {
+  margin-bottom: 0.875rem;
+}
+.prayer-subsection:last-child { margin-bottom: 0; }
+
+.prayer-subsection__label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.25rem;
 }
 
 /* ── Skeleton placeholder ───────────────────────────────────────────────── */

@@ -59,19 +59,20 @@
 
   /* ── Utility: reached status helpers ───────────────────────────────────── */
   function reachClass(jpText, frontier) {
-    if (frontier === 1 || frontier === '1') return 'frontier';
+    // Frontier comes back as "Y"/"N" string from JP API
+    if (frontier === 'Y' || frontier === 1 || frontier === '1') return 'frontier';
     if (!jpText) return 'unknown';
     var t = jpText.toLowerCase();
-    if (t.includes('frontier'))     return 'frontier';
-    if (t.includes('unreached'))    return 'unreached';
-    if (t.includes('minimally'))    return 'minimal';
+    if (t.includes('frontier'))      return 'frontier';
+    if (t.includes('unreached'))     return 'unreached';
+    if (t.includes('minimally'))     return 'minimal';
     if (t.includes('superficially')) return 'superficial';
-    if (t.includes('reached'))      return 'reached';
+    if (t.includes('reached'))       return 'reached';
     return 'unknown';
   }
 
   function reachLabel(jpText, frontier) {
-    if (frontier === 1 || frontier === '1') return 'Frontier';
+    if (frontier === 'Y' || frontier === 1 || frontier === '1') return 'Frontier';
     return jpText || 'Unknown';
   }
 
@@ -119,8 +120,15 @@
 
     var url = JP_BASE + '/people_groups.json?api_key=' + encodeURIComponent(JP_API_KEY) +
       '&countries=' + encodeURIComponent(ctryId) +
-      '&select=PeopNameAcrossCountries,Population,PercentEvangelical,PercentAdherents' +
-        ',PhotoAddress,SummaryProfile,PrayerGoals,JPScaleText,Frontier' +
+      '&select=PeopNameAcrossCountries,PeopNameInCountry,NaturalName,Population' +
+        ',PercentEvangelical,PercentAdherents,PercentChristianPC' +
+        ',PeopleGroupPhotoURL,PeopleGroupURL,PeopleGroupMapURL' +
+        ',Summary,PrayForPG,HowReach,Obstacles,PrayForChurch' +
+        ',JPScaleText,JPScale,Frontier,LRTop100' +
+        ',PrimaryLanguageName,PrimaryReligion,ReligionSubdivision' +
+        ',AffinityBloc,PeopleCluster,LocationInCountry' +
+        ',Window1040,AudioRecordings,HasJesusFilm,BibleStatus' +
+        ',CountOfCountries,SecurityLevel,NaturalPronunciation' +
       '&limit=100&sort_field=Population&sort_dir=DESC';
 
     return fetch(url).then(function (resp) {
@@ -261,47 +269,143 @@
     });
   }
 
+  /* ── Bible status label ─────────────────────────────────────────────────── */
+  var BIBLE_STATUS = {
+    0: '—', 1: 'Portions needed', 2: 'Portions', 3: 'New Testament', 4: 'Full Bible'
+  };
+
   /* ── Render: single prayer card ─────────────────────────────────────────── */
   function renderPrayerCard(g) {
-    var name    = g.PeopNameAcrossCountries || g.PeopNameInCountry || 'Unknown People Group';
-    var rc      = reachClass(g.JPScaleText, g.Frontier);
-    var rl      = reachLabel(g.JPScaleText, g.Frontier);
-    var photo   = (g.PhotoAddress || '').trim();
-    var summary = stripTags(g.SummaryProfile || '');
-    var prayers = stripTags(g.PrayerGoals   || '');
+    var name   = g.PeopNameAcrossCountries || g.PeopNameInCountry || 'Unknown People Group';
+    var rc     = reachClass(g.JPScaleText, g.Frontier);
+    var rl     = reachLabel(g.JPScaleText, g.Frontier);
+    var photo  = (g.PeopleGroupPhotoURL || '').trim();
+    var jpUrl  = (g.PeopleGroupURL || '').trim();
+    var mapUrl = (g.PeopleGroupMapURL || '').trim();
 
+    /* ── Photo ── */
     var photoHTML = photo
       ? '<img class="prayer-card__photo" src="' + esc(photo) + '" ' +
           'alt="' + esc(name) + '" loading="lazy" ' +
-          'onerror="this.classList.add(\'prayer-card__photo--error\')">'
+          'onerror="this.classList.add(\'prayer-card__photo--error\');">'
       : '<div class="prayer-card__photo prayer-card__photo--placeholder" aria-hidden="true">🙏</div>';
 
-    var summaryHTML = summary
-      ? '<p class="prayer-card__summary">' + esc(summary) + '</p>'
+    /* ── Name + badge + JP link ── */
+    var nameLine = esc(name);
+    if (g.NaturalName && g.NaturalName !== name) {
+      nameLine += ' <span class="prayer-card__natural-name">' + esc(g.NaturalName) + '</span>';
+    }
+    var pronHTML = g.NaturalPronunciation
+      ? '<span class="prayer-card__pronunc">' + esc(g.NaturalPronunciation) + '</span>'
+      : '';
+    var jpLinkHTML = jpUrl
+      ? '<a class="prayer-card__jp-link" href="' + esc(jpUrl) + '" ' +
+          'target="_blank" rel="noopener noreferrer">joshuaproject.net ↗</a>'
       : '';
 
-    var prayersHTML = prayers
-      ? '<div class="prayer-card__prayers">' +
-          '<h4 class="prayer-card__prayers-title">Prayer Points</h4>' +
-          '<p class="prayer-card__prayers-text">' + esc(prayers) + '</p>' +
+    /* ── Feature badges (10/40 window, audio, Jesus film, LR Top 100) ── */
+    var features = [];
+    if (g.Window1040 === 'Y')       features.push(featureBadge('10/40 Window', '🗺'));
+    if (g.LRTop100  === 'Y')       features.push(featureBadge('Top 100 Least Reached', '⚑'));
+    if (g.AudioRecordings === 'Y') features.push(featureBadge('Audio Recordings', '🎧'));
+    if (g.HasJesusFilm    === 'Y') features.push(featureBadge('Jesus Film', '🎬'));
+    var featuresHTML = features.length
+      ? '<div class="prayer-card__features">' + features.join('') + '</div>'
+      : '';
+
+    /* ── Stats pills ── */
+    var statsHTML =
+      '<div class="prayer-card__stats">' +
+        statPill('Population',  fmtPop(g.Population)) +
+        statPill('Evangelical', fmtPct(g.PercentEvangelical)) +
+        statPill('Christian',   fmtPct(g.PercentAdherents)) +
+        statPill('Countries',   g.CountOfCountries || '—') +
+      '</div>';
+
+    /* ── Info rows (language, religion, location, affinity, cluster) ── */
+    var infoRows = [];
+    if (g.PrimaryLanguageName) infoRows.push(infoRow('Language',      g.PrimaryLanguageName));
+    var religion = g.PrimaryReligion || '';
+    if (g.ReligionSubdivision) religion += ' · ' + g.ReligionSubdivision;
+    if (religion)               infoRows.push(infoRow('Religion',      religion));
+    if (g.AffinityBloc)         infoRows.push(infoRow('Affinity Bloc', g.AffinityBloc));
+    if (g.PeopleCluster)        infoRows.push(infoRow('Cluster',       g.PeopleCluster));
+    if (g.LocationInCountry)    infoRows.push(infoRow('Location',      g.LocationInCountry));
+    var bibleLabel = BIBLE_STATUS[parseInt(g.BibleStatus, 10)];
+    if (bibleLabel && bibleLabel !== '—') infoRows.push(infoRow('Scripture', bibleLabel));
+    if (g.SecurityLevel > 1)    infoRows.push(infoRow('Security',     'Level ' + g.SecurityLevel));
+    var infoHTML = infoRows.length
+      ? '<div class="prayer-card__info-table">' + infoRows.join('') + '</div>'
+      : '';
+
+    /* ── Map ── */
+    var mapHTML = mapUrl
+      ? '<div class="prayer-card__map-wrap">' +
+          '<img class="prayer-card__map" src="' + esc(mapUrl) + '" ' +
+          'alt="Distribution map for ' + esc(name) + '" loading="lazy">'
+          + '</div>'
+      : '';
+
+    /* ── Profile summary ── */
+    var summary = stripTags(g.Summary || '');
+    var summaryHTML = summary
+      ? '<div class="prayer-card__section">' +
+          '<h4 class="prayer-card__section-title">Profile</h4>' +
+          '<p class="prayer-card__text">' + esc(summary) + '</p>' +
+        '</div>'
+      : '';
+
+    /* ── Prayer points (PrayForPG, HowReach, Obstacles, PrayForChurch) ── */
+    var prayerSections = [
+      { label: 'Prayer for this People', text: stripTags(g.PrayForPG    || '') },
+      { label: 'How to Reach',           text: stripTags(g.HowReach     || '') },
+      { label: 'Obstacles',              text: stripTags(g.Obstacles    || '') },
+      { label: 'Prayer for the Church',  text: stripTags(g.PrayForChurch|| '') },
+    ].filter(function (s) { return s.text; });
+
+    var prayersHTML = prayerSections.length
+      ? '<div class="prayer-card__section">' +
+          '<h4 class="prayer-card__section-title">🙏 Prayer Points</h4>' +
+          prayerSections.map(function (s) {
+            return '<div class="prayer-subsection">' +
+              '<p class="prayer-subsection__label">' + esc(s.label) + '</p>' +
+              '<p class="prayer-card__text">' + esc(s.text) + '</p>' +
+            '</div>';
+          }).join('') +
         '</div>'
       : '';
 
     return '<article class="prayer-card prayer-card--' + rc + '">' +
+
+      /* Top: photo + name block */
       '<div class="prayer-card__top">' +
         photoHTML +
         '<div class="prayer-card__header">' +
-          '<h3 class="prayer-card__name">' + esc(name) + '</h3>' +
+          '<h3 class="prayer-card__name">' + nameLine + '</h3>' +
+          pronHTML +
           '<span class="prayer-card__badge prayer-card__badge--' + rc + '">' + esc(rl) + '</span>' +
+          jpLinkHTML +
         '</div>' +
       '</div>' +
-      '<div class="prayer-card__stats">' +
-        statPill('Population', fmtPop(g.Population)) +
-        statPill('Evangelical', fmtPct(g.PercentEvangelical)) +
-        statPill('Christian',   fmtPct(g.PercentAdherents)) +
-      '</div>' +
+
+      /* Feature badges */
+      featuresHTML +
+
+      /* Stats */
+      statsHTML +
+
+      /* Info table */
+      infoHTML +
+
+      /* Map */
+      mapHTML +
+
+      /* Summary */
       summaryHTML +
+
+      /* Prayer points */
       prayersHTML +
+
     '</article>';
   }
 
@@ -310,6 +414,17 @@
       '<span class="stat-pill__label">' + esc(label) + '</span>' +
       '<span class="stat-pill__value">' + esc(value) + '</span>' +
     '</div>';
+  }
+
+  function infoRow(label, value) {
+    return '<div class="info-row">' +
+      '<span class="info-row__label">' + esc(label) + '</span>' +
+      '<span class="info-row__value">' + esc(value) + '</span>' +
+    '</div>';
+  }
+
+  function featureBadge(label, icon) {
+    return '<span class="feature-badge">' + icon + ' ' + esc(label) + '</span>';
   }
 
   /* ── Init ───────────────────────────────────────────────────────────────── */
