@@ -1061,8 +1061,8 @@
       <p>The world is not saved by Christians who wait for the perfect moment. It is reached by those who are present, available, and convinced that the Gospel is worth interrupting their plans for.</p>
       <p>You were saved for this. Go.</p>
     `;
-    return _story({
-      num:      8,
+    const article = _story({
+      num:      null,
       category: 'THE MISSION',
       section:  'MISSIONS SPOTLIGHT',
       hed:      'You Are the Sent One',
@@ -1070,6 +1070,7 @@
       byline:   'Herald Editorial · The Flock Herald',
       bodyHtml,
     });
+    return `<div class="section-rule"><span class="section-label">\u00a7\u00a08 \u00b7 MISSIONS SPOTLIGHT</span></div>${article}`;
   }
 
   // ── Init ──────────────────────────────────────────────────────────────────────
@@ -1095,19 +1096,19 @@
       buildBibleBookStory(cfg),     // main col 3 — § 2
       buildAnnouncementsStory(cfg), // main col 4 — § 3
       buildPrayerStory(),           // main col 5 — § 4
-      buildMissionsSpotlight(),     // main col 6 — § 5
       buildCounselingCorner(cfg),   // aside 1 — § 4
       buildNationAside(cfg),        // aside 2 — § 5
       buildHeartAside(cfg),         // aside 3 — § 6
       buildQuizAside(cfg),          // aside 4 — § 7
+      buildMissionsSpotlight(),     // aside 5 — § 8
     ]);
 
     const html = results.map(r => r.status === 'fulfilled' ? r.value : '');
 
     const mainEl  = document.getElementById('herald-main');
     const asideEl = document.getElementById('herald-aside');
-    if (mainEl)  mainEl.innerHTML  = html.slice(0, 6).join('');
-    if (asideEl) asideEl.innerHTML = html.slice(6).join('');
+    if (mainEl)  mainEl.innerHTML  = html.slice(0, 5).join('');
+    if (asideEl) asideEl.innerHTML = html.slice(5).join('');
   }
 
   document.addEventListener('DOMContentLoaded', init);
