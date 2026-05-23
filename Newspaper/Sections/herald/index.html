@@ -31,13 +31,11 @@
         <h2 class="sec-compact__title">The Flock Herald</h2>
       </div>
       <div class="sec-compact__right">
-        <button class="sec-date-btn" id="sec-compact-date" aria-haspopup="true" aria-expanded="false" type="button">
+        <button class="sec-date-btn" id="sec-compact-date" type="button" aria-label="Change date">
           <span class="sec-date-btn__text" id="sec-compact-date-text"></span>
           <span class="sec-date-btn__caret" aria-hidden="true">&#9663;</span>
         </button>
-        <div class="sec-date-picker" id="sec-date-picker" aria-hidden="true">
-          <input type="date" id="sec-date-input" />
-        </div>
+        <input type="date" id="sec-date-input" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;" tabindex="-1" aria-hidden="true" />
         <p class="sec-compact__edition" id="sec-compact-edition"></p>
       </div>
     </div>
@@ -141,45 +139,21 @@
         window._heraldDate = dt;
       }
 
-      var _pickerOpen = false;
-      var dateBtn  = document.getElementById('sec-compact-date');
-      var datePicker = document.getElementById('sec-date-picker');
+      var dateBtn   = document.getElementById('sec-compact-date');
       var dateInput  = document.getElementById('sec-date-input');
 
-      function openPicker() {
-        _pickerOpen = true;
-        datePicker.removeAttribute('aria-hidden');
-        datePicker.classList.add('is-open');
-        dateBtn.setAttribute('aria-expanded', 'true');
-        dateInput.focus();
-      }
-      function closePicker() {
-        _pickerOpen = false;
-        datePicker.setAttribute('aria-hidden', 'true');
-        datePicker.classList.remove('is-open');
-        dateBtn.setAttribute('aria-expanded', 'false');
-      }
-
-      if (dateBtn) {
+      if (dateBtn && dateInput) {
         dateBtn.addEventListener('click', function(e) {
           e.stopPropagation();
-          _pickerOpen ? closePicker() : openPicker();
+          try { dateInput.showPicker(); } catch(_) { dateInput.click(); }
         });
-      }
-      if (dateInput) {
         dateInput.addEventListener('change', function() {
           var parts = dateInput.value.split('-');
           var dt = new Date(+parts[0], +parts[1]-1, +parts[2]);
           applyDate(dt);
-          closePicker();
           updatePadding();
         });
       }
-      document.addEventListener('click', function(e) {
-        if (_pickerOpen && datePicker && !datePicker.contains(e.target) && e.target !== dateBtn) {
-          closePicker();
-        }
-      });
 
       applyDate(new Date());
     })();
