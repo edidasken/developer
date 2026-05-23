@@ -177,7 +177,7 @@
   opacity: 1;
   pointer-events: auto;
 }
-.herald-compact__center { text-align: center; }
+.herald-compact__center { text-align: left; }
 .herald-compact__title {
   font-family: 'Great Vibes', cursive;
   font-size: 1.75rem;
