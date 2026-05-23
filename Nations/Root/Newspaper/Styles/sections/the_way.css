@@ -1047,6 +1047,8 @@ a.oyb-stream-card:hover .oyb-stream-arrow { color: var(--sc, var(--accent)); }
 }
 @media (max-width: 860px) {
   .broadsheet-columns { grid-template-columns: 1fr; gap: 0; padding: 1rem 0.75rem calc(4rem + env(safe-area-inset-bottom)); }
+  .sec-the-way .broadsheet-col--aside { order: -1; }
+  .sec-the-way .broadsheet-col--main  { order: 0; }
 }
 
 .broadsheet-col { min-width: 0; }
