@@ -1062,7 +1062,7 @@
       <p>You were saved for this. Go.</p>
     `;
     return _story({
-      num:      5,
+      num:      8,
       category: 'THE MISSION',
       section:  'MISSIONS SPOTLIGHT',
       hed:      'You Are the Sent One',
