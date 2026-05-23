@@ -1800,3 +1800,63 @@ a.oyb-stream-card:hover .oyb-stream-arrow { color: var(--sc, var(--accent)); }
   color: var(--ink);
   line-height: 1.4;
 }
+
+/* ── § 9 Faces of Faith: Genealogy cards ────────────────────────────────── */
+.way-genealogy-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+}
+.way-gen-card {
+  background: var(--paper-card, #fff);
+  border: 1px solid var(--rule, #e4e1dc);
+  border-left: 3px solid var(--gold, #8B7028);
+  border-radius: 3px;
+  padding: 0.625rem 0.75rem 0.7rem;
+}
+.way-gen-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.2rem;
+}
+.way-gen-name {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.way-gen-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold, #8B7028);
+}
+.way-gen-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.3rem;
+}
+.way-gen-meaning {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--ink-muted);
+}
+.way-gen-ref {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.way-gen-bio {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0;
+}

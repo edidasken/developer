@@ -568,6 +568,54 @@
       });
     }
 
+    /* § 9 — Faces of Faith: 3 daily genealogy characters */
+    (function () {
+      var $genRule = document.createElement('div');
+      $genRule.className = 'section-rule';
+      $genRule.style.marginTop = '1.25rem';
+      $genRule.innerHTML = '<span class="section-label">\u00a7\u00a09 \u00b7 FACES OF FAITH \u00b7 GENEALOGY</span>';
+      $aside.appendChild($genRule);
+
+      var $genWrap = document.createElement('div');
+      $genWrap.className = 'way-genealogy-wrap';
+      $aside.appendChild($genWrap);
+
+      import('../../Data/genealogy.js').then(function (m) {
+        var all = (m.default || []).filter(function (p) { return p.name && p.bio; });
+        if (!all.length) return;
+        var di = Math.floor(Date.now() / 86400000);
+        var picks = [
+          all[di % all.length],
+          all[(di * 7 + 113) % all.length],
+          all[(di * 13 + 251) % all.length],
+        ];
+        // De-duplicate by name in case of collision on small datasets
+        var seen = {};
+        picks = picks.filter(function (p) {
+          if (seen[p.name]) return false;
+          seen[p.name] = true;
+          return true;
+        });
+
+        var html = picks.map(function (p) {
+          var meaning = p.meaning ? '<span class="way-gen-meaning">\u201c' + esc(p.meaning) + '\u201d</span>' : '';
+          var ref     = p.reference ? '<span class="way-gen-ref">' + esc(p.reference) + '</span>' : '';
+          var bio     = p.bio.charAt(0).toUpperCase() + p.bio.slice(1);
+          return '<div class="way-gen-card">'
+            + '<div class="way-gen-header">'
+            +   '<span class="way-gen-name">' + esc(p.name) + '</span>'
+            +   (p.title ? '<span class="way-gen-title">' + esc(p.title) + '</span>' : '')
+            + '</div>'
+            + (meaning || ref ? '<div class="way-gen-meta">' + meaning + ref + '</div>' : '')
+            + '<p class="way-gen-bio">' + esc(bio) + '</p>'
+            + '</div>';
+        }).join('');
+        $genWrap.innerHTML = html;
+      }).catch(function () {
+        $genWrap.innerHTML = '<p style="font-size:0.8125rem;color:var(--ink-muted);padding:0.5rem 0">Genealogy data unavailable.</p>';
+      });
+    }());
+
     /* Edit daily messages button — leaders (role >= 3) only */
     var _editRole = (window.FlockGates && typeof window.FlockGates.getUserRole === 'function')
       ? window.FlockGates.getUserRole() : -1;
