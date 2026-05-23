@@ -3,12 +3,7 @@
 
   const SECTION_KEY = 'the_sanctuary';
   const STORAGE_KEY = 'newspaper:the_sanctuary:leader-session';
-  const SERVICE_WORKER_CANDIDATES = [
-    '../../service-worker.js',
-    '../../../service-worker.js',
-    '../../sw.js',
-    '../../../sw.js'
-  ];
+  const SERVICE_WORKER_CANDIDATES = ['../../sw.js'];
   const SESSION_TTL_MS = 1000 * 60 * 60 * 8;
 
   function onReady(callback) {

@@ -3,12 +3,7 @@
 
   const SECTION_KEY = 'the_flock';
   const STORAGE_KEY = 'newspaper:the_flock:cache';
-  const SERVICE_WORKER_CANDIDATES = [
-    '../../service-worker.js',
-    '../../../service-worker.js',
-    '../../sw.js',
-    '../../../sw.js'
-  ];
+  const SERVICE_WORKER_CANDIDATES = ['../../sw.js'];
 
   const SUPPORT_SCRIPT_CANDIDATES = [
     '../../Scripts/the_true_vine.js'
