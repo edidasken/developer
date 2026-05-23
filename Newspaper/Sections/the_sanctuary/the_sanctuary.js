@@ -96,6 +96,107 @@
   const _qs  = id => document.getElementById(id);
   const _now = () => Date.now();
 
+  function _showAuthOverlay() {
+    const overlay = _qs('sanc-auth-overlay');
+    const grid = _qs('the-sanctuary-grid');
+    if (overlay) {
+      overlay.classList.remove('hidden');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    if (grid) grid.classList.add('sanctuary-auth-blocked');
+  }
+
+  function _hideAuthOverlay() {
+    const overlay = _qs('sanc-auth-overlay');
+    const grid = _qs('the-sanctuary-grid');
+    if (overlay) {
+      overlay.classList.add('hidden');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    if (grid) grid.classList.remove('sanctuary-auth-blocked');
+  }
+
+  function _setAuthError(message) {
+    const errorEl = _qs('sanc-auth-error');
+    if (errorEl) {
+      errorEl.textContent = message || '';
+    }
+  }
+
+  function _isAuthenticated() {
+    return window.Nehemiah && typeof window.Nehemiah.isAuthenticated === 'function' && window.Nehemiah.isAuthenticated();
+  }
+
+  function _hasLeaderAccess() {
+    return window.Nehemiah && typeof window.Nehemiah.hasRole === 'function' && window.Nehemiah.hasRole('leader');
+  }
+
+  async function _ensureAuthenticated() {
+    if (_isAuthenticated() && _hasLeaderAccess()) {
+      _hideAuthOverlay();
+      return true;
+    }
+
+    _showAuthOverlay();
+    if (_isAuthenticated() && !window.Nehemiah.hasRole('leader')) {
+      _setAuthError('Current account does not have leader access. Please sign in with a leader account.');
+    }
+
+    const form = _qs('sanc-auth-form');
+    const emailInput = _qs('sanc-auth-email');
+    const passInput = _qs('sanc-auth-pass');
+    const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+
+    if (!form || !emailInput || !passInput || !submitBtn) {
+      _setAuthError('Authentication is unavailable.');
+      return false;
+    }
+
+    return new Promise(resolve => {
+      form.addEventListener('submit', async function onSubmit(event) {
+        event.preventDefault();
+        _setAuthError('');
+
+        const email = String(emailInput.value || '').trim();
+        const passcode = String(passInput.value || '');
+        if (!email || !passcode) {
+          _setAuthError('Please enter your email and passcode.');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing in…';
+
+        if (!window.Nehemiah || typeof window.Nehemiah.login !== 'function') {
+          _setAuthError('Auth system is not ready yet. Refresh and try again.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Sign In';
+          return;
+        }
+
+        try {
+          await window.Nehemiah.login(email, passcode);
+          if (!_hasLeaderAccess()) {
+            _setAuthError('Leader access required. Please sign in with a leader account.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign In';
+            return;
+          }
+          if (window.FlockGates && typeof window.FlockGates.rebuildNavBar === 'function') {
+            window._HERALD_SANCTUARY_LOGIN_REQUIRED = false;
+            window.FlockGates.rebuildNavBar();
+          }
+          _hideAuthOverlay();
+          resolve(true);
+        } catch (err) {
+          _setAuthError(err && err.message ? err.message : 'Sign in failed. Check your credentials and try again.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Sign In';
+        }
+      });
+    });
+  }
+
   function _fmtDate(ts) {
     if (!ts) return '';
     const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(String(ts)) ? ts + 'T00:00:00' : ts);
@@ -1078,9 +1179,9 @@
   ═══════════════════════════════════════════════════════════════════════ */
 
   async function boot() {
-    // Build nav bar
-    if (window.FlockGates && typeof window.FlockGates.buildNavBar === 'function') {
-      window.FlockGates.buildNavBar('the_sanctuary');
+    const authReady = await _ensureAuthenticated();
+    if (!authReady) {
+      return;
     }
 
     // Font scale button

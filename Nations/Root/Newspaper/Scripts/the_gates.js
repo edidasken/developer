@@ -77,16 +77,25 @@
     return -1; // public
   }
 
+  const SANCTUARY_LOGIN_TABS = new Set(['herald', 'the_way', 'the_sanctuary']);
+
+  function _shouldRestrictNav() {
+    return !!window._HERALD_SANCTUARY_LOGIN_REQUIRED;
+  }
+
   // ── Build section nav bar ───────────────────────────────────────────────────
   function buildNavBar() {
     const nav = document.getElementById('sec-nav');
     if (!nav) return;
 
+    nav.innerHTML = '';
     const activeId = getActiveSectionId();
     const userRole = getUserRole();
+    const restrictNav = _shouldRestrictNav();
 
     SECTIONS.forEach(sec => {
-      if (sec.minRole > userRole) return; // hide tabs user doesn't have access to
+      if (restrictNav && !SANCTUARY_LOGIN_TABS.has(sec.id)) return;
+      if (!restrictNav && sec.minRole > userRole) return; // hide tabs user doesn't have access to
 
       const btn = document.createElement('a');
       btn.href = sec.url;
@@ -201,6 +210,10 @@
     }, durationMs || 2200);
   }
 
+  function rebuildNavBar() {
+    buildNavBar();
+  }
+
   // ── Init ─────────────────────────────────────────────────────────────────────
   function init() {
     buildNavBar();
@@ -215,5 +228,5 @@
   }
 
   // Expose public API
-  window.FlockGates = { openDrawer, closeDrawer, showToast, getUserRole };
+  window.FlockGates = { openDrawer, closeDrawer, showToast, getUserRole, rebuildNavBar };
 })();

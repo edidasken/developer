@@ -100,6 +100,30 @@
 
   </main><!-- /sanctuary-columns -->
 
+  <div class="sanctuary-auth-overlay hidden" id="sanc-auth-overlay" aria-hidden="true" role="dialog" aria-labelledby="sanc-auth-title">
+    <div class="sanctuary-auth-card">
+      <div class="sanctuary-auth-brand">
+        <div class="sanctuary-auth-eyebrow">Leader Sign In</div>
+        <h2 id="sanc-auth-title">The Sanctuary</h2>
+        <p class="sanctuary-auth-copy">Sign in with your FlockOS leader credentials to load live sermons, songs, and service order data.</p>
+      </div>
+
+      <form id="sanc-auth-form" class="sanctuary-auth-form" autocomplete="on" novalidate>
+        <label for="sanc-auth-email">Email</label>
+        <input id="sanc-auth-email" type="email" autocomplete="email" placeholder="you@church.com" required>
+
+        <label for="sanc-auth-pass">Passcode</label>
+        <input id="sanc-auth-pass" type="password" autocomplete="current-password" placeholder="••••••••" required>
+
+        <button type="submit" class="sanc-btn">Sign In</button>
+        <div class="sanctuary-auth-error" id="sanc-auth-error" aria-live="polite"></div>
+      </form>
+      <div class="sanctuary-auth-footer">
+        <a href="../herald/index.html" class="sanctuary-auth-return">← Back to Herald</a>
+      </div>
+    </div>
+  </div>
+
   <aside class="right-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
     <header class="drawer-header">
       <h2 id="drawer-title" class="drawer-title"></h2>
@@ -115,6 +139,8 @@
   <script>
     // Auth guard — requires leader (3)
     window._HERALD_AUTH_LEVEL = 3;
+    // Restrict nav until Sanctuary auth completes.
+    window._HERALD_SANCTUARY_LOGIN_REQUIRED = true;
   </script>
   <script src="../../Scripts/the_adornment.js"></script>
   <script src="../../Scripts/the_gates.js"></script>
