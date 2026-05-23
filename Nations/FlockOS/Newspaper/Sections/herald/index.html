@@ -31,19 +31,19 @@
     <button class="sec-masthead__font-btn herald-aa-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
 
     <!-- Compact mini-nameplate — revealed when scrolled -->
-    <div class="herald-compact-folio">
-      <div class="herald-compact__left">
-        <h2 class="herald-compact__title">The Flock Herald</h2>
+    <div class="sec-compact-folio">
+      <div class="sec-compact__left">
+        <h2 class="sec-compact__title">The Flock Herald</h2>
       </div>
-      <div class="herald-compact__right">
-        <button class="herald-date-btn" id="herald-compact-date" aria-haspopup="true" aria-expanded="false" type="button">
-          <span class="herald-date-btn__text" id="herald-compact-date-text"></span>
-          <span class="herald-date-btn__caret" aria-hidden="true">&#9663;</span>
+      <div class="sec-compact__right">
+        <button class="sec-date-btn" id="sec-compact-date" aria-haspopup="true" aria-expanded="false" type="button">
+          <span class="sec-date-btn__text" id="sec-compact-date-text"></span>
+          <span class="sec-date-btn__caret" aria-hidden="true">&#9663;</span>
         </button>
-        <div class="herald-date-picker" id="herald-date-picker" aria-hidden="true">
-          <input type="date" id="herald-date-input" />
+        <div class="sec-date-picker" id="sec-date-picker" aria-hidden="true">
+          <input type="date" id="sec-date-input" />
         </div>
-        <p class="herald-compact__edition" id="herald-compact-edition"></p>
+        <p class="sec-compact__edition" id="sec-compact-edition"></p>
       </div>
     </div>
     <div class="herald-compact-rule" aria-hidden="true"></div>
@@ -134,9 +134,9 @@
       }
 
       function applyDate(dt) {
-        var txt = document.getElementById('herald-compact-date-text');
-        var ed  = document.getElementById('herald-compact-edition');
-        var inp = document.getElementById('herald-date-input');
+        var txt = document.getElementById('sec-compact-date-text');
+        var ed  = document.getElementById('sec-compact-edition');
+        var inp = document.getElementById('sec-date-input');
         if (txt) txt.textContent = formatDisplay(dt);
         if (ed)  ed.textContent  = 'VOLUME: ' + dt.getFullYear() + '  •  EDITION: ' + pad2(dayOfYear(dt));
         if (inp) inp.value = toInputVal(dt);
@@ -147,9 +147,9 @@
       }
 
       var _pickerOpen = false;
-      var dateBtn  = document.getElementById('herald-compact-date');
-      var datePicker = document.getElementById('herald-date-picker');
-      var dateInput  = document.getElementById('herald-date-input');
+      var dateBtn  = document.getElementById('sec-compact-date');
+      var datePicker = document.getElementById('sec-date-picker');
+      var dateInput  = document.getElementById('sec-date-input');
 
       function openPicker() {
         _pickerOpen = true;

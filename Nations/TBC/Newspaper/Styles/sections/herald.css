@@ -150,38 +150,13 @@
 }
 
 /* Compact folio — slides in from under the double gold rule */
-.herald-compact-folio {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding-bottom: 0.5rem;
+/* Herald compact folio — hidden until is-compact; shared layout from broadsheet.css */
+.sec-compact-folio {
   max-height: 0;
   opacity: 0;
-  overflow: visible;
   pointer-events: none;
   transform: translateY(-6px);
   transition: max-height 0.3s ease-in-out, opacity 0.24s ease-in-out, transform 0.24s ease-in-out;
-}
-.herald-compact__left  { flex: 1; min-width: 0; }
-.herald-compact__right { flex-shrink: 0; text-align: right; position: relative; }
-
-/* Mobile: stack title → date → edition vertically when row would overlap */
-@media (max-width: 480px) {
-  .herald-compact-folio {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.125rem;
-  }
-  .herald-compact__right {
-    text-align: left;
-    width: 100%;
-  }
-  .herald-date-picker {
-    left: 0;
-    right: auto;
-  }
 }
 .herald-compact__brand {
   position: absolute;
@@ -199,116 +174,17 @@
   opacity: 1;
   pointer-events: auto;
 }
-/* legacy — no longer used */
-.herald-compact__center { text-align: left; }
-.herald-compact__title {
-  font-family: 'Great Vibes', cursive;
-  font-size: 2.75rem;
-  font-weight: 400;
-  color: var(--ink);
-  line-height: 1.1;
-  margin: 0;
-  white-space: nowrap;
-}
-.herald-compact__tagline {
-  font-size: 0.4375rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: var(--ink-muted);
-  margin-top: 0.125rem;
-}
-.herald-compact__date {
-  font-size: 0.5rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: var(--ink-muted);
-  margin-top: 0.0625rem;
-}
-
-/* Date button — right side of compact header */
-.herald-date-btn {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.25rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  font-family: var(--sec-body-font);
-  color: var(--ink);
-  line-height: 1.1;
-}
-.herald-date-btn__text {
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-.herald-date-btn__caret {
-  font-size: 0.625rem;
-  color: var(--gold);
-  line-height: 1;
-}
-.herald-date-btn:hover .herald-date-btn__text { color: var(--gold); }
-
-/* Date picker dropdown */
-.herald-date-picker {
-  position: absolute;
-  top: calc(100% + 0.375rem);
-  right: 0;
-  background: var(--paper-card);
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-  padding: 0.625rem;
-  z-index: 200;
-  display: none;
-}
-.herald-date-picker.is-open { display: block; }
-.herald-date-picker input[type="date"] {
-  font-family: var(--sec-body-font);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--ink);
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  padding: 0.375rem 0.5rem;
-  background: var(--paper-sunken, #f7f5f2);
-  cursor: pointer;
-}
-
-/* Volume / Edition line */
-.herald-compact__edition {
-  font-size: 0.5625rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: var(--ink-muted);
-  margin-top: 0.125rem;
-  white-space: nowrap;
-}
-.herald-compact__btn { display: flex; justify-content: flex-end; }
-
-/* Separator rule — hidden; ornament replaces it */
 .herald-compact-rule { display: none; }
 
-/* is-compact: double gold rule stays; folio+nameplate collapse; compact slides in */
+/* is-compact: reveal the folio */
 .sec-herald .sec-masthead.is-compact {
   padding-top: max(0.5rem, var(--safe-top));
 }
-/* Show compact */
-.sec-herald .sec-masthead.is-compact .herald-compact-folio {
-  max-height: 120px;
+.sec-herald .sec-masthead.is-compact .sec-compact-folio {
+  max-height: 200px;
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
-}
-.sec-herald .sec-masthead.is-compact .herald-compact-rule {
-  max-height: 2px;
-  opacity: 1;
 }
 /* Collapse large nameplate */
 .sec-herald .sec-masthead.is-compact .herald-folio {

@@ -27,25 +27,22 @@
     <!-- Aa button: absolute top-right, safe area aware -->
     <button class="sec-masthead__font-btn way-aa-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
 
-    <!-- Compact folio: always visible -->
-    <div class="way-compact-folio">
-      <div class="way-compact__center">
-        <h1 class="way-compact__title">The Flock Herald</h1>
-        <p class="way-compact__tagline">Shepherding the Flock by the Power of the Word</p>
-        <p class="way-compact__date" id="way-header-date"></p>
+    <!-- Shared compact folio header -->
+    <div class="sec-compact-folio">
+      <div class="sec-compact__left">
+        <h2 class="sec-compact__title">The Flock Herald</h2>
+      </div>
+      <div class="sec-compact__right">
+        <button class="sec-date-btn" id="sec-compact-date" aria-haspopup="true" aria-expanded="false" type="button">
+          <span class="sec-date-btn__text" id="sec-compact-date-text"></span>
+          <span class="sec-date-btn__caret" aria-hidden="true">&#9663;</span>
+        </button>
+        <div class="sec-date-picker" id="sec-date-picker" aria-hidden="true">
+          <input type="date" id="sec-date-input" />
+        </div>
+        <p class="sec-compact__edition" id="sec-compact-edition"></p>
       </div>
     </div>
-
-    <!-- Decorative ornament -->
-    <svg class="way-ornament" viewBox="0 0 400 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <line x1="0" y1="8" x2="168" y2="8" stroke="var(--gold)" stroke-width="0.75"/>
-      <path d="M171 5 L175 8 L171 11 L167 8 Z" fill="var(--gold)"/>
-      <path d="M200 2 L208 8 L200 14 L192 8 Z" fill="var(--gold)"/>
-      <rect x="198.5" y="2" width="3" height="12" fill="var(--paper-card)"/>
-      <rect x="192" y="6.5" width="16" height="3" fill="var(--paper-card)"/>
-      <path d="M229 5 L233 8 L229 11 L225 8 Z" fill="var(--gold)"/>
-      <line x1="232" y1="8" x2="400" y2="8" stroke="var(--gold)" stroke-width="0.75"/>
-    </svg>
   </header>
 
   <!-- Section Nav Bar — scrolls with page content -->
@@ -73,23 +70,89 @@
 
   <script>
     (function() {
-      var el = document.getElementById('way-header-date');
-      if (el) {
-        el.textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase();
-      }
       var masthead = document.querySelector('.sec-masthead');
-      if (masthead) {
-        function updatePadding() {
-          document.body.style.paddingTop = masthead.offsetHeight + 'px';
-        }
-        if (document.fonts) {
-          document.fonts.ready.then(updatePadding);
+      var secNav   = document.getElementById('sec-nav');
+      if (!masthead) return;
+
+      function updatePadding() {
+        var mh = masthead.offsetHeight;
+        if (secNav) {
+          secNav.style.top = mh + 'px';
+          document.body.style.paddingTop = (mh + secNav.offsetHeight) + 'px';
         } else {
-          setTimeout(updatePadding, 300);
+          document.body.style.paddingTop = mh + 'px';
         }
-        window.addEventListener('resize', updatePadding);
-        updatePadding();
       }
+      if (document.fonts) {
+        document.fonts.ready.then(updatePadding);
+      } else {
+        setTimeout(updatePadding, 300);
+      }
+      window.addEventListener('resize', updatePadding);
+      updatePadding();
+
+      var MONTHS = ['Jan.','Feb.','Mar.','Apr.','May.','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
+      function dayOfYear(dt) {
+        var start = new Date(dt.getFullYear(), 0, 0);
+        return Math.floor((dt - start) / 86400000);
+      }
+      function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+      function formatDisplay(dt) {
+        return MONTHS[dt.getMonth()] + ' ' + pad2(dt.getDate()) + ', ' + dt.getFullYear();
+      }
+      function toInputVal(dt) {
+        return dt.getFullYear() + '-' + pad2(dt.getMonth()+1) + '-' + pad2(dt.getDate());
+      }
+      function applyDate(dt) {
+        var txt = document.getElementById('sec-compact-date-text');
+        var ed  = document.getElementById('sec-compact-edition');
+        var inp = document.getElementById('sec-date-input');
+        if (txt) txt.textContent = formatDisplay(dt);
+        if (ed)  ed.textContent  = 'VOLUME: ' + dt.getFullYear() + '  •  EDITION: ' + pad2(dayOfYear(dt));
+        if (inp) inp.value = toInputVal(dt);
+        window._heraldDate = dt;
+      }
+
+      var _pickerOpen = false;
+      var dateBtn    = document.getElementById('sec-compact-date');
+      var datePicker = document.getElementById('sec-date-picker');
+      var dateInput  = document.getElementById('sec-date-input');
+
+      function openPicker() {
+        _pickerOpen = true;
+        datePicker.removeAttribute('aria-hidden');
+        datePicker.classList.add('is-open');
+        dateBtn.setAttribute('aria-expanded', 'true');
+        dateInput.focus();
+      }
+      function closePicker() {
+        _pickerOpen = false;
+        datePicker.setAttribute('aria-hidden', 'true');
+        datePicker.classList.remove('is-open');
+        dateBtn.setAttribute('aria-expanded', 'false');
+      }
+      if (dateBtn) {
+        dateBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          _pickerOpen ? closePicker() : openPicker();
+        });
+      }
+      if (dateInput) {
+        dateInput.addEventListener('change', function() {
+          var parts = dateInput.value.split('-');
+          var dt = new Date(+parts[0], +parts[1]-1, +parts[2]);
+          applyDate(dt);
+          closePicker();
+          updatePadding();
+        });
+      }
+      document.addEventListener('click', function(e) {
+        if (_pickerOpen && datePicker && !datePicker.contains(e.target) && e.target !== dateBtn) {
+          closePicker();
+        }
+      });
+
+      applyDate(new Date());
     })();
   </script>
   <script src="../../Scripts/the_true_vine.js"></script>

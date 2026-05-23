@@ -846,3 +846,110 @@ hr, .broadsheet-rule {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SHARED COMPACT SECTION HEADER  —  used by Herald, The Way, and all future
+   Newspaper section pages.  Add .sec-compact-folio inside .sec-masthead.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sec-compact-folio {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: 0.5rem;
+  overflow: visible;
+}
+.sec-compact__left  { flex: 1; min-width: 0; }
+.sec-compact__right { flex-shrink: 0; text-align: right; position: relative; }
+
+.sec-compact__title {
+  font-family: 'Great Vibes', cursive;
+  font-size: 2.75rem;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.1;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Tappable date button */
+.sec-date-btn {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  line-height: 1.1;
+}
+.sec-date-btn__text {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.sec-date-btn__caret {
+  font-size: 0.625rem;
+  color: var(--gold);
+  line-height: 1;
+}
+.sec-date-btn:hover .sec-date-btn__text { color: var(--gold); }
+
+/* Date picker dropdown */
+.sec-date-picker {
+  position: absolute;
+  top: calc(100% + 0.375rem);
+  right: 0;
+  background: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  padding: 0.625rem;
+  z-index: 200;
+  display: none;
+}
+.sec-date-picker.is-open { display: block; }
+.sec-date-picker input[type="date"] {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 0.375rem 0.5rem;
+  background: var(--paper-sunken, #f7f5f2);
+  cursor: pointer;
+}
+
+/* Volume / Edition line */
+.sec-compact__edition {
+  font-size: 0.5625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-muted);
+  margin-top: 0.125rem;
+  white-space: nowrap;
+}
+
+/* Mobile: stack title → date → edition vertically */
+@media (max-width: 480px) {
+  .sec-compact-folio {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
+  }
+  .sec-compact__right {
+    text-align: left;
+    width: 100%;
+  }
+  .sec-date-picker {
+    left: 0;
+    right: auto;
+  }
+}
