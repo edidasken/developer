@@ -99,7 +99,7 @@
     } catch (e) { /* ignore */ }
 
     var url = JP_BASE + '/countries.json?api_key=' + encodeURIComponent(JP_API_KEY) +
-      '&select=Ctry,CtryID,RegionName,Population' +
+      '&select=Ctry,ROG3,RegionName,Population' +
       '&limit=300&sort_field=Ctry&sort_dir=ASC';
 
     return fetch(url).then(function (resp) {
@@ -190,10 +190,10 @@
 
     el.innerHTML = _filtered.map(function (c) {
       return '<button class="country-row" ' +
-        'data-ctry-id="' + esc(c.CtryID) + '" ' +
+        'data-ctry-id="' + esc(c.ROG3) + '" ' +
         'data-ctry-name="' + esc(c.Ctry) + '" ' +
         'type="button" role="listitem">' +
-        '<span class="country-row__flag" aria-hidden="true">' + flagEmoji(c.CtryID) + '</span>' +
+        '<span class="country-row__flag" aria-hidden="true">' + flagEmoji(c.ROG3) + '</span>' +
         '<span class="country-row__info">' +
           '<span class="country-row__name">' + esc(c.Ctry) + '</span>' +
           '<span class="country-row__meta">' + esc(c.RegionName || '') +
