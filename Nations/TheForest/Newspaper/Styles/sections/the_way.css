@@ -76,7 +76,7 @@
 @media (max-width: 720px) {
   .way-layout {
     grid-template-columns: 1fr;
-    grid-template-areas: "sidebar" "content" "today";
+    grid-template-areas: "today" "content" "sidebar";
     padding: 0;
     gap: 0;
   }
