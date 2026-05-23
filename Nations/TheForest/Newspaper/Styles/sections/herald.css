@@ -1268,3 +1268,100 @@ details.heart-rx[open] .heart-rx__toggle::before { content: '▾ '; }
   margin: 0 0 0.25rem;
   font-style: italic;
 }
+
+/* ── § 2 Bible Book Overview ─────────────────────────────────────────────── */
+
+.bib-card__verse {
+  margin: 0.5rem 0 0;
+  padding: 0.625rem 0.75rem 0.625rem 1rem;
+  background: var(--bib-tint, #fefce8);
+  border-left: 3px solid var(--bib-accent, #b45309);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-style: italic;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+/* ── Bible Book Drawer ───────────────────────────────────────────────────── */
+
+.bib-drawer {
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.bib-drawer__banner {
+  padding: 1.125rem 1.25rem 1rem;
+  color: #fff;
+}
+
+.bib-drawer__banner-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.bib-drawer__testament-badge {
+  font-size: 0.5625rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.82;
+}
+
+.bib-drawer__title {
+  font-family: var(--font-headline);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0.125rem 0 0;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.bib-drawer__meta {
+  font-size: 0.6875rem;
+  opacity: 0.8;
+  margin-top: 0.125rem;
+}
+
+.bib-drawer__body {
+  padding: 1rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.bib-drawer__key-verse {
+  margin: 0;
+  padding: 0.75rem 0.875rem 0.75rem 1rem;
+  border-left: 3px solid var(--bib-accent, #b45309);
+  background: color-mix(in srgb, var(--bib-accent, #b45309) 8%, var(--paper-card));
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-style: italic;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.bib-drawer__sect {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.bib-drawer__sect-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.bib-drawer__text {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--ink);
+  margin: 0;
+}

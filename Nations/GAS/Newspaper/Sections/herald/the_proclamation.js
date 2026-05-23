@@ -280,7 +280,73 @@
     });
   }
 
-  /** § 2 — Announcements */
+  /** § 2 — Bible Book Overview */
+  async function buildBibleBookStory(cfg) {
+    let book = null;
+    try {
+      const { default: books } = await import('../../Data/books-of-the-bible.js');
+      if (Array.isArray(books) && books.length) {
+        const override = cfg.bibleBookIndex != null ? cfg.bibleBookIndex : null;
+        book = books[idx(override != null ? override : dayIndex(), books.length)];
+      }
+    } catch (_) {}
+
+    if (!book) {
+      return _story({ num: 2, category: 'THE WORD', section: 'BIBLE OVERVIEW', hed: 'Bible Book Overview', deck: 'Book data unavailable today.' });
+    }
+
+    const isNT      = book.testament === 'New';
+    const accentHex = isNT ? '#2563eb' : '#b45309';
+    const tintHex   = isNT ? '#eff6ff' : '#fefce8';
+
+    // Build drawer content
+    const _svgBook  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1.1rem;height:1.1rem"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
+    const _svgCross = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="width:1.1rem;height:1.1rem"><line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="9" x2="19" y2="9"/></svg>`;
+    const _svgStar  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1.1rem;height:1.1rem"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+
+    function _bibSect(label, icon, content) {
+      return `<div class="bib-drawer__sect">
+        <span class="bib-drawer__sect-label" style="color:${accentHex}">${icon} ${label}</span>
+        <p class="bib-drawer__text">${content}</p>
+      </div>`;
+    }
+
+    _drawers['bible-book'] = `<div class="bib-drawer">
+      <div class="bib-drawer__banner" style="background:${accentHex}">
+        <div class="bib-drawer__banner-inner">
+          <span class="bib-drawer__testament-badge">${esc((book.testament || '') + ' Testament')}</span>
+          <h2 class="bib-drawer__title">${esc(book.bookName || '')}</h2>
+          <span class="bib-drawer__meta">${esc(book.genre || '')}${book.author ? ' · ' + esc(book.author) : ''}${book.timePeriod ? ' · ' + esc(book.timePeriod) : ''}</span>
+        </div>
+      </div>
+      <div class="bib-drawer__body">
+        ${book.summary   ? _bibSect('Overview',            _svgBook,  esc(book.summary))   : ''}
+        ${book.keyVerse  ? `<blockquote class="bib-drawer__key-verse" style="--bib-accent:${accentHex}">${esc(book.keyVerse)}</blockquote>` : ''}
+        ${book.themes    ? _bibSect('Key Themes',          _svgStar,  esc(book.themes))    : ''}
+        ${book.christInBook ? _bibSect('Christ in This Book', _svgCross, esc(book.christInBook)) : ''}
+        ${book.application  ? _bibSect('Application',         _svgBook,  esc(book.application))  : ''}
+      </div>
+    </div>`;
+
+    // Inline card body: key verse as pull quote
+    const verseHtml = book.keyVerse
+      ? `<blockquote class="bib-card__verse" style="--bib-accent:${accentHex};--bib-tint:${tintHex}">${esc(book.keyVerse)}</blockquote>`
+      : '';
+    const metaLine  = [book.genre, book.author, book.timePeriod].filter(Boolean).map(esc).join(' · ');
+
+    return _story({
+      num:      2,
+      category: 'THE WORD',
+      section:  (book.testament || '').toUpperCase() + ' TESTAMENT · BIBLE OVERVIEW',
+      hed:      book.bookName || 'Bible Book',
+      deck:     book.summary ? book.summary.slice(0, 120) + (book.summary.length > 120 ? '…' : '') : '',
+      byline:   metaLine,
+      bodyHtml: verseHtml,
+      drawer:   'bible-book',
+    });
+  }
+
+  /** § 3 — Announcements */
   async function buildAnnouncementsStory(cfg) {
     let items = [];
     try {
@@ -301,7 +367,7 @@
 
     if (!items.length || cfg.showAnnouncements === false) {
       return _story({
-        num:      2,
+        num:      3,
         category: 'FROM THE CHURCH',
         section:  'ANNOUNCEMENTS',
         hed:      'From the Flock',
@@ -333,7 +399,7 @@
           </svg>
         </div>
         <div class="dwr-head__meta">
-          <p class="drawer-article__kicker">§\u00a02 · FROM THE CHURCH</p>
+          <p class="drawer-article__kicker">§\u00a03 · FROM THE CHURCH</p>
           <h2 class="drawer-article__hed">Announcements</h2>
         </div>
       </div>
@@ -346,7 +412,7 @@
     </div>`;
 
     return _story({
-      num:      2,
+      num:      3,
       category: 'FROM THE CHURCH',
       section:  'ANNOUNCEMENTS',
       hed,
@@ -371,7 +437,7 @@
     } catch (_) {}
 
     if (!prayer) {
-      return _story({ num: 3, category: 'THE PRAYER WALL', section: 'SPOTLIGHT', hed: 'Prayer Spotlight', deck: 'No prayer requests yet — the flock is at peace.', byline: 'PRAYER WALL' });
+      return _story({ num: 4, category: 'THE PRAYER WALL', section: 'SPOTLIGHT', hed: 'Prayer Spotlight', deck: 'No prayer requests yet — the flock is at peace.', byline: 'PRAYER WALL' });
     }
 
     const name    = prayer.displayName || prayer.name || prayer.memberName || 'Anonymous';
@@ -386,7 +452,7 @@
           </svg>
         </div>
         <div class="dwr-head__meta">
-          <p class="drawer-article__kicker">§\u00a03 · PRAYER WALL · SPOTLIGHT</p>
+          <p class="drawer-article__kicker">§\u00a04 · PRAYER WALL · SPOTLIGHT</p>
           <h2 class="drawer-article__hed">${esc(name)}</h2>
           ${dateStr ? `<p class="drawer-article__theme">Submitted ${esc(dateStr)}</p>` : ''}
         </div>
@@ -403,7 +469,7 @@
     const deckText = text ? `"${text.slice(0, 100)}${text.length > 100 ? '…' : ''}"` : 'A request from your church family.';
 
     return _story({
-      num:      3,
+      num:      4,
       category: 'THE PRAYER WALL',
       section:  'SPOTLIGHT',
       hed:      name,
@@ -971,9 +1037,10 @@
     // Load all stories concurrently
     const results = await Promise.allSettled([
       buildLeadStory(cfg),          // main col 1
-      buildOYBStory(cfg),           // main col 2
-      buildAnnouncementsStory(cfg), // main col 3
-      buildPrayerStory(),           // main col 4
+      buildOYBStory(cfg),           // main col 2 — § 1
+      buildBibleBookStory(cfg),     // main col 3 — § 2
+      buildAnnouncementsStory(cfg), // main col 4 — § 3
+      buildPrayerStory(),           // main col 5 — § 4
       buildCounselingCorner(cfg),   // aside 1 — § 4
       buildNationAside(cfg),        // aside 2 — § 5
       buildHeartAside(cfg),         // aside 3 — § 6
@@ -984,8 +1051,8 @@
 
     const mainEl  = document.getElementById('herald-main');
     const asideEl = document.getElementById('herald-aside');
-    if (mainEl)  mainEl.innerHTML  = html.slice(0, 4).join('');
-    if (asideEl) asideEl.innerHTML = html.slice(4).join('');
+    if (mainEl)  mainEl.innerHTML  = html.slice(0, 5).join('');
+    if (asideEl) asideEl.innerHTML = html.slice(5).join('');
   }
 
   document.addEventListener('DOMContentLoaded', init);
