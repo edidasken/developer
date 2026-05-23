@@ -43,11 +43,39 @@
   </header>
 
   <main class="broadsheet-grid" id="the-flock-grid">
-    <article class="broadsheet-card broadsheet-card--full">
-      <div class="empty-state">
-        <div class="empty-state__icon">🐑</div>
-        <p class="empty-state__title">The Flock — Coming in Phase 5</p>
-        <p class="empty-state__message">Care board, prayer chain, and compassion ministry are being built. Requires care access.</p>
+    <article class="broadsheet-card broadsheet-card--wide" id="flock-account-card">
+      <div class="flock-card-shell">
+        <div class="flock-card-heading">Account &amp; Fold</div>
+        <p class="flock-card-copy">Your member account, notification preferences, and member card setup are managed through FlockOS Fold and the account panel. Open the Fold to complete member setup or review your personal details.</p>
+        <div class="flock-card-actions">
+          <button class="flock-btn flock-btn--primary" type="button" data-action="open-account">Open account panel</button>
+          <button class="flock-btn flock-btn--secondary" type="button" data-action="open-fold">Open The Fold</button>
+        </div>
+        <div class="flock-card-status" id="flock-account-status"></div>
+      </div>
+    </article>
+
+    <article class="broadsheet-card" id="flock-care-card">
+      <div class="flock-card-shell">
+        <div class="flock-card-heading">Care board</div>
+        <div class="flock-card-copy">Immediate shepherding work flows through the care board. Review open cases, compassion touches, and assignments from The Fold.</div>
+        <div class="flock-card-body" id="flock-care-body"></div>
+      </div>
+    </article>
+
+    <article class="broadsheet-card" id="flock-prayer-card">
+      <div class="flock-card-shell">
+        <div class="flock-card-heading">Prayer chain</div>
+        <div class="flock-card-copy">Track the latest prayer requests and prayer chain activity. Prayer items are sourced from your church's UpperRoom/Fold data.</div>
+        <div class="flock-card-body" id="flock-prayer-body"></div>
+      </div>
+    </article>
+
+    <article class="broadsheet-card" id="flock-compassion-card">
+      <div class="flock-card-shell">
+        <div class="flock-card-heading">Compassion ministry</div>
+        <div class="flock-card-copy">Recent care touches and compassionate follow-ups are collected here. Use The Fold to log new outreach and keep caring for your people.</div>
+        <div class="flock-card-body" id="flock-compassion-body"></div>
       </div>
     </article>
   </main>
@@ -67,7 +95,7 @@
   <script>window._HERALD_AUTH_LEVEL = 2;</script>
   <script src="../../Scripts/the_adornment.js"></script>
   <script src="../../Scripts/the_gates.js"></script>
-  <script src="the_flock.js"></script>
+  <script type="module" src="the_flock.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('../../sw.js').catch(() => {});
