@@ -186,7 +186,7 @@
 .herald-compact__center { text-align: left; }
 .herald-compact__title {
   font-family: 'Great Vibes', cursive;
-  font-size: 1.75rem;
+  font-size: 2.75rem;
   font-weight: 400;
   color: var(--ink);
   line-height: 1.1;
@@ -224,7 +224,7 @@
   line-height: 1.1;
 }
 .herald-date-btn__text {
-  font-size: 0.8125rem;
+  font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -265,7 +265,7 @@
 
 /* Volume / Edition line */
 .herald-compact__edition {
-  font-size: 0.4375rem;
+  font-size: 0.5625rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   font-weight: 700;
