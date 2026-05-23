@@ -131,8 +131,36 @@
     return window.Nehemiah && typeof window.Nehemiah.hasRole === 'function' && window.Nehemiah.hasRole('leader');
   }
 
+  function _unlockSanctuaryNav() {
+    if (window._HERALD_SANCTUARY_LOGIN_REQUIRED) {
+      window._HERALD_SANCTUARY_LOGIN_REQUIRED = false;
+      if (window.FlockGates && typeof window.FlockGates.rebuildNavBar === 'function') {
+        window.FlockGates.rebuildNavBar();
+      }
+    }
+  }
+
+  async function _ensureUpperRoomReady() {
+    const ur = window.UpperRoom;
+    if (!ur) return false;
+
+    try {
+      if (typeof ur.isReady === 'function' && ur.isReady()) return true;
+      if (typeof ur.init === 'function') await ur.init();
+      if (typeof ur.isReady === 'function' && ur.isReady()) return true;
+      if (_isAuthenticated() && typeof ur.authenticate === 'function') {
+        await ur.authenticate();
+      }
+      return typeof ur.isReady === 'function' ? ur.isReady() : true;
+    } catch (err) {
+      console.warn('[Sanctuary] UpperRoom bootstrap failed:', err);
+      return false;
+    }
+  }
+
   async function _ensureAuthenticated() {
     if (_isAuthenticated() && _hasLeaderAccess()) {
+      _unlockSanctuaryNav();
       _hideAuthOverlay();
       return true;
     }
@@ -182,10 +210,7 @@
             submitBtn.textContent = 'Sign In';
             return;
           }
-          if (window.FlockGates && typeof window.FlockGates.rebuildNavBar === 'function') {
-            window._HERALD_SANCTUARY_LOGIN_REQUIRED = false;
-            window.FlockGates.rebuildNavBar();
-          }
+          _unlockSanctuaryNav();
           _hideAuthOverlay();
           resolve(true);
         } catch (err) {
@@ -1201,6 +1226,7 @@
     });
 
     // Load data concurrently
+    await _ensureUpperRoomReady();
     await Promise.allSettled([
       _loadSermons(),
       _loadSongs(),
@@ -1216,4 +1242,3 @@
   document.addEventListener('DOMContentLoaded', boot);
 
 })();
-

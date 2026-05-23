@@ -114,13 +114,17 @@ const TheVine = (() => {
 
   function _getSession() {
     try {
-      const raw = sessionStorage.getItem(_config.SESSION_KEY);
+      const raw = sessionStorage.getItem(_config.SESSION_KEY) || localStorage.getItem(_config.SESSION_KEY);
       if (!raw) return null;
       const s = JSON.parse(raw);
       if (!s || !s.token || !s.email) return null;
       if (s.expiresAt && Date.now() > s.expiresAt) {
         sessionStorage.removeItem(_config.SESSION_KEY);
+        localStorage.removeItem(_config.SESSION_KEY);
         return null;
+      }
+      if (!sessionStorage.getItem(_config.SESSION_KEY)) {
+        try { sessionStorage.setItem(_config.SESSION_KEY, JSON.stringify(s)); } catch (_) {}
       }
       return s;
     } catch (_) { return null; }
@@ -130,11 +134,14 @@ const TheVine = (() => {
     if (!data || !data.token) return;
     data.expiresAt = data.expiresAt || (Date.now() + _config.SESSION_TTL);
     sessionStorage.setItem(_config.SESSION_KEY, JSON.stringify(data));
+    try { localStorage.setItem(_config.SESSION_KEY, JSON.stringify(data)); } catch (_) {}
   }
 
   function _clearSession() {
     sessionStorage.removeItem(_config.SESSION_KEY);
     sessionStorage.removeItem(_config.PROFILE_KEY);
+    localStorage.removeItem(_config.SESSION_KEY);
+    localStorage.removeItem(_config.PROFILE_KEY);
     sessionStorage.removeItem(_config.VAULT_KEY);
   }
 

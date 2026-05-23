@@ -250,7 +250,7 @@ const Nehemiah = (() => {
   /** Returns the cached profile or null. */
   function getProfile() {
     try {
-      const raw = sessionStorage.getItem('flock_auth_profile');
+      const raw = sessionStorage.getItem('flock_auth_profile') || localStorage.getItem('flock_auth_profile');
       return raw ? JSON.parse(raw) : null;
     } catch (_) { return null; }
   }
@@ -310,8 +310,14 @@ const Nehemiah = (() => {
    */
   function hasRole(minRole) {
     const session = getSession();
-    if (!session || !session.role) return false;
-    const userLevel = ROLE_LEVELS[session.role] ?? -1;
+    const profile = getProfile();
+    const role = (session && session.role) || (profile && profile.role) || '';
+    const roleLevel = (session && typeof session.roleLevel === 'number')
+      ? session.roleLevel
+      : (profile && typeof profile.roleLevel === 'number')
+        ? profile.roleLevel
+        : null;
+    const userLevel = roleLevel !== null ? roleLevel : (ROLE_LEVELS[String(role).toLowerCase()] ?? -1);
     const reqLevel  = ROLE_LEVELS[minRole] ?? 99;
     return userLevel >= reqLevel;
   }
@@ -440,7 +446,10 @@ const Nehemiah = (() => {
     // TheVine.john.auth.login already saves the session internally.
     // Cache profile if returned with the login response.
     if (result.profile) {
-      try { sessionStorage.setItem('flock_auth_profile', JSON.stringify(result.profile)); } catch (_) {}
+      try {
+        sessionStorage.setItem('flock_auth_profile', JSON.stringify(result.profile));
+        localStorage.setItem('flock_auth_profile', JSON.stringify(result.profile));
+      } catch (_) {}
     }
 
     // If the login response didn't include a profile (or didn't include groups),
@@ -450,7 +459,10 @@ const Nehemiah = (() => {
       try {
         const prof = await TheVine.john.auth.profile({});
         if (prof && (prof.groups || prof.permissions)) {
-          try { sessionStorage.setItem('flock_auth_profile', JSON.stringify(prof)); } catch (_) {}
+          try {
+            sessionStorage.setItem('flock_auth_profile', JSON.stringify(prof));
+            localStorage.setItem('flock_auth_profile', JSON.stringify(prof));
+          } catch (_) {}
         }
       } catch (_) { /* best-effort — app will re-try on load */ }
     }
