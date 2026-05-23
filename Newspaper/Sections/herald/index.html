@@ -27,9 +27,18 @@
 
     <!-- Compact mini-nameplate — revealed when scrolled -->
     <div class="herald-compact-folio">
-      <div class="herald-compact__center">
+      <div class="herald-compact__left">
         <h2 class="herald-compact__title">The Flock Herald</h2>
-        <p class="herald-compact__date" id="herald-compact-date"></p>
+      </div>
+      <div class="herald-compact__right">
+        <button class="herald-date-btn" id="herald-compact-date" aria-haspopup="true" aria-expanded="false" type="button">
+          <span class="herald-date-btn__text" id="herald-compact-date-text"></span>
+          <span class="herald-date-btn__caret" aria-hidden="true">&#9663;</span>
+        </button>
+        <div class="herald-date-picker" id="herald-date-picker" aria-hidden="true">
+          <input type="date" id="herald-date-input" />
+        </div>
+        <p class="herald-compact__edition" id="herald-compact-edition"></p>
       </div>
     </div>
     <div class="herald-compact-rule" aria-hidden="true"></div>
@@ -102,12 +111,77 @@
       updatePadding();
       onScroll();
 
-      var fmt = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
-      var dateStr = new Date().toLocaleDateString('en-US', fmt).toUpperCase();
-      var d = document.getElementById('herald-date');
-      if (d) d.textContent = dateStr;
-      var cd = document.getElementById('herald-compact-date');
-      if (cd) cd.textContent = dateStr;
+      var MONTHS = ['Jan.','Feb.','Mar.','Apr.','May.','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
+
+      function dayOfYear(dt) {
+        var start = new Date(dt.getFullYear(), 0, 0);
+        return Math.floor((dt - start) / 86400000);
+      }
+
+      function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+      function formatDisplay(dt) {
+        return MONTHS[dt.getMonth()] + ' ' + pad2(dt.getDate()) + ', ' + dt.getFullYear();
+      }
+
+      function toInputVal(dt) {
+        return dt.getFullYear() + '-' + pad2(dt.getMonth()+1) + '-' + pad2(dt.getDate());
+      }
+
+      function applyDate(dt) {
+        var txt = document.getElementById('herald-compact-date-text');
+        var ed  = document.getElementById('herald-compact-edition');
+        var inp = document.getElementById('herald-date-input');
+        if (txt) txt.textContent = formatDisplay(dt);
+        if (ed)  ed.textContent  = 'VOLUME: ' + dt.getFullYear() + '  •  EDITION: ' + pad2(dayOfYear(dt));
+        if (inp) inp.value = toInputVal(dt);
+        // also update the large nameplate date if present
+        var d = document.getElementById('herald-date');
+        if (d) d.textContent = formatDisplay(dt);
+        window._heraldDate = dt;
+      }
+
+      var _pickerOpen = false;
+      var dateBtn  = document.getElementById('herald-compact-date');
+      var datePicker = document.getElementById('herald-date-picker');
+      var dateInput  = document.getElementById('herald-date-input');
+
+      function openPicker() {
+        _pickerOpen = true;
+        datePicker.removeAttribute('aria-hidden');
+        datePicker.classList.add('is-open');
+        dateBtn.setAttribute('aria-expanded', 'true');
+        dateInput.focus();
+      }
+      function closePicker() {
+        _pickerOpen = false;
+        datePicker.setAttribute('aria-hidden', 'true');
+        datePicker.classList.remove('is-open');
+        dateBtn.setAttribute('aria-expanded', 'false');
+      }
+
+      if (dateBtn) {
+        dateBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          _pickerOpen ? closePicker() : openPicker();
+        });
+      }
+      if (dateInput) {
+        dateInput.addEventListener('change', function() {
+          var parts = dateInput.value.split('-');
+          var dt = new Date(+parts[0], +parts[1]-1, +parts[2]);
+          applyDate(dt);
+          closePicker();
+          updatePadding();
+        });
+      }
+      document.addEventListener('click', function(e) {
+        if (_pickerOpen && datePicker && !datePicker.contains(e.target) && e.target !== dateBtn) {
+          closePicker();
+        }
+      });
+
+      applyDate(new Date());
     })();
   </script>
   <script src="../../Scripts/the_true_vine.js"></script>
