@@ -1131,8 +1131,33 @@
     if (asideEl) asideEl.innerHTML = html.slice(5).join('');
   }
 
-  document.addEventListener('DOMContentLoaded', init);
-
   // Expose for Editor's Desk re-render trigger
   window.Herald = { reload: init, loadConfig };
+
+  function start() {
+    const run = () => {
+      init().catch((error) => {
+        console.error('[The Herald] Failed to initialize section:', error);
+      });
+    };
+
+    if (window.NewspaperShell && typeof window.NewspaperShell.initializeSectionShell === 'function') {
+      window.NewspaperShell.initializeSectionShell({
+        sectionId: 'herald',
+        title: 'The Herald',
+        authLevel: -1,
+        pageRoot: document.getElementById('herald-grid'),
+        onReady: run,
+      });
+      return;
+    }
+
+    run();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else {
+    start();
+  }
 })();

@@ -1,5 +1,5 @@
 # The Flock Herald — Master Plan
-### Version 6 — May 2026
+### Version 7 — May 2026
 
 ---
 
@@ -106,6 +106,23 @@ layout, columns, and color — not from hard-to-read fonts.
 If it is not mapped, it is not shipped.
 
 ---
+
+## Current Implementation Snapshot — Updated 2026-05-23
+
+- Shared Newspaper shell modules are now in place: `the_section_manifest.js`, `the_section_shell.js`, and `the_data_resolver.js`.
+- `the_gates.js` now owns the shared nav, drawer, toast, and font-scale behavior for every section page.
+- Herald and The Way are running on separate URLs as document-style newspaper sections, both booting through the shared shell.
+- The Flock care/prayer controller has been repaired and now parses/builds cleanly.
+- The service worker precache list now includes the shared Newspaper scripts, section entrypoints, and section CSS needed for offline launches.
+- A root `favicon.ico` was added so the browser no longer requests a missing icon.
+- Build verification passed with `bash "Iris/Bezalel/Scripts/C-Build_Newspaper.sh"`.
+- Browser verification passed for Herald and The Way, including The Way drawer interaction.
+
+### Next direction
+
+- Continue the remaining Newspaper section rollout using the shared shell contracts without changing the section-per-URL structure.
+- Finish the remaining layout polish and CSS cleanup so shared rules stay in `the_broadsheet.css` and section files remain additive only.
+- Complete browser verification across the remaining sections, then finish the Newspaper QA/build pass.
 
 ## Quality Standard — Professional Pastoral Software
 

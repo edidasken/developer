@@ -1100,6 +1100,38 @@
   }
 
   /* ── Init ────────────────────────────────────────────────────────────────── */
-  document.addEventListener('DOMContentLoaded', buildPage);
+  function start() {
+    var shellInit = null;
+    if (window.NewspaperShell && typeof window.NewspaperShell.initializeSectionShell === 'function') {
+      shellInit = window.NewspaperShell.initializeSectionShell;
+    } else if (typeof window.initializeSectionShell === 'function') {
+      shellInit = window.initializeSectionShell;
+    }
+
+    var boot = function () {
+      buildPage();
+    };
+
+    if (shellInit) {
+      shellInit({
+        sectionId: 'the_way',
+        title: 'The Way',
+        authLevel: -1,
+        pageRoot: document.getElementById('way-grid'),
+        onReady: function () {
+          boot();
+        }
+      });
+      return;
+    }
+
+    boot();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else {
+    start();
+  }
 
 }());

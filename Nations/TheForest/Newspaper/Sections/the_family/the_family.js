@@ -1,10 +1,29 @@
-// the_family.js — Section 6: The Family
-// Phase 6 will build member directory and biblical genealogy.
-// Stub only.
-
-(function() {
+(function () {
   'use strict';
-  document.addEventListener('DOMContentLoaded', () => {
-    // Phase 6 implementation
-  });
+
+  function start() {
+    var shellInit = null;
+    if (window.NewspaperShell && typeof window.NewspaperShell.initializeSectionShell === 'function') {
+      shellInit = window.NewspaperShell.initializeSectionShell;
+    } else if (typeof window.initializeSectionShell === 'function') {
+      shellInit = window.initializeSectionShell;
+    }
+
+    if (typeof shellInit !== 'function') {
+      return;
+    }
+
+    shellInit({
+      sectionId: 'the_family',
+      title: 'The Family',
+      authLevel: 0,
+      pageRoot: document.getElementById('the-family-grid'),
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else {
+    start();
+  }
 })();

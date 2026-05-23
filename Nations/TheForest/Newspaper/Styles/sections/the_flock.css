@@ -1,411 +1,215 @@
-/* ==========================================================================
-   the_flock.css — Section 4: The Flock
-   Signature color: var(--mint)
-   Additive only. Never override tokens already in the_broadsheet.css.
-   ========================================================================== */
-
-.sec-the-flock {
-  --sec-color: var(--mint);
-  --sec-color-soft: var(--mint-soft);
-  --sec-heading-font: 'Lora', Georgia, serif;
-  --sec-body-font: 'Plus Jakarta Sans', system-ui, sans-serif;
+body.section-the-flock {
+  --flock-accent: #d9a441;
+  --flock-accent-soft: rgba(217, 164, 65, 0.14);
+  --flock-card: rgba(17, 21, 26, 0.86);
+  --flock-card-border: rgba(255, 255, 255, 0.12);
+  --flock-shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
 }
 
-.sec-the-flock .sec-masthead {
-  border-top: 3px solid var(--mint);
-}
-
-.sec-the-flock .broadsheet-card {
-  border-top: 3px solid var(--mint);
-}
-
-.flock-card-shell {
+body.section-the-flock .section-app {
   display: grid;
-  gap: 0.75rem;
+  gap: 1.5rem;
+  padding: clamp(1rem, 3vw, 2rem);
 }
 
-.flock-card-heading {
-  font-family: var(--sec-heading-font);
-  font-size: 1rem;
-  letter-spacing: 0.08em;
+body.section-the-flock .page-hero,
+body.section-the-flock .section-card {
+  border: 1px solid var(--flock-card-border);
+  background: var(--flock-card);
+  box-shadow: var(--flock-shadow);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(18px);
+}
+
+body.section-the-flock .page-hero {
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+body.section-the-flock .eyebrow {
+  margin: 0 0 0.5rem;
   text-transform: uppercase;
-  color: var(--mint);
-  margin-bottom: 0.25rem;
+  letter-spacing: 0.14em;
+  font-size: 0.76rem;
+  color: var(--flock-accent);
 }
 
-.flock-card-copy,
-.flock-card-note,
-.flock-summary-text,
-.flock-item-copy {
-  font-family: var(--sec-body-font);
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--ink-muted);
+body.section-the-flock .page-hero h1,
+body.section-the-flock .card-header h2,
+body.section-the-flock .drawer-header h2 {
+  margin: 0;
+  line-height: 1.1;
 }
 
-.flock-card-actions,
-.flock-drawer-actions,
-.flock-panel-toolbar {
+body.section-the-flock .hero-copy,
+body.section-the-flock .card-header p,
+body.section-the-flock .drawer-kicker {
+  margin: 0.5rem 0 0;
+  opacity: 0.86;
+}
+
+body.section-the-flock .hero-actions,
+body.section-the-flock .support-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  align-items: center;
-}
-
-.flock-panel-toolbar {
-  margin-top: 0.25rem;
-}
-
-.flock-btn {
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  padding: 0.75rem 1rem;
-  min-height: 2.75rem;
-  font-family: var(--sec-body-font);
-  font-size: 0.9375rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-}
-
-.flock-btn:hover {
-  transform: translateY(-1px);
-}
-
-.flock-btn:focus-visible {
-  outline: 2px solid var(--mint);
-  outline-offset: 2px;
-}
-
-.flock-btn--primary {
-  background: var(--mint);
-  color: var(--paper-card);
-}
-
-.flock-btn--secondary {
-  background: transparent;
-  color: var(--mint);
-  border-color: var(--mint);
-}
-
-.flock-btn--ghost {
-  background: transparent;
-  color: var(--ink);
-  border-color: var(--rule);
-}
-
-.flock-btn--ghost:hover,
-.flock-btn--ghost:focus-visible {
-  border-color: var(--mint);
-  color: var(--mint);
-  background: var(--paper-sunken);
-}
-
-.flock-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.flock-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
-  margin-top: 0.75rem;
-}
-
-.flock-summary-card {
-  background: var(--paper-sunken);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 0.75rem;
-  box-shadow: var(--shadow-sm);
-}
-
-.flock-summary-label {
-  display: block;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink-muted);
-  margin-bottom: 0.25rem;
-}
-
-.flock-source-line {
-  margin-top: 0.5rem;
-}
-
-.flock-source-badge,
-.flock-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 1.75rem;
-  border-radius: 999px;
-  padding: 0.25rem 0.65rem;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border: 1px solid var(--rule);
-  color: var(--ink-muted);
-  background: var(--paper-card);
-}
-
-.flock-pill--status {
-  border-color: var(--rule-strong);
-}
-
-.flock-member-card-slot {
-  margin-top: 0.75rem;
-}
-
-.flock-member-card,
-.flock-list-item,
-.flock-note-item {
-  background: var(--paper-card);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 0.75rem;
-  box-shadow: var(--shadow-sm);
-}
-
-.flock-member-card {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.flock-member-card-title {
-  font-family: var(--sec-heading-font);
-  font-size: 1rem;
-  color: var(--ink);
-}
-
-.flock-member-card-meta {
-  font-size: 0.875rem;
-  color: var(--ink-faint);
-}
-
-.flock-link-button {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  margin-top: 0.25rem;
-  color: var(--mint);
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.flock-link-button:hover,
-.flock-link-button:focus-visible {
-  text-decoration: underline;
-}
-
-.flock-list {
-  list-style: none;
-  padding: 0;
-  margin: 0.75rem 0 0;
-  display: grid;
-  gap: 0.5rem;
-}
-
-.flock-list-item {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.75rem;
-  align-items: start;
-}
-
-.flock-list-item--clickable {
-  cursor: pointer;
-  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.flock-list-item--clickable:hover,
-.flock-list-item--clickable:focus-within {
-  border-color: var(--mint);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--mint) 16%, transparent);
-  transform: translateY(-1px);
-}
-
-.flock-list-item--open {
-  border-left: 3px solid var(--mint);
-}
-
-.flock-list-item__main {
-  min-width: 0;
-  display: grid;
-  gap: 0.3rem;
-}
-
-.flock-list-item__main strong,
-.flock-note-item strong {
-  font-family: var(--sec-heading-font);
-  font-size: 0.9375rem;
-  color: var(--ink);
-}
-
-.flock-list-item__aside {
-  display: flex;
-  align-items: start;
-  justify-content: end;
-}
-
-.flock-item-meta,
-.flock-item-date {
-  display: block;
-  font-size: 0.8125rem;
-  color: var(--ink-muted);
-}
-
-.flock-list-empty,
-.flock-empty-state {
-  border: 1px dashed var(--rule-strong);
-  border-radius: var(--radius);
-  padding: 1rem;
-  background: var(--paper-sunken);
-}
-
-.flock-empty-state {
-  display: grid;
-  place-items: center;
-  gap: 0.5rem;
-  text-align: center;
-}
-
-.flock-empty-state__icon {
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.flock-empty-state__copy {
-  margin: 0;
-  font-family: var(--sec-body-font);
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--ink-muted);
-}
-
-.flock-panel-subhead,
-.flock-drawer-subhead {
-  font-family: var(--sec-heading-font);
-  font-size: 0.875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink);
   margin-top: 1rem;
 }
 
-.flock-input,
-.flock-select,
-.flock-textarea {
-  width: 100%;
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius);
-  background: var(--paper-card);
-  color: var(--ink);
-  font-family: var(--sec-body-font);
-  font-size: 0.9375rem;
-  line-height: 1.4;
-  padding: 0.75rem 0.875rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+body.section-the-flock .drawer-trigger,
+body.section-the-flock .drawer-close {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08));
+  color: inherit;
+  border-radius: 999px;
+  padding: 0.72rem 1rem;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
-.flock-input,
-.flock-select {
-  min-height: 2.75rem;
+body.section-the-flock .drawer-trigger:hover,
+body.section-the-flock .drawer-close:hover {
+  transform: translateY(-1px);
+  border-color: rgba(217, 164, 65, 0.55);
+  background: linear-gradient(180deg, rgba(217, 164, 65, 0.18), rgba(255, 255, 255, 0.08));
 }
 
-.flock-textarea {
-  min-height: 7rem;
-  resize: vertical;
+body.section-the-flock .offline-banner {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.9rem;
+  background: rgba(217, 164, 65, 0.14);
+  color: #ffe8b5;
+  border: 1px solid rgba(217, 164, 65, 0.3);
 }
 
-.flock-input::placeholder,
-.flock-textarea::placeholder {
-  color: var(--ink-faint);
-}
-
-.flock-input:focus,
-.flock-select:focus,
-.flock-textarea:focus {
-  outline: none;
-  border-color: var(--mint);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--mint) 18%, transparent);
-}
-
-.flock-drawer-form {
-  display: grid;
-  gap: 0.875rem;
-}
-
-.flock-drawer-section {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.flock-drawer-label {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-}
-
-.flock-drawer-grid {
+body.section-the-flock .cards-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  gap: 1.25rem;
 }
 
-.flock-drawer-divider {
-  border-top: 1px solid var(--rule);
-  margin: 0.25rem 0;
+body.section-the-flock .section-card {
+  padding: 1.25rem;
 }
 
-.flock-note-list {
+body.section-the-flock .card-header {
+  margin-bottom: 1rem;
+}
+
+body.section-the-flock .entry-list {
   list-style: none;
-  margin: 0.75rem 0 0;
   padding: 0;
+  margin: 0;
   display: grid;
+  gap: 0.9rem;
+}
+
+body.section-the-flock .entry-card {
+  border-radius: 1rem;
+  padding: 1rem;
+  background: var(--flock-accent-soft);
+  border: 1px solid rgba(217, 164, 65, 0.16);
+}
+
+body.section-the-flock .entry-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
   gap: 0.5rem;
 }
 
-.flock-note-item {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.flock-note-item strong {
+body.section-the-flock .entry-card h3 {
   margin: 0;
+  font-size: 1rem;
 }
 
-.flock-note-item .flock-item-copy {
-  color: var(--ink-muted);
+body.section-the-flock .entry-card p {
+  margin: 0.65rem 0 0;
 }
 
-.flock-note-item .flock-item-meta {
-  font-size: 0.75rem;
-  color: var(--ink-faint);
+body.section-the-flock .entry-summary {
+  opacity: 0.95;
 }
 
-@media (max-width: 920px) {
-  .flock-summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+body.section-the-flock .entry-details {
+  opacity: 0.75;
 }
 
-@media (max-width: 720px) {
-  .flock-summary-grid,
-  .flock-drawer-grid {
+body.section-the-flock .entry-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.84rem;
+  opacity: 0.8;
+}
+
+body.section-the-flock .entry-status {
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body.section-the-flock .drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(4, 6, 9, 0.56);
+  backdrop-filter: blur(3px);
+}
+
+body.section-the-flock .drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: end center;
+  padding: 1rem;
+}
+
+body.section-the-flock .drawer-panel {
+  width: min(42rem, 100%);
+  max-height: min(80vh, 100%);
+  overflow: auto;
+  border-radius: 1.4rem;
+  border: 1px solid var(--flock-card-border);
+  background: rgba(12, 16, 20, 0.96);
+  box-shadow: var(--flock-shadow);
+  padding: 1.1rem;
+}
+
+body.section-the-flock .drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+body.section-the-flock .drawer-body {
+  display: grid;
+  gap: 0.9rem;
+}
+
+body.section-the-flock .drawer-empty {
+  margin: 0;
+  opacity: 0.8;
+}
+
+@media (max-width: 760px) {
+  body.section-the-flock .cards-grid {
     grid-template-columns: 1fr;
   }
 
-  .flock-list-item {
-    grid-template-columns: 1fr;
+  body.section-the-flock .drawer {
+    place-items: end stretch;
+    padding: 0.5rem;
   }
 
-  .flock-list-item__aside {
-    justify-content: start;
+  body.section-the-flock .drawer-panel {
+    border-radius: 1rem 1rem 0 0;
+    max-height: 88vh;
   }
 }

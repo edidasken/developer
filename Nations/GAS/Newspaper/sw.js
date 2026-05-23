@@ -9,11 +9,23 @@ const PRECACHE_URLS = [
   './index.html',
   './manifest.json',
   './Styles/the_broadsheet.css',
+  './Styles/sections/herald.css',
+  './Styles/sections/the_way.css',
+  './Styles/sections/the_flock.css',
   './Scripts/the_living_water.js',
   './Scripts/firm_foundation.js',
   './Scripts/the_adornment.js',
   './Scripts/the_cistern.js',
-  './Sections/herald/index.html'
+  './Scripts/the_section_manifest.js',
+  './Scripts/the_section_shell.js',
+  './Scripts/the_data_resolver.js',
+  './Scripts/the_gates.js',
+  './Sections/herald/index.html',
+  './Sections/herald/the_proclamation.js',
+  './Sections/the_way/index.html',
+  './Sections/the_way/the_way.js',
+  './Sections/the_flock/index.html',
+  './Sections/the_flock/the_flock.js'
 ];
 
 // Install — precache core shell

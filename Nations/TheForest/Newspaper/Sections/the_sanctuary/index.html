@@ -1,6 +1,6 @@
-<!DOCTYPE html>
-<html lang="en" class="sec-the-sanctuary">
-<head>
+<!doctype html>
+<html lang="en">
+  <head>
   <script>
     window.FLOCK_FIREBASE_CONFIG = {
       "apiKey": "AIzaSyCnIbShg2ra1t4EiP3CffsivwvIK-bNu8M",
@@ -14,155 +14,88 @@
     window.HERALD_CHURCH_NAME = "The Forest";
     window.HERALD_CHURCH_ID   = "theforest";
   </script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>The Sanctuary — The Flock Herald</title>
-  <script>
-    (function() {
-      var s = localStorage.getItem('flock_font_scale');
-      if (s) document.documentElement.style.setProperty('--fn-scale', s);
-    })();
-  </script>
-  <link rel="stylesheet" href="../../Styles/the_broadsheet.css">
-  <link rel="stylesheet" href="../../Styles/sections/the_sanctuary.css">
-  <link rel="manifest" href="../../manifest.json">
-</head>
-<body class="broadsheet-page sec-the-sanctuary">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Sanctuary</title>
+    <link rel="stylesheet" href="../../Styles/the_broadsheet.css" />
+    <link rel="stylesheet" href="../../Styles/sections/the_sanctuary.css" />
+  </head>
+  <body class="newspaper-page section-the-sanctuary nav-locked">
+    <a class="skip-link" href="#sanctuary-app">Skip to The Sanctuary content</a>
 
-  <header class="sec-masthead" role="banner">
-    <div class="sec-masthead__inner">
-      <div>
-        <h1 class="sec-masthead__title">The Sanctuary</h1>
-        <p class="sec-masthead__subtitle">Sermons · Songs · Service Order</p>
-      </div>
-      <button class="sec-masthead__font-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
-    </div>
-    <nav class="sec-nav-bar" role="navigation" aria-label="Herald sections" id="sec-nav"></nav>
-  </header>
+    <main id="sanctuary-app" class="section-app sanctuary-page" data-section="the_sanctuary">
+      <section class="page-hero sanctuary-hero" aria-labelledby="sanctuary-title">
+        <p class="eyebrow">Section · The Sanctuary</p>
+        <h1 id="sanctuary-title">The Sanctuary</h1>
+        <p class="hero-copy">
+          A protected room for leaders, counsel, notes, and the watch kept over the house.
+        </p>
+        <p id="sanctuary-offline-banner" class="offline-banner" hidden>
+          Offline mode: sanctuary notes are limited to the last cached state.
+        </p>
+      </section>
 
-  <!-- Three-column broadsheet: Sermon Builder | Song Planner | Service Order -->
-  <main class="sanctuary-columns" id="the-sanctuary-grid" role="main">
+      <section id="sanctuary-content" class="sanctuary-content" aria-hidden="true">
+        <div class="sanctuary-grid">
+          <article class="section-card sanctuary-card">
+            <header class="card-header">
+              <h2>Guarded notes</h2>
+              <p>Leader-only notes stay behind the gate until access is confirmed.</p>
+            </header>
+            <ul class="note-list">
+              <li>Review the current watch and prayer assignments.</li>
+              <li>Confirm which messages should move to the public sections.</li>
+              <li>Keep sensitive counsel in the protected archive.</li>
+            </ul>
+          </article>
 
-    <!-- ── Col 1 · Sermon Builder ──────────────────────────────────────── -->
-    <div class="sanctuary-col" id="sanc-col-sermons">
-
-      <div class="sanc-panel-header" data-collapse-target="sanc-sermon-body">
-        <span class="sanc-panel-label">Sermon Builder</span>
-        <button class="sanc-panel-toggle" type="button" data-collapse-panel="sermons" aria-label="Collapse Sermon Builder">▼</button>
-      </div>
-
-      <div id="sanc-sermon-body">
-        <div class="sanc-toolbar">
-          <input id="sanc-sermon-search" class="sanc-search" type="search" placeholder="Search sermons…" aria-label="Search sermons">
-          <select id="sanc-sermon-filter" class="sanc-select" aria-label="Filter by status">
-            <option value="all">All</option>
-            <option value="draft">Draft</option>
-            <option value="ready">Ready</option>
-            <option value="preached">Preached</option>
-          </select>
-          <button class="sanc-btn" id="sanc-new-sermon-btn" type="button">+ New Sermon</button>
+          <article class="section-card sanctuary-card">
+            <header class="card-header">
+              <h2>Nav lock status</h2>
+              <p>Until the gate opens, the wider navigation remains locked.</p>
+            </header>
+            <div class="status-stack">
+              <span id="sanctuary-access-chip" class="status-chip">Locked</span>
+              <p id="sanctuary-status-copy" class="status-copy">
+                Enter the leader access code to unlock the room and restore navigation.
+              </p>
+            </div>
+          </article>
         </div>
-        <!-- Sermon list — rendered by the_sanctuary.js -->
-        <div id="sanc-sermon-list-inner">
-          <div class="sanc-empty" style="padding:2rem 0 1rem">Loading…</div>
-        </div>
+      </section>
+
+      <div id="leader-overlay" class="leader-overlay" role="dialog" aria-modal="true" aria-labelledby="leader-overlay-title">
+        <form id="leader-auth-form" class="auth-panel">
+          <p class="eyebrow">Leader access</p>
+          <h2 id="leader-overlay-title">Unlock The Sanctuary</h2>
+          <p class="hero-copy">
+            Enter the gate code to reveal the protected room and release the nav lock.
+          </p>
+
+          <label class="field">
+            <span class="field-label">Access code</span>
+            <input
+              id="leader-access-code"
+              name="leader-access-code"
+              type="password"
+              autocomplete="one-time-code"
+              inputmode="text"
+              required
+            />
+          </label>
+
+          <p id="leader-auth-error" class="auth-error" hidden></p>
+
+          <div class="auth-actions">
+            <button type="submit" class="drawer-trigger">Unlock Sanctuary</button>
+          </div>
+        </form>
       </div>
+    </main>
 
-    </div><!-- /col-sermons -->
-
-    <!-- ── Col 2 · Song Planner ────────────────────────────────────────── -->
-    <div class="sanctuary-col" id="sanc-col-songs">
-
-      <div class="sanc-panel-header" data-collapse-target="sanc-song-body">
-        <span class="sanc-panel-label">Song Planner</span>
-        <button class="sanc-panel-toggle" type="button" data-collapse-panel="songs" aria-label="Collapse Song Planner">▼</button>
-      </div>
-
-      <div id="sanc-song-body">
-        <div class="sanc-tabs" id="sanc-song-tabs">
-          <button class="sanc-tab is-active" data-tab="library" type="button">Library</button>
-          <button class="sanc-tab" data-tab="setlist" type="button">Sunday's Set</button>
-        </div>
-        <div class="sanc-toolbar">
-          <input id="sanc-song-search" class="sanc-search" type="search" placeholder="Search songs, key, CCLI…" aria-label="Search songs">
-        </div>
-        <!-- Song library / setlist — rendered by the_sanctuary.js -->
-        <div id="sanc-song-list-inner">
-          <div class="sanc-empty" style="padding:2rem 0 1rem">Loading…</div>
-        </div>
-      </div>
-
-    </div><!-- /col-songs -->
-
-    <!-- ── Col 3 · Service Order ──────────────────────────────────────── -->
-    <div class="sanctuary-col" id="sanc-col-order">
-
-      <div class="sanc-panel-header" data-collapse-target="sanc-order-body">
-        <span class="sanc-panel-label">Service Order</span>
-        <button class="sanc-panel-toggle" type="button" data-collapse-panel="order" aria-label="Collapse Service Order">▼</button>
-      </div>
-
-      <!-- Service order — rendered by the_sanctuary.js -->
-      <div id="sanc-order-body">
-        <div class="sanc-empty" style="padding:2rem 0 1rem">Loading…</div>
-      </div>
-
-    </div><!-- /col-order -->
-
-  </main><!-- /sanctuary-columns -->
-
-  <div class="sanctuary-auth-overlay hidden" id="sanc-auth-overlay" aria-hidden="true" role="dialog" aria-labelledby="sanc-auth-title">
-    <div class="sanctuary-auth-card">
-      <div class="sanctuary-auth-brand">
-        <div class="sanctuary-auth-eyebrow">Leader Sign In</div>
-        <h2 id="sanc-auth-title">The Sanctuary</h2>
-        <p class="sanctuary-auth-copy">Sign in with your FlockOS leader credentials to load live sermons, songs, and service order data.</p>
-      </div>
-
-      <form id="sanc-auth-form" class="sanctuary-auth-form" autocomplete="on" novalidate>
-        <label for="sanc-auth-email">Email</label>
-        <input id="sanc-auth-email" type="email" autocomplete="email" placeholder="you@church.com" required>
-
-        <label for="sanc-auth-pass">Passcode</label>
-        <input id="sanc-auth-pass" type="password" autocomplete="current-password" placeholder="••••••••" required>
-
-        <button type="submit" class="sanc-btn">Sign In</button>
-        <div class="sanctuary-auth-error" id="sanc-auth-error" aria-live="polite"></div>
-      </form>
-      <div class="sanctuary-auth-footer">
-        <a href="../herald/index.html" class="sanctuary-auth-return">← Back to Herald</a>
-      </div>
-    </div>
-  </div>
-
-  <aside class="right-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
-    <header class="drawer-header">
-      <h2 id="drawer-title" class="drawer-title"></h2>
-      <button class="drawer-close" type="button" aria-label="Close">&#x2715;</button>
-    </header>
-    <div class="drawer-body" id="drawer-body"></div>
-  </aside>
-  <div class="drawer-backdrop" aria-hidden="true"></div>
-  <div class="toast-layer" id="toast-layer" aria-live="polite" aria-atomic="true"></div>
-
-  <script src="../../Scripts/the_true_vine.js"></script>
-  <script src="../../Scripts/firm_foundation.js"></script>
-  <script>
-    // Auth guard — requires leader (3)
-    window._HERALD_AUTH_LEVEL = 3;
-    // Restrict nav until Sanctuary auth completes.
-    window._HERALD_SANCTUARY_LOGIN_REQUIRED = true;
-  </script>
-  <script src="../../Scripts/the_adornment.js"></script>
-  <script src="../../Scripts/the_gates.js"></script>
-  <script src="the_sanctuary.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('../../sw.js').catch(() => {});
-    }
-  </script>
-</body>
+    <script src="../../Scripts/the_section_manifest.js" defer></script>
+    <script src="../../Scripts/the_section_shell.js" defer></script>
+    <script src="../../Scripts/the_gates.js" defer></script>
+    <script src="./the_sanctuary.js" defer></script>
+  </body>
 </html>
-

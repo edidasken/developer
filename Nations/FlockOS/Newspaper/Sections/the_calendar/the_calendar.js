@@ -1,10 +1,29 @@
-// the_calendar.js — Section 8: The Calendar
-// Phase 8 will build events calendar, RSVP, birthday tracker.
-// Stub only.
-
-(function() {
+(function () {
   'use strict';
-  document.addEventListener('DOMContentLoaded', () => {
-    // Phase 8 implementation
-  });
+
+  function start() {
+    var shellInit = null;
+    if (window.NewspaperShell && typeof window.NewspaperShell.initializeSectionShell === 'function') {
+      shellInit = window.NewspaperShell.initializeSectionShell;
+    } else if (typeof window.initializeSectionShell === 'function') {
+      shellInit = window.initializeSectionShell;
+    }
+
+    if (typeof shellInit !== 'function') {
+      return;
+    }
+
+    shellInit({
+      sectionId: 'the_calendar',
+      title: 'The Calendar',
+      authLevel: 0,
+      pageRoot: document.getElementById('the-calendar-grid'),
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else {
+    start();
+  }
 })();

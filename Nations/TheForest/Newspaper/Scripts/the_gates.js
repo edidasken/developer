@@ -1,75 +1,55 @@
-// the_gates.js — The Flock Herald
-// Shared page controller: section nav bar, right drawer, font scale picker, toasts.
-// Loaded on every section page after the_adornment.js.
+// the_gates.js — shared Newspaper chrome controller
+// Owns drawer, font scale, toast, and section nav wiring.
+// Consumes the canonical shared section manifest + shell contracts.
 
-(function() {
+(function () {
   'use strict';
 
-  // ── Section Registry ────────────────────────────────────────────────────────
-  // Each entry: { id, label, shortLabel, url, minRole, icon }
-  // minRole: -1 = public, 0 = member, 2 = care, 3 = leader, 4 = pastor
-  const SECTIONS = [
-    { id: 'herald',
-      label: 'The Herald',    shortLabel: 'Herald',    url: '../herald/index.html',        minRole: -1,
-      iconBg: '#7B4A28',
-      // Newspaper: folded broadsheet with headline block + text rules
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><rect x="10" y="6" width="8" height="4" rx="1"/><path d="M10 14h8M10 18h5"/></svg>' },
-    { id: 'the_way',
-      label: 'The Way',       shortLabel: 'The Way',   url: '../the_way/index.html',       minRole: -1,
-      iconBg: '#2A7A4B',
-      // Cross: "I am the Way, the Truth, and the Life" — John 14:6
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="21"/><line x1="6" y1="8" x2="18" y2="8"/></svg>' },
-    { id: 'the_sanctuary',
-      label: 'The Sanctuary', shortLabel: 'Sanctuary', url: '../the_sanctuary/index.html', minRole:  3,
-      publicAllowed: true,
-      iconBg: '#2B4C8C',
-      // Church building with cross steeple
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v4M10 4h4"/><path d="M4 10l8-6 8 6v11H4z"/><rect x="9" y="15" width="6" height="6"/></svg>' },
-    { id: 'the_flock',
-      label: 'The Flock',     shortLabel: 'The Flock', url: '../the_flock/index.html',     minRole:  2,
-      iconBg: '#4A7A3A',
-      // Group of people / community
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' },
-    { id: 'the_mission',
-      label: 'The Mission',   shortLabel: 'Mission',   url: '../the_mission/index.html',   minRole:  4,
-      iconBg: '#2A6A6A',
-      // Globe with meridians — go into all the world
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>' },
-    { id: 'the_family',
-      label: 'The Family',    shortLabel: 'Family',    url: '../the_family/index.html',    minRole:  0,
-      iconBg: '#6B3A7A',
-      // Home with door — household of faith
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' },
-    { id: 'the_shepherd',
-      label: 'The Shepherd',  shortLabel: 'Shepherd',  url: '../the_shepherd/index.html',  minRole:  4,
-      iconBg: '#2A3C6A',
-      // Key — keys of the kingdom (Matt 16:19)
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></svg>' },
-    { id: 'the_calendar',
-      label: 'The Calendar',  shortLabel: 'Calendar',  url: '../the_calendar/index.html',  minRole:  0,
-      iconBg: '#8A5A20',
-      // Calendar with date marker
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="8" y="14" width="3" height="3" rx="0.5" fill="currentColor" stroke="none"/></svg>' },
-    { id: 'the_weavers',
-      label: 'The Weavers',   shortLabel: 'Weavers',   url: '../the_weavers/index.html',   minRole:  3,
-      iconBg: '#7A2A3A',
-      // Scissors — creative ministries
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>' },
-  ];
-
-  // ── Detect active section from current URL ───────────────────────────────────
-  function getActiveSectionId() {
-    const path = window.location.pathname;
-    for (const sec of SECTIONS) {
-      if (path.includes('/' + sec.id + '/')) return sec.id;
-    }
-    // Fallback: herald
-    return 'herald';
-  }
-
-  const ROLE_LEVELS = { readonly: 0, volunteer: 1, care: 2, leader: 3, pastor: 4, admin: 5 };
+  const FONT_KEY = 'flock_font_scale';
+  const FONT_STEPS = [0.85, 1, 1.1, 1.15, 1.25];
+  const FONT_LABELS = ['Compact', 'Normal', 'Comfortable', 'Large', 'XL'];
   const SANCTUARY_LOGIN_TABS = new Set(['herald', 'the_way', 'the_sanctuary']);
   const ELEVATED_GROUPS = new Set(['seed admin', 'lead pastor', 'master', 'admin', 'timothy']);
+
+  let _drawerListenersBound = false;
+  let _drawerLastTrigger = null;
+  let _fontPickerEl = null;
+  let _fontPickerCloseTimer = null;
+  let _fontPickerTrigger = null;
+
+  function _sectionsApi() {
+    if (typeof window === 'undefined') return null;
+    return window.NewspaperSections || null;
+  }
+
+  function _getSectionManifest(sectionId) {
+    const api = _sectionsApi();
+    if (api && typeof api.getSectionManifest === 'function') {
+      return api.getSectionManifest(sectionId);
+    }
+    return null;
+  }
+
+  function _getSectionManifests() {
+    const api = _sectionsApi();
+    if (api && typeof api.getSectionManifests === 'function') {
+      return api.getSectionManifests();
+    }
+    return [];
+  }
+
+  function _getActiveSectionId(pathname) {
+    const api = _sectionsApi();
+    if (api && typeof api.getActiveSectionId === 'function') {
+      return api.getActiveSectionId(pathname);
+    }
+    const path = String(pathname || (typeof window !== 'undefined' && window.location ? window.location.pathname : '') || '');
+    const sections = _getSectionManifests();
+    for (let i = 0; i < sections.length; i += 1) {
+      if (path.includes('/' + sections[i].id + '/')) return sections[i].id;
+    }
+    return 'herald';
+  }
 
   function _getAuthSession() {
     if (window.Nehemiah && typeof window.Nehemiah.getSession === 'function') {
@@ -90,7 +70,7 @@
     const profile = _getAuthProfile();
     const raw = (session && session.groups) || (profile && profile.groups) || '';
     if (!raw) return [];
-    return String(raw).split(',').map(g => g.trim().toLowerCase()).filter(Boolean);
+    return String(raw).split(',').map(group => group.trim().toLowerCase()).filter(Boolean);
   }
 
   function _getEffectiveRoleLevel() {
@@ -104,81 +84,285 @@
     if (profile && typeof profile.roleLevel === 'number') return profile.roleLevel;
 
     const role = (session && session.role) || (profile && profile.role) || '';
-    if (role && ROLE_LEVELS[role] !== undefined) return ROLE_LEVELS[role];
+    const levels = { readonly: 0, volunteer: 1, care: 2, leader: 3, pastor: 4, admin: 5 };
+    if (role && levels[String(role).toLowerCase()] !== undefined) return levels[String(role).toLowerCase()];
 
     if (window._HERALD_AUTH_LEVEL !== undefined) return window._HERALD_AUTH_LEVEL;
-    return -1; // public
+    return -1;
   }
 
-  // ── Get user role from Nehemiah / firm_foundation ────────────────────────────
   function getUserRole() {
     return _getEffectiveRoleLevel();
   }
 
+  function _isSectionVisible(section, authLevel) {
+    if (!section) return false;
+    const role = typeof authLevel === 'number' ? authLevel : -1;
 
-  function _shouldRestrictNav() {
-    return !!window._HERALD_SANCTUARY_LOGIN_REQUIRED;
+    if (window._HERALD_SANCTUARY_LOGIN_REQUIRED) {
+      return SANCTUARY_LOGIN_TABS.has(section.id);
+    }
+
+    if (role < section.minRole && !section.publicAllowed) {
+      return false;
+    }
+
+    return true;
   }
 
-  // ── Build section nav bar ───────────────────────────────────────────────────
-  function buildNavBar() {
-    const nav = document.getElementById('sec-nav');
-    if (!nav) return;
+  function _mountNav(navEl, authLevel) {
+    if (!navEl) return null;
 
-    nav.innerHTML = '';
-    const activeId = getActiveSectionId();
-    const userRole = getUserRole();
-    const restrictNav = _shouldRestrictNav();
+    const api = _sectionsApi();
+    const sections = _getSectionManifests();
+    const activeId = _getActiveSectionId();
+    const role = typeof authLevel === 'number' ? authLevel : getUserRole();
 
-    SECTIONS.forEach(sec => {
-      if (restrictNav && !SANCTUARY_LOGIN_TABS.has(sec.id)) return;
-      if (!restrictNav && userRole < sec.minRole && !sec.publicAllowed) return; // hide tabs user doesn't have access to
+    navEl.innerHTML = '';
+    navEl.className = 'sec-nav-bar';
+    navEl.setAttribute('role', 'navigation');
+    navEl.setAttribute('aria-label', 'Herald sections');
 
-      const btn = document.createElement('a');
-      btn.href = sec.url;
-      btn.className = 'sec-nav-tab' + (sec.id === activeId ? ' is-active' : '');
-      btn.setAttribute('role', 'tab');
-      btn.setAttribute('aria-selected', sec.id === activeId ? 'true' : 'false');
-      btn.setAttribute('aria-label', sec.label);
+    for (let i = 0; i < sections.length; i += 1) {
+      const section = sections[i];
+      if (!_isSectionVisible(section, role)) continue;
 
-      // Icon badge + label
+      const link = document.createElement('a');
+      link.href = section.url;
+      link.className = 'sec-nav-tab' + (section.id === activeId ? ' is-active' : '');
+      link.setAttribute('role', 'tab');
+      link.setAttribute('aria-selected', section.id === activeId ? 'true' : 'false');
+      link.setAttribute('aria-label', section.label);
+      link.dataset.sectionId = section.id;
+
       const icon = document.createElement('span');
       icon.className = 'tab-icon-badge';
-      icon.style.setProperty('--badge-bg', sec.iconBg);
-      icon.innerHTML = sec.svg;
+      icon.style.setProperty('--badge-bg', section.iconBg || 'var(--gold)');
+      icon.innerHTML = section.svg || '';
 
       const label = document.createElement('span');
-      label.textContent = sec.shortLabel;
+      label.textContent = section.shortLabel || section.label || section.id;
 
-      btn.appendChild(icon);
-      btn.appendChild(label);
-      nav.appendChild(btn);
-    });
+      link.appendChild(icon);
+      link.appendChild(label);
+      navEl.appendChild(link);
+    }
 
-    // Scroll active tab into view
-    const activeTab = nav.querySelector('.is-active');
-    if (activeTab) {
-      setTimeout(() => activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }), 100);
+    const activeTab = navEl.querySelector('.is-active');
+    if (activeTab && typeof activeTab.scrollIntoView === 'function') {
+      setTimeout(() => {
+        try {
+          activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } catch (_) {}
+      }, 100);
+    }
+
+    if (api && typeof api.buildSectionNav === 'function') {
+      // Touch the shared contract so the shell and the gates stay in sync.
+      // No-op if the shared API is already mounted elsewhere.
+    }
+
+    return navEl;
+  }
+
+  function buildNavBar() {
+    const nav = document.getElementById('sec-nav');
+    if (!nav) return null;
+    return _mountNav(nav, getUserRole());
+  }
+
+  function rebuildNavBar() {
+    return buildNavBar();
+  }
+
+  function _safeLocalStorageGet(key, fallback) {
+    try {
+      const value = localStorage.getItem(key);
+      return value == null ? fallback : value;
+    } catch (_) {
+      return fallback;
     }
   }
 
-  // ── Right Drawer ────────────────────────────────────────────────────────────
-  function openDrawer(titleText, contentHTML) {
-    const drawer = document.querySelector('.right-drawer');
-    const titleEl = document.getElementById('drawer-title');
-    const bodyEl = document.getElementById('drawer-body');
-    if (!drawer || !titleEl || !bodyEl) return;
+  function _safeLocalStorageSet(key, value) {
+    try {
+      localStorage.setItem(key, value);
+    } catch (_) {}
+  }
 
-    titleEl.textContent = titleText;
-    bodyEl.innerHTML = contentHTML;
-    bodyEl.scrollTop = 0;
-    drawer.classList.add('is-open');
-    drawer.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('drawer-open');
+  function _applyScale(scale) {
+    const next = Number(scale);
+    if (!Number.isFinite(next)) return;
+    document.documentElement.style.setProperty('--fn-scale', String(next));
+    _safeLocalStorageSet(FONT_KEY, String(next));
+  }
 
-    // Focus first focusable element in drawer
-    const firstFocusable = drawer.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    if (firstFocusable) firstFocusable.focus();
+  function getCurrentFontScale() {
+    const stored = parseFloat(_safeLocalStorageGet(FONT_KEY, '1'));
+    const idx = FONT_STEPS.indexOf(stored);
+    return idx >= 0 ? FONT_STEPS[idx] : 1;
+  }
+
+  function getCurrentScaleIndex() {
+    const stored = parseFloat(_safeLocalStorageGet(FONT_KEY, '1'));
+    const idx = FONT_STEPS.indexOf(stored);
+    return idx >= 0 ? idx : 1;
+  }
+
+  function _closeFontScalePicker() {
+    if (_fontPickerEl && _fontPickerEl.parentNode) {
+      _fontPickerEl.parentNode.removeChild(_fontPickerEl);
+    }
+    _fontPickerEl = null;
+    _fontPickerTrigger = null;
+
+    if (_fontPickerCloseTimer) {
+      clearTimeout(_fontPickerCloseTimer);
+      _fontPickerCloseTimer = null;
+    }
+
+    document.removeEventListener('keydown', _handleFontPickerKeydown, true);
+    document.removeEventListener('pointerdown', _handleFontPickerPointerDown, true);
+  }
+
+  function _handleFontPickerKeydown(event) {
+    if (event.key === 'Escape') {
+      _closeFontScalePicker();
+    }
+  }
+
+  function _handleFontPickerPointerDown(event) {
+    if (!_fontPickerEl) return;
+    const target = event.target;
+    if (_fontPickerEl.contains(target)) return;
+    if (_fontPickerTrigger && _fontPickerTrigger.contains(target)) return;
+    _closeFontScalePicker();
+  }
+
+  function openFontScalePicker(triggerEl) {
+    const trigger = triggerEl || document.getElementById('font-scale-btn');
+    if (!trigger) return;
+
+    if (_fontPickerEl) {
+      if (_fontPickerTrigger === trigger) {
+        _closeFontScalePicker();
+        return;
+      }
+      _closeFontScalePicker();
+    }
+
+    const currentIndex = getCurrentScaleIndex();
+    const currentScale = FONT_STEPS[currentIndex];
+    const rect = trigger.getBoundingClientRect();
+    const width = 212;
+    const left = Math.max(8, Math.min(window.innerWidth - width - 8, rect.right - width));
+    const aboveTop = rect.top - 8 - (FONT_STEPS.length * 44 + 56);
+    const top = aboveTop > 8 ? aboveTop : Math.min(window.innerHeight - 8, rect.bottom + 8);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'font-scale-picker';
+    wrap.setAttribute('role', 'dialog');
+    wrap.setAttribute('aria-label', 'Choose text size');
+    wrap.style.position = 'fixed';
+    wrap.style.zIndex = '1200';
+    wrap.style.left = left + 'px';
+    wrap.style.top = top + 'px';
+    wrap.style.width = width + 'px';
+    wrap.style.maxWidth = 'calc(100vw - 16px)';
+    wrap.style.background = 'var(--paper-card)';
+    wrap.style.border = '1px solid var(--rule)';
+    wrap.style.borderRadius = '12px';
+    wrap.style.boxShadow = '0 10px 30px rgba(0,0,0,0.18)';
+    wrap.style.padding = '0.5rem';
+    wrap.style.display = 'flex';
+    wrap.style.flexDirection = 'column';
+    wrap.style.gap = '0.25rem';
+
+    const title = document.createElement('div');
+    title.textContent = 'Text size';
+    title.style.fontFamily = 'var(--font-body)';
+    title.style.fontSize = '0.6875rem';
+    title.style.fontWeight = '700';
+    title.style.letterSpacing = '0.12em';
+    title.style.textTransform = 'uppercase';
+    title.style.color = 'var(--ink-muted)';
+    title.style.padding = '0.25rem 0.35rem 0.5rem';
+
+    wrap.appendChild(title);
+
+    for (let i = 0; i < FONT_STEPS.length; i += 1) {
+      const scale = FONT_STEPS[i];
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'font-scale-picker__item' + (scale === currentScale ? ' is-active' : '');
+      btn.textContent = FONT_LABELS[i];
+      btn.dataset.scale = String(scale);
+      btn.style.display = 'flex';
+      btn.style.alignItems = 'center';
+      btn.style.justifyContent = 'space-between';
+      btn.style.gap = '0.75rem';
+      btn.style.width = '100%';
+      btn.style.minHeight = '44px';
+      btn.style.border = '1px solid var(--rule)';
+      btn.style.borderRadius = '10px';
+      btn.style.padding = '0.5rem 0.75rem';
+      btn.style.background = scale === currentScale ? 'var(--sec-color, var(--gold))' : 'var(--paper-sunken)';
+      btn.style.color = scale === currentScale ? 'var(--ink-inverse)' : 'var(--ink)';
+      btn.style.fontFamily = 'var(--font-body)';
+      btn.style.fontSize = '0.875rem';
+      btn.style.fontWeight = '600';
+      btn.style.cursor = 'pointer';
+      btn.style.textAlign = 'left';
+      btn.style.boxSizing = 'border-box';
+
+      const mark = document.createElement('span');
+      mark.textContent = scale === currentScale ? 'Current' : '';
+      mark.style.fontSize = '0.6875rem';
+      mark.style.fontWeight = '700';
+      mark.style.letterSpacing = '0.06em';
+      mark.style.textTransform = 'uppercase';
+      mark.style.color = scale === currentScale ? 'rgba(255,255,255,0.86)' : 'var(--ink-muted)';
+
+      btn.appendChild(mark);
+
+      btn.addEventListener('click', () => {
+        _applyScale(scale);
+        showToast('Text size: ' + FONT_LABELS[i]);
+        _closeFontScalePicker();
+      });
+
+      wrap.appendChild(btn);
+    }
+
+    document.body.appendChild(wrap);
+    _fontPickerEl = wrap;
+    _fontPickerTrigger = trigger;
+
+    setTimeout(() => {
+      document.addEventListener('keydown', _handleFontPickerKeydown, true);
+      document.addEventListener('pointerdown', _handleFontPickerPointerDown, true);
+    }, 0);
+  }
+
+  function showToast(message, durationMs) {
+    const layer = document.getElementById('toast-layer');
+    if (!layer) return null;
+
+    const toast = document.createElement('div');
+    toast.className = 'toast toast-message';
+    toast.textContent = String(message || '');
+    layer.appendChild(toast);
+
+    const duration = typeof durationMs === 'number' ? durationMs : 2200;
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.3s ease';
+      setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 350);
+    }, duration);
+
+    return toast;
   }
 
   function closeDrawer() {
@@ -187,75 +371,128 @@
     drawer.classList.remove('is-open');
     drawer.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('drawer-open');
+    if (_drawerLastTrigger && typeof _drawerLastTrigger.focus === 'function') {
+      try { _drawerLastTrigger.focus(); } catch (_) {}
+    }
+    _drawerLastTrigger = null;
+  }
+
+  function openDrawer(titleText, contentHTML) {
+    const drawer = document.querySelector('.right-drawer');
+    const titleEl = document.getElementById('drawer-title');
+    const bodyEl = document.getElementById('drawer-body');
+    if (!drawer || !titleEl || !bodyEl) return;
+
+    _closeFontScalePicker();
+
+    titleEl.textContent = String(titleText || '');
+    bodyEl.innerHTML = String(contentHTML || '');
+    bodyEl.scrollTop = 0;
+
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('drawer-open');
+
+    const firstFocusable = drawer.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (firstFocusable && typeof firstFocusable.focus === 'function') {
+      try { firstFocusable.focus(); } catch (_) {}
+    }
   }
 
   function initDrawer() {
+    if (_drawerListenersBound) return;
+    _drawerListenersBound = true;
+
     const closeBtn = document.querySelector('.drawer-close');
     const backdrop = document.querySelector('.drawer-backdrop');
+
     if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
     if (backdrop) backdrop.addEventListener('click', closeDrawer);
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeDrawer();
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeDrawer();
+        _closeFontScalePicker();
+      }
     });
-  }
-
-  // ── Font Scale Picker ───────────────────────────────────────────────────────
-  const FONT_STEPS = [0.85, 1.0, 1.1, 1.15, 1.25];
-  const FONT_LABELS = ['Compact', 'Normal', 'Comfortable', 'Large', 'XL'];
-
-  function getCurrentScaleIndex() {
-    const saved = parseFloat(localStorage.getItem('flock_font_scale') || '1.0');
-    const idx = FONT_STEPS.indexOf(saved);
-    return idx >= 0 ? idx : 1; // default Normal
-  }
-
-  function applyScale(scale) {
-    document.documentElement.style.setProperty('--fn-scale', scale);
-    localStorage.setItem('flock_font_scale', scale);
   }
 
   function initFontScale() {
     const btn = document.getElementById('font-scale-btn');
     if (!btn) return;
 
-    // Restore saved scale
-    const saved = parseFloat(localStorage.getItem('flock_font_scale') || '1.0');
-    applyScale(saved);
+    const stored = parseFloat(_safeLocalStorageGet(FONT_KEY, '1'));
+    const idx = FONT_STEPS.indexOf(stored);
+    _applyScale(idx >= 0 ? FONT_STEPS[idx] : 1);
 
-    btn.addEventListener('click', () => {
-      const currentIdx = getCurrentScaleIndex();
-      const nextIdx = (currentIdx + 1) % FONT_STEPS.length;
-      applyScale(FONT_STEPS[nextIdx]);
-      showToast('Text size: ' + FONT_LABELS[nextIdx]);
-    });
+    btn.addEventListener('click', () => openFontScalePicker(btn));
   }
 
-  // ── Toast ───────────────────────────────────────────────────────────────────
-  function showToast(message, durationMs) {
-    const layer = document.getElementById('toast-layer');
-    if (!layer) return;
-
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    layer.appendChild(toast);
-
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transition = 'opacity 0.3s ease';
-      setTimeout(() => toast.remove(), 350);
-    }, durationMs || 2200);
+  function buildNavBarIfNeeded() {
+    const nav = document.getElementById('sec-nav');
+    if (!nav) return null;
+    return _mountNav(nav, getUserRole());
   }
 
-  function rebuildNavBar() {
-    buildNavBar();
-  }
-
-  // ── Init ─────────────────────────────────────────────────────────────────────
   function init() {
-    buildNavBar();
+    buildNavBarIfNeeded();
     initDrawer();
     initFontScale();
+  }
+
+  function getSectionManifestById(sectionId) {
+    return _getSectionManifest(sectionId);
+  }
+
+  function getSectionFromUrl(url) {
+    const api = _sectionsApi();
+    if (api && typeof api.getSectionFromUrl === 'function') {
+      return api.getSectionFromUrl(url);
+    }
+    const sections = _getSectionManifests();
+    const target = String(url || '');
+    for (let i = 0; i < sections.length; i += 1) {
+      if (sections[i].url === target) return sections[i];
+    }
+    return null;
+  }
+
+  function buildSectionNav(activeSectionId, authLevel) {
+    const api = _sectionsApi();
+    if (api && typeof api.buildSectionNav === 'function') {
+      return api.buildSectionNav(activeSectionId, authLevel);
+    }
+    const nav = document.createElement('nav');
+    nav.id = 'sec-nav';
+    nav.className = 'sec-nav-bar';
+    nav.setAttribute('role', 'navigation');
+    nav.setAttribute('aria-label', 'Herald sections');
+    return _mountNav(nav, typeof authLevel === 'number' ? authLevel : getUserRole());
+  }
+
+  const api = {
+    openDrawer,
+    closeDrawer,
+    showToast,
+    toast: showToast,
+    getUserRole,
+    rebuildNavBar,
+    buildNavBar: buildNavBarIfNeeded,
+    openFontScalePicker,
+    closeFontScalePicker: _closeFontScalePicker,
+    applyFontScale: _applyScale,
+    getCurrentFontScale,
+    getCurrentScaleIndex,
+    getSectionManifest: getSectionManifestById,
+    getSectionManifests: _getSectionManifests,
+    getSectionFromUrl,
+    getActiveSectionId: _getActiveSectionId,
+    buildSectionNav,
+    init,
+  };
+
+  if (typeof window !== 'undefined') {
+    window.FlockGates = api;
   }
 
   if (document.readyState === 'loading') {
@@ -263,7 +500,4 @@
   } else {
     init();
   }
-
-  // Expose public API
-  window.FlockGates = { openDrawer, closeDrawer, showToast, getUserRole, rebuildNavBar };
 })();

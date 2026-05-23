@@ -9,10 +9,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>The Herald — The Flock Herald</title>
   <script>
-    // Flash prevention — restore font scale before paint
     (function() {
       var s = localStorage.getItem('flock_font_scale');
       if (s) document.documentElement.style.setProperty('--fn-scale', s);
@@ -21,16 +21,14 @@
   <link rel="stylesheet" href="../../Styles/the_broadsheet.css">
   <link rel="stylesheet" href="../../Styles/sections/herald.css">
   <link rel="manifest" href="../../manifest.json">
+  <link rel="icon" type="image/png" href="../../Images/icon-preview.png">
+  <link rel="apple-touch-icon" href="../../Images/icon-preview.png">
 </head>
 <body class="broadsheet-page sec-herald">
 
-  <!-- Masthead — newspaper nameplate -->
-  <header class="sec-masthead is-compact" role="banner">
-
-    <!-- Aa button: absolute top-right, safe area aware -->
+  <header class="sec-masthead" role="banner">
     <button class="sec-masthead__font-btn herald-aa-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
 
-    <!-- Compact mini-nameplate — revealed when scrolled -->
     <div class="sec-compact-folio">
       <div class="sec-compact__left">
         <h2 class="sec-compact__title">The Flock Herald</h2>
@@ -40,37 +38,30 @@
           <span class="sec-date-btn__text" id="sec-compact-date-text"></span>
           <span class="sec-date-btn__caret" aria-hidden="true">&#9663;</span>
         </button>
-        <input type="date" id="sec-date-input" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;" tabindex="-1" aria-hidden="true" />
+        <input type="date" id="sec-date-input" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;" tabindex="-1" aria-hidden="true">
         <p class="sec-compact__edition" id="sec-compact-edition"></p>
       </div>
     </div>
     <div class="herald-compact-rule" aria-hidden="true"></div>
 
-    <!-- Nameplate -->
     <div class="herald-nameplate">
       <h1 class="herald-nameplate__title">The Flock Herald</h1>
       <p class="herald-nameplate__date" id="herald-date">Loading…</p>
     </div>
-
   </header>
 
-  <!-- Section Nav Bar — scrolls with page content, below fixed header -->
   <nav class="sec-nav-bar" role="navigation" aria-label="Herald sections" id="sec-nav"></nav>
 
-  <!-- Main content — broadsheet newspaper layout -->
   <main class="broadsheet-columns" id="herald-grid" role="main">
-    <!-- Main column: Lead · OYB · Announcements · Prayer Spotlight -->
     <div class="broadsheet-col broadsheet-col--main" id="herald-main" aria-live="polite" aria-label="Main stories">
       <div class="broadsheet-story-loading" aria-hidden="true"></div>
       <div class="broadsheet-story-loading" style="height:120px" aria-hidden="true"></div>
     </div>
-    <!-- Aside column: Nation · Heart Check · Quiz -->
     <div class="broadsheet-col broadsheet-col--aside" id="herald-aside" aria-live="polite" aria-label="Aside features">
       <div class="broadsheet-story-loading" style="height:200px" aria-hidden="true"></div>
     </div>
   </main>
 
-  <!-- Right Drawer (global) -->
   <aside class="right-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
     <header class="drawer-header">
       <h2 id="drawer-title" class="drawer-title"></h2>
@@ -80,98 +71,18 @@
   </aside>
   <div class="drawer-backdrop" aria-hidden="true"></div>
 
-  <!-- Toast layer -->
   <div class="toast-layer" id="toast-layer" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- Script load order: the_true_vine → firm_foundation → auth guard → the_adornment → the_gates → section script -->
-  <script>
-    (function() {
-      var masthead = document.querySelector('.sec-masthead');
-      var secNav  = document.getElementById('sec-nav');
-      if (!masthead) return;
-
-      function updatePadding() {
-        var mh = masthead.offsetHeight;
-        if (secNav) {
-          secNav.style.top = mh + 'px';
-          document.body.style.paddingTop = (mh + secNav.offsetHeight) + 'px';
-        } else {
-          document.body.style.paddingTop = mh + 'px';
-        }
-      }
-
-      function onScroll() {
-        // compact collapse disabled — nameplate stays full size always
-      }
-
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', updatePadding);
-      if (document.fonts) {
-        document.fonts.ready.then(updatePadding);
-      } else {
-        setTimeout(updatePadding, 300);
-      }
-      updatePadding();
-      onScroll();
-
-      var MONTHS = ['Jan.','Feb.','Mar.','Apr.','May.','Jun.','Jul.','Aug.','Sep.','Oct.','Nov.','Dec.'];
-
-      function dayOfYear(dt) {
-        var start = new Date(dt.getFullYear(), 0, 0);
-        return Math.floor((dt - start) / 86400000);
-      }
-
-      function pad2(n) { return n < 10 ? '0' + n : '' + n; }
-
-      function formatDisplay(dt) {
-        return MONTHS[dt.getMonth()] + ' ' + pad2(dt.getDate()) + ', ' + dt.getFullYear();
-      }
-
-      function toInputVal(dt) {
-        return dt.getFullYear() + '-' + pad2(dt.getMonth()+1) + '-' + pad2(dt.getDate());
-      }
-
-      function applyDate(dt) {
-        var txt = document.getElementById('sec-compact-date-text');
-        var ed  = document.getElementById('sec-compact-edition');
-        var inp = document.getElementById('sec-date-input');
-        if (txt) txt.textContent = formatDisplay(dt);
-        if (ed)  ed.textContent  = 'VOLUME: ' + dt.getFullYear() + '  •  EDITION: ' + pad2(dayOfYear(dt));
-        if (inp) inp.value = toInputVal(dt);
-        // also update the large nameplate date if present
-        var d = document.getElementById('herald-date');
-        if (d) d.textContent = formatDisplay(dt);
-        window._heraldDate = dt;
-      }
-
-      var dateBtn   = document.getElementById('sec-compact-date');
-      var dateInput  = document.getElementById('sec-date-input');
-
-      if (dateBtn && dateInput) {
-        dateBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          try { dateInput.showPicker(); } catch(_) { dateInput.click(); }
-        });
-        dateInput.addEventListener('change', function() {
-          var parts = dateInput.value.split('-');
-          var dt = new Date(+parts[0], +parts[1]-1, +parts[2]);
-          applyDate(dt);
-          updatePadding();
-        });
-      }
-
-      applyDate(new Date());
-    })();
-  </script>
   <script src="../../Scripts/the_true_vine.js"></script>
   <script src="../../Scripts/firm_foundation.js"></script>
   <script>
-    // Inline auth guard — Herald is public, no redirect needed
-    // Nehemiah.enableLocalBypass() in console for dev
-    window._HERALD_AUTH_LEVEL = -1; // public
+    window._HERALD_AUTH_LEVEL = -1;
   </script>
   <script src="../../Scripts/the_adornment.js"></script>
+  <script src="../../Scripts/the_section_manifest.js"></script>
+  <script src="../../Scripts/the_section_shell.js"></script>
   <script src="../../Scripts/the_gates.js"></script>
+  <script src="../../Data/the_way_daily.js"></script>
   <script src="the_proclamation.js"></script>
 
   <script>

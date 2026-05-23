@@ -1,94 +1,101 @@
-<!DOCTYPE html>
-<html lang="en" class="sec-the-flock">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="icon" href="../../Images/icon-preview.png" type="image/png">
-  <title>The Flock — The Flock Herald</title>
-  <script>
-    (function() {
-      var s = localStorage.getItem('flock_font_scale');
-      if (s) document.documentElement.style.setProperty('--fn-scale', s);
-    })();
-  </script>
-  <link rel="stylesheet" href="../../Styles/the_broadsheet.css">
-  <link rel="stylesheet" href="../../Styles/sections/the_flock.css">
-  <link rel="manifest" href="../../manifest.json">
-</head>
-<body class="broadsheet-page sec-the-flock">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Flock</title>
+    <link rel="stylesheet" href="../../Styles/the_broadsheet.css" />
+    <link rel="stylesheet" href="../../Styles/sections/the_flock.css" />
+  </head>
+  <body class="newspaper-page section-the-flock">
+    <a class="skip-link" href="#section-app">Skip to The Flock content</a>
 
-  <header class="sec-masthead" role="banner">
-    <div class="sec-masthead__inner">
-      <div>
-        <h1 class="sec-masthead__title">The Flock</h1>
-        <p class="sec-masthead__subtitle">Care, Prayer &amp; Compassion</p>
-      </div>
-      <button class="sec-masthead__font-btn" id="font-scale-btn" aria-label="Adjust text size" type="button">Aa</button>
-    </div>
-    <nav class="sec-nav-bar" role="navigation" aria-label="Herald sections" id="sec-nav"></nav>
-  </header>
+    <main id="section-app" class="section-app flock-page" data-section="the_flock">
+      <section class="page-hero flock-hero" aria-labelledby="flock-title">
+        <p class="eyebrow">Section · The Flock</p>
+        <h1 id="flock-title">The Flock</h1>
+        <p class="hero-copy">
+          Care and prayer notes for the people, the needs, and the watchful work of the flock.
+        </p>
 
-  <main class="broadsheet-grid" id="the-flock-grid">
-    <article class="broadsheet-card broadsheet-card--wide" id="flock-account-card">
-      <div class="flock-card-shell">
-        <div class="flock-card-heading">Account &amp; Fold</div>
-        <p class="flock-card-copy">Your member account, notification preferences, and member card setup are managed through FlockOS Fold and the account panel. Open the Fold to complete member setup or review your personal details.</p>
-        <div class="flock-card-actions">
-          <button class="flock-btn flock-btn--primary" type="button" data-action="open-account">Open account panel</button>
-          <button class="flock-btn flock-btn--secondary" type="button" data-action="open-fold">Open The Fold</button>
+        <div class="hero-actions">
+          <button type="button" class="drawer-trigger" data-drawer-open="care-drawer">
+            Open Care Drawer
+          </button>
+          <button type="button" class="drawer-trigger" data-drawer-open="prayer-drawer">
+            Open Prayer Drawer
+          </button>
         </div>
-        <div class="flock-card-status" id="flock-account-status"></div>
-      </div>
-    </article>
 
-    <article class="broadsheet-card" id="flock-care-card">
-      <div class="flock-card-shell">
-        <div class="flock-card-heading">Care board</div>
-        <div class="flock-card-copy">Immediate shepherding work flows through the care board. Review open cases, compassion touches, and assignments from The Fold.</div>
-        <div class="flock-card-body" id="flock-care-body"></div>
-      </div>
-    </article>
+        <p id="flock-offline-banner" class="offline-banner" hidden>
+          Offline mode: showing the latest cached flock notes.
+        </p>
+      </section>
 
-    <article class="broadsheet-card" id="flock-prayer-card">
-      <div class="flock-card-shell">
-        <div class="flock-card-heading">Prayer chain</div>
-        <div class="flock-card-copy">Track the latest prayer requests and prayer chain activity. Prayer items are sourced from your church's UpperRoom/Fold data.</div>
-        <div class="flock-card-body" id="flock-prayer-body"></div>
-      </div>
-    </article>
+      <section class="cards-grid" aria-label="The Flock summaries">
+        <article class="section-card">
+          <header class="card-header">
+            <h2>Care</h2>
+            <p>Active care requests and follow-up notes.</p>
+          </header>
+          <ol id="care-list" class="entry-list" aria-live="polite"></ol>
+        </article>
 
-    <article class="broadsheet-card" id="flock-compassion-card">
-      <div class="flock-card-shell">
-        <div class="flock-card-heading">Compassion ministry</div>
-        <div class="flock-card-copy">Recent care touches and compassionate follow-ups are collected here. Use The Fold to log new outreach and keep caring for your people.</div>
-        <div class="flock-card-body" id="flock-compassion-body"></div>
-      </div>
-    </article>
-  </main>
+        <article class="section-card">
+          <header class="card-header">
+            <h2>Prayer</h2>
+            <p>Prayer requests, praises, and shared watch notes.</p>
+          </header>
+          <ol id="prayer-list" class="entry-list" aria-live="polite"></ol>
+        </article>
+      </section>
 
-  <aside class="right-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
-    <header class="drawer-header">
-      <h2 id="drawer-title" class="drawer-title"></h2>
-      <button class="drawer-close" type="button" aria-label="Close">&#x2715;</button>
-    </header>
-    <div class="drawer-body" id="drawer-body"></div>
-  </aside>
-  <div class="drawer-backdrop" aria-hidden="true"></div>
-  <div class="toast-layer" id="toast-layer" aria-live="polite" aria-atomic="true"></div>
+      <section class="section-card support-panel" aria-labelledby="flock-support-title">
+        <header class="card-header">
+          <h2 id="flock-support-title">Flock drawer notes</h2>
+          <p>Use the drawers to review detailed notes without leaving the page.</p>
+        </header>
+        <div class="support-actions">
+          <button type="button" class="drawer-trigger" data-drawer-open="care-drawer">Review care drawer</button>
+          <button type="button" class="drawer-trigger" data-drawer-open="prayer-drawer">Review prayer drawer</button>
+        </div>
+      </section>
 
-  <script src="../../Scripts/the_true_vine.js"></script>
-  <script src="../../Scripts/firm_foundation.js"></script>
-  <script>window._HERALD_AUTH_LEVEL = 2;</script>
-  <script src="../../Scripts/the_adornment.js"></script>
-  <script src="../../Scripts/the_gates.js"></script>
-  <script type="module" src="the_flock.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('../../sw.js').catch(() => {});
-    }
-  </script>
-</body>
+      <div class="drawer-backdrop" data-drawer-close hidden></div>
+
+      <aside id="care-drawer" class="drawer" aria-hidden="true" hidden>
+        <div class="drawer-panel" role="dialog" aria-labelledby="care-drawer-title">
+          <div class="drawer-header">
+            <div>
+              <p class="drawer-kicker">The Flock</p>
+              <h2 id="care-drawer-title">Care drawer</h2>
+            </div>
+            <button type="button" class="drawer-close" data-drawer-close aria-label="Close care drawer">
+              ×
+            </button>
+          </div>
+          <ol id="care-drawer-list" class="drawer-body entry-list"></ol>
+        </div>
+      </aside>
+
+      <aside id="prayer-drawer" class="drawer" aria-hidden="true" hidden>
+        <div class="drawer-panel" role="dialog" aria-labelledby="prayer-drawer-title">
+          <div class="drawer-header">
+            <div>
+              <p class="drawer-kicker">The Flock</p>
+              <h2 id="prayer-drawer-title">Prayer drawer</h2>
+            </div>
+            <button type="button" class="drawer-close" data-drawer-close aria-label="Close prayer drawer">
+              ×
+            </button>
+          </div>
+          <ol id="prayer-drawer-list" class="drawer-body entry-list"></ol>
+        </div>
+      </aside>
+    </main>
+
+    <script src="../../Scripts/the_section_manifest.js" defer></script>
+    <script src="../../Scripts/the_section_shell.js" defer></script>
+    <script src="./the_flock.js" defer></script>
+  </body>
 </html>

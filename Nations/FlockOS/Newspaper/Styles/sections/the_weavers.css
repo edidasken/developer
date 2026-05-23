@@ -18,3 +18,9 @@
 .sec-the-weavers .broadsheet-card {
   border-top: 3px solid var(--rose);
 }
+
+.sec-the-weavers .empty-state__icon {
+  color: var(--rose);
+}
+
+/* Shell-managed layout keeps shared chrome additive only. */
