@@ -30,13 +30,37 @@
   </header>
 
   <main class="broadsheet-grid" id="the-mission-grid">
+
+    <!-- Search + region filter card -->
     <article class="broadsheet-card broadsheet-card--full">
-      <div class="empty-state">
-        <div class="empty-state__icon">🌍</div>
-        <p class="empty-state__title">The Mission — Coming in Phase 6</p>
-        <p class="empty-state__message">Harvest tracker and missions registry are being built. Requires pastor access.</p>
+      <div class="card-header">
+        <div>
+          <p class="card-subtitle" style="font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--peach);margin-bottom:.25rem">JOSHUA PROJECT · UNREACHED PEOPLES</p>
+          <h2 class="card-title">People Groups</h2>
+          <p class="card-subtitle" style="margin-top:.25rem">Pray for the nations — every people, tribe, and tongue</p>
+        </div>
+      </div>
+      <div class="mission-search-wrap">
+        <svg class="mission-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="search" id="mission-search" class="mission-search" placeholder="Search countries…" autocomplete="off" spellcheck="false" aria-label="Search countries">
+      </div>
+      <div id="mission-region-tabs" class="mission-region-tabs" role="group" aria-label="Filter by region"></div>
+    </article>
+
+    <!-- Countries list -->
+    <article class="broadsheet-card broadsheet-card--full">
+      <div id="mission-countries-list" class="mission-countries-list" role="list">
+        <!-- Skeleton while loading -->
+        <div class="mission-skeleton-group">
+          <div class="skeleton skeleton-line" style="width:50%"></div>
+          <div class="skeleton skeleton-line" style="width:72%"></div>
+          <div class="skeleton skeleton-line" style="width:65%"></div>
+          <div class="skeleton skeleton-line" style="width:80%"></div>
+          <div class="skeleton skeleton-line" style="width:58%"></div>
+        </div>
       </div>
     </article>
+
   </main>
 
   <aside class="right-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
