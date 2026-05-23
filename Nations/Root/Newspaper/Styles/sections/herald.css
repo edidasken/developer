@@ -22,7 +22,7 @@
   background: var(--paper-card);
   border-bottom: none;
   padding: max(0.75rem, var(--safe-top)) max(1.25rem, var(--safe-right)) 0 max(1.25rem, var(--safe-left));
-  text-align: center;
+  text-align: left;
   position: fixed;
   top: 0;
   left: 0;
@@ -31,7 +31,7 @@
   z-index: 100;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   transition: padding 0.18s ease-in-out;
 }
