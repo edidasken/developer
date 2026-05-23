@@ -328,10 +328,21 @@
       </div>
     </div>`;
 
-    // Inline card body: key verse as pull quote
-    const verseHtml = book.keyVerse
-      ? `<blockquote class="bib-card__verse" style="--bib-accent:${accentHex};--bib-tint:${tintHex}">${esc(book.keyVerse)}</blockquote>`
-      : '';
+    // Inline card body: full overview — all sections
+    function _bibCardSect(label, icon, content) {
+      return `<div class="bib-card__sect">
+        <span class="bib-card__sect-label" style="color:${accentHex}">${icon} ${label}</span>
+        <p class="bib-card__text">${content}</p>
+      </div>`;
+    }
+
+    const bodyHtml = `
+      ${book.summary ? `<p class="bib-card__summary">${esc(book.summary)}</p>` : ''}
+      ${book.keyVerse ? `<blockquote class="bib-card__verse" style="--bib-accent:${accentHex};--bib-tint:${tintHex}">${esc(book.keyVerse)}</blockquote>` : ''}
+      ${book.themes ? _bibCardSect('Key Themes', _svgStar, esc(book.themes)) : ''}
+      ${book.christInBook ? _bibCardSect('Christ in This Book', _svgCross, esc(book.christInBook)) : ''}
+      ${book.application ? _bibCardSect('Application', _svgBook, esc(book.application)) : ''}
+    `;
     const metaLine  = [book.genre, book.author, book.timePeriod].filter(Boolean).map(esc).join(' · ');
 
     return _story({
@@ -339,9 +350,9 @@
       category: 'THE WORD',
       section:  (book.testament || '').toUpperCase() + ' TESTAMENT · BIBLE OVERVIEW',
       hed:      book.bookName || 'Bible Book',
-      deck:     book.summary ? book.summary.slice(0, 120) + (book.summary.length > 120 ? '…' : '') : '',
+      deck:     '',
       byline:   metaLine,
-      bodyHtml: verseHtml,
+      bodyHtml,
       drawer:   'bible-book',
     });
   }
