@@ -282,79 +282,89 @@
 
   /** § 2 — Bible Book Overview */
   async function buildBibleBookStory(cfg) {
-    let book = null;
+    let otBook = null, ntBook = null;
     try {
       const { default: books } = await import('../../Data/books-of-the-bible.js');
       if (Array.isArray(books) && books.length) {
-        const override = cfg.bibleBookIndex != null ? cfg.bibleBookIndex : null;
-        book = books[idx(override != null ? override : dayIndex(), books.length)];
+        const otBooks = books.filter(b => b.testament === 'Old');
+        const ntBooks = books.filter(b => b.testament === 'New');
+        const di = dayIndex();
+        const otOvr = cfg.bibleBookOTIndex != null ? cfg.bibleBookOTIndex : null;
+        const ntOvr = cfg.bibleBookNTIndex != null ? cfg.bibleBookNTIndex : null;
+        if (otBooks.length) otBook = otBooks[idx(otOvr != null ? otOvr : di, otBooks.length)];
+        if (ntBooks.length) ntBook = ntBooks[idx(ntOvr != null ? ntOvr : di, ntBooks.length)];
       }
     } catch (_) {}
 
-    if (!book) {
+    if (!otBook && !ntBook) {
       return _story({ num: 2, category: 'THE WORD', section: 'BIBLE OVERVIEW', hed: 'Bible Book Overview', deck: 'Book data unavailable today.' });
     }
 
-    const isNT      = book.testament === 'New';
-    const accentHex = isNT ? '#2563eb' : '#b45309';
-    const tintHex   = isNT ? '#eff6ff' : '#fefce8';
-
-    // Build drawer content
     const _svgBook  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1.1rem;height:1.1rem"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
     const _svgCross = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="width:1.1rem;height:1.1rem"><line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="9" x2="19" y2="9"/></svg>`;
     const _svgStar  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1.1rem;height:1.1rem"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
 
-    function _bibSect(label, icon, content) {
-      return `<div class="bib-drawer__sect">
-        <span class="bib-drawer__sect-label" style="color:${accentHex}">${icon} ${label}</span>
-        <p class="bib-drawer__text">${content}</p>
-      </div>`;
-    }
+    function _buildBookArticle(book, drawerKey, isFirst) {
+      const isNT      = book.testament === 'New';
+      const accentHex = isNT ? '#2563eb' : '#b45309';
+      const tintHex   = isNT ? '#eff6ff' : '#fefce8';
 
-    _drawers['bible-book'] = `<div class="bib-drawer">
-      <div class="bib-drawer__banner" style="background:${accentHex}">
-        <div class="bib-drawer__banner-inner">
-          <span class="bib-drawer__testament-badge">${esc((book.testament || '') + ' Testament')}</span>
-          <h2 class="bib-drawer__title">${esc(book.bookName || '')}</h2>
-          <span class="bib-drawer__meta">${esc(book.genre || '')}${book.author ? ' · ' + esc(book.author) : ''}${book.timePeriod ? ' · ' + esc(book.timePeriod) : ''}</span>
+      function _bibSect(label, icon, content) {
+        return `<div class="bib-drawer__sect">
+          <span class="bib-drawer__sect-label" style="color:${accentHex}">${icon} ${label}</span>
+          <p class="bib-drawer__text">${content}</p>
+        </div>`;
+      }
+
+      _drawers[drawerKey] = `<div class="bib-drawer">
+        <div class="bib-drawer__banner" style="background:${accentHex}">
+          <div class="bib-drawer__banner-inner">
+            <span class="bib-drawer__testament-badge">${esc((book.testament || '') + ' Testament')}</span>
+            <h2 class="bib-drawer__title">${esc(book.bookName || '')}</h2>
+            <span class="bib-drawer__meta">${esc(book.genre || '')}${book.author ? ' · ' + esc(book.author) : ''}${book.timePeriod ? ' · ' + esc(book.timePeriod) : ''}</span>
+          </div>
         </div>
-      </div>
-      <div class="bib-drawer__body">
-        ${book.summary   ? _bibSect('Overview',            _svgBook,  esc(book.summary))   : ''}
-        ${book.keyVerse  ? `<blockquote class="bib-drawer__key-verse" style="--bib-accent:${accentHex}">${esc(book.keyVerse)}</blockquote>` : ''}
-        ${book.themes    ? _bibSect('Key Themes',          _svgStar,  esc(book.themes))    : ''}
-        ${book.christInBook ? _bibSect('Christ in This Book', _svgCross, esc(book.christInBook)) : ''}
-        ${book.application  ? _bibSect('Application',         _svgBook,  esc(book.application))  : ''}
-      </div>
-    </div>`;
-
-    // Inline card body: full overview — all sections
-    function _bibCardSect(label, icon, content) {
-      return `<div class="bib-card__sect">
-        <span class="bib-card__sect-label" style="color:${accentHex}">${icon} ${label}</span>
-        <p class="bib-card__text">${content}</p>
+        <div class="bib-drawer__body">
+          ${book.summary      ? _bibSect('Overview',             _svgBook,  esc(book.summary))      : ''}
+          ${book.keyVerse     ? `<blockquote class="bib-drawer__key-verse" style="--bib-accent:${accentHex}">${esc(book.keyVerse)}</blockquote>` : ''}
+          ${book.themes       ? _bibSect('Key Themes',           _svgStar,  esc(book.themes))       : ''}
+          ${book.christInBook ? _bibSect('Christ in This Book',  _svgCross, esc(book.christInBook)) : ''}
+          ${book.application  ? _bibSect('Application',          _svgBook,  esc(book.application))  : ''}
+        </div>
       </div>`;
+
+      function _bibCardSect(label, icon, content) {
+        return `<div class="bib-card__sect">
+          <span class="bib-card__sect-label" style="color:${accentHex}">${icon} ${label}</span>
+          <p class="bib-card__text">${content}</p>
+        </div>`;
+      }
+
+      const bodyHtml = `
+        ${book.summary      ? `<p class="bib-card__summary">${esc(book.summary)}</p>` : ''}
+        ${book.keyVerse     ? `<blockquote class="bib-card__verse" style="--bib-accent:${accentHex};--bib-tint:${tintHex}">${esc(book.keyVerse)}</blockquote>` : ''}
+        ${book.themes       ? _bibCardSect('Key Themes',          _svgStar,  esc(book.themes))       : ''}
+        ${book.christInBook ? _bibCardSect('Christ in This Book', _svgCross, esc(book.christInBook)) : ''}
+        ${book.application  ? _bibCardSect('Application',         _svgBook,  esc(book.application))  : ''}
+      `;
+      const metaLine = [book.genre, book.author, book.timePeriod].filter(Boolean).map(esc).join(' · ');
+
+      return _story({
+        num:      isFirst ? 2 : null,
+        category: 'THE WORD',
+        section:  (book.testament || '').toUpperCase() + ' TESTAMENT · BIBLE OVERVIEW',
+        hed:      book.bookName || 'Bible Book',
+        deck:     '',
+        byline:   metaLine,
+        bodyHtml,
+        drawer:   drawerKey,
+      });
     }
 
-    const bodyHtml = `
-      ${book.summary ? `<p class="bib-card__summary">${esc(book.summary)}</p>` : ''}
-      ${book.keyVerse ? `<blockquote class="bib-card__verse" style="--bib-accent:${accentHex};--bib-tint:${tintHex}">${esc(book.keyVerse)}</blockquote>` : ''}
-      ${book.themes ? _bibCardSect('Key Themes', _svgStar, esc(book.themes)) : ''}
-      ${book.christInBook ? _bibCardSect('Christ in This Book', _svgCross, esc(book.christInBook)) : ''}
-      ${book.application ? _bibCardSect('Application', _svgBook, esc(book.application)) : ''}
-    `;
-    const metaLine  = [book.genre, book.author, book.timePeriod].filter(Boolean).map(esc).join(' · ');
-
-    return _story({
-      num:      2,
-      category: 'THE WORD',
-      section:  (book.testament || '').toUpperCase() + ' TESTAMENT · BIBLE OVERVIEW',
-      hed:      book.bookName || 'Bible Book',
-      deck:     '',
-      byline:   metaLine,
-      bodyHtml,
-      drawer:   'bible-book',
-    });
+    const parts = [];
+    if (otBook) parts.push(_buildBookArticle(otBook, 'bible-book-ot', true));
+    if (ntBook) parts.push(_buildBookArticle(ntBook, 'bible-book-nt', !otBook));
+    return parts.join('');
   }
 
   /** § 3 — Announcements */
