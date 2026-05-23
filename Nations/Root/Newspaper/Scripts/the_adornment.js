@@ -52,10 +52,10 @@ let _mql = null;
 let _autoListener = null;
 let _resolved = 'light';
 
-export function choices() { return CHOICES.slice(); }
-export function current() { return _resolved; }
+function choices() { return CHOICES.slice(); }
+function current() { return _resolved; }
 
-export function applyTheme(name) {
+function applyTheme(name) {
   if (!name) name = 'light';
   if (name === 'auto') return applyAuto();
   _detachAuto();
@@ -63,14 +63,14 @@ export function applyTheme(name) {
   try { localStorage.setItem(KEY, name); } catch (_) {}
 }
 
-export function applyAuto() {
+function applyAuto() {
   _attachAuto();
   const dark = _mql && _mql.matches;
   _set(dark ? 'dark' : 'light');
   try { localStorage.setItem(KEY, 'auto'); } catch (_) {}
 }
 
-export function init() {
+function init() {
   let saved = null;
   try { saved = localStorage.getItem(KEY); } catch (_) {}
   if (!saved) return applyAuto();
@@ -106,3 +106,10 @@ function _detachAuto() {
   else if (_mql.removeListener) _mql.removeListener(_autoListener);
   _mql = null; _autoListener = null;
 }
+
+(function() {
+  const adornment = { choices, current, applyTheme, applyAuto, init };
+  if (typeof window !== 'undefined') {
+    window.TheAdornment = adornment;
+  }
+})();
