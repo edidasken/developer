@@ -166,6 +166,23 @@
 }
 .herald-compact__left  { flex: 1; min-width: 0; }
 .herald-compact__right { flex-shrink: 0; text-align: right; position: relative; }
+
+/* Mobile: stack title → date → edition vertically when row would overlap */
+@media (max-width: 480px) {
+  .herald-compact-folio {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.125rem;
+  }
+  .herald-compact__right {
+    text-align: left;
+    width: 100%;
+  }
+  .herald-date-picker {
+    left: 0;
+    right: auto;
+  }
+}
 .herald-compact__brand {
   position: absolute;
   top: calc(max(0.6rem, env(safe-area-inset-top)) + 0.675rem);
