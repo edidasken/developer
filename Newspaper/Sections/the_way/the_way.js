@@ -364,6 +364,7 @@
       +     'Open ' + esc(title) + ' \u2192'
       +   '</button>'
       + '</p>'
+      + '<hr class="story-rule" aria-hidden="true">'
       + '<div class="story-ornament-divider" aria-hidden="true">'
       +   '<svg viewBox="0 0 400 16" xmlns="http://www.w3.org/2000/svg">'
       +     '<line x1="0" y1="8" x2="168" y2="8" stroke="var(--gold,#8B7028)" stroke-width="0.75"/>'

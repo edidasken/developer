@@ -28,6 +28,76 @@
   <link rel="stylesheet" href="../../Styles/the_broadsheet.css">
   <link rel="stylesheet" href="../../Styles/sections/the_way.css">
   <link rel="manifest" href="../../manifest.json">
+  <style>
+    .sec-the-way .sec-masthead {
+      padding-top: max(0.5rem, var(--safe-top));
+    }
+    .sec-the-way .way-aa-btn {
+      position: absolute;
+      top: max(0.75rem, var(--safe-top));
+      right: max(1rem, var(--safe-right));
+    }
+    .sec-the-way .broadsheet-columns {
+      gap: 0;
+    }
+    .sec-the-way .broadsheet-col--main {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 1.5rem;
+      row-gap: 0;
+      padding-right: 1.5rem;
+      border-right: 1px solid var(--rule);
+      align-content: start;
+    }
+    .sec-the-way .broadsheet-col--aside {
+      padding-left: 1.5rem;
+    }
+    .sec-the-way .story-kicker {
+      color: var(--sec-color);
+    }
+    .sec-the-way .pull-quote {
+      margin: 0.75rem 0 1rem;
+      padding: 0.75rem 0.875rem;
+      border-left: 3px solid var(--sec-color);
+      background: var(--paper-sunken);
+      color: var(--ink);
+      font-family: 'Lora', Georgia, serif;
+      font-style: italic;
+      font-size: 0.9375rem;
+      line-height: 1.65;
+    }
+    .sec-the-way .pull-quote cite {
+      display: block;
+      margin-top: 0.375rem;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: 0.6875rem;
+      font-style: normal;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--sec-color);
+    }
+    .sec-the-way .story-rule {
+      display: block;
+    }
+    @media (max-width: 860px) {
+      .sec-the-way .broadsheet-columns {
+        grid-template-columns: 1fr;
+      }
+      .sec-the-way .broadsheet-col--main,
+      .sec-the-way .broadsheet-col--aside {
+        border-right: none;
+        padding-left: 0;
+        padding-right: 0;
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 479px) {
+      .sec-the-way .story-body {
+        text-align: left;
+      }
+    }
+  </style>
 </head>
 <body class="broadsheet-page sec-the-way">
 

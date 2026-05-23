@@ -67,18 +67,54 @@
     return 'herald';
   }
 
-  // ── Get user role from Nehemiah / firm_foundation ────────────────────────────
-  function getUserRole() {
-    // Nehemiah exposes current role. Local bypass sets role to 5.
-    if (window.Nehemiah && typeof window.Nehemiah.getRole === 'function') {
-      return window.Nehemiah.getRole();
+  const ROLE_LEVELS = { readonly: 0, volunteer: 1, care: 2, leader: 3, pastor: 4, admin: 5 };
+  const SANCTUARY_LOGIN_TABS = new Set(['herald', 'the_way', 'the_sanctuary']);
+  const ELEVATED_GROUPS = new Set(['seed admin', 'lead pastor', 'master', 'admin', 'timothy']);
+
+  function _getAuthSession() {
+    if (window.Nehemiah && typeof window.Nehemiah.getSession === 'function') {
+      return window.Nehemiah.getSession() || null;
     }
-    // Fallback: check session storage for dev bypass
+    return null;
+  }
+
+  function _getAuthProfile() {
+    if (window.Nehemiah && typeof window.Nehemiah.getProfile === 'function') {
+      return window.Nehemiah.getProfile() || null;
+    }
+    return null;
+  }
+
+  function _getGroups() {
+    const session = _getAuthSession();
+    const profile = _getAuthProfile();
+    const raw = (session && session.groups) || (profile && profile.groups) || '';
+    if (!raw) return [];
+    return String(raw).split(',').map(g => g.trim().toLowerCase()).filter(Boolean);
+  }
+
+  function _getEffectiveRoleLevel() {
+    const session = _getAuthSession();
+    const profile = _getAuthProfile();
+    const groups = _getGroups();
+
+    if (groups.some(group => ELEVATED_GROUPS.has(group))) return 5;
+
+    if (session && typeof session.roleLevel === 'number') return session.roleLevel;
+    if (profile && typeof profile.roleLevel === 'number') return profile.roleLevel;
+
+    const role = (session && session.role) || (profile && profile.role) || '';
+    if (role && ROLE_LEVELS[role] !== undefined) return ROLE_LEVELS[role];
+
     if (window._HERALD_AUTH_LEVEL !== undefined) return window._HERALD_AUTH_LEVEL;
     return -1; // public
   }
 
-  const SANCTUARY_LOGIN_TABS = new Set(['herald', 'the_way', 'the_sanctuary']);
+  // ── Get user role from Nehemiah / firm_foundation ────────────────────────────
+  function getUserRole() {
+    return _getEffectiveRoleLevel();
+  }
+
 
   function _shouldRestrictNav() {
     return !!window._HERALD_SANCTUARY_LOGIN_REQUIRED;
@@ -96,7 +132,7 @@
 
     SECTIONS.forEach(sec => {
       if (restrictNav && !SANCTUARY_LOGIN_TABS.has(sec.id)) return;
-      if (!restrictNav && sec.minRole > userRole && !sec.publicAllowed) return; // hide tabs user doesn't have access to
+      if (!restrictNav && userRole < sec.minRole && !sec.publicAllowed) return; // hide tabs user doesn't have access to
 
       const btn = document.createElement('a');
       btn.href = sec.url;

@@ -485,3 +485,171 @@
   color: var(--peach);
   text-decoration: underline;
 }
+
+/* ── Accordion cards ───────────────────────────────────────────────────── */
+.mission-accordion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.prayer-card {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--paper-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.prayer-card--frontier {
+  border-left: 4px solid #c0392b;
+}
+
+.prayer-card--unreached {
+  border-left: 4px solid #e07b39;
+}
+
+.prayer-card--minimal {
+  border-left: 4px solid #d4a017;
+}
+
+.prayer-card--superficial {
+  border-left: 4px solid #6aab72;
+}
+
+.prayer-card--reached {
+  border-left: 4px solid var(--success);
+}
+
+.prayer-card--unknown {
+  border-left: 4px solid var(--rule-strong);
+}
+
+.prayer-card__toggle {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+.prayer-card__toggle:hover,
+.prayer-card__toggle:focus-visible {
+  background: var(--peach-soft);
+  outline: none;
+}
+
+.prayer-card__toggle-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.prayer-card__toggle-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.prayer-card__flag {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.prayer-card__toggle-titles {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.prayer-card__toggle-meta {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+.prayer-card__toggle-state {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.prayer-card__chevron--accordion {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--ink-muted);
+  transition: transform 0.2s ease;
+}
+
+.prayer-card.is-open .prayer-card__chevron--accordion {
+  transform: rotate(90deg);
+}
+
+.prayer-card__details {
+  display: none;
+  border-top: 1px solid var(--rule);
+  background: var(--paper-card);
+}
+
+.prayer-card.is-open .prayer-card__details {
+  display: block;
+}
+
+.prayer-card__details-inner {
+  padding: 0.875rem 0 0;
+}
+
+/* Make the loaded details read like a stacked panel */
+.prayer-card.is-open .prayer-card__top,
+.prayer-card.is-open .prayer-card__features,
+.prayer-card.is-open .prayer-card__stats,
+.prayer-card.is-open .prayer-card__info-table,
+.prayer-card.is-open .prayer-card__map-wrap,
+.prayer-card.is-open .prayer-card__section {
+  border-bottom-color: var(--rule);
+}
+
+/* Keep the open card visually contained */
+.prayer-card.is-open {
+  box-shadow: var(--shadow-md);
+}
+
+/* Better spacing for text inside accordion content */
+.prayer-card__text {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--ink-muted);
+}
+
+.prayer-card__section:last-child {
+  border-bottom: none;
+}
+
+.prayer-subsection:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 600px) {
+  .prayer-card__toggle {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .prayer-card__toggle-state {
+    align-items: flex-start;
+  }
+
+  .prayer-card__badge {
+    white-space: nowrap;
+  }
+}

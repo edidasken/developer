@@ -1410,6 +1410,8 @@ The Way page must be a broadsheet newspaper with stories — NOT a sidebar-nav S
 - `Newspaper/Data/` — copied all 18 Data/*.js files from New_Covenant
 - `Newspaper/Sections/herald/index.html` + `the_proclamation.js` — Herald section shell with skeleton cards, correct script load order, full mobile/PWA meta, drawer + toast layer
 - `Newspaper/Sections/the_way/index.html` + `the_way.js` — The Way section stub (Phase 3)
+- `Newspaper/Sections/the_way/index.html` + `the_way.js` — verified the broadsheet story render path over HTTP (`http://localhost:8000/Newspaper/Sections/the_way/index.html`), confirmed all gospel stories render, clickable headlines open the drawer, and the remaining 404 is a non-blocking asset request
+- `Newspaper/Scripts/the_gates.js` — fixed shared nav tab filtering so authenticated users keep all accessible tabs visible after clicking across sections; verified Sanctuary login restores the full tab set and tabs no longer disappear on navigation
 - `Newspaper/Sections/the_sanctuary/index.html` + `the_sanctuary.js` — The Sanctuary stub (Phase 4, role 3)
 - `Newspaper/Sections/the_flock/index.html` + `the_flock.js` — The Flock stub (Phase 5, role 2)
 - `Newspaper/Sections/the_mission/index.html` + `the_mission.js` — The Mission stub (Phase 6, role 4)
@@ -1512,4 +1514,3 @@ Phase 3 delivers The Way as a true broadsheet newspaper page — not a SPA. The 
 The Herald (Section 1) now renders as a true broadsheet newspaper — matching the story treatment already established for The Way. Each panel becomes a full `.story` article with gold kicker, clickable headline button (opens drawer), italic deck, uppercase byline, and body teaser. Story headlines fire `FlockGates.openDrawer()` with panel-specific HTML. The aside column (Nation of the Week, Heart Check, Bible Quiz) is separated by `.section-rule` / `.section-label` dividers. Quiz remains interactive inline (no drawer). The layout is a 2fr + 1fr responsive grid — stacks to single column at ≤860px. `--story-accent: var(--gold)` is bound on `.sec-herald`, so all story kickers, dropcaps, and hover states use The Herald's gold signature color. The story system now lives in the shared `the_broadsheet.css` foundation, so future sections can adopt it without duplicating CSS.
 
 ---
-
