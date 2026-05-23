@@ -125,8 +125,10 @@
 
     titleEl.textContent = titleText;
     bodyEl.innerHTML = contentHTML;
+    bodyEl.scrollTop = 0;
     drawer.classList.add('is-open');
     drawer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('drawer-open');
 
     // Focus first focusable element in drawer
     const firstFocusable = drawer.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
@@ -138,6 +140,7 @@
     if (!drawer) return;
     drawer.classList.remove('is-open');
     drawer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('drawer-open');
   }
 
   function initDrawer() {

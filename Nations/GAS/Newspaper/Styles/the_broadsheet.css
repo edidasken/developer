@@ -340,6 +340,9 @@ a:hover { text-decoration: underline; }
 .skeleton-line--heading { height: 1.25rem; width: 80%; }
 
 /* ── Right Drawer ─────────────────────────────────────────────────────────── */
+/* Prevent background scroll when drawer is open */
+body.drawer-open { overflow: hidden; touch-action: none; }
+
 .drawer-backdrop {
   display: none;
   position: fixed;
@@ -350,10 +353,10 @@ a:hover { text-decoration: underline; }
 
 .right-drawer {
   position: fixed;
-  top: 5vh; right: 5vw; bottom: 5vh;
-  left: 5vw;
-  width: 90vw;
-  height: 90vh;
+  top: max(5vh, env(safe-area-inset-top, 0px) + 1rem);
+  right: max(5vw, env(safe-area-inset-right, 0px) + 0.75rem);
+  bottom: max(5vh, env(safe-area-inset-bottom, 0px) + 1rem);
+  left: max(5vw, env(safe-area-inset-left, 0px) + 0.75rem);
   background: var(--paper-card);
   box-shadow: 0 8px 40px rgba(0,0,0,0.22);
   border-radius: var(--radius-lg, 8px);
@@ -365,9 +368,6 @@ a:hover { text-decoration: underline; }
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-right: env(safe-area-inset-right, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .right-drawer.is-open {
