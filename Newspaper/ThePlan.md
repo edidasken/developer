@@ -1435,6 +1435,28 @@ Phase 0 establishes The Flock Herald as a fully self-contained product with zero
 
 ---
 
+### [Phase 5 — The Flock: care board, prayer chain, and assignment log]
+**Date:** 2026-05-22
+**Commit:** `d473a7f17864f6bffde33f4c43602e5048aa7b06` — "The Flock: wire care and prayer data, update shell and styles"
+**Files created/modified:**
+- `Newspaper/Scripts/the_living_water_adapter.js` — added `flock.care.assignments` adapter verbs for list/forMember/myFlock/create/update/reassign/end/delete
+- `Newspaper/Sections/the_flock/index.html` — added `mobile-web-app-capable` and local favicon to stop browser warnings / 404s
+- `Newspaper/Sections/the_flock/the_flock.js` — rewired the care board, prayer chain, and assignment log to use Firestore-first adapter calls with GAS/localStorage fallback, plus care-case and prayer drawers
+- `Newspaper/Styles/sections/the_flock.css` — expanded section styling for live summary cards, list items, drawers, forms, pills, and mobile layout
+- `Nations/{Root,FlockOS,TBC,TheForest,GAS}/Newspaper/` — updated by C-Build with the same section changes and per-church patches
+**What was built:**
+The Flock section now references live data instead of static summary text. The care board loads care cases through the Firestore-first adapter, the prayer chain loads prayer requests and supports update/answer/archive flows, and the assignment log now reads from `flock.care.assignments` including personal flock lookups. The section shell now includes the favicon and mobile-web-app metadata required by the browser, and the stylesheet was expanded so the new drawers, forms, and list states render consistently in the broadsheet layout.
+**Verified:**
+- [x] C-Build: clean pass — all 5 nations built successfully
+- [x] Browser: The Flock rendered without console errors after metadata fix
+- [x] Browser: favicon 404 resolved after adding local icon link
+- [x] Node parse check: `node --check Newspaper/Sections/the_flock/the_flock.js` completed cleanly
+**Notes / deviations from plan:**
+- The Flock uses a minimal local HTML section shell rather than a brand-new page architecture; the focus was wiring live data first.
+- A temporary helper-escape issue was encountered during edits and then removed; the final file uses plain string coercion for safety and parses cleanly.
+
+---
+
 ### [Phase 2 — The Herald: Wire Live Data]
 **Date:** 2026-05-22
 **Commit:** `6c865808` — "Phase 2 — The Herald: wire all 7 panels to live data (OYB, missions, heart check, quiz, prayer spotlight, announcements, front page)"
