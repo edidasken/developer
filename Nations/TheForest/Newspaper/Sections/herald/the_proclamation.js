@@ -477,13 +477,115 @@
   }
 
   // ── Dossier section SVG icons ────────────────────────────────────────────
+  // ── Counseling color map (Tailwind names → accessible hex) ────────────────
+  const _COUNSEL_COLORS = {
+    slate:'#475569', gray:'#4b5563', zinc:'#52525b', stone:'#57534e',
+    red:'#dc2626', orange:'#ea580c', amber:'#b45309', yellow:'#a16207',
+    lime:'#4d7c0f', green:'#16a34a', emerald:'#059669', teal:'#0f766e',
+    cyan:'#0e7490', sky:'#0369a1', blue:'#2563eb', indigo:'#4f46e5',
+    violet:'#7c3aed', purple:'#9333ea', fuchsia:'#c026d3', pink:'#db2777',
+    rose:'#e11d48', aqua:'#0e7490', gold:'#b45309', silver:'#6b7280',
+  };
+  function _counselColor(c) {
+    if (!c) return '#16a34a';
+    const s = String(c).trim();
+    if (/^(#|rgb|hsl|var\()/i.test(s)) return s;
+    return _COUNSEL_COLORS[s.toLowerCase()] || '#16a34a';
+  }
+  // Lighten a hex color for tinted card backgrounds (mix toward white)
+  function _tintHex(hex, amount) {
+    const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+    const tr = Math.round(r + (255-r)*amount), tg = Math.round(g + (255-g)*amount), tb = Math.round(b + (255-b)*amount);
+    return '#' + [tr,tg,tb].map(v => v.toString(16).padStart(2,'0')).join('');
+  }
+
+  /** § 4 — Counseling Corner */
+  async function buildCounselingCorner(cfg) {
+    let topics = [];
+    try {
+      const { default: data } = await import('../../Data/counseling.js');
+      if (Array.isArray(data) && data.length) {
+        const override = cfg.counselingIndex != null ? cfg.counselingIndex : null;
+        const base = override != null ? override : dayIndex();
+        // Pick 2 topics spaced apart through the dataset
+        const a = data[idx(base, data.length)];
+        const b = data[idx(base + Math.ceil(data.length / 2), data.length)];
+        topics = [a, b].filter(Boolean);
+      }
+    } catch (_) {}
+
+    if (!topics.length) {
+      return `<div class="section-rule"><span class="section-label">§\u00a04 · COUNSELING CORNER</span></div>
+        <p class="story-body" style="color:var(--ink-muted)">Biblical counsel is unavailable — trust God today.</p>
+        <hr class="story-rule">`;
+    }
+
+    function _counselDrawerKey(t) { return 'counsel-' + (t.topicId || t._id || t.title || ''); }
+
+    function _counselDrawerHtml(t) {
+      const color = _counselColor(t.color);
+      const tint  = _tintHex(color.startsWith('#') ? color : '#16a34a', 0.92);
+      // Parse scriptures: "Ref: text. Ref2: text2." split on ". " boundaries
+      const scriptureLines = t.scriptures
+        ? t.scriptures.split(/(?<=\.)\s+(?=[A-Z1-9])/).filter(Boolean)
+        : [];
+      return `<div class="counsel-drawer">
+        <div class="counsel-drawer__banner" style="background:${color}">
+          <span class="counsel-drawer__icon" aria-hidden="true">${t.icon || '💬'}</span>
+          <span class="counsel-drawer__topic-label">COUNSELING CORNER</span>
+        </div>
+        <div class="counsel-drawer__body">
+          <h2 class="counsel-drawer__title">${esc(t.title || '')}</h2>
+          ${t.definition ? `<p class="counsel-drawer__def">${esc(t.definition)}</p>` : ''}
+          ${t.steps ? `<div class="counsel-drawer__sect">
+            <span class="counsel-drawer__sect-label" style="color:${color}">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.6-1.4 4.8-3.5 6.1L15 17H9l-.5-1.9C6.4 13.8 5 11.6 5 9a7 7 0 0 1 7-7z"/></svg>
+              Faith Response
+            </span>
+            <p class="counsel-drawer__steps">${esc(t.steps)}</p>
+          </div>` : ''}
+          ${scriptureLines.length ? `<div class="counsel-drawer__sect">
+            <span class="counsel-drawer__sect-label" style="color:${color}">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              Scripture Foundation
+            </span>
+            ${scriptureLines.map(s => `<p class="counsel-drawer__scripture">${esc(s)}</p>`).join('')}
+          </div>` : ''}
+        </div>
+      </div>`;
+    }
+
+    const cards = topics.map((t, i) => {
+      const color = _counselColor(t.color);
+      const tint  = color.startsWith('#') ? _tintHex(color, 0.91) : '#f8f8f0';
+      const key   = _counselDrawerKey(t);
+      _drawers[key] = _counselDrawerHtml(t);
+      const defSnippet = t.definition ? t.definition.slice(0, 90) + (t.definition.length > 90 ? '…' : '') : '';
+      return `<div class="counsel-corner-card" style="--cc-color:${color};--cc-tint:${tint}" data-open-drawer="${esc(key)}">
+        <div class="counsel-corner-card__stripe"></div>
+        <div class="counsel-corner-card__inner">
+          <div class="counsel-corner-card__head">
+            <span class="counsel-corner-card__icon" aria-hidden="true">${t.icon || '💬'}</span>
+            <span class="counsel-corner-card__title">${esc(t.title || '')}</span>
+          </div>
+          ${defSnippet ? `<p class="counsel-corner-card__def">${esc(defSnippet)}</p>` : ''}
+          <span class="counsel-corner-card__cta">Read counsel &#8594;</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="section-rule section-rule--counsel"><span class="section-label">§\u00a04 · COUNSELING CORNER</span></div>
+      <div class="counsel-corner-grid">${cards}</div>
+      <hr class="story-rule">`;
+  }
+
   const _SVG_SHIELD  = '<svg class="nation-section__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
   const _SVG_BOOK    = '<svg class="nation-section__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
   const _SVG_GLOBE   = '<svg class="nation-section__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>';
   const _SVG_COMPASS = '<svg class="nation-section__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>';
   const _SVG_CROSS   = '<svg class="nation-section__icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="2" x2="12" y2="22"/><line x1="5" y1="9" x2="19" y2="9"/></svg>';
 
-  /** § 4 — Nation of the Day */
+  /** § 5 — Nation of the Day */
   async function buildNationAside(cfg) {
     let nation = null;
     try {
@@ -495,7 +597,7 @@
     } catch (_) {}
 
     if (!nation) {
-      return `<div class="section-rule"><span class="section-label">§\u00a04 · MISSIONS</span></div>
+      return `<div class="section-rule"><span class="section-label">§\u00a05 · MISSIONS</span></div>
         <p class="story-kicker">NATION OF THE DAY</p>
         <p class="story-body" style="color:var(--ink-muted)">Missions data unavailable — pray for all nations.</p>
         <hr class="story-rule">`;
@@ -610,7 +712,7 @@
           </svg>
         </div>
         <div class="dwr-head__meta">
-          <p class="drawer-article__kicker">§\u00a04 · NATION OF THE DAY · MISSIONS</p>
+          <p class="drawer-article__kicker">§\u00a05 · NATION OF THE DAY · MISSIONS</p>
         <h2 class="drawer-article__hed">${esc(nationName)}</h2>
         ${locationParts.length ? `<p class="nation-dossier__meta">${locationParts.map(esc).join(' · ')}</p>` : ''}
         <div class="nation-dossier__badges">
@@ -692,7 +794,7 @@
     const unreachedLine = unreached != null
       ? `<p class="story-body" style="font-size:0.8125rem;color:var(--ink-muted);margin:0.25rem 0">${totalGroups != null ? unreached + ' of ' + totalGroups + ' groups unreached' : unreached + ' unreached people groups'}</p>` : '';
 
-    return `<div class="section-rule"><span class="section-label">§\u00a04 · MISSIONS</span></div>
+    return `<div class="section-rule"><span class="section-label">§\u00a05 · MISSIONS</span></div>
       <article class="story">
         <p class="story-kicker">NATION OF THE DAY</p>
         <h2 class="story-hed"><button class="story-hed-btn" type="button" data-open-drawer="nation" style="font-size:1.0625rem">${esc(nationName)}</button></h2>
@@ -706,7 +808,7 @@
       </article>`;
   }
 
-  /** § 5 — Heart Check */
+  /** § 6 — Heart Check */
   async function buildHeartAside(cfg) {
     let question = null;
     try {
@@ -718,7 +820,7 @@
     } catch (_) {}
 
     if (!question) {
-      return `<div class="section-rule"><span class="section-label">§\u00a05 · HEART CHECK</span></div>
+      return `<div class="section-rule"><span class="section-label">§\u00a06 · HEART CHECK</span></div>
         <p class="story-body" style="font-style:italic;color:var(--ink-muted)">"Search me, O God, and know my heart." — Psalm 139:23</p>
         <hr class="story-rule">`;
     }
@@ -736,7 +838,7 @@
           </svg>
         </div>
         <div class="dwr-head__meta">
-          <p class="drawer-article__kicker">§\u00a05 · HEART CHECK</p>
+          <p class="drawer-article__kicker">§\u00a06 · HEART CHECK</p>
           ${category ? `<p class="drawer-article__theme">${esc(category)}</p>` : ''}
           <h2 class="drawer-article__hed">${esc(qText)}</h2>
         </div>
@@ -756,7 +858,7 @@
       </div>` : ''}
     </div>`;
 
-    return `<div class="section-rule"><span class="section-label">§\u00a05 · HEART CHECK</span></div>
+    return `<div class="section-rule"><span class="section-label">§\u00a06 · HEART CHECK</span></div>
       <article class="story">
         <p class="story-kicker">${esc(category || 'DAILY SELF-INVENTORY')}</p>
         <h2 class="story-hed"><button class="story-hed-btn" type="button" data-open-drawer="heart" style="font-size:1rem">${esc(qText)}</button></h2>
@@ -766,7 +868,7 @@
       </article>`;
   }
 
-  /** § 6 — Bible Quiz (interactive inline — no drawer) */
+  /** § 7 — Bible Quiz (interactive inline — no drawer) */
   async function buildQuizAside(cfg) {
     let q = null;
     try {
@@ -778,7 +880,7 @@
     } catch (_) {}
 
     if (!q) {
-      return `<div class="section-rule"><span class="section-label">§\u00a06 · BIBLE QUIZ</span></div>
+      return `<div class="section-rule"><span class="section-label">§\u00a07 · BIBLE QUIZ</span></div>
         <p class="story-body" style="color:var(--ink-muted)">No quiz available today — check back tomorrow.</p>`;
     }
 
@@ -792,7 +894,7 @@
         <span class="quiz-opt-text">${esc(optKeys[o.toLowerCase()])}</span>
       </button>`).join('');
 
-    return `<div class="section-rule"><span class="section-label">§\u00a06 · BIBLE QUIZ</span></div>
+    return `<div class="section-rule"><span class="section-label">§\u00a07 · BIBLE QUIZ</span></div>
       <article class="story" id="quiz-story">
         <p class="story-kicker">${esc(q.category || 'THEOLOGY')} · ${esc(q.difficulty || 'MEDIUM')}</p>
         <p class="quiz-question">${esc(q.question)}</p>
@@ -872,9 +974,10 @@
       buildOYBStory(cfg),           // main col 2
       buildAnnouncementsStory(cfg), // main col 3
       buildPrayerStory(),           // main col 4
-      buildNationAside(cfg),        // aside 1
-      buildHeartAside(cfg),         // aside 2
-      buildQuizAside(cfg),          // aside 3
+      buildCounselingCorner(cfg),   // aside 1 — § 4
+      buildNationAside(cfg),        // aside 2 — § 5
+      buildHeartAside(cfg),         // aside 3 — § 6
+      buildQuizAside(cfg),          // aside 4 — § 7
     ]);
 
     const html = results.map(r => r.status === 'fulfilled' ? r.value : '');

@@ -1105,3 +1105,166 @@ details.heart-rx[open] .heart-rx__toggle::before { content: '▾ '; }
 .herald-devo-prayer__label .herald-devo-icon {
   color: var(--gold);
 }
+
+/* ── § 4 Counseling Corner ──────────────────────────────────────────────────── */
+
+.section-rule--counsel .section-label {
+  color: var(--gold);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.counsel-corner-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  margin-bottom: 0.25rem;
+}
+
+.counsel-corner-card {
+  display: flex;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--cc-tint, #f5f5f0);
+  border: 1.5px solid color-mix(in srgb, var(--cc-color, #16a34a) 18%, transparent);
+  cursor: pointer;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+  position: relative;
+}
+
+.counsel-corner-card:hover,
+.counsel-corner-card:active {
+  box-shadow: 0 3px 14px color-mix(in srgb, var(--cc-color, #16a34a) 22%, transparent);
+  transform: translateY(-1px);
+}
+
+.counsel-corner-card__stripe {
+  width: 5px;
+  flex-shrink: 0;
+  background: var(--cc-color, #16a34a);
+}
+
+.counsel-corner-card__inner {
+  padding: 0.625rem 0.75rem 0.625rem 0.625rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.counsel-corner-card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.25rem;
+}
+
+.counsel-corner-card__icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.counsel-corner-card__title {
+  font-family: var(--font-headline);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cc-color, var(--ink));
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.counsel-corner-card__def {
+  font-size: 0.78125rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+  margin: 0 0 0.375rem;
+}
+
+.counsel-corner-card__cta {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cc-color, var(--gold));
+}
+
+/* ── Counseling Drawer ──────────────────────────────────────────────────────── */
+
+.counsel-drawer {
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.counsel-drawer__banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  color: #fff;
+}
+
+.counsel-drawer__icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+}
+
+.counsel-drawer__topic-label {
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.88;
+}
+
+.counsel-drawer__body {
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.counsel-drawer__title {
+  font-family: var(--font-headline);
+  font-size: 1.4375rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 0.625rem;
+  line-height: 1.2;
+}
+
+.counsel-drawer__def {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink);
+  margin: 0 0 1rem;
+}
+
+.counsel-drawer__sect {
+  margin-bottom: 1rem;
+}
+
+.counsel-drawer__sect-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.counsel-drawer__steps {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--ink);
+  margin: 0;
+}
+
+.counsel-drawer__scripture {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+  margin: 0 0 0.25rem;
+  font-style: italic;
+}
