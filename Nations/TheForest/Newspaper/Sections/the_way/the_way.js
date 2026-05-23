@@ -535,6 +535,7 @@
       $btn.innerHTML = item.svg
         ? '<span class="way-aside-link__icon" aria-hidden="true">' + item.svg + '</span>'
           + '<span class="way-aside-link__label">' + esc(item.label) + '</span>'
+          + '<span class="way-aside-link__live" aria-label="Live"><span class="way-aside-link__live-dot"></span>LIVE</span>'
         : esc(item.label);
       $btn.addEventListener('click', function () {
         openModule(item.mod, false, item.label);
