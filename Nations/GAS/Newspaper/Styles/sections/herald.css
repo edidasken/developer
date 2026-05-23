@@ -1398,3 +1398,17 @@ details.heart-rx[open] .heart-rx__toggle::before { content: '▾ '; }
   color: var(--ink-muted);
   margin: 0;
 }
+
+/* ── § 5 Missions Spotlight ──────────────────────────────────────────────── */
+.story-body .story-subhed {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 1.1rem 0 0.35rem;
+}
+.story-body p + p {
+  margin-top: 0.7rem;
+}
