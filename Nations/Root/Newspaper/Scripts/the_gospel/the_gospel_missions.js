@@ -29,6 +29,21 @@ const I = {
   church:  `<svg class="ms-ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14 V7.5 L8 3.5 L14 7.5 V14"/><rect x="6" y="9" width="4" height="5"/><line x1="8" y1="1" x2="8" y2="4.5"/><line x1="6.5" y1="2.5" x2="9.5" y2="2.5"/></svg>`,
 };
 
+const FLAG_CDN = 'https://flagcdn.com';
+
+function _flagUrl(isoCode) {
+  const code = String(isoCode || '').trim().toLowerCase();
+  return code ? `${FLAG_CDN}/${code}.svg` : '';
+}
+
+function _flagMarkup(isoCode) {
+  const code = String(isoCode || '').trim().toLowerCase();
+  if (!code) {
+    return `<span class="ms-flag ms-flag--fallback" aria-hidden="true">${I.globe}</span>`;
+  }
+  return `<img class="ms-flag" src="${_flagUrl(code)}" alt="" aria-hidden="true" loading="lazy" decoding="async">`;
+}
+
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 function _dayOfYear() {
   const now = new Date();
@@ -316,7 +331,9 @@ export function render() {
         .ms-ico { width:12px; height:12px; flex-shrink:0; display:inline-block; vertical-align:middle; }
         /* ── Featured nation of the day ── */
         .ms-focus { background:var(--surface-raised,#fff); border-radius:16px; padding:20px 20px 16px; margin:0 0 24px; box-shadow:0 2px 14px rgba(0,0,0,0.08); border:1.5px solid rgba(5,150,105,.2); border-top:4px solid #059669; }
-        .ms-focus-flag { font-size:3rem; line-height:1; display:block; margin-bottom:10px; }
+        .ms-focus-flag { display:flex; align-items:center; justify-content:flex-start; margin-bottom:10px; }
+        .ms-focus-flag .ms-flag { width:64px; height:48px; object-fit:contain; display:block; border-radius:10px; box-shadow:0 1px 0 rgba(0,0,0,0.06); }
+        .ms-focus-flag .ms-flag--fallback { width:64px; height:48px; display:flex; align-items:center; justify-content:center; background:var(--surface,#f4f5f9); border:1px solid var(--line,#e5e7ef); border-radius:10px; }
         .ms-focus-name { font:700 1.25rem var(--font-ui); color:var(--ink,#1a1d2e); margin:0 0 2px; }
         .ms-focus-region { font:0.8rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin:0 0 14px; }
         /* ── Stats grid ── */
@@ -416,7 +433,9 @@ export function render() {
         .ms-card { background:var(--surface-raised,#fff); border-radius:12px; border:1.5px solid var(--line,#e5e7ef); padding:14px 16px; cursor:pointer; transition:box-shadow .15s,border-color .15s; text-align:left; width:100%; }
         .ms-card:hover { box-shadow:0 4px 18px rgba(0,0,0,0.09); border-color:#059669; }
         .ms-card.is-open { border-color:#059669; box-shadow:0 2px 16px rgba(5,150,105,.14); grid-column:1/-1; cursor:default; }
-        .ms-card-flag { font-size:1.7rem; display:block; margin-bottom:6px; }
+        .ms-card-flag { display:flex; align-items:center; justify-content:flex-start; margin-bottom:6px; }
+        .ms-card-flag .ms-flag { width:34px; height:26px; object-fit:contain; display:block; border-radius:5px; box-shadow:0 1px 0 rgba(0,0,0,0.06); }
+        .ms-card-flag .ms-flag--fallback { width:34px; height:26px; display:flex; align-items:center; justify-content:center; background:var(--surface,#f4f5f9); border:1px solid var(--line,#e5e7ef); border-radius:5px; }
         .ms-card-name { font:600 0.93rem var(--font-ui); color:var(--ink,#1a1d2e); margin:0 0 2px; }
         .ms-card-region { font:0.73rem var(--font-ui); color:var(--ink-muted,#7a7f96); margin:0 0 8px; }
         .ms-card-row { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
@@ -489,7 +508,7 @@ function _paint(view) {
     </div>
 
     <div class="ms-focus">
-      <span class="ms-focus-flag">${featured.icon || '🌍'}</span>
+      <span class="ms-focus-flag">${_flagMarkup(featured.isoCode)}</span>
       <h2 class="ms-focus-name">${esc(featured.countryName)}</h2>
       <p class="ms-focus-region">${esc(featured.region || '')}${featured.capital ? ` · ${I.pin} ${esc(featured.capital)}` : ''}</p>
       ${_dossierHTML(featured)}
@@ -574,7 +593,7 @@ function _cardHTML(n) {
 
   return /* html */`
     <div class="ms-card${isOpen ? ' is-open' : ''}" data-id="${esc(n._id || n.countryName)}" role="button" tabindex="0">
-      <span class="ms-card-flag">${n.icon || '🌍'}</span>
+      <span class="ms-card-flag">${_flagMarkup(n.isoCode)}</span>
       <div class="ms-card-name">${esc(n.countryName)}</div>
       <div class="ms-card-region">${esc(n.region || '')}</div>
       <div class="ms-card-row">
