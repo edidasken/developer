@@ -175,6 +175,18 @@ const _DOMAIN_MAP = {
     create: { ur: 'createCareInteraction'  },
   },
 
+  // ── Care Assignments ──────────────────────────────────────────────────────
+  'flock.care.assignments': {
+    list:     { ur: 'listCareAssignments'        },
+    forMember:{ ur: 'careAssignmentsForMember'   },
+    myFlock:  { ur: 'careAssignmentsMyFlock'     },
+    create:   { ur: 'createCareAssignment'      },
+    update:   { ur: 'updateCareAssignment'      },
+    reassign: { ur: 'reassignCareAssignment'     },
+    end:      { ur: 'endCareAssignment'         },
+    delete:   { ur: 'endCareAssignment'         },
+  },
+
   // ── Touches (contact log) ────────────────────────────────────────────────
   // Each touch is a record of a shepherd reaching out to a member via text,
   // call, or email through The Fold. Stored in churches/{id}/touches.
