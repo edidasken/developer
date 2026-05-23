@@ -21,6 +21,7 @@
       svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="3" x2="12" y2="21"/><line x1="6" y1="8" x2="18" y2="8"/></svg>' },
     { id: 'the_sanctuary',
       label: 'The Sanctuary', shortLabel: 'Sanctuary', url: '../the_sanctuary/index.html', minRole:  3,
+      publicAllowed: true,
       iconBg: '#2B4C8C',
       // Church building with cross steeple
       svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v4M10 4h4"/><path d="M4 10l8-6 8 6v11H4z"/><rect x="9" y="15" width="6" height="6"/></svg>' },
@@ -95,7 +96,7 @@
 
     SECTIONS.forEach(sec => {
       if (restrictNav && !SANCTUARY_LOGIN_TABS.has(sec.id)) return;
-      if (!restrictNav && sec.minRole > userRole) return; // hide tabs user doesn't have access to
+      if (!restrictNav && sec.minRole > userRole && !sec.publicAllowed) return; // hide tabs user doesn't have access to
 
       const btn = document.createElement('a');
       btn.href = sec.url;

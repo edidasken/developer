@@ -1177,41 +1177,44 @@ Every section page must pass all of these before any feature work begins:
 ### Phase 2 — The Herald (wire existing stubs to live data)
 - [x] Wire `flockNews` Firestore collection to front page
 - [x] Wire `psalms` + `oneYearBible` to Today's Word panel
-- [x] Wire `prayers` (public flag) to Prayer Spotlight
-- [x] Replace static content with live data, static `Data/*.js` as fallback
-- [x] `herald.css` — apply `--sec-color: var(--gold)`, Lora headlines
-- [x] BCP
+- [x] ~~Wire `prayers` (public flag) to Prayer Spotlight~~
+- [x] ~~Replace static content with live data, static `Data/*.js` as fallback~~
+- [x] ~~`herald.css` — apply `--sec-color: var(--gold)`, Lora headlines~~
+- [x] ~~BCP~~
 
 ### Phase 3 — The Way (public — highest traffic, most features)
-- [x] Port all 14 `app.grow` modules into `the_way/` section
-- [x] Port full `app.invite` gospel presentation + share + church info + contact form
-- [x] Wire `readingPlans`, `lexiconGreek/Hebrew` to live Firestore where available
-- [x] All 14 modules functional with `Data/*.js` static fallback
-- [x] `the_way.css` — `--sec-color: var(--accent)`
-- [x] BCP
+- [x] ~~Port all 14 `app.grow` modules into `the_way/` section~~
+- [x] ~~Port full `app.invite` gospel presentation + share + church info + contact form~~
+- [x] ~~Wire `readingPlans`, `lexiconGreek/Hebrew` to live Firestore where available~~
+- [x] ~~All 14 modules functional with `Data/*.js` static fallback~~
+- [x] ~~`the_way.css` — `--sec-color: var(--accent)`~~
+- [x] ~~BCP~~
 
 #### Phase 3 — Newspaper Layout Polish (complete after all modules wired)
-- [x] The Way page uses `.broadsheet-columns` grid — not a card grid
+- [x] ~~The Way page uses `.broadsheet-columns` grid — not a card grid~~
 - [ ] Lead story (Today's Reading / Devotional) spans 2 columns with drop cap on desktop
 - [ ] Module sub-sections each open with a `.section-rule` / `.section-label` header
-- [x] Story headlines use `.story-hed`, body uses `.story-body` with `text-align: justify` at ≥480px
+- [x] ~~Story headlines use `.story-hed`, body uses `.story-body` with `text-align: justify` at ≥480px~~
 - [ ] Column rules (hairline `border-right: 1px solid var(--rule)`) between all columns
 - [ ] Horizontal `<hr class="story-rule">` between every story
 - [ ] Pull quotes (mission spotlight, invitation quote) use `.pull-quote` class
-- [x] Bylines and datelines present on all data-driven stories
-- [x] Section kickers (`.story-kicker`) above every sub-section headline
+- [x] ~~Bylines and datelines present on all data-driven stories~~
+- [x] ~~Section kickers (`.story-kicker`) above every sub-section headline~~
 - [ ] Mobile: justified disabled at <480px, masthead scales down but nameplate never hidden
-- [x] Tap on any story headline opens right drawer with full module content
+- [x] ~~Tap on any story headline opens right drawer with full module content~~
 - [ ] Playwright: verify column rules visible on desktop, absent on mobile; drop cap renders; no horizontal scroll at 375px
-- [x] BCP
+- [x] ~~BCP~~
 
 ### Phase 4 — The Sanctuary
-- [x] Sermon builder wired to `sermons` Firestore collection
-- [x] Song planner wired to `songs` + `servicePlans`
-- [x] Service order wired to `servicePlans`
-- [x] All three panels collapsible on one page
-- [x] `the_sanctuary.css` — `--sec-color: var(--lilac)`
-- [x] BCP
+- [x] ~~Sermon builder wired to `sermons` Firestore collection~~
+- [x] ~~Song planner wired to `songs` + `servicePlans`~~
+- [x] ~~Service order wired to `servicePlans`~~
+- [x] ~~All three panels collapsible on one page~~
+- [x] ~~`the_sanctuary.css` — `--sec-color: var(--lilac)`~~
+- [x] ~~BCP~~
+- [x] ~~C-Build complete for all 5 nations; per-church patches applied; no Nations push without approval~~
+- [x] ~~Sanctuary login gating enforced, restricted nav tabs until authentication succeeded~~
+- [ ] Final configuration and thorough review still required before marking Phase 4 complete
 
 ### Phase 5 — The Flock
 - [ ] Care board wired to `careCases` + `careInteractions` + `careAssignments`

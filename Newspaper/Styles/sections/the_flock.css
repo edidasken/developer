@@ -18,3 +18,146 @@
 .sec-the-flock .broadsheet-card {
   border-top: 3px solid var(--mint);
 }
+
+.flock-card-shell {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.flock-card-heading {
+  font-family: var(--sec-heading-font);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 0.25rem;
+}
+
+.flock-card-copy,
+.flock-card-note,
+.flock-summary-text {
+  font-size: 0.94rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+.flock-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.flock-btn {
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.flock-btn--primary {
+  background: var(--mint);
+  color: white;
+}
+
+.flock-btn--secondary {
+  background: transparent;
+  color: var(--mint);
+  border-color: var(--mint);
+}
+
+.flock-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.flock-summary-card {
+  background: var(--paper-sunken);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+}
+
+.flock-summary-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  margin-bottom: 0.25rem;
+}
+
+.flock-card-status {
+  margin-top: 0.75rem;
+}
+
+.flock-member-card-slot {
+  margin-top: 0.75rem;
+}
+
+.flock-member-card,
+.flock-list-item {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+}
+
+.flock-member-card {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.flock-member-card-title {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.flock-member-card-meta {
+  font-size: 0.9rem;
+  color: var(--ink-faded);
+}
+
+.flock-link-button {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--mint);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.flock-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.flock-list-item {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.flock-item-meta,
+.flock-item-date {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.flock-list-empty {
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 720px) {
+  .flock-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
