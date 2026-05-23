@@ -9,13 +9,7 @@
   "background_color": "#faf9f6",
   "icons": [
     {
-      "src": "Images/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "Images/icon-512.png",
+      "src": "Images/icon-preview.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

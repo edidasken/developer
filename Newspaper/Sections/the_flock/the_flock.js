@@ -194,7 +194,8 @@ async function loadCareSummary() {
 
   try {
     const adapter = buildAdapter('flock.care', window.TheVine);
-    const cases = Array.isArray(await adapter.list({ limit: DEFAULT_LIMIT })) ? await adapter.list({ limit: DEFAULT_LIMIT }) : [];
+    const result = await adapter.list({ limit: DEFAULT_LIMIT });
+    const cases = Array.isArray(result) ? result : (result && result.results) ? result.results : [];
     const count = cases.length;
     body.innerHTML = `
       <div class="flock-summary-text">${count} open care case${count === 1 ? '' : 's'} found.</div>
@@ -213,7 +214,8 @@ async function loadPrayerSummary() {
 
   try {
     const adapter = buildAdapter('flock.prayer', window.TheVine);
-    const prayers = Array.isArray(await adapter.list({ limit: DEFAULT_LIMIT })) ? await adapter.list({ limit: DEFAULT_LIMIT }) : [];
+    const result = await adapter.list({ limit: DEFAULT_LIMIT });
+    const prayers = Array.isArray(result) ? result : (result && result.results) ? result.results : [];
     const count = prayers.length;
     body.innerHTML = `
       <div class="flock-summary-text">${count} active prayer request${count === 1 ? '' : 's'}.</div>
@@ -232,7 +234,8 @@ async function loadCompassionSummary() {
 
   try {
     const adapter = buildAdapter('flock.touches', window.TheVine);
-    const touches = Array.isArray(await adapter.list({ limit: DEFAULT_LIMIT })) ? await adapter.list({ limit: DEFAULT_LIMIT }) : [];
+    const result = await adapter.list({ limit: DEFAULT_LIMIT });
+    const touches = Array.isArray(result) ? result : (result && result.results) ? result.results : [];
     const count = touches.length;
     body.innerHTML = `
       <div class="flock-summary-text">${count} recent compassion touch${count === 1 ? '' : 'es'}.</div>
