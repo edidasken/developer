@@ -6,7 +6,7 @@
   "scripts": {
     "build:churches": "bash 'Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh'",
     "bcp": "bash 'Running to Jesus/Bezalel/Scripts/A-Build_Churches.sh' --deploy-comms",
-    "build:www": "rm -rf www && mkdir -p www && cp -R FlockOS www/FlockOS && cp index.html manifest.json the_living_water.js www/ && cp -R FlockOS/Images www/FlockOS/Images",
+    "build:www": "rm -rf www && mkdir -p www && if [ -d \"FlockOS\" ]; then cp -R FlockOS www/FlockOS && cp -R FlockOS/Images www/FlockOS/Images; elif [ -d \"Newspaper\" ]; then cp -R Newspaper www/FlockOS && cp -R Newspaper/Images www/FlockOS/Images; elif [ -d \"Nations/FlockOS\" ]; then cp -R Nations/FlockOS www/FlockOS && cp -R Nations/FlockOS/Images www/FlockOS/Images; else echo \"No source directory found (FlockOS/Newspaper/Nations/FlockOS)\" && exit 1; fi && if [ -f Newspaper/Scripts/the_living_water.js ]; then cp Newspaper/Scripts/the_living_water.js www/the_living_water.js; elif [ -f Nations/FlockOS/the_living_water.js ]; then cp Nations/FlockOS/the_living_water.js www/the_living_water.js; elif [ -f New_Covenant/the_living_water.js ]; then cp New_Covenant/the_living_water.js www/the_living_water.js; else echo \"warning: no the_living_water.js found in known locations\"; fi && cp index.html manifest.json www/",
     "cap:sync": "npm run build:www && npx cap sync",
     "cap:ios": "npm run cap:sync && npx cap open ios",
     "cap:android": "npm run cap:sync && npx cap open android"
