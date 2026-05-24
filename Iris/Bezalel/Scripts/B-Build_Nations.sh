@@ -1457,4 +1457,19 @@ if ! $DRY_RUN; then
   fi
 fi
 
+# ── Push the three church Nation repos ───────────────────────────────
+if ! $DRY_RUN; then
+  echo "══════════════════════════════════════════════"
+  echo "Pushing church Nation repos…"
+  echo ""
+  echo "  → Root → edidasken/flockos"
+  git -C "$NATIONS_DIR/Root" push -u origin main
+  echo "  → TBC → edidasken/trinity"
+  git -C "$NATIONS_DIR/TBC" push -u origin main
+  echo "  → TheForest → edidasken/theforest"
+  git -C "$NATIONS_DIR/TheForest" push -u origin main
+  echo "  ✓ Church Nation repos pushed"
+  echo ""
+fi
+
 echo "Next: commit + push to deploy via GitHub Pages / Firebase."
