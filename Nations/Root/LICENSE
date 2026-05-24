@@ -1,0 +1,39 @@
+build tools, assets, and documentation — are the exclusive intellectual
+
+FlockOS License
+========================
+
+Copyright (c) 2026 Greg Granger. All rights reserved.
+
+SUMMARY
+-------
+This software is proprietary and free to use only by explicit license from the copyright holder. All rights are reserved unless a written license is granted. Some educational modules are provided for free use under specific terms (see below).
+
+1. PROPRIETARY SOFTWARE — ALL RIGHTS RESERVED
+---------------------------------------------
+All contents of this repository—including but not limited to source code, scripts, HTML, CSS, configuration, build tools, assets, and documentation—are the exclusive intellectual property of Greg Granger.
+
+No portion of this software may be used, accessed, copied, reproduced, modified, merged, published, distributed, sublicensed, sold, or deployed in any form or by any means, in whole or in part, without the express prior written permission of the copyright holder.
+
+This restriction applies to all components, including:
+  - CRM and church management software (member management, authentication, pastoral care, service planning, music stand, communications, compassion, outreach, discipleship, statistics, multi-church modules, and all related scripts and interfaces)
+  - Messaging software (FlockChat and all related source files)
+  - Educational and learning modules (Bible explorer, devotionals, lexicon, theology reference, quiz, counseling, and all related content)
+  - Build systems, deployment scripts, configuration templates, and tools
+  - All derivative works, adaptations, or ports of any of the above
+
+2. LICENSING
+------------
+Licensing for churches, organizations, and developers is available upon request. Development and deployment fees may apply. For licensing inquiries, please use the Pastoral Referral form: https://flockos.com/pastoral-referral
+
+3. LEARNING MODULES (Free Use)
+-----------------------------
+The educational and learning content modules—including but not limited to Bible explorer, character genealogy, counseling wisdom, daily devotionals, biblical lexicon, heart diagnostic, shepherd's mirror, theology reference, Bible quiz, apologetics, psalms meditation, worship study, and family ministry—are provided free of charge for personal and church use.
+
+You may freely use, copy, and distribute the learning modules for non-commercial, ministry, and educational purposes. Attribution to the original author is appreciated but not required.
+
+You may NOT sell or sublicense the learning modules or incorporate them into a commercial product without prior written permission.
+
+4. GENERAL TERMS
+----------------
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE, DEPLOYMENT, OR OTHER DEALINGS IN THE SOFTWARE.

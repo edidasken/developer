@@ -43,6 +43,10 @@ fi
 if ! command -v python3 &>/dev/null; then
   echo "ERROR: python3 is required."; exit 1
 fi
+if [ ! -f "$WORKSPACE/Iris/Bezalel/Scripts/B-Standalone_Repo_Scaffold.sh" ]; then
+  echo "ERROR: Missing standalone repo scaffold helper: Iris/Bezalel/Scripts/B-Standalone_Repo_Scaffold.sh"
+  exit 1
+fi
 
 # ── Church definitions ────────────────────────────────────────────────
 # FORMAT:  "FolderName|ConfigFile|CACHE_NAME"
@@ -1347,6 +1351,7 @@ else:
     print(f'  ✓ launcher manifest.json → {name}')
 PYEOF
 
+  bash "$WORKSPACE/Iris/Bezalel/Scripts/B-Standalone_Repo_Scaffold.sh" "$TARGET" "$CHURCH_NAME" "$SHORT_NAME"
   echo "  ✓ Nations/$FOLDER complete"
   echo ""
 done

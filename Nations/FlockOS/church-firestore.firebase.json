@@ -1,0 +1,5 @@
+{
+  "firestore": {
+    "rules": "Architechtural Docs/New Covenant/Deployment/Firestore/firestore.rules"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "flockos",
+  "version": "3.0.0",
+  "description": "Standalone FlockOS deployment for FlockOS-GAS.",
+  "private": true,
+  "scripts": {
+    "build:www": "rm -rf www && mkdir -p www && rsync -a --delete --exclude='.git/' --exclude='www/' --exclude='node_modules/' --exclude='.DS_Store' --exclude='.venv/' --exclude='venv/' --exclude='ios/' --exclude='android/' --exclude='.firebase/' --exclude='.vscode/' --exclude='.idea/' --exclude='*.log' --exclude='*.tmp' --exclude='*.bak' --exclude='package.json' --exclude='package-lock.json' --exclude='README.md' --exclude='LICENSE' --exclude='.gitignore' --exclude='.firebaseignore' --exclude='.nojekyll' --exclude='firebase.json' --exclude='flockchat-firebase.json' --exclude='FlockChat.Firestore.Rules' --exclude='church-firestore.firebase.json' --exclude='church-firestore.json' --exclude='church.firestore.rules' --exclude='capacitor.config.ts' ./ www/FlockOS/ && cp index.html manifest.json the_living_water.js www/",
+    "cap:sync": "npm run build:www && npx cap sync",
+    "cap:ios": "npm run cap:sync && npx cap open ios",
+    "cap:android": "npm run cap:sync && npx cap open android"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flock-os/FlockOS.git"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/flock-os/FlockOS/issues"
+  },
+  "homepage": "https://github.com/flock-os/FlockOS#readme",
+  "dependencies": {
+    "@capacitor/cli": "^8.3.0",
+    "@capacitor/core": "^8.3.0",
+    "@capacitor/ios": "^8.3.0",
+    "firebase-admin": "^13.8.0"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.2"
+  }
+}

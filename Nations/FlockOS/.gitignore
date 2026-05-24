@@ -1,0 +1,30 @@
+# ══════════════════════════════════════════════════════════════════════════
+# Standalone Nation repo .gitignore
+# ══════════════════════════════════════════════════════════════════════════
+
+# ── OS / Editor artifacts ─────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# ── Dependencies / build artifacts ────────────────────────────────────────
+node_modules/
+www/
+ios/
+android/
+dist/
+build/
+coverage/
+.cache/
+.firebase/
+*.log
+*.tmp
+*.bak
+
+# ── Environment files ─────────────────────────────────────────────────────
+.env
+.env.*

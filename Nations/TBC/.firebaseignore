@@ -1,0 +1,19 @@
+# Exclude all repo content except the FlockChat app files
+Church/
+FlockOS/
+functions/
+www/
+flockchat-public/
+About_FlockOS.html
+capacitor.config.ts
+firebase.json
+index.html
+LICENSE
+manifest.json
+package.json
+package-lock.json
+README.md
+the_living_water.js
+*.ts
+*.sh
+*.bak
