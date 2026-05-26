@@ -82,10 +82,7 @@ fi
 
 # ── Church definitions ────────────────────────────────────────────────
 # FORMAT:  "FolderName|ConfigFile|CACHE_NAME"
-# Canonical order prefers the real sibling repo name; aliases are skipped safely.
 CHURCHES=(
-  "FlockOS|FlockOS-Root.json|flockos-v1.05"
-  "Root|FlockOS-Root.json|flockos-root-v1.05"
   "TBC|Trinity.json|flockos-tbc-v1.05"
   "TheForest|TheForest.json|flockos-theforest-v1.05"
   "GAS|GAS.json|flockos-gas-v1.05"
