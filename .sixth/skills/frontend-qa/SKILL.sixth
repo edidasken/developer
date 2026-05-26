@@ -1,0 +1,27 @@
+---
+name: frontend-qa
+description: Validate frontend behavior against the expected user flow.
+---
+
+## Purpose
+Check a frontend flow for visible regressions, broken interactions, or wrong UI state.
+
+## When to Use
+- After a UI change.
+- When a page, form, or interaction needs validation.
+- When visual or interaction behavior may have drifted.
+
+## Workflow
+1. Follow the target user flow from start to finish.
+2. Check visible state, interaction, and basic error handling.
+3. Note the exact step where behavior breaks.
+
+## Guardrails
+- Do not change unrelated UI copy or layout.
+- Do not report style issues unless they block use.
+- Keep checks tied to the named flow.
+
+## Output
+- Pass/fail for the flow.
+- Repro steps for any issue.
+- The specific UI state that needs fixing.

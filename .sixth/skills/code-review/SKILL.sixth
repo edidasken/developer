@@ -1,0 +1,27 @@
+---
+name: code-review
+description: Review a change for correctness, risk, and maintainability.
+---
+
+## Purpose
+Review code changes and surface clear issues before merge.
+
+## When to Use
+- After a PR or patch is ready.
+- When you need a quick review for correctness or risk.
+- When a change should be checked before release.
+
+## Workflow
+1. Read the diff and the files it touches.
+2. Check behavior, edge cases, tests, and unintended side effects.
+3. Rank findings by severity and confidence.
+
+## Guardrails
+- Do not restate obvious style nits.
+- Do not ask for unrelated refactors.
+- Prefer concrete issues over general advice.
+
+## Output
+- Findings with severity and file paths.
+- A short overall review summary.
+- Any follow-up verification steps.

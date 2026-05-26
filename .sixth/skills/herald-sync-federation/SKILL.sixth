@@ -1,0 +1,26 @@
+---
+name: herald-sync-federation
+summary: Define multi-device and federated state sync for Herald.
+engine: herald
+---
+
+# Purpose
+Keep Herald state consistent across devices, sessions, and remote sync peers.
+
+# When to Use
+Use this skill for remote state propagation, device reconciliation, sync identity, and fan-out behavior.
+
+# Workflow
+1. Identify the sync source, target, and trust boundary.
+2. Check merge, conflict, and ordering rules for the state being federated.
+3. Note the smallest protocol or client updates required.
+
+# Guardrails
+- Stay on sync transport and reconciliation, not local storage details.
+- Preserve identity and ordering rules.
+- Do not broaden into unrelated collaboration features.
+
+# Output
+- Sync topology summary.
+- Merge and conflict notes.
+- Required protocol or client changes.

@@ -1,0 +1,48 @@
+---
+name: herald-engine-messaging
+description: Guide safe updates to Herald engine messaging, channel bridges, DMs, presence, and push surfaces.
+compatibility: Herald /do engine
+allowed-tools:
+  - read_file
+  - search_files
+  - replace_in_file
+---
+
+## Purpose
+
+Use this skill when the work touches Herald's message delivery and social notification surfaces: channel bridges, message envelopes, DM flows, presence updates, and push handling. It also covers safe backend changes to the /do modules that fan those events through the engine.
+
+This skill is about event transport and surface synchronization, not runtime startup or cache persistence.
+
+## When to Use
+
+- Updating message routing, channel bridging, or envelope normalization.
+- Changing DM, presence, or push behavior.
+- Adjusting how message events are serialized, forwarded, or acknowledged.
+- Modifying notification surfaces that depend on the engine messaging layer.
+- Making safe backend edits to the channels, messages, dms, presence, or push modules.
+- Coordinating changes across multiple message-adjacent scripts so the event contract stays consistent.
+
+## Workflow
+
+1. Read the current messaging scripts and any callers before changing payloads or event names.
+2. Trace how a message moves through channels, DM/presence/push handlers, and any bridge adapters.
+3. Update sender, receiver, and transformation logic together so the contract stays aligned.
+4. Preserve event ordering, topic naming, and acknowledgement behavior unless the change explicitly requires a contract break.
+5. Keep delivery logic separate from runtime and storage concerns.
+6. Validate that any backend update remains compatible with existing consumers of the messaging surface.
+
+## Guardrails
+
+- Do not use this skill for runtime launch or service worker registration changes.
+- Do not use this skill for storage, vault, cache, or persistence updates.
+- Preserve channel IDs, topic names, event shapes, and notification semantics unless every consumer is updated together.
+- Avoid changing DM/presence/push semantics in a way that breaks existing clients.
+- Keep bridge logic and surface logic synchronized; do not update one without checking the other.
+- Prefer targeted edits over broad refactors of the messaging stack.
+
+## Output
+
+- Updated messaging/backend engine files with the smallest necessary diff.
+- Notes on any payload, routing, or notification contract changes.
+- Confirmation that runtime and storage contracts were left untouched unless explicitly required.

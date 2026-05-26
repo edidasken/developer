@@ -1,0 +1,25 @@
+---
+name: herald-google-forms-automation
+summary: Google Forms collection workflow automation for maintenance tasks.
+---
+
+# Purpose
+Automate Google Forms question structure, collection flow, and response handling with minimal edits.
+
+# When to Use
+- Create or revise forms, sections, question types, branching, and required fields.
+- Connect response destinations, notifications, and lightweight intake workflows.
+- Standardize collection logic for surveys, requests, or signups.
+
+# Workflow
+1. Inspect the current form flow, questions, and response destination.
+2. Apply the smallest change needed to structure or logic.
+3. Verify branching, submission behavior, and response capture.
+
+# Guardrails
+- Preserve question intent and response history unless a redesign is requested.
+- Do not change collection logic that would drop or re-route existing responses without warning.
+- Keep the skill focused on Forms; do not manage Sheets analysis or Calendar scheduling here.
+
+# Output
+- Return changed questions, branching, destinations, and any submission or response notes.

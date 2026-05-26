@@ -1,0 +1,27 @@
+---
+name: release-management
+description: Prepare a small release checklist and release notes.
+---
+
+## Purpose
+Organize the release steps, notes, and versioning needed for a safe release.
+
+## When to Use
+- Before tagging or publishing a release.
+- When release notes or a checklist are needed.
+- When version changes must be tracked clearly.
+
+## Workflow
+1. Collect the changes that belong in the release.
+2. Draft concise notes and the release checklist.
+3. Call out any blocking items before publish.
+
+## Guardrails
+- Do not bundle unrelated changes into the release.
+- Do not change code unless the release needs it.
+- Keep the checklist short and actionable.
+
+## Output
+- Release notes or summary.
+- A release checklist.
+- Any blockers or follow-up items.

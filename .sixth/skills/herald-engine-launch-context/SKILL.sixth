@@ -1,0 +1,68 @@
+---
+name: herald-engine-launch-context
+description: Safely update Herald app-launch context, boot handoff, and engine initialization contracts in ../herald/do and ../herald/types/app-context.ts.
+compatibility: Herald backend /do engine
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+---
+
+## Purpose
+
+Use this skill when the work affects how Herald passes launch-time context into the engine or how the engine uses that context during boot.
+
+This skill is centered on the launch contract surface:
+
+- `../herald/types/app-context.ts`
+- `../herald/do/index.ts`
+- boot-time handoff into `../herald/do/scripts/the_ark.ts`
+- context-aware engine code that interprets app IDs, source/destination app fields, entity references, or return targets
+
+Use it to keep launch context consistent across the engine without pushing launch-specific behavior into unrelated modules.
+
+## When to Use
+
+Use this skill when you need to:
+
+- add or change app-launch fields in the shared context type
+- update how the engine reads source, destination, or return navigation data
+- trace how startup routes or boot actions consume launch parameters
+- confirm whether a new field belongs in the shared context or a leaf module
+- safely evolve initialization behavior that depends on app identity or source/destination routing
+- validate that launch context changes stay compatible with existing callers
+
+Do not use this skill for route registration details unless the route is only relevant because it carries launch context.
+
+## Workflow
+
+1. Read `../herald/types/app-context.ts` first to understand the canonical launch shape.
+2. Follow the handoff into `../herald/do/index.ts` and any boot modules that read launch state.
+3. Check whether `../herald/do/scripts/the_ark.ts` or another boot module consumes the context during startup.
+4. Keep the shared type and the engine consumer in sync before making edits.
+5. Decide whether a new field belongs in the shared context or in a narrower engine script.
+6. Make the smallest change that preserves the current boot and navigation semantics.
+7. Re-check any barrels or callers that depend on the launch contract.
+
+## Guardrails
+
+- Do not broaden launch context casually; every new field should have a clear consumer.
+- Avoid moving unrelated runtime or auth behavior into the launch context layer.
+- Keep app-launch changes backward-compatible wherever possible.
+- Do not duplicate source/destination data in multiple engine contracts.
+- Preserve current navigation and startup behavior unless the task explicitly changes it.
+- Do not repurpose this skill for storage, messaging, or route-loading concerns.
+
+## Output
+
+When using this skill, include:
+
+- the files inspected for launch context
+- the canonical app-launch fields being changed
+- the boot or handoff path that consumes the context
+- any type or barrel updates needed
+- any downstream consumers that should be validated after the change
+
+The expected result is a launch-context update that keeps engine boot and shared app handoff aligned.

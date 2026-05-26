@@ -1,0 +1,66 @@
+---
+name: herald-gospel-soul-care
+description: Deep-study and safely evolve the Herald Gospel soul-care surfaces, including Heart Check, Shepherd's Mirror, and prayer-help wiring in ../herald/do/scripts.
+compatibility: Herald backend /do engine
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+---
+
+## Purpose
+
+Use this skill when the work touches the Gospel assessment and pastoral-care surfaces in Herald /do.
+
+This skill centers on the interactive soul-care cluster:
+
+- `../herald/do/scripts/the_gospel_heart.ts`
+- `../herald/do/scripts/the_gospel_mirror.ts`
+- `../herald/do/scripts/the_gospel_shared.ts`
+
+Use it to keep the question flows, answer toggles, category progress, prescriptions, and prayer-help wiring aligned so the pastoral triage experience stays honest and usable.
+
+## When to Use
+
+Use this skill when you need to:
+
+- update Heart Check question grouping, answer handling, or vitality scan rendering
+- adjust Shepherd's Mirror categories, progress bars, prescriptions, or help wiring
+- change how prayer-help messages are assembled, routed, or sent to pastors
+- trace how the interactive pages use shared help, Bible links, chips, or row helpers
+- validate that soul-care changes do not break toggle state, action cards, or help output
+- decide whether a change belongs in the interactive assessment layer or in the shared helper file
+
+Do not use this skill for sermon, devotional, analytics, or curriculum pages unless they are only being changed because they share help wiring.
+
+## Workflow
+
+1. Read `../herald/do/scripts/the_gospel_heart.ts` first when the change affects Heart Check questions or diagnostics.
+2. Read `../herald/do/scripts/the_gospel_mirror.ts` when the change affects Mirror triage, progress bars, or prescriptions.
+3. Read `../herald/do/scripts/the_gospel_shared.ts` when the change affects prayer wiring, Bible links, chips, or shared formatting.
+4. Keep question rendering, answer state, and help wiring separate from content-display pages.
+5. Make the smallest change that preserves the current diagnostic and pastoral flow.
+6. Re-check any shared helpers, question IDs, or row shapes that these pages depend on.
+
+## Guardrails
+
+- Do not move curriculum or sermon behavior into the soul-care layer.
+- Keep Heart Check and Shepherd's Mirror separate unless a shared helper already covers them.
+- Preserve answer toggles, progress calculations, and prayer-help behavior unless the task explicitly changes them.
+- Avoid broadening the pastoral-help payload without a clear consumer.
+- Do not duplicate question or category normalization across the pages if a shared helper already exists.
+- Keep page-specific answer state local to each module.
+
+## Output
+
+When using this skill, include:
+
+- the soul-care files inspected
+- the diagnostic or triage behavior being changed
+- the prayer-help or prescription path that depends on the change
+- any shared helper or type updates needed
+- any downstream Gospel pages that should be rechecked
+
+The expected result is a pastoral-care update that keeps Heart Check and Shepherd's Mirror honest, connected, and easy to act on.

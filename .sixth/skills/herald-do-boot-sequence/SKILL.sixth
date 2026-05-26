@@ -1,0 +1,71 @@
+---
+name: herald-do-boot-sequence
+description: Deep-study and safely evolve Herald /do startup flow, auth gating, theme boot, error handling, and the handoff from engine entry into the routed shell.
+compatibility: Herald backend /do engine
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+---
+
+## Purpose
+
+Use this skill when the work touches the /do startup sequence: booting the engine, gating access, applying theme state, wiring error boundaries, or handing control from startup into the routed app shell.
+
+This skill centers on the boot path:
+
+- `../herald/do/index.ts`
+- `../herald/do/scripts/the_ark.ts`
+- `../herald/do/scripts/the_adornment.ts`
+- `../herald/do/scripts/the_priesthood/index.ts`
+- `../herald/do/scripts/the_lampstand.ts`
+- `../herald/do/scripts/the_living_water_register.ts`
+
+Use it to understand how Herald decides whether to light the app, authenticate the user, mount the shell, register shared services, and finish startup without leaking boot logic into unrelated leaf modules.
+
+## When to Use
+
+Use this skill when you need to:
+
+- trace the startup path from `../herald/do/index.ts` into the boot orchestration
+- update auth gating, sign-in handoff, or boot-time access checks
+- adjust theme initialization, lighting/darkening, or startup adornment
+- inspect how error handling or startup logging is installed
+- understand when the engine registers shared runtime services after boot
+- validate that startup changes do not break the routed shell or the auth flow
+
+Do not use this skill for route registration details unless the route is only relevant because it is reached during startup.
+
+## Workflow
+
+1. Read `../herald/do/index.ts` first to confirm the namespace surface.
+2. Read `../herald/do/scripts/the_ark.ts` to understand the boot sequence and handoff order.
+3. Read `../herald/do/scripts/the_adornment.ts` and `../herald/do/scripts/the_lampstand.ts` when the change affects theme, light, or dark mode startup.
+4. Read `../herald/do/scripts/the_priesthood/index.ts` when the change affects auth, sign-in, or account entry.
+5. Read `../herald/do/scripts/the_living_water_register.ts` only when startup registers shared services or refresh hooks.
+6. Keep boot concerns separate from shell layout and page-level business logic.
+7. Make the smallest change that preserves startup order, auth gating, and the handoff into the routed app.
+8. Re-check any callers or barrels that rely on the startup contract.
+
+## Guardrails
+
+- Do not move page business logic into the boot layer.
+- Preserve startup order unless the task explicitly changes it.
+- Keep auth gating and theme initialization clearly separated.
+- Avoid broadening boot-time side effects without a clear consumer.
+- Do not duplicate startup registration in leaf modules.
+- Keep service registration and page mounting separate unless the boot path truly requires them to meet.
+
+## Output
+
+When using this skill, include:
+
+- the boot files inspected
+- the startup or auth step being changed
+- the theme or service registration behavior that depends on the change
+- any barrel or export updates needed
+- any downstream shell or auth consumers that should be rechecked
+
+The expected result is a startup update that keeps the /do engine booting cleanly into the routed app shell.

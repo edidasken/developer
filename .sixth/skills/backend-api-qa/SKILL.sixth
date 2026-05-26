@@ -1,0 +1,27 @@
+---
+name: backend-api-qa
+description: Validate backend API behavior and contract shape.
+---
+
+## Purpose
+Check API responses, request handling, and contract behavior for a backend change.
+
+## When to Use
+- After an endpoint or handler change.
+- When request or response shape may have changed.
+- When API behavior needs a quick contract check.
+
+## Workflow
+1. Identify the endpoint and expected request/response shape.
+2. Verify success and failure cases that matter for the change.
+3. Record any mismatch in status, payload, or validation.
+
+## Guardrails
+- Do not expand into load or performance testing.
+- Do not test unrelated endpoints.
+- Keep the review focused on the changed API surface.
+
+## Output
+- Endpoint-level findings.
+- Request/response mismatches.
+- Any missing validation or error handling.

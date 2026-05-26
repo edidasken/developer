@@ -1,0 +1,29 @@
+---
+name: herald-bible-com-crawling
+summary: Crawl Bible.com translation and reference content.
+---
+
+## Purpose
+Collect Bible.com translation text, passage references, and associated metadata for scripture access workflows.
+
+## When to Use
+- Fetching passage text by reference
+- Pulling translation-specific scripture content
+- Capturing Bible.com reference metadata and navigation data
+
+## Workflow
+1. Resolve the passage or translation target.
+2. Retrieve the Bible.com page or API-backed content.
+3. Normalize verse text, chapter structure, and translation labels.
+4. Deduplicate repeated passages across translation variants.
+
+## Guardrails
+- Keep scope to Bible.com translation and reference data.
+- Do not use this skill for Blue Letter Bible lexicons or other site families.
+- Preserve verse ordering and translation identifiers.
+- Respect source rate limits and pagination.
+
+## Output
+- Passage text grouped by reference
+- Translation identifiers and source links
+- Normalized metadata for downstream scripture use

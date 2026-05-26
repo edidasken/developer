@@ -1,0 +1,44 @@
+---
+name: herald-translation-workflow
+description: Small, safe workflow for translating Herald content with review loops, glossary handling, and batch updates.
+compatibility:
+  - Sixth
+allowed-tools:
+  - read_file
+  - search_files
+  - replace_in_file
+  - write_to_file
+---
+
+## Purpose
+Provide a lightweight translation workflow for Herald content.
+
+Use it to keep translation work consistent, reviewable, and safe for batch updates.
+
+## When to Use
+- Translating multiple files or strings
+- Updating an existing translation set
+- Reconciling glossary or terminology changes
+- Running a review pass before publishing
+- Coordinating source text with one or more target-language skills
+
+## Workflow
+1. Confirm the source English text and target language scope.
+2. Load the approved glossary, style notes, and prior translations.
+3. Translate in small batches so review stays manageable.
+4. Check placeholders, links, code, dates, numbers, and product names.
+5. Run a review loop for terminology, readability, and consistency.
+6. Apply batch updates only after the reviewed version is approved.
+
+## Guardrails
+- Preserve meaning, tone, and intent.
+- Do not change placeholders, tokens, IDs, URLs, or code samples.
+- Stop and flag ambiguous source text instead of guessing.
+- Keep one language per pass unless the task explicitly says otherwise.
+- Avoid large unreviewed rewrites.
+
+## Output
+- Updated translation files or strings
+- Short notes on glossary decisions
+- Any unresolved source ambiguities
+- Review findings that affect later batch updates

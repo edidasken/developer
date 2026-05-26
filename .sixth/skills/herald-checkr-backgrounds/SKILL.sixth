@@ -1,0 +1,43 @@
+---
+name: herald-checkr-backgrounds
+description: Integrate Checkr background-check workflows, status handling, and webhook-driven updates into Herald systems.
+compatibility: Herald Automation
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+  - write_to_file
+---
+
+# Purpose
+
+Use this skill for background-check automation that depends on Checkr. It focuses on candidate lifecycle mapping, webhook handling, status synchronization, and operational safeguards around background screening events.
+
+# When to Use
+
+- Starting or updating a Checkr candidate workflow
+- Handling Checkr webhooks or polling-based status updates
+- Mapping screening states into internal application statuses
+- Adding retry, idempotency, or audit behavior for background events
+- Reviewing which system owns the source of truth for screening status
+
+# Workflow
+
+1. Identify the Checkr object being integrated: candidate, invitation, report, or webhook event.
+2. Map external Checkr statuses to the internal Herald workflow and persistence model.
+3. Update webhook handlers, polling jobs, or sync routines with idempotent behavior.
+4. Preserve a clear audit trail for state changes and operational failures.
+5. Verify compliance, notification, and escalation requirements before release.
+
+# Guardrails
+
+- Do not expose PII or sensitive screening details in logs or UI messages.
+- Keep status mapping deterministic and documented.
+- Do not treat Checkr as the source of truth for unrelated HR or identity data.
+- Avoid retry loops or duplicate writes that can create conflicting screening states.
+
+# Output
+
+Return the Checkr workflow changes, status mappings, webhook or sync paths, and any retry or audit behavior added. Include any compliance-sensitive notes that operators need to know.

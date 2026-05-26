@@ -1,0 +1,44 @@
+---
+name: herald-khmer-localization
+description: Khmer localization skill for Herald content with script handling, readability, and QA.
+compatibility:
+  - Sixth
+allowed-tools:
+  - read_file
+  - search_files
+  - replace_in_file
+  - write_to_file
+---
+
+## Purpose
+Translate Herald content into clear Khmer with attention to script, spacing, and review quality.
+
+Use it for Khmer writing, translation review, and final QA of Khmer strings.
+
+## When to Use
+- Translating approved English source text into Khmer
+- Reviewing Khmer wording for clarity and natural flow
+- Checking script rendering and line breaks
+- Verifying terminology consistency across files
+- QA for readability, spacing, and UI fit
+
+## Workflow
+1. Start from the approved English source.
+2. Translate into natural Khmer without copying English structure.
+3. Check character rendering, spacing, and wrapping in the UI.
+4. Keep glossary terms consistent across the file set.
+5. Review readability, sentence length, and label fit.
+6. Verify placeholders, links, numbers, and codes after translation.
+
+## Guardrails
+- Preserve meaning, tone, and product terminology.
+- Do not alter placeholders, code, URLs, or identifiers.
+- Avoid Latin transliteration unless the task explicitly asks for it.
+- Keep punctuation and spacing appropriate for Khmer text.
+- Flag ambiguous source text instead of guessing.
+
+## Output
+- Khmer translation text
+- Notes on script, spacing, or readability issues
+- Any unresolved source ambiguities
+- QA notes for placeholders and formatting

@@ -1,0 +1,43 @@
+---
+name: herald-firebase-integration
+description: Handle Firebase project setup, authentication, SDK configuration, and environment wiring for Herald systems.
+compatibility: Herald Automation
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+  - write_to_file
+---
+
+# Purpose
+
+Use this skill for Firebase integration work that connects Herald services to a Firebase project. It covers project configuration, auth setup, SDK initialization, emulator and environment wiring, and safe handling of config values.
+
+# When to Use
+
+- Initializing Firebase in a new environment or app
+- Updating auth providers, sessions, or sign-in boundaries
+- Editing Firebase config, env variables, or initialization code
+- Setting up emulators, service accounts, or runtime credentials
+- Reviewing client versus admin SDK responsibilities
+
+# Workflow
+
+1. Identify the Firebase project, environment, and runtime that owns the change.
+2. Separate client-facing Firebase code from privileged backend/admin code.
+3. Update config, auth, or initialization only where the project requires it.
+4. Verify environment variables, secret handling, and emulator or deployment settings.
+5. Document any setup step needed for local development or production rollout.
+
+# Guardrails
+
+- Never commit secrets, private keys, or service account material into source files.
+- Keep auth configuration consistent with the project’s approved identity flow.
+- Do not blur client SDK and admin SDK responsibilities.
+- Avoid changing unrelated Firestore modeling or app logic while fixing Firebase setup.
+
+# Output
+
+Return the Firebase files changed, the configuration or auth settings affected, and any required environment variables, secrets, or emulator notes. Include any deployment or verification steps that must happen outside the code change.

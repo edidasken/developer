@@ -1,0 +1,26 @@
+---
+name: herald-google-chat-automation
+description: Automate Google Chat spaces, messages, and membership upkeep.
+---
+
+## Purpose
+Keep Google Chat spaces organized and message routing accurate.
+
+## When to Use
+- Create or update Chat spaces, titles, descriptions, or members.
+- Clean up pinned messages, space metadata, or basic message hygiene.
+- Reconcile Chat references with workspace automation workflows.
+
+## Workflow
+1. Confirm the target space, thread, or member list.
+2. Make the smallest safe update to the space settings or message record.
+3. Verify message targets, permissions, and any linked automation notes.
+
+## Guardrails
+- Do not draft or rewrite long message content unless explicitly requested.
+- Do not post to the wrong space or expose private discussions.
+- Keep changes limited to Chat administration and maintenance.
+
+## Output
+- Updated space or message reference.
+- Short summary of what changed and what still needs attention.

@@ -1,0 +1,27 @@
+---
+name: package-management
+description: Maintain package metadata, scripts, and lockfiles.
+---
+
+## Purpose
+Keep package config consistent and installable.
+
+## When to Use
+- When package.json or lockfiles need cleanup.
+- When scripts, workspaces, or metadata change.
+- When installs or publishes need to stay reproducible.
+
+## Workflow
+1. Inspect package metadata and the related lockfile.
+2. Make the smallest consistent package change.
+3. Confirm the package graph or script shape still fits.
+
+## Guardrails
+- Do not change package structure without need.
+- Do not remove a dependency unless it is clearly unused.
+- Keep install behavior stable.
+
+## Output
+- The package files changed.
+- Any lockfile or script impact.
+- Follow-up install or publish checks.

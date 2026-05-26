@@ -1,0 +1,119 @@
+---
+name: repofix
+description: Apply the repo-fix checklist from fixes.md to another codebase. Use when porting known TypeScript, module-contract, runtime safety, link-validation, and reachability fixes such as explicit exports/imports, API signature alignment, safer browser API handling, date sorting corrections, duplicate key removal, stale argument cleanup, tighter payload typing, broken link repair, and missing module wiring.
+compatibility:
+  - sixth
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - replace_in_file
+  - execute_command
+---
+
+# Purpose
+
+Use this skill for bounded repo-repair passes that fix one issue class at a time without scanning the entire codebase.
+
+## Scope rules — read before doing anything
+
+**Do NOT scan the entire repo.** Do NOT run open-ended `find` or `grep` across all directories. Every step below is bounded to a specific file or a small, named set of files.
+
+- Work **one fix at a time**. If the user names a fix number (e.g. "fix 3") apply only that fix.
+- For repo-wide repair work, treat each pass as a **single-fix task**. Do one fix, verify it, stop, and hand off the next pass instead of batching multiple classes of issues together.
+- Read **at most 3 files** before editing: the target file plus its direct callers if a contract change is needed.
+- If a typecheck is needed, run it once at the very end, not repeatedly.
+- If a fix touches more than 5 files, **stop, list what remains, and ask the user before continuing**.
+
+## Instructions
+
+### 1. Identify the single fix to apply
+Match the user’s request to one numbered pattern in the catalog below. If the request is ambiguous, ask which pattern to apply rather than guessing or applying several at once.
+
+### 2. Read only the target file and its direct callers
+Open the file named by the user (or identified by the pattern). If a contract change is needed, grep for the exported symbol to find direct callers — stop at the first 10 results. Do not traverse transitive callers.
+
+### 3. Apply the smallest contract-preserving change
+Use the pattern below and keep runtime behavior intact:
+
+- Export explicit symbols instead of relying on side effects or globals.
+- Match exported function signatures to real call sites; remove stale overloads.
+- Narrow browser API results (`FileReader.result`) safely before using as string.
+- Remove duplicate object keys; keep object shapes aligned with consumers.
+- Replace unsafe global `firebase` access with the repo’s imported adapter.
+- Normalize date comparisons with `Date` objects or numeric timestamps.
+- Remove obsolete `ctx` arguments at call sites only.
+- Tighten payload types to the exact shape the code uses.
+
+### 4. Update direct callers only
+Update only the callers you already read in step 2. Do not chase transitive callers in this pass. If more callers exist, note them and stop.
+
+### 5. Typecheck once at the end
+Only if the user asks for verification, run:
+
+```bash
+npx tsc --noEmit -p jsconfig.json 2>&1 | head -40
+```
+
+Report errors; do not auto-fix them unless the user asks.
+
+### 6. Automate the next pass when the user wants the whole repo repaired
+If the user asks for a full repo repair, automate the workflow at the pass level:
+
+- Start with a bounded discovery pass to identify the next likely fix class.
+- Apply exactly one fix in the current pass.
+- Verify that fix before moving on.
+- Summarize the files changed and the issue class fixed.
+- Use `new_task` with compact context to hand off the next pass automatically.
+- Repeat until the repair queue is empty or the next pass would exceed the 5-file limit.
+
+This is the automation layer: it chains passes together, but each pass still stays narrow and piece-by-piece.
+
+### 7. Keep the repair queue exhaustive
+For repo-wide repair jobs, do not stop after the original 8 catalog items if the repo still has repairable breakage. Keep a queue of follow-up passes for the most common remaining classes:
+
+- Broken internal links, route targets, and navigation destinations
+- Missing, stale, or unresolved imports and exports
+- Renamed module paths that no longer match call sites
+- Syntax or parse errors in `.js` modules surfaced during repair
+- Missing registration or wiring for new views, modules, or pages
+- Reachability gaps where a file exists but is not linked into the app
+- Broken asset references, image paths, CSS links, and favicon references
+- Stale menu items, sidebar entries, and sitemap/docs links
+- Configuration drift in manifests, scripts, path aliases, and env references
+- Failing build, test, lint, or typecheck steps surfaced by the repair process
+- Dead or duplicate routes, views, pages, and index barrels
+- Import/export mismatches caused by renamed files or moved modules
+- Malformed HTML, JSX, or template syntax in view files
+- Missing or broken registration in routers, dispatchers, schedulers, or app switchers
+- Obsolete documentation references that point to removed or renamed features
+
+Run these as bounded passes, one class at a time, and stop only when the current queue is empty or a pass would violate the scope limits above.
+
+### 8. Keep validation lightweight but complete
+After each pass, do the smallest verification that proves the fix worked. For repo-wide work, prefer a bounded follow-up check over a full open-ended scan, and only escalate to a broader verification if the user asked for it.
+
+### 9. Keep searching for adjacent breakage while the queue is non-empty
+If a fix reveals an adjacent class of breakage, add it to the queue and continue in a fresh pass instead of stopping early. The repair job is only complete when:
+- the original requested fix is done,
+- the current queue of likely repo-repair classes is exhausted,
+- and the next pass would not be expected to surface another reachable issue.
+
+## Known fix catalog
+
+1. **Explicit vessel exports** — Export implementation directly; update consumers to use real imports instead of globals.
+2. **Accurate message APIs** — Align exported function signatures to runtime use; remove stale placeholders.
+3. **Safe file reader handling** — Narrow `FileReader.result`; handle `string`, `ArrayBuffer`, and `null`.
+4. **Duplicate invitation fields** — Remove duplicate `email` keys; keep row objects canonical.
+5. **No unsafe global firebase** — Replace `firebase.*` globals with the repo’s import path or adapter.
+6. **Deterministic date sorting** — Convert to timestamps or `Date` before compare/sort; guard missing dates.
+7. **Remove stale mount args** — Drop obsolete `ctx` from mount calls; update callee signature only if context is still needed.
+8. **Tighter payload typing** — Replace broad payload types with the exact shape or a discriminated union.
+
+## Output
+
+Return:
+- the fix class applied
+- files changed
+- any direct callers updated
+- what remains for the next pass, if anything

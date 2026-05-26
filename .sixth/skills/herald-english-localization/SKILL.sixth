@@ -1,0 +1,43 @@
+---
+name: herald-english-localization
+description: English source-standard skill for Herald copy, terminology, and translation-ready editorial cleanup.
+compatibility:
+  - Sixth
+allowed-tools:
+  - read_file
+  - search_files
+  - replace_in_file
+  - write_to_file
+---
+
+## Purpose
+Keep English content clear, canonical, and ready to serve as the source for other localizations.
+
+Use it when writing or reviewing English strings that other languages will translate from.
+
+## When to Use
+- Drafting English source copy
+- Normalizing terminology before translation
+- Editing English for clarity and consistency
+- Preparing source text for glossary entry creation
+- Reviewing English phrasing after localized changes
+
+## Workflow
+1. Use plain, globally understandable English.
+2. Prefer short sentences and direct wording.
+3. Standardize product names, labels, and key terms.
+4. Check placeholders, punctuation, and formatting for translation safety.
+5. Capture glossary notes when terminology is newly introduced.
+
+## Guardrails
+- Avoid idioms, slang, and culture-specific references.
+- Keep meaning stable across edits.
+- Do not change placeholders, code, URLs, or identifiers.
+- Prefer one canonical English term for each concept.
+- Do not over-edit text that is already translation-ready.
+
+## Output
+- Clean English source text
+- Translation-ready terminology notes
+- Glossary candidates or term decisions
+- A short list of any unclear source phrases

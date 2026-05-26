@@ -1,0 +1,26 @@
+---
+name: herald-live-radio
+summary: Define live radio station handling for the Herald media client.
+engine: herald
+---
+
+# Purpose
+Keep live radio focused on station selection, tuning, and stream continuity.
+
+# When to Use
+Use this skill for live station metadata, live stream playback, reconnect behavior, and live-program indicators.
+
+# Workflow
+1. Identify the station source and live stream state.
+2. Check tuning, reconnect, and latency behavior.
+3. Document the minimal client updates needed for live status and controls.
+
+# Guardrails
+- Stay within live stream behavior.
+- Do not mix in podcast or on-demand playback rules.
+- Preserve current live session behavior unless a bug requires a fix.
+
+# Output
+- Live stream flow summary.
+- Station and status updates.
+- Reconnect or failure handling notes.

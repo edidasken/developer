@@ -1,0 +1,48 @@
+---
+name: herald-engine-storage-cache
+description: Guide safe updates to Herald engine cache, persistence, offline vault, and storage-state modules.
+compatibility: Herald /do engine
+allowed-tools:
+  - read_file
+  - search_files
+  - replace_in_file
+---
+
+## Purpose
+
+Use this skill for work that changes the Herald storage and cache layer: offline persistence, vault-backed storage, cache registration, state hydration, and the backend /do modules that keep data available across reloads and offline sessions.
+
+This skill covers the engine's durable state path, including cache keys, persistence contracts, schema/version updates, and storage recovery. It does not cover runtime launch wiring or messaging surfaces.
+
+## When to Use
+
+- Updating offline storage or vault behavior.
+- Changing cache registration, invalidation, hydration, or eviction.
+- Adjusting persistence keys, serialized shapes, or versioned stored state.
+- Modifying state that is restored on reload, reconnect, or offline resume.
+- Making safe backend edits to the cistern, living-water-register, manna, or related storage modules.
+- Coordinating persistence changes that must remain compatible with previously stored data.
+
+## Workflow
+
+1. Read the current storage and cache scripts before editing any persisted contract.
+2. Identify every stored shape, cache key, and hydration path affected by the change.
+3. Update serialization, migration, and invalidation logic together.
+4. Keep offline behavior deterministic so cached state can be restored safely.
+5. Verify that any version bump or schema change has a clear compatibility story.
+6. Check that runtime launch and messaging modules still consume the same storage contract.
+
+## Guardrails
+
+- Do not use this skill for runtime bootstrapping or service worker registration changes.
+- Do not use this skill for message routing, DM/presence/push handling, or channel bridges.
+- Preserve backward compatibility for stored records whenever possible.
+- Avoid breaking existing cache keys, vault names, or persistence namespaces without coordinated migration.
+- Never change serialized payloads without considering hydration and rollback behavior.
+- Keep storage updates isolated from unrelated engine systems.
+
+## Output
+
+- Updated storage/backend engine files with targeted cache or persistence changes.
+- Any migration, versioning, or invalidation notes required by the change.
+- Confirmation that runtime and messaging contracts were not altered unless explicitly required.

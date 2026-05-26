@@ -1,0 +1,27 @@
+---
+name: herald-propresenter-integration
+summary: ProPresenter API connections, playlist sync, and import flows.
+---
+
+# Purpose
+Support Herald integrations with ProPresenter data and automation.
+
+# When to Use
+- Connecting to ProPresenter APIs or related sync endpoints.
+- Importing playlists, cues, media, or presentation data.
+- Mapping data needed for downstream stage and presentation workflows.
+
+# Workflow
+1. Validate the ProPresenter connection and required credentials.
+2. Sync or import the needed playlist or content data.
+3. Check that imported records match the intended Herald use case.
+
+# Guardrails
+- Do not define projector routing, secondary display behavior, or live output control.
+- Do not take over music-stand presentation UX or stage note layout.
+- Keep scope limited to integration, synchronization, and import handling.
+
+# Output
+- Connection and sync notes.
+- Import status or mapping summary.
+- Data-handling guidance for follow-up workflows.

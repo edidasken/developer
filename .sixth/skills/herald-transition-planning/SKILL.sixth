@@ -1,0 +1,26 @@
+---
+name: herald-transition-planning
+summary: Plan incremental migration work into the Herald engine and client stack.
+engine: herald
+---
+
+# Purpose
+Turn a legacy-to-Herald migration into a small, ordered transition plan.
+
+# When to Use
+Use this skill for rollout sequencing, deprecation steps, compatibility windows, and cutover planning.
+
+# Workflow
+1. Map the legacy surface, the Herald target surface, and any overlap.
+2. Break the move into reversible phases with clear dependencies.
+3. Define the cutover, fallback, and cleanup steps for each phase.
+
+# Guardrails
+- Keep the plan incremental and reversible.
+- Do not redesign unrelated systems during migration planning.
+- Call out compatibility and data-loss risks early.
+
+# Output
+- Phase list.
+- Cutover and fallback notes.
+- Cleanup and deprecation checklist.

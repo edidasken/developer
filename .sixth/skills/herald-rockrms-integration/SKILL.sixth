@@ -1,0 +1,28 @@
+---
+name: herald-rockrms-integration
+description: Rock RMS API integration and high-value data imports for Herald.
+---
+
+## Purpose
+Connect Herald to Rock RMS and import key Rock RMS data.
+
+## When to Use
+- Set up Rock RMS API access or refresh credentials.
+- Import people, groups, attendance, events, or related records.
+- Map Rock RMS fields into Herald data models.
+
+## Workflow
+1. Confirm Rock RMS auth, endpoint, and source objects.
+2. Map Rock RMS fields to Herald targets and ids.
+3. Import in small, repeatable batches with checksums or dedupe keys.
+4. Surface failures, retries, and sync status clearly.
+
+## Guardrails
+- Keep Rock RMS specifics in this skill.
+- Hand off generic scheduling and retry design to import orchestration.
+- Preserve source ids and avoid lossy transformations.
+
+## Output
+- Rock RMS connection and mapping notes.
+- Import handlers and target entity mappings.
+- Sync status and error details.

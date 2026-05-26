@@ -1,0 +1,24 @@
+---
+name: broadsheet-css-best-practices
+description: Safe CSS architecture and maintainability guidance for Broadsheet.
+---
+
+# Purpose
+Keep Broadsheet CSS modular, predictable, and easy to change.
+
+# When to Use
+Use this skill for selector cleanup, cascade fixes, stylesheet organization, and safe style updates that should not change the design system.
+
+# Workflow
+1. Find the smallest affected stylesheet, component, or selector.
+2. Reuse existing patterns, variables, and utility classes first.
+3. Prefer targeted edits over broad overrides or reshaping the cascade.
+4. Check for specificity, responsive, and state regressions before finalizing.
+
+# Guardrails
+- Do not rename shared classes or tokens without coordination.
+- Avoid deep nesting, `!important`, and one-off overrides.
+- Keep design tokens, layout decisions, and typography changes in their own skills.
+
+# Output
+Return the minimal CSS changes, plus a short note on scope, impact, and any follow-up cleanup.

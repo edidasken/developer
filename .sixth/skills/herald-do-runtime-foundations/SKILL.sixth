@@ -1,0 +1,68 @@
+---
+name: herald-do-runtime-foundations
+description: Deep-study and safely evolve Herald /do runtime foundations, including tenant identity, Firebase config, TheVine runtime, and the legacy bridge helpers.
+compatibility: Herald backend /do engine
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+---
+
+## Purpose
+
+Use this skill when the work touches the foundational runtime contracts that the /do engine uses to discover identity, config, and bridge access.
+
+This skill centers on the runtime foundation cluster:
+
+- `../herald/do/scripts/the_firebase_config.ts`
+- `../herald/do/scripts/the_tenant.ts`
+- `../herald/do/scripts/the_true_vine.ts`
+- `../herald/do/scripts/the_legacy_bridge.ts`
+
+Use it to keep church identity, Firebase configuration, TheVine façade access, and legacy global bridging aligned so the rest of the engine can assume a stable runtime context.
+
+## When to Use
+
+Use this skill when you need to:
+
+- update Firebase config discovery from globals, meta tags, or document data attributes
+- change tenant/church ID resolution or the derived Firestore/RTDB paths
+- adjust TheVine session, endpoint, branch, or health accessors
+- evolve the generic legacy global bridge helpers used to wait for or call old runtime objects
+- validate that runtime discovery stays backward-compatible with existing boot and adapter callers
+- decide whether a new runtime concern belongs in the shared foundation layer or in a narrower adapter
+
+Do not use this skill for page-level business logic, app chrome, or service-worker registration unless the issue is only visible because the runtime foundation is wrong.
+
+## Workflow
+
+1. Read `../herald/do/scripts/the_firebase_config.ts` first when the change affects config discovery.
+2. Read `../herald/do/scripts/the_tenant.ts` when the change affects church ID or storage path derivation.
+3. Read `../herald/do/scripts/the_true_vine.ts` when the change affects session, endpoints, branch calls, or health probing.
+4. Read `../herald/do/scripts/the_legacy_bridge.ts` when the change affects wait/call behavior for legacy globals.
+5. Keep config resolution, tenant identity, runtime façade access, and legacy bridging separate unless a shared contract already ties them together.
+6. Make the smallest change that preserves the current runtime discovery and compatibility behavior.
+7. Re-check any boot, adapter, or shared-service callers that depend on these foundation helpers.
+
+## Guardrails
+
+- Do not move page business logic into the runtime foundation layer.
+- Keep Firebase config and tenant resolution backward-compatible wherever possible.
+- Avoid broadening the runtime façade or legacy bridge without a clear consumer.
+- Preserve the current global, document, and fallback lookup order unless the task explicitly changes it.
+- Do not duplicate config parsing or path-joining logic across modules.
+- Keep legacy bridge helpers generic and narrow.
+
+## Output
+
+When using this skill, include:
+
+- the runtime foundation files inspected
+- the config, tenant, or bridge behavior being changed
+- the branch/session or path resolution behavior that depends on the change
+- any barrel or export updates needed
+- any downstream boot or adapter callers that should be rechecked
+
+The expected result is a runtime foundation update that keeps Herald /do discovering config, tenant identity, and legacy bridges consistently.

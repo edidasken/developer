@@ -1,0 +1,70 @@
+---
+name: herald-do-shell-navigation
+description: Deep-study and safely evolve the Herald /do shell, boot chain, route registry, and UI mount flow in ../herald/do.
+compatibility: Herald backend /do engine
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+---
+
+## Purpose
+
+Use this skill when the work touches the /do engine’s top-level shell: startup, navigation, registry, mount points, or the browser handoff that makes the app flow.
+
+This skill centers on the shell path:
+
+- `../herald/do/index.ts`
+- `../herald/do/scripts/index.ts`
+- `../herald/do/scripts/the_scribes/index.ts`
+- `../herald/do/scripts/the_ark.ts`
+- `../herald/do/scripts/the_veil/index.ts`
+- `../herald/do/scripts/the_upper_room/index.ts`
+
+Use it to understand how Herald boots the app, mounts the shell, loads route modules, and keeps the visible interface moving without forcing unrelated modules to know about startup internals.
+
+## When to Use
+
+Use this skill when you need to:
+
+- trace boot flow from the app entry into the /do shell
+- add or adjust route registration, mount targets, or boot-time startup behavior
+- update the registry or loader contract that moves the app from shell to page
+- inspect how the veil, ark, and scribes cooperate during navigation
+- verify that shell changes do not break deep links, reloads, or history state
+- decide whether a change belongs in the shell layer or in a leaf module
+
+Do not use this skill for business logic inside individual pages unless the issue is only visible because the shell loads them.
+
+## Workflow
+
+1. Read `../herald/do/index.ts` first to see how the engine starts.
+2. Read `../herald/do/scripts/index.ts` and `../herald/do/scripts/the_scribes/index.ts` to understand exports and routing.
+3. Trace the mount path through `../herald/do/scripts/the_ark.ts` and `../herald/do/scripts/the_veil/index.ts`.
+4. Check `../herald/do/scripts/the_upper_room/index.ts` only when the shell exposes shared cross-page runtime state.
+5. Keep shell-level and leaf-module responsibilities separate.
+6. Make the smallest change that preserves current startup, registry, and reload behavior.
+7. Re-check any export barrels or callers that rely on the shell contract.
+
+## Guardrails
+
+- Do not move leaf-page business logic into the shell.
+- Keep route registration and shell mounting separate unless the contract truly requires them to meet.
+- Avoid broadening startup behavior without a clear consumer.
+- Preserve history, reload, and back-navigation behavior unless the task explicitly changes them.
+- Keep shared cross-page state in the shell only when it must be visible to multiple routes.
+- Do not duplicate mount or routing logic in multiple places.
+
+## Output
+
+When using this skill, include:
+
+- the shell and boot files inspected
+- the mount or registry path being changed
+- the startup or navigation behavior that depends on the change
+- any barrel or export updates needed
+- any downstream routes that should be rechecked
+
+The expected result is a shell update that keeps the /do engine flowing cleanly from startup into routed views.

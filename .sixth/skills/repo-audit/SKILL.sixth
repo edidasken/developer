@@ -1,0 +1,27 @@
+---
+name: repo-audit
+description: Audit repository health and surface maintenance issues.
+---
+
+## Purpose
+Check the repo for structure drift, stale files, missing config, and other maintenance gaps.
+
+## When to Use
+- Before a cleanup pass.
+- When you need a fast repo health check.
+- When docs, scripts, or layout may be out of sync.
+
+## Workflow
+1. Scan the relevant repo areas and note obvious drift.
+2. Group findings by impact and effort.
+3. Recommend the smallest safe fix for each item.
+
+## Guardrails
+- Do not edit unrelated files.
+- Do not propose broad rewrites unless necessary.
+- Keep findings specific and actionable.
+
+## Output
+- A short issue list with file paths.
+- A prioritized fix order.
+- Any follow-up checks needed.

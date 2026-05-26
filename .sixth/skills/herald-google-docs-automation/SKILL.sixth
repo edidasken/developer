@@ -1,0 +1,25 @@
+---
+name: herald-google-docs-automation
+summary: Google Docs formatting and document workflow automation for maintenance tasks.
+---
+
+# Purpose
+Automate Google Docs formatting, templates, section structure, and document workflows with minimal editing.
+
+# When to Use
+- Apply or update headings, styles, spacing, lists, tables, and template blocks.
+- Standardize document structure, placeholders, approvals, or handoff sections.
+- Prepare docs for review, export, or repeated reuse.
+
+# Workflow
+1. Inspect the current document structure, style rules, and reusable sections.
+2. Apply the smallest formatting or workflow update needed.
+3. Verify headings, spacing, placeholders, and export readiness.
+
+# Guardrails
+- Preserve the document's meaning unless a content rewrite is explicitly requested.
+- Keep changes focused on Docs formatting and workflow; do not manage Drive storage here.
+- Avoid broad rewrites when a local style fix or section update is enough.
+
+# Output
+- Return changed sections, formatting updates, and any template or workflow adjustments.

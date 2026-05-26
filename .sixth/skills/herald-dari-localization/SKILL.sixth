@@ -1,0 +1,44 @@
+---
+name: herald-dari-localization
+description: Dari localization skill for Herald content with Arabic-script handling, readability, and QA.
+compatibility:
+  - Sixth
+allowed-tools:
+  - read_file
+  - search_files
+  - replace_in_file
+  - write_to_file
+---
+
+## Purpose
+Translate Herald content into clear Dari with attention to script, readability, and review quality.
+
+Use it for Dari writing, translation review, and final QA of Dari strings.
+
+## When to Use
+- Translating approved English source text into Dari
+- Reviewing Dari copy for clarity and natural phrasing
+- Checking right-to-left rendering and punctuation
+- Verifying terminology consistency across files
+- QA for script, numerals, and UI fit
+
+## Workflow
+1. Start from the approved English source.
+2. Translate into natural Dari rather than direct English structure.
+3. Check RTL rendering, joining behavior, and line wrapping.
+4. Keep glossary terms and proper nouns consistent.
+5. Review readability, formality, and label length.
+6. Verify placeholders, links, numbers, and codes after translation.
+
+## Guardrails
+- Preserve meaning, tone, and product terms.
+- Do not alter placeholders, code, URLs, or identifiers.
+- Keep punctuation and numerals appropriate for Dari.
+- Avoid mixing Persian or other variants unless the task requires it.
+- Flag any ambiguous source text instead of guessing.
+
+## Output
+- Dari translation text
+- Notes on script, RTL, or readability issues
+- Any unresolved source ambiguities
+- QA notes for placeholders and formatting

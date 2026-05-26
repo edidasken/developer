@@ -1,0 +1,28 @@
+---
+name: herald-bible-study-materials
+description: Reusable Bible study assets such as outlines, lesson plans, handouts, study sheets, and reading guides.
+---
+
+## Purpose
+Create the documents and reusable assets that support Bible study delivery.
+
+## When to Use
+- Draft outlines, lesson plans, handouts, study sheets, or reading guides.
+- Package a study method into a shareable classroom or group resource.
+- Build worksheets, fill-in sheets, or facilitator notes for repeated use.
+
+## Workflow
+1. Identify the passage, audience, format, and expected use.
+2. Choose the asset type and organize the sections.
+3. Draft concise, reusable content with clear headings and prompts.
+4. Keep the asset presentation-ready and leave language study to other skills.
+
+## Guardrails
+- Do not design the study method itself; use `herald-bible-study-techniques`.
+- Do not do Strong’s, parsing, or lexical work here; use `herald-greek-hebrew-word-study`.
+- Keep the content reusable and avoid over-customizing for a single session unless requested.
+
+## Output
+- A structured outline, lesson plan, handout, study sheet, or reading guide.
+- Optional fill-in blanks, discussion prompts, and facilitator notes.
+- Clean sections ready for reuse or formatting.

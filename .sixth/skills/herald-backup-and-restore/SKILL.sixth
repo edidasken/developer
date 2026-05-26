@@ -1,0 +1,32 @@
+---
+name: herald-backup-and-restore
+description: Backup and restore workflows for Herald systems and content.
+---
+
+## Purpose
+Keep Herald backups current, restorable, and easy to verify with minimal manual steps.
+
+## When to Use
+- Creating or updating a backup routine
+- Restoring a file, bundle, or dataset
+- Confirming backup coverage or retention
+- Preparing a small recovery update
+
+## Workflow
+1. Identify the asset, backup source, and restore target.
+2. Confirm the latest valid backup or snapshot.
+3. Run the smallest safe restore path first.
+4. Verify integrity, ownership, and expected contents.
+5. Record the result and any follow-up action.
+
+## Guardrails
+- Prefer automated backup and restore paths.
+- Do not overwrite known-good data without confirmation.
+- Keep restores scoped to the smallest useful unit.
+- Escalate if the backup is missing, corrupted, or stale.
+
+## Output
+- Backup or restore status
+- Verification result
+- Gaps or follow-up tasks
+- Any required next step for operations

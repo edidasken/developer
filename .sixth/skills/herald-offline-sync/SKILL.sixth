@@ -1,0 +1,26 @@
+---
+name: herald-offline-sync
+summary: Define offline queueing, cache, and replay behavior for Herald.
+engine: herald
+---
+
+# Purpose
+Keep offline work safe by defining how Herald stores, replays, and reconciles pending actions.
+
+# When to Use
+Use this skill for cache strategy, queued writes, reconnect replay, and offline conflict handling.
+
+# Workflow
+1. Identify what must be cached, queued, or replayed offline.
+2. Check persistence, expiry, and retry rules.
+3. Describe how the client reconciles local and server state after reconnect.
+
+# Guardrails
+- Keep the scope to offline sync mechanics.
+- Do not add new offline data models unless needed.
+- Prefer deterministic replay and clear conflict handling.
+
+# Output
+- Offline flow summary.
+- Queue and cache rules.
+- Conflict or retry notes.

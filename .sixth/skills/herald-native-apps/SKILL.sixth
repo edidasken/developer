@@ -1,0 +1,26 @@
+---
+name: herald-native-apps
+summary: Define the native mobile shell and bridge behavior for Herald.
+engine: herald
+---
+
+# Purpose
+Keep iOS and Android client integration focused on the native shell, bridge, and device capabilities.
+
+# When to Use
+Use this skill for deep links, push, background playback, permissions, and platform bridge work.
+
+# Workflow
+1. Identify the native capability or bridge involved.
+2. Check platform constraints, lifecycle, and handoff rules.
+3. Specify the smallest native or shared-client update needed.
+
+# Guardrails
+- Stay on native shell integration, not general app redesign.
+- Do not duplicate web-only PWA guidance.
+- Preserve platform-specific expectations and permissions.
+
+# Output
+- Native integration summary.
+- Platform constraints and lifecycle notes.
+- Required bridge or shared-code updates.

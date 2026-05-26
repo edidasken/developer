@@ -1,0 +1,25 @@
+---
+name: broadsheet-product-architecture
+description: Product-level architecture decisions, feature boundaries, and cross-surface consistency for Broadsheet.
+---
+
+# Purpose
+Keep Broadsheet product changes aligned across features, surfaces, and user journeys.
+
+# When to Use
+Use when defining new product capabilities, splitting features, or coordinating behavior across web, backend, and other surfaces.
+
+# Workflow
+1. Define the user problem and the product boundary first.
+2. Split the work into clear feature slices and owner surfaces.
+3. Check that terminology, behavior, and states stay consistent everywhere.
+4. Confirm the rollout shape and dependencies before implementation.
+
+# Guardrails
+- Do not blur separate features into one shared product concept.
+- Keep naming, states, and flows consistent across surfaces.
+- Avoid implementation detail unless it changes the product boundary.
+- Favor small, testable slices that can ship independently.
+
+# Output
+Provide the feature boundary, the impacted surfaces, and the consistency checks needed for launch.

@@ -1,0 +1,27 @@
+---
+name: accessibility-checks
+description: Check a UI change for basic accessibility issues.
+---
+
+## Purpose
+Validate keyboard access, labels, contrast, and semantic structure.
+
+## When to Use
+- After a UI or interaction change.
+- When accessibility may have regressed.
+- When a quick a11y pass is needed.
+
+## Workflow
+1. Check keyboard reachability and focus order.
+2. Verify labels, roles, and announced state.
+3. Note contrast or semantic issues that block use.
+
+## Guardrails
+- Do not turn this into a full audit unless requested.
+- Do not flag cosmetic issues that do not affect access.
+- Keep findings tied to the affected UI.
+
+## Output
+- A short accessibility finding list.
+- The impacted element or interaction.
+- Any immediate fix recommendation.

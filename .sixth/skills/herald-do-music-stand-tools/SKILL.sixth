@@ -1,0 +1,63 @@
+---
+name: herald-do-music-stand-tools
+description: Deep-study and safely evolve Herald /do music-stand tools, including song lists, arrangements, chord-sheet rendering, and the Shofar runtime.
+compatibility: Herald backend /do engine
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+---
+
+## Purpose
+
+Use this skill when the work touches the music-stand and song-management surface used by Herald /do.
+
+This skill centers on the music and setlist cluster:
+
+- `../herald/do/scripts/the_shofar/index.ts`
+
+Use it to keep song loading, arrangement management, chord-sheet transposition, stand navigation, and editor overlays aligned so the music runtime can handle set planning and live chord view behavior cleanly.
+
+## When to Use
+
+Use this skill when you need to:
+
+- update song list loading, search, pagination, or card/table rendering
+- change arrangement loading, creation, editing, or deletion behavior
+- adjust chord-sheet rendering, transposition, or live stand view behavior
+- evolve the song editor or arrangement editor modal flows
+- change stand navigation, active-song selection, or detail-panel behavior
+- validate that music-stand changes do not break the Shofar shell, overlays, or route wiring
+- decide whether a change belongs in the music-stand layer or in a narrower helper
+
+Do not use this skill for general ministry workspace pages or content-editor pages unless the issue is only visible because the Shofar runtime is wrong.
+
+## Workflow
+
+1. Read `../herald/do/scripts/the_shofar/index.ts` first when the change affects songs, arrangements, or stand rendering.
+2. Keep song loading, arrangement editing, chord rendering, and shell mounting separate unless a shared contract already ties them together.
+3. Make the smallest change that preserves the current music-stand behavior.
+4. Re-check any shell, navigation, or runtime callers that depend on the Shofar surface.
+
+## Guardrails
+
+- Do not move ministry workspace logic into the music-stand layer.
+- Keep song and arrangement APIs backward-compatible wherever possible.
+- Avoid broadening chord-transposition or editor behavior without a clear consumer.
+- Preserve current stand navigation, search, and modal behavior unless the task explicitly changes them.
+- Do not duplicate music-stand helpers across modules.
+- Keep runtime shims and UI state explicit and local.
+
+## Output
+
+When using this skill, include:
+
+- the music-stand file inspected
+- the song, arrangement, or chord behavior being changed
+- the stand or editor path that depends on the change
+- any barrel or export updates needed
+- any downstream shell or music callers that should be rechecked
+
+The expected result is a music-stand update that keeps Herald /do song and arrangement workflows explicit, stable, and easy to evolve.

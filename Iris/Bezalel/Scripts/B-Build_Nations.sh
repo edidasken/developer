@@ -83,6 +83,7 @@ fi
 # ── Church definitions ────────────────────────────────────────────────
 # FORMAT:  "FolderName|ConfigFile|CACHE_NAME"
 CHURCHES=(
+  "FlockOS|FlockOS-Root.json|flockos-v1.05"
   "TBC|Trinity.json|flockos-tbc-v1.05"
   "TheForest|TheForest.json|flockos-theforest-v1.05"
   "GAS|GAS.json|flockos-gas-v1.05"
@@ -1489,7 +1490,7 @@ if ! $DRY_RUN; then
     GIT_HASH=$(git -C "$WORKSPACE" log -1 --pretty=format:'%h' 2>/dev/null || echo "")
     BUILD_DATE=$(date +%Y-%m-%d)
     BUILD_TITLE="Build: ${GIT_SUBJECT}"
-    BUILD_DESC="B-Build completed on ${BUILD_DATE}. Nations synced: Root, FlockOS, TBC, TheForest, GAS. Commit: ${GIT_HASH}. ${GIT_SUBJECT}"
+    BUILD_DESC="B-Build completed on ${BUILD_DATE}. Nations synced: FlockOS, TBC, TheForest, GAS. Commit: ${GIT_HASH}. ${GIT_SUBJECT}"
 
     python3 "$SEED_SCRIPT" \
       --title "$BUILD_TITLE" \
@@ -1505,12 +1506,11 @@ if ! $DRY_RUN; then
   echo "══════════════════════════════════════════════"
   echo "Pushing church Nation repos…"
   echo ""
-  echo "  → Root → edidasken/flockos"
-  git -C "$NATIONS_DIR/Root" push -u origin main
-  echo "  → TBC → edidasken/trinity"
-  git -C "$NATIONS_DIR/TBC" push -u origin main
-  echo "  → TheForest → edidasken/theforest"
-  git -C "$NATIONS_DIR/TheForest" push -u origin main
+  for TARGET in "${BUILT_TARGETS[@]}"; do
+    REPO_NAME="$(basename "$TARGET")"
+    echo "  → ${REPO_NAME}"
+    git -C "$TARGET" push -u origin main
+  done
   echo "  ✓ Church Nation repos pushed"
   echo ""
 fi

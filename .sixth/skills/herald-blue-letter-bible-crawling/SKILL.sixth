@@ -1,0 +1,29 @@
+---
+name: herald-blue-letter-bible-crawling
+summary: Crawl Blue Letter Bible lexicons and cross references.
+---
+
+## Purpose
+Collect Blue Letter Bible lexicon entries, cross references, and related study lookups for Bible study workflows.
+
+## When to Use
+- Gathering lexicon terms and definitions
+- Pulling cross-reference chains for a passage or word
+- Resolving original-language study links from Blue Letter Bible
+
+## Workflow
+1. Fetch the requested BLB page or lookup target.
+2. Extract lexicon, cross-reference, and linked study data.
+3. Normalize references, lemma fields, and display text.
+4. Deduplicate repeated links and repeated reference targets.
+
+## Guardrails
+- Stay within Blue Letter Bible pages and linked study data.
+- Do not broaden into general Bible.com, AfghanBibles, or missions content.
+- Preserve source wording for terms, references, and labels.
+- Respect source rate limits and avoid unnecessary repeat requests.
+
+## Output
+- Lexicon entries with normalized identifiers
+- Cross-reference lists with canonical references
+- Source URL and retrieval metadata

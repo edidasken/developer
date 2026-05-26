@@ -1,0 +1,28 @@
+---
+name: herald-bible-study-techniques
+description: Study methods for inductive, expository, SOAP/HBLT-style, and discussion-based Bible work.
+---
+
+## Purpose
+Shape a Bible study method, not the full study content.
+
+## When to Use
+- Build an inductive, expository, SOAP, HBLT, or discussion-based study.
+- Turn a passage into a repeatable group flow.
+- Compare methods and choose the right one for a class, group, or one-on-one study.
+
+## Workflow
+1. Confirm the passage, audience, and time limit.
+2. Pick one method and keep the structure simple.
+3. Draft observations, interpretation prompts, application prompts, and discussion questions.
+4. Keep the output method-focused; send reusable assets to `herald-bible-study-materials`.
+
+## Guardrails
+- Do not do original-language lookup here; use `herald-greek-hebrew-word-study`.
+- Do not create lesson plans, handouts, or reading guides here.
+- Avoid mixing multiple study frameworks unless the request explicitly asks for comparison.
+
+## Output
+- A named study method with a clear flow.
+- Questions, prompts, and timing notes.
+- Brief facilitator guidance when useful.

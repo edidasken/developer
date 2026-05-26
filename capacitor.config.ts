@@ -1,6 +1,4 @@
-import type { CapacitorConfig } from '@capacitor/cli';
-
-const config: CapacitorConfig = {
+const config = {
   appId: 'com.flockos.app',
   appName: 'FlockOS',
   webDir: 'www',

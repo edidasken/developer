@@ -1,0 +1,27 @@
+---
+name: dependency-update
+description: Update dependencies with minimal breakage risk.
+---
+
+## Purpose
+Bump dependencies and capture any compatibility or lockfile changes.
+
+## When to Use
+- When dependencies need refresh or patching.
+- After a vulnerability or maintenance update.
+- When lockfiles and manifests drift.
+
+## Workflow
+1. Update the target dependency set.
+2. Check for API, peer, or lockfile changes.
+3. Record any required code or config follow-up.
+
+## Guardrails
+- Do not upgrade beyond the requested scope.
+- Do not change unrelated package versions.
+- Keep the update set small and reviewable.
+
+## Output
+- Updated packages and version changes.
+- Any compatibility notes.
+- Verification steps or follow-up fixes.

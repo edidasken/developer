@@ -1,0 +1,28 @@
+---
+name: herald-greek-hebrew-word-study
+description: Original-language Bible word study for Strong’s lookups, transliteration, parsing, lexical notes, and nuance.
+---
+
+## Purpose
+Support careful Greek and Hebrew word study without turning it into a full sermon or lesson.
+
+## When to Use
+- Look up Strong’s numbers, transliteration, or parsing.
+- Compare lexical meanings and usage across contexts.
+- Explain original-language nuance, grammar, or translation choices.
+
+## Workflow
+1. Identify the target term and the verse or verses in view.
+2. Provide transliteration, lemma, parsing, and Strong’s data when available.
+3. Summarize lexical range, nearby context, and translation implications.
+4. Keep the result tightly tied to the word study request.
+
+## Guardrails
+- Do not draft full study outlines or teaching materials here.
+- Do not replace context with word-study prooftexting.
+- Avoid overclaiming precise meanings when the context only supports a range.
+
+## Output
+- A word-study summary with transliteration and parsing.
+- Strong’s and lexical notes, plus context-sensitive nuance.
+- Brief cautions about translation and interpretation limits.

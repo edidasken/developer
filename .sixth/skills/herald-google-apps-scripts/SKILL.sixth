@@ -1,0 +1,43 @@
+---
+name: herald-google-apps-scripts
+description: Keep Google Apps Script work bounded, deployable, and aligned with Herald automation and script ownership rules.
+compatibility: Herald Automation
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+  - write_to_file
+---
+
+# Purpose
+
+Use this skill for Google Apps Script maintenance that must stay separate from the main application runtime. It covers script boundaries, deployment shape, triggers, scopes, and configuration that affect Apps Script projects.
+
+# When to Use
+
+- Updating Apps Script functions, triggers, or menus
+- Adjusting clasp, manifest, or deployment configuration
+- Connecting Google Sheets, Docs, Drive, Gmail, or Calendar automations
+- Reviewing OAuth scopes or execution boundaries
+- Preparing an Apps Script change for deployment or review
+
+# Workflow
+
+1. Identify which script project owns the change and what Google service it touches.
+2. Keep the script boundary clear: Apps Script logic stays in script files and script config.
+3. Update the minimum set of functions, triggers, and manifest entries required.
+4. Verify required scopes, runtime constraints, and deployment targets.
+5. Document any manual deployment or authorization step needed after the code change.
+
+# Guardrails
+
+- Do not mix Apps Script concerns into non-script backend code.
+- Keep secrets, tokens, and sensitive service data out of script source.
+- Avoid expanding scopes unless the change truly requires them.
+- Preserve existing trigger behavior unless the task explicitly changes it.
+
+# Output
+
+Return the script files changed, any manifest or deployment updates, and the scopes or triggers affected. Include any manual deployment notes or authorization steps.

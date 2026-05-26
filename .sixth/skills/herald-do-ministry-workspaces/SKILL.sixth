@@ -1,0 +1,71 @@
+---
+name: herald-do-ministry-workspaces
+description: Deep-study and safely evolve Herald /do ministry workspace pages, including Fold, Harvest, Way, Life, and Seasons.
+compatibility: Herald backend /do engine
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+---
+
+## Purpose
+
+Use this skill when the work touches the ministry workspace pages that organize groups, attendance, service planning, discipleship tracks, pastoral care, and seasonal rhythms in Herald /do.
+
+This skill centers on the ministry workspace cluster:
+
+- `../herald/do/scripts/the_fold/index.ts`
+- `../herald/do/scripts/the_harvest/index.ts`
+- `../herald/do/scripts/the_way/index.ts`
+- `../herald/do/scripts/the_life/index.ts`
+- `../herald/do/scripts/the_seasons/index.ts`
+
+Use it to keep the ministry dashboards, cards, tabs, search, summaries, and return-to-hub behavior aligned so each workspace feels like a coherent ministry surface instead of a one-off page.
+
+## When to Use
+
+Use this skill when you need to:
+
+- update group and attendance dashboard behavior in The Fold
+- adjust Harvest hub cards, links, or ministry-entry navigation
+- change discipleship track, group, or volunteer-flow rendering in The Way
+- evolve pastoral-care or resilience messaging in The Life
+- update seasonal planning or rhythm views in The Seasons
+- validate that ministry workspace changes do not break the shell or the return-to-dashboard flow
+- decide whether a change belongs in the ministry workspace layer or in a narrower page module
+
+Do not use this skill for content editing, music tools, or shared runtime adapters unless the issue is only visible because a ministry workspace page consumes them.
+
+## Workflow
+
+1. Read `../herald/do/scripts/the_fold/index.ts` first when the change affects groups, attendance, search, or return-to-dashboard behavior.
+2. Read `../herald/do/scripts/the_harvest/index.ts` when the change affects the ministry hub cards or entry links.
+3. Read `../herald/do/scripts/the_way/index.ts` when the change affects discipleship tracks, groups, or volunteer-slot cards.
+4. Read `../herald/do/scripts/the_life/index.ts` when the change affects pastoral-care or formation wrapper behavior.
+5. Read `../herald/do/scripts/the_seasons/index.ts` when the change affects seasonal planning or re-exported runtime behavior.
+6. Keep dashboard state, ministry navigation, and page-specific content separate unless a shared contract already ties them together.
+7. Make the smallest change that preserves the current ministry workspace flow.
+8. Re-check any shell or navigation callers that rely on the ministry workspace contract.
+
+## Guardrails
+
+- Do not move content-editing or music-management logic into the ministry workspace layer.
+- Keep search, tabbing, and summary rendering local to the page that owns them.
+- Preserve existing navigation targets and return-to-hub behavior unless the task explicitly changes them.
+- Avoid broadening workspace state without a clear consumer.
+- Do not duplicate dashboard or card logic across the ministry workspace modules.
+- Keep page-specific state and formatting local to each workspace.
+
+## Output
+
+When using this skill, include:
+
+- the ministry workspace files inspected
+- the workspace or navigation behavior being changed
+- the summary, card, or return-path behavior that depends on the change
+- any barrel or export updates needed
+- any downstream shell or ministry callers that should be rechecked
+
+The expected result is a ministry workspace update that keeps Fold, Harvest, Way, Life, and Seasons cohesive and easy to navigate.

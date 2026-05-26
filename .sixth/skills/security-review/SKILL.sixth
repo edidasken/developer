@@ -1,0 +1,27 @@
+---
+name: security-review
+description: Check a change for obvious security risks.
+---
+
+## Purpose
+Review code or config for likely security issues before merge or release.
+
+## When to Use
+- After an auth, input, secret, or config change.
+- When a change may affect trust boundaries.
+- When you need a lightweight security pass.
+
+## Workflow
+1. Review the changed paths for data exposure or unsafe trust.
+2. Check validation, auth, secrets, and access control.
+3. Note the highest-risk issue first.
+
+## Guardrails
+- Do not claim a full audit.
+- Do not overstate unverified risk.
+- Keep the scope to the changed surface.
+
+## Output
+- Security findings ranked by risk.
+- The affected file or control point.
+- Any immediate mitigation or follow-up.

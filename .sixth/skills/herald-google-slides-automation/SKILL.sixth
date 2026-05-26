@@ -1,0 +1,25 @@
+---
+name: herald-google-slides-automation
+summary: Google Slides presentation automation for maintenance tasks.
+---
+
+# Purpose
+Automate Google Slides structure, layouts, placeholders, and export-ready updates with minimal manual work.
+
+# When to Use
+- Reorder slides, update layouts, replace placeholders, or refresh recurring deck sections.
+- Standardize titles, spacing, theme usage, and simple presentation templates.
+- Prepare decks for review, sharing, or export.
+
+# Workflow
+1. Inspect the current deck theme, slide order, and reusable layout patterns.
+2. Apply the smallest slide or template change needed.
+3. Verify visual consistency, placeholders, and export readiness.
+
+# Guardrails
+- Preserve theme and presentation intent unless a redesign is requested.
+- Avoid unnecessary animation or visual churn when a layout fix is enough.
+- Keep changes limited to Slides; do not manage Drive storage or Docs text workflows here.
+
+# Output
+- Return changed slides, layout updates, and any export or formatting notes.

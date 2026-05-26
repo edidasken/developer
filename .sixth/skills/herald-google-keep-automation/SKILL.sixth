@@ -1,0 +1,26 @@
+---
+name: herald-google-keep-automation
+description: Automate Google Keep notes, labels, and checklist upkeep.
+---
+
+## Purpose
+Keep Google Keep notes, labels, and checklists organized and current.
+
+## When to Use
+- Create or update notes, labels, reminders, or checklist items.
+- Clean up note titles, tagging, or duplicated checklist entries.
+- Reconcile note references used by lightweight workspace workflows.
+
+## Workflow
+1. Confirm the target note or checklist and the fields to adjust.
+2. Make the smallest edit needed to titles, labels, reminders, or items.
+3. Verify the final note structure and any linked references.
+
+## Guardrails
+- Do not rewrite note content unless the request calls for it.
+- Do not remove checklist items without clear direction.
+- Keep changes limited to Keep maintenance and organization.
+
+## Output
+- Updated note, label, or checklist state.
+- Brief summary of changed items and any follow-up actions.

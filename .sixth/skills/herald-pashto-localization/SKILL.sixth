@@ -1,0 +1,44 @@
+---
+name: herald-pashto-localization
+description: Pashto localization skill for Herald content with right-to-left script handling, readability, and QA.
+compatibility:
+  - Sixth
+allowed-tools:
+  - read_file
+  - search_files
+  - replace_in_file
+  - write_to_file
+---
+
+## Purpose
+Translate Herald content into clear Pashto with attention to script, flow, and review quality.
+
+Use it for Pashto writing, translation review, and final QA of Pashto strings.
+
+## When to Use
+- Translating approved English source text into Pashto
+- Reviewing Pashto wording for clarity and natural flow
+- Checking right-to-left rendering and punctuation
+- Verifying terminology consistency across files
+- QA for script, numerals, and UI fit
+
+## Workflow
+1. Start from the approved English source.
+2. Translate into natural Pashto without forcing English structure.
+3. Check RTL rendering, joining behavior, and line breaks.
+4. Keep glossary terms consistent across the file set.
+5. Review readability, politeness level, and label length.
+6. Verify placeholders, links, numbers, and codes after translation.
+
+## Guardrails
+- Preserve meaning, tone, and product terms.
+- Do not alter placeholders, code, URLs, or identifiers.
+- Avoid Latin transliteration unless the task explicitly asks for it.
+- Keep punctuation and numerals appropriate for Pashto context.
+- Flag any ambiguous source text instead of guessing.
+
+## Output
+- Pashto translation text
+- Notes on RTL, script, or readability issues
+- Any unresolved source ambiguities
+- QA notes for placeholders and formatting

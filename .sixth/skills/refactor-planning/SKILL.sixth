@@ -1,0 +1,27 @@
+---
+name: refactor-planning
+description: Draft a small, safe plan for a targeted refactor.
+---
+
+## Purpose
+Plan a refactor that improves code structure without changing intent.
+
+## When to Use
+- Before a focused cleanup or extraction.
+- When a module is hard to extend or test.
+- When you need a step-by-step refactor plan.
+
+## Workflow
+1. Identify the narrow refactor target and its dependencies.
+2. Break the change into small, safe steps.
+3. Call out validation points after each step.
+
+## Guardrails
+- Do not expand the scope into a redesign.
+- Do not change behavior unless the plan says so.
+- Keep steps small enough to review independently.
+
+## Output
+- A concise refactor plan.
+- Risks and dependencies.
+- Suggested validation after each step.

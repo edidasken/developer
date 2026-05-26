@@ -1,0 +1,25 @@
+---
+name: herald-google-drive-automation
+summary: Google Drive file and folder automation for maintenance tasks.
+---
+
+# Purpose
+Automate Google Drive file, folder, naming, location, and sharing maintenance with the smallest safe change.
+
+# When to Use
+- Create, rename, move, copy, archive, or organize Drive files and folders.
+- Standardize folder conventions, shared links, and ownership handoffs.
+- Clean up duplicates, stale items, or inconsistent paths.
+
+# Workflow
+1. Inspect the current Drive structure, names, and sharing state.
+2. Apply the minimal file or folder change needed.
+3. Verify paths, links, access, and archive targets.
+
+# Guardrails
+- Do not edit document content; only manage Drive objects and metadata.
+- Avoid broad permission changes unless explicitly requested.
+- Keep changes targeted to the requested folders, files, and shared links.
+
+# Output
+- Return changed paths, permission updates, and any unresolved Drive hygiene items.

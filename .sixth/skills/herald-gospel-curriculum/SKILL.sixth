@@ -1,0 +1,68 @@
+---
+name: herald-gospel-curriculum
+description: Deep-study and safely evolve the Herald Gospel curriculum surface, including shared helpers, book library, course playlists, and teaching-plan views in ../herald/do/scripts.
+compatibility: Herald backend /do engine
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+---
+
+## Purpose
+
+Use this skill when the work touches the Gospel curriculum and formation flow in Herald /do.
+
+This skill centers on the study and teaching cluster:
+
+- `../herald/do/scripts/the_gospel_shared.ts`
+- `../herald/do/scripts/the_gospel_library.ts`
+- `../herald/do/scripts/the_gospel_courses.ts`
+- `../herald/do/scripts/the_gospel_teaching_plans.ts`
+
+Use it to keep the shared helpers, library browser, course cards, and teaching-plan renderer aligned so the curriculum flow stays consistent and easy to extend.
+
+## When to Use
+
+Use this skill when you need to:
+
+- update shared Gospel UI helpers or formatting utilities
+- adjust the book library, card layout, or selection flow in The Word
+- change course listing, filter behavior, or membership gating
+- evolve teaching-plan grouping, session selection, or segment rendering
+- trace how these pages depend on shared helper output or study data types
+- validate that curriculum changes do not break the shared rendering flow
+
+Do not use this skill for unrelated ministry pages unless they reuse the Gospel shared helpers directly.
+
+## Workflow
+
+1. Read `../herald/do/scripts/the_gospel_shared.ts` first because it defines the shared formatting and help wiring.
+2. Read `../herald/do/scripts/the_gospel_library.ts` to understand the book browser and detail flow.
+3. Read `../herald/do/scripts/the_gospel_courses.ts` when the change affects discipleship tracks or course listing behavior.
+4. Read `../herald/do/scripts/the_gospel_teaching_plans.ts` when the change affects session grouping or segment rendering.
+5. Keep helper responsibilities separate from each page’s local state and rendering.
+6. Make the smallest change that preserves the current flow between shared helpers and the page modules.
+7. Re-check any types, imports, or data bundles that the curriculum pages share.
+
+## Guardrails
+
+- Do not move general engine behavior into the Gospel helper layer.
+- Keep shared helper logic generic and reusable.
+- Avoid mixing library, course, and teaching-plan concerns into one module.
+- Preserve the current filter, grouping, and selection behavior unless the task explicitly changes it.
+- Do not duplicate format helpers across the Gospel pages.
+- Keep page-specific state local to each page module.
+
+## Output
+
+When using this skill, include:
+
+- the Gospel modules inspected
+- the shared helper or page flow being changed
+- the data or render behavior that depends on the change
+- any type or import updates needed
+- any downstream Gospel pages that should be rechecked
+
+The expected result is a curriculum update that keeps the Gospel learning surfaces flowing from shared helpers into the page-level views.

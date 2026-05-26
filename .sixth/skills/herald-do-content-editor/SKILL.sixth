@@ -1,0 +1,62 @@
+---
+name: herald-do-content-editor
+description: Deep-study and safely evolve Herald /do content-editor surfaces, including the Truth Firestore-backed collections and related editorial workflows.
+compatibility: Herald backend /do engine
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+---
+
+## Purpose
+
+Use this skill when the work touches the Firestore-backed content editor in Herald /do.
+
+This skill centers on the editorial cluster:
+
+- `../herald/do/scripts/the_truth/index.ts`
+
+Use it to keep the content collections, bundle sync, pagination, editing modal, and save/delete flow aligned so the editor can manage books, theology, teaching plans, genealogy, counseling, devotionals, reading plans, lexicon entries, heart check items, mirror items, quizzes, and apologetics content safely.
+
+## When to Use
+
+Use this skill when you need to:
+
+- update Truth tab definitions, fields, or list columns
+- adjust the editor modal, search, pagination, or table actions
+- change bundle sync, caching, or stale-data behavior
+- evolve Firestore read/write behavior for the truth collections
+- validate that editorial changes do not break add/edit/delete flows or offline bundle refreshes
+- decide whether a change belongs in the editor layer or in a narrower collection-specific helper
+
+Do not use this skill for the Gospel curriculum, ministry workspace, or music stand pages unless they are only being changed because they share a content-editing dependency.
+
+## Workflow
+
+1. Read `../herald/do/scripts/the_truth/index.ts` first when the change affects the Truth editor.
+2. Keep collection definitions, bundle sync, and editor modal behavior separate from shell and boot logic.
+3. Make the smallest change that preserves the current editorial flow.
+4. Re-check any Firestore, bundle, or diagnostics callers that depend on the editor contract.
+
+## Guardrails
+
+- Do not move general shell behavior into the content editor layer.
+- Keep bundle sync and modal editing backward-compatible wherever possible.
+- Avoid broadening Firestore write behavior without a clear consumer.
+- Preserve current pagination, search, and tab behavior unless the task explicitly changes them.
+- Do not duplicate editor state across collection helpers.
+- Keep field definitions and collection metadata explicit.
+
+## Output
+
+When using this skill, include:
+
+- the editor files inspected
+- the collection or modal behavior being changed
+- the sync, pagination, or save path that depends on the change
+- any barrel or export updates needed
+- any downstream callers that should be rechecked
+
+The expected result is a content-editor update that keeps Herald /do editorial workflows explicit, stable, and easy to extend.

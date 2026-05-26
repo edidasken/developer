@@ -1,0 +1,69 @@
+---
+name: herald-do-auth-account
+description: Deep-study and safely evolve Herald /do auth and account surfaces, including identity, priesthood, garments, breastplate, and anointing helpers.
+compatibility: Herald backend /do engine
+allowed-tools:
+  - read_file
+  - read_batch
+  - search_files
+  - list_files
+  - replace_in_file
+---
+
+## Purpose
+
+Use this skill when the work touches the auth and account layer used by Herald /do.
+
+This skill centers on the account and covenant cluster:
+
+- `../herald/do/scripts/the_identity.ts`
+- `../herald/do/scripts/the_priesthood/index.ts`
+- `../herald/do/scripts/the_breastplate.ts`
+- `../herald/do/scripts/the_garments.ts`
+- `../herald/do/scripts/the_anointing.ts`
+
+Use it to keep identity minting, sign-in handoff, profile lookup, account sheets, and priesthood/covenant rendering aligned so the engine can move between anonymous, signed-in, and account-management states cleanly.
+
+## When to Use
+
+Use this skill when you need to:
+
+- update identity minting, forgetting, or storage behavior
+- adjust sign-in handoff or account-sheet rendering
+- change profile lookup, session shaping, or logout behavior
+- evolve breastplate or garments presentation tied to auth/account state
+- change token reading or covenant/account gating behavior
+- validate that auth and account updates do not break startup or downstream shell access
+
+Do not use this skill for general runtime discovery, shell chrome, or page business logic unless the issue is only visible because auth/account state is wrong.
+
+## Workflow
+
+1. Read `../herald/do/scripts/the_identity.ts` first when the change affects minted identity or stored identity access.
+2. Read `../herald/do/scripts/the_priesthood/index.ts` when the change affects profile lookup, account access, or sign-out behavior.
+3. Read `../herald/do/scripts/the_breastplate.ts` and `../herald/do/scripts/the_garments.ts` when the change affects account presentation or covenant-state display.
+4. Read `../herald/do/scripts/the_anointing.ts` when the change affects token reading or covenant-related auth helpers.
+5. Keep identity storage, account presentation, and sign-in/logout flow separate unless a shared contract already ties them together.
+6. Make the smallest change that preserves the current auth and account behavior.
+7. Re-check any boot or shell callers that depend on the auth/account surface.
+
+## Guardrails
+
+- Do not move page business logic into the auth/account layer.
+- Keep identity storage backward-compatible wherever possible.
+- Avoid broadening account-sheet or sign-in behavior without a clear consumer.
+- Preserve current logout, redirect, and profile-selection behavior unless the task explicitly changes it.
+- Do not duplicate account-state helpers across modules.
+- Keep covenant and presentation concerns narrowly focused.
+
+## Output
+
+When using this skill, include:
+
+- the auth/account files inspected
+- the identity or account behavior being changed
+- the profile, logout, or covenant-state path that depends on the change
+- any barrel or export updates needed
+- any downstream boot or shell callers that should be rechecked
+
+The expected result is an auth/account update that keeps Herald /do identity and priesthood flows explicit, safe, and easy to reason about.

@@ -1,0 +1,24 @@
+---
+name: broadsheet-design-system
+description: Layout, tokens, components, spacing, and visual consistency guidance for Broadsheet.
+---
+
+# Purpose
+Keep Broadsheet interfaces visually consistent through shared layout rules, spacing, tokens, and component patterns.
+
+# When to Use
+Use this skill for layout structure, spacing scale decisions, design tokens, reusable components, and consistency checks across screens or surfaces.
+
+# Workflow
+1. Start with existing tokens, layout primitives, and component patterns.
+2. Choose the simplest structure that preserves the current visual language.
+3. Apply spacing, alignment, and responsive rules consistently across related surfaces.
+4. Review for rhythm, hierarchy, and cross-page consistency before shipping.
+
+# Guardrails
+- Do not introduce new tokens or component patterns when an existing one fits.
+- Do not hardcode values that should come from the shared system.
+- Keep CSS architecture and typography-specific changes in their own skills.
+
+# Output
+Return layout or component recommendations with the token and spacing choices used, plus any consistency notes.

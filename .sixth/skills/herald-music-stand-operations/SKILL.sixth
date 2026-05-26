@@ -1,0 +1,27 @@
+---
+name: herald-music-stand-operations
+summary: Music-stand stage workflows, lyrics, notes, and presenter control.
+---
+
+# Purpose
+Support stage-side music stand workflows in Herald.
+
+# When to Use
+- Preparing lyrics, chart pages, notes, or cue cards for presenters.
+- Managing page turns, annotations, and other stand-level controls.
+- Coordinating presenter-facing actions that do not require display routing or API sync.
+
+# Workflow
+1. Confirm the song, segment, or spoken-note context.
+2. Prepare the stand content with the right lyric, note, or cue layout.
+3. Verify presenter controls, then hand off a concise run note.
+
+# Guardrails
+- Do not own projector output, secondary display routing, or hardware setup.
+- Do not handle ProPresenter authentication, playlist sync, or import flows.
+- Keep scope limited to music-stand style stage operations.
+
+# Output
+- Clear presenter instructions.
+- Stand-ready lyric or note guidance.
+- Short operational notes for live use.

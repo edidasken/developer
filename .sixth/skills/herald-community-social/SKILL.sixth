@@ -1,0 +1,26 @@
+---
+name: herald-community-social
+summary: Define social interactions and community surfaces for Herald.
+engine: herald
+---
+
+# Purpose
+Keep community features focused on follows, shares, reactions, and light social activity.
+
+# When to Use
+Use this skill for profile interactions, activity surfaces, sharing, and social engagement signals.
+
+# Workflow
+1. Identify the social action and the surface that exposes it.
+2. Check identity, visibility, and moderation implications.
+3. Specify the smallest UI or data changes needed.
+
+# Guardrails
+- Stay on social interactions, not full community platform design.
+- Avoid adding new moderation or messaging systems unless required.
+- Keep privacy and visibility rules explicit.
+
+# Output
+- Social interaction summary.
+- Visibility and moderation notes.
+- Required client or data updates.

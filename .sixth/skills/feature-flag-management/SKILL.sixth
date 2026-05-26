@@ -1,0 +1,27 @@
+---
+name: feature-flag-management
+description: Manage feature flags for controlled rollout.
+---
+
+## Purpose
+Add, update, or retire a flag for a controlled release.
+
+## When to Use
+- When a feature needs staged rollout.
+- When a kill switch or gate is needed.
+- When an old flag should be removed safely.
+
+## Workflow
+1. Identify the flag name, scope, and default state.
+2. Update the code or config with the smallest safe change.
+3. Confirm rollout, fallback, and cleanup steps.
+
+## Guardrails
+- Do not leave stale flags behind.
+- Do not widen the flag scope without need.
+- Keep naming and defaults explicit.
+
+## Output
+- Flag changes made.
+- Rollout or fallback notes.
+- Cleanup needed for retired flags.

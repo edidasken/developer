@@ -1,0 +1,29 @@
+---
+name: herald-frontlines-international-crawling
+summary: Crawl FrontlinesInternational.org content and data structures.
+---
+
+## Purpose
+Collect FrontlinesInternational.org content, structured records, and source-specific data shapes for downstream use.
+
+## When to Use
+- Retrieving FrontlinesInternational.org pages or datasets
+- Parsing source-owned content structures and labels
+- Capturing organizational or missions data from that source
+
+## Workflow
+1. Resolve the FrontlinesInternational.org target.
+2. Fetch the page, feed, or structured source payload.
+3. Map source fields into normalized records without changing meaning.
+4. Deduplicate repeated entries and repeated content blocks.
+
+## Guardrails
+- Keep scope limited to FrontlinesInternational.org content and structures.
+- Do not mix in unrelated Bible.com, BLB, or AfghanBibles data.
+- Preserve source field names when they carry meaning.
+- Respect source rate limits and any access rules.
+
+## Output
+- Normalized FrontlinesInternational.org records
+- Source field mappings and retrieval metadata
+- Deduped content batches for downstream systems

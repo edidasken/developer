@@ -1,0 +1,26 @@
+---
+name: herald-architecture-governance
+summary: Review and constrain architecture changes for the Herald media client.
+engine: herald
+---
+
+# Purpose
+Keep Herald changes inside the approved engine, app, and client boundaries.
+
+# When to Use
+Use this skill when a change affects routes, services, data flow, caching, auth/session, or shared contracts.
+
+# Workflow
+1. Identify the impacted Herald subsystems and the smallest safe change.
+2. Check the change against engine contracts, route registration, and app-launch flow.
+3. Note required updates, risks, and any follow-up work in dependency order.
+
+# Guardrails
+- Stay at architecture level; do not implement feature UI or product copy.
+- Prefer narrow, incremental edits over broad refactors.
+- Flag contract changes explicitly before anything is coded.
+
+# Output
+- Short architecture note.
+- Affected subsystems.
+- Required follow-up items and risks.

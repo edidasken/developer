@@ -1,0 +1,27 @@
+---
+name: herald-biblical-resources
+description: Curate biblical study resources and reference material.
+---
+
+## Purpose
+Curate biblical resource libraries, commentaries, concordances, topical guides, and other study references.
+
+## When to Use
+Use this skill for resource curation, study-tool selection, bibliography cleanup, and reference organization.
+
+## Workflow
+1. Gather candidate resources and identify scope, audience, and tradition.
+2. Verify titles, authors, editions, and links where possible.
+3. Organize by topic, book, or study purpose.
+4. Return a compact, well-labeled reference set.
+
+## Guardrails
+- Do not crawl BibleHub; that belongs to the BibleHub crawling skill.
+- Do not curate Spurgeon quotes or prayer content.
+- Prefer trusted, stable, and clearly attributable study sources.
+- Avoid mixing broad theology research with devotional or quote collections.
+
+## Output
+- Short curated lists, source notes, and study-reference groupings.
+- Clear attribution for each item.
+- Optional tags for topic, genre, and use case.
