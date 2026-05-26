@@ -11,6 +11,10 @@ Thumbs.db
 .vscode/
 .idea/
 
+# ── SSH / local key material ─────────────────────────────────────────────
+SSH/
+SSH/Git/id_ed25519_herald_20260524_084750
+
 # ── Backup / temp files ──────────────────────────────────────────────────
 *.bak
 *.tmp
@@ -44,6 +48,7 @@ FlockOS/Planning/
 Covenant/Courts/TheTabernacle/Tools/Flock Secrets/
 # Catch-all for per-church tool secrets folders
 **/Tools/Flock Secrets/
+
 # ── Internal reference docs ───────────────────────────────────────────────
 # Large citation/reference markdown — useful locally, not for the repo.
 \#\ Code\ Citations.md
