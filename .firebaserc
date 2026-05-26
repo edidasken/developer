@@ -3,8 +3,7 @@
     "default": "flockos-notify",
     "flockos": "flockos-notify",
     "theforest": "flockos-theforest",
-    "tbc": "flockos-trinity",
-    "comms": "flockos-comms"
+    "tbc": "flockos-trinity"
   },
   "targets": {},
   "etags": {}
