@@ -3,7 +3,7 @@
 # B-Build_Nations.sh — Build New_Covenant for each Nation
 #
 # Source of truth:  New_Covenant/
-# Output:           Nations/<church>/   (repo root)
+# Output:           $NATIONS_REPO_ROOT/<church>/   (standalone repo root)
 #
 # Per-church patches applied to each copy:
 #   • Scripts/the_true_vine.js  → church GAS API endpoints
@@ -33,8 +33,40 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # Script lives at Covenant/Bezalel/Scripts/ → workspace root is 3 levels up
 WORKSPACE="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 NEW_COVENANT="$WORKSPACE/New_Covenant"
-NATIONS_DIR="$WORKSPACE/Nations"
+# Build to the standalone sibling repos outside this workspace by default.
+# Override with SIBLING_REPOS_ROOT if your repo clones live elsewhere.
+SIBLING_REPOS_ROOT="${SIBLING_REPOS_ROOT:-$WORKSPACE/..}"
+SIBLING_REPOS_ROOT="$(python3 -c "import os,sys; print(os.path.abspath(sys.argv[1]))" "$SIBLING_REPOS_ROOT")"
+case "$SIBLING_REPOS_ROOT" in
+  "$WORKSPACE"|"$WORKSPACE"/*)
+    echo "ERROR: SIBLING_REPOS_ROOT must point outside this workspace to the standalone sibling repos."
+    echo "       Current value: $SIBLING_REPOS_ROOT"
+    exit 1
+    ;;
+esac
+NATIONS_DIR="$SIBLING_REPOS_ROOT"
 CONFIGS_DIR="$WORKSPACE/Architechtural Docs/New Covenant As Built/Church Registry"
+
+BUILT_TARGETS=()
+
+resolve_nation_repo() {
+  case "$1" in
+    FlockOS|Root) echo "$NATIONS_DIR/flockos" ;;
+    TBC) echo "$NATIONS_DIR/trinity" ;;
+    TheForest) echo "$NATIONS_DIR/theforest" ;;
+    GAS) echo "$NATIONS_DIR/offline" ;;
+    *) return 1 ;;
+  esac
+}
+
+target_already_built() {
+  local candidate="$1"
+  local item
+  for item in "${BUILT_TARGETS[@]-}"; do
+    [ "$item" = "$candidate" ] && return 0
+  done
+  return 1
+}
 
 # ── Dependency check ──────────────────────────────────────────────────
 if ! command -v jq &>/dev/null; then
@@ -50,9 +82,10 @@ fi
 
 # ── Church definitions ────────────────────────────────────────────────
 # FORMAT:  "FolderName|ConfigFile|CACHE_NAME"
+# Canonical order prefers the real sibling repo name; aliases are skipped safely.
 CHURCHES=(
-  "Root|FlockOS-Root.json|flockos-root-v1.05"
   "FlockOS|FlockOS-Root.json|flockos-v1.05"
+  "Root|FlockOS-Root.json|flockos-root-v1.05"
   "TBC|Trinity.json|flockos-tbc-v1.05"
   "TheForest|TheForest.json|flockos-theforest-v1.05"
   "GAS|GAS.json|flockos-gas-v1.05"
@@ -134,9 +167,23 @@ for entry in "${CHURCHES[@]}"; do
   IFS='|' read -r FOLDER CONFIG CACHE_NAME <<< "$entry"
 
   CFG="$CONFIGS_DIR/$CONFIG"
-  TARGET="$NATIONS_DIR/$FOLDER"
+  TARGET="$(resolve_nation_repo "$FOLDER")"
+  if [ -z "$TARGET" ]; then
+    echo "ERROR: No sibling repo target mapped for church '$FOLDER'"
+    exit 1
+  fi
+  if [ ! -d "$TARGET" ]; then
+    echo "ERROR: Missing sibling repo target: $TARGET"
+    exit 1
+  fi
+  if target_already_built "$TARGET"; then
+    echo "  ↳ Skipping duplicate repo target: $TARGET (church alias: $FOLDER)"
+    echo ""
+    continue
+  fi
+  BUILT_TARGETS+=("$TARGET")
 
-  echo "═══ Building  Nations/$FOLDER  ←  $CONFIG ═══"
+  echo "═══ Building  $TARGET  ←  $CONFIG ═══"
 
   # Read config values
   DB_URL=$(jq -r '.databaseUrl' "$CFG")
@@ -147,7 +194,7 @@ for entry in "${CHURCHES[@]}"; do
   BG_COLOR=$(jq -r '.backgroundColor // "#0c1445"' "$CFG")
 
   if $DRY_RUN; then
-    echo "  [dry] rsync New_Covenant → Nations/$FOLDER"
+    echo "  [dry] rsync New_Covenant → $TARGET/"
     echo "  [dry] GAS URL: $DB_URL"
     echo "  [dry] CACHE_NAME: $CACHE_NAME"
     echo "  [dry] Church: $CHURCH_NAME"
@@ -684,7 +731,7 @@ if not os.path.exists(path):
 else:
     with open(path, 'r') as f:
         content = f.read()
-    base_url = f'https://flock-os.github.io/FlockOS/Nations/{folder}/'
+    base_url = f'https://edidasken.github.io/developer/Nations/{folder}/'
     content = content.replace('{{CHURCH_NAME}}', name)
     content = content.replace('{{BASE_URL}}', base_url)
     with open(path, 'w') as f:
@@ -1358,9 +1405,8 @@ done
 
 echo "══════════════════════════════════════════════"
 echo "Nations build complete:"
-for entry in "${CHURCHES[@]}"; do
-  IFS='|' read -r FOLDER CONFIG CACHE <<< "$entry"
-  echo "  Nations/$FOLDER/"
+for target in "${BUILT_TARGETS[@]}"; do
+  echo "  ${target}/"
 done
 echo ""
 
