@@ -37,18 +37,28 @@ ROOT_FILES=(
   .nojekyll
   LICENSE
   capacitor.config.ts
-  church-firestore.firebase.json
-  church-firestore.json
   church.firestore.rules
   firebase.json
-  firestore.indexes.json
-  flockchat-firebase.json
   FlockChat.Firestore.Rules
   package-lock.json
 )
 
+CONFIG_FILES=(
+  "config/church-firestore.firebase.json|church-firestore.firebase.json"
+  "config/church-firestore.json|church-firestore.json"
+  "config/firestore.indexes.json|firestore.indexes.json"
+  "config/firebase-church.json|firebase-church.json"
+  "config/flockchat-firebase.json|flockchat-firebase.json"
+  "config/flockchat-firestore.indexes.json|flockchat-firestore.indexes.json"
+)
+
 for file in "${ROOT_FILES[@]}"; do
   copy_if_exists "$REPO_ROOT/$file" "$TARGET_DIR/$file"
+done
+
+for mapping in "${CONFIG_FILES[@]}"; do
+  IFS='|' read -r source_path destination_path <<< "$mapping"
+  copy_if_exists "$REPO_ROOT/$source_path" "$TARGET_DIR/$destination_path"
 done
 
 python3 - "$REPO_ROOT/package.json" "$TARGET_DIR/package.json" "$CHURCH_NAME" "$SHORT_NAME" <<'PYEOF'

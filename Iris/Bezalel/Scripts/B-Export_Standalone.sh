@@ -169,12 +169,19 @@ ROOT_FILES=(
   package.json
   package-lock.json
   firebase.json
-  flockchat-firebase.json
   FlockChat.Firestore.Rules
   capacitor.config.ts
   index.html
   LICENSE
   README.md
+)
+CONFIG_FILES=(
+  "config/church-firestore.firebase.json|church-firestore.firebase.json"
+  "config/church-firestore.json|church-firestore.json"
+  "config/firebase-church.json|firebase-church.json"
+  "config/firestore.indexes.json|firestore.indexes.json"
+  "config/flockchat-firebase.json|flockchat-firebase.json"
+  "config/flockchat-firestore.indexes.json|flockchat-firestore.indexes.json"
 )
 for f in "${ROOT_FILES[@]}"; do
   if [ -f "$REPO_ROOT/$f" ]; then
@@ -182,6 +189,16 @@ for f in "${ROOT_FILES[@]}"; do
       echo "    [dry-run] $f"
     else
       cp "$REPO_ROOT/$f" "$EXPORT_DEST/$f"
+    fi
+  fi
+done
+for mapping in "${CONFIG_FILES[@]}"; do
+  IFS='|' read -r source_path destination_path <<< "$mapping"
+  if [ -f "$REPO_ROOT/$source_path" ]; then
+    if $DRY_RUN; then
+      echo "    [dry-run] $destination_path"
+    else
+      cp "$REPO_ROOT/$source_path" "$EXPORT_DEST/$destination_path"
     fi
   fi
 done

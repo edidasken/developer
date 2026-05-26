@@ -1449,7 +1449,7 @@ if ! $DRY_RUN; then
   # Church Rules → truth, trinity, theforest, notify
   CHURCH_RULES="$WORKSPACE/church.firestore.rules"
   FLOCKCHAT_RULES="$WORKSPACE/FlockChat.Firestore.Rules"
-  CHURCH_CONFIG="$WORKSPACE/firebase-church.json"
+  CHURCH_CONFIG="$WORKSPACE/config/firebase-church.json"
 
   if [ -f "$CHURCH_RULES" ] && [ -f "$CHURCH_CONFIG" ]; then
     echo "Deploying comprehensive church rules…"
@@ -1459,7 +1459,7 @@ if ! $DRY_RUN; then
     done
     echo "  ✓ Church rules deployed"
   else
-    echo "  ⚠  church.firestore.rules or firebase-church.json not found — skipping church deployments"
+    echo "  ⚠  church.firestore.rules or config/firebase-church.json not found — skipping church deployments"
   fi
 
   echo ""

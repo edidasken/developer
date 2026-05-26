@@ -619,9 +619,9 @@ if $DEPLOY_COMMS; then
   # ── Deploy Firestore indexes to each church project ───────────────────
   echo ""
   echo "Deploying Firestore indexes to church projects…"
-  INDEXES_FILE="$WORKSPACE_ROOT/firestore.indexes.json"
+  INDEXES_FILE="$WORKSPACE_ROOT/config/firestore.indexes.json"
   if [ ! -f "$INDEXES_FILE" ]; then
-    echo "  ✗ MISSING: firestore.indexes.json — skipping index deploy"
+    echo "  ✗ MISSING: config/firestore.indexes.json — skipping index deploy"
   else
     # Collect project IDs from ChurchRegistry (firebaseProjectId field, skip if absent = GAS)
     INDEX_PROJECTS=()
@@ -654,7 +654,7 @@ if $DEPLOY_COMMS; then
   echo ""
   echo "Deploying Firestore rules to church projects…"
   _RULES_FILE="$WORKSPACE_ROOT/Architechtural Docs/New Covenant/Deployment/Firestore/firestore.rules"
-  _CHURCH_CFG="$WORKSPACE_ROOT/church-firestore.json"
+  _CHURCH_CFG="$WORKSPACE_ROOT/config/church-firestore.json"
   if [ ! -f "$_RULES_FILE" ]; then
     echo "  ✗ MISSING: Deployment/Firestore/firestore.rules — skipping rules deploy"
   else
@@ -672,12 +672,12 @@ if $DEPLOY_COMMS; then
     else
       for _proj in "${RULES_PROJECTS[@]}"; do
         if $DRY_RUN; then
-          echo "  [dry-run] Would run: firebase deploy --only firestore:rules --config church-firestore.json --project $_proj"
+          echo "  [dry-run] Would run: firebase deploy --only firestore:rules --config config/church-firestore.json --project $_proj"
         else
           echo "  → Deploying rules to ${_proj}…"
           (
             cd "$WORKSPACE_ROOT"
-            firebase deploy --only firestore:rules --config church-firestore.json --project "$_proj" 2>&1
+            firebase deploy --only firestore:rules --config config/church-firestore.json --project "$_proj" 2>&1
           ) && echo "  ✓ Rules deployed to $_proj" || echo "  ✗ Rules deploy failed for $_proj (check firebase CLI auth)"
         fi
       done
