@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # ======================================================================
-# B-Snapshot_Storehouse.sh — Snapshot the entire repo into the Storehouse.
+# B-Snapshot_Storehouse.sh — Snapshot Desktop Deployments into the Storehouse.
 #
 # Creates a timestamped, browsable copy at:
 #   /Users/greg.granger/Library/CloudStorage/GoogleDrive-flockos.notify@gmail.com/My Drive/Developer/Storehouse/DD-MM-YYYY (hh_mm_ss)
 #
-# The snapshot includes the full repository tree as-is.
+# The snapshot includes the full /Users/greg.granger/Desktop/Deployments tree as-is.
 #
 # Usage:
 #   bash Iris/Bezalel/Scripts/B-Snapshot_Storehouse.sh
@@ -15,7 +15,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+DEPLOYMENTS_ROOT="/Users/greg.granger/Desktop/Deployments"
 STOREHOUSE="/Users/greg.granger/Library/CloudStorage/GoogleDrive-flockos.notify@gmail.com/My Drive/Developer/Storehouse"
 
 DRY_RUN=false
@@ -47,7 +47,7 @@ while [[ -e "$DEST" ]]; do
   DEST="$STOREHOUSE/$TS"
 done
 
-echo "Snapshot source : $REPO_ROOT"
+echo "Snapshot source : $DEPLOYMENTS_ROOT"
 echo "Snapshot dest   : $DEST"
 if $DRY_RUN; then
   echo "(dry-run — no files will be copied)"
@@ -58,7 +58,7 @@ if $DRY_RUN; then
   RSYNC_FLAGS+=(--dry-run --stats)
 fi
 
-rsync "${RSYNC_FLAGS[@]}" "$REPO_ROOT/" "$DEST/"
+rsync "${RSYNC_FLAGS[@]}" "$DEPLOYMENTS_ROOT/" "$DEST/"
 
 if $DRY_RUN; then
   echo "Dry-run complete."
@@ -68,7 +68,7 @@ fi
 {
   echo "Snapshot:  $(basename "$DEST")"
   echo "Created:   $(date '+%Y-%m-%d %H:%M:%S %Z')"
-  echo "Source:    $REPO_ROOT"
+  echo "Source:    $DEPLOYMENTS_ROOT"
   echo "Host:      $(hostname)"
   echo "User:      $(id -un)"
   echo "Format:    DD-MM-YYYY (hh_mm_ss)"
