@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="The Flock Herald — Daily devotionals, missions, theology, apologetics, discipleship, and Scripture for the Body of Christ.">
   <title>The Flock Herald — FlockOS Daily</title>
+  <link rel="icon" type="image/png" sizes="512x512" href="../Images/FlockIcon-512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IM+Fell+English:ital@0;1&display=swap">
@@ -811,12 +812,15 @@ const PICK  = window._PICK || {};
   `;
 
   // World Watch — clickable rows open dossier drawer
-  const ranked = missionsRaw.filter(c=>typeof c.persecutionRank==='number'&&c.persecutionRank>0)
-    .sort((a,b)=>a.persecutionRank-b.persecutionRank).slice(0,10);
+  const ranked = missionsRaw
+    .map(c => ({ ...c, _watchRank: Number(c.persecutionRank || c.worldWatchListRank || 0) }))
+    .filter(c => c._watchRank > 0)
+    .sort((a,b) => a._watchRank - b._watchRank)
+    .slice(0,10);
   document.getElementById('fn-watch-content').innerHTML =
     '<ul class="fn-watch-list">' +
     ranked.map(c=>`<li class="fn-watch-item" data-iso="${esc(c.isoCode||'')}" tabindex="0" role="button" aria-label="View dossier for ${esc(c.countryName||'')}">
-      <span class="fn-watch-rank">${c.persecutionRank}.</span>
+      <span class="fn-watch-rank">${c._watchRank}.</span>
       <div>
         <div class="fn-watch-name">${esc(c.icon||'')} ${esc(c.countryName||'')}</div>
         <div class="fn-watch-desc">${esc(c.persecutionTier||c.persecutionLevel||'')}${c.capital?' · '+esc(c.capital):''}</div>
