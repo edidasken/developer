@@ -1,0 +1,35 @@
+---
+name: the_life
+description: Teach and maintain the Herald life teach view and its supporting modules.
+compatibility: Sixth AI
+allowed-tools: read_file, read_batch, list_files, search_files, execute_command
+---
+
+Purpose
+
+Use this skill when you need to work on the Herald teach view located at `../herald/teach/views/the_life/index.ts`.
+
+When to Use
+
+- When the life teach view or its helper modules need review.
+- When you need to trace how life content is assembled.
+- When a task references the life lesson, lesson data, or rendering logic.
+
+Workflow
+
+1. Read `../herald/teach/views/the_life/index.ts`.
+2. Read any sibling helpers or child modules such as `../herald/teach/views/the_life/_helpers.ts`.
+3. Follow imports to any local modules that shape the view output.
+4. Make the smallest change needed and keep the view semantics intact.
+5. Verify that any related content or copy still matches the teach intent.
+
+Guardrails
+
+- Do not edit unrelated teach views.
+- Do not rename the view folder or exported identifiers unless the task explicitly requires it.
+- Preserve the local data shape and formatting conventions used by the view.
+
+Output
+
+- Report the files reviewed and the helper modules consulted.
+- Summarize any edits made to the view or its supporting modules.

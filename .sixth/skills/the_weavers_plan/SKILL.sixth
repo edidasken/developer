@@ -1,0 +1,37 @@
+---
+name: the_weavers_plan
+description: Engine-first skill for the The Weavers Plan teach view.
+compatibility: Sixth AI
+allowed-tools:
+  - read_file
+  - read_batch
+  - list_files
+  - search_files
+  - execute_command
+---
+
+## Purpose
+Use this skill to turn the `../herald/teach/views/the_weavers_plan/index.ts` view into a clear, engine-first catalog entry. Keep the view code and any sibling helper modules as the source of truth.
+
+## When to Use
+- Cataloging or reviewing the The Weavers Plan teach view.
+- Explaining how the view data flow, exports, and helpers fit the Herald teaching model.
+- Preparing guidance that should stay aligned with the code rather than inventing new behavior.
+
+## Workflow
+1. Read `../herald/teach/views/the_weavers_plan/index.ts`.
+2. Inspect any sibling helper files in the same folder, such as `_helpers.ts`, if they exist.
+3. Follow the component, data, and metadata flow exactly as implemented.
+4. Summarize the view in engine-first terms: inputs, transforms, outputs, and dependencies.
+5. Keep the skill output concise and tied to the actual files.
+
+## Guardrails
+- Do not invent view behavior that is not present in the code.
+- Prefer the view module and sibling helpers over assumptions or prose.
+- Keep guidance focused on cataloging and teaching, not on unrelated Herald features.
+- Preserve existing naming, exported symbols, and file relationships.
+
+## Output
+- Reference `../herald/teach/views/the_weavers_plan/index.ts` as the primary source.
+- Include any sibling helper modules from the same folder when they exist.
+- Produce a short, structured, engine-first explanation suitable for the skill catalog.

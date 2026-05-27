@@ -1,0 +1,39 @@
+---
+name: the_pentecost
+description: Maintain the Herald The Pentecost teach view in `../herald/teach/views/the_pentecost/index.ts`.
+compatibility: sixth
+allowed-tools:
+  - read_file
+  - list_files
+  - search_files
+  - replace_in_file
+  - execute_command
+---
+
+# Purpose
+Use this skill when editing or reviewing the Herald The Pentecost teach view. The source of truth lives in `../herald/teach/views/the_pentecost/index.ts`, with any sibling helper modules in the same folder.
+
+# When to Use
+- The user asks to update the Pentecost route or its teaching copy.
+- You need to inspect the feast-day content, copy, or behavior for the page.
+- The route’s helper modules need to remain in sync with the main view.
+
+# Workflow
+1. Read `../herald/teach/views/the_pentecost/index.ts` and any sibling helper files before making changes.
+2. Preserve the existing Herald tone, structure, and exported names.
+3. Make the smallest change that satisfies the requested update.
+4. Keep helper modules and the main view aligned when route logic depends on them.
+5. Verify the route still matches the expectations of the calling code.
+6. Summarize the exact files changed and what was updated.
+
+# Guardrails
+- Do not modify unrelated teach views or skill folders.
+- Do not change route names, exports, or data contracts unless the caller requires it.
+- Avoid broad rewrites when a targeted edit will do.
+- Leave unrelated helper files alone.
+- Keep wording clear, reverent, and consistent with existing Herald patterns.
+
+# Output
+- Updated `../herald/teach/views/the_pentecost/index.ts`
+- Updated any sibling helper modules used by the same route
+- A concise summary of the change
