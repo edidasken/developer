@@ -12,8 +12,13 @@ Thumbs.db
 .idea/
 
 # ── SSH / local key material ─────────────────────────────────────────────
+.ssh/
 SSH/
 SSH/Git/id_ed25519_herald_20260524_084750
+
+# ── Local agent / tooling workspaces ─────────────────────────────────────
+.sixth/
+.agents/
 
 # ── Backup / temp files ──────────────────────────────────────────────────
 *.bak
