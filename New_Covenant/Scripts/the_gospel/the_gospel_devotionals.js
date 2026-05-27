@@ -27,7 +27,7 @@ function _dayOfYear(iso) {
   try {
     const d = new Date(iso + 'T12:00:00');
     const start = new Date(d.getFullYear(), 0, 1);
-    return Math.floor((d - start) / 86400000) + 1;
+    return Math.floor((d.getTime() - start.getTime()) / 86400000) + 1;
   } catch { return 0; }
 }
 
@@ -179,4 +179,3 @@ function _feedCard(d) {
     </div>
   `;
 }
-

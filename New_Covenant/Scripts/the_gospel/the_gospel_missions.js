@@ -16,7 +16,7 @@ let _state = { nations: [], query: '', filter: 'all', openId: null };
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 function _dayOfYear() {
   const now = new Date();
-  return Math.floor((now - new Date(now.getFullYear(), 0, 1)) / 86400000);
+  return Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / 86400000);
 }
 
 function _accessClass(level) {
@@ -306,7 +306,7 @@ function _prayCount(id) {
 }
 function _prayBump(id) {
   const n = _prayCount(id) + 1;
-  localStorage.setItem(`pray_${id}`, n);
+  localStorage.setItem(`pray_${id}`, String(n));
   return n;
 }
 
@@ -339,5 +339,3 @@ function _wireControls(view) {
     btn.classList.add('prayed');
   });
 }
-
-

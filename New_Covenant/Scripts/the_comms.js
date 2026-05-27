@@ -42,7 +42,11 @@ import * as life    from './the_life/index.js';
 // hosting URL until that's wired so the iframe doesn't time out on DNS.
 const FLOCKCHAT_BASE = 'https://flockos-comms.web.app/';
 
-function _flockchatUrl({ church, conversationId, channel, dm, source, return: returnTo } = {}) {
+/**
+ * @param {{ church?: string, conversationId?: string, channel?: string, dm?: string, source?: string, return?: string }} [opts]
+ */
+function _flockchatUrl(opts = {}) {
+  const { church, conversationId, channel, dm, source, return: returnTo } = opts;
   const cid = church || (upper.tenant && upper.tenant.churchId && upper.tenant.churchId());
   const u = new URL(FLOCKCHAT_BASE);
   if (cid)            u.searchParams.set('church', cid);

@@ -13,6 +13,9 @@
 const TheLife = (() => {
   'use strict';
 
+  var TheVine = typeof window !== 'undefined' ? window['TheVine'] : undefined;
+  var UpperRoom = typeof window !== 'undefined' ? window['UpperRoom'] : undefined;
+
   // ── Borrow helpers from Modules / global scope ──────────────────────────
   // These are all defined inside the_tabernacle.js IIFE but exposed via Modules.*
   // We reference the low-level ones via the parent scope (they share the same IIFE
@@ -130,12 +133,14 @@ const TheLife = (() => {
   }
   function _callPhone(phone) {
     if (!phone) return;
-    if (typeof Trumpet !== 'undefined') { Trumpet.call(phone); }
+    var trumpet = window.Trumpet;
+    if (trumpet && typeof trumpet.call === 'function') { trumpet.call(phone); }
     else { window.open('tel:' + encodeURIComponent(phone.replace(/[^\d+]/g, ''))); }
   }
   function _smsPhone(phone, body) {
     if (!phone) return;
-    if (typeof Trumpet !== 'undefined') { Trumpet.sms(phone, body); }
+    var trumpet = window.Trumpet;
+    if (trumpet && typeof trumpet.sms === 'function') { trumpet.sms(phone, body); }
     else { window.open('sms:' + encodeURIComponent(phone.replace(/[^\d+]/g, '')) + (body ? '?body=' + encodeURIComponent(body) : '')); }
   }
 
