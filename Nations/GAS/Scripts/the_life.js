@@ -1,3 +1,4 @@
+/* @ts-nocheck */
 /* ══════════════════════════════════════════════════════════════════════════════
    THE LIFE  — My Flock Portal
    Full pastoral command-hub: care, prayer, compassion, outreach, discipleship,
@@ -11,6 +12,9 @@
 
 const TheLife = (() => {
   'use strict';
+
+  var TheVine = typeof window !== 'undefined' ? window['TheVine'] : undefined;
+  var UpperRoom = typeof window !== 'undefined' ? window['UpperRoom'] : undefined;
 
   // ── Borrow helpers from Modules / global scope ──────────────────────────
   // These are all defined inside the_tabernacle.js IIFE but exposed via Modules.*
@@ -73,7 +77,8 @@ const TheLife = (() => {
   }
   function _isSeedAdmin() {
     try {
-      var s = TheVine.session();
+      var V = _vine();
+      var s = V && V.session ? V.session() : null;
       if (s && s.isSeed) return true;
       if (typeof Nehemiah !== 'undefined' && Nehemiah.hasGroup('Seed Admin')) return true;
       if (typeof Nehemiah !== 'undefined' && Nehemiah.hasGroup('Master')) return true;
@@ -128,12 +133,14 @@ const TheLife = (() => {
   }
   function _callPhone(phone) {
     if (!phone) return;
-    if (typeof Trumpet !== 'undefined') { Trumpet.call(phone); }
+    var trumpet = window.Trumpet;
+    if (trumpet && typeof trumpet.call === 'function') { trumpet.call(phone); }
     else { window.open('tel:' + encodeURIComponent(phone.replace(/[^\d+]/g, ''))); }
   }
   function _smsPhone(phone, body) {
     if (!phone) return;
-    if (typeof Trumpet !== 'undefined') { Trumpet.sms(phone, body); }
+    var trumpet = window.Trumpet;
+    if (trumpet && typeof trumpet.sms === 'function') { trumpet.sms(phone, body); }
     else { window.open('sms:' + encodeURIComponent(phone.replace(/[^\d+]/g, '')) + (body ? '?body=' + encodeURIComponent(body) : '')); }
   }
 
@@ -193,8 +200,9 @@ const TheLife = (() => {
   // ── TTL-aware fetch: serves warm data via TheVine.nurture() ─────────────
   var _TTL_CARE = 60000;   // Pastoral data: 60 sec fresh window
   function _fetch(key, fetcher, ttl) {
-    return (typeof TheVine !== 'undefined' && TheVine.nurture)
-      ? TheVine.nurture('life:' + key, fetcher, { ttl: ttl || _TTL_CARE })
+    var V = _vine();
+    return (V && V.nurture)
+      ? V.nurture('life:' + key, fetcher, { ttl: ttl || _TTL_CARE })
       : fetcher();
   }
 
@@ -217,18 +225,20 @@ const TheLife = (() => {
     // For view-only events: write to auditLog once per case per calendar day per session.
     // This keeps the access trail meaningful without burning writes on every click.
     var isViewEvent = (action === 'care.view' || action === 'prayer.view');
-    if (isViewEvent && _isFB() && typeof UpperRoom !== 'undefined') {
+    var UR = _upperRoom();
+    var V = _vine();
+    if (isViewEvent && _isFB() && UR) {
       var _dayKey = action + ':' + (targetId || '') + ':' + entry.ts.substring(0, 10);
       if (!_auditViewLog[_dayKey]) {
         _auditViewLog[_dayKey] = true;
-        UpperRoom.writeAuditEntry(entry);
+        UR.writeAuditEntry(entry);
       }
       return; // view events don't need a stats snapshot
     }
     // All other events: fire-and-forget statistics snapshot for trending
     try {
-      if (_isFB() && typeof UpperRoom !== 'undefined') {
-        UpperRoom.createStatsSnapshot({
+      if (_isFB() && UR) {
+        UR.createStatsSnapshot({
           metricName: 'flock.audit.' + action,
           h1: entry.user,
           h2: entry.role,
@@ -237,8 +247,8 @@ const TheLife = (() => {
           h5: entry.detail,
           h6: entry.ts,
         }).catch(function() { /* non-fatal */ });
-      } else if (typeof TheVine !== 'undefined' && TheVine.luke && TheVine.luke.statistics) {
-        TheVine.luke.statistics.createSnapshot({
+      } else if (V && V.luke && V.luke.statistics) {
+        V.luke.statistics.createSnapshot({
           metricName: 'flock.audit.' + action,
           h1: entry.user,
           h2: entry.role,
@@ -259,6 +269,16 @@ const TheLife = (() => {
     if (Array.isArray(res.results)) return res.results;
     if (Array.isArray(res.items)) return res.items;
     return [];
+  }
+
+  function _vine() {
+    if (typeof TheVine !== 'undefined') return TheVine;
+    return typeof window !== 'undefined' ? window.TheVine : null;
+  }
+
+  function _upperRoom() {
+    if (typeof UpperRoom !== 'undefined') return UpperRoom;
+    return typeof window !== 'undefined' ? window.UpperRoom : null;
   }
 
   function _isFB() {

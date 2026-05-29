@@ -716,7 +716,7 @@ const TheVine = (() => {
 
   /**
    * Check if user is currently logged in.
-   * @returns {{ token:string, email:string, role:string }|null}
+   * @returns {FlockSession|null}
    */
   function session() {
     return _getSession();

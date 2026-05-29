@@ -99,8 +99,15 @@ export function timeAgo(ts) {
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
+/**
+ * @typedef {Object} GrowEmptyStateOptions
+ * @property {string} [icon]
+ * @property {string} [title]
+ * @property {string} [body]
+ * @property {string} [action]
+ */
 /** Empty state — a polished placeholder used by every grow-module. */
-export function emptyState({ icon, title, body, action } = {}) {
+export function emptyState({ icon, title, body, action } = /** @type {GrowEmptyStateOptions} */ ({})) {
   return /* html */`
     <div class="grow-empty">
       ${icon ? `<div class="grow-empty-icon" aria-hidden="true">${icon}</div>` : ''}
@@ -154,6 +161,16 @@ export function sectionHead(title, action) {
 /* ── ASK FOR HELP → PRAYER REQUEST ─────────────────────────────────────────
    Generates a prayer request from a learning-hub module summary. Wired into
    counseling, heart, mirror, and quiz-results "Ask for help" buttons.   */
+/**
+ * @typedef {Object} AskForHelpOptions
+ * @property {string} [summary]
+ * @property {string} [category]
+ * @property {string} [source]
+ * @property {boolean} [confidential]
+ */
+/**
+ * @param {AskForHelpOptions} [options]
+ */
 export async function askForHelp({ summary, category = 'Discipleship', source = 'Grow', confidential = true } = {}) {
   const U = ur();
   const sess = session();
@@ -196,8 +213,8 @@ export function helpButton({ label = 'Ask for help', dataAttr = 'help' } = {}) {
 
 /** Wire the helpButton inside `root` to call askForHelp() with `summaryFn()`. */
 export function wireHelp(root, summaryFn, opts = {}) {
-  const btn  = root.querySelector('[data-help-btn]');
-  const stat = root.querySelector('[data-help-status]');
+  const btn  = /** @type {HTMLButtonElement|null} */ (root.querySelector('[data-help-btn]'));
+  const stat = /** @type {HTMLElement|null} */ (root.querySelector('[data-help-status]'));
   if (!btn || !stat) return;
   /* Store summaryFn so the public prayer hook in grow_public.js can read it */
   btn._prayerSummaryFn = summaryFn;

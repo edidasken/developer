@@ -447,8 +447,8 @@ textarea.gp-prayer-input { resize:vertical; min-height:100px; font-size:.85rem; 
 document.head.appendChild(_outreachStyle);
 
 /** Open the public outreach / prayer-request modal.
- * @param {string} prefillSummary  — pre-filled message text
- * @param {{name:string,title:string}} [ctx] — module context (where button was pressed)
+ * @param {string} prefillSummary  - pre-filled message text
+ * @param {{name:string,title:string}} [ctx] - module context (where button was pressed)
  */
 function _openOutreachModal(prefillSummary, ctx) {
   document.getElementById('gp-prayer-overlay')?.remove();
@@ -589,7 +589,7 @@ function _openOutreachModal(prefillSummary, ctx) {
     if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
 
     try {
-      await _submitOutreachContact({ firstName: fn, lastName: ln, email, phone, requestType: type, urgency, message: msg, context: _ctxNote });
+      await _submitOutreachContact({ firstName: fn, lastName: ln, email, phone, requestType: type, urgency, message: msg, context: _ctxLabel });
       const card = document.getElementById('gp-pr-card');
       if (card) card.innerHTML = _renderSuccess(fn);
       document.getElementById('gp-pr-done')?.addEventListener('click', _close);
@@ -659,7 +659,7 @@ function _gatherDiagnosticSummary(root, ctx) {
  * Install a capture-phase listener on `root` that intercepts any
  * [data-help-btn] click and opens the public outreach modal.
  * @param {Element} root
- * @param {{name:string,title:string}} [ctx] — module context
+ * @param {{name:string,title:string}} [ctx] - module context
  */
 function _installPrayerHook(root, ctx) {
   root.addEventListener('click', (e) => {
@@ -669,8 +669,9 @@ function _installPrayerHook(root, ctx) {
     e.preventDefault();
     /* Prefer the module's own summaryFn (stored by wireHelp) over DOM scraping */
     let summary = '';
-    if (typeof btn._prayerSummaryFn === 'function') {
-      try { const r = btn._prayerSummaryFn(); summary = (r instanceof Promise) ? '' : (r || ''); } catch (_) {}
+    const prayerBtn = /** @type {HTMLElement & { _prayerSummaryFn?: () => (string|Promise<string>) }} */ (btn);
+    if (typeof prayerBtn._prayerSummaryFn === 'function') {
+      try { const r = prayerBtn._prayerSummaryFn(); summary = (r instanceof Promise) ? '' : (r || ''); } catch (_) {}
     }
     if (!summary) summary = _gatherDiagnosticSummary(root, ctx);
     _openOutreachModal(summary, ctx);

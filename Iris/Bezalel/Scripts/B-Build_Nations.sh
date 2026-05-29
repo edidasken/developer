@@ -33,28 +33,19 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # Script lives at Covenant/Bezalel/Scripts/ → workspace root is 3 levels up
 WORKSPACE="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 NEW_COVENANT="$WORKSPACE/New_Covenant"
-# Build to the standalone sibling repos outside this workspace by default.
-# Override with SIBLING_REPOS_ROOT if your repo clones live elsewhere.
-SIBLING_REPOS_ROOT="${SIBLING_REPOS_ROOT:-$WORKSPACE/..}"
-SIBLING_REPOS_ROOT="$(python3 -c "import os,sys; print(os.path.abspath(sys.argv[1]))" "$SIBLING_REPOS_ROOT")"
-case "$SIBLING_REPOS_ROOT" in
-  "$WORKSPACE"|"$WORKSPACE"/*)
-    echo "ERROR: SIBLING_REPOS_ROOT must point outside this workspace to the standalone sibling repos."
-    echo "       Current value: $SIBLING_REPOS_ROOT"
-    exit 1
-    ;;
-esac
-NATIONS_DIR="$SIBLING_REPOS_ROOT"
+# Build directly into the in-repo Nations/ output directory.
+NATIONS_DIR="$WORKSPACE/Nations"
 CONFIGS_DIR="$WORKSPACE/Architechtural Docs/New Covenant As Built/Church Registry"
 
 BUILT_TARGETS=()
 
 resolve_nation_repo() {
   case "$1" in
-    FlockOS|Root) echo "$NATIONS_DIR/flockos" ;;
-    TBC) echo "$NATIONS_DIR/trinity" ;;
-    TheForest) echo "$NATIONS_DIR/theforest" ;;
-    GAS) echo "$NATIONS_DIR/offline" ;;
+    FlockOS) echo "$NATIONS_DIR/FlockOS" ;;
+    Root) echo "$NATIONS_DIR/Root" ;;
+    TBC) echo "$NATIONS_DIR/TBC" ;;
+    TheForest) echo "$NATIONS_DIR/TheForest" ;;
+    GAS) echo "$NATIONS_DIR/GAS" ;;
     *) return 1 ;;
   esac
 }
@@ -1506,12 +1497,18 @@ if ! $DRY_RUN; then
   echo "══════════════════════════════════════════════"
   echo "Pushing church Nation repos…"
   echo ""
+  PUSHED_ANY=false
   for TARGET in "${BUILT_TARGETS[@]}"; do
     REPO_NAME="$(basename "$TARGET")"
     echo "  → ${REPO_NAME}"
-    git -C "$TARGET" push -u origin main
+    if [ -d "$TARGET/.git" ]; then
+      git -C "$TARGET" push -u origin main
+      PUSHED_ANY=true
+    else
+      echo "  ⚠ skipping push for $REPO_NAME — not a git repository"
+    fi
   done
-  echo "  ✓ Church Nation repos pushed"
+  $PUSHED_ANY && echo "  ✓ Church Nation repos pushed" || echo "  ⚠ no git repos were available to push"
   echo ""
 fi
 

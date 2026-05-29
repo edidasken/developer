@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="The Flock Herald — Daily devotionals, missions, theology, apologetics, discipleship, and Scripture for the Body of Christ.">
   <title>The Flock Herald — FlockOS Daily</title>
+  <link rel="icon" type="image/png" sizes="512x512" href="../Images/FlockIcon-512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IM+Fell+English:ital@0;1&display=swap">
@@ -57,7 +58,7 @@
         <span class="fn-sw-icon" style="color:#e8a838"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
         <span class="fn-sw-text"><span class="fn-sw-name">FEED</span><span class="fn-sw-hint">Sermon Workspace</span></span>
       </a>
-      <a class="fn-sw-item" href="../../flockchat-public/FlockChat.html" role="menuitem">
+      <a class="fn-sw-item" href="../../legacy/apps/FlockChat/FlockChat.html" role="menuitem">
         <span class="fn-sw-icon" style="color:#06b6d4"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
         <span class="fn-sw-text"><span class="fn-sw-name">FlockChat</span><span class="fn-sw-hint">Church Messaging</span></span>
       </a>
@@ -811,12 +812,15 @@ const PICK  = window._PICK || {};
   `;
 
   // World Watch — clickable rows open dossier drawer
-  const ranked = missionsRaw.filter(c=>typeof c.persecutionRank==='number'&&c.persecutionRank>0)
-    .sort((a,b)=>a.persecutionRank-b.persecutionRank).slice(0,10);
+  const ranked = missionsRaw
+    .map(c => ({ ...c, _watchRank: Number(c.persecutionRank || c.worldWatchListRank || 0) }))
+    .filter(c => c._watchRank > 0)
+    .sort((a,b) => a._watchRank - b._watchRank)
+    .slice(0,10);
   document.getElementById('fn-watch-content').innerHTML =
     '<ul class="fn-watch-list">' +
     ranked.map(c=>`<li class="fn-watch-item" data-iso="${esc(c.isoCode||'')}" tabindex="0" role="button" aria-label="View dossier for ${esc(c.countryName||'')}">
-      <span class="fn-watch-rank">${c.persecutionRank}.</span>
+      <span class="fn-watch-rank">${c._watchRank}.</span>
       <div>
         <div class="fn-watch-name">${esc(c.icon||'')} ${esc(c.countryName||'')}</div>
         <div class="fn-watch-desc">${esc(c.persecutionTier||c.persecutionLevel||'')}${c.capital?' · '+esc(c.capital):''}</div>
@@ -1232,7 +1236,7 @@ var SUITE_APPS = {
     full: 'FlockChat — Church Messaging',
     sub: 'Church Messaging',
     color: '#06b6d4',
-    href: '../../flockchat-public/FlockChat.html',
+    href: '../../legacy/apps/FlockChat/FlockChat.html',
     svg: '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
     what: 'FlockChat is a secure, real-time church messaging platform — channels for ministry teams, rooms for small groups, direct messages for pastoral care, and prayer chains for the whole body. Every conversation stays within the church\'s own account.',
     keyFeatures: ['Ministry team channels', 'Small group rooms', 'Direct messages and prayer chains', 'Church-scoped accounts — no public exposure'],

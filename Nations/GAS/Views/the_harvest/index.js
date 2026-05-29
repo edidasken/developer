@@ -85,7 +85,7 @@ export function mount(root) {
 }
 
 async function _loadHarvest(root) {
-  const V   = window.TheVine;
+  const V   = window["TheVine"];
   const MXP = buildAdapter('missions.partners', V);
   const MXR = buildAdapter('missions.registry', V);
   const MXE = buildAdapter('flock.events', V);
@@ -396,33 +396,73 @@ function _openOutreachSheet(ev, onReload) {
 
   document.body.appendChild(sheet);
   _activeHarvestSheet = sheet;
+
+  /** @type {HTMLElement | null} */
+  const overlayEl = sheet.querySelector('.life-sheet-overlay');
+  /** @type {HTMLElement | null} */
+  const panelEl = sheet.querySelector('.life-sheet-panel');
+  /** @type {HTMLButtonElement | null} */
+  const cancelBtn = sheet.querySelector('[data-cancel]');
+  /** @type {HTMLButtonElement | null} */
+  const closeBtn = sheet.querySelector('.life-sheet-close');
+  /** @type {HTMLElement | null} */
+  const errEl = sheet.querySelector('[data-error]');
+  /** @type {HTMLInputElement | null} */
+  const titleInput = sheet.querySelector('[data-field="title"]');
+  /** @type {HTMLButtonElement | null} */
+  const saveBtn = sheet.querySelector('[data-save]');
+  /** @type {HTMLInputElement | null} */
+  const teamSizeInput = sheet.querySelector('[data-field="teamSize"]');
+  /** @type {HTMLInputElement | null} */
+  const dateInput = sheet.querySelector('[data-field="startDate"]');
+  /** @type {HTMLInputElement | null} */
+  const locationInput = sheet.querySelector('[data-field="location"]');
+  /** @type {HTMLSelectElement | null} */
+  const statusInput = sheet.querySelector('[data-field="status"]');
+  /** @type {HTMLTextAreaElement | null} */
+  const descriptionInput = sheet.querySelector('[data-field="description"]');
+  /** @type {HTMLButtonElement | null} */
+  const deleteBtn = sheet.querySelector('[data-delete]');
+
   requestAnimationFrame(() => {
-    sheet.querySelector('.life-sheet-overlay').classList.add('is-open');
-    sheet.querySelector('.life-sheet-panel').classList.add('is-open');
-    if (isNew) sheet.querySelector('[data-field="title"]')?.focus();
+    overlayEl?.classList.add('is-open');
+    panelEl?.classList.add('is-open');
+    if (isNew) titleInput?.focus();
   });
 
   const close = () => _closeHarvestSheet();
-  sheet.querySelector('[data-cancel]').addEventListener('click', close);
-  sheet.querySelector('.life-sheet-close').addEventListener('click', close);
+  cancelBtn?.addEventListener('click', close);
+  closeBtn?.addEventListener('click', close);
 
-  sheet.querySelector('[data-save]').addEventListener('click', async () => {
-    const errEl    = sheet.querySelector('[data-error]');
-    const titleVal = sheet.querySelector('[data-field="title"]').value.trim();
-    if (!titleVal) { errEl.textContent = 'Title is required.'; errEl.style.display = ''; return; }
-    if (!V) { errEl.textContent = 'Harvest backend not loaded.'; errEl.style.display = ''; return; }
-    errEl.style.display = 'none';
-    const btn = sheet.querySelector('[data-save]');
-    btn.disabled = true; btn.textContent = isNew ? 'Creating…' : 'Saving…';
-    const teamVal = parseFloat(sheet.querySelector('[data-field="teamSize"]').value);
+  saveBtn?.addEventListener('click', async () => {
+    const titleVal = titleInput?.value.trim() || '';
+    if (!titleVal) {
+      if (errEl) {
+        errEl.textContent = 'Title is required.';
+        errEl.style.display = '';
+      }
+      return;
+    }
+    if (!V) {
+      if (errEl) {
+        errEl.textContent = 'Harvest backend not loaded.';
+        errEl.style.display = '';
+      }
+      return;
+    }
+    if (errEl) errEl.style.display = 'none';
+    saveBtn.disabled = true;
+    saveBtn.textContent = isNew ? 'Creating…' : 'Saving…';
+
+    const teamVal = parseFloat(teamSizeInput?.value || '');
     const payload = {
-      title:    titleVal,
-      type:     'Outreach',
-      startDate: sheet.querySelector('[data-field="startDate"]').value || undefined,
-      location:  sheet.querySelector('[data-field="location"]').value.trim() || undefined,
-      teamSize:  isNaN(teamVal) ? undefined : teamVal,
-      status:    sheet.querySelector('[data-field="status"]').value,
-      description: sheet.querySelector('[data-field="description"]').value.trim() || undefined,
+      title: titleVal,
+      type: 'Outreach',
+      startDate: dateInput?.value || undefined,
+      location: locationInput?.value.trim() || undefined,
+      teamSize: isNaN(teamVal) ? undefined : teamVal,
+      status: statusInput?.value || undefined,
+      description: descriptionInput?.value.trim() || undefined,
     };
     Object.keys(payload).forEach(k => { if (payload[k] === undefined) delete payload[k]; });
     if (!isNew) payload.id = uid;
@@ -433,24 +473,28 @@ function _openOutreachSheet(ev, onReload) {
       onReload?.();
     } catch (err) {
       console.error('[TheHarvest] outreach save error:', err);
-      errEl.textContent = err?.message || 'Could not save.';
-      errEl.style.display = '';
-      btn.disabled = false; btn.textContent = isNew ? 'Create Effort' : 'Save Changes';
+      if (errEl) {
+        errEl.textContent = err?.message || 'Could not save.';
+        errEl.style.display = '';
+      }
+      saveBtn.disabled = false;
+      saveBtn.textContent = isNew ? 'Create Effort' : 'Save Changes';
     }
   });
 
-  sheet.querySelector('[data-delete]')?.addEventListener('click', async () => {
+  deleteBtn?.addEventListener('click', async () => {
     const ok = confirm(`Delete "${title}"? This cannot be undone.`);
     if (!ok) return;
-    const btn = sheet.querySelector('[data-delete]');
-    btn.disabled = true; btn.textContent = 'Deleting…';
+    deleteBtn.disabled = true;
+    deleteBtn.textContent = 'Deleting…';
     try {
       await MXE.cancel({ id: uid });
       _closeHarvestSheet();
       onReload?.();
     } catch (err) {
       console.error('[TheHarvest] outreach delete error:', err);
-      btn.disabled = false; btn.textContent = 'Delete Effort';
+      deleteBtn.disabled = false;
+      deleteBtn.textContent = 'Delete Effort';
       alert(err?.message || 'Could not delete outreach effort.');
     }
   });
@@ -460,7 +504,7 @@ const PARTNER_TYPES = ['Sending Agency', 'Field Partner', 'Training Ministry', '
 
 function _openMissionarySheet(m, onReload) {
   _closeHarvestSheet();
-  const V     = window.TheVine;
+  const V     = window["TheVine"];
   const MXP   = buildAdapter('missions.partners', V);
   const isNew = !m;
   const uid   = m?.id ? String(m.id) : '';
@@ -530,33 +574,75 @@ function _openMissionarySheet(m, onReload) {
 
   document.body.appendChild(sheet);
   _activeHarvestSheet = sheet;
+
+  /** @type {HTMLElement | null} */
+  const overlayEl = sheet.querySelector('.life-sheet-overlay');
+  /** @type {HTMLElement | null} */
+  const panelEl = sheet.querySelector('.life-sheet-panel');
+  /** @type {HTMLButtonElement | null} */
+  const cancelBtn = sheet.querySelector('[data-cancel]');
+  /** @type {HTMLButtonElement | null} */
+  const closeBtn = sheet.querySelector('.life-sheet-close');
+  /** @type {HTMLElement | null} */
+  const errEl = sheet.querySelector('[data-error]');
+  /** @type {HTMLInputElement | null} */
+  const nameInput = sheet.querySelector('[data-field="name"]');
+  /** @type {HTMLButtonElement | null} */
+  const saveBtn = sheet.querySelector('[data-save]');
+  /** @type {HTMLInputElement | null} */
+  const goalInput = sheet.querySelector('[data-field="monthlyGoal"]');
+  /** @type {HTMLInputElement | null} */
+  const regionInput = sheet.querySelector('[data-field="region"]');
+  /** @type {HTMLInputElement | null} */
+  const orgInput = sheet.querySelector('[data-field="org"]');
+  /** @type {HTMLSelectElement | null} */
+  const partnerTypeInput = sheet.querySelector('[data-field="partnerType"]');
+  /** @type {HTMLInputElement | null} */
+  const websiteInput = sheet.querySelector('[data-field="website"]');
+  /** @type {HTMLTextAreaElement | null} */
+  const descriptionInput = sheet.querySelector('[data-field="description"]');
+  /** @type {HTMLButtonElement | null} */
+  const deleteBtn = sheet.querySelector('[data-delete]');
+
   requestAnimationFrame(() => {
-    sheet.querySelector('.life-sheet-overlay').classList.add('is-open');
-    sheet.querySelector('.life-sheet-panel').classList.add('is-open');
-    if (isNew) sheet.querySelector('[data-field="name"]')?.focus();
+    overlayEl?.classList.add('is-open');
+    panelEl?.classList.add('is-open');
+    if (isNew) nameInput?.focus();
   });
 
   const close = () => _closeHarvestSheet();
-  sheet.querySelector('[data-cancel]').addEventListener('click', close);
-  sheet.querySelector('.life-sheet-close').addEventListener('click', close);
+  cancelBtn?.addEventListener('click', close);
+  closeBtn?.addEventListener('click', close);
 
-  sheet.querySelector('[data-save]').addEventListener('click', async () => {
-    const errEl   = sheet.querySelector('[data-error]');
-    const nameVal = sheet.querySelector('[data-field="name"]').value.trim();
-    if (!nameVal) { errEl.textContent = 'Name is required.'; errEl.style.display = ''; return; }
-    if (!V) { errEl.textContent = 'Harvest backend not loaded.'; errEl.style.display = ''; return; }
-    errEl.style.display = 'none';
-    const btn = sheet.querySelector('[data-save]');
-    btn.disabled = true; btn.textContent = isNew ? 'Adding…' : 'Saving…';
-    const goalVal = parseFloat(sheet.querySelector('[data-field="monthlyGoal"]').value);
+  saveBtn?.addEventListener('click', async () => {
+    const nameVal = nameInput?.value.trim() || '';
+    if (!nameVal) {
+      if (errEl) {
+        errEl.textContent = 'Name is required.';
+        errEl.style.display = '';
+      }
+      return;
+    }
+    if (!V) {
+      if (errEl) {
+        errEl.textContent = 'Harvest backend not loaded.';
+        errEl.style.display = '';
+      }
+      return;
+    }
+    if (errEl) errEl.style.display = 'none';
+    saveBtn.disabled = true;
+    saveBtn.textContent = isNew ? 'Adding…' : 'Saving…';
+
+    const goalVal = parseFloat(goalInput?.value || '');
     const payload = {
       organizationName: nameVal,
-      region:      sheet.querySelector('[data-field="region"]').value.trim() || undefined,
-      organization: sheet.querySelector('[data-field="org"]').value.trim() || undefined,
-      partnerType: sheet.querySelector('[data-field="partnerType"]').value || undefined,
+      region: regionInput?.value.trim() || undefined,
+      organization: orgInput?.value.trim() || undefined,
+      partnerType: partnerTypeInput?.value || undefined,
       monthlyGoal: isNaN(goalVal) ? undefined : goalVal,
-      website:     sheet.querySelector('[data-field="website"]').value.trim() || undefined,
-      description: sheet.querySelector('[data-field="description"]').value.trim() || undefined,
+      website: websiteInput?.value.trim() || undefined,
+      description: descriptionInput?.value.trim() || undefined,
     };
     Object.keys(payload).forEach(k => { if (payload[k] === undefined) delete payload[k]; });
     if (!isNew) payload.id = uid;
@@ -567,24 +653,28 @@ function _openMissionarySheet(m, onReload) {
       onReload?.();
     } catch (err) {
       console.error('[TheHarvest] missionary save error:', err);
-      errEl.textContent = err?.message || 'Could not save.';
-      errEl.style.display = '';
-      btn.disabled = false; btn.textContent = isNew ? 'Add Partner' : 'Save Changes';
+      if (errEl) {
+        errEl.textContent = err?.message || 'Could not save.';
+        errEl.style.display = '';
+      }
+      saveBtn.disabled = false;
+      saveBtn.textContent = isNew ? 'Add Partner' : 'Save Changes';
     }
   });
 
-  sheet.querySelector('[data-delete]')?.addEventListener('click', async () => {
+  deleteBtn?.addEventListener('click', async () => {
     const ok = confirm(`Remove "${name}" from missionary support? This cannot be undone.`);
     if (!ok) return;
-    const btn = sheet.querySelector('[data-delete]');
-    btn.disabled = true; btn.textContent = 'Removing…';
+    deleteBtn.disabled = true;
+    deleteBtn.textContent = 'Removing…';
     try {
       await MXP.update({ id: uid, status: 'Deleted' });
       _closeHarvestSheet();
       onReload?.();
     } catch (err) {
       console.error('[TheHarvest] missionary delete error:', err);
-      btn.disabled = false; btn.textContent = 'Remove Partner';
+      deleteBtn.disabled = false;
+      deleteBtn.textContent = 'Remove Partner';
       alert(err?.message || 'Could not remove missionary partner.');
     }
   });

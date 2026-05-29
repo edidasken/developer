@@ -826,8 +826,13 @@
   // ── Module render (registered with Modules via _def) ──────────────────────
 
   export async function render(el, session) {
-    var s = session || (typeof TheVine !== 'undefined' ? TheVine.session() : null);
-    var allowed = s && (TheVine.hasRole('admin') || TheVine.hasRole('pastor') || (typeof Nehemiah !== 'undefined' && Nehemiah.hasGroup('Master')));
+    var s = session || (typeof TheVine !== 'undefined' && typeof TheVine.session === 'function' ? TheVine.session() : null);
+    var allowed = !!s && (
+      s.role === 'admin' ||
+      s.role === 'superadmin' ||
+      (s.roleLevel != null && s.roleLevel >= 2) ||
+      (typeof Nehemiah !== 'undefined' && (Nehemiah.hasGroup('Master') || Nehemiah.hasGroup('Seed Admin') || Nehemiah.hasGroup('Lead Pastor')))
+    );
     if (!allowed) {
       el.innerHTML = '<div style="text-align:center;padding:80px 20px;">'
         + '<div style="font-size:3rem;margin-bottom:12px;">&#128274;</div>'

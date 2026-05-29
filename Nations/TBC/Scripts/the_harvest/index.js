@@ -46,6 +46,16 @@
     return '<span class="badge badge-' + (cls || 'info') + '">' + _e(text) + '</span>';
   }
 
+  function _actionBtn(label, onclick) {
+    return '<button onclick="' + _e(onclick) + '" '
+         + 'style="padding:7px 16px;border:1px solid var(--line);border-radius:6px;'
+         + 'background:var(--bg-raised);color:var(--accent);font-size:0.8rem;'
+         + 'cursor:pointer;font-family:inherit;transition:all 0.15s;"'
+         + ' onmouseover="this.style.background=\'var(--accent)\';this.style.color=\'var(--ink-inverse)\'"'
+         + ' onmouseout="this.style.background=\'var(--bg-raised)\';this.style.color=\'var(--accent)\'"'
+         + '>' + label + '</button>';
+  }
+
   function _statusBadge(val) {
     if (typeof Modules !== 'undefined' && Modules._statusBadge) return Modules._statusBadge(val);
     var t = String(val || '').toUpperCase();

@@ -4,7 +4,7 @@
     blessed God." — 1 Timothy 1:10-11
    ══════════════════════════════════════════════════════════════════════════════ */
 
-import { esc, snip, emptyState, loadingCards, sectionHead, mdInline, stripHtml } from './the_gospel_shared.js';
+import { esc, snip, emptyState, loadingCards, sectionHead, mdInline, stripHtml, rows } from './the_gospel_shared.js';
 
 export const name        = 'the_gospel_theology';
 export const title       = 'Theology';

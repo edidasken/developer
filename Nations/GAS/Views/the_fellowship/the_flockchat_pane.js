@@ -9,7 +9,7 @@
 
 import { flockchat } from '../../Scripts/the_comms.js';
 
-export function renderFlockchatPane(host /*, ctx */) {
+export function renderFlockchatPane(host, ctx = {}) {
   if (!host) return () => {};
   host.innerHTML = `
     <div class="fc-pane" style="display:flex; flex-direction:column; gap:8px; height:70vh;">
@@ -21,10 +21,32 @@ export function renderFlockchatPane(host /*, ctx */) {
       <div data-bind="frame" style="flex:1; min-height:0;"></div>
     </div>
   `;
+
   const frameHost = host.querySelector('[data-bind="frame"]');
   const openLink  = host.querySelector('[data-bind="open"]');
-  const url = flockchat.url();
+  const handoff   = buildHandoff(ctx);
+  const url       = flockchat.url(handoff);
+
   openLink.href = url;
-  flockchat.embed(frameHost);
+  flockchat.embed(frameHost, handoff);
+
   return () => { /* iframe disposed with host */ };
+}
+
+function buildHandoff(ctx = {}) {
+  const query = ctx?.handoff || ctx?.launchIntent || ctx || {};
+  const handoff = {};
+
+  if (query.church) handoff.church = query.church;
+  if (query.conversationId) handoff.conversationId = query.conversationId;
+  if (query.channel) handoff.channel = query.channel;
+  if (query.dm) handoff.dm = query.dm;
+  if (query.source) handoff.source = query.source;
+  if (query.return) handoff.return = query.return;
+  if (query.returnTo) handoff.return = query.returnTo;
+
+  if (!handoff.source) handoff.source = 'the_fellowship';
+  if (!handoff.return) handoff.return = window.location.href;
+
+  return handoff;
 }

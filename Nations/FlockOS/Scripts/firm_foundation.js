@@ -30,7 +30,7 @@
      Nehemiah.getSession();                         // { token, email, role, ... }
    ══════════════════════════════════════════════════════════════════════════════ */
 
-const Nehemiah = (() => {
+var Nehemiah = (() => {
   'use strict';
 
   // ── Constants ────────────────────────────────────────────────────────────
@@ -249,6 +249,13 @@ const Nehemiah = (() => {
     } catch (_) { return null; }
   }
 
+  /**
+   * Check if user is currently logged in.
+   * @returns {FlockSession|null}
+   */
+  function session() {
+    return getSession();
+  }
 
   // ── Guard (page-level gate) ──────────────────────────────────────────────
 
@@ -670,7 +677,7 @@ const Nehemiah = (() => {
    * Attempt offline login with PIN.
    * Decrypts the vault and creates a local session with offline:true flag.
    * @param {string} pin
-   * @returns {object} session object
+   * @returns {Promise<FlockSession>}
    */
   async function loginOffline(pin) {
     if (typeof TheWellspring === 'undefined' || !TheWellspring.vault) {

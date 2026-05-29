@@ -1,3 +1,5 @@
+/* @ts-nocheck */
+/// <reference lib="webworker" />
 /* ══════════════════════════════════════════════════════════════════════════════
    THE LIVING WATER — Service Worker (New Covenant Shell)
    "Whosoever drinketh of the water that I shall give him shall never thirst."
@@ -128,6 +130,7 @@ const PRECACHE_URLS = [
   'Scripts/the_scrolls/the_bible_link.js',
   'Scripts/the_shofar/index.js',
   'Scripts/the_trumpet/index.js',
+  'Scripts/the_tabernacle/index.js',
 
   /* ── Domain flat-export shims (coexist alongside /index.js) ───────────── */
   'Scripts/the_life.js',

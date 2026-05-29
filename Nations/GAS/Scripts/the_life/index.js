@@ -18,10 +18,19 @@ function _rows(res) {
   return [];
 }
 
+const W = /** @type {{[key: string]: any}} */ (typeof window !== 'undefined' ? window : globalThis);
+
+function _hasSession() {
+  const nehemiahSession = (typeof Nehemiah !== 'undefined' && Nehemiah.getSession) ? Nehemiah.getSession() : null;
+  const vineSession = (W.TheVine && typeof W.TheVine.session === 'function') ? W.TheVine.session() : null;
+  const s = nehemiahSession || vineSession || null;
+  return !!(s && (s.email || s.token));
+}
+
 const _TERMINAL = new Set(['resolved','closed','archived','cancelled','denied','completed','answered','inactive','deleted']);
 
 export async function careCases() {
-  const V = window.TheVine;
+  const V = W.TheVine;
   if (!V) return [];
   // Fetch all cases — don't filter by status on the API side because field
   // values vary ('Open', 'In Progress', 'Follow-Up', not 'Active').
@@ -32,7 +41,7 @@ export async function careCases() {
 export async function prayerRequests() {
   // UpperRoom (Firestore) is the authoritative backend for prayer requests.
   // allUsers:true so pastors see everyone's requests, not just their own.
-  const UR = window.UpperRoom;
+  const UR = W.UpperRoom;
   if (UR && typeof UR.listPrayers === 'function') {
     try {
       const rows = await UR.listPrayers({ allUsers: true, limit: 100 });
@@ -40,14 +49,14 @@ export async function prayerRequests() {
     } catch (_) {}
   }
   // TheVine fallback (GAS-backed churches)
-  const V = window.TheVine;
+  const V = W.TheVine;
   if (!V) return [];
   const res = await V.flock.prayer?.list({ limit: 100 }) ?? [];
   return _rows(res);
 }
 
 export async function compassionList() {
-  const V = window.TheVine;
+  const V = W.TheVine;
   if (!V) return [];
   // Try the dedicated follow-ups endpoint first; fall back to the active care queue.
   try {
@@ -65,7 +74,7 @@ export async function pendingCount() {
   if (_warmCount !== null) return _warmCount;
   // Wait for Firestore (no timeout on Firestore churches \u2014 see _awaitBackend).
   await _awaitBackend();
-  const UR = window.UpperRoom;
+  const UR = W.UpperRoom;
   // Use the SAME call as the on-screen tiles (UR.listCareCases) so the
   // count agrees with the queue. NEVER fall back to GAS \u2014 GAS returned
   // 21 here while Firestore (and the view) returned 19 (the user had
@@ -105,7 +114,7 @@ export function subscribeOpenCareCount(cb) {
   (async () => {
     await _awaitBackend();
     if (cancelled) return;
-    const UR = window.UpperRoom;
+    const UR = W.UpperRoom;
     const fsReady = !!(UR && typeof UR.isReady === 'function' && UR.isReady());
     console.log('[CARE-BADGE] _awaitBackend resolved in ' + (Date.now() - _t0) + 'ms — fsReady=' + fsReady + ', hasUR=' + !!UR + ', hasListCareCases=' + !!(UR && typeof UR.listCareCases === 'function'));
 
@@ -185,10 +194,12 @@ let _ensureAuthPromise = null;
 function _ensureUpperRoomAuth() {
   if (_ensureAuthPromise) return _ensureAuthPromise;
   _ensureAuthPromise = (async () => {
-    const UR = window.UpperRoom;
+    const UR = W.UpperRoom;
     if (!UR || typeof UR.init !== 'function' || typeof UR.authenticate !== 'function') return;
     if (typeof UR.isReady === 'function' && UR.isReady()) return;
+    if (!_hasSession()) return;
     try { await UR.init(); } catch (_) {}
+    if (!_hasSession()) return;
     try {
       await UR.authenticate();
     } catch (e) {
@@ -214,20 +225,20 @@ function _awaitBackend(_legacyMs) {
   return new Promise((resolve) => {
     const isFirestoreChurch = !!(
       typeof window !== 'undefined' &&
-      (window.FLOCK_FIREBASE_CONFIG || window.UpperRoom)
+      (W.FLOCK_FIREBASE_CONFIG || W.UpperRoom)
     );
     let prodTries = 0;
     let lastProd = 0;
     const check = () => {
-      const UR = window.UpperRoom;
-      const V  = window.TheVine;
+      const UR = W.UpperRoom;
+      const V  = W.TheVine;
       const fsReady = !!(UR && typeof UR.isReady === 'function' && UR.isReady());
       if (fsReady) return resolve();
       // Only accept TheVine on GAS-only churches with no Firebase config.
       if (!isFirestoreChurch && V) return resolve();
       // Periodically prod auth (every ~5s, max 5 tries) in case nothing
       // else is going to trigger it.
-      if (UR && typeof UR.init === 'function' && prodTries < 5 && (Date.now() - lastProd) > 5_000) {
+      if (_hasSession() && UR && typeof UR.init === 'function' && prodTries < 5 && (Date.now() - lastProd) > 5_000) {
         prodTries++;
         lastProd = Date.now();
         _ensureUpperRoomAuth().catch(() => {});
@@ -307,25 +318,25 @@ if (typeof window !== 'undefined') {
 /* ── Convenience delegates (formerly bridge stubs) ─────────────────────────── */
 export async function outreachList(params = {}) {
   const r = _isFB()
-    ? window.UpperRoom?.listOutreachContacts?.(params)
-    : window.TheVine?.flock?.outreach?.contacts?.list?.(params);
+    ? W.UpperRoom?.listOutreachContacts?.(params)
+    : W.TheVine?.flock?.outreach?.contacts?.list?.(params);
   return _rows(await r);
 }
 export async function discipleshipFor(memberId) {
   const r = _isFB()
-    ? window.UpperRoom?.listDiscEnrollments?.({ memberId })
-    : window.TheVine?.flock?.discipleship?.enrollments?.list?.({ memberId });
+    ? W.UpperRoom?.listDiscEnrollments?.({ memberId })
+    : W.TheVine?.flock?.discipleship?.enrollments?.list?.({ memberId });
   return _rows(await r);
 }
 export async function commsLog(params = {}) {
   const r = _isFB()
-    ? window.UpperRoom?.listConversations?.(params)
-    : window.TheVine?.flock?.comms?.messages?.list?.(params);
+    ? W.UpperRoom?.listConversations?.(params)
+    : W.TheVine?.flock?.comms?.messages?.list?.(params);
   return _rows(await r);
 }
 export async function notesFor(memberId) {
   const r = _isFB()
-    ? window.UpperRoom?.listPastoralNotes?.({ memberId })
-    : window.TheVine?.flock?.notes?.list?.({ memberId });
+    ? W.UpperRoom?.listPastoralNotes?.({ memberId })
+    : W.TheVine?.flock?.notes?.list?.({ memberId });
   return _rows(await r);
 }

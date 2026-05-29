@@ -13,8 +13,13 @@
    ══════════════════════════════════════════════════════════════════════════════ */
 
 const HOST_ID = 'the-staff-host';
+let hostObserver = null;
 
-export function raiseToast({ tone = 'info', message = '', action, duration = 4500 } = {}) {
+/**
+ * @param {{ tone?: 'info'|'good'|'warn'|'danger'; message?: string; action?: { label?: string, run?: Function }; duration?: number }} [opts]
+ */
+export function raiseToast(opts = {}) {
+  const { tone = 'info', message = '', action, duration = 4500 } = opts;
   const host = _ensureHost();
   const t = document.createElement('div');
   t.className = 'staff-toast staff-tone-' + tone;
@@ -86,13 +91,13 @@ function _ensureHost() {
   host.style.pointerEvents = 'none';
   Array.from(host.children).forEach((c) => c.style.pointerEvents = 'auto');
   // New children get pointer events at append time too.
-  const obs = host._observer;
-  if (!obs) {
-    const m = new MutationObserver((muts) => {
-      muts.forEach((mu) => mu.addedNodes.forEach((n) => { if (n.style) n.style.pointerEvents = 'auto'; }));
+  if (!hostObserver) {
+    hostObserver = new MutationObserver((muts) => {
+      muts.forEach((mu) => mu.addedNodes.forEach((n) => {
+        if (n instanceof HTMLElement) n.style.pointerEvents = 'auto';
+      }));
     });
-    m.observe(host, { childList: true });
-    host._observer = m;
+    hostObserver.observe(host, { childList: true });
   }
   return host;
 }

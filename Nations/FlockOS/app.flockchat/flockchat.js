@@ -77,6 +77,8 @@
   let _showArchived = false;
   let _openMenuConvId = null;
   let _sanctuaryTab = 'journal'; // active tab inside personal sanctuary hub
+  let _launchIntent = null;
+  let _launchIntentApplied = false;
   // Church / member context (resolved during boot)
   let _myGender      = '';    // 'Male' | 'Female' | '' — from member doc
   let _meIsAllAccess = false; // Lead Pastor / admin — sees all pinned groups
@@ -227,6 +229,7 @@
   async function _boot() {
     console.log('[FlockChat] Booting', VERSION);
     _setBootStatus('Loading…');
+    _launchIntent = _readLaunchIntent();
     
     // Wait for Nehemiah (auth must be checked before proceeding)
     await _waitFor(() => typeof window.Nehemiah !== 'undefined');
@@ -234,14 +237,14 @@
     // Check auth FIRST (like FlockStand does)
     const N = window.Nehemiah;
     if (typeof N.isAuthenticated === 'function' && !N.isAuthenticated()) {
-      window.location.replace('app.flockchat/index.html');
+      window.location.replace('app.flockchat/index.html' + window.location.search + window.location.hash);
       return;
     }
     
     // Get session
     _me = N.getSession ? N.getSession() : null;
     if (!_me) {
-      window.location.replace('app.flockchat/index.html');
+      window.location.replace('app.flockchat/index.html' + window.location.search + window.location.hash);
       return;
     }
     
@@ -306,6 +309,34 @@
       if (Date.now() - start > timeout) throw new Error('Timeout waiting for condition');
       await new Promise(r => setTimeout(r, 100));
     }
+  }
+
+  function _readLaunchIntent() {
+    const query = new URLSearchParams(window.location.search || '');
+    const hashRaw = String(window.location.hash || '').replace(/^#\??/, '');
+    const hash = new URLSearchParams(hashRaw);
+    const read = (key) => query.get(key) || hash.get(key) || '';
+    const conversationId = read('conversationId') || read('channel') || read('dm');
+
+    if (!conversationId && !read('church') && !read('source') && !read('return')) return null;
+
+    return {
+      church: read('church'),
+      conversationId,
+      channel: read('channel'),
+      dm: read('dm'),
+      source: read('source'),
+      return: read('return') || read('returnTo'),
+    };
+  }
+
+  function _maybeApplyLaunchIntent() {
+    if (_launchIntentApplied || !_launchIntent || !_launchIntent.conversationId) return false;
+    const conv = _conversations.find(c => c.id === _launchIntent.conversationId);
+    if (!conv) return false;
+    _launchIntentApplied = true;
+    if (_activeConvId !== conv.id) window._openConversation(conv.id);
+    return true;
   }
 
   /* ── User Setup ─────────────────────────────────────────────────────── */
@@ -1063,6 +1094,7 @@
     _injectFlockNews();
     _renderConversations();
     _srmCheckNewBadge();
+    _maybeApplyLaunchIntent();
 
     _convUnsub = _db.collection('conversations')
       .where('participants', 'array-contains', _me.uid)
@@ -1085,6 +1117,7 @@
         _injectSermons();
         _injectFlockNews();
         _renderConversations();
+        _maybeApplyLaunchIntent();
       }, err => {
         console.error('[FlockChat] Failed to load conversations:', err);
         _toast('Failed to load conversations', 'error');
@@ -1097,6 +1130,7 @@
         _injectSermons();
         _injectFlockNews();
         _renderConversations();
+        _maybeApplyLaunchIntent();
       });
   }
 

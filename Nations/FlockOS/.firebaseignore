@@ -3,7 +3,6 @@ Church/
 FlockOS/
 functions/
 www/
-flockchat-public/
 About_FlockOS.html
 capacitor.config.ts
 firebase.json
@@ -11,7 +10,6 @@ index.html
 LICENSE
 manifest.json
 package.json
-package-lock.json
 README.md
 the_living_water.js
 *.ts

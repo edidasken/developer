@@ -40,7 +40,6 @@ ROOT_FILES=(
   church.firestore.rules
   firebase.json
   FlockChat.Firestore.Rules
-  package-lock.json
 )
 
 CONFIG_FILES=(
@@ -56,12 +55,15 @@ for file in "${ROOT_FILES[@]}"; do
   copy_if_exists "$REPO_ROOT/$file" "$TARGET_DIR/$file"
 done
 
+copy_if_exists "$REPO_ROOT/Nations/Root/package-lock.json" "$TARGET_DIR/package-lock.json"
+
 for mapping in "${CONFIG_FILES[@]}"; do
   IFS='|' read -r source_path destination_path <<< "$mapping"
   copy_if_exists "$REPO_ROOT/$source_path" "$TARGET_DIR/$destination_path"
 done
 
-python3 - "$REPO_ROOT/package.json" "$TARGET_DIR/package.json" "$CHURCH_NAME" "$SHORT_NAME" <<'PYEOF'
+PACKAGE_TEMPLATE="$REPO_ROOT/Nations/Root/package.json"
+python3 - "$PACKAGE_TEMPLATE" "$TARGET_DIR/package.json" "$CHURCH_NAME" "$SHORT_NAME" <<'PYEOF'
 import json
 import sys
 from pathlib import Path

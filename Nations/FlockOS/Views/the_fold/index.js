@@ -212,15 +212,31 @@ function _wireCards(grid, root) {
   });
 }
 
+function _awaitBackend(ms = 15_000) {
+  return new Promise((resolve) => {
+    const t0 = Date.now();
+    const check = () => {
+      const UR = (typeof window !== 'undefined') ? (window.UpperRoom || window.TheUpperRoom || null) : null;
+      const V  = (typeof window !== 'undefined') ? window.TheVine   : null;
+      const fsReady = !!(UR && typeof UR.isReady === 'function' && UR.isReady());
+      if (fsReady || V) return resolve({ UR, V, fsReady });
+      if (Date.now() - t0 >= ms) return resolve({ UR, V, fsReady: false });
+      setTimeout(check, 200);
+    };
+    check();
+  });
+}
+
 async function _loadMembers(root) {
-  const V   = window.TheVine;
+  const { V, fsReady } = await _awaitBackend(15_000);
   const MXM = buildAdapter('flock.members', V);
   const grid  = root.querySelector('[data-bind="members"]');
   const stats = root.querySelector('[data-bind="stats"]');
   if (!grid) return;
-  if (!V) {
-    grid.innerHTML = '<div class="life-empty">Directory backend not loaded.</div>';
+  if (!MXM.isFirestore() && !V && !fsReady) {
+    grid.innerHTML = '<div class="life-empty">Loading members…</div>';
     if (stats) stats.innerHTML = _loadingStats();
+    setTimeout(() => { if (root.isConnected) _loadMembers(root); }, 500);
     return;
   }
   grid.innerHTML = '<div class="life-empty">Loading members…</div>';
@@ -1281,11 +1297,10 @@ function _openNewMemberSheet(onReload) {
     if (row) row.style.display = this.value ? '' : 'none';
   });
 
-  sheet.querySelector('[data-save]').addEventListener('click', async () => {
+    sheet.querySelector('[data-save]').addEventListener('click', async () => {
     const firstName = sheet.querySelector('[data-field="firstName"]').value.trim();
     const errEl     = sheet.querySelector('[data-error]');
     if (!firstName) { errEl.textContent = 'First name is required.'; errEl.style.display = ''; return; }
-    if (!V) { errEl.textContent = 'Directory backend not loaded — cannot add.'; errEl.style.display = ''; return; }
     errEl.style.display = 'none';
     const btn = sheet.querySelector('[data-save]');
     btn.disabled = true; btn.textContent = 'Adding…';

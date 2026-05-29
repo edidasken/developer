@@ -243,6 +243,10 @@
     (function () {
       var APP_URL = 'app.flockchat/app.flockchat.html';
 
+      function buildAppUrl() {
+        return APP_URL + window.location.search + window.location.hash;
+      }
+
       function ready(fn) {
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', fn);
@@ -253,7 +257,7 @@
 
       ready(function () {
         if (typeof Nehemiah !== 'undefined' && Nehemiah.isAuthenticated()) {
-          window.location.replace(APP_URL);
+          window.location.replace(buildAppUrl());
           return;
         }
 
@@ -295,7 +299,7 @@
           setLoading(true);
           try {
             await Nehemiah.login(email, pass);
-            window.location.replace(APP_URL);
+            window.location.replace(buildAppUrl());
           } catch (err) {
             setLoading(false);
             showError(err.message || 'Sign in failed. Check your credentials and try again.');
