@@ -198,6 +198,26 @@ const TheLife = (() => {
       : fetcher();
   }
 
+  async function _ensureBackendReady() {
+    try {
+      if (typeof UpperRoom === 'undefined') return true;
+      if (typeof UpperRoom.isReady === 'function' && UpperRoom.isReady()) return true;
+      if (typeof UpperRoom.init === 'function') {
+        try { await UpperRoom.init(); } catch (e) { console.warn('[TheLife] UpperRoom.init() failed:', e); }
+      }
+      if (typeof UpperRoom.authenticate === 'function') {
+        try { await UpperRoom.authenticate(); } catch (e) { console.warn('[TheLife] UpperRoom.authenticate() failed:', e); }
+      }
+      if (typeof UpperRoom.waitReady === 'function') {
+        try { await UpperRoom.waitReady(); } catch (e) { console.warn('[TheLife] UpperRoom.waitReady() failed:', e); }
+      }
+      return typeof UpperRoom === 'undefined' || !UpperRoom.isReady || UpperRoom.isReady();
+    } catch (e) {
+      console.warn('[TheLife] backend readiness check failed:', e);
+      return false;
+    }
+  }
+
   // ── Audit logger ────────────────────────────────────────────────────────
   // Backend writeAudit fires on every API call automatically.
   // This frontend helper provides console-level tracing + Luke statistics,
@@ -267,6 +287,7 @@ const TheLife = (() => {
 
   async function _ensureDir() {
     if (_cache.memberDir && _cache.memberDir.length) return _cache.memberDir;
+    await _ensureBackendReady();
     if (!_memberDirPromise) {
       // All My Flock users have care+ role → use members.list (full roster).
       // Admins also pull users.list (AuthUsers) to catch staff not in Members.
@@ -4088,6 +4109,12 @@ const TheLife = (() => {
     try {
       var email = (session && session.email) || '';
       if (!email) { _hubBody(_errHtml('Session email not available.')); return; }
+
+      var backendReady = await _ensureBackendReady();
+      if (!backendReady && _isFB()) {
+        _hubBody(_errHtml('Backend auth is still loading. Please retry sign-in or refresh the page.'));
+        return;
+      }
 
       var isPastorPlus = Nehemiah.can('my-flock.full-directory');
       var isCareRole    = !isPastorPlus && Nehemiah.can('my-flock');

@@ -59,6 +59,26 @@ const TheFold = (() => {
     return typeof Modules !== 'undefined' && Modules._isFirebaseComms && Modules._isFirebaseComms();
   }
 
+  async function _ensureBackendReady() {
+    try {
+      if (typeof UpperRoom === 'undefined') return true;
+      if (typeof UpperRoom.isReady === 'function' && UpperRoom.isReady()) return true;
+      if (typeof UpperRoom.init === 'function') {
+        try { await UpperRoom.init(); } catch (e) { console.warn('[TheFold] UpperRoom.init() failed:', e); }
+      }
+      if (typeof UpperRoom.authenticate === 'function') {
+        try { await UpperRoom.authenticate(); } catch (e) { console.warn('[TheFold] UpperRoom.authenticate() failed:', e); }
+      }
+      if (typeof UpperRoom.waitReady === 'function') {
+        try { await UpperRoom.waitReady(); } catch (e) { console.warn('[TheFold] UpperRoom.waitReady() failed:', e); }
+      }
+      return typeof UpperRoom === 'undefined' || !UpperRoom.isReady || UpperRoom.isReady();
+    } catch (e) {
+      console.warn('[TheFold] backend readiness check failed:', e);
+      return false;
+    }
+  }
+
   // ══════════════════════════════════════════════════════════════════════════
   // MAIN APP — two tabs: Groups | Attendance
   // ══════════════════════════════════════════════════════════════════════════
@@ -69,6 +89,11 @@ const TheFold = (() => {
     container.innerHTML = _spinner();
 
     try {
+      var backendReady = await _ensureBackendReady();
+      if (!backendReady && _isFB()) {
+        container.innerHTML = _errHtml('Backend auth is still loading. Please retry sign-in or refresh the page.');
+        return;
+      }
       var res = await Promise.allSettled([
         _isFB() ? UpperRoom.listGroups() : TheVine.flock.groups.list(),
         _isFB() ? UpperRoom.listAttendance({ limit: 60 }) : TheVine.flock.attendance.list({ limit: 60 }),
