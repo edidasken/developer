@@ -1,337 +1,219 @@
 #!/usr/bin/env bash
 # ======================================================================
-# B-Export_Standalone.sh — Export a self-contained, standalone copy of
-# the FlockOS project for one specific church.
+# B-Export_Standalone.sh — Export built Nations into standalone copies.
 #
-# Output:
-#   Covenant/Testimony/Migration/FlockOS CRM for <ShortName>/
+# Source of truth for export payload:   $SOURCE_ROOT/<Nation>/
+# Standalone output root:               /Users/greg.granger/Desktop/Deployments/Nations
 #
-# What's included:
-#   • Repo-root project files (package.json, firebase.json, index.html, etc.)
-#   • Full Covenant/ tree:
-#       - Bezalel/      (all build scripts)
-#       - Courts/       (FlockChat, ATOG, FlockOS source)
-#       - Foundations/  (shared adapters, vessels)
-#       - Gate/         (templates)
-#       - Scrolls/      (only this church's JSON + ChurchTemplate)
-#       - Shepherds/    (verify/build/deploy helpers)
-#       - Testimony/    (full docs — gitignored in standalone)
-#       - Storehouse/   (empty stub — no root data copied)
-#   • Nations/<ShortName>/  ← only this church's branded deployment
-#   • A fresh .gitignore that excludes Testimony/ and Storehouse/
-#   • A fresh README pointer
-#
-# What's NOT included:
-#   • .git history (fresh project)
-#   • Other churches' folders under Nations/
-#   • node_modules, .venv, snapshots, etc.
+# What this does:
+#   1. Copies each built Nation folder out of the repo's Nations/ build output
+#   2. Re-scaffolds the destination so it can act as its own repository root
+#   3. Verifies the exported copy contains the runtime entrypoints expected
 #
 # Usage:
-#   bash "Iris/Bezalel/Scripts/B-Export_Standalone.sh" <ShortName>
-#   bash "Iris/Bezalel/Scripts/B-Export_Standalone.sh" TBC
-#   bash "Iris/Bezalel/Scripts/B-Export_Standalone.sh" TheForest --dry-run
+#   bash Iris/Bezalel/Scripts/B-Export_Standalone.sh
+#   bash Iris/Bezalel/Scripts/B-Export_Standalone.sh --dry-run
+#   bash Iris/Bezalel/Scripts/B-Export_Standalone.sh --force
+#   bash Iris/Bezalel/Scripts/B-Export_Standalone.sh --source /path/to/Nations --target-root /path/to/output
 # ======================================================================
 set -euo pipefail
 
-# ── Args ──────────────────────────────────────────────────────────────
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+WORKSPACE="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+SOURCE_ROOT="$WORKSPACE/Nations"
+DEFAULT_TARGET_ROOT="/Users/greg.granger/Desktop/Deployments/Nations"
+TARGET_ROOT="$DEFAULT_TARGET_ROOT"
 DRY_RUN=false
-SHORT_NAME=""
-for arg in "$@"; do
-  case "$arg" in
-    --dry-run) DRY_RUN=true ;;
-    -h|--help) sed -n '2,33p' "$0"; exit 0 ;;
-    *) [ -z "$SHORT_NAME" ] && SHORT_NAME="$arg" ;;
+FORCE=false
+
+usage() {
+  cat <<'EOF'
+Usage:
+  bash Iris/Bezalel/Scripts/B-Export_Standalone.sh [--dry-run] [--force] [--source PATH] [--target-root PATH]
+
+Options:
+  --dry-run         Show what would be exported without writing files
+  --force           Remove any existing exported Nation folder before copying
+  --source PATH     Built Nations source root (default: repo/Nations)
+  --target-root PATH Export destination root (default: /Users/greg.granger/Desktop/Deployments/Nations)
+EOF
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dry-run)
+      DRY_RUN=true
+      shift
+      ;;
+    --force)
+      FORCE=true
+      shift
+      ;;
+    --source)
+      [ $# -ge 2 ] || { echo "ERROR: --source requires a path"; exit 1; }
+      SOURCE_ROOT="$2"
+      shift 2
+      ;;
+    --target-root)
+      [ $# -ge 2 ] || { echo "ERROR: --target-root requires a path"; exit 1; }
+      TARGET_ROOT="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "ERROR: Unknown argument: $1"
+      usage
+      exit 1
+      ;;
   esac
 done
 
-if [ -z "$SHORT_NAME" ]; then
-  echo "ERROR: Church short name required."
-  echo "Usage: bash $0 <ShortName>"
+SCaffold_HELPER="$SCRIPT_DIR/B-Standalone_Repo_Scaffold.sh"
+
+if [ ! -d "$SOURCE_ROOT" ]; then
+  echo "ERROR: Source Nations folder not found: $SOURCE_ROOT"
+  exit 1
+fi
+
+if [ ! -f "$SCaffold_HELPER" ]; then
+  echo "ERROR: Missing standalone scaffold helper: $SCaffold_HELPER"
+  exit 1
+fi
+
+if ! command -v rsync >/dev/null 2>&1; then
+  echo "ERROR: rsync is required."
+  exit 1
+fi
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "ERROR: python3 is required."
+  exit 1
+fi
+
+if [ "$DRY_RUN" = false ]; then
+  mkdir -p "$TARGET_ROOT"
+fi
+
+echo "Exporting standalone Nations"
+echo "  source: $SOURCE_ROOT"
+echo "  target: $TARGET_ROOT"
+echo "  mode:   $([ "$DRY_RUN" = true ] && echo DRY-RUN || echo LIVE)"
+echo ""
+
+is_exportable_nation() {
+  local dir="$1"
+  [ -d "$dir" ] || return 1
+  [ -f "$dir/index.html" ] || [ -f "$dir/FlockOS.html" ] || [ -f "$dir/the_living_water.js" ]
+}
+
+validate_export() {
+  local nation_dir="$1"
+  local errors=0
+
+  for required in index.html manifest.json the_living_water.js package.json README.md .gitignore; do
+    if [ ! -f "$nation_dir/$required" ]; then
+      echo "  ✗ missing $required"
+      errors=$((errors + 1))
+    fi
+  done
+
+  for required_dir in Scripts Styles Views Data Images app.embeds; do
+    if [ ! -d "$nation_dir/$required_dir" ]; then
+      echo "  ✗ missing $required_dir/"
+      errors=$((errors + 1))
+    fi
+  done
+
+  if [ ! -d "$nation_dir/app.flockos" ]; then
+    echo "  ✗ missing app.flockos/"
+    errors=$((errors + 1))
+  fi
+
+  if [ ! -d "$nation_dir/app.grow" ]; then
+    echo "  ✗ missing app.grow/"
+    errors=$((errors + 1))
+  fi
+
+  if [ ! -d "$nation_dir/app.stand" ]; then
+    echo "  ✗ missing app.stand/"
+    errors=$((errors + 1))
+  fi
+
+  return "$errors"
+}
+
+NATION_DIRS=()
+while IFS= read -r dir; do
+  [ -n "$dir" ] && NATION_DIRS+=("$dir")
+done < <(find "$SOURCE_ROOT" -mindepth 1 -maxdepth 1 -type d | sort)
+
+if [ "${#NATION_DIRS[@]}" -eq 0 ]; then
+  echo "ERROR: No Nation folders found under $SOURCE_ROOT"
+  exit 1
+fi
+
+exported=()
+failed=()
+
+for source_dir in "${NATION_DIRS[@]}"; do
+  nation_name="$(basename "$source_dir")"
+
+  if ! is_exportable_nation "$source_dir"; then
+    echo "Skipping non-Nation directory: $nation_name"
+    continue
+  fi
+
+  target_dir="$TARGET_ROOT/$nation_name"
+  echo "→ $nation_name"
+
+  if $DRY_RUN; then
+    echo "  [dry-run] would export to $target_dir"
+    echo ""
+    exported+=("$nation_name")
+    continue
+  fi
+
+  if [ -e "$target_dir" ] && [ "$FORCE" = true ]; then
+    rm -rf "$target_dir"
+  fi
+
+  mkdir -p "$target_dir"
+
+  rsync -a --delete \
+    --exclude='.git/' \
+    --exclude='node_modules/' \
+    --exclude='www/' \
+    --exclude='.DS_Store' \
+    "$source_dir/" "$target_dir/"
+
+  bash "$SCaffold_HELPER" "$target_dir" "$nation_name" "$nation_name"
+
+  echo "  validating…"
+  if validate_export "$target_dir"; then
+    echo "  ✓ exported"
+    exported+=("$nation_name")
+  else
+    echo "  ✗ validation failed"
+    failed+=("$nation_name")
+  fi
   echo ""
-  echo "Available churches:"
-  for jf in "$(dirname "$0")/../../Scrolls/ChurchRegistry"/*.json; do
-    bn="$(basename "$jf" .json)"
-    [[ "$bn" == "ChurchTemplate" || "$bn" == "Master-API" ]] && continue
-    echo "  • $bn"
-  done
+done
+
+echo "Export summary"
+echo "  exported: ${#exported[@]}"
+if [ "${#exported[@]}" -gt 0 ]; then
+  printf '    - %s\n' "${exported[@]}"
+fi
+
+if [ "${#failed[@]}" -gt 0 ]; then
+  echo "  failed: ${#failed[@]}"
+  printf '    - %s\n' "${failed[@]}"
   exit 1
 fi
 
-# ── Paths ─────────────────────────────────────────────────────────────
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-COVENANT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-# When invoked via canonical Iris path, COVENANT_ROOT is wrong.
-# Re-anchor to actual Covenant/ folder (which holds Courts, Scrolls, etc.).
-if [ ! -d "$COVENANT_ROOT/Courts/TheTabernacle" ]; then
-  _CANDIDATE_REPO="$(cd "$COVENANT_ROOT/.." && pwd)"
-  if [ -d "$_CANDIDATE_REPO/Covenant/Courts/TheTabernacle" ]; then
-    COVENANT_ROOT="$_CANDIDATE_REPO/Covenant"
-  fi
-fi
-REPO_ROOT="$(cd "$COVENANT_ROOT/.." && pwd)"
-CONFIGS_DIR="$COVENANT_ROOT/Scrolls/ChurchRegistry"
-
-# Resolve the church config (try local file first, then ask user it's a known shortName)
-CHURCH_CONFIG=""
-if [ -f "$CONFIGS_DIR/${SHORT_NAME}.json" ]; then
-  CHURCH_CONFIG="$CONFIGS_DIR/${SHORT_NAME}.json"
-fi
-
-if [ -z "$CHURCH_CONFIG" ]; then
-  # Fall back to looking up by .shortName in any local JSON
-  for jf in "$CONFIGS_DIR"/*.json; do
-    bn="$(basename "$jf" .json)"
-    [[ "$bn" == "ChurchTemplate" || "$bn" == "Master-API" ]] && continue
-    if [ "$(jq -r '.shortName // empty' "$jf")" = "$SHORT_NAME" ]; then
-      CHURCH_CONFIG="$jf"
-      break
-    fi
-  done
-fi
-
-# Last resort: fetch from master API
-if [ -z "$CHURCH_CONFIG" ] && [ -f "$CONFIGS_DIR/Master-API.json" ]; then
-  _API_URL=$(jq -r '.apiUrl // empty' "$CONFIGS_DIR/Master-API.json")
-  if [ -n "$_API_URL" ]; then
-    echo "Fetching $SHORT_NAME from master API…"
-    _RESP=$(curl -sfL "${_API_URL}?action=church.configs" 2>/dev/null || echo '')
-    _MATCH=$(echo "$_RESP" | jq --arg sn "$SHORT_NAME" '.configs[] | select(.shortName==$sn)')
-    if [ -n "$_MATCH" ]; then
-      CHURCH_CONFIG="$(mktemp)"
-      echo "$_MATCH" > "$CHURCH_CONFIG"
-    fi
-  fi
-fi
-
-if [ -z "$CHURCH_CONFIG" ] || [ ! -s "$CHURCH_CONFIG" ]; then
-  echo "ERROR: No config found for shortName '$SHORT_NAME'."
-  exit 1
-fi
-
-CHURCH_NAME=$(jq -r '.name'      "$CHURCH_CONFIG")
-CHURCH_SHORT=$(jq -r '.shortName' "$CHURCH_CONFIG")
-EXPORT_NAME="FlockOS CRM for ${CHURCH_SHORT}"
-EXPORT_DEST="$COVENANT_ROOT/Testimony/Migration/${EXPORT_NAME}"
-
-# ── Pre-flight ────────────────────────────────────────────────────────
-echo "════════════════════════════════════════════════════════════════════"
-echo "  Standalone Export: $CHURCH_NAME ($CHURCH_SHORT)"
-echo "════════════════════════════════════════════════════════════════════"
-echo "  Source:      $REPO_ROOT"
-echo "  Destination: $EXPORT_DEST"
-$DRY_RUN && echo "  Mode:        DRY-RUN (no files will be written)"
 echo ""
-
-command -v rsync >/dev/null || { echo "ERROR: rsync required"; exit 1; }
-command -v jq    >/dev/null || { echo "ERROR: jq required";    exit 1; }
-
-# Ensure the church has a built deployment to copy
-DEPLOYED_DIR="$COVENANT_ROOT/Nations/$CHURCH_SHORT"
-if [ ! -d "$DEPLOYED_DIR/FlockOS" ]; then
-  echo "ERROR: No built deployment at Nations/$CHURCH_SHORT/FlockOS/"
-  echo "       Run A-Build_Churches.sh first."
-  exit 1
-fi
-
-# ── Build action plan ─────────────────────────────────────────────────
-RSYNC_FLAGS=(-a)
-$DRY_RUN && RSYNC_FLAGS+=(--dry-run)
-
-# Common excludes for any rsync into the export
-COMMON_EXCLUDES=(
-  --exclude='.DS_Store'
-  --exclude='.git/'
-  --exclude='node_modules/'
-  --exclude='.venv/'
-  --exclude='venv/'
-  --exclude='__pycache__/'
-  --exclude='*.pyc'
-  --exclude='*.log'
-  --exclude='*.bak'
-  --exclude='.next/'
-  --exclude='dist/'
-  --exclude='build/'
-  --exclude='.cache/'
-)
-
-# ── Wipe any previous export and recreate ─────────────────────────────
-if ! $DRY_RUN; then
-  if [ -d "$EXPORT_DEST" ]; then
-    echo "Removing previous export…"
-    rm -rf "$EXPORT_DEST"
-  fi
-  mkdir -p "$EXPORT_DEST"
-fi
-
-# ── 1. Repo-root project files ────────────────────────────────────────
-echo "[1/7] Copying repo-root project files…"
-ROOT_FILES=(
-  package.json
-  package-lock.json
-  firebase.json
-  FlockChat.Firestore.Rules
-  capacitor.config.ts
-  index.html
-  LICENSE
-  README.md
-)
-CONFIG_FILES=(
-  "config/church-firestore.firebase.json|church-firestore.firebase.json"
-  "config/church-firestore.json|church-firestore.json"
-  "config/firebase-church.json|firebase-church.json"
-  "config/firestore.indexes.json|firestore.indexes.json"
-  "config/flockchat-firebase.json|flockchat-firebase.json"
-  "config/flockchat-firestore.indexes.json|flockchat-firestore.indexes.json"
-)
-for f in "${ROOT_FILES[@]}"; do
-  if [ -f "$REPO_ROOT/$f" ]; then
-    if $DRY_RUN; then
-      echo "    [dry-run] $f"
-    else
-      cp "$REPO_ROOT/$f" "$EXPORT_DEST/$f"
-    fi
-  fi
-done
-for mapping in "${CONFIG_FILES[@]}"; do
-  IFS='|' read -r source_path destination_path <<< "$mapping"
-  if [ -f "$REPO_ROOT/$source_path" ]; then
-    if $DRY_RUN; then
-      echo "    [dry-run] $destination_path"
-    else
-      cp "$REPO_ROOT/$source_path" "$EXPORT_DEST/$destination_path"
-    fi
-  fi
-done
-
-# Also copy the public hosting tree (FlockChat hosting source)
-if [ -d "$REPO_ROOT/flockchat-public" ]; then
-  echo "    flockchat-public/ (FlockChat hosting tree)"
-  rsync "${RSYNC_FLAGS[@]}" "${COMMON_EXCLUDES[@]}" \
-    "$REPO_ROOT/flockchat-public/" "$EXPORT_DEST/flockchat-public/"
-fi
-
-# ── 2. Covenant/ — sub-tree by sub-tree ───────────────────────────────
-echo "[2/7] Copying Bezalel/ (build scripts) from Iris/…"
-rsync "${RSYNC_FLAGS[@]}" "${COMMON_EXCLUDES[@]}" \
-  "$REPO_ROOT/Iris/Bezalel/" "$EXPORT_DEST/Covenant/Bezalel/"
-
-echo "[3/7] Copying Covenant/Courts/ (FlockOS, FlockChat, ATOG sources)…"
-rsync "${RSYNC_FLAGS[@]}" "${COMMON_EXCLUDES[@]}" \
-  "$COVENANT_ROOT/Courts/" "$EXPORT_DEST/Covenant/Courts/"
-
-echo "[4/7] Copying Covenant/Foundations/, Gate/, Shepherds/, Scrolls/ProductRegistry/…"
-for sub in Foundations Gate Shepherds; do
-  if [ -d "$COVENANT_ROOT/$sub" ]; then
-    rsync "${RSYNC_FLAGS[@]}" "${COMMON_EXCLUDES[@]}" \
-      "$COVENANT_ROOT/$sub/" "$EXPORT_DEST/Covenant/$sub/"
-  fi
-done
-if [ -d "$COVENANT_ROOT/Scrolls/ProductRegistry" ]; then
-  rsync "${RSYNC_FLAGS[@]}" "${COMMON_EXCLUDES[@]}" \
-    "$COVENANT_ROOT/Scrolls/ProductRegistry/" "$EXPORT_DEST/Covenant/Scrolls/ProductRegistry/"
-fi
-
-# ── 5. Scrolls/ChurchRegistry — only THIS church + template ───────────
-echo "[5/7] Copying Covenant/Scrolls/ChurchRegistry/ (only $CHURCH_SHORT + template)…"
-if ! $DRY_RUN; then
-  mkdir -p "$EXPORT_DEST/Covenant/Scrolls/ChurchRegistry"
-  cp "$CONFIGS_DIR/ChurchTemplate.json" "$EXPORT_DEST/Covenant/Scrolls/ChurchRegistry/" 2>/dev/null || true
-  # Write the church's config under its shortName.json (works whether source was local or API-fetched)
-  jq '.' "$CHURCH_CONFIG" > "$EXPORT_DEST/Covenant/Scrolls/ChurchRegistry/${CHURCH_SHORT}.json"
-else
-  echo "    [dry-run] ChurchTemplate.json + ${CHURCH_SHORT}.json"
-fi
-
-# ── 6. Testimony/ + empty Storehouse/ ─────────────────────────────────
-echo "[6/7] Copying Covenant/Testimony/ (will be gitignored in standalone)…"
-rsync "${RSYNC_FLAGS[@]}" "${COMMON_EXCLUDES[@]}" \
-  --exclude='Migration/' \
-  "$COVENANT_ROOT/Testimony/" "$EXPORT_DEST/Covenant/Testimony/"
-
-if ! $DRY_RUN; then
-  mkdir -p "$EXPORT_DEST/Covenant/Storehouse"
-  cat > "$EXPORT_DEST/Covenant/Storehouse/README.md" <<'EOF'
-# Storehouse
-
-This folder is intentionally empty in standalone exports.
-Use it for your own backups, archived files, and legacy material.
-EOF
-fi
-
-# ── 7. Nations/<ShortName>/ — branded deployment + standalone scaffolding
-echo "[7/7] Copying Covenant/Nations/$CHURCH_SHORT/ (branded deployment)…"
-rsync "${RSYNC_FLAGS[@]}" "${COMMON_EXCLUDES[@]}" \
-  "$DEPLOYED_DIR/" "$EXPORT_DEST/Covenant/Nations/$CHURCH_SHORT/"
-
-# ── Standalone scaffolding: .gitignore + README pointer ───────────────
-if ! $DRY_RUN; then
-  cat > "$EXPORT_DEST/.gitignore" <<'EOF'
-# ── OS / editor noise ──
-.DS_Store
-*.swp
-*~
-
-# ── Dependencies / build artifacts ──
-node_modules/
-.venv/
-venv/
-__pycache__/
-*.pyc
-.next/
-dist/
-build/
-.cache/
-*.log
-
-# ── Local-only working folders ──
-Covenant/Testimony/
-Covenant/Storehouse/
-
-# ── Firebase / secrets (church-specific — keep out of public commits) ──
-.firebaserc
-*-service-account.json
-*.firebase-debug.log
-EOF
-
-  cat > "$EXPORT_DEST/STANDALONE.md" <<EOF
-# FlockOS CRM for ${CHURCH_NAME} (${CHURCH_SHORT})
-
-This is a standalone export of the FlockOS platform branded for **${CHURCH_NAME}**.
-
-Generated: $(date '+%Y-%m-%d %H:%M:%S %Z')
-Source:    Master FlockOS repo @ $(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo 'untracked')
-
-## What's here
-- \`Covenant/Nations/${CHURCH_SHORT}/\` — your branded FlockOS deployment
-- \`Covenant/Courts/\` — full source for FlockOS, FlockChat, ATOG
-- \`Covenant/Bezalel/Scripts/\` — build & deploy scripts
-- \`Covenant/Scrolls/ChurchRegistry/${CHURCH_SHORT}.json\` — your church config
-- \`Covenant/Testimony/\` — internal documentation (gitignored)
-
-## Quick start
-
-\`\`\`bash
-# Initialize git (this export has no .git history)
-git init && git add -A && git commit -m "Initial standalone export"
-
-# Rebuild the deployment after edits
-bash "Iris/Bezalel/Scripts/A-Build_Churches.sh"
-\`\`\`
-
-## Live URL
-After deploying to GitHub Pages or your own hosting, your FlockOS will be at:
-\`<your-host>/Covenant/Nations/${CHURCH_SHORT}/index.html\`
-EOF
-fi
-
-# ── Summary ───────────────────────────────────────────────────────────
-echo ""
-echo "════════════════════════════════════════════════════════════════════"
-if $DRY_RUN; then
-  echo "  Dry-run complete — no files written."
-else
-  SIZE=$(du -sh "$EXPORT_DEST" 2>/dev/null | awk '{print $1}')
-  echo "  ✓ Export complete: $EXPORT_NAME  ($SIZE)"
-  echo "  → $EXPORT_DEST"
-fi
-echo "════════════════════════════════════════════════════════════════════"
+echo "Standalone export complete."
+echo "Output root: $TARGET_ROOT"

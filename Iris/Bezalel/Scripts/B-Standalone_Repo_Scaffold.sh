@@ -62,6 +62,25 @@ for mapping in "${CONFIG_FILES[@]}"; do
   copy_if_exists "$REPO_ROOT/$source_path" "$TARGET_DIR/$destination_path"
 done
 
+copy_if_exists "$REPO_ROOT/Import_FlockOS.sh" "$TARGET_DIR/Import_FlockOS.sh"
+
+if [ -f "$TARGET_DIR/Import_FlockOS.sh" ]; then
+  python3 - "$TARGET_DIR/Import_FlockOS.sh" "$SHORT_NAME" <<'PYEOF'
+from pathlib import Path
+import sys
+
+script_path = Path(sys.argv[1])
+short_name = sys.argv[2]
+
+content = script_path.read_text()
+old = "/Users/greg.granger/Desktop/Deployments/Nations/FlockOS"
+new = f"/Users/greg.granger/Desktop/Deployments/Nations/{short_name}"
+if old in content:
+    content = content.replace(old, new)
+script_path.write_text(content)
+PYEOF
+fi
+
 PACKAGE_TEMPLATE="$REPO_ROOT/Nations/Root/package.json"
 python3 - "$PACKAGE_TEMPLATE" "$TARGET_DIR/package.json" "$CHURCH_NAME" "$SHORT_NAME" <<'PYEOF'
 import json
