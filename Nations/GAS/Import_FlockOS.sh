@@ -1,22 +1,13 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 set -euo pipefail
 
-SOURCE_DIR="${1:-${FLOCKOS_SOURCE_DIR:-/Users/greg.granger/Desktop/Deployments/Nations/GAS}}"
-DEST_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="${0:A:h}"
+REPO_ROOT="${SCRIPT_DIR:h:h}"
+NATION="${SCRIPT_DIR:t}"
+SHARED_IMPORTER="$REPO_ROOT/Iris/Bezalel/Scripts/Import_FlockOS.sh"
 
-if [[ ! -d "$SOURCE_DIR" ]]; then
-  echo "Source directory not found: $SOURCE_DIR" >&2
-  exit 1
+if [[ -f "$SHARED_IMPORTER" && "${0:A}" != "$SHARED_IMPORTER" ]]; then
+  exec "$SHARED_IMPORTER" "$@"
 fi
 
-SOURCE_DIR="$(cd "$SOURCE_DIR" && pwd)"
-
-if [[ "$SOURCE_DIR" == "$DEST_DIR" ]]; then
-  echo "Source directory must be different from the destination repo root." >&2
-  exit 1
-fi
-
-rsync -a --delete \
-  --exclude='.DS_Store' \
-  --exclude='Import_FlockOS.sh' \
-  "$SOURCE_DIR"/ "$DEST_DIR"/
+print -r -- "Import_FlockOS.sh: shared importer unavailable for ${NATION}"

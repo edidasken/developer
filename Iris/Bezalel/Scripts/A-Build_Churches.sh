@@ -306,6 +306,35 @@ for config in "$BUILD_CONFIGS_DIR"/*.json; do
 
   mkdir -p "$OUT"
 
+  cat > "$OUT/Import_FlockOS.sh" <<EOF
+#!/usr/bin/env zsh
+set -euo pipefail
+
+# Nation-specific importer for ${CHURCH_SHORT}
+DEST_DIR="\${0:A:h}"
+SOURCE_DIR="\${FLOCKOS_SOURCE_DIR:-/Users/greg.granger/Desktop/Deployments/Nations/FlockOS}"
+
+if [[ ! -d "\$SOURCE_DIR" ]]; then
+  print -u2 "Import_FlockOS.sh: source directory not found: \$SOURCE_DIR"
+  exit 1
+fi
+
+SOURCE_ABS="\${SOURCE_DIR:A}"
+DEST_ABS="\${DEST_DIR:A}"
+
+if [[ "\$SOURCE_ABS" == "\$DEST_ABS" ]]; then
+  print -u2 "Import_FlockOS.sh: source and destination must be different: \$SOURCE_ABS"
+  exit 1
+fi
+
+rsync -a \
+  --exclude='/.git/' \
+  --exclude='.DS_Store' \
+  --exclude='Import_FlockOS.sh' \
+  "\$SOURCE_ABS"/ "\$DEST_ABS"/
+EOF
+  chmod +x "$OUT/Import_FlockOS.sh"
+
   # 1. Copy FlockOS/ source tree (exclude dev-only files)
   rsync -a \
     --exclude='*.md' --exclude='*.gs' --exclude='*.bak' --exclude='*.txt' \
