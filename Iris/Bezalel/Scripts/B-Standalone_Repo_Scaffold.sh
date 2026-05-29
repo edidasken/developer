@@ -5,13 +5,14 @@
 #
 # Usage:
 #   bash Iris/Bezalel/Scripts/B-Standalone_Repo_Scaffold.sh \
-#     Nations/FlockOS "FlockOS" "FlockOS"
+#     Nations/FlockOS "FlockOS" "flockos" "Nations/Root"
 # ======================================================================
 set -euo pipefail
 
-TARGET_DIR="${1:?Usage: bash $0 <target-dir> <church-name> <short-name>}"
-CHURCH_NAME="${2:?Usage: bash $0 <target-dir> <church-name> <short-name>}"
-SHORT_NAME="${3:?Usage: bash $0 <target-dir> <church-name> <short-name>}"
+TARGET_DIR="${1:?Usage: bash $0 <target-dir> <church-name> <repo-name> <source-export-dir>}"
+CHURCH_NAME="${2:?Usage: bash $0 <target-dir> <church-name> <repo-name> <source-export-dir>}"
+SHORT_NAME="${3:?Usage: bash $0 <target-dir> <church-name> <repo-name> <source-export-dir>}"
+SOURCE_EXPORT_DIR="${4:?Usage: bash $0 <target-dir> <church-name> <repo-name> <source-export-dir>}"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WORKSPACE="$(cd "$SCRIPT_DIR/../../.." && pwd)"
@@ -33,6 +34,7 @@ echo "  → Adding standalone repo files to $(basename "$TARGET_DIR")"
 # standalone Nation repo.
 ROOT_FILES=(
   .firebaseignore
+  .firebaserc
   .gitignore
   .nojekyll
   LICENSE
@@ -62,21 +64,23 @@ for mapping in "${CONFIG_FILES[@]}"; do
   copy_if_exists "$REPO_ROOT/$source_path" "$TARGET_DIR/$destination_path"
 done
 
-copy_if_exists "$REPO_ROOT/Import_FlockOS.sh" "$TARGET_DIR/Import_FlockOS.sh"
+copy_if_exists "$SCRIPT_DIR/Import_FlockOS.sh" "$TARGET_DIR/Import_FlockOS.sh"
 
 if [ -f "$TARGET_DIR/Import_FlockOS.sh" ]; then
-  python3 - "$TARGET_DIR/Import_FlockOS.sh" "$SHORT_NAME" <<'PYEOF'
+  python3 - "$TARGET_DIR/Import_FlockOS.sh" "$SOURCE_EXPORT_DIR" <<'PYEOF'
 from pathlib import Path
 import sys
 
 script_path = Path(sys.argv[1])
-short_name = sys.argv[2]
+source_export_dir = sys.argv[2]
 
 content = script_path.read_text()
-old = "/Users/greg.granger/Desktop/Deployments/Nations/FlockOS"
-new = f"/Users/greg.granger/Desktop/Deployments/Nations/{short_name}"
+old = 'SOURCE_DIR="${FLOCKOS_SOURCE_DIR:-/Users/greg.granger/Desktop/Deployments/Nations/FlockOS}"'
+new = f'SOURCE_DIR="${{FLOCKOS_SOURCE_DIR:-{source_export_dir}}}"'
 if old in content:
     content = content.replace(old, new)
+else:
+    content = content.replace("/Users/greg.granger/Desktop/Deployments/Nations/FlockOS", source_export_dir)
 script_path.write_text(content)
 PYEOF
 fi
@@ -95,9 +99,10 @@ short_name = sys.argv[4]
 with source_pkg.open() as f:
     pkg = json.load(f)
 
-# Keep the package name stable so the copied package-lock remains valid.
-pkg["name"] = "flockos"
-pkg["description"] = f"Standalone FlockOS deployment for {church_name}."
+# Keep the package name stable for the destination repo and make the
+# standalone copy self-describing.
+pkg["name"] = short_name
+pkg["description"] = f"Standalone deployment repository for {church_name}."
 pkg["private"] = True
 
 build_www = (

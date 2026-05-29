@@ -36,6 +36,11 @@ NEW_COVENANT="$WORKSPACE/New_Covenant"
 # Build directly into the in-repo Nations/ output directory.
 NATIONS_DIR="$WORKSPACE/Nations"
 CONFIGS_DIR="$WORKSPACE/Architechtural Docs/New Covenant As Built/Church Registry"
+# Backward-compatible fallback for older docs/paths.
+LEGACY_CONFIGS_DIR="$WORKSPACE/Architechtural Docs/New Covenant/Deployment/ChurchRegistry"
+if [ ! -d "$CONFIGS_DIR" ] && [ -d "$LEGACY_CONFIGS_DIR" ]; then
+  CONFIGS_DIR="$LEGACY_CONFIGS_DIR"
+fi
 
 BUILT_TARGETS=()
 
@@ -74,6 +79,7 @@ fi
 # ── Church definitions ────────────────────────────────────────────────
 # FORMAT:  "FolderName|ConfigFile|CACHE_NAME"
 CHURCHES=(
+  "Root|FlockOS-Root.json|flockos-root-v1.05"
   "FlockOS|FlockOS-Root.json|flockos-v1.05"
   "TBC|Trinity.json|flockos-tbc-v1.05"
   "TheForest|TheForest.json|flockos-theforest-v1.05"
@@ -1481,7 +1487,7 @@ if ! $DRY_RUN; then
     GIT_HASH=$(git -C "$WORKSPACE" log -1 --pretty=format:'%h' 2>/dev/null || echo "")
     BUILD_DATE=$(date +%Y-%m-%d)
     BUILD_TITLE="Build: ${GIT_SUBJECT}"
-    BUILD_DESC="B-Build completed on ${BUILD_DATE}. Nations synced: FlockOS, TBC, TheForest, GAS. Commit: ${GIT_HASH}. ${GIT_SUBJECT}"
+    BUILD_DESC="B-Build completed on ${BUILD_DATE}. Nations synced: Root, FlockOS, TBC, TheForest, GAS. Commit: ${GIT_HASH}. ${GIT_SUBJECT}"
 
     python3 "$SEED_SCRIPT" \
       --title "$BUILD_TITLE" \

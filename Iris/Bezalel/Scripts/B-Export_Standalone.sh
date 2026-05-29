@@ -3,7 +3,7 @@
 # B-Export_Standalone.sh — Export built Nations into standalone copies.
 #
 # Source of truth for export payload:   $SOURCE_ROOT/<Nation>/
-# Standalone output root:               /Users/greg.granger/Desktop/Deployments/Nations
+# Standalone repo roots:               /Users/greg.granger/Desktop/Deployments/{build,flockos,trinity,theforest,offline}
 #
 # What this does:
 #   1. Copies each built Nation folder out of the repo's Nations/ build output
@@ -21,7 +21,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WORKSPACE="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 SOURCE_ROOT="$WORKSPACE/Nations"
-DEFAULT_TARGET_ROOT="/Users/greg.granger/Desktop/Deployments/Nations"
+DEFAULT_TARGET_ROOT="/Users/greg.granger/Desktop/Deployments"
 TARGET_ROOT="$DEFAULT_TARGET_ROOT"
 DRY_RUN=false
 FORCE=false
@@ -33,9 +33,9 @@ Usage:
 
 Options:
   --dry-run         Show what would be exported without writing files
-  --force           Remove any existing exported Nation folder before copying
+  --force           Resync existing destination folders in place
   --source PATH     Built Nations source root (default: repo/Nations)
-  --target-root PATH Export destination root (default: /Users/greg.granger/Desktop/Deployments/Nations)
+  --target-root PATH Export destination base (default: /Users/greg.granger/Desktop/Deployments)
 EOF
 }
 
@@ -97,6 +97,38 @@ if [ "$DRY_RUN" = false ]; then
   mkdir -p "$TARGET_ROOT"
 fi
 
+target_repo_name_for_nation() {
+  case "$1" in
+    Root) echo "build" ;;
+    FlockOS) echo "flockos" ;;
+    TBC) echo "trinity" ;;
+    TheForest) echo "theforest" ;;
+    GAS) echo "offline" ;;
+    *) return 1 ;;
+  esac
+}
+
+church_name_for_nation() {
+  case "$1" in
+    Root|FlockOS) echo "FlockOS" ;;
+    TBC) echo "Trinity Baptist Church" ;;
+    TheForest) echo "The Forest" ;;
+    GAS) echo "FlockOS-GAS" ;;
+    *) echo "$1" ;;
+  esac
+}
+
+cleanup_copy_artifacts() {
+  local dir="$1"
+  local artifact_count
+
+  artifact_count="$(find "$dir" -depth \( -name '* 2' -o -name '* 2.*' \) -print | wc -l | tr -d ' ')"
+  if [ "${artifact_count:-0}" -gt 0 ]; then
+    find "$dir" -depth \( -name '* 2' -o -name '* 2.*' \) -exec rm -rf {} +
+    echo "  ✓ removed ${artifact_count} copy artifact(s)"
+  fi
+}
+
 echo "Exporting standalone Nations"
 echo "  source: $SOURCE_ROOT"
 echo "  target: $TARGET_ROOT"
@@ -142,7 +174,7 @@ validate_export() {
     errors=$((errors + 1))
   fi
 
-  return "$errors"
+  return $errors
 }
 
 NATION_DIRS=()
@@ -166,8 +198,16 @@ for source_dir in "${NATION_DIRS[@]}"; do
     continue
   fi
 
-  target_dir="$TARGET_ROOT/$nation_name"
+  target_repo_name="$(target_repo_name_for_nation "$nation_name")" || {
+    echo "Skipping unmapped Nation directory: $nation_name"
+    continue
+  }
+
+  church_name="$(church_name_for_nation "$nation_name")"
+  target_dir="$TARGET_ROOT/$target_repo_name"
+
   echo "→ $nation_name"
+  echo "  target repo: $target_repo_name"
 
   if $DRY_RUN; then
     echo "  [dry-run] would export to $target_dir"
@@ -176,20 +216,19 @@ for source_dir in "${NATION_DIRS[@]}"; do
     continue
   fi
 
-  if [ -e "$target_dir" ] && [ "$FORCE" = true ]; then
-    rm -rf "$target_dir"
-  fi
-
   mkdir -p "$target_dir"
 
   rsync -a --delete \
     --exclude='.git/' \
+    --exclude='.git' \
     --exclude='node_modules/' \
     --exclude='www/' \
     --exclude='.DS_Store' \
     "$source_dir/" "$target_dir/"
 
-  bash "$SCaffold_HELPER" "$target_dir" "$nation_name" "$nation_name"
+  cleanup_copy_artifacts "$target_dir"
+
+  bash "$SCaffold_HELPER" "$target_dir" "$church_name" "$target_repo_name" "$source_dir"
 
   echo "  validating…"
   if validate_export "$target_dir"; then
