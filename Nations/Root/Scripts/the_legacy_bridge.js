@@ -20,17 +20,44 @@
 
 const _waiters = new Map(); // globalName -> Promise
 
+function _readLegacyGlobal(globalName) {
+  if (typeof window !== 'undefined' && window[globalName] != null) {
+    return window[globalName];
+  }
+
+  try {
+    // Resolve lexical globals from classic scripts without touching TDZ-prone
+    // bare identifiers in this bridge scope.
+    var getter = new Function(
+      'try { return typeof ' + globalName + " !== 'undefined' ? " + globalName + " : null; } catch (_) { return null; }"
+    );
+    return getter();
+  } catch (_) {
+    return null;
+  }
+}
+
+function _resolveLegacyGlobal(globalName, fallback) {
+  var value = _readLegacyGlobal(globalName);
+  if (value != null && typeof window !== 'undefined' && window[globalName] == null) {
+    window[globalName] = value;
+  }
+  return value != null ? value : fallback;
+}
+
 export function bridge(globalName, fallback = null) {
-  return globalThis[globalName] || fallback;
+  return _resolveLegacyGlobal(globalName, fallback);
 }
 
 export function when(globalName, { timeoutMs = 8000, intervalMs = 50 } = {}) {
-  if (globalThis[globalName]) return Promise.resolve(globalThis[globalName]);
+  var existing = bridge(globalName);
+  if (existing) return Promise.resolve(existing);
   if (_waiters.has(globalName)) return _waiters.get(globalName);
   const p = new Promise((resolve, reject) => {
     const t0 = Date.now();
     const tick = () => {
-      if (globalThis[globalName]) return resolve(globalThis[globalName]);
+      const value = bridge(globalName);
+      if (value) return resolve(value);
       if (Date.now() - t0 > timeoutMs) return reject(new Error(`legacy '${globalName}' never appeared`));
       setTimeout(tick, intervalMs);
     };
