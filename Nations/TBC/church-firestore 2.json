@@ -1,0 +1,6 @@
+{
+  "firestore": {
+    "rules": "Architechtural Docs/New Covenant/Deployment/Firestore/firestore.rules",
+    "indexes": "Architechtural Docs/New Covenant/Deployment/Firestore/firestore.indexes.json"
+  }
+}
